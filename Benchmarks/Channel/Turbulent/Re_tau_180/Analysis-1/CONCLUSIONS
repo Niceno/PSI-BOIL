@@ -1,0 +1,23 @@
+Judging from ... and ...,
+
+Averaging range must be from 30'000 - 40'000
+
+At least every 100th time step must be taken, meaning a 100 realizations
+
+These are stored in:
+
+u.dat, uu.dat, vv.dat, ww.dat
+
+------------------------------------------------------------------------
+Normalization for const dp:
+
+AGARD data is for Re_tau = 186
+
+KIM data is for Re_tau = 178
+
+I have used KIM data
+
+x-axis from 0-1. Later multiplied Kim's and mine data with 180 in x.
+
+(all .dat files in this directory are from const dp)
+------------------------------------------------------------------------

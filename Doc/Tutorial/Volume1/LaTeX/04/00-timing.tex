@@ -1,0 +1,16 @@
+\label{chap_timing}
+
+Numerical solution of three-dimensional unsteady flow phenomena is 
+very CPU-time demanding. Therefore, both developers and users of CFD 
+programs are constantly concerned about the efficiency of their programs. 
+From user's point of view, the total time needed to resolve a certain
+problem is most important, while the developer might be interested in
+more detailed information, on efficiency of certain parts of the code,
+comparison of different algorithms, suitability for different computer
+architectures and alike. 
+
+{\psiboil} provides means to measure both the overall execution time
+of the program, and to fine measure parts of the algorithms, whether it
+means whole subroutines, or certain programming constructs. These 
+time-measurements are performed using the {\psiboil}'s global object
+{\tt boil::timer}, briefly introduced in section~\ref{sec_compiling}.

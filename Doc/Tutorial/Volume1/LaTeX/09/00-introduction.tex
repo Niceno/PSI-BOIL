@@ -1,0 +1,101 @@
+\label{chap_single_phase}
+
+This chapter deals with the solution of transport equation for incompressible
+fluid flow. The equation which describes this phenomenon is momentum
+conservation equation, given by~\ref{eq_momentum}, repeated here for
+convenience:
+%
+\be
+         \int_V \frac{\p \rho \uvw}{\p t} dV
+       + \int_S \rho \uvw \uvw \, dS
+       = \int_S \mu \nabla \uvw \, dS
+       - \int_V \nabla p \, dV
+       + {\bf F}
+       \; \; \; \;
+       [N]
+  \label{eq_momentum_2}
+\ee
+%
+This form, however,
+poses a problem. We have one three equations (one for each velocity 
+component), but for unknowns: velocity components and pressure. 
+
+For incompressible flow problems, pressure has always been sought through
+additional constraint, mass conservation equation:
+%
+\be
+       \int_V \frac{\p \rho}{\p t} dV 
+       = 
+       - \int_S \rho \uvw d{\bf S}
+       \; \; \; \;
+       [\frac{kg}{s}]
+  \label{eq_mass}
+\ee
+% 
+Momentum and mass conservation have been linked in various ways, providing
+different algorithms for computation of incompressible flows. The most
+widely used in applied CFD are SIMPLE, SIMPLEC, SIMPLER and even PISO 
+({\bf references}). For highly unsteady flow, at simulation of which
+{\psiboil} aims, the most efficient is the {\em fractional step method},
+sometimes referred to as the {\em projection} method. It combines momentum
+conservation equation~(\ref{eq_momentum}) with mass conservation
+equation~(\ref{eq_mass}), at intermediate time between two simulated
+time steps, to give additional equation for pressure (already introduced
+as~\ref{eq_pressure}):
+%
+\be
+         \int_S \frac{\nabla p}{\rho} \, d{\bf S} 
+       = \frac{1}{\Delta t} \int_S \uvw^\s \, d{\bf S}
+       \; \; \; \; 
+       [ \frac{m^3}{s^2} ],
+  \label{eq_pressure_2}
+\ee
+%
+often referred to as pressure-Poisson equation.
+
+The fractional step method, which is used by {\psiboil}, is now outlined.
+The momentum conservation equation~(\ref{eq_momentum_2}) must first be discretized
+in time, part by part. The most usual approach is to use Crank-Nicolson
+scheme for diffusion (to avoid very low time steps needed by the forward
+Euler scheme) and to use Adams-Bashforth for convection, for the sake
+of simplicity. Inertial terms are discretized with backward Euler scheme.
+The time-discretized momentum equation then looks like:
+%
+\be
+        {\bf I}^\s - {\bf I}^{n-1} 
+       + \frac{3}{2} {\bf C}^{n-1} - \frac{1}{2} {\bf C}^{n-2}
+       = \frac{1}{2} {\bf D}^\s + \frac{1}{2} {\bf D}^{n-1}
+       + {\bf F}^{n-1}
+  \label{eq_semi}
+\ee
+%
+Here, $\s$ denotes the tentative (intermediate) time step, while 
+${\bf I}^\s = \frac{1}{\Delta t} \int_V  \rho \uvw^\s dV$ 
+and ${\bf D}^\s = \int_S \mu \nabla \uvw^\s \, d{\bf S}$ 
+denote inertial and diffusive term in the tentative time step. 
+Old (known) values of velocity (at time step $n-1$) define terms:
+${\bf I}^{n-1} = \frac{1}{\Delta t} \int_V  \rho \uvw^{n-1} dV$,
+and ${\bf D}^{n-1} = \int_S \mu \nabla \uvw^{n-1} \, d{\bf S}$, as well
+as convective term at old time step: 
+${\bf C}^{n-1} = \int_S \rho \uvw^{n-1}\uvw^{n-1} \, d{\bf S}$. Clearly,
+${\bf C}^{n-2} = \int_S \rho \uvw^{n-2}\uvw^{n-2} \, d{\bf S}$.
+
+Equation~\ref{eq_semi} is discretized in space giving a linear system
+of equations for intermediate velocity~($\uvw^\s$). Once this
+system is solved gives velocity field which does not, generally, 
+satisfies mass conservation equation. It is used to compute pressure 
+from~\ref{eq_pressure_2}. The computed pressure is used to {\em project}
+velocity into a divergence free velocity field:
+%
+\be
+  \uvw^{n} = \uvw^\s + \frac{1}{\rho} \nabla p \, \Delta t
+  \label{eq_projection}
+\ee
+%
+which represents velocity at new time step. 
+
+% wrong: {\psiboil} uses only fractional step method to link velocity and pressure.
+% wrong: This also means that {\psiboil} can be used to simulate only unsteady 
+% wrong: phenomena. If steady solution is sought, the governing equations should
+% wrong: be integrated long enough until steady state is reached.
+

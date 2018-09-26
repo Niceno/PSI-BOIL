@@ -1,0 +1,16 @@
+rm -f config.*
+rm -fR .deps */.deps */*/.deps */*/*/.deps */*/*/*/.deps
+rm -fR Makefile */Makefile */*/Makefile */*/*/Makefile */*/*/*/Makefile
+rm -fR Makefile.in */Makefile.in */*/Makefile.in */*/*/Makefile.in */*/*/*/Makefile.in
+rm -fR aclocal.m4
+rm -fR autom4te.cache
+rm -fR configure
+rm -fR stamp-h1
+rm -fR Run/*.gmv
+rm -fR Src/Parallel/mpi_macros.h
+cd Doc/Tutorial/Volume1/LaTeX
+./clean
+cd ../../../../
+cd Doc/Tutorial/Volume2/LaTeX
+./clean
+cd ../../../../

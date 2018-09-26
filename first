@@ -1,0 +1,115 @@
+#!/bin/bash
+
+if [ $# -lt 1 ]; then
+  echo "Wrong syntax!"
+  echo "Usage: " $0 "LAM         -> configure for LAM/MPI"
+  echo "       " $0 "OPEN        -> configure for OPEN MPI"
+  echo "       " $0 "OPEN-INTEL  -> configure for OPEN MPI with Intel"
+  echo "       " $0 "OPEN-INTEL-CHECK  -> configure for OPEN MPI with Intel with -check-pointers"
+  echo "       " $0 "CSCS        -> configure for CSCS machine"
+  echo "       " $0 "CSCS-INTEL  -> configure for INTEL in CSCS.CH machine"
+  echo "       " $0 "JULIER      -> configure for JULIER.CSCS.CH machine"
+  echo "       " $0 "MPICH       -> configure for MPICH"
+  echo "       " $0 "INTEL       -> configure for Intel-MPI with Intel compiler"
+  echo "       " $0 "INTEL-PHI   -> configure for INTEL-PHI"
+  echo "       " $0 "NOMPI       -> configure without MPI"
+  echo "       " $0 "NOMPI-INTEL -> configure without MPI, for Intel"
+else
+  if [ $1 = "LAM" ] || [ $1 = "OPEN" ]; then
+    aclocal
+    autoconf
+    autoheader
+    automake --add-missing
+    ./configure CC=mpicc CXX=mpiCC CXXFLAGS='-O3'
+    cd Src/Parallel; ln -f -s parallel.h mpi_macros.h; cd ../../
+  elif [ $1 = "OPEN-INTEL" ]; then
+    aclocal
+    autoconf
+    autoheader
+    automake --add-missing
+    ./configure CC=mpicc CXX=mpiCC CXXFLAGS='-O2 -w2'
+    cd Src/Parallel; ln -f -s parallel.h mpi_macros.h; cd ../../
+  elif [ $1 = "OPEN-INTEL-CHECK" ]; then
+    aclocal
+    autoconf
+    autoheader
+    automake --add-missing
+    ./configure CC=mpicc CXX=mpiCC CXXFLAGS='-w2 -check=uninit -traceback -fstack-protector-all -fp-trap=common -fp-stack-check -check-pointers=rw -check-pointers-undimensioned'
+    cd Src/Parallel; ln -f -s parallel.h mpi_macros.h; cd ../../
+  elif [ $1 = "MPICH" ]; then
+    aclocal
+    autoconf
+    autoheader
+    automake --add-missing
+    ./configure CC=mpicc CXX=mpicxx CXXFLAGS='-O3'
+    cd Src/Parallel; ln -f -s parallel.h mpi_macros.h; cd ../../
+  elif [ $1 = "CSCS" ]; then
+    aclocal
+    autoconf
+    autoheader
+    automake --add-missing
+    ./configure CC=cc CXX=CC CXXFLAGS='-O2'
+    cd Src/Parallel; ln -f -s parallel.h mpi_macros.h; cd ../../
+  elif [ $1 = "CSCS-INTEL" ]; then
+    aclocal
+    autoconf
+    autoheader
+    automake --add-missing
+    ./configure CC=cc CXX=CC CXXFLAGS='-O2 -w2'
+    cd Src/Parallel; ln -f -s parallel.h mpi_macros.h; cd ../../
+  elif [ $1 = "JULIER" ]; then
+    aclocal
+    autoconf
+    autoheader
+    automake --add-missing
+    ./configure CC=mpicc CXX=mpicxx CXXFLAGS='-O3'
+    cd Src/Parallel; ln -f -s parallel.h mpi_macros.h; cd ../../
+  elif [ $1 = "NOMPI" ]; then
+    aclocal
+    autoconf
+    autoheader
+    automake --add-missing
+    ./configure CC=gcc CXX=g++ CXXFLAGS='-O3'
+    cd Src/Parallel; ln -f -s sequential.h mpi_macros.h; cd ../../
+  elif [ $1 = "INTEL" ]; then
+    aclocal
+    autoconf
+    autoheader
+    automake --add-missing
+    #./configure CC=mpiicc CXX=mpiicpc CXXFLAGS='-O3 -opt-report=4'
+    ./configure CC=mpiicc CXX=mpiicpc CXXFLAGS='-O3'
+    cd Src/Parallel; ln -f -s parallel.h mpi_macros.h; cd ../../
+  elif [ $1 = "NOMPI-INTEL" ]; then
+    aclocal
+    autoconf
+    autoheader
+    automake --add-missing
+    ./configure CC=icpc CXX=icpc CXXFLAGS='-g -w2 -debug full -O0 -check=uninit -traceback -fstack-protector-all -fp-trap=common -fp-stack-check -check-pointers=rw'
+    cd Src/Parallel; ln -f -s sequential.h mpi_macros.h; cd ../../
+  elif [ $1 = "INTEL-PHI" ]; then
+    aclocal
+    autoconf
+    autoheader
+    automake --add-missing
+    ./configure CC=mpiicc CXX=mpiicpc CXXFLAGS='-O2 -mmic -no-offload -opt-threads-per-core=1'
+    cd Src/Parallel; ln -f -s parallel.h mpi_macros.h; cd ../../
+  else
+    echo "Wrong syntax!"
+    echo "Usage: " $0 "LAM         -> to configure for LAM/MPI"
+    echo "       " $0 "OPEN        -> configure for OPEN MPI"
+    echo "       " $0 "OPEN-INTEL  -> configure for OPEN MPI with Intel"
+    echo "       " $0 "OPEN-INTEL-CHECK  -> configure for OPEN MPI with Intel with -check-pointers"
+    echo "       " $0 "CSCS        -> configure for CSCS machine"
+    echo "       " $0 "CSCS-INTEL  -> configure for INTEL in CSCS.CH machine"
+    echo "       " $0 "JULIER      -> configure for JULIER.CSCS.CH machine"
+    echo "       " $0 "MPICH       -> configure for MPICH"
+    echo "       " $0 "INTEL       -> configure for Intel-MPI with Intel compiler"
+    echo "       " $0 "INTEL-PHI   -> configure for Intel-PHI"
+    echo "       " $0 "NOMPI       -> configure without MPI"
+    echo "       " $0 "NOMPI-INTEL -> configure without MPI, for Intel"
+  fi
+fi
+
+#------------------------------------------------------------------------------#
+# '$Id: first,v 1.34 2017/04/11 09:50:09 sato Exp $'/
+#------------------------------------------------------------------------------#

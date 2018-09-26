@@ -1,0 +1,2 @@
+mpicxx -O2 -o Connect connect.cpp libBoil.a
+mpicxx -O2 -o Boil    main.cpp libBoil.a

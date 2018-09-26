@@ -1,0 +1,24 @@
+I have tried sensitivity on the domain size. 
+
+I have tried the following:
+
+1 - small (default )  8 x 2 x 4 
+2 - wide              8 x 2 x 6 
+3 - long             12 x 2 x 4 
+4 - big              12 x 2 x 6 
+
+40 k time steps were performed, statistics was gathered from 20-40 k.
+Time step was 0.015. 
+
+Each had the same cell size in non-dimensional coordinates, meaning that:
+
+1 - small was: 64 x 64 x 64
+2 - wide  was: 64 x 64 x 96
+3 - long  was: 96 x 64 x 64
+4 - big   was: 96 x 64 x 96
+
+The results are virtually the same, as seen in this graphs.    
+
+And they all compare well with Kim's data :-)
+
+Statistics was taken from 20 - 40 k.

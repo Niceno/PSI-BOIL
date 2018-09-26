@@ -1,0 +1,34 @@
+#!/bin/bash
+
+dir_src=$PWD/Src
+dir_test=$PWD/Tests
+
+#------------------------------#
+# browse through all the tests #
+#------------------------------#
+for i in $( ls $dir_test ); do
+
+  if [ $i != "CVS" ]; then
+
+    # go to source directory
+    echo "=================="
+    echo $i
+    echo "=================="
+    cd $dir_src
+
+    # compile in source directory
+    rm -f main.o
+    rm -f Boil
+    ln -s -f $dir_test/$i/main-$i.cpp main.cpp
+    make
+
+    # go to test directory and run
+    cd $dir_test/$i
+    cp -f $dir_src/Boil .
+
+  fi
+
+done
+
+echo 'done !'
+

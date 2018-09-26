@@ -1,0 +1,40 @@
+#!/bin/sh
+
+make &
+cd Equation/Centered/CIPCSL2
+make &
+cd ../../../Equation/Centered/Pressure
+make &
+cd ../../../Equation/Centered/PhaseChange
+make &
+cd ../../../Equation/Centered/ColorCIP
+make &
+cd ../../../Equation/Centered/LevelSet
+make &
+cd ../../../Equation/Centered
+make &
+cd ../../Equation/Dispersed
+make &
+cd ../../Model
+make &
+cd ../Body
+make &
+cd ../Global
+make &
+cd ../Domain
+make &
+cd ../Grid
+make &
+cd ../Matter
+make &
+cd ../Field/Scalar
+make &
+cd ../Vector
+make &
+cd ../ScalarBool
+make &
+cd ../VectorBool
+make &
+cd ../ScalarInt
+make &
+

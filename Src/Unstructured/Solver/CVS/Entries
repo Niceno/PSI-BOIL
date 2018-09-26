@@ -1,0 +1,17 @@
+/Makefile.am/1.1/Tue Sep  1 09:41:25 2015//
+/calc_con.cpp/1.1/Tue Sep  1 09:41:25 2015//
+/calc_geo.cpp/1.2/Tue Sep  1 09:51:02 2015//
+/definitions.h/1.2/Tue Sep  1 09:51:02 2015//
+/form_aphi.cpp/1.1/Tue Sep  1 09:41:25 2015//
+/form_auvw.cpp/1.1/Tue Sep  1 09:41:25 2015//
+/form_bphi.cpp/1.1/Tue Sep  1 09:41:25 2015//
+/form_buvw.cpp/1.1/Tue Sep  1 09:41:25 2015//
+/io_load.cpp/1.1/Tue Sep  1 09:41:25 2015//
+/io_save.cpp/1.1/Tue Sep  1 09:41:25 2015//
+/main.cpp/1.2/Tue Sep  1 09:51:02 2015//
+/project_uvw.cpp/1.1/Tue Sep  1 09:41:25 2015//
+/solve_bicg.cpp/1.1/Tue Sep  1 09:41:25 2015//
+/solve_cg.cpp/1.1/Tue Sep  1 09:41:25 2015//
+/structures.h/1.2/Tue Sep  1 09:51:02 2015//
+/variables.h/1.2/Tue Sep  1 09:51:02 2015//
+D

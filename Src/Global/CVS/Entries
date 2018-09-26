@@ -1,0 +1,26 @@
+/Makefile.am/1.12/Thu Apr  7 08:46:51 2011//
+/global_approx.cpp/1.4/Mon Feb  3 11:09:19 2014//
+/global_approx.h/1.4/Thu Apr  7 08:47:58 2011//
+/global_checking.h/1.3/Mon Nov 17 19:23:23 2008//
+/global_constants.cpp/1.4/Wed Apr  6 07:26:16 2016//
+/global_constants.h/1.5/Wed Apr  6 07:26:16 2016//
+/global_endl.cpp/1.3/Thu Apr  7 08:11:04 2011//
+/global_endl.h/1.4/Mon Nov 17 19:23:23 2008//
+/global_factor.cpp/1.3/Mon Nov 17 19:23:23 2008//
+/global_factor.h/1.4/Mon Nov 17 19:23:23 2008//
+/global_limiter.cpp/1.12/Wed May 25 12:36:04 2011//
+/global_limiter.h/1.7/Wed Aug  6 08:04:57 2014//
+/global_malloc.cpp/1.6/Mon Feb  3 11:14:07 2014//
+/global_malloc.h/1.4/Mon Feb  3 11:14:07 2014//
+/global_minmax.cpp/1.4/Fri Mar 27 15:11:26 2009//
+/global_minmax.h/1.4/Fri Mar 27 15:11:26 2009//
+/global_name_file.cpp/1.10/Thu Apr  7 08:11:43 2011//
+/global_name_file.h/1.4/Mon Nov 17 19:23:23 2008//
+/global_precision.h/1.10/Tue May  5 14:32:14 2015//
+/global_random.cpp/1.3/Thu Nov 12 07:47:16 2015//
+/global_random.h/1.4/Thu Nov 12 07:47:16 2015//
+/global_split_string.cpp/1.1/Thu May  7 17:56:44 2009//
+/global_split_string.h/1.1/Thu May  7 17:56:44 2009//
+/global_swap.cpp/1.4/Thu Apr  7 08:12:45 2011//
+/global_swap.h/1.3/Mon Nov 17 19:23:23 2008//
+D

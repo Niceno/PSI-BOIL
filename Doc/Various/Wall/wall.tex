@@ -1,0 +1,201 @@
+\documentclass{report} 
+
+\input{../commands.tex}
+
+\begin{document}  
+
+%%%%%%%%%%%%%%%%%%%%
+%                  %
+%  Wall treatment  %
+%                  %
+%%%%%%%%%%%%%%%%%%%%
+\section{Wall treatment}
+
+This document describes details of implementation of the power-law wall function.
+In viscous sub-layer ($\delta^+ < \delta_C^+$):
+%
+\be
+  u^+ = \delta^+
+  \label{eq:u_plus_viscous}
+\ee
+%
+In fully developed region ($\delta^+ >= \delta_C^+$):
+% 
+\be
+  u^+ = A(\delta^+)^B
+  \label{eq:u_plus_turbulent}
+\ee
+%
+with $A=8.3$ and $B=1/7$. Here, $u^+$ and $\delta^+$ are non-dimensional velocity 
+and non-dimensional wall distance respectivelly, defined as:
+%
+\be
+  u^+ = \frac{u}{u_{\tau}}
+  \label{eq:u_plus}
+\ee
+%
+\be
+  \delta^+ = \frac{ u_{\tau} \delta }{\nu}
+  \label{eq:delta_plus}
+\ee
+%
+where $\delta$ is the wall-distance and $u_{\tau}$ friction velocity defined as:
+%
+\be
+  u_{\tau} = \sqrt{ \frac{\tau_w}{\rho} }
+  \label{eq:u_tau}
+\ee
+%
+where $\tau_w$ is friction at the wall, which is usually cumbersome to evaluate 
+in a numerical simulation, but is needed for the wall function. Therefore, we 
+try to express law of the wall in terms of know (computed) quantities.
+
+%%%%%%%%%%%%%%%%%%%%%%%
+%  Viscous sub-layer  %
+%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Viscous sub-layer}
+
+In viscous sub-layer, inserting equations~(\ref{eq:u_plus}) and~(\ref{eq:delta_plus})
+into~(\ref{eq:u_plus_viscous}):
+%
+\be
+  \frac{u}{u_\tau} = \frac{ u_{\tau} \delta }{\nu}
+\ee
+%
+leading to:
+%
+\be
+  u_\tau = \sqrt{ \frac{u \nu}{\delta} }
+  \label{eq:u_tau_viscous}
+\ee
+%
+and from equation~(\ref{eq:delta_plus}):
+%
+\be
+  \fbox {$
+  \delta^+ = \sqrt{ \frac{u \delta}{\nu} }
+  $ }
+  \label{eq:delta_plus_viscous}
+\ee
+%
+Friction at the wall can be estimated from equations~(\ref{eq:u_tau}) 
+and~(\ref{eq:u_tau_viscous}) as:
+%
+\be
+  \fbox {$
+  \tau_w = \rho \frac{u \nu}{\delta}
+  $ }
+  \label{eq:tau_w_viscous}
+\ee
+
+\subsection{Turbulent layer}
+
+In fully developed region, inserting equations~(\ref{eq:u_plus}) and~(\ref{eq:delta_plus}) into
+the equation for power-law~(\ref{eq:u_plus_turbulent}), we have:
+%
+\be
+  \frac{u}{u_\tau} = A \left( \frac{ u_{\tau} \delta }{\nu} \right)^B
+\ee
+%
+leading to:
+%
+\be
+  \frac{u}{A} \left( \frac{\nu}{\delta} \right) ^ B = u_\tau^{(1+B)}
+\ee
+%
+so $u_\tau$ can be evaluated from:
+%
+\be
+  u_\tau = \left[ 
+              \frac{u}{A} \left( \frac{\nu}{\delta} \right) ^ B 
+           \right] ^ \frac{1}{1+B}
+  \label{eq:u_tau_turbulent}
+\ee
+%
+From equation~(\ref{eq:delta_plus}), we get:
+%
+\bea
+  \delta^+ & = & \frac{\delta}{\nu} 
+            \left[ 
+                   \frac{u}{A} \left( \frac{\nu}{\delta} \right) ^ B 
+            \right] ^ \frac{1}{1+B}                     \nonumber \\
+      & = & \left[ 
+                   \frac{u}{A} 
+                   \left( \frac{\nu}{\delta} \right) ^ B 
+                   \left( \frac{\delta}{\nu} \right) ^ {1+B} 
+            \right] ^ \frac{1}{1+B}                     \nonumber \\
+      & = & \left[ 
+                   \frac{u}{A} 
+                   \left( \frac{\delta}{\nu} \right) ^ {-B} 
+                   \left( \frac{\delta}{\nu} \right) ^ {1+B} 
+            \right] ^ \frac{1}{1+B}                     \nonumber \\
+      & = & \left[ 
+                   \frac{u}{A} 
+                   \left( \frac{\delta}{\nu} \right) ^ {-B} 
+                   \left( \frac{\delta}{\nu} \right) ^ {1+B} 
+            \right] ^ \frac{1}{1+B}                     
+\eea
+\be
+  \fbox
+  { $
+  \delta^+ = \left( 
+                   \frac{u}{A} \frac{\delta}{\nu} 
+            \right) ^ \frac{1}{1+B}                               
+  $ }
+  \label{eq:delta_plus_turbulent}
+\ee
+%
+Friction at the wall can be estimated from equations~(\ref{eq:u_tau}) 
+and~(\ref{eq:u_tau_turbulent}) as:
+%
+\be
+  \fbox
+  { $
+  \tau_w = \rho \left[ 
+                   \frac{u}{A} \left( \frac{\nu}{\delta} \right) ^ B 
+                \right] ^ \frac{2}{1+B}
+  $ }
+  \label{eq:tau_w_turbulent}
+\ee
+%
+
+%%%%%%%%%%%%%%%%%%
+%  An algorithm  %
+%%%%%%%%%%%%%%%%%%
+\subsection{An algorithm}
+
+A sample algorithm for estimation of the wall friction, might be assembled
+as follows:
+
+\begin{itemize}
+
+   \item Estimate $\delta^+$ from linear law (assume you are in viscous sub-layer)
+
+   \item if $\delta^+ < \delta_C^+$, evaluate $tau_w$ from equation~(\ref{eq:tau_w_viscous}).
+
+   \item otherwise, evaluate $tau_w$ from equation~(\ref{eq:tau_w_turbulent}) and 
+         recompute $\delta^+$ from~(\ref{eq:delta_plus_turbulent}).
+
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%
+%  Critical distance  %
+%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Critical distance}
+
+We refer to a boundary between viscous and turbulent region as critical 
+distance and denote it with~$\delta_C^+$. We can get it's value, if we
+equate linear (\ref{eq:u_plus_viscous}) and power (\ref{eq:u_plus_turbulent})
+laws of the wall, namely:
+%
+\be
+  \delta_C^+ = A (\delta_C^+) ^ B
+\ee
+%
+\be
+  \delta_C^+ = A ^ {\frac{1}{1-B}}
+\ee
+%
+if $A=8.3$ and $B=1/7$, $\delta_C^+ = 11.81021420062548881$.
+
+\end{document}

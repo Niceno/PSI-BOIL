@@ -1,0 +1,31 @@
+#!/bin/bash
+
+#---------------------------------
+# arguments:
+#
+# $0 script name
+# $1 base name  
+# $2 number of processors
+# $3 first step 
+# $4 last step
+# $5 stride
+#---------------------------------
+
+#---------------------------------
+# check number of arguments
+#---------------------------------
+if [ "$#" -ne "5" ]; then
+  echo "Right sintax is: "
+  echo "$0 <base_name> <number_of_processors> <first> <last> <stride>"
+  exit
+fi
+
+#---------------------------------
+# loop through all results 
+#---------------------------------
+cnt=$3
+while [  $cnt -le $4 ]; do
+    ./Connect $1 $2 $cnt
+    let cnt=cnt+$5
+done
+

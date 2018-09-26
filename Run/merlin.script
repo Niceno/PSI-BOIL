@@ -1,0 +1,28 @@
+#!/bin/bash
+#$ -cwd
+#$ -N Column64
+#$ -pe openmpi 64
+#$ -l s_rt=23:59:30,h_rt=23:59:40
+#$ -o out-cfl-control-006.3
+
+ARGS=''
+
+###################################################
+# Fix the SGE environment-handling bug (bash):
+source /usr/share/Modules/init/sh
+export -n -f module
+# set path to mpirun
+module add mpi/openmpi-1.5.4-gcc-4.6.1
+###################################################
+ 
+# The command to run with mpiexec: 
+CMD=Boil
+ 
+# The MPI command to run:
+MPICMD="mpirun -np $NSLOTS $CMD $ARGS"
+echo "Command to run:"
+echo "$MPICMD"
+echo
+cd $SGE_O_WORKDIR
+$MPICMD
+exit

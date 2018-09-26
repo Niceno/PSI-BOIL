@@ -1,0 +1,40 @@
+#ifndef CONSTANTS_H
+#define CONSTANTS_H
+
+#include <cmath>
+#include "global_precision.h"
+
+#define DIM 3
+ 
+namespace boil {
+  /* big */
+  extern real yotta;
+  extern real zetta;
+  extern real exa;
+  extern real peta;
+  extern real tera; 
+  extern real giga; 
+  extern real mega;
+  extern real kilo;
+  /* small */
+  extern real milli;
+  extern real micro;
+  extern real nano; 
+  extern real pico; 
+  extern real femto;
+  extern real atto;
+  extern real zepto;
+  extern real yocto;
+
+  /* pi */
+  extern real pi;
+
+  /* gravitational constant  */
+  extern real g; 
+}
+
+#endif
+
+/*-----------------------------------------------------------------------------+
+ '$Id: global_constants.h,v 1.5 2016/04/06 07:26:16 sato Exp $'/
++-----------------------------------------------------------------------------*/

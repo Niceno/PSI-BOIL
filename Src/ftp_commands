@@ -1,0 +1,6 @@
+open ftp.psi.ch
+user ftp bojan.niceno@psi.ch
+cd PSI_intranet/Bestiarium/Drop
+mput uvw*
+dir
+bye

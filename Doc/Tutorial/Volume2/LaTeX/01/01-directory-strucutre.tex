@@ -1,0 +1,132 @@
+\section{Directory structure}
+\label{sec:directory_structure}
+
+{\psiboil} has an established directory structure which should be obeyed when
+new files are added to the package. 
+Once retrieved from the {\tt CVS} database, the {\psiboil}'s directory 
+structure (not fully expanded for the sake of clarity), looks like:
+%
+{\small \begin{verbatim}
+PSI-Boil
+|-- Benchmarks
+|-- Doc
+|   |-- Dox
+|   |-- Tutorial
+|   `-- Various
+|-- Jobs
+|-- Run
+|-- Src
+`-- Tests
+\end{verbatim}}
+%
+The content of each sub-directory is as follows:
+%
+\begin{itemize}
+  \item {\tt Benchmarks} -- contains sub-directories with cases to benchmark the 
+        code. 
+  \item {\tt Doc} -- contains documentation for the code and has tree sub-directories:
+  \begin{itemize}
+    \item {\tt Dox} -- directory for creating Doxygen\footnote{{\tt www.doxygen.org}} 
+          documentation.
+    \item {\tt Tutorial} -- \LaTeX sources for this document.
+    \item {\tt Various} -- various figures and \LaTeX sources to elucidate certain
+          aspects of numerical algorithms used in {\psiboil}. These files are 
+          destined to become part of this tutorial or Doxygen documentation. 
+  \end{itemize}
+  \item {\tt Jobs} -- holds scripts to launch {\psiboil} simulations on various
+        computational platforms. 
+  \item {\tt Run} -- directory where simulations should be launched.
+  \item {\tt Src} -- contains source files. It is elaborated in more detail below.
+  \item {\tt Tests} -- similar to {\tt Benchmarks}, but contains cases to check the
+        most essential functionality of the code. 
+\end{itemize}
+
+The most interesting of these sub-directories, for the present document at least,
+is the {\tt Src} which contains the source code for {\psiboil}. When expanded, 
+it looks like:
+%
+{\small \begin{verbatim}
+Src
+|-- Board
+|-- Body
+|   `-- Empty
+|-- Boundary
+|-- Connect
+|-- Domain
+|-- Equation
+|   |-- Centered
+|   |   |-- ColorCIP
+|   |   |-- Concentration
+|   |   |-- Distance
+|   |   |-- Enthalpy
+|   |   |-- LevelSet
+|   |   `-- Pressure
+|   `-- Staggered
+|       `-- Momentum
+|-- Field
+|   |-- Scalar
+|   `-- Vector
+|-- Formula
+|-- Global
+|-- Grid
+|-- Include
+|-- Matrix
+|-- Matter
+|-- Model
+|-- Monitor
+|   |-- Location
+|   `-- Rack
+|-- Parallel
+|   `-- Out
+|-- Plot
+|   |-- GMV
+|   |-- TEC
+|   `-- VTK
+|-- Profile
+|-- RandomFlow
+|-- Ravioli
+|-- Solver
+|   |-- Additive
+|   |-- Gauss
+|   |-- Krylov
+|   `-- Preconditioner
+`-- Timer
+\end{verbatim}}
+%
+Each of these directories contains header (extension {\tt .h}) and source files 
+(extension {\tt .cpp}) which define a class with the same name as the directory 
+itself, except:
+%
+\begin{itemize}
+  \item {\tt Connect} -- contains a separate program which connects result files 
+        after a parallel run.
+  \item {\tt Global} and {\tt Ravioli} -- contain definitions of classes which 
+        are to small to have a directory of their own. 
+\end{itemize}
+%
+In addition to directories having the same names as the classes they define,
+the directory hierarchy itself follows the class hierarchy. For example, class
+{\tt Field} has two {\em children}, called {\tt Scalar} and {\tt Vector}. 
+Class {\tt Equation} features even more complex structure, having {\tt Centered}
+and {\tt Staggered} as it's first ancestors and classes such as {\tt Distance},
+{\tt LevelSet}, {\tt Pressure} and {\tt Momentum} as second. 
+
+%---------------------------------------------------------------------nutshell-%
+\vspace*{5mm} \fbox{ \begin{minipage}[c] {0.97\textwidth} %-----------nutshell-%
+    {\sf Section \ref{sec:directory_structure} in a nutshell} \\ %----nutshell-%
+
+      - {\psiboil} has a clearly defined directory structure:
+      \begin{itemize}
+        \item There are separate directories for documentation, benchmarks,
+              test, runs, batch scripts to run the code and, most important
+              of all, with sources to compile the package. 
+        \item Directory with sources is divided in separate sub-directories,
+              each holding a separate class.
+        \item Directory names correspond to class names they hold, with the
+              exception of {\tt Connect} (which is a separate program) and
+              {\tt Global} and {\tt Ravioli} which contain many small classes.
+        \item Hierarchical directory structure closely follows the hierarchy
+              of the class inheritance. 
+      \end{itemize}
+  \end{minipage} } %--------------------------------------------------nutshell-%
+%---------------------------------------------------------------------nutshell-%

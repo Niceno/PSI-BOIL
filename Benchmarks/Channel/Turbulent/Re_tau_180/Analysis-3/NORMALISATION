@@ -1,0 +1,41 @@
+How to perform normalisation?
+
+I take the file: domains-U.agr and find the velocity in the first cell.
+
+It is:
+
+u_1 = 
+
+S0) 0.0423661
+S1) 0.04260105
+S2) 0.04240595
+S3) 0.04264425
+
+Then I compute the derivative:
+
+S0) (du/dy)_1 = 10.84641577
+S1) (du/dy)_1 = 10.90656682
+S2) (du/dy)_1 = 10.85661802
+S3) (du/dy)_1 = 10.91762673
+
+find the tau_w = 
+
+S0) 3.2539 e-3
+S1) 3.2720 e-3
+S2) 3.2570 e-3
+S3) 3.2753 e-3
+
+and u_tau = 
+
+S0) 0.0570
+S1) 0.0572
+S2) 0.0571
+S3) 0.0572
+
+Finally I get the scaling factor for each set:
+
+S0) 307.321
+S1) 305.626
+S2) 307.032
+S3) 305.317
+

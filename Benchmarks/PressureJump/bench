@@ -1,0 +1,45 @@
+#!/bin/bash
+
+dir_ini=$PWD
+dir_src=$PWD/../../Src
+
+#---------------------------------------------#
+#                                             #
+#  browse through all tests and execute them  #  
+#                                             # 
+#---------------------------------------------#
+for jres in '032' '064' '128'; do
+
+  echo '====================='
+  echo 'Ra_10^'$iray'/'$jres
+  echo '====================='
+
+  dir_test=$dir_ini'/'$jres
+
+  #------------------------------------#
+  # go to source directory and compile #
+  #------------------------------------#
+  cd $dir_src
+  rm -f main.o
+  ln -f -s $dir_test/main.cpp main.cpp
+  make
+
+  #------------------------------#
+  # go to test directory and run #
+  #------------------------------#
+  cp Boil $dir_test
+  cd $dir_test
+
+##  if [ "$iray" -lt "6" ]; then
+##    nohup ./Boil > out &
+##  else
+##    nohup ./Boil > out
+##  fi
+
+done
+
+cd $dir_ini
+
+# echo $dir_test
+# ls $dir_test
+

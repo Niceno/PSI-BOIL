@@ -1,0 +1,11 @@
+#PBS -N boil
+#PBS -l size=1
+#PBS -l walltime=01:00:00
+#PBS -M bojan.niceno@psi.ch
+#PBS -m abe
+
+cd /users/bniceno/Development/PSI-Boil/Run
+
+export IOBUF_PARAMS='*:verbose'
+
+yod -np all ../Src/Boil

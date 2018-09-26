@@ -1,0 +1,16 @@
+/Makefile.am/1.23/Fri May 27 21:41:05 2011//
+/centered.cpp/1.17/Wed Jul  1 09:20:27 2009//
+/centered.h/1.66/Fri Feb 26 11:07:40 2016//
+/centered_advance.cpp/1.13/Fri Jul 24 11:21:31 2009//
+/centered_coarsen.cpp/1.7/Wed Jul  1 09:20:27 2009//
+/centered_convection.cpp/1.27/Mon Jan  5 17:00:27 2015//
+/centered_diffusion.cpp/1.7/Mon Nov 17 19:23:22 2008//
+/centered_load.cpp/1.4/Mon Nov 17 19:23:22 2008//
+/centered_new_time_step.cpp/1.20/Wed Aug  6 08:27:53 2014//
+/centered_save.cpp/1.4/Mon Nov 17 19:23:22 2008//
+/centered_solve.cpp/1.2/Wed May 25 12:29:01 2011//
+/centered_system_bnd.cpp/1.25/Fri Oct 20 08:48:21 2017//
+/centered_system_diffusive.cpp/1.24/Wed Aug  6 08:28:36 2014//
+/centered_system_innertial.cpp/1.13/Wed Aug  6 08:28:36 2014//
+/centered_update_rhs.cpp/1.13/Wed Oct 15 13:37:08 2014//
+D

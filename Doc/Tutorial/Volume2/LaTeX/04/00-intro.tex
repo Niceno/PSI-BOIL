@@ -1,0 +1,32 @@
+This section explains the implementation of time-stepping 
+(time-integration) algorithms in {\psiboil}. Since {\psiboil} supports variety
+of time-stepping schemes, this is far from an easy task. To make matters 
+even more complex, the implementation spans over several objects and member 
+functions. 
+
+Therefore, it is strongly recommended that the reader prints the following 
+functions:
+%
+\begin{itemize}
+  \item {\tt Src/Ravioli/timescheme.h}
+  \item {\tt Src/Equation/equation.h}
+  \item {\tt Src/Equation/Centered/centered.h}
+  \item {\tt Src/Equation/Centered/centered\_new\_time\_step.cpp}
+  \item {\tt Src/Equation/Centered/centered\_update\_rhs.cpp}
+  \item {\tt Src/Equation/Centered/centered\_solve.cpp}
+\end{itemize}
+%
+and keeps the printouts at hand while reading this chapter.
+
+This chapter begins with a recollection of the conservation equation for 
+general variable. This is done in order to identify different terms in the
+governing equations, their possible time time-discretization schemes and 
+relation to the final form of the discretized system of equations.
+
+The section which follows focuses on implementation of these concepts into
+{\psiboil}. In order to do that, two objects had to be explained in more
+details {\tt TimeScheme} which is a ravioli object holding basic information
+on time-stepping schemes and {\tt Centered} which embodies the implementation
+of time-stepping schemes. Everything what is explained about the {\tt Centered}
+class is also valid for its children, as well as for its sister 
+class~{\tt Staggered}. 

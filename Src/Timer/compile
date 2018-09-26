@@ -1,0 +1,1 @@
+mpiCC main.cpp  timer.cpp ../Parallel/Out/libOut.a ../Parallel/libParallel.a
