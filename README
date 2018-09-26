@@ -1,0 +1,186 @@
+THE BIGGEST PROBLEM OF ALL: SWITCHING TO FINITE VOLUME DISCRETIZATION
+SLOWES THE CONVERGENCE CONSIDERABLY.
+
+I DISCOVERED WHY IS THAT PROBLEM. FOR FINITE VOLUME DISCRETZATON,
+RESTRICTION SHOULD BE JUST ADDING THE FINE CELL VALUES. THESE ARE
+INTEGRATED RESIDUALS!
+
+I completely forgot to create/check copy constructors :-(
+
+
+@ Grid1D
+%%%%%%%%
+
+Information on periodicity might get lost when dividing the grid :-(
+Not any longer, I have introduced periodic1 and periodicN :-)
+
+
+Strategical question about domain decomposition
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+I have to perform two things: grid coarsening and grid decomposition
+for parallel processing. The question is: which one to make first.
+If I first make coarsening, my algorithm for decomposition would not
+be so flexible any longer.
+
+So I have decided to make decomposition first (still automatic), and
+then coarsen in each sub-grid (sub-domain). To achieve this, I need
+to coarsen the grid to a certain extent and then take part of it.
+
+For example, if I had this grid:
+
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 0 1 2         7              15
+
+I know from the domain decomposition algorithm that proc 1 gets cells
+0 - 7. So, for the level 1, I coarsen the grid by 2:
+
++---+---+---+---+---+---+---+---+
+  0   1   2   3               7 
+
+and take the sub-grid 0 - 3 from it. For the next level, I coarsen 
+again the original grid by 4:
+
++-------+-------+-------+-------+
+    0       1       2        3    
+
+and take cells 0 and 1. I achieve that by writing specialized constructor
+in Grid1D.
+
+However, all of this is still a bit questionable, since I am not sure 
+yet what will partitioning requirements result from parallel multigrid 
+strategies.
+
+
+Ravioli
+%%%%%%%
+
+Maybe they should be defined in the include file for the class they are
+used for, rather than in separate directory. 
+
+-> Maybe not. Some of them might be used in several classes.
+
+-> Maybe those which are used inside one class only, could be defined
+   (declared) in the header of that functions. Others, which are used
+   in different places, could be in the separate directory.
+
+
+Restriction & Interpolation
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Is it parallelized? Does it take any care about periodicity?
+
+
+@ Discretization
+%%%%%%%%%%%%%%%%
+
+Huge problem: when switching from FD to FV discretization in 2D, it
+converges very poorly. Why?
+
+I DISCOVERED WHY IS THAT PROBLEM. FOR FINITE VOLUME DISCRETZATON,
+RESTRICTION SHOULD BE JUST ADDING THE FINE CELL VALUES. THESE ARE
+INTEGRATED RESIDUALS!
+
+Implementation of Aditive correction AC method:
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Step 1: Make AC from MG
+        -  1D -> OK
+        -  2D -> OK
+        -  3D -> OK
+
+Step 2: Embed AC algorithms into loops! -> OK
+
+Step 3: Encapsulate AC and MG into one class.
+        (I am not quite sure about this. Transport is quite cumbersome).
+        (Maybe to separate Scalar from the Pressure)
+
+Code duplication
+%%%%%%%%%%%%%%%%
+
+I have it a lot :-( For example, Level in MG and AC are almost identical,
+I have gmv plotting of problem domains from Scalar3D and Domain3D. 
+
+A cure to resolve this issue could be in abandoning 1D and 2D versions.
+I do not think it has a lot of sense to contine the development of these
+parts of the code.
+
+OK, I DID IT. ABANDONED 1D AND 2D VERSIONS AND ALSO CREATED A SPECIALIZED
+CLASS ONLY FOR PLOTTING!
+
+How to make just one instance of the solver?
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+OK, I DID THAT AS WELL. NOT WITH STATIC METHOD, BUT BY PASSING IT AS
+AN ARGUMENT.
+
+I have to decide how to treat sources for variables. There is external
+source, the one from boundary conditions, and internal (from time stepping
+algorithm). So how to deal with all of this?
+
+@ Discretization (04.11.2008)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Should I switch back to finite difference discretization? 
+It is easier to define projection algorithm and immersed boundary methods.
+Or should I keep both?
+
+The discretization is performed in following 18 functions:
+
+Centered/centered_advance.cpp                 - (A)
+Centered/centered_convection.cpp              - (B)
+Centered/centered_insert_bc.cpp               - (B)
+Centered/centered_new_time_step.cpp           - (A)
+Centered/centered_system_bnd.cpp              - (B)
+Centered/centered_system_diffusive.cpp        - (A)
+Centered/centered_system_innertial.cpp        - (A)
+Centered/centered_system_obst.cpp             - (E)
+
+Centered/LevelSet/levelset_sharpen.cpp        - (D)
+Centered/LevelSet/levelset_tension.cpp        - (A)
+
+Centered/Pressure/pressure_discretize.cpp     - (A)
+Centered/Pressure/pressure_update_rhs.cpp     - (A)
+
+Staggered/Momentum/momentum_bulk_ijk.cpp      - (C)
+Staggered/Momentum/momentum_convection.cpp    - (B)
+Staggered/Momentum/momentum_create_system.cpp - (A)
+Staggered/Momentum/momentum_grad.cpp          - (A)
+Staggered/Momentum/momentum_new_time_step.cpp - (A)
+Staggered/Momentum/momentum_volf_bct.cpp      - (C)
+
+(A) - could be done with: dV(i,j,k), dSi(i,j,k), dSj(i,j,k) dSk(i,j,k)
+
+(B) - uses dV(i,j,k), dSi(i,j,k), dSj(i,j,k) dSk(i,j,k), 
+      but it would require big modifications too.
+
+(C) - has dV(i,j,k), dSi(i,j,k), dSj(i,j,k) dSk(i,j,k), 
+      but they are just a hinderance.
+
+(D) - big modifications are needed
+
+(E) - it is not finished, anyway.
+
+Total: 10 A  +  4 B  +  2 C  +  1 D  +  1 E
+
+List them all:
+
+Centered/centered_advance.cpp
+Centered/centered_convection.cpp
+Centered/centered_insert_bc.cpp
+Centered/centered_new_time_step.cpp
+Centered/centered_system_bnd.cpp
+Centered/centered_system_diffusive.cpp
+Centered/centered_system_innertial.cpp
+Centered/centered_system_obst.cpp
+Centered/LevelSet/levelset_sharpen.cpp
+Centered/LevelSet/levelset_tension.cpp
+Centered/Pressure/pressure_discretize.cpp
+Centered/Pressure/pressure_update_rhs.cpp
+Staggered/Momentum/momentum_bulk_ijk.cpp
+Staggered/Momentum/momentum_convection.cpp
+Staggered/Momentum/momentum_create_system.cpp
+Staggered/Momentum/momentum_grad.cpp
+Staggered/Momentum/momentum_new_time_step.cpp
+Staggered/Momentum/momentum_volf_bct.cpp
+
+
