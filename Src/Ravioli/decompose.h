@@ -31,10 +31,6 @@ class Decompose {
     /* prevent creation of new decompose conditions */
     explicit Decompose(const int i) {val = i;}
     int val;
-};	
+};
 
 #endif
-
-/*-----------------------------------------------------------------------------+
- '$Id: decompose.h,v 1.4 2009/10/27 09:09:47 niceno Exp $'/
-+-----------------------------------------------------------------------------*/

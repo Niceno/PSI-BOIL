@@ -17,7 +17,3 @@ real Momentum::vol_phase_change(Scalar * psrc_old) {
   std::cout.unsetf(std::ios_base::floatfield);
   return(v_phase_change);
 }
-
-/*-----------------------------------------------------------------------------+
- '$Id: momentum_vol_phase_change.cpp,v 1.3 2014/02/03 14:37:21 sato Exp $'/
-+-----------------------------------------------------------------------------*/

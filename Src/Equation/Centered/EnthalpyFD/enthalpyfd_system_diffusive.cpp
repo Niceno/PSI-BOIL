@@ -377,6 +377,3 @@ void EnthalpyFD::create_system_diffusive(const Scalar * diff_eddy) {
 #endif
 
 }
-/*-----------------------------------------------------------------------------+
- '$Id: enthalpyfd_system_diffusive.cpp,v 1.7 2015/06/29 18:21:50 sato Exp $'/
-+-----------------------------------------------------------------------------*/

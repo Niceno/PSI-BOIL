@@ -33,7 +33,3 @@ Krylov::Krylov(const Domain & d, const Prec & pc)
   if(pc == Prec::ic2()) prec = new IncompleteCholesky2(d);
   if(pc == Prec::ic3()) prec = new IncompleteCholesky3(d);
 }
-
-/*-----------------------------------------------------------------------------+
- '$Id: krylov.cpp,v 1.7 2011/09/29 03:12:56 niceno Exp $'/
-+-----------------------------------------------------------------------------*/

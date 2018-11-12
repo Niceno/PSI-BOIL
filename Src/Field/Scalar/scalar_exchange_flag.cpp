@@ -319,7 +319,3 @@ void Scalar::exchange(const int * ical, const int dir) const {
   delete [] rbuff_s;
   delete [] rbuff_e;
 }
-
-/*-----------------------------------------------------------------------------+
- '$Id: scalar_exchange_flag.cpp,v 1.1 2011/03/28 07:51:38 sato Exp $'/
-+-----------------------------------------------------------------------------*/

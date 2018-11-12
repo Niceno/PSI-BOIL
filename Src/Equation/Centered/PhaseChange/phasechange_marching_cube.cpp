@@ -505,7 +505,3 @@ real PhaseChange::marching_cube(const int i, const int j, const int k){
   //exit(0);
   return (area);
 }
-
-/*-----------------------------------------------------------------------------+
- '$Id: phasechange_marching_cube.cpp,v 1.2 2018/03/16 14:12:43 bures_l Exp $'/
-+-----------------------------------------------------------------------------*/

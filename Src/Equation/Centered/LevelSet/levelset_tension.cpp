@@ -118,7 +118,3 @@ void LevelSet::tension(Vector * vec, const Matter matt, Scalar & sca) {
 
   boil::timer.stop("levelsetdit tension");
 }
-
-/*-----------------------------------------------------------------------------+
- '$Id: levelset_tension.cpp,v 1.3 2012/09/13 08:42:27 niceno Exp $'/
-+-----------------------------------------------------------------------------*/

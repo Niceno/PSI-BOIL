@@ -163,7 +163,3 @@ TransformSVG::setBoundingBox( const Rect & rect )
   _deltaX = 0.5 * 210 * ppmm - _scale * ( rect.left + 0.5 * rect.width );
   _deltaY = 0.5 * 297 * ppmm - _scale * ( rect.top - 0.5 * rect.height );
 }
-
-/*-----------------------------------------------------------------------------+
- '$Id: transforms.cpp,v 1.2 2008/10/21 11:54:22 niceno Exp $'/
-+-----------------------------------------------------------------------------*/

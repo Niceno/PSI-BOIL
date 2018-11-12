@@ -39,7 +39,4 @@ void Grid1D::correct_boundaries() {
   dx_node[N+2] = 0;
   if(periodic1()==true) dx_node[0]   = x_cell[N] - x_cell[N-1];
   if(periodicN()==true) dx_node[N+2] = x_cell[2] - x_cell[1];
-}  
-/*-----------------------------------------------------------------------------+
- '$Id: grid1d_correct_boundaries.cpp,v 1.3 2008/11/17 19:23:23 niceno Exp $'/
-+-----------------------------------------------------------------------------*/
+}

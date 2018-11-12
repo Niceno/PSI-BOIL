@@ -53,7 +53,3 @@ void Domain::distribute(const int nproc, const int dim, int * dis, int * res) {
     assert(done);
   }
 }
- 
-/*-----------------------------------------------------------------------------+
- '$Id: domain_distribute.cpp,v 1.4 2009/07/17 16:36:23 niceno Exp $'/
-+-----------------------------------------------------------------------------*/

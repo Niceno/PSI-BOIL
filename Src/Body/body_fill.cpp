@@ -82,7 +82,3 @@ void Body::body_fillv(real new_color, int i, int j, int k,const Comp m) {
   }
   while( pop(&i,&j,&k) ); /* ... while there are cells on the stack */
 }
-
-/*-----------------------------------------------------------------------------+
- '$Id: body_fill.cpp,v 1.7 2011/03/28 08:12:04 sato Exp $'/
-+-----------------------------------------------------------------------------*/

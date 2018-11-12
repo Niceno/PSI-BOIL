@@ -716,7 +716,3 @@ Board::save( const char * filename ) const
  * <li>Visit the <a href="http://www.greyc.ensicaen.fr/~seb/board/">Board homepage</a>.</li>
  * </ul>
  */
-
-/*-----------------------------------------------------------------------------+
- '$Id: board.cpp,v 1.3 2008/11/29 13:52:23 niceno Exp $'/
-+-----------------------------------------------------------------------------*/

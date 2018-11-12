@@ -93,7 +93,3 @@ void jacobi(real ** a, real * d, real ** v, const int n, int * nrot)
 
   std::cout << "Too many iterations in routine jacobi" << std::endl;
 }
-
-/*-----------------------------------------------------------------------------+
- '$Id: jacobi.cpp,v 1.3 2008/11/17 19:23:24 niceno Exp $'/
-+-----------------------------------------------------------------------------*/

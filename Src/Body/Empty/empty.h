@@ -27,10 +27,6 @@ class Empty : public Body {
     real fSb(const Comp & m, int i, int j, int k) const {return 1.0;}
     real fSt(const Comp & m, int i, int j, int k) const {return 1.0;}
 
-};	
+};
 
 #endif
-
-/*-----------------------------------------------------------------------------+
- '$Id: empty.h,v 1.2 2009/07/02 14:24:16 niceno Exp $'/
-+-----------------------------------------------------------------------------*/

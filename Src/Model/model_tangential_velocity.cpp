@@ -37,7 +37,3 @@ real Model::tangential_velocity( const real ux, const real uy, const real uz,
   return sqrt(ua2 - un);
   +-----------------------------*/
 }
-
-/*-----------------------------------------------------------------------------+
- '$Id: model_tangential_velocity.cpp,v 1.3 2014/10/28 12:51:52 sato Exp $'/
-+-----------------------------------------------------------------------------*/

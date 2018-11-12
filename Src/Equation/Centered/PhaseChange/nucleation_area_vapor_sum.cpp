@@ -37,6 +37,3 @@ real Nucleation::area_vapor_sum( Range<real> xr
    boil::cart.sum_real(&area);
    return(area);
 }
-/*-----------------------------------------------------------------------------+
- '$Id: nucleation_area_vapor_sum.cpp,v 1.1 2014/08/06 08:19:35 sato Exp $'/
-+-----------------------------------------------------------------------------*/

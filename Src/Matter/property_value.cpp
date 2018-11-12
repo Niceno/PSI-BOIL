@@ -51,7 +51,3 @@ real PropertyMix::value(const int i, const int j, const int k) const {
    return a -> value(i,j,k) * col_a +
           b -> value(i,j,k) * (1.0 - col_a);
 }
-
-/*-----------------------------------------------------------------------------+
- '$Id: property_value.cpp,v 1.3 2015/08/19 12:01:43 badreddine Exp $'/
-+-----------------------------------------------------------------------------*/

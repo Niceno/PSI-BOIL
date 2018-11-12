@@ -32,7 +32,3 @@ const std::string name_file(const char * gname, const char * ext,
   /* finalize the file name */
   return numb.str();
 }
-
-/*-----------------------------------------------------------------------------+
- '$Id: global_name_file.cpp,v 1.10 2011/04/07 08:11:43 niceno Exp $'/
-+-----------------------------------------------------------------------------*/

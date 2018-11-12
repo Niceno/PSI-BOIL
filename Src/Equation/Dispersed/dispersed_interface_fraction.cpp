@@ -95,7 +95,3 @@ real Dispersed::interface_fraction(int i, int j, int k, int p,
 
   return result;
 }
-
-/*-----------------------------------------------------------------------------+
- '$Id: dispersed_interface_fraction.cpp,v 1.3 2015/08/19 11:39:12 badreddine Exp $'/ 
-+-----------------------------------------------------------------------------*/

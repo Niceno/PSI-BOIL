@@ -36,7 +36,3 @@ void Dispersed::rebounce(int pa, int pb) {
   particles[pb].uvw(Comp::v()) += delta_ub_n * dy;    
   particles[pb].uvw(Comp::w()) += delta_ub_n * dz;   
 }
-
-/*-----------------------------------------------------------------------------+
- '$Id: dispersed_rebounce.cpp,v 1.1 2015/08/19 11:31:15 badreddine Exp $'/ 
-+-----------------------------------------------------------------------------*/

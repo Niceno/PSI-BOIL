@@ -24,7 +24,3 @@ void VectorBool::exchange(const int * i, const Comp comp, const int dir) {
       vec[m].exchange(i, dir);
 
 }
-
-/*-----------------------------------------------------------------------------+
- '$Id: vectorbool_exchange.cpp,v 1.1 2014/02/04 08:20:58 sato Exp $'/
-+-----------------------------------------------------------------------------*/

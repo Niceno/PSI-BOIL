@@ -138,8 +138,4 @@ void AC::coarsen_system(const Centered & h, Centered & H) const {
     H.A.ci[iH][jH][kH] = 1.0 / H.A.c[iH][jH][kH];
 
   boil::timer.stop("coarsening");
-}	
-
-/*-----------------------------------------------------------------------------+
- '$Id: additive_coarsen_system.cpp,v 1.4 2008/11/17 19:23:24 niceno Exp $'/
-+-----------------------------------------------------------------------------*/
+}

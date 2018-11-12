@@ -99,8 +99,4 @@ real EnthalpyFD::hflux_wall_ib(const Scalar * diff_eddy) {
   //boil::oout<<"areaw= "<<areaw<<"\n";
 
   return hflux;
-}	
-
-/*-----------------------------------------------------------------------------+
- '$Id: enthalpyfd_hflux_wall_ib.cpp,v 1.2 2015/05/05 15:05:16 sato Exp $'/
-+-----------------------------------------------------------------------------*/
+}

@@ -37,7 +37,3 @@ void VectorBool::load(std::ifstream & in) {
     in.read(reinterpret_cast<char *> (vec[m].val[0][0]), 
             ni(m)*nj(m)*nk(m) * sizeof(bool));
 }
-
-/*-----------------------------------------------------------------------------+
- '$Id: vectorbool_load.cpp,v 1.1 2014/02/04 08:20:58 sato Exp $'/
-+-----------------------------------------------------------------------------*/

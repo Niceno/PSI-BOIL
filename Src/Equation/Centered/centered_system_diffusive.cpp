@@ -366,8 +366,4 @@ void Centered::create_system_diffusive(const Property * f_prop,
   A.t.exchange();
   A.ci.exchange();
 
-}	
-
-/*-----------------------------------------------------------------------------+
- '$Id: centered_system_diffusive.cpp,v 1.24 2014/08/06 08:28:36 sato Exp $'/
-+-----------------------------------------------------------------------------*/
+}

@@ -33,7 +33,3 @@ void EnthalpyFD::solve(const ResRat & fact, const char * name) {
   if( name ) 
    {boil::timer.stop(msg.c_str());}
 }
-
-/*-----------------------------------------------------------------------------+
- '$Id: enthalpyfd_solve.cpp,v 1.4 2015/02/16 08:28:29 sato Exp $'/
-+-----------------------------------------------------------------------------*/

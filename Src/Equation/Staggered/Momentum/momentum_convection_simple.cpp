@@ -266,7 +266,3 @@ void Momentum::convection(Vector * conv) {
   if(time->current_step() % 4000 == 0)
     boil::plot->plot(*conv, "conv", time->current_step());
 }
-
-/*-----------------------------------------------------------------------------+
- '$Id: momentum_convection_simple.cpp,v 1.3 2010/11/06 20:14:19 niceno Exp $'/
-+-----------------------------------------------------------------------------*/

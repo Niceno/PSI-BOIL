@@ -41,7 +41,3 @@ bool PhaseChange::incl_no_interface(const int i, const int j, const int k) {
 
   return true;
 }
-
-/*-----------------------------------------------------------------------------+
- '$Id: phasechange_incl_no_interface.cpp,v 1.1 2014/08/06 08:19:36 sato Exp $'/
-+-----------------------------------------------------------------------------*/

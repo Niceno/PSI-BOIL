@@ -167,7 +167,3 @@ void CIPCSL2::tension(Vector * vec, const Matter matt, Scalar & sca) {
 
   boil::timer.stop("cipcsl2 tension");
 }
-
-/*-----------------------------------------------------------------------------+
- '$Id: cipcsl2_tension.cpp,v 1.17 2016/02/09 12:51:45 sato Exp $'/
-+-----------------------------------------------------------------------------*/

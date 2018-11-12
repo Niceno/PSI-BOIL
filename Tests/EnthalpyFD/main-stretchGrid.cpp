@@ -192,5 +192,4 @@ main(int argc, char ** argv) {
   boil::oout << "finished" << boil::endl;
   boil::timer.stop();
   boil::timer.report();
-
 }

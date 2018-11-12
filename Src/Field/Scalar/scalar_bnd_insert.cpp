@@ -39,7 +39,3 @@ void Scalar::bnd_insert ( const Dir d, real **  cp ) {
   /* free the memory used during this process */
   dealloc2d( &cp );
 }
-
-/*-----------------------------------------------------------------------------+
- '$Id: scalar_bnd_insert.cpp,v 1.2 2015/01/05 16:49:57 sato Exp $'/
-+-----------------------------------------------------------------------------*/

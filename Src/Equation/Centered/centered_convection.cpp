@@ -221,7 +221,3 @@ void Centered::convection(Scalar * conv, const Property * prop) {
   //if(time->current_step() % 100 == 0)
   //  boil::plot->plot(*conv, "conv", time->current_step());
 }
-
-/*-----------------------------------------------------------------------------+
- '$Id: centered_convection.cpp,v 1.27 2015/01/05 17:00:27 sato Exp $'/
-+-----------------------------------------------------------------------------*/

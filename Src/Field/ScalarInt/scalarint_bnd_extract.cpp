@@ -160,7 +160,3 @@ void ScalarInt::bnd_extract( const Dir d, int *** cplane ) const {
 
   //std::cout<<"scalar_bnd_extract:end\n";
 }
-
-/*-----------------------------------------------------------------------------+
- '$Id: scalarint_bnd_extract.cpp,v 1.1 2015/05/05 14:36:01 sato Exp $'/
-+-----------------------------------------------------------------------------*/

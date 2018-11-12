@@ -31,7 +31,3 @@ void VectorBool::save(std::ofstream & out) {
     out.write(reinterpret_cast<const char *> (vec[m].val[0][0]), 
               ni(m)*nj(m)*nk(m) * sizeof(bool));
 }
-
-/*-----------------------------------------------------------------------------+
- '$Id: vectorbool_save.cpp,v 1.1 2014/02/04 08:20:58 sato Exp $'/
-+-----------------------------------------------------------------------------*/

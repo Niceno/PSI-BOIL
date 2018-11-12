@@ -30,7 +30,3 @@ void ScalarInt::save(std::ofstream & out) {
   out.write(reinterpret_cast<const char *> (val[0][0]), 
             ni()*nj()*nk()*sizeof(int));
 }
-
-/*-----------------------------------------------------------------------------+
- '$Id: scalarint_save.cpp,v 1.1 2015/05/05 14:36:01 sato Exp $'/
-+-----------------------------------------------------------------------------*/

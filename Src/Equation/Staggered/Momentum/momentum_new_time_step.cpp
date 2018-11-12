@@ -56,7 +56,3 @@ void Momentum::new_time_step() {
   /* a condition like: if(diff_ts != backward_euler()) would be good */
   diffusion();
 }
-
-/*-----------------------------------------------------------------------------+
- '$Id: momentum_new_time_step.cpp,v 1.17 2010/03/25 08:15:54 niceno Exp $'/
-+-----------------------------------------------------------------------------*/

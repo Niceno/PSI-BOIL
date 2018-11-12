@@ -16,7 +16,3 @@ operator||( const Rect & rectA, const Rect & rectB )
     rect.height = rect.top - ( rectB.top - rectB.height );
   return rect;
 }
-
-/*-----------------------------------------------------------------------------+
- '$Id: rect.cpp,v 1.2 2008/10/21 11:54:22 niceno Exp $'/
-+-----------------------------------------------------------------------------*/

@@ -241,8 +241,3 @@ real linear_interpolate(const real c1, const real c2, const real k1,
     return k1 * weight1 + k2 * weight2;
   }
 }
-
-/*-----------------------------------------------------------------------------+
- '$Id: cipcsl2_bdcurv_interface.cpp,v 1.2 2018/07/11 14:13:19 guo_w Exp $'/
-+-----------------------------------------------------------------------------*/
-

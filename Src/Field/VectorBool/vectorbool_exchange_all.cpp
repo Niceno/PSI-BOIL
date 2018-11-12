@@ -8,7 +8,3 @@ void VectorBool::exchange_all(const Comp comp, const int dir) {
     if(comp == Comp::undefined() || comp == m) 
       vec[m].exchange_all(dir);
 }
-
-/*-----------------------------------------------------------------------------+
- '$Id: vectorbool_exchange_all.cpp,v 1.1 2014/02/04 08:20:58 sato Exp $'/
-+-----------------------------------------------------------------------------*/

@@ -147,7 +147,3 @@ main(int argc, char * argv[]) {
   boil::plot->plot(uvw,"uvw", time.current_step()-1);
   boil::plot->plot(phi,"phi", time.current_step()-1);
 }	
-
-/*-----------------------------------------------------------------------------+
- '$Id: main-phasefield-width.cpp,v 1.1 2009/12/29 10:26:38 l_niceno Exp $'/
-+-----------------------------------------------------------------------------*/

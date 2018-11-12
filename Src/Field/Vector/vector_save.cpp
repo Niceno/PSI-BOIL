@@ -31,7 +31,3 @@ void Vector::save(std::ofstream & out) {
     out.write(reinterpret_cast<const char *> (vec[m].val[0][0]), 
               ni(m)*nj(m)*nk(m) * sizeof(real));
 }
-
-/*-----------------------------------------------------------------------------+
- '$Id: vector_save.cpp,v 1.11 2009/05/09 20:11:27 niceno Exp $'/
-+-----------------------------------------------------------------------------*/

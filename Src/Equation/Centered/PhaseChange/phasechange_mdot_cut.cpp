@@ -27,6 +27,3 @@ real PhaseChange::mdot_cut(real mdotc, real clrc) {
   mdotc = std::min(mdotc,rhol*clrc/dt);
   return std::max(mdotc,-rhol*(1.0-clrc)/dt);
 }
-/*-----------------------------------------------------------------------------+
- '$Id: phasechange_mdot_cut.cpp,v 1.3 2014/02/18 14:52:07 sato Exp $'/
-+-----------------------------------------------------------------------------*/

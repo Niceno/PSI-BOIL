@@ -68,10 +68,6 @@ class PlotGMV : public Plot {
     void plot_gmv_vector(const Domain &, const Vector &);
     void plot_gmv_footer();
     std::ofstream out;
-};	
+};
 
 #endif
-
-/*-----------------------------------------------------------------------------+
- '$Id: plot_gmv.h,v 1.20 2015/05/05 14:27:45 sato Exp $'/
-+-----------------------------------------------------------------------------*/

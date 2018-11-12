@@ -30,7 +30,3 @@ void ScalarBool::save(std::ofstream & out) {
   out.write(reinterpret_cast<const char *> (val[0][0]), 
             ni()*nj()*nk()*sizeof(bool));
 }
-
-/*-----------------------------------------------------------------------------+
- '$Id: scalarbool_save.cpp,v 1.1 2014/02/04 08:16:57 sato Exp $'/
-+-----------------------------------------------------------------------------*/

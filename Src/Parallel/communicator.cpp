@@ -247,7 +247,3 @@ void Communicator::one2one(int * buff_send, int * buff_recv,
   if(iam() == cpu_recv)
     par_recv(buff_recv, size, par_t, cpu_send, (int)tag, &status);
 }
-	
-/*-----------------------------------------------------------------------------+
- '$Id: communicator.cpp,v 1.37 2015/05/05 14:10:15 sato Exp $'/
-+-----------------------------------------------------------------------------*/

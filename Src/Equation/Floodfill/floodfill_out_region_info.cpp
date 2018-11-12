@@ -53,8 +53,3 @@ void Floodfill::out_region_info() {
   }
   oldtime = time->current_time(); //used to calculate dt between outputs
 }
-
-
-/*-----------------------------------------------------------------------------+
- '$Id: identify_regions  lafferty
-+-----------------------------------------------------------------------------*/

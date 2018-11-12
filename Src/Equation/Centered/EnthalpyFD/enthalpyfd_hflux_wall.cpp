@@ -64,8 +64,4 @@ real EnthalpyFD::hflux_wall(const Scalar & val, const Dir din
   } else {
     return (hflux/areaw);
   }
-}	
-
-/*-----------------------------------------------------------------------------+
- '$Id: enthalpyfd_hflux_wall.cpp,v 1.2 2015/05/05 15:00:45 sato Exp $'/
-+-----------------------------------------------------------------------------*/
+}

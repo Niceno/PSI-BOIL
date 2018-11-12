@@ -18,8 +18,4 @@ Centered::Centered(const Centered * fn, const Domain * d,
 
   if(dom->coarser() != NULL)
     crsr = new Centered( this, this->dom->coarser(), phi.bc(), solver ); 
-}	
-
-/*-----------------------------------------------------------------------------+
- '$Id: centered.cpp,v 1.17 2009/07/01 09:20:27 niceno Exp $'/
-+-----------------------------------------------------------------------------*/
+}

@@ -289,7 +289,3 @@ void ScalarBool::exchange_all(const int dir) const {
   delete [] rbuff_s;
   delete [] rbuff_e;
 }
-
-/*-----------------------------------------------------------------------------+
- '$Id: scalarbool_exchange_all.cpp,v 1.1 2014/02/04 08:16:57 sato Exp $'/
-+-----------------------------------------------------------------------------*/

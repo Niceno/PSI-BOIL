@@ -115,8 +115,4 @@ main(int argc, char * argv[]) {
   boil::plot->plot(uvw,"uvw", time.current_step()-1);
   uvw.save("uvw_final", time.current_step()-1);
   p.save  ("p_final",   time.current_step()-1);
-}	
-
-/*-----------------------------------------------------------------------------+
- '$Id: main.cpp,v 1.9 2011/05/25 11:09:21 niceno Exp $'/
-+-----------------------------------------------------------------------------*/
+}

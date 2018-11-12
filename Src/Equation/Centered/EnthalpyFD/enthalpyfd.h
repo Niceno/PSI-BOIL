@@ -131,9 +131,5 @@ class EnthalpyFD : public Centered {
     real turbP; //turbulent Prandtl number
     bool laminar;
 
-};	
+};
 #endif
-
-/*-----------------------------------------------------------------------------+
- '$Id: enthalpyfd.h,v 1.9 2015/05/05 14:53:58 sato Exp $'/
-+-----------------------------------------------------------------------------*/

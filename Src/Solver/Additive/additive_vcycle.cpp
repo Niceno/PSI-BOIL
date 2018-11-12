@@ -111,8 +111,4 @@ bool AC::vcycle(const ResRat & factor, int * ncyc) {
   boil::timer.stop("vcycle");
   if(ncyc) * ncyc = max_cyc;
   return false;
-}	
-
-/*-----------------------------------------------------------------------------+
- '$Id: additive_vcycle.cpp,v 1.24 2014/08/06 08:47:50 sato Exp $'/
-+-----------------------------------------------------------------------------*/
+}

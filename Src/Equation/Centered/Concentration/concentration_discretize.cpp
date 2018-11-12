@@ -25,8 +25,3 @@ void Concentration::discretize(const Scalar * eddy) {
 
   boil::timer.stop("concentration discretize");
 }
-
-/*-----------------------------------------------------------------------------+
- '$Id: concentration_discretize.cpp,v 1.3 2014/08/06 08:14:31 sato Exp $'/
-+-----------------------------------------------------------------------------*/
- 

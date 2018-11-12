@@ -70,10 +70,6 @@ class PlotTEC : public Plot {
     void plot_tec_vector   (const Domain &, const Vector &);
     void plot_tec_footer   ();
     std::ofstream out;
-};	
+};
 
 #endif
-
-/*-----------------------------------------------------------------------------+
- '$Id: plot_tec.h,v 1.22 2015/05/05 14:27:21 sato Exp $'/
-+-----------------------------------------------------------------------------*/

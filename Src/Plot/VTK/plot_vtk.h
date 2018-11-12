@@ -66,10 +66,6 @@ class PlotVTK : public Plot {
     void plot_vtk_vector   (const Domain &, const Vector &);
     void plot_vtk_footer   ();
     std::ofstream out;
-};	
+};
 
 #endif
-
-/*-----------------------------------------------------------------------------+
- '$Id: plot_vtk.h,v 1.9 2015/05/05 14:28:09 sato Exp $'/
-+-----------------------------------------------------------------------------*/

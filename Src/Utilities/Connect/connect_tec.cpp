@@ -344,7 +344,3 @@ void connect_tec(const char * bname, const int n, const int t) {
   out << "# END OF TECPLOT FILE" << std::endl; 
   out.close();
 }
-
-/*-----------------------------------------------------------------------------+
- '$Id: connect_tec.cpp,v 1.16 2013/09/11 07:12:59 niceno Exp $'/
-+-----------------------------------------------------------------------------*/

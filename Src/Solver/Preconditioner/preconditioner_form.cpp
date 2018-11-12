@@ -141,8 +141,4 @@ void IncompleteCholesky3 :: form(const Matrix & A, const Scalar & x) {
   //Mts.exchange();
   //Mb.exchange();
 
-}  
-
-/*-----------------------------------------------------------------------------+
- '$Id: preconditioner_form.cpp,v 1.16 2016/02/12 13:49:55 sato Exp $'/
-+-----------------------------------------------------------------------------*/
+}

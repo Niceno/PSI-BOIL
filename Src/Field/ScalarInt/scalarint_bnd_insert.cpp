@@ -39,7 +39,3 @@ void ScalarInt::bnd_insert ( const Dir d, int **  cp ) {
   /* free the memory used during this process */
   dealloc2d( &cp );
 }
-
-/*-----------------------------------------------------------------------------+
- '$Id: scalarint_bnd_insert.cpp,v 1.1 2015/05/05 14:36:01 sato Exp $'/
-+-----------------------------------------------------------------------------*/

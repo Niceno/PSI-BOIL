@@ -42,8 +42,3 @@ void Enthalpy::discretize(const Scalar * eddy) {
 
   boil::timer.stop("enthalpy discretize");
 }
-
-/*-----------------------------------------------------------------------------+
- '$Id: enthalpy_discretize.cpp,v 1.3 2016/02/26 11:07:41 niceno Exp $'/
-+-----------------------------------------------------------------------------*/
- 

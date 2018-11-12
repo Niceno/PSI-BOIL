@@ -79,7 +79,3 @@ void Centered::new_time_step(const Property * f_prop, const Property * s_prop) {
   diffusion();
 
 }
-
-/*-----------------------------------------------------------------------------+
-  '$Id: centered_new_time_step.cpp,v 1.20 2014/08/06 08:27:53 sato Exp $'/
-+-----------------------------------------------------------------------------*/

@@ -67,7 +67,3 @@ void Vector::randomize(RandomFlow & rf, const real magn, const real time) {
 
   boil::timer.stop("randomization");
 }
-
-/*-----------------------------------------------------------------------------+
- '$Id: vector_randomize.cpp,v 1.15 2015/09/23 09:24:40 sato Exp $'/
-+-----------------------------------------------------------------------------*/

@@ -104,7 +104,3 @@ void Polygon::split(Polygon ** poly_left,
   * poly_left  = new Polygon( (int)nodes_left.size(),  xl, yl, zl );
   * poly_right = new Polygon( (int)nodes_right.size(), xr, yr, zr );
 }
-
-/*-----------------------------------------------------------------------------+
- '$Id: polygon_split.cpp,v 1.1 2015/08/17 10:37:55 niceno Exp $'/
-+-----------------------------------------------------------------------------*/

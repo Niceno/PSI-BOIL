@@ -55,7 +55,3 @@ void Times::control_dt(const real current_cfl,
   if (nhist==CFL_HIST_SIZE) decrease_nhist(); 
 
 }
-
-/*-----------------------------------------------------------------------------+
- '$Id: simulation_time_control_dt.cpp,v 1.6 2015/06/29 18:17:56 sato Exp $'/
-+-----------------------------------------------------------------------------*/

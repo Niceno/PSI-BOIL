@@ -35,7 +35,3 @@ void ColorFunction::discretize() {
 
   boil::timer.stop("colorfunction discretize");
 }
-
-/*-----------------------------------------------------------------------------+
- '$Id: colorfunction_discretize.cpp,v 1.17 2012/09/13 08:13:22 niceno Exp $'/
-+-----------------------------------------------------------------------------*/

@@ -126,7 +126,3 @@ inline unsigned char Color::blue() const { return _blue; }
 inline unsigned char Color::alpha() const { return _alpha; } 
 
 #endif // _COLOR_H_
-
-/*-----------------------------------------------------------------------------+
- '$Id: color.h,v 1.3 2008/11/17 19:23:22 niceno Exp $'/
-+-----------------------------------------------------------------------------*/

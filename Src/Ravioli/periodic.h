@@ -22,10 +22,6 @@ class Periodic {
     /* prevent creation of new periodicity conditions */
     explicit Periodic(const bool i) {val = i;}
     bool val;
-};	
+};
 
 #endif
-
-/*-----------------------------------------------------------------------------+
- '$Id: periodic.h,v 1.4 2008/11/17 19:23:24 niceno Exp $'/
-+-----------------------------------------------------------------------------*/

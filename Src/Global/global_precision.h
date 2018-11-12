@@ -29,7 +29,3 @@
   #define par_bool MPI::BOOL
   // #define par_bool MPI::CHAR  //for HPC in Imperial College London
 #endif
-
-/*-----------------------------------------------------------------------------+
- '$Id: global_precision.h,v 1.10 2015/05/05 14:32:14 sato Exp $'/
-+-----------------------------------------------------------------------------*/

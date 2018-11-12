@@ -52,7 +52,3 @@
 #define par_type_commit(a)           MPI_Type_commit((a))
 #define par_type_free(a)             MPI_Type_free  ((a))
 #define par_wtime()                  MPI_Wtime      ()
-
-/*-----------------------------------------------------------------------------+
- '$Id: parallel.h,v 1.10 2015/05/05 14:11:44 sato Exp $'/
-+-----------------------------------------------------------------------------*/
