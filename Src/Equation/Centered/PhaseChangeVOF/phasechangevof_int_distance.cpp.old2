@@ -1,0 +1,189 @@
+#include "phasechangevof.h"
+
+/* 
+ * dir > 0: positive direction
+ * dir < 0: negative direction
+*/
+
+/* x-direction */
+real PhaseChangeVOF::distance_x(const int i, const int j, const int k,
+                                const int dir, real & tint) { 
+  int of(1);
+  if(dir<0) of = -1;
+
+  int flagc(0),flago(0);
+  if(Interface(i   ,j,k))
+    flagc = 1;
+  if(Interface(i+of,j,k))
+    flago = 1; 
+
+  real dist;
+  if(flagc>0) { /* interface exists in centre */
+    if(distance1D_x(i   ,j,k, of,tint,dist)) {
+      return dist;
+    }
+  }
+ 
+  if(flago>0) { /* interface exists in the neighbor */
+    if(distance1D_x(i+of,j,k,-of,tint,dist)) {
+      if(dir>0) {
+        return phi.dxe(i)-dist;
+      } else {
+        return phi.dxw(i)-dist;
+      }
+    }
+  }
+
+  boil::oout<<"PhaseChangeVOF::int_dist_x: Error! Flag inconsistent w/ vol. fraction!\n";
+  boil::oout<<i<<" "<<j<<" "<<k<<" "<<dir<<" "<<flagc<<" "<<flago<<" "
+            <<iflag[i][j][k]<<" "<<iflag[i+of][j][k]<<" "<<clr[i][j][k]<<" "<<clr[i+of][j][k]<<boil::endl;
+  exit(0);
+ 
+  return 0.0;
+}
+
+bool PhaseChangeVOF::distance1D_x(const int i, const int j, const int k,
+                                  const int dir, real & tint, real & dist) {
+
+  real intx = fsx[i][j][k];
+  /* is result inside of cell + in the correct direction? */
+  real centrex = phi.xc(i);
+  real edgex   = centrex+0.5*phi.dxc(i)*real(dir);
+  if(dir>0) {
+    if(intx>=centrex&&intx<=edgex) {
+      tint = Tint(i,j,k);
+      dist = intx-centrex;
+      return true;
+    }
+  } else {
+    if(intx<=centrex&&intx>=edgex) {
+      tint = Tint(i,j,k);
+      dist = centrex-intx;
+      return true;
+    } 
+  }
+ 
+  return false;
+}
+
+/* y-direction */
+real PhaseChangeVOF::distance_y(const int i, const int j, const int k,
+                                const int dir, real & tint) { 
+  int of(1);
+  if(dir<0) of = -1;
+
+  int flagc(0),flago(0);
+  if(Interface(i,j   ,k))
+    flagc = 1;
+  if(Interface(i,j+of,k))
+    flago = 1; 
+
+  real dist;
+  if(flagc>0) { /* interface exists in centre */
+    if(distance1D_y(i,j   ,k, of,tint,dist)) {
+      return dist;
+    }
+  }
+ 
+  if(flago>0) { /* interface exists in the neighbor */
+    if(distance1D_y(i,j+of,k,-of,tint,dist)) {
+      if(dir>0) {
+        return phi.dyn(j)-dist;
+      } else {
+        return phi.dys(j)-dist;
+      }
+    }
+  }
+
+  boil::oout<<"PhaseChangeVOF::int_dist_y: Error! Flag inconsistent w/ vol. fraction!\n";
+  boil::oout<<i<<" "<<j<<" "<<k<<" "<<dir<<" "<<flagc<<" "<<flago<<" "
+            <<iflag[i][j][k]<<" "<<iflag[i][j+of][k]<<" "<<clr[i][j][k]<<" "<<clr[i][j+of][k]<<boil::endl;
+  exit(0);
+ 
+  return 0.0;
+}
+
+bool PhaseChangeVOF::distance1D_y(const int i, const int j, const int k,
+                                  const int dir, real & tint, real & dist) {
+
+  real inty = fsy[i][j][k];
+  /* is result inside of cell + in the correct direction? */
+  real centrey = phi.yc(j);
+  real edgey   = centrey+0.5*phi.dyc(j)*real(dir);
+  if(dir>0) {
+    if(inty>=centrey&&inty<=edgey) {
+      tint = Tint(i,j,k);
+      dist = inty-centrey;
+      return true;
+    }
+  } else {
+    if(inty<=centrey&&inty>=edgey) {
+      tint = Tint(i,j,k);
+      dist = centrey-inty;
+      return true;
+    } 
+  }
+ 
+  return false;
+}
+
+/* z-direction */
+real PhaseChangeVOF::distance_z(const int i, const int j, const int k,
+                                const int dir, real & tint) { 
+  int of(1);
+  if(dir<0) of = -1;
+
+  int flagc(0),flago(0);
+  if(Interface(i,j,k   ))
+    flagc = 1;
+  if(Interface(i,j,k+of))
+    flago = 1; 
+
+  real dist;
+  if(flagc>0) { /* interface exists in centre */
+    if(distance1D_z(i,j,k   , of,tint,dist)) {
+      return dist;
+    }
+  }
+ 
+  if(flago>0) { /* interface exists in the neighbor */
+    if(distance1D_z(i,j,k+of,-of,tint,dist)) {
+      if(dir>0) {
+        return phi.dzt(k)-dist;
+      } else {
+        return phi.dzb(k)-dist;
+      }
+    }
+  }
+
+  boil::oout<<"PhaseChangeVOF::int_dist_z: Error! Flag inconsistent w/ vol. fraction!\n";
+  boil::oout<<i<<" "<<j<<" "<<k<<" "<<dir<<" "<<flagc<<" "<<flago<<" "
+            <<iflag[i][j][k]<<" "<<iflag[i][j][k+of]<<" "<<clr[i][j][k]<<" "<<clr[i][j][k+of]<<boil::endl;
+  exit(0);
+ 
+  return 0.0;
+}
+
+bool PhaseChangeVOF::distance1D_z(const int i, const int j, const int k,
+                                  const int dir, real & tint, real & dist) {
+
+  real intz = fsz[i][j][k];
+  /* is result inside of cell + in the correct direction? */
+  real centrez = phi.zc(k);
+  real edgez   = centrez+0.5*phi.dzc(k)*real(dir);
+  if(dir>0) {
+    if(intz>=centrez&&intz<=edgez) {
+      tint = Tint(i,j,k);
+      dist = intz-centrez;
+      return true;
+    }
+  } else {
+    if(intz<=centrez&&intz>=edgez) {
+      tint = Tint(i,j,k);
+      dist = centrez-intz;
+      return true;
+    } 
+  }
+ 
+  return false;
+}
