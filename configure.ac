@@ -32,6 +32,7 @@ AC_OUTPUT(Makefile                                     \
           Src/Equation/Centered/ColorCIP/Makefile      \
           Src/Equation/Centered/CIPCSL2/Makefile       \
           Src/Equation/Centered/Distance/Makefile      \
+          Src/Equation/Centered/VOF/Makefile           \
           Src/Equation/Centered/Makefile               \
           Src/Equation/Staggered/Momentum/Makefile     \
           Src/Equation/Staggered/Makefile              \

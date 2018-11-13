@@ -17,6 +17,7 @@ SUBDIRS = Equation/Staggered/Momentum     \
           Equation/Centered/ColorCIP      \
           Equation/Centered/CIPCSL2       \
           Equation/Centered/Distance      \
+          Equation/Centered/VOF           \
           Equation/Centered               \
           Equation/Dispersed              \
           Equation/Floodfill              \
@@ -64,6 +65,7 @@ LDADD = Equation/Staggered/Momentum/libMomentum.a          \
         Equation/Centered/ColorCIP/libColorCIP.a           \
         Equation/Centered/CIPCSL2/libCipcsl2.a             \
         Equation/Centered/Distance/libDistance.a           \
+        Equation/Centered/VOF/libVof.a                \
         Equation/Centered/libCentered.a                    \
         Equation/Dispersed/libDispersed.a                  \
         Equation/Floodfill/libFloodfill.a                  \

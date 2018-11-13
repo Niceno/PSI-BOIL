@@ -1,0 +1,20 @@
+/Makefile.am/1.5/Thu Nov 12 12:16:15 2009//
+/colorcip.cpp/1.3/Thu Nov 12 12:15:47 2009//
+/colorcip.h/1.6/Thu Nov 12 12:24:07 2009//
+/colorcip_advance.cpp/1.8/Wed Oct 15 13:39:30 2014//
+/colorcip_bdcurv.cpp/1.2/Thu Nov 12 12:15:47 2009//
+/colorcip_curv.cpp/1.2/Thu Nov 12 12:15:48 2009//
+/colorcip_discretize.cpp/1.2/Thu Nov  5 09:34:41 2009//
+/colorcip_front_minmax.cpp/1.3/Thu Nov 12 12:15:48 2009//
+/colorcip_gradphi.cpp/1.2/Thu Nov 12 12:15:48 2009//
+/colorcip_gradphic.cpp/1.3/Wed Oct 15 13:39:30 2014//
+/colorcip_init.cpp/1.3/Wed Oct 15 13:39:30 2014//
+/colorcip_insert_bc.cpp/1.1/Thu Nov 12 12:15:48 2009//
+/colorcip_insert_bc_ls.cpp/1.2/Mon Jan  5 17:11:57 2015//
+/colorcip_insert_bc_tanh.cpp/1.2/Mon Jan  5 17:11:57 2015//
+/colorcip_smooth.cpp/1.5/Thu Nov 12 12:15:48 2009//
+/colorcip_smooth_ls.cpp/1.2/Thu Nov 12 12:15:48 2009//
+/colorcip_smooth_tanh.cpp/1.2/Thu Nov 12 12:15:48 2009//
+/colorcip_tension.cpp/1.4/Thu Nov 12 12:15:48 2009//
+/colorcip_totalvol.cpp/1.3/Thu Nov 12 12:15:48 2009//
+D
