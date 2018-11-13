@@ -19,3 +19,4 @@ Src/Parallel/mpi_macros.h
 **/Boil
 **/main.cpp*
 **/.deps/
+**/*.a
