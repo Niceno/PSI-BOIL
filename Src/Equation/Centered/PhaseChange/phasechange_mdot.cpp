@@ -28,5 +28,12 @@ void PhaseChange::mdot() {
   }
   phi.exchange_all();
 
+#if 1
+  for_i(i) {
+    if(fabs(phi[i][1][1])>boil::atto) boil::oout<<"PC ::mdot "<<i<<" "<<txv[i][1][1]<<" "<<txl[i][1][1]<<" "<<nx[i][1][1]<<" "<<M[i][1][1]<<" "<<phi[i][1][1]<<boil::endl;
+  }
+#endif
+
   return;
 }
+

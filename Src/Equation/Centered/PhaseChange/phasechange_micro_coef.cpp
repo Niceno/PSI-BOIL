@@ -18,4 +18,3 @@ real PhaseChange::pcfrc(real tpr) {
   //std::cout<<"pcfrc: "<<frc<<"\n";
   return frc;
 }
-

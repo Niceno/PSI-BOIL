@@ -23,6 +23,8 @@ class PhaseChange : public Centered {
                 Times & t,
                 Matter * flu,
                 real r1, real r2,
+                Scalar * tif = NULL,
+                const Vector * bndclr = NULL,
                 Matter * sol = NULL,
                 Nucleation * nucl = NULL);
 
@@ -70,6 +72,12 @@ class PhaseChange : public Centered {
       turbP=a;
       boil::oout<<"EnthalpyFD:turbP= "<<turbP<<"\n";
     }
+   
+    Scalar M; // moved to public
+    void cal_massflux(const Scalar * diff_eddy = NULL);
+    void initialize();
+    void finalize();
+    void set_tif(Scalar * newtif) { tif = newtif; }
 
   private:
     void cal_gradt(const Scalar * diff_eddy = NULL);
@@ -84,11 +92,19 @@ class PhaseChange : public Centered {
     void gradphic(const Scalar & sca);
     void gradt (const Scalar * diff_eddy = NULL);
     void gradtx5( const int i, const int j, const int k,
-              real * txm, real * txp, const int m) const;
+              real * txm, real * txp, const int m);
     void gradty5( const int i, const int j, const int k,
-              real * tym, real * typ, const int m) const;
+              real * tym, real * typ, const int m);
     void gradtz5( const int i, const int j, const int k,
-              real * tzm, real * tzp, const int m) const;
+              real * tzm, real * tzp, const int m);
+
+    void prepare_gradt8();
+    real gradtx8(const int dir, const int i, const int j, const int k);
+    real gradty8(const int dir, const int i, const int j, const int k);
+    real gradtz8(const int dir, const int i, const int j, const int k);
+    real gradt8(const real tm0, const real tm1, const real tm2,
+                const real dm1, const real dm2);
+    real surface_color(const Comp & m, const int i, const int j, const int k);
 
     void ext_gradt(Scalar & sca, const int iext);
     void m(const Scalar * diff_eddy = NULL);
@@ -112,10 +128,17 @@ class PhaseChange : public Centered {
     void ib_ext_scalar(const Scalar & sca);
     void insert_bc(const Scalar & val);
 
+    Scalar * tif;
+    const Vector * bndclr;
+    Vector bndtpr;
+    real Tint(const int i, const int j, const int k);
+    real Tint(const int dir, const Comp &mcomp, const real frac,
+              const int i, const int j, const int k);
+
     Nucleation * nucl;
     int nlayer,imodcal;
     Scalar tpr,tprs,clr,clrs,step;
-    Scalar dist,stmp,stmp2,delta,M;
+    Scalar dist,stmp,stmp2,delta;
     ScalarInt dflag, iflag;
     Scalar nx,ny,nz;
     Scalar txv,tyv,tzv;
@@ -134,3 +157,4 @@ class PhaseChange : public Centered {
 };	
 
 #endif
+

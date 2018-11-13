@@ -39,3 +39,4 @@ void Nucleation::set_range(std::vector<Site> & s) {
   s[ns].set_ks(ks);
   s[ns].set_ke(ke);
 }
+

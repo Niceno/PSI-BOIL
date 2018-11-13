@@ -22,15 +22,19 @@ libPhaseChange_a_SOURCES = site.h                     \
                            phasechange.h                      \
                            phasechange.cpp                    \
                            phasechange_cal_gradt.cpp          \
+                           phasechange_cal_massflux.cpp       \
                            phasechange_distfunc.cpp           \
-                           phasechange_dmicro_intermediate.cpp \
+                           phasechange_dmicro_intermediate.cpp\
                            phasechange_ext_gradt.cpp          \
+                           phasechange_finalize.cpp           \
                            phasechange_gradphic.cpp           \
                            phasechange_gradt.cpp              \
                            phasechange_gradt5.cpp             \
+                           phasechange_gradt8.cpp             \
                            phasechange_ib_ext_scalar.cpp      \
                            phasechange_ib_set_dflag.cpp       \
                            phasechange_incl_no_interface.cpp  \
+                           phasechange_initialize.cpp         \
                            phasechange_insert_bc_gradphic.cpp \
                            phasechange_insert_bc_dist.cpp     \
                            phasechange_insert_bc_flag.cpp     \
@@ -51,5 +55,7 @@ libPhaseChange_a_SOURCES = site.h                     \
                            phasechange_sources_sum.cpp        \
                            phasechange_sources_tprs.cpp       \
                            phasechange_str_dSprev.cpp         \
+                           phasechange_surface_color.cpp      \
+                           phasechange_tint.cpp               \
                            phasechange_update.cpp
 INCLUDE = -I@top_srcdir@/

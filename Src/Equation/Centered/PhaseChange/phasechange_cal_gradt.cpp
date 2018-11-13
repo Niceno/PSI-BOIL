@@ -12,6 +12,10 @@ void PhaseChange::cal_gradt(const Scalar * diff_eddy) {
 *         txv,tyv,tzv: gradient of vapor  tempereture in x,y,z-direction
 *******************************************************************************/
 
+#if 1
+  if (bndclr) prepare_gradt8();
+#endif
+
   for_vijk(tpr,i,j,k){
 
     /* normal cell, 2nd order */
@@ -40,6 +44,7 @@ void PhaseChange::cal_gradt(const Scalar * diff_eddy) {
 
     ii=jj=kk=0;
 
+  if (!bndclr) {
     /* west */
     if((clrw-phisurf)*(clrc-phisurf)<=0.0){
       gradtx5( i-1, j, k, &txm, &txp, 1);
@@ -100,8 +105,71 @@ void PhaseChange::cal_gradt(const Scalar * diff_eddy) {
       }
       kk+=1;
     }
-#if 0
-#else
+  } /* bndclr? */
+  else {
+    /* west */
+    if((clrw-phisurf)*(clrc-phisurf)<=0.0){
+      txp = gradtx8(-1,i,j,k);
+      if((clrc-phisurf)<0.0){
+        txv[i][j][k] = txp; 
+      } else {
+        txl[i][j][k] = txp;
+      }
+      ii=1;
+    }
+    /* east */
+    if((clre-phisurf)*(clrc-phisurf)<=0.0){
+      txm = gradtx8(+1,i,j,k);
+      if((clrc-phisurf)<0.0){
+        txv[i][j][k]=txm;
+      } else {
+        txl[i][j][k]=txm;
+      }
+      ii+=1;
+    }
+    /* south */
+    if((clrs-phisurf)*(clrc-phisurf)<=0.0){
+      typ = gradty8(-1,i,j,k);
+      if((clrc-phisurf)<0.0){
+        tyv[i][j][k]=typ;
+      } else {
+        tyl[i][j][k]=typ;
+      }
+      jj=1;
+    }
+    /* north */
+    if((clrn-phisurf)*(clrc-phisurf)<=0.0){
+      tym = gradty8(+1,i,j,k);
+      if((clrc-phisurf)<0.0){
+        tyv[i][j][k]=tym;
+      } else {
+        tyl[i][j][k]=tym;
+      }
+      jj+=1;
+    }
+    /* bottom */
+    if((clrb-phisurf)*(clrc-phisurf)<=0.0){
+      tzp = gradtz8(-1,i,j,k);
+      if((clrc-phisurf)<0.0){
+        tzv[i][j][k]=tzp;
+      } else {
+        tzl[i][j][k]=tzp;
+      }
+      kk=1;
+    }
+    /* top */
+    if((clrt-phisurf)*(clrc-phisurf)<=0.0){
+      tzm = gradtz8(+1,i,j,k);
+      if((clrc-phisurf)<0.0){
+        tzv[i][j][k]=tzm;
+      } else {
+        tzl[i][j][k]=tzm;
+      }
+      kk+=1;
+    }
+  } /* bndclr? */
+
+#if 1
     if(ii==2)txv[i][j][k]=txl[i][j][k]=0.0;
     if(jj==2)tyv[i][j][k]=tyl[i][j][k]=0.0;
     if(kk==2)tzv[i][j][k]=tzl[i][j][k]=0.0;
@@ -145,8 +213,8 @@ void PhaseChange::cal_gradt(const Scalar * diff_eddy) {
 
       // interface in east
       if((clr[i][j][k]-phisurf)*(clr[i+1][j][k]-phisurf)<=0.0){
-        t_e = tsat;
         real ww = (phisurf-clr[i][j][k])/(clr[i+1][j][k]-clr[i][j][k]);
+        t_e = Tint(+1,Comp::i(),ww,i,j,k);
         dx_e *= ww;
 	dtdx = grad3(ww, dx_w, dx_e, t_w, t_c, t_e, epsl);
       }
@@ -180,8 +248,8 @@ void PhaseChange::cal_gradt(const Scalar * diff_eddy) {
 
       // interface in west
       if((clr[i-1][j][k]-phisurf)*(clr[i][j][k]-phisurf)<=0.0){
-        t_w = tsat;
         real ww = (phisurf-clr[i][j][k])/(clr[i-1][j][k]-clr[i][j][k]);
+        t_w = Tint(-1,Comp::i(),ww,i,j,k);
         dx_w *= ww;
 	dtdx = grad3(ww, dx_w, dx_e, t_w, t_c, t_e, epsl);
       }
@@ -222,8 +290,8 @@ void PhaseChange::cal_gradt(const Scalar * diff_eddy) {
 
       // interface in north
       if((clr[i][j][k]-phisurf)*(clr[i][j+1][k]-phisurf)<=0.0){
-        t_n = tsat;
         real ww = (phisurf-clr[i][j][k])/(clr[i][j+1][k]-clr[i][j][k]);
+        t_n = Tint(+1,Comp::j(),ww,i,j,k);
         dy_n *= ww;
 	dtdy = grad3(ww, dy_s, dy_n, t_s, t_c, t_n, epsl);
       }
@@ -257,8 +325,8 @@ void PhaseChange::cal_gradt(const Scalar * diff_eddy) {
 
       // interface in south
       if((clr[i][j-1][k]-phisurf)*(clr[i][j][k]-phisurf)<=0.0){
-        t_s = tsat;
         real ww = (phisurf-clr[i][j][k])/(clr[i][j-1][k]-clr[i][j][k]);
+        t_s = Tint(-1,Comp::j(),ww,i,j,k);
         dy_s *= ww;
 	dtdy = grad3(ww, dy_s, dy_n, t_s, t_c, t_n, epsl);
       }
@@ -303,8 +371,8 @@ void PhaseChange::cal_gradt(const Scalar * diff_eddy) {
 
       // interface in top
       if((clr[i][j][k]-phisurf)*(clr[i][j][k+1]-phisurf)<=0.0){
-        t_t = tsat;
 	real ww = (phisurf-clr[i][j][k])/(clr[i][j][k+1]-clr[i][j][k]);
+        t_t = Tint(+1,Comp::k(),ww,i,j,k);
        	dz_t *= ww;
 	dtdz = grad3(ww, dz_b, dz_t, t_b, t_c, t_t, epsl);
         if (ww>epsl) {
@@ -346,8 +414,8 @@ void PhaseChange::cal_gradt(const Scalar * diff_eddy) {
 
       // interface in bottom
       if((clr[i][j][k-1]-phisurf)*(clr[i][j][k]-phisurf)<=0.0){
-        t_b = tsat;
         real ww = (phisurf-clr[i][j][k])/(clr[i][j][k-1]-clr[i][j][k]);
+        t_b = Tint(-1,Comp::k(),ww,i,j,k);
         dz_b *= ww;
 	dtdz = grad3(ww, dz_b, dz_t, t_b, t_c, t_t, epsl);
       }
@@ -418,3 +486,4 @@ real grad3(real ww, real dm, real dp, real tm, real tc, real tp, real epsl){
    }
   return dtdx;
 }
+

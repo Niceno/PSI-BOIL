@@ -36,6 +36,7 @@ void PhaseChange::ext_gradt(Scalar & sca, const int iext) {
   }
   //stmp.exchange();
   //boil::plot->plot(clr,stmp,"clr-stmp",time->current_step());
+  //exit(0);
 
   /*-------------------------------------------+
   |  advect sca                                |
@@ -128,3 +129,4 @@ void PhaseChange::ext_gradt(Scalar & sca, const int iext) {
 
   return;
 }
+

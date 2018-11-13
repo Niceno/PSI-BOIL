@@ -1,5 +1,5 @@
-AC_INIT([PSI-BOIL], [0.0])
-AM_INIT_AUTOMAKE([subdir-objects])
+AC_INIT
+AM_INIT_AUTOMAKE(PSI-Boil,0.3)
 AM_CONFIG_HEADER(config.h)
 
 AC_PROG_CC
@@ -23,20 +23,20 @@ AC_OUTPUT(Makefile                                     \
           Src/Makefile                                 \
           Src/Equation/Centered/Enthalpy/Makefile      \
           Src/Equation/Centered/EnthalpyFD/Makefile    \
+          Src/Equation/Centered/EnthalpyTif/Makefile   \
           Src/Equation/Centered/Concentration/Makefile \
           Src/Equation/Centered/Pressure/Makefile      \
-          Src/Equation/Centered/ColorFunction/Makefile \
-          Src/Equation/Centered/LevelSet/Makefile      \
           Src/Equation/Centered/PhaseChange/Makefile   \
-          Src/Equation/Centered/PhaseField/Makefile    \
-          Src/Equation/Centered/ColorCIP/Makefile      \
+          Src/Equation/Centered/PhaseChangeVOF/Makefile\
           Src/Equation/Centered/CIPCSL2/Makefile       \
+          Src/Equation/Centered/VOF/Makefile           \
           Src/Equation/Centered/Distance/Makefile      \
           Src/Equation/Centered/Makefile               \
           Src/Equation/Staggered/Momentum/Makefile     \
           Src/Equation/Staggered/Makefile              \
           Src/Equation/Dispersed/Makefile              \
           Src/Equation/Floodfill/Makefile              \
+          Src/Equation/Heaviside/Makefile              \
           Src/Boundary/Makefile                        \
           Src/Solver/Makefile                          \
           Src/Ravioli/Makefile                         \

@@ -175,6 +175,8 @@ class CIPCSL2 : public Centered {
     real maxval() {return maxclr;}
     void color_minmax(); 
 
+    /* moved to public */
+    Vector sxyz;
 
   protected:
     void bnd_sym_kappa();
@@ -260,7 +262,6 @@ class CIPCSL2 : public Centered {
     real *** vel;
     real *** delrho;
     real epsnorm,epss,eps_clr,eps_st;
-    Vector sxyz;
     real cangle;
     real minclr, maxclr;
     bool localSharpen, use_dist_for_kappa;
