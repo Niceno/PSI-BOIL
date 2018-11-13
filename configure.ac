@@ -1,5 +1,5 @@
-AC_INIT
-AM_INIT_AUTOMAKE(PSI-Boil,0.3)
+AC_INIT([PSI-BOIL], [0.0])
+AM_INIT_AUTOMAKE([subdir-objects])
 AM_CONFIG_HEADER(config.h)
 
 AC_PROG_CC
