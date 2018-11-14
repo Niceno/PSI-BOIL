@@ -8,29 +8,6 @@ void Lagrangian::forces() {
 |                                                  |
 +=================================================*/
 
-  //boil::plot->plot(dom, "WaterPool--ii000");  //error-?!
-
-  //const real sigma    = flu->sigma()->value();
-  //const real mu_cont  = flu->mu(continuous);  //1-mu_cont-interpolated-with-colorfunction
-  //const real rho_cont = flu->rho(continuous);  //2-rho_cont-interpolated-with-colorfunction
-  /*const real rho_cont =  flu->rho(1.0) * ( (*cfu)[12][7][23] )
-                       + flu->rho(0.0) * ( 1.0 - (*cfu)[12][7][23] );  // main.cpp order: Matter mixed(liquid, vapor, &c);
-  OPR( (*cfu)[12][7][23] );
-  OPR( flu->rho(1.0) );
-  OPR( flu->rho(0.0) );
-  boil::oout<<"force-initial.rho_flud... " << rho_cont << boil::endl;*/
-
-  //const real rho_lagp = sol->rho(lagrangian);
-  //const real rho_lagp = flu->rho(lagrangian);
-  //const real rho_lagp = lagparticle->rho(lagrangian);
-  //const real rho_lagp = lagparticle.rho->value(1,1,1);
-  //const real rho_lagp = 3000.0;
-  /*const real rho_lagp = sol->rho(12,7,23);  //3-rho_lagp-const
-  boil::oout<<"force-initial.rho_lagp... " << rho_lagp << boil::endl;
-  getchar();*/
-
-  //const real delta_rho =  fabs(rho_cont  - rho_lagp);  //4-delta_rho
-
   const int nb_proc = boil::cart.nproc();
 
   /* morton number */
@@ -126,10 +103,6 @@ void Lagrangian::forces() {
       const int cell_i = ( dom->local_i( dom->I(particles[p].x()) ) );
       const int cell_j = ( dom->local_j( dom->J(particles[p].y()) ) );
       const int cell_k = ( dom->local_k( dom->K(particles[p].z()) ) );
-      /*OPR(mu_cont);
-      OPR(rho_cont);
-      OPR(rho_lagp);
-      OPR(delta_rho);*/
 
       //calculate-the-properties-of-all-the-three-phases
       //continuous
@@ -145,25 +118,6 @@ void Lagrangian::forces() {
       uvwc[0] = (*u)[Comp::u()][cell_i][cell_j][cell_k];
       uvwc[1] = (*u)[Comp::v()][cell_i][cell_j][cell_k];
       uvwc[2] = (*u)[Comp::w()][cell_i][cell_j][cell_k];
-
-      /*OPR(cell_i);
-      OPR(cell_j);
-      OPR(cell_k);
-      OPR((*cfu)[cell_i][cell_j][cell_k]);
-      OPR(mu_cont);
-      OPR(rho_cont);
-      OPR(rho_lagp);
-      OPR(delta_rho);
-
-      OPR(BoxingScheme);
-      OPR(cell_i);
-      OPR(cell_j);
-      OPR(cell_k);
-      OPR( (*u)[Comp::u()][cell_i][cell_j][cell_k] );
-      OPR( (*u)[Comp::v()][cell_i][cell_j][cell_k] );
-      OPR( (*u)[Comp::w()][cell_i][cell_j][cell_k] );
-      OPR( (*cfu)[cell_i][cell_j][cell_k] );
-      getchar();*/
       }
     else if (BoxingScheme==3) {
       //step-1-locate particle position and achieve cell coordinate
@@ -274,12 +228,6 @@ void Lagrangian::forces() {
       norm_uvwr += uvwr[~m] * uvwr[~m];
     }
     norm_uvwr = sqrt(norm_uvwr);
-
-    /*boil::oout<<" " << boil::endl;
-    boil::oout<<"forces... " << boil::endl;
-    boil::oout<<"lagp.num... " << p << boil::endl;
-    boil::oout<<"lagp.uvw... " << particles[p].uvw(Comp::u()) << " " << particles[p].uvw(Comp::v()) << " " << particles[p].uvw(Comp::w()) << boil::endl;
-    boil::oout<<"cont.uvw... " << uvwc[0] << " " << uvwc[1] << " " << uvwc[2] << boil::endl;*/
 
 
     /*---------------------------------+
@@ -493,16 +441,6 @@ void Lagrangian::forces() {
       //ft[~m] = fb[~m] + fd[~m] + fl[~m] + fw[~m] + fam[~m]; 
       ft[~m] = fd[~m];  //only-drag-force-assumption
 
-
-    /*-------------------------------------------+
-    |  check particle moving characteristic time |
-    +-------------------------------------------*/
-    //real taup = ( rho_lagp * pow(particles[p].d(),2.0) ) / (18.0*mu_cont) / (1.0 + 0.15 * pow(reynolds,0.687));
-    /*real taup = ( rho_lagp * pow(particles[p].d(),2.0) ) / (18.0*mu_cont);
-    OPR("particle moving characteristic time, taup, us");
-    OPR(taup/1.e-6); */
-
-
     /*---------------------------------------+
     |                                        |
     |  compute new velocity of the particle  |
@@ -511,33 +449,10 @@ void Lagrangian::forces() {
     real duvw[DIM] = {0.0, 0.0, 0.0}; /* increase in velocity */
 
     for_m(m) {
-      /*boil::oout<<" " << boil::endl;
-      boil::oout<<"lagp.num " << p << boil::endl;
-      boil::oout<<"force-initial.uvw.. " << time->dt() << boil::endl;
-      boil::oout<<"lagp.uvw.. " << particles[p].uvw(Comp::u()) << " " << particles[p].uvw(Comp::v()) << " " << particles[p].uvw(Comp::w()) << boil::endl;
-      boil::oout<<"ft.. " << ft[0] << " " << ft[1] << " " << ft[2] << boil::endl;
-      boil::oout<<"vol.. " << particles[p].volume() << " " << rho_lagp << " " << rho_cont << boil::endl;*/
-
       duvw[~m] = time->dt() * ft[~m] / (particles[p].volume() * (rho_lagp));
                //time->dt() * ft[~m] / (particles[p].volume() * (0.5 * rho_cont + rho_lagp));
-      /*OPR(time->dt());
-      OPR(ft[2]);
-      OPR(particles[p].volume());
-      OPR(rho_lagp);
-      OPR( time->dt() * ft[2] / (particles[p].volume() * (rho_lagp)) );
-      OPR(duvw[2]);
-      OPR(particles[p].uvw(Comp::w()));*/
 
       particles[p].uvw(m) += duvw[~m];
-
-      /*OPR(duvw[2]);
-      OPR(particles[p].uvw(Comp::w()));
-      boil::oout<<"forces.update.uvw.. " << boil::endl;
-      boil::oout<<"duvw.. " << duvw[0] << " " << duvw[1] << " " << duvw[2] << boil::endl;
-      boil::oout<<"lagp.uvw.. " << particles[p].uvw(Comp::u()) << " " << particles[p].uvw(Comp::v()) << " " << particles[p].uvw(Comp::w()) << boil::endl;
-      boil::oout<<"cont.uvw.. " << uvwc[0] << " " << uvwc[1] << " " << uvwc[2] << boil::endl;
-      getchar();*/
-
 
       /* averaging through all the processor is very important.
          In some cases, very small differences can build up and 

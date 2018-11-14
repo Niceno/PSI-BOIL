@@ -16,10 +16,6 @@ void Lagrangian::save(const char * nm, const int it) {
   //out.write(reinterpret_cast<const char*>(&nb_particles), sizeof size());
   //out.write(reinterpret_cast<const char*>(&t_step), sizeof t_step);
 
-  boil::oout<<"save-1... " << time->current_step() << boil::endl;
-  //boil::oout<<"save-1... " << time->current_step() << boil::endl -> outttt;
-
-
   std::ofstream outfile("particle_tracks.plt", std::ios_base::app);  //appendix-write-in
   //std::ofstream outfile("particle_tracks.plt");  //cover-write-in
   //outfile << " VARIABLES= xp,yp,up,vp,dp,numin" << boil::endl;
@@ -37,41 +33,10 @@ void Lagrangian::save(const char * nm, const int it) {
     real v_old = particles[p].uvwc_old(Comp::v());
     real w_old = particles[p].uvwc_old(Comp::w());
 
-    //boil::oout<<"save-d_p... " << dp << boil::endl;
-    //boil::oout<<"save-xyz_p... " << xp << " " << yp << " " << zp << boil::endl;
-    //boil::oout<<"save-uvw_p... " << up << " " << vp << " " << wp << boil::endl;
-    //boil::oout<<"save-uvw_old... " << u_old << " " << v_old << " " << w_old << boil::endl;
-
-
-    //std::ofstream outfile("particle_tracks.txt", std::ios_base::app);
-    //outfile << time->current_step() << " " << xp << " " << yp << " " << up << " " << vp << " " << dp << boil::endl;
-    //outfile.close();
-
-
-    //outfile << " " << xp << " " << yp << " " << up << " " << vp << " " << dp << " " << (p+1) << boil::endl;
     outfile << xp << " " << yp << " " << up << " " << vp << " " << dp << " " << time->current_step() << boil::endl;
-
-    //out.write(xp);
-    //boil::oout << (particles[p].x()) -> outxp;
-
-    /*
-    out.write(reinterpret_cast<const char *> (&dp), sizeof dp);
-    out.write(reinterpret_cast<const char *> (&xp), sizeof xp);
-    out.write(reinterpret_cast<const char *> (&yp), sizeof yp);
-    out.write(reinterpret_cast<const char *> (&zp), sizeof zp);
-    out.write(reinterpret_cast<const char *> (&up), sizeof up);
-    out.write(reinterpret_cast<const char *> (&vp), sizeof vp);
-    out.write(reinterpret_cast<const char *> (&wp), sizeof wp);
-    out.write(reinterpret_cast<const char *> (&u_old), sizeof u_old);
-    out.write(reinterpret_cast<const char *> (&v_old), sizeof v_old);
-    out.write(reinterpret_cast<const char *> (&w_old), sizeof w_old);*/
   }
 
   outfile.close();
-
-  
-  /* close a file */
-  //out.close();
 }
 
 /******************************************************************************/
