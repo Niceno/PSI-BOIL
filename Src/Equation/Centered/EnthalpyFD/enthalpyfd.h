@@ -1,4 +1,4 @@
-#ifndef ENTHAPLYFD_H
+#ifndef ENTHALPYFD_H
 #define ENTHALPYFD_H
 
 #include "../../../Parallel/mpi_macros.h"
