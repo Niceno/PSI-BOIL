@@ -18,6 +18,7 @@
 #include "../Equation/Centered/Pressure/pressure.h"
 #include "../Equation/Centered/Concentration/concentration.h"
 #include "../Equation/Dispersed/dispersed.h"
+#include "../Equation/Lagrangian/lagrangian.h"
 #include "../Equation/Floodfill/floodfill.h"
 #include "../Timer/timer.h"
 #include "../Solver/Krylov/krylov.h"

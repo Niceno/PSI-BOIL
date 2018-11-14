@@ -36,6 +36,7 @@ AC_OUTPUT(Makefile                                     \
           Src/Equation/Staggered/Momentum/Makefile     \
           Src/Equation/Staggered/Makefile              \
           Src/Equation/Dispersed/Makefile              \
+          Src/Equation/Lagrangian/Makefile             \
           Src/Equation/Floodfill/Makefile              \
           Src/Boundary/Makefile                        \
           Src/Solver/Makefile                          \

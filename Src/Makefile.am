@@ -19,6 +19,7 @@ SUBDIRS = Equation/Staggered/Momentum     \
           Equation/Centered/Distance      \
           Equation/Centered               \
           Equation/Dispersed              \
+          Equation/Lagrangian             \
           Equation/Floodfill              \
           Monitor/Rack                    \
           Monitor/Location                \
@@ -66,6 +67,7 @@ LDADD = Equation/Staggered/Momentum/libMomentum.a          \
         Equation/Centered/Distance/libDistance.a           \
         Equation/Centered/libCentered.a                    \
         Equation/Dispersed/libDispersed.a                  \
+        Equation/Lagrangian/libLagrangian.a                \
         Equation/Floodfill/libFloodfill.a                  \
         Monitor/Rack/libRack.a                             \
         Monitor/Location/libLocation.a                     \
