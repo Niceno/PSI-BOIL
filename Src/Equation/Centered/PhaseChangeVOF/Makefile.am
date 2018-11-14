@@ -8,7 +8,9 @@ libPhaseChangeVOF_a_SOURCES = phasechangevof.h                  \
                               phasechangevof_ext_gradt.cpp      \
                               phasechangevof_grad_2nd.cpp       \
                               phasechangevof_gradt.cpp          \
+                              phasechangevof_gradt_gen.cpp      \
                               phasechangevof_gradt8.cpp         \
+                              phasechangevof_gradt9.cpp         \
 			      phasechangevof_finalize.cpp       \
                               phasechangevof_initialize.cpp     \
                               phasechangevof_interface.cpp      \

@@ -87,6 +87,12 @@ PhaseChangeVOF::PhaseChangeVOF(const Scalar & MDOT,
   epsl = 1.0e-1;
   //epsl = 1.0e-2;
   dxmin = dom->dxyz_min();
+
+#if 1
+  upwind_flag = false;
+#else
+  upwind_flag = true;
+#endif
 }	
 
 /******************************************************************************/

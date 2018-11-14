@@ -34,8 +34,6 @@ void VOF::cal_fs() {
 
   for_ijk(i,j,k) {
     real c = phi[i][j][k];
-    //if(i<6&&j==1&&k==1)
-    //  boil::oout<<i<<" "<<iflag[i][1][1]<<" "<<phi[i][1][1]<<" "<<boil::endl;
 #if 0
       if (i==26&&j==1&&k==56) {
         cout<<"cal_fs: "<<c<<"\n";
@@ -71,10 +69,6 @@ void VOF::cal_fs() {
       if (phi[i][j][k+1]>1.0-boil::pico) {
         fsz[i][j][k] = phi.zn(k+1);
       } 
-
-      //if(i<6&&j==1&&k==1)
-      //  boil::oout<<"<1> "<<fsx[i][j][k]<<" "<<iflagx[i][j][k]<<boil::endl;
-
     } else if (1.0-boil::pico<c) {
       if (phi[i-1][j][k]<boil::pico) {
         fsx[i][j][k]=phi.xn(i);
@@ -94,11 +88,8 @@ void VOF::cal_fs() {
       if (phi[i][j][k+1]<boil::pico) {
         fsz[i][j][k] = phi.zn(k+1);
       }
-
-      //if(i<6&&j==1&&k==1)
-      //  boil::oout<<"<2> "<<fsx[i][j][k]<<" "<<iflagx[i][j][k]<<boil::endl;
-
     } else {
+
 #if 0
     if (i==26&&j==1&&k==50) {
       cout<<"cal_fs:B "<<c<<"\n";
@@ -213,9 +204,6 @@ void VOF::cal_fs() {
                  <<fsz[i][j][k]<<"\n";
       }
 #endif
-
-    //if(i<6&&j==1&&k==1)
-    //  boil::oout<<"<3> --- "<<fsx[i][1][1]<<" "<<iflagx[i][1][1]<<" "<<xuni<<" "<<alpha<<" "<<nx[i][j][k]<<boil::endl;
     }
   }
 
@@ -300,7 +288,6 @@ void VOF::cal_fs() {
     }
   }
 
-
 #ifdef OUTPUT
   if (time->current_step()==350) {
     string fname_x, fname_y, fname_z;
@@ -341,4 +328,3 @@ void VOF::cal_fs() {
 #endif
   return;
 }
-/*-----------------------------------------------------------------------------+

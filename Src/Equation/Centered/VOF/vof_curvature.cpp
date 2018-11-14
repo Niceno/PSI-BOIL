@@ -209,9 +209,13 @@ void VOF::curvature() {
                  / (4.0*phi.dyc(j)*phi.dzc(k));
 
 
-        kappa[i][j][k] = -1.0
-                       * (hyy + hzz + hyy*hz*hz + hzz*hy*hy + 2.0*hyz*hy*hz)
-                       / pow(1.0 + hy*hy + hz*hz, 1.5);
+        real curv = -1.0
+                    * (hyy + hzz + hyy*hz*hz + hzz*hy*hy + 2.0*hyz*hy*hz)
+                    / pow(1.0 + hy*hy + hz*hz, 1.5);
+        real curv_max = 1.0/phi.dyc(j) + 1.0/phi.dzc(k);
+        real curv_min = -curv_max;
+
+        kappa[i][j][k] = max(curv_min,min(curv_max,curv));
 #if 0
         if (i==27&&j==1&&k==57) {
           cout<<"hmax= "<<hmax<<" "<<kappa[i][j][k]<<"\n";
@@ -261,9 +265,13 @@ void VOF::curvature() {
         real hxz = (hpp-hpm-hmp+hmm)
                  / (4.0*phi.dxc(i)*phi.dzc(k));
 
-        kappa[i][j][k] = -1.0
-                       * (hxx + hzz + hxx*hz*hz + hzz*hx*hx + 2.0*hxz*hx*hz)
-                       / pow(1.0 + hx*hx + hz*hz, 1.5);
+        real curv = -1.0
+                  * (hxx + hzz + hxx*hz*hz + hzz*hx*hx + 2.0*hxz*hx*hz)
+                  / pow(1.0 + hx*hx + hz*hz, 1.5);
+        real curv_max = 1.0/phi.dxc(i) + 1.0/phi.dzc(k);
+        real curv_min = -curv_max;
+
+        kappa[i][j][k] = max(curv_min,min(curv_max,curv));
 
 #if 0
         if (i==27&&j==23&&k==23) {
@@ -353,11 +361,15 @@ void VOF::curvature() {
         real hxy = (hpp-hpm-hmp+hmm)
                  / (4.0*phi.dxc(i)*phi.dyc(j));
 
-        kappa[i][j][k] = -1.0
-                       * (hxx + hyy + hxx*hy*hy + hyy*hx*hx + 2.0*hxy*hx*hy)
-                       / pow(1.0 + hx*hx + hy*hy, 1.5);
+        real curv = -1.0
+                  * (hxx + hyy + hxx*hy*hy + hyy*hx*hx + 2.0*hxy*hx*hy)
+                  / pow(1.0 + hx*hx + hy*hy, 1.5);
+        real curv_max = 1.0/phi.dxc(i) + 1.0/phi.dyc(j);
+        real curv_min = -curv_max;
+
+        kappa[i][j][k] = max(curv_min,min(curv_max,curv));
       }
-#if 1
+#if 0
       if(i==27&&j==23&&k==23) {
         cout<<"kappa= "<<kappa[i][j][k]<<" "<<dirMax<<"\n";
       }
@@ -380,4 +392,3 @@ void VOF::curvature() {
 
   return;
 }
-/*-----------------------------------------------------------------------------+

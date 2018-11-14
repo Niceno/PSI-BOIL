@@ -44,7 +44,7 @@ void PhaseChangeVOF::cal_gradt(const Scalar * diff_eddy) {
 
     /* west */
     if((clrw-phisurf)*(clrc-phisurf)<=0.0){
-      txp = gradtx8(-1,i,j,k);
+      txp = gradtx(-1,i,j,k);
       if((clrc-phisurf)<0.0){
         txv[i][j][k] = txp; 
       } else {
@@ -54,7 +54,7 @@ void PhaseChangeVOF::cal_gradt(const Scalar * diff_eddy) {
     }
     /* east */
     if((clre-phisurf)*(clrc-phisurf)<=0.0){
-      txm = gradtx8(+1,i,j,k);
+      txm = gradtx(+1,i,j,k);
       if((clrc-phisurf)<0.0){
         txv[i][j][k]=txm;
       } else {
@@ -64,7 +64,7 @@ void PhaseChangeVOF::cal_gradt(const Scalar * diff_eddy) {
     }
     /* south */
     if((clrs-phisurf)*(clrc-phisurf)<=0.0){
-      typ = gradty8(-1,i,j,k);
+      typ = gradty(-1,i,j,k);
       if((clrc-phisurf)<0.0){
         tyv[i][j][k]=typ;
       } else {
@@ -74,7 +74,7 @@ void PhaseChangeVOF::cal_gradt(const Scalar * diff_eddy) {
     }
     /* north */
     if((clrn-phisurf)*(clrc-phisurf)<=0.0){
-      tym = gradty8(+1,i,j,k);
+      tym = gradty(+1,i,j,k);
       if((clrc-phisurf)<0.0){
         tyv[i][j][k]=tym;
       } else {
@@ -84,7 +84,7 @@ void PhaseChangeVOF::cal_gradt(const Scalar * diff_eddy) {
     }
     /* bottom */
     if((clrb-phisurf)*(clrc-phisurf)<=0.0){
-      tzp = gradtz8(-1,i,j,k);
+      tzp = gradtz(-1,i,j,k);
       if((clrc-phisurf)<0.0){
         tzv[i][j][k]=tzp;
       } else {
@@ -94,7 +94,7 @@ void PhaseChangeVOF::cal_gradt(const Scalar * diff_eddy) {
     }
     /* top */
     if((clrt-phisurf)*(clrc-phisurf)<=0.0){
-      tzm = gradtz8(+1,i,j,k);
+      tzm = gradtz(+1,i,j,k);
       if((clrc-phisurf)<0.0){
         tzv[i][j][k]=tzm;
       } else {

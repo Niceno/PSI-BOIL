@@ -48,6 +48,9 @@ class PhaseChangeVOF : public Centered {
 
     void set_gradclr_ext(const Scalar & heavi);
 
+    bool get_upwind_flag() { return upwind_flag; }
+    void set_upwind_flag(const bool flag = true) { upwind_flag = flag; }
+
   private:
     bool Interface(const int i, const int j, const int k,
                    const Comp m, const int dir);
@@ -75,9 +78,15 @@ class PhaseChangeVOF : public Centered {
     void prepare_gradt8();
     real grad_2nd(const real tm0, const real tm1, const real tm2,
                   const real dm1, const real dm2);
+    real gradtx(const int dir, const int i, const int j, const int k);
+    real gradty(const int dir, const int i, const int j, const int k);
+    real gradtz(const int dir, const int i, const int j, const int k);
     real gradtx8(const int dir, const int i, const int j, const int k);
     real gradty8(const int dir, const int i, const int j, const int k);
     real gradtz8(const int dir, const int i, const int j, const int k);
+    real gradtx9(const int dir, const int i, const int j, const int k);
+    real gradty9(const int dir, const int i, const int j, const int k);
+    real gradtz9(const int dir, const int i, const int j, const int k);
 
     void sources_clrs();
     void sources_fext();
@@ -97,6 +106,8 @@ class PhaseChangeVOF : public Centered {
                       const int dir, real & tint, real & dist);
  
     real Tint(const int i, const int j, const int k);
+
+    bool upwind_flag;
 
     ScalarInt iflag;
     Scalar txv, tyv, tzv;

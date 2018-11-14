@@ -564,9 +564,14 @@ real MarchingCube::volume(const int i, const int j, const int k){
                 +(*clr)[ii][jj+1][kk  ]+(*clr)[ii+1][jj+1][kk  ]
                 +(*clr)[ii][jj  ][kk+1]+(*clr)[ii+1][jj  ][kk+1]
                 +(*clr)[ii][jj+1][kk+1]+(*clr)[ii+1][jj+1][kk+1])/8.0;
-    if(fabs(grid.val[m] - clrsurf) < 1.0e-11){
-        grid.val[m]=clrsurf+1.0e-11;
+#if 1
+    if(fabs(grid.val[m] - clrsurf) < boil::pico){
+        grid.val[m]=clrsurf+boil::pico;
     }
+#else
+    /* for the purpose of indicator reconstruction, the sign of phase change
+     * should not matter? Cf. phasechange_marching_cube.cpp */
+#endif
     if(grid.val[m]>clrsurf)isum++;
   }
   if(isum==8)return(1.0);

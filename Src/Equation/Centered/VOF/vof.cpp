@@ -68,11 +68,13 @@ VOF::VOF(const Scalar & PHI,
   //alloc3d(& iflag, phi.ni(), phi.nj(), phi.nk());
 
   discretize();
-//  init();
+
+  /* apply boundary condition */
+  phi.bnd_update();
+  phi.exchange_all();
+
 }	
 
 /******************************************************************************/
 VOF::~VOF() {
 }	
-
-/*-----------------------------------------------------------------------------+

@@ -6,7 +6,7 @@ void VOF::advance() {
   /*------------------------------+
   |  source term for phase change |
   +------------------------------*/
-  for_aijk(i,j,k){   //must be aijk for insert boundary
+  for_ijk(i,j,k){
     phi[i][j][k]=phi[i][j][k]+time->dt()*fext[i][j][k];
   }
   phi.bnd_update();
@@ -15,7 +15,6 @@ void VOF::advance() {
   /*-------------------------------+
   |  normal vector at cell center  |
   +-------------------------------*/
-  //gradphic(phi);
   norm_cc(phi);
 
   for_aijk(i,j,k){
@@ -37,11 +36,6 @@ void VOF::advance() {
 #if 0
     // limit C
     phi[i][j][k] = std::min(1.0,std::max(0.0,phi_tmp));
-    if(phi_tmp>1.0+boil::pico || phi_tmp< -boil::pico){
-      std::cout.setf(std::ios_base::scientific);
-      std::cout<<"limit phi "<<phi_tmp<<" i "<<i<<" j "<<j<<" k "<<k<<"\n";
-      std::cout.unsetf(std::ios_base::floatfield);
-    }
 #else
     // unlimit C
     phi[i][j][k] = phi_tmp;
