@@ -14,15 +14,7 @@ void Lagrangian::collisions() {
   |  smaller than then time step ...                                          |
   |  if yes, advance the particle and take into consideration the collision    |
   +--------------------------------------------------------------------------*/
-  /*const real sigma    = flu->sigma()->value(); 
-  const real mu_cont  = flu->mu(continuous);  //viscosity carrier phase
-  const real rho_lagp = flu->rho(lagrangian);
-  const real rho_cont = flu->rho(continuous);*/
-
   const int nb_proc = boil::cart.nproc();
-
-  //boil::oout << "lag_coll_check: " << sigma << " " << mu_cont << " " << rho_lagp << " " << rho_cont << boil::endl;
-
 
   boil::timer.start("lagrangian collisions");
 
@@ -113,28 +105,12 @@ void Lagrangian::collisions() {
    } 
    assert(min_dt <= time->dt());
 
-   boil::oout<<" " << boil::endl;
-   OPR(min_dt);
-   OPR(cur_time);
-
    cur_time += min_dt;
-
-   OPR(min_dt);
-   OPR(cur_time);
-   boil::oout<<"time->dt()... " << time->dt() << boil::endl;
 
    if (cur_time <= time->dt()) {
      for_p(p)
        for_m(m) {
-         boil::oout<<"check-p-uvw-xyz... " << boil::endl;
-         boil::oout<<"kstep..collision.. " << time->current_step() << boil::endl;
-         boil::oout<<"velocity--a... " << particles[p].uvw(m) << boil::endl;
-         boil::oout<<"xxxyyyzz--a... " << particles[p].xyz(m) << boil::endl;
-
          particles[p].xyz(m) += min_dt * particles[p].uvw(m);
-
-         boil::oout<<"velocity--b... " << particles[p].uvw(m) << boil::endl;
-         boil::oout<<"xxxyyyzz--b... " << particles[p].xyz(m) << boil::endl;
 
          boil::cart.sum_real(& particles[p].xyz(m));
          /* averaging through all the processor is very important.
@@ -192,11 +168,6 @@ void Lagrangian::collisions() {
        //if(u->bc(Comp::u()).type(b) == BndType::outlet()) {
 
          //Dir d = u->bc(Comp::u()).direction(b);
-
-         //OPR(Dir::imax());
-         //OPR(Dir::imin());
-         //OPR( imax );
-         //OPR( imin );
 
          //if(d == Dir::imax() && fabs(xp - dom->global_max_x()) <= r) 
          //if(d == Dir::imax() && (xp >= dom->global_max_x()) ) 
@@ -269,13 +240,6 @@ void Lagrangian::collisions() {
  }
  
  boil::timer.stop("lagrangian collisions");
-
- /*boil::oout<<"x.max... " << dom->global_max_x() << boil::endl;
- boil::oout<<"x.min... " << dom->global_min_x() << boil::endl;
- boil::oout<<"y.max... " << dom->global_max_y() << boil::endl;
- boil::oout<<"y.min... " << dom->global_min_y() << boil::endl;
- boil::oout<<"z.max... " << dom->global_max_z() << boil::endl;
- boil::oout<<"z.min... " << dom->global_min_z() << boil::endl;*/
 
 }
 
