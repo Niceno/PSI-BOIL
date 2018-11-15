@@ -47,6 +47,7 @@ class VOF : public Centered {
     void cal_fs();
     //void cal_fs2();
     void cal_fs3();
+    void fs_bnd();
     void ext_fs();
     real extract_alpha(const int i, const int j, const int k);
     void insert_bc(const Scalar & g);

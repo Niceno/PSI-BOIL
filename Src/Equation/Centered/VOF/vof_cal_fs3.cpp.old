@@ -10,7 +10,8 @@ void VOF::cal_fs3() {
 *******************************************************************************/
 
   /* tolerance is necessary because the linear-planes are not closed */
-  /* with this version, it shouldnt be necessary anymore */
+  //real tol = 0.0e-3; 
+  //real tol = 2.0e-2;  
   real tol = 0.0e-2;
         
   /* initialize */
@@ -30,12 +31,24 @@ void VOF::cal_fs3() {
   for(int j=sj(); j<=ej()  ; j++)
   for(int k=sk(); k<=ek()  ; k++) {
   
+#if 0
+    if(i<6&&j==1&&k==1)
+      boil::oout<<"VOF::FS3 "<<i<<" "<<iflag[i-1][j][k]<<" "<<iflag[i][j][k]<<boil::endl;  
+#endif
+             
+    //if(abs(iflag[i-1][j][k])>=1||abs(iflag[i][j][k])>=1)
+    //  continue;
+
     /* degenerate cases */
     real clrw = phi[i-1][j][k];
     real clre = phi[i  ][j][k];
 
     if((clrw-phisurf)*(clre-phisurf)>0.0) 
       continue;
+#if 0
+    if(i<6&&j==1&&k==1)
+      boil::oout<<"           "<<clrw<<" "<<clre<<boil::endl;  
+#endif  
   
     if(  (clrw<boil::pico&&clre>1.0-boil::pico)
        ||(clrw>1.0-boil::pico&&clre<boil::pico)) {
@@ -47,6 +60,11 @@ void VOF::cal_fs3() {
     real fsxw = fs_val(m,i-1,j,k);
     real fsxe = fs_val(m,i  ,j,k);
 
+#if 0
+    if(i<6&&j==1&&k==1)
+      boil::oout<<"           "<<fsxw<<" "<<fsxe<<boil::endl;  
+#endif
+
     /* --------------------------------------------
        first check: are candidate positions 
        a. between cell centres
@@ -57,14 +75,26 @@ void VOF::cal_fs3() {
 
     if     ( flagw && !flage) { /* west is real and east is not */
       fs[m][i][j][k] = phi.xn(i-1) + phi.dxc(i-1) * fsxw;
+
+#if 0
+      if(i<6&&j==1&&k==1)
+        boil::oout<<"           "<<flagw<<" "<<flage<<" "<<fs[m][i][j][k]<<boil::endl;  
+#endif
       continue;
     }
     else if(!flagw &&  flage) { /* east is real and west is not */
       fs[m][i][j][k] = phi.xn(i) + phi.dxc(i) * fsxe;
+
+#if 0
+      if(i<6&&j==1&&k==1)
+        boil::oout<<"           "<<flagw<<" "<<flage<<" "<<fs[m][i][j][k]<<boil::endl;  
+#endif
       continue;
     }
     else if( flagw &&  flage) { /* both are real */
-
+#if 0
+      fs[m][i][j][k] = phi.xn(i);
+#else
       /* calculate distance between the two candidate positions */
       real fsx_diff = fsxe + 1.0 - fsxw;
       if(fabs(fsx_diff)<tol) { /* they are close to each other */
@@ -74,10 +104,37 @@ void VOF::cal_fs3() {
                          phi.xn(i-1) + phi.dxc(i-1) * fsxw
                        : phi.xn(i  ) + phi.dxc(i  ) * fsxe;
       }
+#endif
+
+#if 0
+      if(i<6&&j==1&&k==1)
+        boil::oout<<"           "<<flagw<<" "<<flage<<" "<<fs[m][i][j][k]<<boil::endl;  
+#endif
       continue;
     }
-
+#if 0
+    /* -----------------------------------------------
+       second check: are candidate positions 
+       a. between cell centres
+       b. inside the wrong cell (imaginary interface)
+    -------------------------------------------------- */
+    flagw = ( 1.0-tol <= fsxw && fsxw <= 1.5    );
+    flage = (-0.5     <= fsxe && fsxe <= 0.0+tol);
+    if     ( flagw && !flage) { /* west is imaginary and east is not */
+      fs[m][i][j][k] = phi.xn(i-1) + phi.dxc(i-1) * fsxw;
+      continue;
+    }
+    else if(!flagw &&  flage) { /* east is imaginary and west is not */
+      fs[m][i][j][k] = phi.xn(i) + phi.dxc(i) * fsxe;
+      continue;
+    }
+    else { /* both are either imaginary or not intersecting */
+      fs[m][i][j][k] = phi.xn(i);
+      continue;
+    }
+#else
     fs[m][i][j][k] = phi.xn(i);
+#endif
   } 
   
   /******************************************
@@ -90,6 +147,9 @@ void VOF::cal_fs3() {
   for(int j=sj(); j<=ej()+1; j++)
   for(int k=sk(); k<=ek()  ; k++) {
                
+    //if(abs(iflag[i][j-1][k])>=1||abs(iflag[i][j][k])>=1)
+    //  continue;
+
     /* degenerate cases */
     real clrs = phi[i][j-1][k];
     real clrn = phi[i][j  ][k];
@@ -117,14 +177,22 @@ void VOF::cal_fs3() {
    
     if     ( flags && !flagn) { /* south is real and north is not */
       fs[m][i][j][k] = phi.yn(j-1) + phi.dyc(j-1) * fsys;
+
+     //if(time->current_step()==518&&i==5)
+     //  boil::oout<<i<<" "<<j<<" "<<k<<" "<<fs[m][i][j][k]<<" "<<flags<<" "<<flagn<<" "<<fsys<<" "<<fsyn<<" "<<phi.yn(j-1) + phi.dyc(j-1) * fsys<<" "<<phi.yn(j) + phi.dyc(j) * fsyn<<boil::endl;
       continue;
     }
     else if(!flags &&  flagn) { /* north is real and south is not */
       fs[m][i][j][k] = phi.yn(j) + phi.dyc(j) * fsyn;
+
+     //if(time->current_step()==518&&i==5)
+     //   boil::oout<<i<<" "<<j<<" "<<k<<" "<<fs[m][i][j][k]<<" "<<flags<<" "<<flagn<<" "<<fsys<<" "<<fsyn<<" "<<phi.yn(j-1) + phi.dyc(j-1) * fsys<<" "<<phi.yn(j) + phi.dyc(j) * fsyn<<boil::endl;
       continue;
     }
     else if( flags &&  flagn) { /* both are real */
-
+#if 0
+      fs[m][i][j][k] = phi.yn(j);
+#else
       /* calculate distance between the two candidate positions */
       real fsy_diff = fsyn + 1.0 - fsys;
       if(fabs(fsy_diff)<tol) { /* they are close to each other */
@@ -134,9 +202,39 @@ void VOF::cal_fs3() {
                          phi.yn(j-1) + phi.dyc(j-1) * fsys
                        : phi.yn(j  ) + phi.dyc(j  ) * fsyn;
       }
+
+     //if(time->current_step()==518&&i==5)
+     //   boil::oout<<i<<" "<<j<<" "<<k<<" "<<fs[m][i][j][k]<<" "<<flags<<" "<<flagn<<" "<<fsys<<" "<<fsyn<<" "<<phi.yn(j-1) + phi.dyc(j-1) * fsys<<" "<<phi.yn(j) + phi.dyc(j) * fsyn<<boil::endl;
+#endif
+    
       continue;
     }
+#if 0     
+    /* -----------------------------------------------
+       second check: are candidate positions 
+       a. between cell centres
+       b. inside the wrong cell (imaginary interface)
+    -------------------------------------------------- */
+    flags = ( 1.0-tol <= fsys && fsys <= 1.5    );
+    flagn = (-0.5     <= fsyn && fsyn <= 0.0+tol);
+    if     ( flags && !flagn) { /* south is imaginary and north is not */
+      fs[m][i][j][k] = phi.yn(j-1) + phi.dyc(j-1) * fsys;
+      continue;
+    }
+    else if(!flags &&  flagn) { /* north is imaginary and south is not */
+      fs[m][i][j][k] = phi.yn(j) + phi.dyc(j) * fsyn;
+      continue;
+    }
+    else { /* both are either imaginary or not intersecting */
+      fs[m][i][j][k] = phi.yn(j);
+      continue;
+    }
+#else
     fs[m][i][j][k] = phi.yn(j);
+
+    //if(time->current_step()==518&&i==5)
+    //    boil::oout<<i<<" "<<j<<" "<<k<<" "<<fs[m][i][j][k]<<" "<<flags<<" "<<flagn<<" "<<fsys<<" "<<fsyn<<" "<<phi.yn(j-1) + phi.dyc(j-1) * fsys<<" "<<phi.yn(j) + phi.dyc(j) * fsyn<<boil::endl;
+#endif
   } 
   
   /******************************************
@@ -149,6 +247,9 @@ void VOF::cal_fs3() {
   for(int j=sj(); j<=ej()  ; j++)
   for(int k=sk(); k<=ek()+1; k++) {
                
+    //if(abs(iflag[i][j][k-1])>=1||abs(iflag[i][j][k])>=1)
+    //  continue;
+
     /* degenerate cases */
     real clrb = phi[i][j][k-1];
     real clrt = phi[i][j][k  ];
@@ -183,7 +284,9 @@ void VOF::cal_fs3() {
       continue;
     }
     else if( flagb &&  flagt) { /* both are real */
-
+#if 0
+      fs[m][i][j][k] = phi.zn(k);
+#else
       /* calculate distance between the two candidate positions */
       real fsz_diff = fszt + 1.0 - fszb;
       if(fabs(fsz_diff)<tol) { /* they are close to each other */
@@ -193,13 +296,34 @@ void VOF::cal_fs3() {
                          phi.zn(k-1) + phi.dzc(k-1) * fszb
                        : phi.zn(k  ) + phi.dzc(k  ) * fszt;
       }
+#endif
       continue;
     }
+#if 0     
+    /* -----------------------------------------------
+       second check: are candidate positions 
+       a. between cell centres
+       b. inside the wrong cell (imaginary interface)
+    -------------------------------------------------- */
+    flagb = ( 1.0-tol <= fszb && fszb <= 1.5    );
+    flagt = (-0.5     <= fszt && fszt <= 0.0+tol);
+    if     ( flagb && !flagt) { /* south is imaginary and north is not */
+      fs[m][i][j][k] = phi.zn(k-1) + phi.dzc(k-1) * fszb;
+      continue;
+    }
+    else if(!flagb &&  flagt) { /* north is imaginary and south is not */
+      fs[m][i][j][k] = phi.zn(k) + phi.dzc(k) * fszt;
+      continue;
+    }
+    else { /* both are either imaginary or not intersecting */
+      fs[m][i][j][k] = phi.zn(k);
+      continue;
+    }
+#else
     fs[m][i][j][k] = phi.zn(k);
+#endif
   } 
 
-  /* correct at boundaries */
-  fs_bnd();
   //fs.exchange_all();
 
   //boil::plot->plot(fs,phi, "fs-clr", 0);
@@ -228,6 +352,11 @@ real VOF::fs_val(const Comp m, const int i, const int j, const int k) {
   real c = phi[i][j][k];
   real alpha = calc_alpha(c, vm1, vm2, vm3);
   
+#if 0
+  if(i<6&&j==1&&k==1)
+    boil::oout<<"VOF::FSV "<<i<<" "<<vn1<<" "<<vn2<<" "<<vn3<<" "<<alpha<<boil::endl;  
+#endif
+
   real xpos = 0.5;
   real ypos = 0.5;
   real zpos = 0.5;
@@ -237,18 +366,21 @@ real VOF::fs_val(const Comp m, const int i, const int j, const int k) {
     if(vn1<0)
       xuni = 1.0-xuni;
     return xuni;
+    //return phi.xn(i) + phi.dxc(i) * xuni;
   } else if(m==Comp::j()) {
     real yuni = (alpha-vm1*xpos-vm3*zpos)/(vm2+boil::pico);
     if(vn2<0)
       yuni = 1.0-yuni;
     return yuni;
+    //return phi.yn(j) + phi.dyc(j) * yuni;
   } else {
     real zuni = (alpha-vm1*xpos-vm2*ypos)/(vm3+boil::pico);
     if(vn3<0)
       zuni = 1.0-zuni;
     return zuni;
+    //return phi.zn(k) + phi.dzc(k) * zuni;
   }
 
-  return boil::yotta;
+  return 0.0;
 }
 

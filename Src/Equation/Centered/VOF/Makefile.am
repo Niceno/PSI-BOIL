@@ -14,6 +14,7 @@ libVof_a_SOURCES = vof.h                 \
                         vof_curv_HF.cpp          \
                         vof_ext_fs.cpp          \
                         vof_extract_alpha.cpp          \
+                        vof_fs_bnd.cpp          \
                         vof_front_minmax.cpp  \
                         vof_gradphi.cpp  \
                         vof_insert_bc.cpp     \
