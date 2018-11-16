@@ -25,11 +25,7 @@ AC_OUTPUT(Makefile                                     \
           Src/Equation/Centered/EnthalpyFD/Makefile    \
           Src/Equation/Centered/Concentration/Makefile \
           Src/Equation/Centered/Pressure/Makefile      \
-          Src/Equation/Centered/ColorFunction/Makefile \
-          Src/Equation/Centered/LevelSet/Makefile      \
           Src/Equation/Centered/PhaseChange/Makefile   \
-          Src/Equation/Centered/PhaseField/Makefile    \
-          Src/Equation/Centered/ColorCIP/Makefile      \
           Src/Equation/Centered/CIPCSL2/Makefile       \
           Src/Equation/Centered/Distance/Makefile      \
           Src/Equation/Centered/Makefile               \

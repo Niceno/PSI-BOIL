@@ -10,11 +10,7 @@ SUBDIRS = Equation/Staggered/Momentum     \
           Equation/Centered/EnthalpyFD    \
           Equation/Centered/Concentration \
           Equation/Centered/Pressure      \
-          Equation/Centered/ColorFunction \
-          Equation/Centered/LevelSet      \
           Equation/Centered/PhaseChange   \
-          Equation/Centered/PhaseField    \
-          Equation/Centered/ColorCIP      \
           Equation/Centered/CIPCSL2       \
           Equation/Centered/Distance      \
           Equation/Centered               \
@@ -58,11 +54,7 @@ LDADD = Equation/Staggered/Momentum/libMomentum.a          \
         Equation/Centered/EnthalpyFD/libEnthalpyFD.a       \
         Equation/Centered/Concentration/libConcentration.a \
         Equation/Centered/Pressure/libPressure.a           \
-        Equation/Centered/ColorFunction/libColorFunction.a \
-        Equation/Centered/LevelSet/libLevelSet.a           \
         Equation/Centered/PhaseChange/libPhaseChange.a     \
-        Equation/Centered/PhaseField/libPhaseField.a       \
-        Equation/Centered/ColorCIP/libColorCIP.a           \
         Equation/Centered/CIPCSL2/libCipcsl2.a             \
         Equation/Centered/Distance/libDistance.a           \
         Equation/Centered/libCentered.a                    \
