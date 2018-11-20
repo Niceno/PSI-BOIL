@@ -30,7 +30,7 @@ main(int argc, char * argv[]) {
   boil::plot->plot(pipe, "pipe");
 
   Times time(250, 0.0008); /* ndt, dt */
-	
+
   /*----------------+
   |  linear solver  |
   +----------------*/
@@ -98,7 +98,7 @@ main(int argc, char * argv[]) {
   /*------------------+ 
   |  physical models  |
   +------------------*/
-  Model mod(d);
+  Model mod;
 
   /*--------------------------+ 
   |  force profiles to inlet  |
@@ -123,28 +123,20 @@ main(int argc, char * argv[]) {
 
   /*----------+
   |  restart  |
-  +----------*/
   uvw.load("uvw", 10000);
   t.  load("t",   10000);
   time.first_step(10000);
+  +----------*/
 
   /*------------+
   |  time-loop  |
   +------------*/
   for(time.start(); time.end(); time.increase()) {
 
-    boil::oout << "##################" << boil::endl;
-    boil::oout << "#                 " << boil::endl;
-    boil::oout << "# TIME:      " << time.current_time() << boil::endl;
-    boil::oout << "#                 " << boil::endl;
-    boil::oout << "# TIME STEP: " << time.current_step() << boil::endl;
-    boil::oout << "#                 " << boil::endl;
-    boil::oout << "##################" << boil::endl;
-	  
     /*--------------------+
     |  smagorinsky model  |
     +--------------------*/
-    mod.smagorinsky( &mu_t, uvw, fluid );
+    mod.smagorinsky( &ns, &mu_t, 0.1 );
 
     ns.discretize( &mu_t );
 
