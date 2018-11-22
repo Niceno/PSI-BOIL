@@ -21,3 +21,4 @@ Src/Parallel/mpi_macros.h
 **/main.cpp*
 **/.deps/
 **/*.a
+*.dat
