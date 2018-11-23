@@ -15,14 +15,14 @@ main(int argc, char * argv[]) {
   /*--------------------------------+
   |  choose the output file format  |
   +--------------------------------*/
-  boil::plot = new PlotGMV();
+  boil::plot = new PlotTEC();
 
   boil::timer.start();
 
   const real b_des = 3.86;
   real       b_new = 0;
 
-  Times time(20, 0.00004); /* ndt, dt */
+  Times time(6000, 0.00004); /* ndt, dt */
 
   /*--------+
   |  grids  |
@@ -91,14 +91,6 @@ main(int argc, char * argv[]) {
 
   for(time.start(); time.end(); time.increase()) {
 
-    boil::oout << "##################" << boil::endl;
-    boil::oout << "#                 " << boil::endl;
-    boil::oout << "# TIME:      " << time.current_time() << boil::endl;
-    boil::oout << "#                 " << boil::endl;
-    boil::oout << "# TIME STEP: " << time.current_step() << boil::endl;
-    boil::oout << "#                 " << boil::endl;
-    boil::oout << "##################" << boil::endl;
-	  
     ns.discretize();
     ns.cfl_max();
     ns.new_time_step(); 
@@ -115,11 +107,15 @@ main(int argc, char * argv[]) {
 
     b_new = ns.bulk(Comp::u(), LX*0.333);
 
-    real p_drop = fluid.rho() * (b_des - b_new) / time.dt();
+    real p_drop = fluid.rho()->value() * (b_des - b_new) / time.dt();
 
     const Comp m = Comp::u();
     for_vmijk(xyz,m,i,j,k)
       xyz[m][i][j][k] = p_drop * uvw.dV(m,i,j,k);
+
+    if(time.current_step() % 120 == 0) {
+      boil::plot->plot(uvw, p, "uvw,p",  time.current_step());
+    }
 
     OPR( b_new );
     OPR( p_drop );
