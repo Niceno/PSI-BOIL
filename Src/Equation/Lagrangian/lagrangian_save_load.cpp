@@ -16,7 +16,7 @@ void Lagrangian::save(const char * nm, const int it) {
   //out.write(reinterpret_cast<const char*>(&nb_particles), sizeof size());
   //out.write(reinterpret_cast<const char*>(&t_step), sizeof t_step);
 
-  std::ofstream outfile("particle_tracks.plt", std::ios_base::app);  //appendix-write-in
+  std::ofstream outfile("particles-trajectory.plt", std::ios_base::app);  //appendix-write-in
   //std::ofstream outfile("particle_tracks.plt");  //cover-write-in
   //outfile << " VARIABLES= xp,yp,up,vp,dp,numin" << boil::endl;
 
@@ -33,7 +33,7 @@ void Lagrangian::save(const char * nm, const int it) {
     real v_old = particles[p].uvwc_old(Comp::v());
     real w_old = particles[p].uvwc_old(Comp::w());
 
-    outfile << xp << " " << yp << " " << up << " " << vp << " " << dp << " " << time->current_step() << boil::endl;
+    outfile << xp << " " << yp << " " << zp << " " << up << " " << vp << " " << wp << " " << dp << " " << time->current_step() << boil::endl;
   }
 
   outfile.close();

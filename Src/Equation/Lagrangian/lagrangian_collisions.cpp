@@ -172,66 +172,63 @@ void Lagrangian::collisions() {
          //if(d == Dir::imax() && fabs(xp - dom->global_max_x()) <= r) 
          //if(d == Dir::imax() && (xp >= dom->global_max_x()) ) 
          //if( xp >= dom->global_max_x() )
-         if( xp >= (dom->global_max_x()-r) )
-         //if( xp > 0.10 )
-           {OPR("Leaving imax.."); erase(p); ind = 1;
+         if( xp >= (dom->global_max_x()-r) ) {
+           OPR("Leaving imax.."); erase(p); ind = 1;
            std::ofstream outfile("erase-particle-after-leaving-xmax.txt", std::ios_base::app);  //appendix-write-in
            outfile << xp << boil::endl;
            outfile.close();
-           }
+         }
          //if(d == Dir::imin() && fabs(xp - dom->global_min_x()) <= r) 
-         if( xp <= (dom->global_min_x()+r) )
-           {OPR("Leaving imin.."); erase(p); ind = 1;
+         if( xp <= (dom->global_min_x()+r) ) {
+           OPR("Leaving imin.."); erase(p); ind = 1;
            std::ofstream outfile("erase-particle-after-leaving-xmin.txt", std::ios_base::app);  //appendix-write-in
            outfile << xp << boil::endl;
            outfile.close();
-           }
+         }
          //if(d == Dir::jmax() && fabs(yp - dom->global_max_y()) <= r) 
-         if( yp >= (dom->global_max_y()-r) )
-           {OPR("Leaving jmax.."); erase(p); ind = 1;
+         if( yp >= (dom->global_max_y()-r) ) {
+           OPR("Leaving jmax.."); erase(p); ind = 1;
            std::ofstream outfile("erase-particle-after-leaving-ymax.txt", std::ios_base::app);  //appendix-write-in
            outfile << yp << boil::endl;
            outfile.close();
-           }
+         }
          //if(d == Dir::jmin() && fabs(yp - dom->global_min_y()) <= r) 
          //if(d == Dir::jmin() && fabs(yp - dom->global_min_y()) <= r) 
          //if(d == Dir::jmin() && (yp <= dom->global_min_y()) ) 
          //if( yp <= dom->global_min_y() )
-         if( yp <= (dom->global_min_y()+r) )
-         //if( ( dom->local_j( dom->J(particles[p].y()) ) ) == 1 )
-           {OPR("Leaving jmin.."); erase(p); ind = 1;
+         if( yp <= (dom->global_min_y()+r) ) {
+           OPR("Leaving jmin.."); erase(p); ind = 1;
            std::ofstream outfile("erase-particle-after-leaving-ymin.txt", std::ios_base::app);  //appendix-write-in
            outfile << yp << boil::endl;
            outfile.close();
-           }
+         }
          //if(d == Dir::kmax() && fabs(zp - dom->global_max_z()) <= r) 
          //if( zp >= (dom->global_max_z()-r) )  //error-over-defined-with-color-function-criterion
-         if( zp >= (39.9e-3) )
-           {OPR("Leaving kmax.."); erase(p); ind = 1;
+         if( zp >= (dom->global_max_z()-r) ) {
+           OPR("Leaving kmax.."); erase(p); ind = 1;
            std::ofstream outfile("erase-particle-after-leaving-zmax.txt", std::ios_base::app);  //appendix-write-in
            outfile << zp << boil::endl;
            outfile.close();
-           }
+         }
          //if(d == Dir::kmin() && fabs(zp - dom->global_min_z()) <= r) 
-         //if( zp <= (dom->global_min_z()+r) )
-         if( zp <= (dom->global_min_z()+0.0) )
-           {OPR("Leaving kmin.."); erase(p); ind = 1;
+         if( zp <= (dom->global_min_z()+r) ) {
+           OPR("Leaving kmin.."); erase(p); ind = 1;
            std::ofstream outfile("erase-particle-after-leaving-zmin.txt", std::ios_base::app);  //appendix-write-in
            outfile << zp << boil::endl;
            outfile.close();
-           }
+         }
 
          //check-color-function-to-"erase"/"deposit"-particles
          //define-the-interface-of-continuous-phases
          const int cell_i = ( dom->local_i( dom->I(particles[p].x()) ) );
          const int cell_j = ( dom->local_j( dom->J(particles[p].y()) ) );
          const int cell_k = ( dom->local_k( dom->K(particles[p].z()) ) );
-         if( (*cfu)[cell_i][cell_j][cell_k] > 0.5 )
-           {OPR("Deposition.."); erase(p); ind = 1;
+         if( (*cfu)[cell_i][cell_j][cell_k] > 0.5 ) {
+           OPR("Deposition.."); erase(p); ind = 1;
            std::ofstream outfile("deposit-particle-into-liquid.txt", std::ios_base::app);  //appendix-write-in
            outfile << xp << " " << yp << " " << zp << boil::endl;
            outfile.close();
-           }
+         }
 
        //}
      //}

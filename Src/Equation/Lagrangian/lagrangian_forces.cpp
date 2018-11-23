@@ -59,7 +59,7 @@ void Lagrangian::forces() {
                           particles[p].box_uvw(6,m)+particles[p].box_uvw(7,m));  
     } 
 
-    int BoxingScheme = 2;  //interpolation-mark-modify-into-main.cpp
+    const int InterpolationScheme = 2;  //interpolation-mark-modify-into-main.cpp
     real uvwc[DIM] = {0.0, 0.0, 0.0};
 
     real mu_cont   = -99.1;  //can't be const, and set initial value for checking
@@ -67,7 +67,7 @@ void Lagrangian::forces() {
     real rho_lagp  = -99.3;
     real delta_rho = -99.4;
 
-    if (BoxingScheme==1) {
+    if (InterpolationScheme==1) {
       //step-1-locate particle position and achieve cell coordinate
       const int cell_i = ( dom->local_i( dom->I(particles[p].x()) ) );
       const int cell_j = ( dom->local_j( dom->J(particles[p].y()) ) );
@@ -98,7 +98,7 @@ void Lagrangian::forces() {
       uvwc[1] = 0.5 * (uvw_s[1] + uvw_n[1]);
       uvwc[2] = 0.5 * (uvw_b[2] + uvw_t[2]);
       }
-    else if (BoxingScheme==2) {
+    else if (InterpolationScheme==2) {
       //step-1-locate particle position and achieve cell coordinate
       const int cell_i = ( dom->local_i( dom->I(particles[p].x()) ) );
       const int cell_j = ( dom->local_j( dom->J(particles[p].y()) ) );
@@ -119,7 +119,7 @@ void Lagrangian::forces() {
       uvwc[1] = (*u)[Comp::v()][cell_i][cell_j][cell_k];
       uvwc[2] = (*u)[Comp::w()][cell_i][cell_j][cell_k];
       }
-    else if (BoxingScheme==3) {
+    else if (InterpolationScheme==3) {
       //step-1-locate particle position and achieve cell coordinate
       const int cell_i = ( dom->local_i( dom->I(particles[p].x()) ) );
       const int cell_j = ( dom->local_j( dom->J(particles[p].y()) ) );

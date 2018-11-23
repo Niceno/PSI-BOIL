@@ -54,9 +54,6 @@ void Lagrangian::advance(Vector * force) {
 
   boil::timer.stop("lagrangian advance");
 
-  /*OPR("lagrangian_advance.cpp");
-  getchar();*/
-
 }
 
 /*-----------------------------------------------------------------------------+
