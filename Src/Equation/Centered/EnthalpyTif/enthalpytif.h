@@ -44,7 +44,14 @@ class EnthalpyTIF : public Centered {
                      smoother for AC multirid.
         \param flu - Holds all fluid properties (\f$\rho, C_p, \lambda\f$),
         \param sol - holds all solid properties (\f$\rho, C_p, \lambda\f$).
+        \param sol - holds all solid properties (\f$\rho, C_p, \lambda\f$).
+        \param tsat - (reference) saturation temperature.
+        \param latent - latent heat of evaporation.
+        \param mresis - interfacial mass transfer resistance.
+        \param fs - free surface position from VOF.
     */
+
+    /* Most general constructor */
     EnthalpyTIF(const Scalar & phi, 
                const Scalar & f,
                const Scalar & clr,
@@ -53,12 +60,26 @@ class EnthalpyTIF : public Centered {
                Krylov * sm,
                Matter * flu,
                const real tsat,
+               Matter * sol = NULL,
+               const Vector * fs = NULL,
                const real latent = 1.0,
                const real mresis = 0.0,
                const Scalar * mdot = NULL,
-               const Scalar * pres = NULL,
-               const Vector * fs = NULL,
-               Matter * sol = NULL);
+               const Scalar * pres = NULL);
+
+#if 0  /* sadly, constructors calling different constructors requires C++11 */
+    /* Original CIPCSL2-EnthalpyFD constructor */
+    EnthalpyTIF(const Scalar & phi,
+                const Scalar & f,
+                const Scalar & clr,
+                const Vector & u,
+                Times & t,
+                Krylov * sm,
+                Matter * flu,
+                const real tsat,
+                Matter * sol = NULL) :
+      EnthalpyTIF(phi,f,clr,u,t,sm,flu,tsat,sol) { }
+#endif
     ~EnthalpyTIF();
 
     void new_time_step(const Scalar * diff_eddy = NULL);
@@ -112,7 +133,6 @@ class EnthalpyTIF : public Centered {
 
     void tint_field(const Scalar & heaviside, const real factor = blendfactor, const bool iter = false);
     Scalar tif, tifold;
-    //ScalarInt intflag;
 
     real get_blendfactor(){return blendfactor;}
     void set_blendfactor(real b){
@@ -142,7 +162,6 @@ class EnthalpyTIF : public Centered {
                 , const bool onm, const bool onc, const bool onp
                 , const bool ofm, const bool ofc, const bool ofp
                 , const real lsm, const real lsc, const real lsp
-                , const real lfm, const real lfc, const real lfp
                 , const real clm, const real clc, const real clp
                 , real dxm, real dxp
                 , real fdm, real fdp, real fdms, real fdps
@@ -161,7 +180,6 @@ class EnthalpyTIF : public Centered {
 
     const Vector * fs;
     Vector fsold;
-    //ScalarInt intflagold;
 
     real latent, mresis;
     static real blendfactor;
@@ -177,17 +195,12 @@ class EnthalpyTIF : public Centered {
                   const Scalar & heaviside);
     //bool Vicinity(const int i, const int j, const int k);
 
-    bool Interface    (const int i, const int j, const int k,
-                       const Scalar & heaviside);
-    //bool Interface    (const int i, const int j, const int k);
-    bool Interface    (const real heavi);
-    //bool Interface_old(const int i, const int j, const int k);
+    bool Interface(const int i, const int j, const int k,
+                   const Scalar & heaviside);
+    bool Interface(const real heavi);
 
-    //void set_intflag();
-
-    //bool Interface1D_x(const int i, const int j, const int k);
-    //bool Interface1D_y(const int i, const int j, const int k);
-    //bool Interface1D_z(const int i, const int j, const int k);
+    bool Interface(const int dir, const Comp m,
+                   const int i, const int j, const int k);
 
     real Tint(const int dir, const Comp &mcomp, const real frac,
               const int i, const int j, const int k);
@@ -195,6 +208,7 @@ class EnthalpyTIF : public Centered {
               const int i, const int j, const int k);
     real Tint(const int i, const int j, const int k);
     real Tint_old(const int i, const int j, const int k);
+
     real distance_x(const int i, const int j, const int k,
                     const int dir, real & tint,
                     const bool old = false);

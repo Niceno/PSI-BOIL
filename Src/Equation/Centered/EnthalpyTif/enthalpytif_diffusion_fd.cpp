@@ -71,7 +71,6 @@ void EnthalpyTIF::diffusion_fd(const Scalar * diff_eddy) {
           pm=Tint(-1,Comp::i(),frac,i,j,k);
         } else {
           xm = std::max(epsl*phi.dxw(i),distance_x(i,j,k,-1,pm));
-          //if(j==1&&k==1) boil::oout<<"HERE! "<<i<<" "<<(*fs)[i-1][j][k]<<" "<<(*fs)[i][j][k]<<boil::endl;
         }
         aflagm=1.0;
       }
@@ -222,6 +221,7 @@ void EnthalpyTIF::diffusion_fd(const Scalar * diff_eddy) {
   +------------------------------------------*/
   } else {
 
+    bool oldflag = true; /* we are considering previous time step */
     for_m(m){
       int ii,jj,kk;
       ii=jj=kk=0;
@@ -239,7 +239,7 @@ void EnthalpyTIF::diffusion_fd(const Scalar * diff_eddy) {
         real lc, xm, xp;
 
         bool onm, onc, onp, ofm, ofc, ofp; // on & off
-        real lsm, lsc, lsp, lfm, lfc, lfp; // lambda
+        real lsm, lsc, lsp; // lambda
         real clm, clc, clp; // color function
         real dxm, dxp, fdm, fdp, fdms, fdps;
         real edm, edc, edp; // eddy viscosity
@@ -258,9 +258,6 @@ void EnthalpyTIF::diffusion_fd(const Scalar * diff_eddy) {
         lsm=solid()->lambda (i-ii,j-jj,k-kk);
         lsc=solid()->lambda (i   ,j   ,k   );
         lsp=solid()->lambda (i+ii,j+jj,k+kk);
-        lfm=fluid()->lambda (i-ii,j-jj,k-kk);
-        lfc=fluid()->lambda (i   ,j   ,k   );
-        lfp=fluid()->lambda (i+ii,j+jj,k+kk);
         clm=(*clr)[i-ii][j-jj][k-kk];
         clc=(*clr)[i   ][j   ][k   ];
         clp=(*clr)[i+ii][j+jj][k+kk];
@@ -303,7 +300,7 @@ void EnthalpyTIF::diffusion_fd(const Scalar * diff_eddy) {
                   , aflagm, aflagp
                   , vol, area
                   , onm, onc, onp, ofm, ofc, ofp
-                  , lsm, lsc, lsp, lfm, lfc, lfp
+                  , lsm, lsc, lsp
                   , clm, clc, clp
                   , dxm, dxp, fdm, fdp, fdms, fdps
                   , pm, pc, pp

@@ -37,6 +37,7 @@ class VOF : public Centered {
     real get_zmaxft() { return(zmaxft);};
 
     Vector fs;
+    Scalar nalpha;
     Scalar nx,ny,nz,nmag;/* normal to interface */
   protected:
     void advance_x();
@@ -74,6 +75,7 @@ class VOF : public Centered {
     void norm_cc_kmin(const Scalar &g, const int i,const int j, const int k);
     void norm_cc_kmax(const Scalar &g, const int i,const int j, const int k);
 
+    real alpha_val(const int i, const int j, const int k);
     real fs_val(const Comp m, const int i, const int j, const int k);
     real frontPosition(const int i, const int j, const int k, const Comp m);
 
@@ -89,7 +91,7 @@ class VOF : public Centered {
     real dxmin,ww;
     real epsnorm;
     real phisurf;
-    
+
     int nlayer, n_ext_fs;
     //int *** iflag;
 };	

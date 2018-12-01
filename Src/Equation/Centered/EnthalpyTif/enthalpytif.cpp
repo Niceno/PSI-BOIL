@@ -12,12 +12,12 @@ EnthalpyTIF::EnthalpyTIF(const Scalar & PHI,
                        Krylov * S,
                        Matter * f,
                        const real Tsat,
+                       Matter * s,
+                       const Vector * FS,
                        const real Latent,
                        const real Mresis,
                        const Scalar * MFLX,
-                       const Scalar * PRES,
-                       const Vector * FS,
-                       Matter * s) :
+                       const Scalar * PRES) :
 /*---------------------+ 
 |  initialize parent   |
 +---------------------*/
@@ -29,8 +29,6 @@ EnthalpyTIF::EnthalpyTIF(const Scalar & PHI,
   ftifold(  *PHI.domain()),
   fdelta (  *PHI.domain()),
   iflag     (*C  .domain()),
-  //intflag   (*C  .domain()),
-  //intflagold(*C  .domain()),
   fsold(  *U  .domain())
 {
   tsat = Tsat,
@@ -44,8 +42,6 @@ EnthalpyTIF::EnthalpyTIF(const Scalar & PHI,
   clrsurf = 0.5;
   clrold = (*clr).shape();
   iflag  = (*clr).shape();
-  //intflag     = (*clr).shape();
-  //intflagold  = (*clr).shape();
   store_clrold = false;
   assert(PHI.domain() == F.domain());
   assert(PHI.domain() == U.domain());
@@ -59,7 +55,6 @@ EnthalpyTIF::EnthalpyTIF(const Scalar & PHI,
     for_m(m) {
       fsold(m) = (*fs)(m).shape();
     }
-   // set_intflag();
   }
  
   ftif = phi.shape();

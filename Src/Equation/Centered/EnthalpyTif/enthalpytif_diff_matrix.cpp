@@ -11,13 +11,12 @@ void EnthalpyTIF::diff_matrix(real & am, real & ac, real & ap
                 , const bool onm, const bool onc, const bool onp
                 , const bool ofm, const bool ofc, const bool ofp
                 , const real lsm, const real lsc, const real lsp
-                , const real lfm, const real lfc, const real lfp
                 , const real clm, const real clc, const real clp
                 , real dxm, real dxp
                 , real fdm, real fdp, real fdms, real fdps
                 , real pm, real pc, real pp
                 , const real edm, const real edc, const real edp
-                , const int i, const int j, const int k, const Comp m){
+                , const int i, const int j, const int k, const Comp m) {
   // i,j,k,m: used for debugging
   real lm, lc, lp;                      // lambda
   aflagm=aflagp=1.0;
@@ -60,86 +59,147 @@ void EnthalpyTIF::diff_matrix(real & am, real & ac, real & ap
     lp = lsp;
   }
 
+  /*------------------+
+  |  center in solid  |
+  +------------------*/
   if(ofc){
-    // center:solid
     tm = pm; 
     tc = pc; 
     tp = pp; 
 
     if(ofm && ofp){
-      // s-s-s
+      /* s-s-s */
+#if 1
       /* FDM */
-      //am = lc * vol * 2.0 / (dxm*(dxm+dxp));
-      //ac = lc * vol * 2.0 / (dxm*dxp);
-      //ap = lc * vol * 2.0 / (dxp*(dxm+dxp));
+      am = lc * vol * 2.0 / (dxm*(dxm+dxp));
+      ac = lc * vol * 2.0 / (dxm*dxp);
+      ap = lc * vol * 2.0 / (dxp*(dxm+dxp));
+#else
       /* FVM */
       am = 0.5 * (lc + lm) * area / dxm;
       ap = 0.5 * (lc + lp) * area / dxp;
       ac = am + ap;
-
-      //std::cout<<"s-s-s: "<<i<<" "<<j<<" "<<k<<"\n";
+#endif
+#if 0
+      std::cout<<"s-s-s: "<<i<<" "<<j<<" "<<k<<"\n";
+#endif
     } else if(onm && ofp){
-      // f-s-s
-      fdm = max(fdm,epsl);
-      dxm = dxm * fdm;
+      /* f-s-s */
+      if(fs&&Interface(-1,m,i,j,k)) {
+        /* removed from system matrix */
+        aflagm = 0.0;
+        /* dxm,fdm are corrected to account for interface position */
+        /* tm is changed to the saturation temperature */
+        fdm *= dxm;
+        if(m==Comp::i()) 
+          dxm = std::max(epsl*dxm,distance_x(i,j,k,-1,tm));
+        else if(m==Comp::j())
+          dxm = std::max(epsl*dxm,distance_y(i,j,k,-1,tm));
+        else
+          dxm = std::max(epsl*dxm,distance_z(i,j,k,-1,tm));
+        fdm /= dxm; 
+        fdm = max(fdm,epsl);
+        /* dxm is corrected */
+        dxm = dxm * fdm;
+        /* lambdaf is inverted */
+        if(clm>=0.5){
+          lm = lambdav + edm*cpv/rhov/turbP;
+        } else {
+          lm = lambdal + edm*cpl/rhol/turbP;
+        }
+      } else {
+        fdm = max(fdm,epsl);
+        dxm = dxm * fdm;
+      }
+#if 1
       /* FDM */
-      //am = lc*vol*2.0/(dxm*(dxm+dxp))*fdm*lm/(fdm*lm+(1.0-fdm)*lc);
-      //ac = lc*vol*2.0/(dxm*dxp)
-      //   - lc*vol*2.0/(dxm*(dxm+dxp))*(1.0-fdm)*lc/(fdm*lm+(1.0-fdm)*lc);
-      //ap = lc*vol*2.0/(dxp*(dxm+dxp));
+      am = lc*vol*2.0/(dxm*(dxm+dxp))*fdm*lm/(fdm*lm+(1.0-fdm)*lc);
+      ac = lc*vol*2.0/(dxm*dxp)
+         - lc*vol*2.0/(dxm*(dxm+dxp))*(1.0-fdm)*lc/(fdm*lm+(1.0-fdm)*lc);
+      ap = lc*vol*2.0/(dxp*(dxm+dxp));
+#else
       /* FVM */
       am = lc * area / dxm * fdm*lm/((1.0-fdm)*lc+fdm*lm);
       ap = 0.5 * (lc + lp) * area / dxp;
       ac = am + ap;
-      //std::cout<<"f-s-s: "<<i<<" "<<j<<" "<<k<<" "<<am-ac+ap<<"\n";
+#endif
+#if 0
+      std::cout<<"f-s-s: "<<i<<" "<<j<<" "<<k<<" "<<am-ac+ap<<"\n";
+#endif
     } else if(ofm && onp){
-      // s-s-f
-      fdp = max(fdp,epsl);
-      dxp = dxp * fdp;
+      /* s-s-f */
+      if(fs&&Interface(+1,m,i,j,k)) {
+        /* removed from system matrix */
+        aflagp = 0.0;
+        /* dxp,fdp are corrected to account for interface position */
+        /* tp is changed to the saturation temperature */
+        fdp *= dxp;
+        if(m==Comp::i()) 
+          dxp = std::max(epsl*dxp,distance_x(i,j,k,+1,tp));
+        else if(m==Comp::j())
+          dxp = std::max(epsl*dxp,distance_y(i,j,k,+1,tp));
+        else
+          dxp = std::max(epsl*dxp,distance_z(i,j,k,+1,tp));
+        fdp /= dxp; 
+        fdp = max(fdp,epsl);
+        /* dxp is corrected */
+        dxp = dxp * fdp;
+        /* lambdaf is inverted */
+        if(clp>=0.5){
+          lp = lambdav + edp*cpv/rhov/turbP;
+        } else {
+          lp = lambdal + edp*cpl/rhol/turbP;
+        }
+      } else {
+        fdp = max(fdp,epsl);
+        dxp = dxp * fdp;
+      }
+#if 1
       /* FDM */
-      //am = lc*vol*2.0/(dxm*(dxm+dxp));
-      //ac = lc*vol*2.0/(dxm*dxp)
-      //   - lc*vol*2.0/(dxp*(dxm+dxp))*(1.0-fdp)*lc/((1.0-fdp)*lc+fdp*lp);
-      //ap = lc*vol*2.0/(dxp*(dxm+dxp))*fdp*lp/((1.0-fdp)*lc+fdp*lp);
+      am = lc*vol*2.0/(dxm*(dxm+dxp));
+      ac = lc*vol*2.0/(dxm*dxp)
+         - lc*vol*2.0/(dxp*(dxm+dxp))*(1.0-fdp)*lc/((1.0-fdp)*lc+fdp*lp);
+      ap = lc*vol*2.0/(dxp*(dxm+dxp))*fdp*lp/((1.0-fdp)*lc+fdp*lp);
+#else
       /* FVM */
       am = 0.5 * (lc + lm) * area / dxm;
       ap = lc * area / dxp * fdp*lp/((1.0-fdp)*lc+fdp*lp);
       ac = am + ap;
-      //std::cout<<"s-s-f: "<<i<<" "<<j<<" "<<k<<" "<<am-ac+ap<<"\n";
+#endif
+#if 0
+      std::cout<<"s-s-f: "<<i<<" "<<j<<" "<<k<<" "<<am-ac+ap<<"\n";
+#endif
     } else {
-      // f-s-f
-      std::cout<<"diff_matrix: need to be develop!!!\n";
+      /* f-s-f */
+      std::cout<<"ETIF::diff_matrix: Underdevelopment!\n";
       std::cout<<"fluid-solid-fluid.\n";
       exit(0);
     }
 
+  /*------------------+
+  |  center in fluid  |
+  +------------------*/
   } else {
-    // center:fluid
     tm = pm; 
     tc = pc; 
     tp = pp; 
 
     if(onm && onp){
-      // f-f-f
+      /* f-f-f */
       if((clm-0.5)*(clc-0.5)>=0){
         dxm=dxm;
       } else {
         if(!fs) {
           real frac = std::max((0.5-clc)/(clm-clc),epsl);
           dxm=frac*dxm;
-          tm = Tint_old(-1,m,frac,i,j,k);
+          tm = Tint(-1,m,frac,i,j,k);
         } else {
-          #if 0
           if(m==Comp::i())
-            dxm = max(epsl*dxm,distance_x(i,j,k,-1,tm,true,&dxm));
+            dxm = std::max(epsl*dxm,distance_x(i,j,k,-1,tm));
           else if(m==Comp::j())
-            dxm = max(epsl*dxm,distance_y(i,j,k,-1,tm,true,&dxm));
+            dxm = std::max(epsl*dxm,distance_y(i,j,k,-1,tm));
           else
-            dxm = max(epsl*dxm,distance_z(i,j,k,-1,tm,true,&dxm));
-          #else
-            boil::oout<<"EnthalpyTif:diff_matrix: Underdevelopment. Exiting."<<boil::endl;
-            exit(0);
-          #endif
+            dxm = std::max(epsl*dxm,distance_z(i,j,k,-1,tm));
         }
         aflagm=0.0;
       }
@@ -149,127 +209,154 @@ void EnthalpyTIF::diff_matrix(real & am, real & ac, real & ap
         if(!fs) {
           real frac = std::max((0.5-clc)/(clp-clc),epsl);
           dxp=frac*dxp;
-          tp = Tint_old(+1,m,frac,i,j,k);
+          tp = Tint(+1,m,frac,i,j,k);
         } else {
-          #if 0
           if(m==Comp::i())
-            dxp = max(epsl*dxp,distance_x(i,j,k,+1,tp,true,&dxp));
+            dxp = std::max(epsl*dxp,distance_x(i,j,k,+1,tp));
           else if(m==Comp::j())
-            dxp = max(epsl*dxp,distance_y(i,j,k,+1,tp,true,&dxp));
+            dxp = std::max(epsl*dxp,distance_y(i,j,k,+1,tp));
           else
-            dxp = max(epsl*dxp,distance_z(i,j,k,+1,tp,true,&dxp));
-          #else
-            boil::oout<<"EnthalpyTif:diff_matrix: Underdevelopment. Exiting."<<boil::endl;
-            exit(0);
-          #endif
+            dxp = std::max(epsl*dxp,distance_z(i,j,k,+1,tp));
         }
         aflagp=0.0;
 #if 0
 	std::cout<<"aflagp=0.0: " <<i<<" "<<j<<" "<<k<<"\n";
 #endif
       }
-      if (aflagm==0.0 || aflagp==0.0) {
+#if 1 /* now, finite difference is applied always, as in system_diffusive */
+      //if(aflagm==0.0 || aflagp==0.0) {
         /* FDM */
         am = lc * vol * 2.0 / (dxm*(dxm+dxp));
         ac = lc * vol * 2.0 / (dxm*dxp);
         ap = lc * vol * 2.0 / (dxp*(dxm+dxp));
+#else
       } else { 
         /* FVM */
         am = 0.5 * (lc + lm) * area / dxm;
         ap = 0.5 * (lc + lp) * area / dxp;
         ac = am + ap;
       }
-      //std::cout<<"f-f-f: "<<i<<" "<<j<<" "<<k<<" "<<am-ac+ap<<"\n";
-
+#endif
+#if 0
+      std::cout<<"f-f-f: "<<i<<" "<<j<<" "<<k<<" "<<am-ac+ap<<"\n";
+#endif
     } else if(ofm && onp){ 
-
-      // s-f-f
-      fdm = max(fdm,epsl);
-      dxm = dxm * fdm;
+      /* s-f-f */
       if((clc-0.5)*(clp-0.5)>=0){
         dxp=dxp;
       } else {
         if(!fs) {
           real frac = std::max((0.5-clc)/(clp-clc),epsl);
           dxp=frac*dxp;
-          tp = Tint_old(+1,m,frac,i,j,k);
+          tp = Tint(+1,m,frac,i,j,k);
         } else {
-          #if 0
           if(m==Comp::i())
-            dxp = max(epsl*dxp,distance_x(i,j,k,+1,tp,true,&dxp));
+            dxp = std::max(epsl*dxp,distance_x(i,j,k,+1,tp));
           else if(m==Comp::j())
-            dxp = max(epsl*dxp,distance_y(i,j,k,+1,tp,true,&dxp));
+            dxp = std::max(epsl*dxp,distance_y(i,j,k,+1,tp));
           else
-            dxp = max(epsl*dxp,distance_z(i,j,k,+1,tp,true,&dxp));
-          #else
-            boil::oout<<"EnthalpyTif:diff_matrix: Underdevelopment. Exiting."<<boil::endl;
-            exit(0);
-          #endif
+            dxp = std::max(epsl*dxp,distance_z(i,j,k,+1,tp));
         }
         aflagp=0.0;
       }
-      if(aflagp==0.0) {
+      if(fs&&Interface(-1,m,i,j,k)) {
+        /* removed from system matrix */
+        aflagm = 0.0;
+        /* dxm is corrected to account for interface position */
+        /* tm is changed to the saturation temperature */
+        if(m==Comp::i()) 
+          dxm = std::max(epsl*dxm,distance_x(i,j,k,-1,tm));
+        else if(m==Comp::j())
+          dxm = std::max(epsl*dxm,distance_y(i,j,k,-1,tm));
+        else
+          dxm = std::max(epsl*dxm,distance_z(i,j,k,-1,tm));
+        /* FDM */
+        am = lc * vol * 2.0 / (dxm*(dxm+dxp));
+        ac = lc * vol * 2.0 / (dxm*dxp);
+        ap = lc * vol * 2.0 / (dxp*(dxm+dxp));
+      } else {
+        fdm = max(fdm,epsl);
+        dxm = dxm * fdm;
+#if 1 /* now, finite difference is applied always, as in system_diffusive */
+      //if(aflagp==0.0) {
         /* FDM */
         am = lc*vol*2.0/(dxm*(dxm+dxp))*fdm*lm/(fdm*lm+(1.0-fdm)*lc);
         ac = lc*vol*2.0/(dxm*dxp)
            - lc*vol*2.0/(dxm*(dxm+dxp))*(1.0-fdm)*lc/(fdm*lm+(1.0-fdm)*lc);
         ap = lc*vol*2.0/(dxp*(dxm+dxp));
+#else
       } else {
         /* FVM */
         am = lc * area / dxm * fdm * lm / (fdm*lm+(1.0-fdm)*lc);
         ap = 0.5 * (lc + lp) * area / dxp;
         ac = am + ap;
       }
-      //std::cout<<"s-f-f: "<<i<<" "<<j<<" "<<k<<" "<<am-ac+ap<<"\n";
- 
+#endif
+      }
+#if 0
+      std::cout<<"s-f-f: "<<i<<" "<<j<<" "<<k<<" "<<am-ac+ap<<"\n";
+#endif
     } else if(onm && ofp){
-
-      // f-f-s
-      fdp = max(fdp,epsl);
-      dxp = dxp * fdp;
+      /* f-f-s */
       if((clm-0.5)*(clc-0.5)>=0){
         dxm=dxm;
       } else {
         if(!fs) {
           real frac = std::max((0.5-clc)/(clm-clc),epsl);
           dxm=frac*dxm;
-          tm = Tint_old(-1,m,frac,i,j,k);
+          tm = Tint(-1,m,frac,i,j,k);
         } else {
-          #if 0
           if(m==Comp::i())
-            dxm = max(epsl*dxm,distance_x(i,j,k,-1,tm,true,&dxm));
+            dxm = std::max(epsl*dxm,distance_x(i,j,k,-1,tm));
           else if(m==Comp::j())
-            dxm = max(epsl*dxm,distance_y(i,j,k,-1,tm,true,&dxm));
+            dxm = std::max(epsl*dxm,distance_y(i,j,k,-1,tm));
           else
-            dxm = max(epsl*dxm,distance_z(i,j,k,-1,tm,true,&dxm));
-          #else
-            boil::oout<<"EnthalpyTif:diff_matrix: Underdevelopment. Exiting."<<boil::endl;
-            exit(0);
-          #endif
+            dxm = std::max(epsl*dxm,distance_z(i,j,k,-1,tm));
         }
         aflagm=0.0;
       }
-      if (aflagm==0.0) {
+      if(fs&&Interface(+1,m,i,j,k)) {
+        /* removed from system matrix */
+        aflagp = 0.0;
+        /* dxp is corrected to account for interface position */
+        /* tp is changed to the saturation temperature */
+        if(m==Comp::i())
+          dxp = std::max(epsl*dxp,distance_x(i,j,k,+1,tp));
+        else if(m==Comp::j())
+          dxp = std::max(epsl*dxp,distance_y(i,j,k,+1,tp));
+        else
+          dxp = std::max(epsl*dxp,distance_z(i,j,k,+1,tp));
+        /* FDM */
+        am = lc * vol * 2.0 / (dxm*(dxm+dxp));
+        ac = lc * vol * 2.0 / (dxm*dxp);
+        ap = lc * vol * 2.0 / (dxp*(dxm+dxp));
+      } else {
+        fdp = max(fdp,epsl);
+        dxp = dxp * fdp;
+#if 1 /* now, finite difference is applied always, as in system_diffusive */
+      //if (aflagm==0.0) {
         /* FVM */
         am = lc*vol*2.0/(dxm*(dxm+dxp));
         ac = lc*vol*2.0/(dxm*dxp)
            - lc*vol*2.0/(dxp*(dxm+dxp))*(1.0-fdp)*lc/((1.0-fdp)*lc+fdp*lp);
         ap = lc*vol*2.0/(dxp*(dxm+dxp))*fdp*lp/((1.0-fdp)*lc+fdp*lp);
+#else
       } else {
         /* FVM */
         am = 0.5 * (lc + lm) * area / dxm;
         ap = lc * area / dxp * fdp * lp / (fdp*lp+(1.0-fdp)*lc);
         ac = am + ap;
       }
-      //std::cout<<"f-f-s: "<<i<<" "<<j<<" "<<k<<" "<<am-ac+ap<<"\n";
- 
+#endif
+      }
+#if 0
+      std::cout<<"f-f-s: "<<i<<" "<<j<<" "<<k<<" "<<am-ac+ap<<"\n";
+#endif 
     } else {
-
-      // s-f-s
-      std::cout<<"diff_matrix: need to be develop!!!\n";
+      /* s-f-s */
+      std::cout<<"ETIF::diff_matrix: Underdevelopment!\n";
       std::cout<<"solid-fluid-solid.\n";
       exit(0);
-
     }
   }
 

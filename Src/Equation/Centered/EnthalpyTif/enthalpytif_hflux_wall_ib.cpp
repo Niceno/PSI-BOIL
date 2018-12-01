@@ -6,6 +6,12 @@ using namespace std;
 *******************************************************************************/
 real EnthalpyTIF::hflux_wall_ib(const Scalar * diff_eddy) {
 
+  if(fs) {
+    boil::oout<<"ETIF::hflux_wall_ib: Underdevelopment!"<<boil::endl;
+    boil::oout<<"Doesn't account for subgrid films"<<boil::endl;
+    exit(0);
+  }
+
   real hflux=0.0;
   real areaw=0.0;
 

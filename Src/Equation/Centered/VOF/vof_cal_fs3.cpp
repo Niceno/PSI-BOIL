@@ -9,6 +9,17 @@ void VOF::cal_fs3() {
     output: fs
 *******************************************************************************/
 
+  /* avoid singular cases */
+  for_avijk(phi,i,j,k) {
+    if(phi[i][j][k]==0.5) phi[i][j][k] += boil::pico;
+  }
+
+  /* calculate alpha value in the domain */
+  for_avijk(nalpha,i,j,k) {
+    nalpha[i][j][k] = alpha_val(i,j,k);
+  }
+
+
   /* tolerance is necessary because the linear-planes are not closed */
   /* with this version, it shouldnt be necessary anymore */
   real tol = 0.0e-2;
@@ -37,8 +48,8 @@ void VOF::cal_fs3() {
     if((clrw-phisurf)*(clre-phisurf)>0.0) 
       continue;
   
-    if(  (clrw<boil::pico&&clre>1.0-boil::pico)
-       ||(clrw>1.0-boil::pico&&clre<boil::pico)) {
+    if(  (clrw<boil::pico&&clre-1.0>-boil::pico)
+       ||(clrw-1.0>-boil::pico&&clre<boil::pico)) {
       fs[m][i][j][k] = phi.xn(i);
       continue;
     }
@@ -97,8 +108,8 @@ void VOF::cal_fs3() {
     if((clrs-phisurf)*(clrn-phisurf)>0.0) 
       continue;
     
-    if(  (clrs<boil::pico&&clrn>1.0-boil::pico)
-       ||(clrs>1.0-boil::pico&&clrn<boil::pico)) {
+    if(  (clrs<boil::pico&&clrn-1.0>-boil::pico)
+       ||(clrs-1.0>-boil::pico&&clrn<boil::pico)) {
       fs[m][i][j][k] = phi.yn(j);
       continue;
     }
@@ -156,8 +167,8 @@ void VOF::cal_fs3() {
     if((clrb-phisurf)*(clrt-phisurf)>0.0) 
       continue;
     
-    if(  (clrb<boil::pico&&clrt>1.0-boil::pico)
-       ||(clrb>1.0-boil::pico&&clrt<boil::pico)) {
+    if(  (clrb<boil::pico&&clrt-1.0>-boil::pico)
+       ||(clrb-1.0>-boil::pico&&clrt<boil::pico)) {
       fs[m][i][j][k] = phi.zn(k);
       continue;
     }
@@ -208,11 +219,18 @@ void VOF::cal_fs3() {
 }
 
 /***********************
- * ancillary function
+ * ancillary functions
  ***********************/
-real VOF::fs_val(const Comp m, const int i, const int j, const int k) {
+real VOF::alpha_val(const int i, const int j, const int k) {
 
-  /* calculate vn1, vn2, vn3: normal vector at face center */
+  /* degenerate case I */
+  real c = phi[i][j][k];
+  if(c<boil::pico||c-1.0>-boil::pico) {
+    return boil::yotta;
+  }
+
+  /* calculate vn1, vn2, vn3: normal vector at cell center */
+  /* n points to the liquid */
   real vn1 = -nx[i][j][k];
   real vn2 = -ny[i][j][k];
   real vn3 = -nz[i][j][k];
@@ -221,13 +239,34 @@ real VOF::fs_val(const Comp m, const int i, const int j, const int k) {
   real vm2 = fabs(vn2);
   real vm3 = fabs(vn3);
 
+  real denom = vm1+vm2+vm3;
+  /* degenerate case II */
+  if(denom<boil::pico)
+    return boil::yotta;
+
   real qa = 1.0/(vm1+vm2+vm3);
   vm1 *= qa;
   vm2 *= qa;
   vm3 *= qa;
-  real c = phi[i][j][k];
-  real alpha = calc_alpha(c, vm1, vm2, vm3);
-  
+
+  return calc_alpha(c, vm1, vm2, vm3);
+}
+
+real VOF::fs_val(const Comp m, const int i, const int j, const int k) {
+
+  real alpha = nalpha[i][j][k];
+  /* degenerate case */
+  if(alpha>boil::zetta)
+    return boil::yotta;
+
+  real vn1 = -nx[i][j][k];
+  real vn2 = -ny[i][j][k];
+  real vn3 = -nz[i][j][k];
+
+  real vm1 = fabs(vn1);
+  real vm2 = fabs(vn2);
+  real vm3 = fabs(vn3);
+
   real xpos = 0.5;
   real ypos = 0.5;
   real zpos = 0.5;

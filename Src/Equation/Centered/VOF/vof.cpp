@@ -18,6 +18,7 @@ VOF::VOF(const Scalar & PHI,
   nx( *PHI.domain() ),
   ny( *PHI.domain() ),
   nz( *PHI.domain() ),
+  nalpha( *PHI.domain() ),
   nmag( *PHI.domain() ),
   clrn( *PHI.domain() ),
   stmp( *PHI.domain() ),
@@ -39,6 +40,7 @@ VOF::VOF(const Scalar & PHI,
   ny        = phi.shape();
   nz        = phi.shape();
   nmag      = phi.shape();
+  nalpha    = phi.shape();
   stmp      = phi.shape();
   fsx       = phi.shape();
   fsy       = phi.shape();

@@ -4,9 +4,9 @@
  *  Checks if the given cell is at an interface
 ******************************************************************************/
 
-/******************************************\
-| if combination color + indicator is used |
-\******************************************/
+/*-------------------------+
+| using indicator function |
++-------------------------*/
 bool EnthalpyTIF::Interface(const int i, const int j, const int k,
                             const Scalar & heaviside) {
   if(Interface(heaviside[i][j][k])) {
@@ -16,75 +16,24 @@ bool EnthalpyTIF::Interface(const int i, const int j, const int k,
 }
 
 bool EnthalpyTIF::Interface(const real heavi) {
-  return heavi > boil::atto && heavi < 1.0-boil::atto;
+  return heavi > boil::pico && heavi-1.0 < -boil::pico;
 }
 
-/******************************************\
-|            if vof is used                |
-\******************************************/
-#if 0
-bool EnthalpyTIF::Interface(const int i, const int j, const int k) {
-  if(intflag[i][j][k]>0) {
-    return true;
-  }
-  return false;
-}
-
-bool EnthalpyTIF::Interface_old(const int i, const int j, const int k) {
-  if(intflagold[i][j][k]>0) {
-    return true;
-  }
-  return false;
-}
-
-/* x-direction */
-bool EnthalpyTIF::Interface1D_x(const int i, const int j, const int k) {
-
-  real intm = (*fs)[Comp::i()][i  ][j][k];
-  real intp = (*fs)[Comp::i()][i+1][j][k];
-  /* is result inside of cell + in the correct direction? */
-  real centrex = phi.xc(i);
-  real edgep   = centrex+0.5*phi.dxc(i);
-  real edgem   = centrex-0.5*phi.dxc(i);
-  if(  (intm>=edgem&&intm<=centrex)
-     ||(intp<=edgep&&intp>=centrex)) {
-      return true;
-  }
+/*------------+
+|  using vof  |
++------------*/
+bool EnthalpyTIF::Interface(const int dir, const Comp m,
+                            const int i, const int j, const int k) {
+  int of(0);
+  if(dir>0)
+   of = 1;
+ 
+  if(m==Comp::i())
+    return (*fs)[m][i+of][j][k]<boil::zetta;  
+  else if(m==Comp::j())
+    return (*fs)[m][i][j+of][k]<boil::zetta;  
+  else
+    return (*fs)[m][i][j][k+of]<boil::zetta;  
 
   return false;
 }
-
-/* y-direction */
-bool EnthalpyTIF::Interface1D_y(const int i, const int j, const int k) {
-
-  real intm = (*fs)[Comp::j()][i][j  ][k];
-  real intp = (*fs)[Comp::j()][i][j+1][k];
-  /* is result inside of cell + in the correct direction? */
-  real centrey = phi.yc(j);
-  real edgep   = centrey+0.5*phi.dyc(j);
-  real edgem   = centrey-0.5*phi.dyc(j);
-  if(  (intm>=edgem&&intm<=centrey)
-     ||(intp<=edgep&&intp>=centrey)) {
-      return true;
-  }
-
-  return false;
-}
-
-/* z-direction */
-bool EnthalpyTIF::Interface1D_z(const int i, const int j, const int k) {
-
-  real intm = (*fs)[Comp::k()][i][j][k  ];
-  real intp = (*fs)[Comp::k()][i][j][k+1];
-  /* is result inside of cell + in the correct direction? */
-  real centrez = phi.zc(k);
-  real edgep   = centrez+0.5*phi.dzc(k);
-  real edgem   = centrez-0.5*phi.dzc(k);
-  if(  (intm>=edgem&&intm<=centrey)
-     ||(intp<=edgep&&intp>=centrey)) {
-      return true;
-  }
-
-  return false;
-}
-#endif

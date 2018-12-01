@@ -222,7 +222,7 @@ void EnthalpyTIF::create_system_diffusive(const Scalar * diff_eddy) {
       real lc, xm, xp;
 
       bool onm, onc, onp, ofm, ofc, ofp; // on & off
-      real lsm, lsc, lsp, lfm, lfc, lfp; // lambda
+      real lsm, lsc, lsp; // lambda
       real clm, clc, clp; // color function
       real dxm, dxp, fdm, fdp, fdms, fdps;
       real pm, pc, pp;    // temperature-input
@@ -241,9 +241,6 @@ void EnthalpyTIF::create_system_diffusive(const Scalar * diff_eddy) {
       lsm=solid()->lambda(i-1,j,k);
       lsc=solid()->lambda(i  ,j,k);
       lsp=solid()->lambda(i+1,j,k);
-      lfm=fluid()->lambda(i-1,j,k);
-      lfc=fluid()->lambda(i  ,j,k);
-      lfp=fluid()->lambda(i+1,j,k);
       clm=(*clr)[i-1][j][k];
       clc=(*clr)[i  ][j][k];
       clp=(*clr)[i+1][j][k];
@@ -268,7 +265,7 @@ void EnthalpyTIF::create_system_diffusive(const Scalar * diff_eddy) {
                 , aflagm, aflagp
                 , vol, dSx(i,j,k)
                 , onm, onc, onp, ofm, ofc, ofp
-                , lsm, lsc, lsp, lfm, lfc, lfp
+                , lsm, lsc, lsp
                 , clm, clc, clp
                 , dxm, dxp, fdm, fdp, fdms, fdps
                 , pm, pc, pp
@@ -288,9 +285,6 @@ void EnthalpyTIF::create_system_diffusive(const Scalar * diff_eddy) {
       lsm=solid()->lambda(i,j-1,k);
       lsc=solid()->lambda(i,j  ,k);
       lsp=solid()->lambda(i,j+1,k);
-      lfm=fluid()->lambda(i,j-1,k);
-      lfc=fluid()->lambda(i,j  ,k);
-      lfp=fluid()->lambda(i,j+1,k);
       clm=(*clr)[i][j-1][k];
       clc=(*clr)[i][j  ][k];
       clp=(*clr)[i][j+1][k];
@@ -315,7 +309,7 @@ void EnthalpyTIF::create_system_diffusive(const Scalar * diff_eddy) {
                 , aflagm, aflagp
                 , vol, dSy(i,j,k)
                 , onm, onc, onp, ofm, ofc, ofp
-                , lsm, lsc, lsp, lfm, lfc, lfp
+                , lsm, lsc, lsp
                 , clm, clc, clp
                 , dxm, dxp, fdm, fdp, fdms, fdps
                 , pm, pc, pp
@@ -335,9 +329,6 @@ void EnthalpyTIF::create_system_diffusive(const Scalar * diff_eddy) {
       lsm=solid()->lambda(i,j,k-1);
       lsc=solid()->lambda(i,j,k  );
       lsp=solid()->lambda(i,j,k+1);
-      lfm=fluid()->lambda(i,j,k-1);
-      lfc=fluid()->lambda(i,j,k  );
-      lfp=fluid()->lambda(i,j,k+1);
       clm=(*clr)[i][j][k-1];
       clc=(*clr)[i][j][k  ];
       clp=(*clr)[i][j][k+1];
@@ -362,7 +353,7 @@ void EnthalpyTIF::create_system_diffusive(const Scalar * diff_eddy) {
                 , aflagm, aflagp
                 , vol, dSz(i,j,k)
                 , onm, onc, onp, ofm, ofc, ofp
-                , lsm, lsc, lsp, lfm, lfc, lfp
+                , lsm, lsc, lsp
                 , clm, clc, clp
                 , dxm, dxp, fdm, fdp, fdms, fdps
                 , pm, pc, pp

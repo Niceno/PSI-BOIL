@@ -181,6 +181,7 @@ void EnthalpyTIF::update_ftif(const Scalar * diff_eddy) {
   +------------------------------------------*/
   } else {
 
+    bool oldflag = true; /* we are considering previous time step */
     for_m(m){
       int ii,jj,kk;
       ii=jj=kk=0;
@@ -198,7 +199,7 @@ void EnthalpyTIF::update_ftif(const Scalar * diff_eddy) {
         real lc, xm, xp;
 
         bool onm, onc, onp, ofm, ofc, ofp; // on & off
-        real lsm, lsc, lsp, lfm, lfc, lfp; // lambda
+        real lsm, lsc, lsp; // lambda
         real clm, clc, clp; // color function
         real dxm, dxp, fdm, fdp, fdms, fdps;
         real edm, edc, edp; // eddy viscosity
@@ -217,9 +218,6 @@ void EnthalpyTIF::update_ftif(const Scalar * diff_eddy) {
         lsm=solid()->lambda (i-ii,j-jj,k-kk);
         lsc=solid()->lambda (i   ,j   ,k   );
         lsp=solid()->lambda (i+ii,j+jj,k+kk);
-        lfm=fluid()->lambda (i-ii,j-jj,k-kk);
-        lfc=fluid()->lambda (i   ,j   ,k   );
-        lfp=fluid()->lambda (i+ii,j+jj,k+kk);
         clm=(*clr)[i-ii][j-jj][k-kk];
         clc=(*clr)[i   ][j   ][k   ];
         clp=(*clr)[i+ii][j+jj][k+kk];
@@ -262,7 +260,7 @@ void EnthalpyTIF::update_ftif(const Scalar * diff_eddy) {
                   , aflagm, aflagp
                   , vol, area
                   , onm, onc, onp, ofm, ofc, ofp
-                  , lsm, lsc, lsp, lfm, lfc, lfp
+                  , lsm, lsc, lsp
                   , clm, clc, clp
                   , dxm, dxp, fdm, fdp, fdms, fdps
                   , pm, pc, pp

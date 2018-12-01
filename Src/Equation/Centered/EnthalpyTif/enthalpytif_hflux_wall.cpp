@@ -7,6 +7,12 @@ real EnthalpyTIF::hflux_wall(const Scalar & val, const Dir din
                           , const Scalar * diff_eddy) {
   //std::cout<<"hflux_wall: "<<din<<"\n";
 
+  if(fs) {
+    boil::oout<<"ETIF::hflux_wall: Underdevelopment!"<<boil::endl;
+    boil::oout<<"Doesn't account for subgrid films"<<boil::endl;
+    exit(0);
+  }
+
   Formula form;
 
   real hflux=0.0; //average heat flux [W/m2]

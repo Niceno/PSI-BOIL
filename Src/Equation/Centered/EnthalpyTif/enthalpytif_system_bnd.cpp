@@ -24,40 +24,62 @@ void EnthalpyTIF::create_system_bnd() {
       if( d == Dir::imin() ) 
         for_vjk(phi.bc().at(b),j,k) 
          {//fbnd[si()][j][k] += phi.bc().value(b) * dSx(si(),j,k);
-          A.c[si()][j][k] -= A.w[si()][j][k];
-          A.w[si()][j][k]  = 0.0;}
+          if(!fs||!Interface(-1,Comp::i(),si(),j,k)) {
+            A.c[si()][j][k] -= A.w[si()][j][k];
+            A.w[si()][j][k]  = 0.0;
+          }
+         }
 
       if( d == Dir::imax() ) 
         for_vjk(phi.bc().at(b),j,k)
          {//fbnd[ei()][j][k] += phi.bc().value(b) * dSx(ei(),j,k);
-          A.c[ei()][j][k] -= A.e[ei()][j][k];
-          A.e[ei()][j][k]  = 0.0;}
+          if(!fs||!Interface(+1,Comp::i(),ei(),j,k)) {
+            A.c[ei()][j][k] -= A.e[ei()][j][k];
+            A.e[ei()][j][k]  = 0.0;
+          }
+         }
 
       if( d == Dir::jmin() ) 
         for_vik(phi.bc().at(b),i,k)
          {//fbnd[i][sj()][k] += phi.bc().value(b) * dSy(i,sj(),k);
-          A.c[i][sj()][k] -= A.s[i][sj()][k];
-          A.s[i][sj()][k]  = 0.0;}
+          if(!fs||!Interface(-1,Comp::j(),i,sj(),k)) {
+            A.c[i][sj()][k] -= A.s[i][sj()][k];
+            A.s[i][sj()][k]  = 0.0;
+          }
+         }
 
       if( d == Dir::jmax() ) 
         for_vik(phi.bc().at(b),i,k)
          {//fbnd[i][ej()][k] += phi.bc().value(b) * dSy(i,ej(),k);
-          A.c[i][ej()][k] -= A.n[i][ej()][k];
-          A.n[i][ej()][k]  = 0.0;}
+          if(!fs||!Interface(+1,Comp::j(),i,ej(),k)) {
+            A.c[i][ej()][k] -= A.n[i][ej()][k];
+            A.n[i][ej()][k]  = 0.0;
+          }
+         }
 
       if( d == Dir::kmin() ) 
         for_vij(phi.bc().at(b),i,j)
          {//fbnd[i][j][sk()] += phi.bc().value(b) * dSz(i,j,sk());
-          A.c[i][j][sk()] -= A.b[i][j][sk()];
-          A.b[i][j][sk()]  = 0.0;}
+          if(!fs||!Interface(-1,Comp::k(),i,j,sk())) {
+            A.c[i][j][sk()] -= A.b[i][j][sk()];
+            A.b[i][j][sk()]  = 0.0;
+          }
+         }
 
       if( d == Dir::kmax() ) 
         for_vij(phi.bc().at(b),i,j)
          {//fbnd[i][j][ek()] += phi.bc().value(b) * dSz(i,j,ek());
-          A.c[i][j][ek()] -= A.t[i][j][ek()];
-          A.t[i][j][ek()]  = 0.0;}
+          if(!fs||!Interface(+1,Comp::k(),i,j,ek())) {
+            A.c[i][j][ek()] -= A.t[i][j][ek()];
+            A.t[i][j][ek()]  = 0.0;
+          }
+         }
 
+      /* this part should be deprecated! */
       if( d == Dir::ibody() ) {
+        boil::oout << "ETIF::system_bnd: Underdevelopment!"<<boil::endl;
+        exit(0);
+        #if 0
         for(int cc=0; cc<dom->ibody().nccells(); cc++) {
           int i,j,k;
           dom->ibody().ijk(cc,&i,&j,&k); // OPR(i); OPR(j); OPR(k);
@@ -91,10 +113,11 @@ void EnthalpyTIF::create_system_bnd() {
             A.c[i][j][k]   -= A.t[i][j][k];   A.t[i][j][k]   = 0.0;
             A.c[i][j][k+1] -= A.b[i][j][k+1]; A.b[i][j][k+1] = 0.0;
           }
-        }
-      }
-    }
-  }
+        } /* loop over ibody cells */
+        #endif
+      } /* dir = ibody */
+    } /* if condition */
+  } /* loop over bc directions */
 
   /*----------------------+ 
   |  dirichlet and inlet  |
@@ -109,42 +132,70 @@ void EnthalpyTIF::create_system_bnd() {
 
       if( d == Dir::imin() ) 
         for_vjk(phi.bc().at(b),j,k) 
-         {const real value = phi[si()-1][j][k];
-          fbnd[si()][j][k] += value * A.w[si()][j][k];
-          A.w[si()][j][k]  = 0.0;}
+         {
+          if(!fs||!Interface(-1,Comp::i(),si(),j,k)) {
+            const real value = phi[si()-1][j][k];
+            fbnd[si()][j][k] += value * A.w[si()][j][k];
+            A.w[si()][j][k]  = 0.0;
+          }
+         }
 
       if( d == Dir::imax() ) 
         for_vjk(phi.bc().at(b),j,k)
-         {const real value = phi[ei()+1][j][k];
-          fbnd[ei()][j][k] += value * A.e[ei()][j][k];
-          A.e[ei()][j][k]  = 0.0;}
+         {
+          if(!fs||!Interface(+1,Comp::i(),ei(),j,k)) {
+            const real value = phi[ei()+1][j][k];
+            fbnd[ei()][j][k] += value * A.e[ei()][j][k];
+            A.e[ei()][j][k]  = 0.0;
+          }
+         }
 
       if( d == Dir::jmin() ) 
         for_vik(phi.bc().at(b),i,k)
-         {const real value = phi[i][sj()-1][k];
-          fbnd[i][sj()][k] += value * A.s[i][sj()][k];
-          A.s[i][sj()][k]  = 0.0;}
+         {
+          if(!fs||!Interface(-1,Comp::j(),i,sj(),k)) {
+            const real value = phi[i][sj()-1][k];
+            fbnd[i][sj()][k] += value * A.s[i][sj()][k];
+            A.s[i][sj()][k]  = 0.0;
+          }
+         }
 
       if( d == Dir::jmax() )  
         for_vik(phi.bc().at(b),i,k)
-         {const real value = phi[i][ej()+1][k];
-          fbnd[i][ej()][k] += value * A.n[i][ej()][k];
-          A.n[i][ej()][k]  = 0.0;}
+         {
+          if(!fs||!Interface(+1,Comp::j(),i,ej(),k)) {
+            const real value = phi[i][ej()+1][k];
+            fbnd[i][ej()][k] += value * A.n[i][ej()][k];
+            A.n[i][ej()][k]  = 0.0;
+          }
+         }
 
       if( d == Dir::kmin() ) 
         for_vij(phi.bc().at(b),i,j)
-         {const real value = phi[i][j][sk()-1];
-          fbnd[i][j][sk()] += value * A.b[i][j][sk()];
-          A.b[i][j][sk()]  = 0.0;}
+         {
+          if(!fs||!Interface(-1,Comp::k(),i,j,sk())) {
+            const real value = phi[i][j][sk()-1];
+            fbnd[i][j][sk()] += value * A.b[i][j][sk()];
+            A.b[i][j][sk()]  = 0.0;
+          }
+         }
 
       if( d == Dir::kmax() ) 
         for_vij(phi.bc().at(b),i,j)
-         {const real value = phi[i][j][ek()+1];
-          fbnd[i][j][ek()] += value * A.t[i][j][ek()];
-          A.t[i][j][ek()]  = 0.0;}
+         {
+          if(!fs||!Interface(+1,Comp::k(),i,j,ek())) {
+            const real value = phi[i][j][ek()+1];
+            fbnd[i][j][ek()] += value * A.t[i][j][ek()];
+            A.t[i][j][ek()]  = 0.0;
+          }
+         }
 
+      /* this part should be deprecated! */
       if( d == Dir::ibody() ) {
-
+        boil::oout << "ETIF::system_bnd: Underdevelopment!"<<boil::endl;
+        boil::oout << "ibody without conduction in solid." <<boil::endl;
+        exit(0);
+        #if 0
         for(int cc=0; cc<dom->ibody().nccells(); cc++) {
           int i,j,k;
           dom->ibody().ijk(cc,&i,&j,&k); // OPR(i); OPR(j); OPR(k);
@@ -194,7 +245,8 @@ void EnthalpyTIF::create_system_bnd() {
             A.b [i][j][k+1] = 0.0;}
           
         }
-      }
+        #endif
+      } /* dir = ibody */
     }
   }
 

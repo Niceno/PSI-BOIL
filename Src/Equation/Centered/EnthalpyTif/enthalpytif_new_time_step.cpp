@@ -42,8 +42,6 @@ void EnthalpyTIF::new_time_step(const Scalar * diff_eddy) {
       for_m(m)
         for_avmijk(fsold,m,i,j,k)
           fsold[m][i][j][k] = (*fs)[m][i][j][k];
-      //for_avijk(intflagold,i,j,k)
-      //  intflagold[i][j][k] = intflag[i][j][k];
     }
     store_clrold = true;
   }
@@ -89,7 +87,7 @@ void EnthalpyTIF::new_time_step(const Scalar * diff_eddy) {
   /* semi-lagrangian scheme */
   for_ijk(i,j,k){
     if(dom->ibody().on(i,j,k)){
-      real r,c;
+      real c;
       if(clrold[i][j][k]>=clrsurf){
         c = cpl;
       } else {
@@ -106,7 +104,7 @@ void EnthalpyTIF::new_time_step(const Scalar * diff_eddy) {
       // phase does not change
       } else {
         if( (phi[i][j][k]-tsat)*(t_new-tsat)<0.0 ){
-          t_new = tsat;     /* crude code: Is this necesarry? */
+          t_new = tsat;     /* crude code: Is this necessary? */
         }
       }
 #endif
@@ -131,8 +129,6 @@ void EnthalpyTIF::new_time_step(const Scalar * diff_eddy) {
     for_m(m)
       for_avmijk(fsold,m,i,j,k)
         fsold[m][i][j][k] = (*fs)[m][i][j][k];
-    //for_avijk(intflagold,i,j,k)
-    //  intflagold[i][j][k] = intflag[i][j][k];
   }
 
   /*---------------------------------------+

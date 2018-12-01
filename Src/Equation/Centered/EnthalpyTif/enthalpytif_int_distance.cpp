@@ -29,11 +29,9 @@ real EnthalpyTIF::distance_x(const int i, const int j, const int k,
   boil::oout<<"EnthalpyTIF::int_dist_x: Error! Flag inconsistent w/ vol. fraction!\n";
   if(!old)
     boil::oout<<"new "<<i<<" "<<j<<" "<<k<<" "<<dir<<" "
-              //<<intflag[i][j][k]<<" "<<intflag[i+of][j][k]<<" "
               <<(*clr)[i][j][k]<<" "<<(*clr)[i+of][j][k]<<boil::endl;
   else
     boil::oout<<"old "<<i<<" "<<j<<" "<<k<<" "<<dir<<" "
-              //<<intflagold[i][j][k]<<" "<<intflagold[i+of][j][k]<<" "
               <<clrold[i][j][k]<<" "<<clrold[i+of][j][k]<<boil::endl;
   exit(0);
  
@@ -132,11 +130,9 @@ real EnthalpyTIF::distance_y(const int i, const int j, const int k,
   if(!old)
     boil::oout<<"new "<<i<<" "<<j<<" "<<k<<" "<<dir<<" "
               <<phi.yc(j)<<" "<<phi.yc(j+of)<<" "<<(*fs)[Comp::j()][i][j+(of>0)][k]<<" "
-              //<<intflag[i][j][k]<<" "<<intflag[i][j+of][k]<<" "
               <<(*clr)[i][j][k]<<" "<<(*clr)[i][j+of][k]<<boil::endl;
   else
     boil::oout<<"old "<<i<<" "<<j<<" "<<k<<" "<<dir<<" "
-              //<<intflagold[i][j][k]<<" "<<intflagold[i][j+of][k]<<" "
               <<clrold[i][j][k]<<" "<<clrold[i][j+of][k]<<boil::endl;
   exit(0);
  
@@ -234,11 +230,9 @@ real EnthalpyTIF::distance_z(const int i, const int j, const int k,
   boil::oout<<"EnthalpyTIF::int_dist_z: Error! Flag inconsistent w/ vol. fraction!\n";
   if(!old)
     boil::oout<<"new "<<i<<" "<<j<<" "<<k<<" "<<dir<<" "
-              //<<intflag[i][j][k]<<" "<<intflag[i][j][k+of]<<" "
               <<(*clr)[i][j][k]<<" "<<(*clr)[i][j][k+of]<<boil::endl;
   else
     boil::oout<<"old "<<i<<" "<<j<<" "<<k<<" "<<dir<<" "
-              //<<intflagold[i][j][k]<<" "<<intflagold[i][j][k+of]<<" "
               <<clrold[i][j][k]<<" "<<clrold[i][j][k+of]<<boil::endl;
   exit(0);
  
