@@ -1,0 +1,49 @@
+\section{Implementation}
+
+\label{sec_lptimplementation}
+
+All the necessary files for Lagrangian particle tracking module are included under the folder of {\psiboil}/Src/Equation/Lagrangian, as:
+
+%
+{\small \begin{verbatim}
+Src
+|-- Board
+|-- ...
+|-- Equation
+|   |-- Centered
+|   |-- Staggered
+|   |-- Floorfill
+|   |-- Dispersed
+|   |-- Lagrangian
+|       |-- lagrangian.h
+|       |-- lagrangian.cpp
+|       |-- lagrangian_count_particles.cpp
+|       |-- lagrangian_advance.cpp
+|       |-- lagrangian_box_init.cpp
+|       |-- lagrangian_box_velocity.cpp
+|       |-- lagrangian_collisions.cpp
+|       |-- lagrangian_forces.cpp
+|       |-- lagrangian_save_load.cpp
+|       |-- ...
+|-- ...
+\end{verbatim}}
+%
+
+The structure of Dispersed class was followed in the development of Lagrangian class, while there are many differences between these two classes.
+Some useful functions and interfaces of Dispersed class are also kept in the present version of Lagrangian class, even though they are not in use at the moment.  However, it should be easier and promising for more developments in the future.
+Stop points are used to ensure that these functions are not working in Lagrangian particle tracking for {\psiboil}.
+
+\subsection{Call Lagrangian class in main.cpp}
+
+\begin{itemize}
+  \item {Matter lagparticle(d);}
+  \item {lagparticle.rho(3000.0);}
+  \item {Lagrangian lagp (c, );}
+  \item {Lagrangian lagp (c, \&c, 3, c, uvw, time, \&mixed, \&lagparticle);}
+  \item {\begin{flushleft}
+             lagp.add(Particle( Position(-5.0e-3, 7.0e-3, 30.0e-3), \\
+             \quad \quad \quad \quad Diameter(5.0e-6), \\
+             \quad \quad \quad \quad Position(0.0, 0.0, 0.1)));
+         \end{flushleft}}
+  \item {lagp.advance(\& xyz);}
+\end{itemize}

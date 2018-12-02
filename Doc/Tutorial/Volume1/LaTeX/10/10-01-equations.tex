@@ -1,0 +1,153 @@
+\section{Lagrangian particle tracking equations in {\psiboil}}
+
+\label{sec_lptequations}
+
+In this section, Lagrangian particle tracking equations currently implemented in {\psiboil} are briefly outlined.
+
+First of all, some basic assumptions should be made ahead:
+
+\begin{itemize}
+  \item {dilute particle-laden flow}, 
+  \item {stationary spherical particle}, 
+  \item {only drag, gravity and buoyancy forces}, 
+  \item {point-particle model with one-way coupling},
+  \item {particles deposit at wall and bubble interface, etc}.
+\end{itemize}
+
+For example, there are various inter-phase forces including:
+
+\begin{itemize}
+  \item {drag}, 
+  \item {gravity}, 
+  \item {buoyancy}, 
+  \item {pressure gradient},
+  \item {virtual mass},
+  \item {basset},
+  \item {brownian diffusion},
+  \item {thermophoresis},
+  \item {electrophoresis},
+  \item {photophoresis},
+  \item {saffman},
+  \item {magus, etc}.
+\end{itemize}
+
+For the dilute heavy-particle-laden flow, only the first three forces\footnote{\tt Maxey M R, Riley J J. Equation of motion for a small rigid sphere in a nonuniform flow[J]. The Physics of Fluids, 1983, 26(4): 883-889.} need to be taken into account considering the relative order.
+
+The concept of regarding the condensed phase as a source of mass, momentum  and  energy  to  the  continuum phase was pro-posed first by Migdal and Agosta [8].  
+Finite-difference equations for mass, momentum and energy conservation are written for each cell, incorporating the   contribution due to the condensed phase.
+The continuum flow field is analyzed utilizing the Eulerian approach, which is the most straightforward approach  for analyzing continuum flows. The entire flow-field solution is obtained by solving the system of algebraic equations constituting the finite-difference equations for  each  cell.  
+The particle trajectories, size and temperature history are obtained by integrating the equations of motion for the particles in the gas flow field and utilizing expressions for the particle-gas mass and heat transfer rates.
+Solving for the particle velocity, size and temperature along particle trajectories is done using the Lagrangian approach, which is the most straightforward approach for the particle phase.
+Recording the mass, momentum and energy of the particles on crossing cell boundaries provides the particle source terms  for the gas flow equations.
+
+\subsection{Governing equations of motion for isolated particle}
+
+In order to evaluate the source terms in the gas-phase flow equations due to the presence of particles, it is necessary to establish particle trajectories, size and temperature histories. This is accomplished by integrating the particle equation of motion and the heat and mass transfer equations relating to particle temperature and size. The velocity, pressure and temperature field of the gas is used in these calculations.
+
+The equation of motion for isolated particle is given by:
+
+%
+\be
+    {m_{\rm p}} \frac{d v}{d t}
+    = {C_{\rm D}} \rho ({v_{\rm g}}-{v_{\rm p}}) |{v_{\rm g}}-{v_{\rm p}}| \frac{A_{\rm p}}{2}
+    + {m_{\rm p}} {\rm g}
+  \label{eq_motion}
+\ee
+%
+
+where ${C_{\rm D}}$ is the drag coefficient, ${v_{\rm p}}$ is the particle velocity, ${v_{\rm g}}$ is the gas velocity, ${m_{\rm p}}$ is the mass of the particle, ${A_{\rm p}}$ is the particle area and ${\rm g}$ is the gravity vector.
+The other terms contributing to aerodynamic forces on the particle--namely the pressure gradient, virtual mass and Basset term--are neglected because they are of the order of the gas/particle density ratio, which for most applications of interest is approximately ${10^{-3}}$.
+The Saffman lift and Magnus forces also are neglected because the particles are not in a high-shear region of the gas flow.
+The drag coefficient for a particle depends primarily on the Reynolds number based on the gas-particle relative velocity:
+
+%
+\be
+    {\rm Re}
+    = \frac{\rho |{v_{\rm g}}-{v_{\rm p}}| d}{\mu}
+  \label{eq_relativevelocity}
+\ee
+%
+
+where $d$ is the particle diameter. For a nonevaporating particle, the drag coefficient can be represented reasonably well by:
+
+%
+\be
+    {C_{\rm D}}
+    = \frac{{\rm Re}}{24} (1+0.15{{\rm Re}^{0.687}})
+  \label{eq_dragcoefficient}
+\ee
+%
+
+for Reynolds numbers up to 1000, while is limited to 0.24 as when ${\rm Re}>1000$.
+
+%Considerable economy in computing time is realized if the particle trajectory equation is integrated once analytically.
+
+Rewriting the above equation for particle motion, one has
+
+%
+\be
+    \frac{d {v_{\rm p}}}{d t}
+    = (\frac{18 \mu f}{ {\rho_{\rm p}} d^2 }) ({v_{\rm g}}-{v_{\rm p}})
+    + {\rm g}
+  \label{eq_motionrewrite}
+\ee
+%
+
+where $f={C_{\rm D}} {\rm Re} / 24$ and $\rho_{\rm p}$ is the density of the particle substance.
+Integrating the equation, assuming the gas velocity is constant over the time of integration, yields
+
+after time interval $\Delta t$
+
+Newton's 2nd Law with only drag and gravity
+
+%
+\be
+    {v_{\rm p}^n}
+    = {v_{\rm p}^{n-1}} + \frac{f}{m_{\rm p}} {\Delta t}
+  \label{eq_updatevelocity}
+\ee
+%
+
+for computational precision, we can use Runge-Kutta techniques\footnote{\tt Hazewinkel, Michiel, ed. (2001) [1994], "Runge-Kutta method", Encyclopedia of Mathematics, Springer Science+Business Media B.V. / Kluwer Academic Publishers, ISBN 978-1-55608-010-4}.
+For accurate estimation of particle trajectory:
+
+%
+\be
+    {\Delta t} \leqslant \frac{{\tau}}{2}
+  \label{eq_RungeKuttanewvelocity}
+\ee
+%
+
+Considerable economy in computing time is realized if the particle trajectory equation is integrated once analytically\footnote{\tt Crowe C T, Sharma M P, Stock D E. The particle-source-in cell (PSI-CELL) model for gas-droplet flows[J]. Journal of fluids engineering, 1977, 99(2): 325-332.} as:
+
+%
+\be
+    {v_{\rm p}^n}
+    = {v_{\rm g}} - ({v_{\rm g}} - {v_{\rm p}^{n-1}}) {\rm exp}(\frac{-{\Delta t}}{\tau})
+    + {\rm g} {\tau} [1-{\rm exp}(\frac{-{\Delta t}}{\tau})]
+  \label{eq_integratnewvelocity}
+\ee
+%
+
+where ${v_{\rm p}^{n-1}}$ is the initial particle velocity, ${\Delta t}$ is the time interval,
+and ${\tau}$ is the characteristic time defined by:
+
+%
+\be
+    {\tau}
+    = \frac{ {\rho_{\rm p}} d^2 }{18 \mu f}
+  \label{eq_tau}
+\ee
+%
+
+After determining the new particle velocity at time At, the particle position at time ${\Delta t}$ is determined from
+
+%
+\be
+    {x_{\rm p}^n}
+    = {x_{\rm p}^{n-1}} + ({v_{\rm p}^{n}}+{v_{\rm p}^{n-1}}) \frac{\Delta t}{2}
+  \label{eq_updateposition}
+\ee
+%
+
+where ${x_{\rm p}^{n-1}}$ is the particle position at the beginning of the time increment.
