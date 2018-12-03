@@ -26,7 +26,7 @@ class VOF : public Centered {
     void tension(Vector * vec, const Matter matt);
     void totalvol();
     void front_minmax();
-    void init();
+    void init(){};
 
     // getter for front_minmax
     real get_xminft() { return(xminft);};
@@ -44,11 +44,11 @@ class VOF : public Centered {
     void advance_y();
     void advance_z();
     void bdcurv(const Scalar & g, const real & v);
-    void curv_HF();
     void cal_fs();
     //void cal_fs2();
     void cal_fs3();
     void fs_bnd();
+    void curv_HF();
     void ext_fs();
     real extract_alpha(const int i, const int j, const int k);
     void insert_bc(const Scalar & g);
@@ -82,8 +82,8 @@ class VOF : public Centered {
     Scalar clr,clrn;     /* color function */
     Scalar kappa;        /* curvature */
     Scalar stmp;
-    ScalarInt iflag,iflagx,iflagy,iflagz;
     Scalar fsx,fsy,fsz;
+    ScalarInt iflag,iflagx,iflagy,iflagz;
 
     Matter jelly;   /* virtual fluid for level set transport */
     real xminft,xmaxft,yminft,ymaxft,zminft,zmaxft; /* xyz min&max of front */
@@ -96,3 +96,4 @@ class VOF : public Centered {
     //int *** iflag;
 };	
 #endif
+

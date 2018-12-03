@@ -72,4 +72,3 @@ void VOF::insert_bc_norm() {
     }
   }
 }
-

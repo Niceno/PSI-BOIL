@@ -283,4 +283,3 @@ void VOF::insert_bc_gradphic(const Scalar & val) {
   }
 #endif
 }
-
