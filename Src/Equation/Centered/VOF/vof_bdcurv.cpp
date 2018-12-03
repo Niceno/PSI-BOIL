@@ -603,3 +603,4 @@ real divnorm(const Scalar & nx, const Scalar & ny,const Scalar & nz
           +(nn-ns)/(ny.dyc(j))
           +(nt-nb)/(nz.dzc(k))));
 }
+
