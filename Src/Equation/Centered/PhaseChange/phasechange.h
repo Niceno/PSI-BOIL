@@ -79,6 +79,7 @@ class PhaseChange : public Centered {
     void finalize();
     void set_tif(Scalar * newtif) { tif = newtif; }
 
+    real marching_cube(const int i, const int j, const int k); /* temp public */
   private:
     void cal_gradt(const Scalar * diff_eddy = NULL);
     void distfunc(const Scalar & sca, const int itnum);
@@ -108,7 +109,7 @@ class PhaseChange : public Centered {
 
     void ext_gradt(Scalar & sca, const int iext);
     void m(const Scalar * diff_eddy = NULL);
-    real marching_cube(const int i, const int j, const int k);
+    //real marching_cube(const int i, const int j, const int k);
     real iso_length(const int i, const int j, const int k, const Dir d);
     void mdot_cut();
     void micro_shift();

@@ -15,7 +15,7 @@ class FineScalar {
     FineScalar(const Scalar & PHI, const Vector & FS,
                const Scalar * NX, const Scalar * NY, const Scalar * NZ,
                const Scalar * NALPHA) :
-               faceval(*FS.domain()) {
+               faceval(*FS.domain()), adens(*PHI.domain()) {
 
       phi = &PHI; 
       fs = &FS;
@@ -37,6 +37,8 @@ class FineScalar {
       for_m(m){
         faceval(m) = FS(m).shape();
       }
+
+      adens = PHI.shape();
 
       /* initialize edge-based values */
       edgex = PHI.shape();
@@ -87,6 +89,9 @@ class FineScalar {
     real & value(int i, int j, int k, int dir);
     void evaluate();
 
+    void cal_adens();
+    Scalar adens; /* area density */
+
    private:
     typedef struct {
       bool rl; /* does the interface cross bw point and cell centre? */
@@ -98,15 +103,23 @@ class FineScalar {
     void eval_face();
     void eval_edge();
 
-    real edge_eval_val(const real phi1,
-                       const int i1, const int j1, const int k1,
-                       const int dir1,
-                       const real phi2,
-                       const int i2, const int j2, const int k2,
-                       const int dir2);
+    real eval_marker(const real phi1,
+                     const int i1, const int j1, const int k1,
+                     const int dir1,
+                     const real phi2,
+                     const int i2, const int j2, const int k2,
+                     const int dir2);
 
-    point_coord edge_eval_point(const int i, const int j, 
-                                const int k, const int dir);
+    point_coord eval_point(const int i, const int j, 
+                           const int k, const int dir);
+
+    real grad_1D(const real mF,
+                 const real mE1, const real mE2, const real mE3, const real mE4,
+                 const real mN1, const real mN2, const real mN3, const real mN4,
+                 const real pF,
+                 const real pE1, const real pE2, const real pE3, const real pE4,
+                 const real pN1, const real pN2, const real pN3, const real pN4,
+                 const real delta, const int k);
 
     void bdcond_node();
     void bdcond_face();

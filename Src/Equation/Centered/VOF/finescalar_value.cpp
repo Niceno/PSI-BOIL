@@ -21,10 +21,10 @@ real & FineScalar::value(int i, int j, int k, int dir) {
   if(dir == eb()) return edgey[i+1][j  ][k  ];
   if(dir == et()) return edgey[i+1][j  ][k+1];
         
-  if(dir == sb()) return edgez[i  ][j  ][k  ];
-  if(dir == st()) return edgez[i  ][j  ][k+1];
-  if(dir == nb()) return edgez[i  ][j+1][k  ];
-  if(dir == nt()) return edgez[i  ][j+1][k+1];
+  if(dir == sb()) return edgex[i  ][j  ][k  ];
+  if(dir == st()) return edgex[i  ][j  ][k+1];
+  if(dir == nb()) return edgex[i  ][j+1][k  ];
+  if(dir == nt()) return edgex[i  ][j+1][k+1];
 
   if(dir == w()) return faceval[Comp::i()][i  ][j][k];
   if(dir == e()) return faceval[Comp::i()][i+1][j][k];

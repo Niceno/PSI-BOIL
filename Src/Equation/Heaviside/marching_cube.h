@@ -17,6 +17,7 @@ class MarchingCube {
     ~MarchingCube() {}
 
     real volume(const int i, const int j, const int k);
+    real area(const int i, const int j, const int k);
     real surface(const int dir, const Comp & mcomp,
                  const int i, const int j, const int k);
 

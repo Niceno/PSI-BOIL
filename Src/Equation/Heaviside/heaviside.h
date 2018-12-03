@@ -20,6 +20,11 @@ class Heaviside {
 
     const Domain * domain() const {return dom;}
     void calculate();
+
+    real volume(const int i, const int j, const int k) 
+      { return mc.volume(i,j,k); }
+    real area  (const int i, const int j, const int k) 
+      { return mc.area(i,j,k); }
    
   protected:
     const Domain * dom; 

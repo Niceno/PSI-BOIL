@@ -1,9 +1,12 @@
 noinst_LIBRARIES = libVof.a
 libVof_a_SOURCES =      finescalar.h               \
-                        finescalar_evaluate.cpp    \
-                        finescalar_eval_face.cpp   \
-                        finescalar_eval_edge.cpp   \
+                        finescalar_ancillary.cpp   \
                         finescalar_bdcond_face.cpp \
+                        finescalar_cal_adens.cpp   \
+                        finescalar_evaluate.cpp    \
+                        finescalar_eval_edge.cpp   \
+                        finescalar_eval_face.cpp   \
+                        finescalar_eval_node.cpp   \
                         finescalar_value.cpp       \
                         vof.h                 \
                         vof.cpp               \

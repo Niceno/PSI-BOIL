@@ -6,7 +6,7 @@ void FineScalar::evaluate() {
 *  \brief Evaluate the marker function.
 *******************************************************************************/
 
-  //eval_node();
+  eval_node();
   eval_face();
   eval_edge();
 
