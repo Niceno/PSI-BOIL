@@ -1191,4 +1191,3 @@ void VOF::norm_cc_kmax(const Scalar & val,
 
   selectMax(mxX,myX,mzX,mxY,myY,mzY,mxZ,myZ,mzZ,i,j,k);
 }
-

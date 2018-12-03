@@ -1,18 +1,16 @@
 #include "vof.h"
 
 /******************************************************************************/
-void VOF::curv_intpos() {
+void VOF::curv_HF() {
 /***************************************************************************//**
 *  \brief Calculate curvature using height function.
 *     output: kappa
 *******************************************************************************/
 
-  /*----------------------------------+
-  |  calculate free surface position  |
-  +----------------------------------*/
-  cal_fs();
+  const int ist=-1;
+  const int ied=+1;
 
-#if 0
+
   /* interfacial cells: iflag=1 */
   iflag=0;
   for_ijk(i,j,k) {
@@ -54,13 +52,21 @@ void VOF::curv_intpos() {
           dirMax=1;
         }
       }
-
-      
+    if(time->current_step() % 858 == 0) {
+      std::cout<<"i: "<<i<<"j: "<<j<<"k: "<<k<<"dirMax: "<<dirMax<<"\n";     
+    }  
       if (dirMax==1) {
         real hmm, hcm, hpm, hmc, hcc, hpc, hmp, hcp, hpp;
+#if 1
         hmm = phi[i-1][j-1][k-1]*phi.dxc(i-1)
             + phi[i  ][j-1][k-1]*phi.dxc(i)
             + phi[i+1][j-1][k-1]*phi.dxc(i+1);
+#else
+        hmm = 0.0;
+        for (int ii=ist; ii<=ied; ii++) {
+          hmm += phi[i+ii][j-1][k-1]*phi.dxc(i+ii);
+        }
+#endif
         hcm = phi[i-1][j  ][k-1]*phi.dxc(i-1)
             + phi[i  ][j  ][k-1]*phi.dxc(i)
             + phi[i+1][j  ][k-1]*phi.dxc(i+1);
@@ -149,16 +155,25 @@ void VOF::curv_intpos() {
     }
   }
   kappa.exchange();
-#endif
 
-#if 0
+#if 1
   for_aijk(i,j,k) {
     stmp[i][j][k]=real(iflag[i][j][k]);
   }
-  boil::plot->plot(phi,kappa,stmp, "phi-kappa-iflag", time->current_step());
-  exit(0);
+  if(time->current_step() % 858 == 0) {
+    boil::plot->plot(phi,kappa,stmp, "phi-kappa-iflag", time->current_step());
+  }
+//  exit(0);
 #endif
 
+#if 1
+  nx.exchange_all();
+  ny.exchange_all();
+  nz.exchange_all();
+  if(time->current_step() % 858 == 0) {
+    boil::plot->plot(phi,nx,ny,nz, "clr-nx-ny-nz", time->current_step());
+  }
+#endif
   return;
 }
-/*-----------------------------------------------------------------------------+
+

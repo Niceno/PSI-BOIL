@@ -386,8 +386,10 @@ void VOF::curvature() {
   for_aijk(i,j,k) {
     stmp[i][j][k]=real(iflag[i][j][k]);
   }
-  boil::plot->plot(phi,kappa,stmp, "phi-kappa-iflag", time->current_step());
-  exit(0);
+  if(time->current_step() % 858 == 0) {
+    boil::plot->plot(phi,kappa,stmp, "phi-kappa-iflag", time->current_step());
+  }
+//  exit(0);
 #endif
 
   return;

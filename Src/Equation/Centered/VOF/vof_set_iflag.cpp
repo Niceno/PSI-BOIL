@@ -120,4 +120,3 @@ void VOF::set_iflag() {
 
   return;
 }
-

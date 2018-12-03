@@ -51,6 +51,9 @@ void VOF::advance() {
   phi.bnd_update();
   phi.exchange_all();
 
+#if 1
+  curv_HF();
+#endif
   return;
 }
 

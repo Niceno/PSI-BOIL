@@ -19,8 +19,8 @@ void VOF::tension(Vector * vec, const Matter matt) {
   /*----------------------------------+
   |  1st step: curvature calculation  |
   +----------------------------------*/
-  //curv_HF();
-  curvature();
+  curv_HF();
+  //curvature();
 
   /*-----------------------+
   |  2nd step: body force  |
