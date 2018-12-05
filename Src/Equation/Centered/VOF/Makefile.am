@@ -3,10 +3,12 @@ libVof_a_SOURCES =      finescalar.h               \
                         finescalar_ancillary.cpp   \
                         finescalar_bdcond_face.cpp \
                         finescalar_cal_adens.cpp   \
+                        finescalar_cal_adens27.cpp   \
                         finescalar_evaluate.cpp    \
                         finescalar_eval_edge.cpp   \
                         finescalar_eval_face.cpp   \
                         finescalar_eval_node.cpp   \
+                        finescalar_output.cpp      \
                         finescalar_value.cpp       \
                         vof.h                 \
                         vof.cpp               \
@@ -22,7 +24,7 @@ libVof_a_SOURCES =      finescalar.h               \
                         vof_curvature.cpp          \
                         vof_curv_HF.cpp          \
                         vof_ext_fs.cpp          \
-                        vof_extract_alpha.cpp          \
+                        vof_extract_alpha.cpp   \
                         vof_fs_bnd.cpp          \
                         vof_front_minmax.cpp  \
                         vof_gradphi.cpp  \

@@ -4,21 +4,10 @@
 void VOF::cal_fs3() {
 /***************************************************************************//**
  \brief Calculate free-surface position between cell centers
-    if there is no interface in the cell, yotta (=1e+24) is stored.
+    if there is no interface in the cell, unreal=yotta (=1e+24) is stored.
     plane: vm1*x + vm2*y + vm3*z = alpha
     output: fs
 *******************************************************************************/
-
-  /* avoid singular cases */
-  for_avijk(phi,i,j,k) {
-    if(phi[i][j][k]==0.5) phi[i][j][k] += boil::pico;
-  }
-
-  /* calculate alpha value in the domain */
-  for_avijk(nalpha,i,j,k) {
-    nalpha[i][j][k] = alpha_val(i,j,k);
-  }
-
 
   /* tolerance is necessary because the linear-planes are not closed */
   /* with this version, it shouldnt be necessary anymore */
@@ -27,7 +16,7 @@ void VOF::cal_fs3() {
   /* initialize */
   for_m(m)
     for_avmijk(fs,m,i,j,k)
-      fs[m][i][j][k] = boil::yotta;
+      fs[m][i][j][k] = boil::unreal;
 
   Comp m;
   
@@ -185,6 +174,8 @@ void VOF::cal_fs3() {
     bool flagb = (0.5     <= fszb && fszb <= 1.0+tol);
     bool flagt = (0.0-tol <= fszt && fszt <= 0.5    );
    
+    //if(i==46&&j==50&&k==76) boil::oout<<"VOF::cal_FS3 "<<fszb<<" "<<fszt<<boil::endl;
+  
     if     ( flagb && !flagt) { /* south is real and north is not */
       fs[m][i][j][k] = phi.zn(k-1) + phi.dzc(k-1) * fszb;
       continue;
@@ -219,45 +210,14 @@ void VOF::cal_fs3() {
 }
 
 /***********************
- * ancillary functions
+ * ancillary function
  ***********************/
-real VOF::alpha_val(const int i, const int j, const int k) {
-
-  /* degenerate case I */
-  real c = phi[i][j][k];
-  if(c<boil::pico||c-1.0>-boil::pico) {
-    return boil::yotta;
-  }
-
-  /* calculate vn1, vn2, vn3: normal vector at cell center */
-  /* n points to the liquid */
-  real vn1 = -nx[i][j][k];
-  real vn2 = -ny[i][j][k];
-  real vn3 = -nz[i][j][k];
-
-  real vm1 = fabs(vn1);
-  real vm2 = fabs(vn2);
-  real vm3 = fabs(vn3);
-
-  real denom = vm1+vm2+vm3;
-  /* degenerate case II */
-  if(denom<boil::pico)
-    return boil::yotta;
-
-  real qa = 1.0/(vm1+vm2+vm3);
-  vm1 *= qa;
-  vm2 *= qa;
-  vm3 *= qa;
-
-  return calc_alpha(c, vm1, vm2, vm3);
-}
-
 real VOF::fs_val(const Comp m, const int i, const int j, const int k) {
 
   real alpha = nalpha[i][j][k];
   /* degenerate case */
   if(alpha>boil::zetta)
-    return boil::yotta;
+    return boil::unreal;
 
   real vn1 = -nx[i][j][k];
   real vn2 = -ny[i][j][k];
@@ -271,6 +231,7 @@ real VOF::fs_val(const Comp m, const int i, const int j, const int k) {
   real ypos = 0.5;
   real zpos = 0.5;
 
+#if 1
   if(m==Comp::i()) {
     real xuni = (alpha-vm2*ypos-vm3*zpos)/(vm1+boil::pico);
     if(vn1<0)
@@ -287,7 +248,25 @@ real VOF::fs_val(const Comp m, const int i, const int j, const int k) {
       zuni = 1.0-zuni;
     return zuni;
   }
+#else
+  if(m==Comp::i()) {
+    real xuni = (alpha-vn2*ypos-vn3*zpos)/(vm1+boil::pico);
+    if(vn1<0) 
+      xuni = xuni-1.0;
+    return xuni;
+  } else if(m==Comp::j()) {
+    real yuni = (alpha-vn1*xpos-vn3*zpos)/(vm2+boil::pico);
+    if(vn2<0)
+      yuni = yuni-1.0;
+    return yuni;
+  } else {
+    real zuni = (alpha-vn1*xpos-vn2*ypos)/(vm3+boil::pico);
+    if(vn3<0)
+      zuni = zuni-1.0;
+    return zuni;
+  }
+#endif
 
-  return boil::yotta;
+  return boil::unreal;
 }
 

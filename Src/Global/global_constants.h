@@ -26,6 +26,9 @@ namespace boil {
   extern real zepto;
   extern real yocto;
 
+  /* special */
+  extern real unreal;
+
   /* pi */
   extern real pi;
 

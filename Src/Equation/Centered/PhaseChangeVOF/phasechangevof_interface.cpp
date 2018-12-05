@@ -9,11 +9,11 @@ bool PhaseChangeVOF::Interface(const int i, const int j, const int k,
   if(dir<0) of = 0;
 
   if(m == Comp::i())
-    return (fs)[m][i+of][j][k] < boil::zetta;
+    return boil::realistic(fs[m][i+of][j][k]);
   else if(m == Comp::j()) 
-    return (fs)[m][i][j+of][k] < boil::zetta; 
+    return boil::realistic(fs[m][i][j+of][k]); 
   else
-    return (fs)[m][i][j][k+of] < boil::zetta; 
+    return boil::realistic(fs[m][i][j][k+of]); 
 
   return false;
 }

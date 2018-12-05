@@ -514,3 +514,85 @@ real MarchingCube::area(const int i, const int j, const int k){
   //exit(0);
   return (area);
 }
+
+/******************************************************************************/
+real MarchingCube::area(const real p1, const real p2, const real p3,
+                        const real p4, const real p5, const real p6,
+                        const real p7, const real p8,
+                        const int i, const int j, const int k){
+/***************************************************************************//**
+*  \brief calculate iso-surface area of cell (i,j,k)
+*******************************************************************************/
+  GRIDCELL grid;
+
+  grid.val[0]=p1;
+  grid.val[1]=p2;
+  grid.val[2]=p3;
+  grid.val[3]=p4;
+  grid.val[4]=p5;
+  grid.val[5]=p6;
+  grid.val[6]=p7;
+  grid.val[7]=p8;
+ 
+  int isum(0);
+  for(int m=0;m!=8;m++) {
+#if 0
+    if(fabs(grid.val[m] - clrsurf) < 1.0e-11){
+      grid.val[m]=clrsurf+1.0e-11;
+    }
+#else
+    if(fabs(grid.val[m] - clrsurf) < boil::pico){
+      if( (*clr)[i][j][k]>(1.0-boil::pico)){
+        grid.val[m]=clrsurf-boil::pico;
+      } else if ( (*clr)[i][j][k]<(boil::pico)){
+        grid.val[m]=clrsurf+boil::pico;
+      } else {
+        grid.val[m]=clrsurf+boil::pico;
+      }
+    }
+#endif
+
+    if(grid.val[m]>clrsurf)isum++;
+  }
+
+  if(isum==0||isum==8)return(0.0);
+
+  /* to achieve symmetry, cases isum < 4 are solved using an inverse problem */
+  if (isum < 4) {
+    for (int m=0; m<=7; m++) {
+      grid.val[m] = 1.0 - grid.val[m];
+    }
+  }
+
+  for (int m=0; m<=7; m++){
+    int ii,jj,kk;
+    if(m==0)     {ii=i  ; jj=j  ; kk=k  ;}
+    else if(m==1){ii=i+1; jj=j  ; kk=k  ;}
+    else if(m==2){ii=i+1; jj=j+1; kk=k  ;}
+    else if(m==3){ii=i  ; jj=j+1; kk=k  ;}
+    else if(m==4){ii=i  ; jj=j  ; kk=k+1;}
+    else if(m==5){ii=i+1; jj=j  ; kk=k+1;}
+    else if(m==6){ii=i+1; jj=j+1; kk=k+1;}
+    else if(m==7){ii=i  ; jj=j+1; kk=k+1;}
+    grid.p[m].x=(*clr).xn(ii);
+    grid.p[m].y=(*clr).yn(jj);
+    grid.p[m].z=(*clr).zn(kk);
+  }
+
+#if 0
+  grid.p[0].x=0.0; grid.p[0].y=0.0; grid.p[0].z=0.0; grid.val[0]=0.5;
+  grid.p[1].x=1.0; grid.p[1].y=0.0; grid.p[1].z=0.0; grid.val[1]=0.5;
+  grid.p[2].x=1.0; grid.p[2].y=1.0; grid.p[2].z=0.0; grid.val[2]=0.5;
+  grid.p[3].x=0.0; grid.p[3].y=1.0; grid.p[3].z=0.0; grid.val[3]=0.5;
+  grid.p[4].x=0.0; grid.p[4].y=0.0; grid.p[4].z=1.0; grid.val[4]=0.0;
+  grid.p[5].x=1.0; grid.p[5].y=0.0; grid.p[5].z=1.0; grid.val[5]=0.0;
+  grid.p[6].x=1.0; grid.p[6].y=1.0; grid.p[6].z=1.0; grid.val[6]=0.0;
+  grid.p[7].x=0.0; grid.p[7].y=1.0; grid.p[7].z=1.0; grid.val[7]=0.0;
+#endif
+
+  real area = Polygonise(grid, clrsurf);
+  //std::cout<<"marching_cube "<<area<<"\n";
+  //exit(0);
+ 
+  return (area);
+}

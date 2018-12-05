@@ -23,8 +23,13 @@ void VOF::curvature() {
   +----------------------------------*/
   cal_fs();
   //cal_fs2();
-  cal_fs3();
+#if 1 /* done in advance */
+  /* calculate alpha in cells */
+  extract_alpha();
 
+  /*  calculate free surface position */
+  cal_fs3();
+#endif
   /*------------------------------------+
   |  extrapolate free surface position  |
   +------------------------------------*/

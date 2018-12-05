@@ -4,6 +4,7 @@
 #include "../../../Field/Vector/vector.h"
 #include "../../../Field/Scalar/scalar.h"
 #include "../../../Parallel/communicator.h"
+#include "../../../Global/global_realistic.h"
 
 //////////////////
 //              //
@@ -15,7 +16,8 @@ class FineScalar {
     FineScalar(const Scalar & PHI, const Vector & FS,
                const Scalar * NX, const Scalar * NY, const Scalar * NZ,
                const Scalar * NALPHA) :
-               faceval(*FS.domain()), adens(*PHI.domain()) {
+               faceval(*FS.domain()), adens(*PHI.domain()),
+               adens27(*PHI.domain()) {
 
       phi = &PHI; 
       fs = &FS;
@@ -39,6 +41,7 @@ class FineScalar {
       }
 
       adens = PHI.shape();
+      adens27 = PHI.shape();
 
       /* initialize edge-based values */
       edgex = PHI.shape();
@@ -92,6 +95,10 @@ class FineScalar {
     void cal_adens();
     Scalar adens; /* area density */
 
+    void cal_adens27();
+    Scalar adens27; /* area density (27-point) */
+
+    void output(int i, int j, int k);
    private:
     typedef struct {
       bool rl; /* does the interface cross bw point and cell centre? */

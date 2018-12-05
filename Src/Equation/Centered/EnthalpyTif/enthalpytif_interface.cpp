@@ -29,11 +29,11 @@ bool EnthalpyTIF::Interface(const int dir, const Comp m,
    of = 1;
  
   if(m==Comp::i())
-    return (*fs)[m][i+of][j][k]<boil::zetta;  
+    return boil::realistic((*fs)[m][i+of][j][k]);  
   else if(m==Comp::j())
-    return (*fs)[m][i][j+of][k]<boil::zetta;  
+    return boil::realistic((*fs)[m][i][j+of][k]);  
   else
-    return (*fs)[m][i][j][k+of]<boil::zetta;  
+    return boil::realistic((*fs)[m][i][j][k+of]);  
 
   return false;
 }

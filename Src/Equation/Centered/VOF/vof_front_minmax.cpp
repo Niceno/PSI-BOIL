@@ -98,15 +98,15 @@ real VOF::frontPosition(const int i, const int j, const int k,
    real xyzfront;
    if (m == Comp::i()) { 
      xyzfront = fs[m][i][j][k];
-     if (xyzfront>boil::zetta)
+     if(!boil::realistic(xyzfront))
        xyzfront = phi.xn(i);
    } else if (m == Comp::j()) {
      xyzfront = fs[m][i][j][k];
-     if (xyzfront>boil::zetta)
+     if(!boil::realistic(xyzfront))
        xyzfront = phi.yn(j);
    } else {
      xyzfront = fs[m][i][j][k];
-     if (xyzfront>boil::zetta)
+     if(!boil::realistic(xyzfront))
        xyzfront = phi.zn(k);
    }
 

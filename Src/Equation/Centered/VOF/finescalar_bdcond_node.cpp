@@ -62,7 +62,7 @@ void FineScalar::bdcond_node() {
           real fsval = (*fs)[mcomp][i+ofxv][j+ofyv][k+ofzv];
           real phiref = (*phi)[ii][jj][kk];
 
-          if(fsval>boil::zetta) {
+          if(!boil::realistic(fsval)) {
             value(ii,jj,kk,dir) = phiref>phisurf;
           } else {
             value(ii,jj,kk,dir) = phiref<phisurf;
@@ -90,7 +90,7 @@ void FineScalar::bdcond_node() {
       real fsval = (*fs)[mcomp][i  ][j][k];
       real phiref = (*phi)[i][j][k];
 
-      if(fsval>boil::zetta) {
+      if(!boil::realistic(fsval)) {
         value(i,j,k,dir) = phiref>phisurf;
       } else {
         value(i,j,k,dir) = phiref<phisurf;
@@ -104,7 +104,7 @@ void FineScalar::bdcond_node() {
       real fsval = (*fs)[mcomp][i+1][j][k];
       real phiref = (*phi)[i][j][k];
 
-      if(fsval>boil::zetta) {
+      if(!boil::realistic(fsval)) {
         value(i,j,k,dir) = phiref>phisurf;
       } else {
         value(i,j,k,dir) = phiref<phisurf;
@@ -118,7 +118,7 @@ void FineScalar::bdcond_node() {
       real fsval = (*fs)[mcomp][i][j  ][k];
       real phiref = (*phi)[i][j][k];
 
-      if(fsval>boil::zetta) {
+      if(!boil::realistic(fsval)) {
         value(i,j,k,dir) = phiref>phisurf;
       } else {
         value(i,j,k,dir) = phiref<phisurf;
@@ -132,7 +132,7 @@ void FineScalar::bdcond_node() {
       real fsval = (*fs)[mcomp][i][j+1][k];
       real phiref = (*phi)[i][j][k];
 
-      if(fsval>boil::zetta) {
+      if(!boil::realistic(fsval)) {
         value(i,j,k,dir) = phiref>phisurf;
       } else {
         value(i,j,k,dir) = phiref<phisurf;
@@ -146,7 +146,7 @@ void FineScalar::bdcond_node() {
       real fsval = (*fs)[mcomp][i][j][k  ];
       real phiref = (*phi)[i][j][k];
 
-      if(fsval>boil::zetta) {
+      if(!boil::realistic(fsval)) {
         value(i,j,k,dir) = phiref>phisurf;
       } else {
         value(i,j,k,dir) = phiref<phisurf;
@@ -160,7 +160,7 @@ void FineScalar::bdcond_node() {
       real fsval = (*fs)[mcomp][i][j][k+1];
       real phiref = (*phi)[i][j][k];
 
-      if(fsval>boil::zetta) {
+      if(!boil::realistic(fsval)) {
         value(i,j,k,dir) = phiref>phisurf;
       } else {
         value(i,j,k,dir) = phiref<phisurf;

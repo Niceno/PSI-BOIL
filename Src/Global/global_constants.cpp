@@ -20,6 +20,8 @@ namespace boil {
   real zepto(1.0e-21);
   real yocto(1.0e-24);
 
+  real unreal = yotta;
+
   real pi(acos(-1.0));
 
   /* gravitational constant for earth.  

@@ -20,6 +20,11 @@ class MarchingCube {
     real area(const int i, const int j, const int k);
     real surface(const int dir, const Comp & mcomp,
                  const int i, const int j, const int k);
+ 
+    real area(const real p1, const real p2, const real p3,
+              const real p4, const real p5, const real p6,
+              const real p7, const real p8,
+              const int i, const int j, const int k);
 
   protected:
     typedef struct {

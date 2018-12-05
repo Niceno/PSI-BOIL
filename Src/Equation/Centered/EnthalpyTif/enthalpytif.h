@@ -7,6 +7,7 @@
 #include "../../../Parallel/communicator.h"
 #include "../../../Solver/Gauss/gauss.h"
 #include "../../../Timer/timer.h"
+#include "../../../Global/global_realistic.h"
 
 /***************************************************************************//**
 *  \brief Discretizes and solves enthalpy conservaion equation.

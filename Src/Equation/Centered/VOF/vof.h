@@ -4,6 +4,7 @@
 #include <cmath>
 #include "../centered.h"
 #include "../../../Parallel/communicator.h"
+#include "../../../Global/global_realistic.h"
 
 ///////////
 //       //
@@ -45,12 +46,12 @@ class VOF : public Centered {
     void advance_z();
     void bdcurv(const Scalar & g, const real & v);
     void cal_fs();
+    void ext_fs();
     //void cal_fs2();
     void cal_fs3();
     void fs_bnd();
     void curv_HF();
-    void ext_fs();
-    real extract_alpha(const int i, const int j, const int k);
+    void extract_alpha();
     void insert_bc(const Scalar & g);
     void gradphi(const Scalar & g);
     void gradphic(const Scalar & g);
@@ -59,8 +60,8 @@ class VOF : public Centered {
     void insert_bc_norm();
     void norm_cc(const Scalar & g);
     void normalize(real & r1, real & r2, real & r3);
-    real calc_alpha(real & r1, real & r2, real & r3, real & r4);
     real calc_v(real r1, real r2, real r3, real r4);
+    real calc_alpha(real & r1, real & r2, real & r3, real & r4);
     void selectMax(const real r1, const real r2, const real r3,
                    const real r4, const real r5, const real r6,
                    const real r7, const real r8, const real r9,

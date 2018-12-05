@@ -51,7 +51,7 @@ FineScalar::point_coord FineScalar::eval_point(
   real alpha = (*nalpha)[i][j][k];
   
   /* degenerate case */
-  if(alpha>boil::zetta) {
+  if(!boil::realistic(alpha)) {
     real c = (*phi)[i][j][k];
     if(c>phisurf)
      p.marker = 1;

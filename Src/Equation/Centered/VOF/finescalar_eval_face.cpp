@@ -22,7 +22,7 @@ void FineScalar::eval_face() {
     real phim = (*phi)[i-1][j][k];
     real phip = (*phi)[i  ][j][k];
     
-    if(fsval>boil::zetta) {
+    if(!boil::realistic(fsval)) {
       value(i,j,k,w()) = phim>phisurf;
     } else {
       real edgepos = phi->xn(i);
@@ -49,7 +49,7 @@ void FineScalar::eval_face() {
     real phim = (*phi)[i][j-1][k];
     real phip = (*phi)[i][j  ][k];
     
-    if(fsval>boil::zetta) {
+    if(!boil::realistic(fsval)) {
       value(i,j,k,s()) = phim>phisurf;
     } else {
       real edgepos = phi->yn(j);
@@ -76,7 +76,7 @@ void FineScalar::eval_face() {
     real phim = (*phi)[i][j][k-1];
     real phip = (*phi)[i][j][k  ];
     
-    if(fsval>boil::zetta) {
+    if(!boil::realistic(fsval)) {
       value(i,j,k,b()) = phim>phisurf;
     } else {
       real edgepos = phi->zn(k);

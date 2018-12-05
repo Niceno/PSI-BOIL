@@ -7,6 +7,8 @@ void FineScalar::cal_adens() {
 *         Results: gradclr = adens
 *******************************************************************************/
 
+  boil::timer.start("finescalar adens");
+
   /* cell centered */
   for_vijk(adens,i,j,k) {
     real gradient = 0.0;
@@ -103,6 +105,9 @@ void FineScalar::cal_adens() {
                          dz, k);
 
     adens[i][j][k] = sqrt(gradx*gradx+grady*grady+gradz*gradz);
+    //adens[i][j][k] = ((*phi)[i][j][k]>0.)*sqrt(gradx*gradx+grady*grady+gradz*gradz);
+    //adens[i][j][k]=2.*(*phi)[i][j][k]*sqrt(gradx*gradx+grady*grady+gradz*gradz);
+    //adens[i][j][k]=6.*(1.-(*phi)[i][j][k])*(*phi)[i][j][k]*sqrt(gradx*gradx+grady*grady+gradz*gradz);
 
   }
 
@@ -114,6 +119,8 @@ void FineScalar::cal_adens() {
     sum += sumplus;
   }
   boil::oout<<"VOF::finescalar_adens "<<count<<" "<<sum<<boil::endl;
+
+  boil::timer.stop("finescalar adens");
 
   return;
 }
