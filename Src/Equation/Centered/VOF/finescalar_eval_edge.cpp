@@ -89,6 +89,13 @@ void FineScalar::eval_edge() {
                               phi_pm, i  ,j,k-1, wt());
     }
 
+#if 0
+    if(i==5&&j==9&&k==8) boil::oout<<"FSevaledge: "<<i<<" "<<j<<" "<<k<<" | "<<mm_pp<<" "<<mp_pm<<" | "<<phi_mm<<" "<<phi_mp<<" "<<phi_pm<<" "<<phi_pp<<" | "<<vals[0]<<" "<<vals[1]<<boil::endl;
+    if(i==5&&j==9&&k==9) boil::oout<<"FSevaledge: "<<i<<" "<<j<<" "<<k<<" | "<<mm_pp<<" "<<mp_pm<<" | "<<phi_mm<<" "<<phi_mp<<" "<<phi_pm<<" "<<phi_pp<<" | "<<vals[0]<<" "<<vals[1]<<boil::endl;
+    if(i==13&&j==9&&k==8) boil::oout<<"FSevaledge: "<<i<<" "<<j<<" "<<k<<" | "<<mm_pp<<" "<<mp_pm<<" | "<<phi_mm<<" "<<phi_mp<<" "<<phi_pm<<" "<<phi_pp<<" | "<<vals[0]<<" "<<vals[1]<<boil::endl;
+    if(i==13&&j==9&&k==9) boil::oout<<"FSevaledge: "<<i<<" "<<j<<" "<<k<<" | "<<mm_pp<<" "<<mp_pm<<" | "<<phi_mm<<" "<<phi_mp<<" "<<phi_pm<<" "<<phi_pp<<" | "<<vals[0]<<" "<<vals[1]<<boil::endl;
+#endif
+
     /* sum everything together */
     real sum(0.0);
     for(auto val : vals)

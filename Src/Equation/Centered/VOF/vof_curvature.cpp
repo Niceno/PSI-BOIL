@@ -29,6 +29,9 @@ void VOF::curvature() {
 
   /*  calculate free surface position */
   cal_fs3();
+
+  /* prerequisite for marching cubes */
+  update_at_walls();
 #endif
   /*------------------------------------+
   |  extrapolate free surface position  |

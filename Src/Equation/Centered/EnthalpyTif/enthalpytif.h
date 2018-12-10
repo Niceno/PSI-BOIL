@@ -65,8 +65,9 @@ class EnthalpyTIF : public Centered {
                const Vector * fs = NULL,
                const real latent = 1.0,
                const real mresis = 0.0,
-               const Scalar * mdot = NULL,
-               const Scalar * pres = NULL);
+               const Scalar * mflx = NULL,
+               const Scalar * pres = NULL,
+               const Scalar * adens = NULL);
 
 #if 0  /* sadly, constructors calling different constructors requires C++11 */
     /* Original CIPCSL2-EnthalpyFD constructor */
@@ -178,6 +179,9 @@ class EnthalpyTIF : public Centered {
     ScalarInt iflag;
     real turbP; /* turbulent Prandtl number */
     bool laminar;
+
+    const Scalar * adens;
+    Scalar adensold;
 
     const Vector * fs;
     Vector fsold;

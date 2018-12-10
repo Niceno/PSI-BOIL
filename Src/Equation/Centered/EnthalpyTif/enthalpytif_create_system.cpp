@@ -9,9 +9,6 @@
 *******************************************************************************/
 void EnthalpyTIF::create_system(const Scalar * diff_eddy) {
 
-  //if(fs) 
-  //  set_intflag();
-                             
   /*-----------------------------+ 
   |  create system in the core,  |
   |  correct at the boundaries.  |

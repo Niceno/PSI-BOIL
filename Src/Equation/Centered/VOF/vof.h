@@ -50,6 +50,7 @@ class VOF : public Centered {
     //void cal_fs2();
     void cal_fs3();
     void fs_bnd();
+    void update_at_walls();
     void curv_HF();
     void extract_alpha();
     void insert_bc(const Scalar & g);
@@ -68,6 +69,10 @@ class VOF : public Centered {
                    const int i1,  const int i2,  const int i3);
     void set_iflag();
     void insert_bc_flag(ScalarInt & g, const bool b);
+
+    real extrapolate_v(const int i, const int j, const int k,
+                       const int ofx, const int ofy, const int ofz,
+                       const real xp, const real yp, const real zp, real tol);
 
     void norm_cc_imin(const Scalar &g, const int i,const int j, const int k);
     void norm_cc_imax(const Scalar &g, const int i,const int j, const int k);

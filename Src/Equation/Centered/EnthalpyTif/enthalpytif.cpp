@@ -17,7 +17,8 @@ EnthalpyTIF::EnthalpyTIF(const Scalar & PHI,
                        const real Latent,
                        const real Mresis,
                        const Scalar * MFLX,
-                       const Scalar * PRES) :
+                       const Scalar * PRES,
+                       const Scalar * ADENS) :
 /*---------------------+ 
 |  initialize parent   |
 +---------------------*/
@@ -27,6 +28,7 @@ EnthalpyTIF::EnthalpyTIF(const Scalar & PHI,
   tifold (  *PHI.domain()),
   ftif   (  *PHI.domain()),
   ftifold(  *PHI.domain()),
+  adensold( *PHI.domain()),
   fdelta (  *PHI.domain()),
   iflag     (*C  .domain()),
   fsold(  *U  .domain())
@@ -60,6 +62,10 @@ EnthalpyTIF::EnthalpyTIF(const Scalar & PHI,
   ftif = phi.shape();
   mflx = MFLX;
   pres = PRES;
+  adens = ADENS;
+
+  adensold = (*adens).shape();
+
   if(mflx||pres) {
     tif    = phi.shape();
     tifold = phi.shape();

@@ -181,7 +181,6 @@ void EnthalpyTIF::update_ftif(const Scalar * diff_eddy) {
   +------------------------------------------*/
   } else {
 
-    bool oldflag = true; /* we are considering previous time step */
     for_m(m){
       int ii,jj,kk;
       ii=jj=kk=0;

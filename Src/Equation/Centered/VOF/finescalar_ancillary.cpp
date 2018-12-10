@@ -31,7 +31,7 @@ real FineScalar::eval_marker(
         return 0.5;
       else
         /* further from interface assumed more valid */
-        return (point_1.dist>point_1.dist) ? 
+        return (point_1.dist>point_2.dist) ? 
                (point_1.marker>0) :
                (point_2.marker>0) ;
     }

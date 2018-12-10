@@ -51,6 +51,7 @@ void EnthalpyTIF::setflag() {
     }
   }
 
+#if 0
   /* special marching-cube based trigger for interfacial cells
    * that are only partially cut by the isosurface */
   for_ijk(i,j,k) {
@@ -78,6 +79,16 @@ void EnthalpyTIF::setflag() {
       }
     }
   }
+#else
+  /* trigger based on adens */
+  for_ijk(i,j,k) {
+    if(iflag[i][j][k] != 0 && iflag[i][j][k] != -1000) {
+      if(adensold[i][j][k]>boil::pico) {
+        iflag[i][j][k]=0;
+      } 
+    }
+  }
+#endif
 
   iflag.exchange();
 }	

@@ -51,6 +51,7 @@ void VOF::advance() {
   phi.bnd_update();
   phi.exchange_all();
 
+#if 1
   /* calculate alpha in cells */
   extract_alpha();
 
@@ -58,7 +59,8 @@ void VOF::advance() {
   cal_fs3();
 
   /* prerequisite for marching cubes */
-  //update_at_walls();
+  update_at_walls();
+#endif
 
 #if 0
   curv_HF();

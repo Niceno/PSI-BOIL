@@ -1,15 +1,16 @@
 noinst_LIBRARIES = libVof.a
-libVof_a_SOURCES =      finescalar.h               \
-                        finescalar_ancillary.cpp   \
-                        finescalar_bdcond_face.cpp \
-                        finescalar_cal_adens.cpp   \
-                        finescalar_cal_adens27.cpp   \
-                        finescalar_evaluate.cpp    \
-                        finescalar_eval_edge.cpp   \
-                        finescalar_eval_face.cpp   \
-                        finescalar_eval_node.cpp   \
-                        finescalar_output.cpp      \
-                        finescalar_value.cpp       \
+libVof_a_SOURCES =      finescalar.h                    \
+                        finescalar_ancillary.cpp        \
+                        finescalar_bdcond_face.cpp      \
+                        finescalar_cal_adens.cpp        \
+                        finescalar_cal_adens_geom.cpp   \
+                        finescalar_calc_alpha.cpp       \
+                        finescalar_evaluate.cpp         \
+                        finescalar_eval_edge.cpp        \
+                        finescalar_eval_face.cpp        \
+                        finescalar_eval_node.cpp        \
+                        finescalar_output.cpp           \
+                        finescalar_value.cpp            \
                         vof.h                 \
                         vof.cpp               \
                         vof_advance.cpp       \
@@ -38,6 +39,7 @@ libVof_a_SOURCES =      finescalar.h               \
                         vof_insert_bc_norm_cc.cpp \
                         vof_normalize.cpp \
                         vof_norm_cc.cpp \
-                        vof_set_iflag.cpp
+                        vof_set_iflag.cpp \
+                        vof_update_at_walls.cpp
                 
 INCLUDE = -I@top_srcdir@/

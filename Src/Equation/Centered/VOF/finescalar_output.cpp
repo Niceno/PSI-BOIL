@@ -1,5 +1,9 @@
 #include "finescalar.h"
 
+void FineScalar::output() {
+  boil::oout << "FineScalar::otp@ i j k a c |  w e s n b t | ws wn wb wt | es en eb et | sb st nb nt || wsb wst wnb wnt esb est enb ent"<<boil::endl;
+}
+
 void FineScalar::output(int ii, int jj, int kk) {
   boil::oout <<"FineScalar::otp@ "<< ii<<" "<<jj<<" "<<kk<<" "<<adens[ii][jj][kk]
      <<" "<<(*phi)[ii][jj][kk]<<" | "

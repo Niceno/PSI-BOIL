@@ -216,7 +216,7 @@ real VOF::fs_val(const Comp m, const int i, const int j, const int k) {
 
   real alpha = nalpha[i][j][k];
   /* degenerate case */
-  if(alpha>boil::zetta)
+  if(!boil::realistic(alpha))
     return boil::unreal;
 
   real vn1 = -nx[i][j][k];

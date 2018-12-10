@@ -43,6 +43,10 @@ void EnthalpyTIF::new_time_step(const Scalar * diff_eddy) {
         for_avmijk(fsold,m,i,j,k)
           fsold[m][i][j][k] = (*fs)[m][i][j][k];
     }
+    if(adens) 
+      for_aijk(i,j,k){
+        adensold[i][j][k] = (*adens)[i][j][k];
+      }
     store_clrold = true;
   }
 
@@ -78,7 +82,7 @@ void EnthalpyTIF::new_time_step(const Scalar * diff_eddy) {
   /*-----------------------------------------------------------------------+
   |  fold = fold + C                                                       |
   |  Euler explicit 1st order for convection term                          |
-  |  Semi-laglangian scheme: update convection term, separating diffusion  |
+  |  Semi-lagrangian scheme: update convection term, separating diffusion  |
   +-----------------------------------------------------------------------*/
   convection(&cold);
   for_ijk(i,j,k)
@@ -129,6 +133,10 @@ void EnthalpyTIF::new_time_step(const Scalar * diff_eddy) {
     for_m(m)
       for_avmijk(fsold,m,i,j,k)
         fsold[m][i][j][k] = (*fs)[m][i][j][k];
+  }
+  if(adens) {
+    for_aijk(i,j,k)
+      adensold[i][j][k] = (*adens)[i][j][k];
   }
 
   /*---------------------------------------+

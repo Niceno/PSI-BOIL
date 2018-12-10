@@ -17,7 +17,7 @@ class FineScalar {
                const Scalar * NX, const Scalar * NY, const Scalar * NZ,
                const Scalar * NALPHA) :
                faceval(*FS.domain()), adens(*PHI.domain()),
-               adens27(*PHI.domain()) {
+               adensgeom(*PHI.domain()) {
 
       phi = &PHI; 
       fs = &FS;
@@ -41,7 +41,7 @@ class FineScalar {
       }
 
       adens = PHI.shape();
-      adens27 = PHI.shape();
+      adensgeom = PHI.shape();
 
       /* initialize edge-based values */
       edgex = PHI.shape();
@@ -95,9 +95,10 @@ class FineScalar {
     void cal_adens();
     Scalar adens; /* area density */
 
-    void cal_adens27();
-    Scalar adens27; /* area density (27-point) */
+    void cal_adens_geom();
+    Scalar adensgeom; /* area density (geometric) */
 
+    void output();
     void output(int i, int j, int k);
    private:
     typedef struct {
@@ -105,6 +106,10 @@ class FineScalar {
       int marker; /* -1 below intface (phi=0), 0 at intface (phi=0.5) */
       real dist;
     } point_coord;
+
+    typedef struct {
+      real x,y,z;
+    } XYZ;
 
     void eval_node();
     void eval_face();
@@ -134,6 +139,12 @@ class FineScalar {
     void bdcond_y();
     void bdcond_z();
 
+    real calc_alpha(real r1, real r2, real r3, real r4);
+    real calc_area(const std::vector<XYZ> &vect, const XYZ norm);
+    XYZ PlusXYZ(const XYZ p1, const XYZ p2);
+    real DotProduct(const XYZ p1, const XYZ p2);
+    XYZ CrossProduct(const XYZ p1, const XYZ p2);
+
     Scalar nodeval; /* nodal values */
     Vector faceval; /* face values  */
     Scalar edgex; /* edge values, staggered in y and z */
@@ -148,6 +159,7 @@ class FineScalar {
     const Scalar * nalpha;
  
     real phisurf;
+
 };
 
 #endif
