@@ -16,19 +16,19 @@ void Momentum::create_system(const Scalar * mu_eddy) {
   Comp m = Comp::u();
   for_mijk(m,i,j,k) {
     /* linear */
-    rho = 0.5 * (fluid()->rho(i,j,k) + fluid()->rho(i-1,j,k));
+    rho = fluid()->rho(m,i,j,k);
     A[~m]->c[i][j][k] = dV(m,i,j,k) * rho * time->dti();
   }
   m = Comp::v();
   for_mijk(m,i,j,k) {
     /* linear */
-    rho = 0.5 * (fluid()->rho(i,j,k) + fluid()->rho(i,j-1,k));
+    rho = fluid()->rho(m,i,j,k);
     A[~m]->c[i][j][k] = dV(m,i,j,k) * rho * time->dti();
   }
   m = Comp::w();
   for_mijk(m,i,j,k) {
     /* linear */
-    rho = 0.5 * (fluid()->rho(i,j,k) + fluid()->rho(i,j,k-1));
+    rho = fluid()->rho(m,i,j,k);
     A[~m]->c[i][j][k] = dV(m,i,j,k) * rho * time->dti();
   }
  

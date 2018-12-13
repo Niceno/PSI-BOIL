@@ -2,13 +2,13 @@
 #include "../../../Parallel/Out/out.h"
 
 /******************************************************************************/
-void PhaseChangeVOF::ext_gradt(Scalar & sca, const int iext) {
+void PhaseChangeVOF::ext_gradt(Scalar & sca, const int iext, const Comp mcomp) {
 /***************************************************************************//**
 *  \brief advect scalar variable sca in normal direction.
 *         iext =  1 for extrapolate from vapor to liquid
 *         iext = -1 for extrapolate from liquid to vapor
 *         output : sca 
-*         tempolary: stmp2
+*         temporary: stmp2
 *******************************************************************************/
   /*----------------------------------------------------------+
   |  set flag                                                 |
@@ -28,7 +28,7 @@ void PhaseChangeVOF::ext_gradt(Scalar & sca, const int iext) {
   } else {                     // extrapolate from liquid to vapor
     for_aijk(i,j,k){
       int flagval = iflag[i][j][k];
-      if(flagval == -1 || flagval == -2){   // liquid cell next to interface
+      if(flagval == -1 || flagval == -2){  // vapor cell next to interface
         stmp[i][j][k]=0;
       } else {                 // otherwise
         stmp[i][j][k]=1;
@@ -36,6 +36,10 @@ void PhaseChangeVOF::ext_gradt(Scalar & sca, const int iext) {
       if(dom->ibody().off(i,j,k))stmp[i][j][k]=1; // fix value in solid
     }
   }
+
+  /* correct at walls */
+  insert_bc_ext(mcomp);
+
   //stmp.exchange();
   //boil::plot->plot(clr,stmp,"clr-stmp",time->current_step());
   //exit(0);

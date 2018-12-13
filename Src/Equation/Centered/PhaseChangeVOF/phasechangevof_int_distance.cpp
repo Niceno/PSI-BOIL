@@ -5,6 +5,21 @@
  * dir < 0: negative direction
 */
 
+/* generic */
+real PhaseChangeVOF::distance(const int i, const int j, const int k,
+                              const int dir, const Comp m, real & tint) {
+  if        (m==Comp::i()) {
+    return distance_x(i,j,k,dir,tint);
+  } else if (m==Comp::j()) {
+    return distance_y(i,j,k,dir,tint);
+  } else {
+    return distance_z(i,j,k,dir,tint);
+  }
+
+  return 0.0;
+}
+
+
 /* x-direction */
 real PhaseChangeVOF::distance_x(const int i, const int j, const int k,
                                const int dir, real & tint) {

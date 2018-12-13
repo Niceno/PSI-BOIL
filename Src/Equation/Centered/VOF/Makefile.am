@@ -18,7 +18,9 @@ libVof_a_SOURCES =      finescalar.h                    \
                         vof_advance_y.cpp     \
                         vof_advance_z.cpp     \
                         vof_bdcurv.cpp        \
+                        vof_bndclr.cpp        \
                         vof_calc_alpha.cpp   \
+                        vof_cal_adens.cpp          \
                         vof_cal_fs.cpp          \
                         vof_cal_fs3.cpp          \
                         vof_calc_v.cpp        \
@@ -31,6 +33,7 @@ libVof_a_SOURCES =      finescalar.h                    \
                         vof_gradphi.cpp  \
                         vof_insert_bc.cpp     \
                         vof_insert_bc_flag.cpp     \
+                        vof_marching_cube_area.cpp     \
                         vof_tension.cpp       \
                         vof_totalvol.cpp     \
                         vof_gradphic.cpp      \

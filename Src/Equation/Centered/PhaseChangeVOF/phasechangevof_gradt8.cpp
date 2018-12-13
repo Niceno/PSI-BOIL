@@ -26,7 +26,7 @@ real PhaseChangeVOF::gradtx8(const int dir, const int i, const int j, const int 
       }
 
     real temp = bndtpr[mcomp][i+m2][j][k];
-    if (temp<tempnull+1.) {
+    if (boil::realistic(temp)) {
       dxm2 = clr.dxc(i)/2.0;
       tm2  = bndtpr[mcomp][i+m1][j][k];
     } else {
@@ -46,7 +46,7 @@ real PhaseChangeVOF::gradtx8(const int dir, const int i, const int j, const int 
       }
 
     real temp = bndtpr[mcomp][i+m1][j][k];
-    if (temp<tempnull+1.) {
+    if (boil::realistic(temp)) {
       dxm2 = -clr.dxc(i)/2.0;
       tm2  = bndtpr[mcomp][i   ][j][k];
     } else {
@@ -83,7 +83,7 @@ real PhaseChangeVOF::gradty8(const int dir, const int i, const int j, const int 
       }
     
     real temp = bndtpr[mcomp][i][j+m2][k];
-    if (temp<tempnull+1.) {
+    if (boil::realistic(temp)) {
       dym2 = clr.dyc(j)/2.0;
       tm2  = bndtpr[mcomp][i][j+m1][k];
     } else {
@@ -103,7 +103,7 @@ real PhaseChangeVOF::gradty8(const int dir, const int i, const int j, const int 
       }
 
     real temp = bndtpr[mcomp][i][j+m1][k];
-    if (temp<tempnull+1.) {
+    if (boil::realistic(temp)) {
       dym2 = -clr.dyc(j)/2.0;
       tm2  = bndtpr[mcomp][i][j   ][k];
     } else {
@@ -140,7 +140,7 @@ real PhaseChangeVOF::gradtz8(const int dir, const int i, const int j, const int 
       }
 
     real temp = bndtpr[mcomp][i][j][k+m2];
-    if (temp<tempnull+1.) {
+    if (boil::realistic(temp)) {
       dzm2 = clr.dzc(k)/2.0;
       tm2  = bndtpr[mcomp][i][j][k+m1];
     } else {
@@ -160,7 +160,7 @@ real PhaseChangeVOF::gradtz8(const int dir, const int i, const int j, const int 
       }
 
     real temp = bndtpr[mcomp][i][j][k+m1];
-    if (temp<tempnull+1.) {
+    if (boil::realistic(temp)) {
       dzm2 = -clr.dzc(k)/2.0;
       tm2  = bndtpr[mcomp][i][j][k   ];
     } else {

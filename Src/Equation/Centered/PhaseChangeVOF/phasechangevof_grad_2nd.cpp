@@ -4,7 +4,7 @@
 real PhaseChangeVOF::grad_2nd(const real tm0, const real tm1, const real tm2,
                               const real dm1, const real dm2){
 /***************************************************************************//**
-*  \brief calculate second order accurate grad(tpr) 
+*  \brief calculate second order accurate grad 
 *******************************************************************************/
   real denom = dm1*dm2*(dm2-dm1);
 

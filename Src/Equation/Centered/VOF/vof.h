@@ -18,7 +18,8 @@ class VOF : public Centered {
         const Scalar & kappa,
         const Vector & u, 
         Times & t,
-        Krylov * S);
+        Krylov * S,
+        Vector * bndclr = NULL);
     ~VOF();
 
     void new_time_step(){};
@@ -38,8 +39,10 @@ class VOF : public Centered {
     real get_zmaxft() { return(zmaxft);};
 
     Vector fs;
+    Vector * bndclr;
     Scalar nalpha;
     Scalar nx,ny,nz,nmag;/* normal to interface */
+    Scalar adens; /* area density */
   protected:
     void advance_x();
     void advance_y();
@@ -73,6 +76,11 @@ class VOF : public Centered {
     real extrapolate_v(const int i, const int j, const int k,
                        const int ofx, const int ofy, const int ofz,
                        const real xp, const real yp, const real zp, real tol);
+
+    real marching_cube_area(const int i, const int j, const int k);
+
+    void cal_adens();
+    void cal_bndclr();
 
     void norm_cc_imin(const Scalar &g, const int i,const int j, const int k);
     void norm_cc_imax(const Scalar &g, const int i,const int j, const int k);

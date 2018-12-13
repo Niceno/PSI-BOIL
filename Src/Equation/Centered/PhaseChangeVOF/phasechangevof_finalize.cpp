@@ -5,8 +5,6 @@ using namespace std;
 /******************************************************************************/
 void PhaseChangeVOF::finalize() {
 
-  //cal_gradclr(); /* moved to initialize */
-
 #ifdef DEBUG
   boil::plot->plot(clr, tpr, phi, "clr-tpr-m",  time->current_step());
 #endif

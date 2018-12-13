@@ -83,6 +83,7 @@ Scalar::Scalar(const Scalar * s) : alias(true), nam(s->nam) {
 
   dom    = s->domain();
   bndcnd = s->bndcnd;
+
 }	
 
 /******************************************************************************/

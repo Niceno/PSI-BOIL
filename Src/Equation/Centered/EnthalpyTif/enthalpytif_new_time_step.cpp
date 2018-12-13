@@ -100,15 +100,15 @@ void EnthalpyTIF::new_time_step(const Scalar * diff_eddy) {
       real t_new = fold[i][j][k] / (c * dV(i,j,k)) * time->dt();
 
 #if 0
-      // phase change
+      /* phase change */
       if( ((*clr)[i][j][k]-clrsurf)*(clrold[i][j][k]-clrsurf) < 0.0){
-        if( (phi[i][j][k]-tsat)*(t_new-tsat)<=0.0 ){
-          t_new = tsat;     /* crude code */
+        if( (phi[i][j][k]-tifmodel.tref())*(t_new-tifmodel.tref())<=0.0 ){
+          t_new = tifmodel.tref();     /* crude code */
         }
-      // phase does not change
+      /* phase does not change */
       } else {
-        if( (phi[i][j][k]-tsat)*(t_new-tsat)<0.0 ){
-          t_new = tsat;     /* crude code: Is this necessary? */
+        if( (phi[i][j][k]-tifmodel.tref())*(t_new-tifmodel.tref())<0.0 ){
+          t_new = tifmodel.tref();     /* crude code: Is this necessary? */
         }
       }
 #endif

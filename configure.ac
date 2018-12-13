@@ -37,6 +37,7 @@ AC_OUTPUT(Makefile                                     \
           Src/Equation/Dispersed/Makefile              \
           Src/Equation/Floodfill/Makefile              \
           Src/Equation/Heaviside/Makefile              \
+          Src/Equation/Tifmodel/Makefile               \
           Src/Boundary/Makefile                        \
           Src/Solver/Makefile                          \
           Src/Ravioli/Makefile                         \

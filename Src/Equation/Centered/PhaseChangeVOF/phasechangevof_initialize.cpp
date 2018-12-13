@@ -12,8 +12,5 @@ void PhaseChangeVOF::initialize() {
   /* calculate normal vector */
   cal_norm_vect();
 
-  /* calculate interfacial area density */
-  cal_gradclr();
-
 }
 

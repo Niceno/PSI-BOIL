@@ -32,7 +32,15 @@ void VOF::curvature() {
 
   /* prerequisite for marching cubes */
   update_at_walls();
+
+  /* calculate area */
+  cal_adens();
+
+  /* calculate phi in staggered cells */
+  if(bndclr)
+    cal_bndclr();
 #endif
+
   /*------------------------------------+
   |  extrapolate free surface position  |
   +------------------------------------*/

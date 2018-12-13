@@ -2,6 +2,7 @@
 
 /******************************************************************************/
 PhaseChangeVOF::PhaseChangeVOF(const Scalar & MDOT, 
+                               const Scalar & MFLX,
                                const Scalar & TPR, 
                                const Scalar & TPRS,
                                const Scalar & CLR,
@@ -11,11 +12,12 @@ PhaseChangeVOF::PhaseChangeVOF(const Scalar & MDOT,
                                const Scalar & NX,
                                const Scalar & NY,
                                const Scalar & NZ,
+                               const Scalar & ADENS,
                                const Vector & FS,
+                               const TIF & TIFMODEL,
                                Times & T, 
                                Matter * f,
-                               real LAT, real TS,
-                               Scalar * TIF,
+                               real LAT,
                                Matter * s) :
 /*---------------------+ 
 |  initialize parent   |
@@ -25,15 +27,16 @@ PhaseChangeVOF::PhaseChangeVOF(const Scalar & MDOT,
   tprs(&TPRS),
   clr(&CLR),
   clrs(&CLRS),
+  M(&MFLX),
   mx(&NX),
   my(&NY),
   mz(&NZ),
   fs(&FS),
+  adens(&ADENS),
   nx(*NX.domain()),
   ny(*NY.domain()),
   nz(*NZ.domain()),
   bndtpr ( *U   .domain() ),
-  M      ( *MDOT.domain()),
   txv    ( *MDOT.domain()),
   tyv    ( *MDOT.domain()),
   tzv    ( *MDOT.domain()),
@@ -44,9 +47,8 @@ PhaseChangeVOF::PhaseChangeVOF(const Scalar & MDOT,
   stmp2  ( *MDOT.domain()),
   delta  ( *MDOT.domain()),
   iflag  ( *MDOT.domain()),
-  gradclr( *CLR .domain())
+  tifmodel(TIFMODEL)
 {
-  M       = MDOT.shape();
   txv     = MDOT.shape();
   tyv     = MDOT.shape();
   tzv     = MDOT.shape();
@@ -57,18 +59,13 @@ PhaseChangeVOF::PhaseChangeVOF(const Scalar & MDOT,
   stmp2   = MDOT.shape();
   delta   = MDOT.shape();
   iflag   = MDOT.shape();
-  gradclr = MDOT.shape();
   nx  = NX.shape();
   ny  = NY.shape();
   nz  = NZ.shape();
   for_m(m) bndtpr(m) = U(m).shape(); /* a mistake? */
 
-
-  tif = TIF;
-
   /* set arguments */
   latent = LAT;
-  tsat = TS;
   rhol = fluid()->rho(1);
   rhov = fluid()->rho(0);
   rhoave = 0.5*(rhol+rhov);
@@ -79,12 +76,11 @@ PhaseChangeVOF::PhaseChangeVOF(const Scalar & MDOT,
   cpv = fluid()->cp(0);
 
   /* set constants */
-  tempnull = -1000.0;
   pi = acos(-1.0);
-  phisurf = 0.5;
+  clrsurf = 0.5;
   turbP = 0.9;
 
-  epsl = 1.0e-1;
+  epsl = 5.0e-2;
   //epsl = 1.0e-2;
   dxmin = dom->dxyz_min();
 

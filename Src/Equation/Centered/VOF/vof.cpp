@@ -7,7 +7,8 @@ VOF::VOF(const Scalar & PHI,
          const Scalar & K,
          const Vector & U, 
          Times & T,
-         Krylov * S) :
+         Krylov * S,
+         Vector * BNDCLR) :
 /*---------------------+ 
 |  initialize parent   | NULL is for solid
 +---------------------*/
@@ -29,7 +30,8 @@ VOF::VOF(const Scalar & PHI,
   iflag(*PHI.domain() ),
   iflagx(*PHI.domain() ),
   iflagy(*PHI.domain() ),
-  iflagz(*PHI.domain() )
+  iflagz(*PHI.domain() ),
+  adens(*PHI.domain() )
 
 /*------------------------------------------------------+
 |  this constructor is called only at the finest level  |
@@ -49,9 +51,13 @@ VOF::VOF(const Scalar & PHI,
   iflagx    = phi.shape();
   iflagy    = phi.shape();
   iflagz    = phi.shape();
-
-  for_m(m)
+ 
+  adens = phi.shape();
+  for_m(m) {
     fs(m) = (*u)(m).shape();
+  }
+
+  bndclr = BNDCLR;
 
   assert(PHI.domain() == F.domain());
 

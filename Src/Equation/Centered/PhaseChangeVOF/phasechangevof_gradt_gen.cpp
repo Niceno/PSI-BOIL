@@ -2,7 +2,8 @@
 using namespace std;
 
 /******************************************************************************/
-real PhaseChangeVOF::gradtx(const int dir, const int i, const int j, const int k){
+real PhaseChangeVOF::gradtx(const int dir,
+                            const int i, const int j, const int k) {
 /***************************************************************************//**
 *  \brief calculate grad(tpr) in x-direction
 *         dir= 1: grad(tpr) second order downwind
@@ -15,7 +16,8 @@ real PhaseChangeVOF::gradtx(const int dir, const int i, const int j, const int k
 }
 
 /******************************************************************************/
-real PhaseChangeVOF::gradty(const int dir, const int i, const int j, const int k){
+real PhaseChangeVOF::gradty(const int dir,
+                            const int i, const int j, const int k) {
 /***************************************************************************//**
 *  \brief calculate grad(tpr) in y-direction
 *         dir= 1: grad(tpr) second order downwind
@@ -28,7 +30,8 @@ real PhaseChangeVOF::gradty(const int dir, const int i, const int j, const int k
 }
 
 /******************************************************************************/
-real PhaseChangeVOF::gradtz(const int dir, const int i, const int j, const int k){
+real PhaseChangeVOF::gradtz(const int dir,
+                            const int i, const int j, const int k) {
 /***************************************************************************//**
 *  \brief calculate grad(tpr) in z-direction
 *         dir= 1: grad(tpr) second order downwind

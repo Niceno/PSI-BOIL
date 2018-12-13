@@ -11,29 +11,23 @@ EnthalpyTIF::EnthalpyTIF(const Scalar & PHI,
                        Times & T,
                        Krylov * S,
                        Matter * f,
-                       const real Tsat,
+                       TIF & tintmodel,
                        Matter * s,
                        const Vector * FS,
-                       const real Latent,
-                       const real Mresis,
-                       const Scalar * MFLX,
-                       const Scalar * PRES,
                        const Scalar * ADENS) :
 /*---------------------+ 
 |  initialize parent   |
 +---------------------*/
   Centered( PHI.domain(), PHI, F, & U, T, f, s, S ),
   clrold (  *C  .domain()),
-  tif    (  *PHI.domain()),
-  tifold (  *PHI.domain()),
   ftif   (  *PHI.domain()),
   ftifold(  *PHI.domain()),
   adensold( *PHI.domain()),
   fdelta (  *PHI.domain()),
   iflag     (*C  .domain()),
-  fsold(  *U  .domain())
+  fsold(  *U  .domain()),
+  tifmodel(tintmodel)
 {
-  tsat = Tsat,
   rhol = fluid()->rho(1),
   rhov = fluid()->rho(0),
   cpl  = fluid()->cp(1),
@@ -52,6 +46,7 @@ EnthalpyTIF::EnthalpyTIF(const Scalar & PHI,
   laminar=true;
 
   fs = FS;
+  adens = ADENS;
 
   if(fs) {
     for_m(m) {
@@ -60,19 +55,10 @@ EnthalpyTIF::EnthalpyTIF(const Scalar & PHI,
   }
  
   ftif = phi.shape();
-  mflx = MFLX;
-  pres = PRES;
-  adens = ADENS;
+  if(adens)
+    adensold = (*adens).shape();
 
-  adensold = (*adens).shape();
-
-  if(mflx||pres) {
-    tif    = phi.shape();
-    tifold = phi.shape();
-    latent = Latent;
-    mresis = Mresis;
-    store_tif = false;
-  }
+  /* to be removed */
   blendfactor = 0.05;
 
   phi.bnd_update();
@@ -87,5 +73,6 @@ EnthalpyTIF::EnthalpyTIF(const Scalar & PHI,
 EnthalpyTIF::~EnthalpyTIF() {
 }	
 
+/******************************************************************************/
 real EnthalpyTIF::blendfactor;
 

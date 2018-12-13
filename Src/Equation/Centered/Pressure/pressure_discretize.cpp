@@ -26,6 +26,7 @@ void Pressure::discretize() {
     /* linear */
     rhom = fluid()->rho(m,i,  j,k);
     rhop = fluid()->rho(m,i+1,j,k);
+
     a_x = dSx(i,j,k);
     A.w[i][j][k] = a_x / dxw(i) / rhom;
     A.e[i][j][k] = a_x / dxe(i) / rhop;

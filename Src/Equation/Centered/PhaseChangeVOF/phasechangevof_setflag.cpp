@@ -15,17 +15,39 @@ void PhaseChangeVOF::setflag() {
 *******************************************************************************/
 
   for_vijk(clr,i,j,k) {
-    if(clr[i][j][k]>=phisurf){
+    if(clr[i][j][k]>=clrsurf){
       iflag[i][j][k]=3;
     } else {
       iflag[i][j][k]=-3;
     }
   }
+
+#ifdef IB
+  for_ijk(i,j,k) {
+    if(dom->ibody().off(i,j,k))
+      iflag[i][j][k]=-1001;
+  }
+#endif
+
+#if 1
+  for_ijk(i,j,k) {
+    if(Interface(i,j,k)) {
+      if(clr[i][j][k]<clrsurf)
+        iflag[i][j][k]=-1;
+      else
+        iflag[i][j][k]=+1; /* clr = 0.5? questionable...*/
+    }
+  }
+#else /* if you decide to use this one later on, check the enthalpy flagging
+       * for a way how to efficiently treat the ibody.
+       * Moreover, the interfacial flagging should really be unified among
+       * classes...I am looking at you, Enthalpy, VOF, PhaseChange... */
+
   /* i-direction */
   for(int i=clr.si()-1; i<=clr.ei(); i++){
     for_vjk(clr,j,k){
-       if((clr[i][j][k]-phisurf)*(clr[i+1][j][k]-phisurf)<=0.0){
-         if(clr[i][j][k]<phisurf){
+       if((clr[i][j][k]-clrsurf)*(clr[i+1][j][k]-clrsurf)<=0.0){
+         if(clr[i][j][k]<clrsurf){
             iflag[i  ][j][k]=-1;
             iflag[i+1][j][k]=1;
          } else {
@@ -38,8 +60,8 @@ void PhaseChangeVOF::setflag() {
   /* j-direction */
   for(int j=clr.sj()-1; j<=clr.ej(); j++){
     for_vik(clr,i,k){
-      if((clr[i][j][k]-phisurf)*(clr[i][j+1][k]-phisurf)<=0.0){
-        if(clr[i][j][k]<phisurf){
+      if((clr[i][j][k]-clrsurf)*(clr[i][j+1][k]-clrsurf)<=0.0){
+        if(clr[i][j][k]<clrsurf){
           iflag[i][j  ][k]=-1;
           iflag[i][j+1][k]=1;
         } else {
@@ -52,8 +74,8 @@ void PhaseChangeVOF::setflag() {
   /* k-direction */
   for(int k=clr.sk()-1; k<=clr.ek(); k++){
     for_vij(clr,i,j){
-       if((clr[i][j][k]-phisurf)*(clr[i][j][k+1]-phisurf)<=0.0){
-        if(clr[i][j][k]<phisurf){
+       if((clr[i][j][k]-clrsurf)*(clr[i][j][k+1]-clrsurf)<=0.0){
+        if(clr[i][j][k]<clrsurf){
           iflag[i][j][k  ]=-1;
           iflag[i][j][k+1]=1;
         } else {
@@ -102,12 +124,6 @@ void PhaseChangeVOF::setflag() {
         }
       }
     }
-  }
-
-#ifdef IB
-  for_ijk(i,j,k) {
-    if(dom->ibody().off(i,j,k))
-      iflag[i][j][k]=-1001;
   }
 #endif
 

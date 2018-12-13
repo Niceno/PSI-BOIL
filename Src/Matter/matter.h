@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "../Field/Scalar/scalar.h"
+#include "../Field/Vector/vector.h"
 #include "../Ravioli/comp.h"
 #include "../Ravioli/column.h"
 #include "../LookUpTable/lookuptable.h"
@@ -30,6 +31,13 @@ class Matter {
            const Scalar * cda = NULL,  /* concentration of dispersed "a" */
            const Scalar * cdb = NULL); /* concentration of dispersed "b" */
 
+    Matter(const Matter & a, 
+           const Matter & b, 
+           const Scalar * ca,          /* concentration of component "a" */
+           const Vector * bdca,        /* concentration of "a", staggered */
+           const Scalar * cda = NULL,  /* concentration of dispersed "a" */
+           const Scalar * cdb = NULL); /* concentration of dispersed "b" */
+
     real rho   (const int i,
                 const int j,
                 const int k) const {return dens->value(i,j,k);}
@@ -37,12 +45,7 @@ class Matter {
                 const int i,
                 const int j,
                 const int k) const {
-                  if(m==Comp::u()) 
-                    return 0.5*(dens->value(i,j,k)+dens->value(i-1,j,k));
-                  else if(m==Comp::v()) 
-                    return 0.5*(dens->value(i,j,k)+dens->value(i,j-1,k));
-                  else
-                    return 0.5*(dens->value(i,j,k)+dens->value(i,j,k-1));
+                    return dens->value(m,i,j,k);
                 }
 
     real rho   (const int comp) const {return dens->value_comp(comp);}
@@ -54,12 +57,7 @@ class Matter {
                 const int i,
                 const int j,
                 const int k) const {
-                  if(m==Comp::u()) 
-                    return 0.5*(visc->value(i,j,k)+visc->value(i-1,j,k));
-                  else if(m==Comp::v()) 
-                    return 0.5*(visc->value(i,j,k)+visc->value(i,j-1,k));
-                  else
-                    return 0.5*(visc->value(i,j,k)+visc->value(i,j,k-1));
+                    return visc->value(m,i,j,k);
                 }
     real mu    (const int comp) const {return visc->value_comp(comp);}
 
@@ -70,12 +68,7 @@ class Matter {
                 const int i,
                 const int j,
                 const int k) const {
-                  if(m==Comp::u()) 
-                    return 0.5*(capa->value(i,j,k)+capa->value(i-1,j,k));
-                  else if(m==Comp::v()) 
-                    return 0.5*(capa->value(i,j,k)+capa->value(i,j-1,k));
-                  else
-                    return 0.5*(capa->value(i,j,k)+capa->value(i,j,k-1));
+                    return capa->value(m,i,j,k);
                 }
     real cp    (const int comp) const {return capa->value_comp(comp);}
 
@@ -86,12 +79,7 @@ class Matter {
                 const int i,
                 const int j,
                 const int k) const {
-                  if(m==Comp::u()) 
-                    return 0.5*(cond->value(i,j,k)+cond->value(i-1,j,k));
-                  else if(m==Comp::v()) 
-                    return 0.5*(cond->value(i,j,k)+cond->value(i,j-1,k));
-                  else
-                    return 0.5*(cond->value(i,j,k)+cond->value(i,j,k-1));
+                    return cond->value(m,i,j,k);
                 }
     real lambda(const int comp) const {return cond->value_comp(comp);}
 
@@ -102,12 +90,7 @@ class Matter {
                 const int i,
                 const int j,
                 const int k) const {
-                  if(m==Comp::u()) 
-                    return 0.5*(diff->value(i,j,k)+diff->value(i-1,j,k));
-                  else if(m==Comp::v())  
-                    return 0.5*(diff->value(i,j,k)+diff->value(i,j-1,k));
-                  else
-                    return 0.5*(diff->value(i,j,k)+diff->value(i,j,k-1));
+                    return diff->value(m,i,j,k);
                 }
     real gamma (const int comp) const {return diff->value_comp(comp);}
 
@@ -118,12 +101,7 @@ class Matter {
                 const int i,
                 const int j,
                 const int k) const {
-                  if(m==Comp::u()) 
-                    return 0.5*(texp->value(i,j,k)+texp->value(i-1,j,k));
-                  else if(m==Comp::v())  
-                    return 0.5*(texp->value(i,j,k)+texp->value(i,j-1,k));
-                  else
-                    return 0.5*(texp->value(i,j,k)+texp->value(i,j,k-1));
+                    return texp->value(m,i,j,k);
                 }
     real beta  (const int comp) const {return texp->value_comp(comp);}
 
@@ -135,12 +113,7 @@ class Matter {
                 const int j,
                 const int k) const {
                   assert(tens);
-                  if(m==Comp::u()) 
-                    return 0.5*(tens->value(i,j,k)+tens->value(i-1,j,k));
-                  else if(m==Comp::v()) 
-                    return 0.5*(tens->value(i,j,k)+tens->value(i,j-1,k));
-                  else
-                    return 0.5*(tens->value(i,j,k)+tens->value(i,j,k-1));
+                  return tens->value(m,i,j,k);
                 }
 
     /* set (initialize) physical properties */

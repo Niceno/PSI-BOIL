@@ -81,13 +81,14 @@ void EnthalpyTIF::setflag() {
   }
 #else
   /* trigger based on adens */
-  for_ijk(i,j,k) {
-    if(iflag[i][j][k] != 0 && iflag[i][j][k] != -1000) {
-      if(adensold[i][j][k]>boil::pico) {
-        iflag[i][j][k]=0;
-      } 
+  if(adens)
+    for_ijk(i,j,k) {
+      if(iflag[i][j][k] != 0 && iflag[i][j][k] != -1000) {
+        if(adensold[i][j][k]>boil::pico) {
+          iflag[i][j][k]=0;
+        } 
+      }
     }
-  }
 #endif
 
   iflag.exchange();

@@ -8,6 +8,7 @@
 #include "../../../Solver/Gauss/gauss.h"
 #include "../../../Timer/timer.h"
 #include "../../../Global/global_realistic.h"
+#include "../../Tifmodel/tif.h"
 
 /***************************************************************************//**
 *  \brief Discretizes and solves enthalpy conservaion equation.
@@ -38,7 +39,7 @@ class EnthalpyTIF : public Centered {
     //! Global constructor.
     /*!
         \param phi - temperature (\f$T\f$),
-        \param f   - extarnal source array (\f$\dot{q}\f$),
+        \param f   - external source array (\f$\dot{q}\f$),
         \param u   - convection velocity (\f${\bf u}\f$),
         \param t   - simulation (physical) time (\f${t}\f$),
         \param sm  - Krylov subspace solver. It acts as a solver, or as a
@@ -46,28 +47,28 @@ class EnthalpyTIF : public Centered {
         \param flu - Holds all fluid properties (\f$\rho, C_p, \lambda\f$),
         \param sol - holds all solid properties (\f$\rho, C_p, \lambda\f$).
         \param sol - holds all solid properties (\f$\rho, C_p, \lambda\f$).
-        \param tsat - (reference) saturation temperature.
+        \param tifmodel - interfacial temperature model.
         \param latent - latent heat of evaporation.
         \param mresis - interfacial mass transfer resistance.
         \param fs - free surface position from VOF.
+        \param adens - interfacial area density.
     */
 
     /* Most general constructor */
     EnthalpyTIF(const Scalar & phi, 
-               const Scalar & f,
-               const Scalar & clr,
-               const Vector & u,
-               Times & t,
-               Krylov * sm,
-               Matter * flu,
-               const real tsat,
-               Matter * sol = NULL,
-               const Vector * fs = NULL,
-               const real latent = 1.0,
-               const real mresis = 0.0,
-               const Scalar * mflx = NULL,
-               const Scalar * pres = NULL,
-               const Scalar * adens = NULL);
+                const Scalar & f,
+                const Scalar & clr,
+                const Vector & u,
+                Times & t,
+                Krylov * sm,
+                Matter * flu,
+                TIF & tifmodel,
+                Matter * sol = NULL,
+                const Vector * fs = NULL,
+                const Scalar * adens = NULL);
+
+    /* would it be possible to construct an ETIF object using real tsat 
+     * for bckwrd compatibility? */
 
 #if 0  /* sadly, constructors calling different constructors requires C++11 */
     /* Original CIPCSL2-EnthalpyFD constructor */
@@ -79,23 +80,14 @@ class EnthalpyTIF : public Centered {
                 Krylov * sm,
                 Matter * flu,
                 const real tsat,
-                Matter * sol = NULL) :
-      EnthalpyTIF(phi,f,clr,u,t,sm,flu,tsat,sol) { }
+                Matter * sol = NULL);
 #endif
     ~EnthalpyTIF();
 
     void new_time_step(const Scalar * diff_eddy = NULL);
     void solve(const ResRat & fact, const char * name = NULL);
     void solve_sor(const int & it, const real & r, const char * name = NULL);
-    void deltat(Scalar & deltaT, const Scalar & heaviside, 
-                const ResRat & fact, const char * name = NULL, const real flag = blendfactor);
-    void update_tifold() {
-      for_ijk(i,j,k) 
-        tifold[i][j][k] = tif[i][j][k];
-      //boil::oout<<"EnthalpyFD::tint_field()  initialize tif"<<"\n";
-      store_tif = true;
-      tifold.exchange();
-    }
+    void deltat(Scalar & deltaT, const ResRat & fact, const char * name = NULL, const real flag = blendfactor);
 
 #if 0
     //! Direct solver introduced just for checking it.
@@ -133,10 +125,11 @@ class EnthalpyTIF : public Centered {
 
     void convection();
 
-    void tint_field(const Scalar & heaviside, const real factor = blendfactor, const bool iter = false);
-    Scalar tif, tifold;
-
+    /* to be removed */
+    void tint_field(const real factor = blendfactor, const bool iter = false);
+    /* to be removed */
     real get_blendfactor(){return blendfactor;}
+    /* to be removed */
     void set_blendfactor(real b){
       blendfactor=b;
       boil::oout<<"EnthalpyTIF:blendfactor= "<<blendfactor<<"\n";
@@ -172,7 +165,7 @@ class EnthalpyTIF : public Centered {
                 , const int i, const int j, const int k, const Comp m);
 
     const Scalar * clr;
-    real tsat,rhol,rhov,cpl,cpv,lambdal,lambdav,clrsurf,epsl;
+    real rhol,rhov,cpl,cpv,lambdal,lambdav,clrsurf,epsl;
     bool store_clrold;
     Scalar clrold;
     Scalar ftif,ftifold,fdelta;
@@ -186,23 +179,12 @@ class EnthalpyTIF : public Centered {
     const Vector * fs;
     Vector fsold;
 
-    real latent, mresis;
+    TIF & tifmodel;  
+
+    /* to be removed */
     static real blendfactor;
-    bool store_tif;
-    const Scalar * mflx;
-    const Scalar * pres;
-    void Pressure_effect(const Scalar & heaviside);
-    void Mass_src_effect(const Scalar & heaviside);
-    void Extend_tint    (const Scalar & heaviside);
+    /* to be removed */
     void update_ftif(const Scalar * diff_eddy = NULL);
-
-    bool Vicinity(const int i, const int j, const int k,
-                  const Scalar & heaviside);
-    //bool Vicinity(const int i, const int j, const int k);
-
-    bool Interface(const int i, const int j, const int k,
-                   const Scalar & heaviside);
-    bool Interface(const real heavi);
 
     bool Interface(const int dir, const Comp m,
                    const int i, const int j, const int k);

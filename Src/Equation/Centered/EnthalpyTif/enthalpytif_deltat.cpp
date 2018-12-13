@@ -7,12 +7,12 @@ using namespace std;
 *      [A] \cdot \{ \phi \}^N = \{ f \}
 *  \f] 
 *******************************************************************************/
-void EnthalpyTIF::deltat(Scalar & deltaT, const Scalar & heaviside,
-                         const ResRat & fact, const char * name, const real factor) {
+void EnthalpyTIF::deltat(Scalar & deltaT, const ResRat & fact,
+                         const char * name, const real factor) {
 
   assert(solver);
 
-  tint_field(heaviside,factor,true);
+  tint_field(factor,true);
 
   /* set the name and start timing */
   std::string msg;
