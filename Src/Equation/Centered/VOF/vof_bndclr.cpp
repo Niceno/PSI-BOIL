@@ -45,13 +45,15 @@ void VOF::cal_bndclr() {
       if(liqp||gasp) {
         stagphip = phip*0.5*dV(i,j,k); /* this only works for cart. grid...*/
       } else {
-        real g = 0.5;
+        /* we are looking in the negative direction */
+        real g = -0.5;
         real c = phip;
 
         real vn1 = -nx[i][j][k];
         real vn2 = -ny[i][j][k];
         real vn3 = -nz[i][j][k];
 
+        real absg = fabs(g);
         real vm1 = fabs(vn1);
         real vm2 = fabs(vn2);
         real vm3 = fabs(vn3)+boil::pico;
@@ -75,12 +77,13 @@ void VOF::cal_bndclr() {
           alig_vn = &vn3;
         }
 
-        real ra = (*alig_vm) * (1.0-g);
+        real ra = (*alig_vm) * (1.0-absg);
         qa = 1.0/(1.0-ra);
-        if((*alig_vn)>0.0) alpha -= ra; 
-        (*alig_vm) *= g;
+        if((*alig_vn)*g>0.0) alpha -= ra; 
+        (*alig_vm) *= absg;
 
-        stagphip = calc_v(alpha*qa, vm1*qa, vm2*qa, vm3*qa)*g*dV(i,j,k);
+        /* here we use absg to avoid negative sign */
+        stagphip = calc_v(alpha*qa, vm1*qa, vm2*qa, vm3*qa)*absg*dV(i,j,k);
       }
 
       if(liqm||gasm) {
@@ -125,8 +128,8 @@ void VOF::cal_bndclr() {
       }
 
 #if 0
-      if(j==1&&k==1&&m==Comp::i())
-      boil::oout<<"VOF::bdclr "<<i<<" "<<stagphip<<" "<<stagphim<<boil::endl;
+      if(j==i-1&&m==Comp::i())
+      boil::oout<<"VOF::bdclr "<<i<<" "<<stagphip<<" "<<stagphim<<" "<<(*bndclr).dV(m,i,j,k)<<boil::endl;
 #endif
 
     

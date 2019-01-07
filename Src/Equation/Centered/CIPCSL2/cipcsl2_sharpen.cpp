@@ -257,7 +257,7 @@ bool CIPCSL2::sharpen(Scalar & sca, const real epss, const int itmax, const bool
 #endif
   }
 
-#if 0
+#if 1
   // for 1D 
   for_i(i){
     real phiave=0.0;
