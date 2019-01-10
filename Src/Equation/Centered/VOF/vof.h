@@ -78,6 +78,13 @@ class VOF : public Centered {
                        const real xp, const real yp, const real zp, real tol);
 
     real marching_cube_area(const int i, const int j, const int k);
+#if 0
+    real vel_value(const Comp m, const int i, const int j, const int k);
+    real vel_correct(const int i, const int j, const int k,
+                     const bool dirx, const bool diry, const bool dirz,
+                     const real coef, const real mflx);
+#endif
+    real fext_cut(const int i, const int j, const int k, const real fval);
 
     void cal_adens();
     void cal_bndclr();
@@ -93,9 +100,9 @@ class VOF : public Centered {
     real fs_val(const Comp m, const int i, const int j, const int k);
     real frontPosition(const int i, const int j, const int k, const Comp m);
 
-    Scalar clr,clrn;     /* color function */
+    Scalar clr;     /* color function */
     Scalar kappa;        /* curvature */
-    Scalar stmp;
+    Scalar stmp,stmp2;
     Scalar fsx,fsy,fsz;
     ScalarInt iflag,iflagx,iflagy,iflagz;
 

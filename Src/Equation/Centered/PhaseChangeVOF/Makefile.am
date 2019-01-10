@@ -19,7 +19,6 @@ libPhaseChangeVOF_a_SOURCES = phasechangevof.h                  \
                               phasechangevof_int_distance.cpp   \
                               phasechangevof_m.cpp              \
                               phasechangevof_mdot.cpp           \
-                              phasechangevof_mdot_cut.cpp       \
                               phasechangevof_modify_vel.cpp     \
                               phasechangevof_prepare_gradt8.cpp \
                               phasechangevof_setflag.cpp        \

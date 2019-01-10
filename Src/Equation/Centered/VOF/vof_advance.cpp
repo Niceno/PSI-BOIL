@@ -7,7 +7,16 @@ void VOF::advance() {
   |  source term for phase change |
   +------------------------------*/
   for_aijk(i,j,k){   //must be aijk for insert boundary
+   #if 1
+    /* fext cut */
+    real ftot = fext[i][j][k];
+    real fval = fext_cut(i,j,k,ftot);
+    phi[i][j][k]=phi[i][j][k]+time->dt()*fval;
+    stmp2[i][j][k] = ftot-fval;
+   #else
     phi[i][j][k]=phi[i][j][k]+time->dt()*fext[i][j][k];
+   #endif
+
   }
   phi.bnd_update();
   phi.exchange_all();
@@ -22,6 +31,12 @@ void VOF::advance() {
     stmp[i][j][k] = phi[i][j][k] * dV(i,j,k);
   }
 
+#if 1
+  adens.exchange();
+  /* calculate phi in staggered cells */
+  if(bndclr)
+    cal_bndclr();
+#endif
   // advance in x-direction
   advance_x();
 
@@ -45,8 +60,14 @@ void VOF::advance() {
 #else
     // unlimit C
     phi[i][j][k] = phi_tmp;
-#endif
 
+  #if 1
+    /* fext cut II */
+    real ftot = stmp2[i][j][k];
+    real fval = fext_cut(i,j,k,ftot);
+    phi[i][j][k]=phi[i][j][k]+time->dt()*fval;
+  #endif
+#endif
   }
   phi.bnd_update();
   phi.exchange_all();

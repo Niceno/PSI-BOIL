@@ -28,6 +28,7 @@ libVof_a_SOURCES =      finescalar.h                    \
                         vof_curv_HF.cpp          \
                         vof_ext_fs.cpp          \
                         vof_extract_alpha.cpp   \
+                        vof_fext_cut.cpp          \
                         vof_fs_bnd.cpp          \
                         vof_front_minmax.cpp  \
                         vof_gradphi.cpp  \

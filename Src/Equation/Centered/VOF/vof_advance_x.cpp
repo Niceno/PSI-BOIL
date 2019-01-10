@@ -16,30 +16,32 @@ void VOF::advance_x() {
     // flux
     real f;
 
+    real uval = vel_value(m,i,j,k);
+
     // upwind i-index
     int iup = i-1;
-    if((*u)[m][i][j][k]<0.0) iup = i;             
+    if(uval<0.0) iup = i;             
 
     real dt = time->dt();
 
     if (phi[iup][j][k] < boil::pico) {
 
-      f = phi[iup][j][k] * dSx(i,j,k) * ((*u)[m][i][j][k]) * dt;
+      f = phi[iup][j][k] * dSx(i,j,k) * uval * dt;
 
     } else if(phi[iup][j][k]>1.0-boil::pico) {
 
-      f = phi[iup][j][k] * dSx(i,j,k) * ((*u)[m][i][j][k]) * dt;
+      f = phi[iup][j][k] * dSx(i,j,k) * uval * dt;
 
     } else {
 
       if (phi.dxc(iup)==0.0 ) {
 
-        f = phi[iup][j][k] * dSx(i,j,k) * ((*u)[m][i][j][k]) * dt;
+        f = phi[iup][j][k] * dSx(i,j,k) * uval * dt;
 
       } else {
 
         // calculate g: CFL upwind
-        real g = ((*u)[m][i][j][k])*dt/phi.dxc(iup);
+        real g = uval*dt/phi.dxc(iup);
 
         if (g==0.0) {
           f=0.0;
