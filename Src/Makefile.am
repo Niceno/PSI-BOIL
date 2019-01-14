@@ -27,7 +27,6 @@ SUBDIRS = Equation/Staggered/Momentum     \
           Plot/TEC                        \
           Plot/VTK                        \
           Domain                          \
-          Board                           \
           Body                            \
           Model                           \
           Field/Vector                    \
@@ -71,7 +70,6 @@ LDADD = Equation/Staggered/Momentum/libMomentum.a          \
         Plot/TEC/libPlotTEC.a                              \
         Plot/VTK/libPlotVTK.a                              \
         Domain/libDomain.a                                 \
-        Board/libBoard.a                                   \
         Body/libBody.a                                     \
         Model/libModel.a                                   \
         Field/Vector/libVector.a                           \
