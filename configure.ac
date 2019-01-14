@@ -44,7 +44,6 @@ AC_OUTPUT(Makefile                                     \
           Src/Monitor/Rack/Makefile                    \
           Src/Formula/Makefile                         \
           Src/Profile/Makefile                         \
-          Src/Board/Makefile                           \
           Src/Model/Makefile                           \
           Src/Plot/Makefile                            \
           Src/Plot/GMV/Makefile                        \
