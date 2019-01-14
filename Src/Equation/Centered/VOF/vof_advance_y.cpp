@@ -14,7 +14,11 @@ void VOF::advance_y() {
     // flux
     real f;
 
+#if 0
+    real uval = (*u)[m][i][j][k];
+#else
     real uval = vel_value(m,i,j,k);
+#endif
 
     // upwind j-index
     int jup = j-1;

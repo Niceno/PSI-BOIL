@@ -44,6 +44,7 @@ libVof_a_SOURCES =      finescalar.h                    \
                         vof_normalize.cpp \
                         vof_norm_cc.cpp \
                         vof_set_iflag.cpp \
+                        vof_vel_value.cpp \
                         vof_update_at_walls.cpp
                 
 INCLUDE = -I@top_srcdir@/

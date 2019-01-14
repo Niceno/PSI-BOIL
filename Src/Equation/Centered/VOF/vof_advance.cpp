@@ -13,10 +13,11 @@ void VOF::advance() {
     real fval = fext_cut(i,j,k,ftot);
     phi[i][j][k]=phi[i][j][k]+time->dt()*fval;
     stmp2[i][j][k] = ftot-fval;
+  //if(fabs(ftot)>boil::atto&&j==2)
+  //  boil::aout<<"VOF::advance_I: "<<i<<" "<<phi[i][j][k]<<" "<<ftot<<" "<<fval<<boil::endl;
    #else
     phi[i][j][k]=phi[i][j][k]+time->dt()*fext[i][j][k];
    #endif
-
   }
   phi.bnd_update();
   phi.exchange_all();
@@ -37,6 +38,7 @@ void VOF::advance() {
   if(bndclr)
     cal_bndclr();
 #endif
+#if 1
   // advance in x-direction
   advance_x();
 
@@ -45,6 +47,7 @@ void VOF::advance() {
   
   // advance in z-direction
   advance_z();
+#endif
 
   // update phi
   for_ijk(i,j,k){
@@ -66,6 +69,8 @@ void VOF::advance() {
     real ftot = stmp2[i][j][k];
     real fval = fext_cut(i,j,k,ftot);
     phi[i][j][k]=phi[i][j][k]+time->dt()*fval;
+  //if(fabs(ftot)>boil::atto&&j==2)
+  //  boil::aout<<"VOF::advance_II: "<<i<<" "<<phi[i][j][k]<<" "<<ftot<<" "<<fval<<boil::endl;
   #endif
 #endif
   }

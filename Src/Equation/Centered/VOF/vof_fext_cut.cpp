@@ -10,10 +10,14 @@ real VOF::fext_cut(const int i, const int j, const int k, const real mdotc) {
   clrc = std::min(1.0,std::max(0.0,clrc));
 
   /* more evaporation than liquid content */
-  if(mdotc<-clrc/dt)
+  if        (mdotc<-clrc/dt) {
+    //boil::oout<<"VOF::fext_cut: "<<i<<" "<<clrc<<boil::endl;
     return -clrc/dt;
-  else if (mdotc>(1.0-clrc)/dt)
+#if 1
+  } else if (mdotc>(1.0-clrc)/dt) {
     return (1.0-clrc)/dt;
+#endif
+  }
 
   return mdotc;
 }

@@ -78,7 +78,7 @@ class VOF : public Centered {
                        const real xp, const real yp, const real zp, real tol);
 
     real marching_cube_area(const int i, const int j, const int k);
-#if 0
+#if 1
     real vel_value(const Comp m, const int i, const int j, const int k);
     real vel_correct(const int i, const int j, const int k,
                      const bool dirx, const bool diry, const bool dirz,

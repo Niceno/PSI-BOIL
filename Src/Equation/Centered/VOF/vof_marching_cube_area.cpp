@@ -449,17 +449,23 @@ real VOF::marching_cube_area(const int i, const int j, const int k){
     else if(m==5){ii=i  ; jj=j-1; kk=k  ;}
     else if(m==6){ii=i  ; jj=j  ; kk=k  ;}
     else if(m==7){ii=i-1; jj=j  ; kk=k  ;}
+#if 0
     grid.val[m]=((phi)[ii][jj  ][kk  ]+(phi)[ii+1][jj  ][kk  ]
                 +(phi)[ii][jj+1][kk  ]+(phi)[ii+1][jj+1][kk  ]
                 +(phi)[ii][jj  ][kk+1]+(phi)[ii+1][jj  ][kk+1]
                 +(phi)[ii][jj+1][kk+1]+(phi)[ii+1][jj+1][kk+1])/8.0;
-
-#if 0
-    if(fabs(grid.val[m] - phisurf) < 1.0e-11){
-      grid.val[m]=phisurf+1.0e-11;
-    }
 #else
+    grid.val[m]=0.0;
+    for(int idx=0;idx<2;idx++)
+      for(int jdx=0;jdx<2;jdx++)
+        for(int kdx=0;kdx<2;kdx++)
+          grid.val[m]+=std::max(0.0,std::min(1.0,phi[ii+idx][jj+jdx][kk+kdx]));
+    grid.val[m] /= 8.0;
+#endif 
+
+
     if(fabs(grid.val[m] - phisurf) < boil::pico){
+#if 1
       if( (phi)[i][j][k]>(1.0-boil::pico)){
         grid.val[m]=phisurf-boil::pico;
       } else if ( (phi)[i][j][k]<(boil::pico)){
@@ -467,8 +473,10 @@ real VOF::marching_cube_area(const int i, const int j, const int k){
       } else {
         grid.val[m]=phisurf+boil::pico;
       }
-    }
+#else
+      grid.val[m]=phisurf-boil::pico;
 #endif
+    }
 
     if(grid.val[m]>phisurf)isum++;
   }
