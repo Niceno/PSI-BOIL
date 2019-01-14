@@ -35,7 +35,7 @@ void PhaseChangeVOF::mdot() {
 
 #if 1
   for_i(i) {
-    if(fabs(phi[i][2][2])>boil::atto) boil::aout<<"PCV::mdot "<<i<<" "<<phi[i][2][2]<<" "<<clr[i-1][2][2]<<" "<<clr[i][2][2]<<" "<<clr[i+1][2][2]<<boil::endl;
+    if(fabs(phi[i][2][2])>boil::atto) boil::aout<<"PCV::mdot "<<i<<" "<<phi[i][2][2]<<" "<<clr[i-1][2][2]<<" "<<clr[i][2][2]<<" "<<clr[i+1][2][2]<<" "<<tpr[i-1][2][2]<<" "<<tpr[i][2][2]<<" "<<tpr[i+1][2][2]<<boil::endl;
   }
 #endif
 
