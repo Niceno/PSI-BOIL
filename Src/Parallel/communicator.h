@@ -6,6 +6,7 @@
 #include "mpi_macros.h"
 #include "tag.h"
 #include "../Ravioli/dir.h"
+#include "../Global/global_buffer_width.h"
 #include "../Global/global_endl.h"
 #include "../Global/global_precision.h"
 #include "../Global/global_constants.h"
