@@ -42,27 +42,8 @@ void Domain::setup(const Decompose & dec) {
   grid_y_local = new Grid1D( *grid_y_original, cr_y );
   grid_z_local = new Grid1D( *grid_z_original, cr_z );
 
-  /* debugging info
-  boil::aout << boil::pid << "ni =   " 
-             << grid_x_local->ncell_b() << boil::endl;
-  boil::aout << boil::pid << "nj =   " 
-             << grid_y_local->ncell_b() << boil::endl;
-  boil::aout << boil::pid << "nk =   " 
-             << grid_z_local->ncell_b() << boil::endl;
-  */
-
-  // aout << "Decomposed the domain " << boil::endl;
-  // aout << " c1x = " << cr_x.first() << boil::endl;
-  // aout << " cNx = " << cr_x.last () << boil::endl;
-  // aout << " c1y = " << cr_y.first() << boil::endl;
-  // aout << " cNy = " << cr_y.last () << boil::endl;
-  // aout << " c1z = " << cr_z.first() << boil::endl;
-  // aout << " cNz = " << cr_z.last () << boil::endl;
-
   crsr = coarsen();
 
-  //debug: if(boil::plot) boil::plot->plot(*this, name.c_str(), 0);
-  
   boil::oout << "Domain decomposed into " << dim(Comp::i()) << " x " 
                                           << dim(Comp::j()) << " x "
                                           << dim(Comp::k()) << " blocks."
