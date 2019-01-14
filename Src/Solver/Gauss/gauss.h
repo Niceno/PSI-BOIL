@@ -3,11 +3,6 @@
 *
 *  Direct solution of system of linear algebraic equations by Gaussian 
 *  elimination. It was designed for coarsest levels of AdditiveCorrection 
-*  multigrid solver and therefore handles only relativelly small systems.
-*
-*  \note
-*  May use class Board for plotting system matrices, introduced for debugging.
-*  This calls to debugging plottings are disabled by commenting them out.
 *******************************************************************************/
 
 #ifndef GAUSS_H
@@ -20,7 +15,6 @@
 
 #include "../../Global/global_malloc.h"
 #include "../../Matrix/matrix.h"
-#include "../../Board/board.h"
 
 /////////////
 //         //
@@ -43,7 +37,6 @@ class Gauss {
   private:
     void legs(real ** a, real * b, real * x, int * indx, int n);
     void elgs(real ** a, int * indx, int n);
-    void plot_system(real ** a, real * b, int c, int nj, int nk, char * name);
 };
 
 #endif
