@@ -8,7 +8,8 @@ VOF::VOF(const Scalar & PHI,
          const Vector & U, 
          Times & T,
          Krylov * S,
-         Vector * BNDCLR) :
+         Vector * BNDCLR,
+         Matter * flu) :
 /*---------------------+ 
 |  initialize parent   | NULL is for solid
 +---------------------*/
@@ -52,6 +53,15 @@ VOF::VOF(const Scalar & PHI,
   iflagy    = phi.shape();
   iflagz    = phi.shape();
  
+  mixture = flu;
+  if(mixture) {
+    rhol = mixt()->rho(1);
+    rhov = mixt()->rho(0);
+  } else {
+    rhol = 1.;
+    rhov = 1.;
+  }
+
   adens = phi.shape();
   for_m(m) {
     fs(m) = (*u)(m).shape();

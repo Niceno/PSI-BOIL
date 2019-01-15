@@ -10,63 +10,61 @@ real VOF::vel_value(const Comp m, const int i, const int j, const int k) {
    real uval = (*u)[m][i][j][k];
 
 #if 1
-   /* test */
-   real rhog = 0.597;
-   real rhol = 958.4;
+   if(mixture) {
+     /* simplified approach */
+     int ii(i), jj(j), kk(k);
+     bool dirx(false), diry(false), dirz(false);
+     if       (m == Comp::i()) {
+       ii--;
+       dirx = true;
+     } else if(m == Comp::j()) {
+       jj--;
+       diry = true;
+     } else {
+       kk--;
+       dirz = true;
+     }
+  
+     real mflxm = fext[ii][jj][kk];
+     real mflxp = fext[i ][j ][k ];
 
-   /* simplified approach */
-   int ii(i), jj(j), kk(k);
-   bool dirx(false), diry(false), dirz(false);
-   if       (m == Comp::i()) {
-     ii--;
-     dirx = true;
-   } else if(m == Comp::j()) {
-     jj--;
-     diry = true;
-   } else {
-     kk--;
-     dirz = true;
-   }
+     real bdphi;
+     if(bndclr) {
+       bdphi = (*bndclr)[m][i][j][k];
+     } else {
+       bdphi = 0.5*(phi[ii][jj][kk]+phi[i][j][k]);
+     }
 
-   real mflxm = fext[ii][jj][kk];
-   real mflxp = fext[i ][j ][k ];
-
-   real bdphi;
-   if(bndclr) {
-     bdphi = (*bndclr)[m][i][j][k];
-   } else {
-     bdphi = 0.5*(phi[ii][jj][kk]+phi[i][j][k]);
-   }
-
-   bool pcmin = fabs(mflxm)>boil::pico;
-   bool pcplu = fabs(mflxp)>boil::pico;
+     bool pcmin = fabs(mflxm)>boil::pico;
+     bool pcplu = fabs(mflxp)>boil::pico;
  
-   /* phase change occurs in both cells: uval assumed to be the vol. avg */
-   if(pcmin&pcplu) {
-     real coef = (1.0-bdphi)*(rhol/rhog-1.0); 
-     uval += vel_correct(ii,jj,kk,dirx,diry,dirz,coef,mflxm);
-     uval += vel_correct(i ,j ,k ,dirx,diry,dirz,coef,mflxp);
-
-     //boil::aout<<"M+P: "<<m<<" "<<ii<<" "<<jj<<" "<<kk<<" "<<mflxm<<" "<<bdphi<<" "<<vel_correct(ii,jj,kk,dirx,diry,dirz,coef,mflxm)<<boil::endl;
-     //boil::aout<<"M+P: "<<m<<" "<<i<<" "<<j<<" "<<k<<" "<<mflxp<<" "<<bdphi<<" "<<vel_correct(i,j,k,dirx,diry,dirz,coef,mflxp)<<boil::endl;
-   /* phase change occurs in the minus cell: uval assumed to be single phase */ 
-   } else if(pcmin) {
-     /* staggered cell center does not correspond to normal cell boundary */
-     //if(bdphi<phisurf) { 
-     if(phi[i ][j ][k ]<phisurf) {
-       real coef = (rhol/rhog-1.0);
+     /* phase change occurs in both cells: uval assumed to be the vol. avg */
+     if(pcmin&pcplu) {
+       real coef = (1.0-bdphi)*(rhol/rhov-1.0); 
        uval += vel_correct(ii,jj,kk,dirx,diry,dirz,coef,mflxm);
-       //boil::aout<<"M: "<<m<<" "<<ii<<" "<<jj<<" "<<kk<<" "<<mflxm<<" "<<bdphi<<" "<<vel_correct(ii,jj,kk,dirx,diry,dirz,coef,mflxm)<<boil::endl;
-     }
-   /* phase change occurs in the plus cell: uval assumed to be single phase */ 
-   } else if(pcplu) {
-     //if(bdphi<phisurf) {
-     if(phi[ii][jj][kk]<phisurf) {
-       real coef = (rhol/rhog-1.0);
        uval += vel_correct(i ,j ,k ,dirx,diry,dirz,coef,mflxp);
-       //boil::aout<<"P: "<<m<<" "<<i<<" "<<j<<" "<<k<<" "<<mflxp<<" "<<bdphi<<" "<<vel_correct(i,j,k,dirx,diry,dirz,coef,mflxp)<<boil::endl;
+
+       //boil::aout<<"M+P: "<<m<<" "<<ii<<" "<<jj<<" "<<kk<<" "<<mflxm<<" "<<bdphi<<" "<<vel_correct(ii,jj,kk,dirx,diry,dirz,coef,mflxm)<<boil::endl;
+       //boil::aout<<"M+P: "<<m<<" "<<i<<" "<<j<<" "<<k<<" "<<mflxp<<" "<<bdphi<<" "<<vel_correct(i,j,k,dirx,diry,dirz,coef,mflxp)<<boil::endl;
+     /* phase change occurs in the minus cell: uval assumed to be single phase */ 
+     } else if(pcmin) {
+       /* staggered cell center does not correspond to normal cell boundary */
+       //if(bdphi<phisurf) { 
+       if(phi[i ][j ][k ]<phisurf) {
+         real coef = (rhol/rhov-1.0);
+         uval += vel_correct(ii,jj,kk,dirx,diry,dirz,coef,mflxm);
+         //boil::aout<<"M: "<<m<<" "<<ii<<" "<<jj<<" "<<kk<<" "<<mflxm<<" "<<bdphi<<" "<<vel_correct(ii,jj,kk,dirx,diry,dirz,coef,mflxm)<<boil::endl;
+       }
+     /* phase change occurs in the plus cell: uval assumed to be single phase */ 
+     } else if(pcplu) {
+       //if(bdphi<phisurf) {
+       if(phi[ii][jj][kk]<phisurf) {
+         real coef = (rhol/rhov-1.0);
+         uval += vel_correct(i ,j ,k ,dirx,diry,dirz,coef,mflxp);
+         //boil::aout<<"P: "<<m<<" "<<i<<" "<<j<<" "<<k<<" "<<mflxp<<" "<<bdphi<<" "<<vel_correct(i,j,k,dirx,diry,dirz,coef,mflxp)<<boil::endl;
+       }
      }
-   }
+   } /* if mixture */
 #endif
 
    return uval;

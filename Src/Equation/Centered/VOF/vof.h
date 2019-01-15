@@ -19,7 +19,8 @@ class VOF : public Centered {
         const Vector & u, 
         Times & t,
         Krylov * S,
-        Vector * bndclr = NULL);
+        Vector * bndclr = NULL,
+        Matter * flu = NULL);
     ~VOF();
 
     void new_time_step(){};
@@ -105,6 +106,10 @@ class VOF : public Centered {
     Scalar stmp,stmp2;
     Scalar fsx,fsy,fsz;
     ScalarInt iflag,iflagx,iflagy,iflagz;
+
+    real rhol, rhov; /* densities for velocity correction */
+    const Matter * mixt() const {return mixture;}
+    Matter * mixture;
 
     Matter jelly;   /* virtual fluid for level set transport */
     real xminft,xmaxft,yminft,ymaxft,zminft,zmaxft; /* xyz min&max of front */
