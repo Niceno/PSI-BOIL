@@ -46,7 +46,6 @@ AC_OUTPUT(Makefile                                     \
           Src/Profile/Makefile                         \
           Src/Model/Makefile                           \
           Src/Plot/Makefile                            \
-          Src/Plot/GMV/Makefile                        \
           Src/Plot/TEC/Makefile                        \
           Src/Plot/VTK/Makefile                        \
           Src/Unstructured/Solver/Makefile             \
