@@ -79,6 +79,16 @@ void CIPCSL2::set_wflag2() {
   cout<<"set_wflag2: "<<wflag[4][17][1]<<" "<<clr[4][17][1]<<" "<<clr[3][17][1]<<"\n";
 #endif
 
+  /* EXTENDED BUFFERS HINT:
+   all lines with: 
+     for(int i=0; i<ni()-1; i++) or ...
+     for(int j=0; i<nj()-1; i++) or ...
+     for(int k=0; i<nk()-1; i++)
+   could probably be replaced with:
+     for(int i=si()-1; i<ei()+1; i++) and ...
+     for(int j=sj()-1; i<ej()+1; i++) and ...
+     for(int k=sk()-1; i<ek()+1; i++)
+  */
 
   /* next to free-surface (NFCell) */
   /* i-direction */
