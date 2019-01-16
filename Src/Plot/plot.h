@@ -29,7 +29,7 @@ class ScalrInt;
 class Plot {
   public:
     Plot( const AsNodes asno=AsNodes::no(), 
-          const Buffers buff=Buffers::no() ) {boxed=false;}
+          const Buffers buff=Buffers::no() ) {}
 
     virtual void plot(Domain &, const char *, const int = -1) = 0;
     virtual void plot(Body &, const char *, const int = -1) = 0;
@@ -66,12 +66,8 @@ class Plot {
     virtual void plot(const Scalar &, const Scalar &, const Scalar &, 
                       const Scalar &, const Scalar &, const Scalar &,
                       const char *, const int) = 0;
-    void box_set(const Domain & d, const Box<int> & b);
-    void box_release();
 
   protected:
-    Box<int>       box;
-    bool           boxed;
     const Domain * dom;
     int   sh;           /* shift */
     int   nodal;        /* if 1 plot as nodes */
