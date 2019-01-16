@@ -15,10 +15,10 @@ class TIF {
     TIF(const real tref, 
         const real latent,
         const real mresis,
-        const Scalar & mflx,
         Matter * flu,
-        const Scalar * pres = NULL,
-        const Scalar * adens = NULL);
+        const Scalar & adens,
+        const Scalar & mflx,
+        const Scalar * pres = NULL);
     ~TIF() {}
 
     void update_tifold() {
@@ -27,12 +27,16 @@ class TIF {
       store_tif = true;
       tifold.exchange();
     }
-    //void tint_field(const real factor = blendfactor, const bool iter = false);
-    /* to be removed */
-    void tint_field(const real factor = 0.05, const bool iter = false);
+    void tint_field(const bool newstep = true);
+
+    real get_ur() { return factor; }
+    void set_ur(const real factnew) {
+      factor = factnew;
+      boil::oout<<"TIFmodel: Underrelaxation factor = "<<factnew<<boil::endl;
+    }
 
     real tref() { return tr; }
-    void set_tref(real tnew) {
+    void set_tref(const real tnew) {
       tr = tnew;
       boil::oout<<"TIFmodel: Tref = "<<tnew<<boil::endl;
     }
@@ -47,6 +51,8 @@ class TIF {
     real Tint_old(const int i, const int j, const int k) const; 
 
   protected:
+    real factor; /* under-relaxation factor */
+
     bool store_tif,variable_tif;
     real tr, latent, mresis, rhol;
 
@@ -54,8 +60,8 @@ class TIF {
     Matter * flu;
 
     const Scalar mflx;
-    const Scalar * pres;
-    const Scalar * adens;
+    const Scalar adens;
+    const Scalar * dpres;
 
     void Pressure_effect();
     void Mass_src_effect();
@@ -63,7 +69,8 @@ class TIF {
 
     bool Vicinity(const int i, const int j, const int k);
     bool Interface(const int i, const int j, const int k);
-    bool Interface(const real heavi);
+    inline real Underrelaxation(const real tintnew, const real tifold);
+
 };
 
 #endif

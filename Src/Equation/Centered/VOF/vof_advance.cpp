@@ -20,6 +20,8 @@ void VOF::advance() {
    #endif
   }
   phi.bnd_update();
+  update_at_walls();
+
   phi.exchange_all();
 
   /*-------------------------------+

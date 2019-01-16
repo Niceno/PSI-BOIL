@@ -53,7 +53,7 @@ void PhaseChangeVOF::insert_bc_gradt(const Scalar * diff_eddy) {
           /* is there an interface between cell centre and wall? */
           if(Interface(dir,mcomp,ii,jj,kk)) {
             /* wall temperature */
-            real tw = tpr[i][jj][kk];
+            real tw = tpr[i][j][k];
             /* interface temperature and distance wall-interface */
             real ti;
             real dist;
@@ -61,7 +61,7 @@ void PhaseChangeVOF::insert_bc_gradt(const Scalar * diff_eddy) {
              * extrapolation is turned off in ext_gradt */
             if       (mcomp==Comp::i()) {
               dist = distance_x(ii,jj,kk,dir,ti);
-              dist = clr.dxc(i)/2.0 - dist;
+              dist = clr.dxc(ii)/2.0 - dist;
               if(clr[ii][jj][kk]>=clrsurf) {
                 txv[ii][jj][kk] = (tw-ti)/dist * real(dir);
               } else {
@@ -69,7 +69,7 @@ void PhaseChangeVOF::insert_bc_gradt(const Scalar * diff_eddy) {
               }
             } else if(mcomp==Comp::j()) {             
               dist = distance_y(ii,jj,kk,dir,ti);
-              dist = clr.dyc(j)/2.0 - dist;
+              dist = clr.dyc(jj)/2.0 - dist;
               if(clr[ii][jj][kk]>=clrsurf) {
                 tyv[ii][jj][kk] = (tw-ti)/dist * real(dir);
               } else {
@@ -77,7 +77,7 @@ void PhaseChangeVOF::insert_bc_gradt(const Scalar * diff_eddy) {
               }
             } else {
               dist = distance_z(ii,jj,kk,dir,ti);
-              dist = clr.dzc(k)/2.0 - dist;
+              dist = clr.dzc(kk)/2.0 - dist;
               if(clr[ii][jj][kk]>=clrsurf) {
                 tzv[ii][jj][kk] = (tw-ti)/dist * real(dir);
               } else {

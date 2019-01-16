@@ -175,7 +175,6 @@ void EnthalpyTIF::update_ftif(const Scalar * diff_eddy) {
     }
     // need to add here immersed boundary without solid !!!
 
-#if 1
   /*------------------------------------------+
   |  features conduction through solid parts  |
   +------------------------------------------*/
@@ -270,5 +269,6 @@ void EnthalpyTIF::update_ftif(const Scalar * diff_eddy) {
       }
     }
   }
-#endif
+
+  return;
 }

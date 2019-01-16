@@ -23,7 +23,6 @@ EnthalpyTIF::EnthalpyTIF(const Scalar & PHI,
   ftif   (  *PHI.domain()),
   ftifold(  *PHI.domain()),
   adensold( *PHI.domain()),
-  fdelta (  *PHI.domain()),
   iflag     (*C  .domain()),
   fsold(  *U  .domain()),
   tifmodel(tintmodel)
@@ -58,9 +57,6 @@ EnthalpyTIF::EnthalpyTIF(const Scalar & PHI,
   if(adens)
     adensold = (*adens).shape();
 
-  /* to be removed */
-  blendfactor = 0.05;
-
   phi.bnd_update();
 
   convection_set(TimeScheme::forward_euler());
@@ -74,5 +70,3 @@ EnthalpyTIF::~EnthalpyTIF() {
 }	
 
 /******************************************************************************/
-real EnthalpyTIF::blendfactor;
-

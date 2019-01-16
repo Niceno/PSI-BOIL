@@ -9,8 +9,7 @@
 *******************************************************************************/
 void EnthalpyTIF::create_system(const Scalar * diff_eddy) {
 
-   tint_field();
-
+  tifmodel.tint_field(); 
 
   /*-----------------------------+ 
   |  create system in the core,  |

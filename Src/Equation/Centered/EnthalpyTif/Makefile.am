@@ -1,7 +1,6 @@
 noinst_LIBRARIES = libEnthalpyTif.a
 libEnthalpyTif_a_SOURCES = enthalpytif.h                   \
                           enthalpytif.cpp                  \
-                          enthalpytif_deltat.cpp           \
                           enthalpytif_new_time_step.cpp    \
                           enthalpytif_system_diffusive.cpp \
                           enthalpytif_system_innertial.cpp \
@@ -17,7 +16,6 @@ libEnthalpyTif_a_SOURCES = enthalpytif.h                   \
                           enthalpytif_setflag.cpp          \
                           enthalpytif_solve.cpp            \
                           enthalpytif_solve_sor.cpp        \
-                          enthalpytif_tint_field.cpp       \
                           enthalpytif_tint_val.cpp         \
                           enthalpytif_update_rhs.cpp       \
                           enthalpytif_update_ftif.cpp      

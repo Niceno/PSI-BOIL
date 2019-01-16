@@ -53,6 +53,9 @@ void EnthalpyTIF::new_time_step(const Scalar * diff_eddy) {
   /*---------------------------+
   |  fold = rho * cp * T / dt  |
   +---------------------------*/
+
+  real dti = time->dti();
+
   /* no transport in solid */
   if( !solid() ) 
     for_ijk(i,j,k) {
@@ -62,7 +65,7 @@ void EnthalpyTIF::new_time_step(const Scalar * diff_eddy) {
       } else {
         c = cpv;
       }
-      fold[i][j][k] = c * dV(i,j,k) * phi[i][j][k] * time->dti();
+      fold[i][j][k] = c * dV(i,j,k) * phi[i][j][k] * dti;
     }
   /* with transport in solid */
   else {
@@ -75,7 +78,7 @@ void EnthalpyTIF::new_time_step(const Scalar * diff_eddy) {
       }
 
       fold[i][j][k] = (cf*fV + cs*(1.0-fV)) * dV(i,j,k)
-                    * phi[i][j][k] * time->dti();
+                    * phi[i][j][k] * dti;
     }
   }
 
@@ -97,7 +100,7 @@ void EnthalpyTIF::new_time_step(const Scalar * diff_eddy) {
       } else {
         c = cpv;
       }
-      real t_new = fold[i][j][k] / (c * dV(i,j,k)) * time->dt();
+      real t_new = fold[i][j][k] / (c * dV(i,j,k)) / dti;
 
 #if 0
       /* phase change */
@@ -119,7 +122,7 @@ void EnthalpyTIF::new_time_step(const Scalar * diff_eddy) {
       } else {
         c = cpv;
       }
-      fold[i][j][k] = c * dV(i,j,k) * phi[i][j][k] * time->dti();
+      fold[i][j][k] = c * dV(i,j,k) * phi[i][j][k] * dti;
     }
   }
   phi.bnd_update();

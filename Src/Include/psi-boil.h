@@ -13,7 +13,6 @@
 #include "../Equation/Centered/PhaseChangeVOF/phasechangevof.h"
 #include "../Equation/Centered/CIPCSL2/cipcsl2.h"
 #include "../Equation/Centered/VOF/vof.h"
-#include "../Equation/Centered/VOF/finescalar.h"
 #include "../Equation/Centered/Distance/distance.h"
 #include "../Equation/Centered/Pressure/pressure.h"
 #include "../Equation/Centered/Concentration/concentration.h"

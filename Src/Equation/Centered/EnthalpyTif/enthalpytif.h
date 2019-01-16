@@ -87,7 +87,6 @@ class EnthalpyTIF : public Centered {
     void new_time_step(const Scalar * diff_eddy = NULL);
     void solve(const ResRat & fact, const char * name = NULL);
     void solve_sor(const int & it, const real & r, const char * name = NULL);
-    void deltat(Scalar & deltaT, const ResRat & fact, const char * name = NULL, const real flag = blendfactor);
 
 #if 0
     //! Direct solver introduced just for checking it.
@@ -126,14 +125,7 @@ class EnthalpyTIF : public Centered {
     void convection();
 
     /* to be removed */
-    void tint_field(const real factor = blendfactor, const bool iter = false);
-    /* to be removed */
-    real get_blendfactor(){return blendfactor;}
-    /* to be removed */
-    void set_blendfactor(real b){
-      blendfactor=b;
-      boil::oout<<"EnthalpyTIF:blendfactor= "<<blendfactor<<"\n";
-    }
+    void update_ftif(const Scalar * diff_eddy = NULL);
 
   protected:
     void create_system(const Scalar * diff_eddy = NULL);
@@ -168,7 +160,7 @@ class EnthalpyTIF : public Centered {
     real rhol,rhov,cpl,cpv,lambdal,lambdav,clrsurf,epsl;
     bool store_clrold;
     Scalar clrold;
-    Scalar ftif,ftifold,fdelta;
+    Scalar ftif,ftifold; /* tbd */
     ScalarInt iflag;
     real turbP; /* turbulent Prandtl number */
     bool laminar;
@@ -180,11 +172,6 @@ class EnthalpyTIF : public Centered {
     Vector fsold;
 
     TIF & tifmodel;  
-
-    /* to be removed */
-    static real blendfactor;
-    /* to be removed */
-    void update_ftif(const Scalar * diff_eddy = NULL);
 
     bool Interface(const int dir, const Comp m,
                    const int i, const int j, const int k);
