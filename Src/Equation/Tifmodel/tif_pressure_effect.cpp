@@ -8,7 +8,7 @@ void TIF::Pressure_effect() {
     if(Interface(i,j,k)) {
       tif[i][j][k] -= (*dpres)[i][j][k]*tr/rhol/latent;
 #if 0
-      boil::oout << "TIFmodel: "<<i<<" "<<(*dpres)[i][j][k]<<" "<<(*dpres)[i][j][k]*tr/rhol/latent<<boil::endl;
+      boil::oout << "TIFmodel: "<<i<<" "<<k<<" "<<(*dpres)[i][j][k]<<" "<<(*dpres)[i][j][k]*tr/rhol/latent<<boil::endl;
 #endif
     }
 }

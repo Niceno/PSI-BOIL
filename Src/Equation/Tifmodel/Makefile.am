@@ -4,6 +4,7 @@ libTif_a_SOURCES = tif.h                   \
                   tif_interface.cpp        \
                   tif_mass_src_effect.cpp  \
                   tif_pressure_effect.cpp  \
+                  tif_set_limiting.cpp     \
                   tif_tint_field.cpp       \
                   tif_tint_val.cpp         \
                   tif_vicinity.cpp

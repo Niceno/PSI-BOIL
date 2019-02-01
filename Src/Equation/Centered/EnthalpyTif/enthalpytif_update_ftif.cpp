@@ -5,7 +5,10 @@ using namespace std;
 /***************************************************************************//**
 *  \brief Adds diffusion to right hand side.
 *******************************************************************************/
-void EnthalpyTIF::update_ftif(const Scalar * diff_eddy) {
+void EnthalpyTIF::update_ftif(const real TS0, const real TSm, const bool nst,
+                              const Scalar * diff_eddy) {
+
+  tifmodel.tint_field(nst); 
 
   /* get time stepping coefficient */
   real tscn = diff_ts.N();
@@ -268,6 +271,10 @@ void EnthalpyTIF::update_ftif(const Scalar * diff_eddy) {
         ftif[i][j][k] += tscn * (am*(1.0-aflagm)*tm+ap*(1.0-aflagp)*tp);
       }
     }
+  }
+
+  for_ijk(i,j,k) {
+    ftif[i][j][k] = TS0*ftif[i][j][k]+TSm*ftifold[i][j][k];
   }
 
   return;

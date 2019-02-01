@@ -83,7 +83,7 @@ void VOF::advance() {
   /* calculate alpha in cells */
   extract_alpha();
 
-  /*  calculate free surface position */
+  /* calculate free surface position */
   cal_fs3();
 
   /* prerequisite for marching cubes */

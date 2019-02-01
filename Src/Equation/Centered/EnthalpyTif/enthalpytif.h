@@ -125,7 +125,8 @@ class EnthalpyTIF : public Centered {
     void convection();
 
     /* to be removed */
-    void update_ftif(const Scalar * diff_eddy = NULL);
+    void update_ftif(const real ts0 = 1.0, const real tsm = 0.0,
+                     const bool nst = false, const Scalar * diff_eddy = NULL);
 
   protected:
     void create_system(const Scalar * diff_eddy = NULL);

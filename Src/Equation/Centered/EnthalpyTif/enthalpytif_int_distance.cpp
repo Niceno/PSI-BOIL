@@ -259,6 +259,7 @@ bool EnthalpyTIF::distance1D_z(const int i, const int j, const int k,
     real edgez= centrez-0.5*phi.dzc(k);
     real intz = (*fs)[Comp::k()][i][j][k  ];
     real offz = phi.zc(k-1);
+    //boil::oout<<i<<" "<<j<<" "<<k<<" "<<centrez<<" "<<edgez<<" "<<intz<<" "<<offz<<boil::endl;
     if(intz<=centrez&&intz>=edgez) {
       tint = Tint(i,j,k);
       dist = centrez-intz;

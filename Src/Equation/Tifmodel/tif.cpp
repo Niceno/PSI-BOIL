@@ -29,6 +29,14 @@ TIF::TIF(const real Tref,
   latent = Latent;
   mresis = Mresis;
 
+  tmin = -boil::unreal;
+  tmax = boil::unreal;
+  weaklim = false;
+  stronglim = false;
+  clr = NULL;
+  tpr = NULL;
+  clrsurf = 0.5;
+
   tif    = mflx.shape(); /* a mistake? */
   tifold = mflx.shape(); /* a mistake? */
 

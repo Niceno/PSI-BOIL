@@ -39,6 +39,14 @@ class VOF : public Centered {
     real get_zminft() { return(zminft);};
     real get_zmaxft() { return(zmaxft);};
 
+    // getter/setter for wall value tolerance
+    real get_tol() { return tol; }
+    void set_tol(real tolnew) { 
+      tol = tolnew;
+      boil::oout<<"VOF: New wall value tolerance: "<<tol<<boil::endl;
+      return;
+    }
+
     Vector fs;
     Vector * bndclr;
     Scalar nalpha;
@@ -76,7 +84,7 @@ class VOF : public Centered {
 
     real extrapolate_v(const int i, const int j, const int k,
                        const int ofx, const int ofy, const int ofz,
-                       const real xp, const real yp, const real zp, real tol);
+                       const real xp, const real yp, const real zp);
 
     real marching_cube_area(const int i, const int j, const int k);
 #if 1
@@ -110,6 +118,8 @@ class VOF : public Centered {
     real rhol, rhov; /* densities for velocity correction */
     const Matter * mixt() const {return mixture;}
     Matter * mixture;
+
+    real tol;
 
     Matter jelly;   /* virtual fluid for level set transport */
     real xminft,xmaxft,yminft,ymaxft,zminft,zmaxft; /* xyz min&max of front */

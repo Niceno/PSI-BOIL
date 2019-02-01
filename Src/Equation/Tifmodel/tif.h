@@ -3,6 +3,7 @@
 
 #include "../../Field/Scalar/scalar.h"
 #include "../../Matter/matter.h"
+#include "../../Global/global_realistic.h"
 
 ///////////////////////////////////
 //                               //
@@ -50,8 +51,16 @@ class TIF {
     real Tint(const int i, const int j, const int k) const;
     real Tint_old(const int i, const int j, const int k) const; 
 
+    void set_weak_limiting(const real tmin, const real tmax);
+    void set_strong_limiting(const Scalar * tpr,
+                             const Scalar * clr,
+                             const real clrsurf);
+
   protected:
     real factor; /* under-relaxation factor */
+    real tmin, tmax;
+    bool weaklim, stronglim;
+    real clrsurf;
 
     bool store_tif,variable_tif;
     real tr, latent, mresis, rhol;
@@ -62,6 +71,8 @@ class TIF {
     const Scalar mflx;
     const Scalar adens;
     const Scalar * dpres;
+    const Scalar * clr;
+    const Scalar * tpr;
 
     void Pressure_effect();
     void Mass_src_effect();
@@ -70,7 +81,6 @@ class TIF {
     bool Vicinity(const int i, const int j, const int k);
     bool Interface(const int i, const int j, const int k);
     inline real Underrelaxation(const real tintnew, const real tifold);
-
 };
 
 #endif

@@ -40,7 +40,7 @@ void VOF::curvature() {
   if(bndclr)
     cal_bndclr();
 #endif
-
+#if 0
   /*------------------------------------+
   |  extrapolate free surface position  |
   +------------------------------------*/
@@ -408,6 +408,7 @@ void VOF::curvature() {
 //  exit(0);
 #endif
 
+#endif
   return;
 }
 

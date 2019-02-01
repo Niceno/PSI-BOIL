@@ -17,7 +17,8 @@ void VOF::update_at_walls() {
 
   /* tolerance is necessary because of errors */
   /* e.g. 1.0 approx 0.999 */
-  real tol = 0.5e-2;
+  /* now defined in the header file */
+  //real tol = 0.5e-2;
 
   /*-------------+
   | single walls |
@@ -55,7 +56,7 @@ void VOF::update_at_walls() {
         }
        
         for_vijk( phi.bc().at(b), i,j,k ) { 
-          phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,tol);
+          phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
         }
       } /* dir not undefined */
     } /* is wall? */
@@ -77,7 +78,7 @@ void VOF::update_at_walls() {
     xpos = -0.5;
     ypos = -0.5;
     for_k(k) {
-      phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,tol);
+      phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
     }
   }
 
@@ -93,7 +94,7 @@ void VOF::update_at_walls() {
     xpos = -0.5;
     ypos = 1.5;
     for_k(k) {
-      phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,tol);
+      phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
     }
   }
 
@@ -109,7 +110,7 @@ void VOF::update_at_walls() {
     xpos = 1.5;
     ypos = -0.5;
     for_k(k) {
-      phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,tol);
+      phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
     }
   }
 
@@ -125,7 +126,7 @@ void VOF::update_at_walls() {
     xpos = 1.5;
     ypos = 1.5;
     for_k(k) {
-      phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,tol);
+      phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
     }
   }
 
@@ -141,7 +142,7 @@ void VOF::update_at_walls() {
     xpos = -0.5;
     zpos = -0.5;
     for_j(j) {
-      phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,tol);
+      phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
     }
   }
 
@@ -157,7 +158,7 @@ void VOF::update_at_walls() {
     xpos = -0.5;
     zpos = 1.5;
     for_j(j) {
-      phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,tol);
+      phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
     }
   }
 
@@ -173,7 +174,7 @@ void VOF::update_at_walls() {
     xpos = 1.5;
     zpos = -0.5;
     for_j(j) {
-      phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,tol);
+      phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
     }
   }
 
@@ -189,7 +190,7 @@ void VOF::update_at_walls() {
     ypos = 1.5;
     zpos = 1.5;
     for_j(j) {
-      phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,tol);
+      phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
     }
   }
 
@@ -205,7 +206,7 @@ void VOF::update_at_walls() {
     ypos = -0.5;
     zpos = -0.5;
     for_i(i) {
-      phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,tol);
+      phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
     }
   }
 
@@ -221,7 +222,7 @@ void VOF::update_at_walls() {
     ypos = -0.5;
     zpos = 1.5;
     for_i(i) {
-      phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,tol);
+      phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
     }
   }
 
@@ -237,7 +238,7 @@ void VOF::update_at_walls() {
     ypos = 1.5;
     zpos = -0.5;
     for_i(i) {
-      phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,tol);
+      phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
     }
   }
 
@@ -253,7 +254,7 @@ void VOF::update_at_walls() {
     ypos = 1.5;
     zpos = 1.5;
     for_i(i) {
-      phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,tol);
+      phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
     }
   }
 
@@ -276,7 +277,7 @@ void VOF::update_at_walls() {
     xpos = -0.5;
     ypos = -0.5;
     zpos = -0.5;
-    phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,tol);
+    phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
   }
 
 
@@ -295,7 +296,7 @@ void VOF::update_at_walls() {
     xpos = -0.5;
     ypos = -0.5;
     zpos = 1.5;
-    phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,tol);
+    phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
   }
 
   /* corner i-min & j-max & k-min */
@@ -313,7 +314,7 @@ void VOF::update_at_walls() {
     xpos = -0.5;
     ypos = 1.5;
     zpos = -0.5;
-    phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,tol);
+    phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
   }
 
 
@@ -332,7 +333,7 @@ void VOF::update_at_walls() {
     xpos = -0.5;
     ypos = 1.5;
     zpos = 1.5;
-    phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,tol);
+    phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
   }
 
 
@@ -351,7 +352,7 @@ void VOF::update_at_walls() {
     xpos = 1.5;
     ypos = -0.5;
     zpos = -0.5;
-    phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,tol);
+    phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
   }
 
   /* corner i-max & j-min & k-max */
@@ -369,7 +370,7 @@ void VOF::update_at_walls() {
     xpos = 1.5;
     ypos = -0.5;
     zpos = 1.5;
-    phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,tol);
+    phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
   }
 
   /* corner i-max & j-max & k-min */
@@ -387,7 +388,7 @@ void VOF::update_at_walls() {
     xpos = 1.5;
     ypos = 1.5;
     zpos = -0.5;
-    phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,tol);
+    phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
   }
 
   /* corner i-max & j-max & k-max */
@@ -405,7 +406,7 @@ void VOF::update_at_walls() {
     xpos = 1.5;
     ypos = 1.5;
     zpos = 1.5;
-    phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,tol);
+    phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
   }
 
   /*--------------+
@@ -422,7 +423,7 @@ void VOF::update_at_walls() {
       real xpos(0.5), ypos(0.5), zpos(0.5);
       ofx = +1;
       xpos = -0.5;
-      phi[i-1][j][k] = extrapolate_v(i-1,j,k,ofx,ofy,ofz,xpos,ypos,zpos,tol);
+      phi[i-1][j][k] = extrapolate_v(i-1,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
     }
 
     /* east */
@@ -431,7 +432,7 @@ void VOF::update_at_walls() {
       real xpos(0.5), ypos(0.5), zpos(0.5);
       ofx = -1;
       xpos = 1.5;
-      phi[i+1][j][k] = extrapolate_v(i+1,j,k,ofx,ofy,ofz,xpos,ypos,zpos,tol);
+      phi[i+1][j][k] = extrapolate_v(i+1,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
     }
 
     /* south */
@@ -440,7 +441,7 @@ void VOF::update_at_walls() {
       real xpos(0.5), ypos(0.5), zpos(0.5);
       ofy = +1;
       ypos = -0.5;
-      phi[i][j-1][k] = extrapolate_v(i,j-1,k,ofx,ofy,ofz,xpos,ypos,zpos,tol);
+      phi[i][j-1][k] = extrapolate_v(i,j-1,k,ofx,ofy,ofz,xpos,ypos,zpos);
     }
 
     /* north */
@@ -449,7 +450,7 @@ void VOF::update_at_walls() {
       real xpos(0.5), ypos(0.5), zpos(0.5);
       ofy = -1;
       ypos = 1.5;
-      phi[i][j+1][k] = extrapolate_v(i,j+1,k,ofx,ofy,ofz,xpos,ypos,zpos,tol);
+      phi[i][j+1][k] = extrapolate_v(i,j+1,k,ofx,ofy,ofz,xpos,ypos,zpos);
     }
 
     /* bottom */
@@ -458,7 +459,7 @@ void VOF::update_at_walls() {
       real xpos(0.5), ypos(0.5), zpos(0.5);
       ofz = +1;
       zpos = -0.5;
-      phi[i][j][k-1] = extrapolate_v(i,j,k-1,ofx,ofy,ofz,xpos,ypos,zpos,tol);
+      phi[i][j][k-1] = extrapolate_v(i,j,k-1,ofx,ofy,ofz,xpos,ypos,zpos);
     }
 
     /* top */
@@ -467,7 +468,7 @@ void VOF::update_at_walls() {
       real xpos(0.5), ypos(0.5), zpos(0.5);
       ofy = -1;
       ypos = 1.5;
-      phi[i][j][k+1] = extrapolate_v(i,j,k+1,ofx,ofy,ofz,xpos,ypos,zpos,tol);
+      phi[i][j][k+1] = extrapolate_v(i,j,k+1,ofx,ofy,ofz,xpos,ypos,zpos);
     }
   }
 
@@ -481,8 +482,7 @@ void VOF::update_at_walls() {
 +-------------------*/
 real VOF::extrapolate_v(const int i, const int j, const int k,
                         const int ofx, const int ofy, const int ofz,
-                        const real xp, const real yp, const real zp,
-                        real tol) {
+                        const real xp, const real yp, const real zp) {
 
   int ii = i+ofx;
   int jj = j+ofy;

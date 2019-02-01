@@ -11,7 +11,7 @@ void VOF::cal_fs3() {
 
   /* tolerance is necessary because the linear-planes are not closed */
   /* with this version, it shouldnt be necessary anymore */
-  real tol = 0.0e-2;
+  real tolf = 0.0e-2;
         
   /* initialize */
   for_m(m)
@@ -52,8 +52,8 @@ void VOF::cal_fs3() {
        a. between cell centres
        b. inside the correct cell (real interface)
     ----------------------------------------------- */
-    bool flagw = (0.5     <= fsxw && fsxw <= 1.0+tol);
-    bool flage = (0.0-tol <= fsxe && fsxe <= 0.5    );
+    bool flagw = (0.5     <= fsxw && fsxw <= 1.0+tolf);
+    bool flage = (0.0-tolf <= fsxe && fsxe <= 0.5    );
 
     if     ( flagw && !flage) { /* west is real and east is not */
       fs[m][i][j][k] = phi.xn(i-1) + phi.dxc(i-1) * fsxw;
@@ -67,7 +67,7 @@ void VOF::cal_fs3() {
 
       /* calculate distance between the two candidate positions */
       real fsx_diff = fsxe + 1.0 - fsxw;
-      if(fabs(fsx_diff)<tol) { /* they are close to each other */
+      if(fabs(fsx_diff)<tolf) { /* they are close to each other */
         fs[m][i][j][k] = phi.xn(i);
       } else {  /* choose the "more real" value */
         fs[m][i][j][k] = (1.0-fsxw>fsxe) ? 
@@ -112,8 +112,8 @@ void VOF::cal_fs3() {
        a. between cell centres
        b. inside the correct cell (real interface)
     ----------------------------------------------- */
-    bool flags = (0.5     <= fsys && fsys <= 1.0+tol);
-    bool flagn = (0.0-tol <= fsyn && fsyn <= 0.5+tol);
+    bool flags = (0.5     <= fsys && fsys <= 1.0+tolf);
+    bool flagn = (0.0-tolf <= fsyn && fsyn <= 0.5+tolf);
    
     if     ( flags && !flagn) { /* south is real and north is not */
       fs[m][i][j][k] = phi.yn(j-1) + phi.dyc(j-1) * fsys;
@@ -127,7 +127,7 @@ void VOF::cal_fs3() {
 
       /* calculate distance between the two candidate positions */
       real fsy_diff = fsyn + 1.0 - fsys;
-      if(fabs(fsy_diff)<tol) { /* they are close to each other */
+      if(fabs(fsy_diff)<tolf) { /* they are close to each other */
         fs[m][i][j][k] = phi.yn(j);
       } else {  /* choose the "more real" value */
         fs[m][i][j][k] = (1.0-fsys>fsyn) ? 
@@ -171,8 +171,8 @@ void VOF::cal_fs3() {
        a. between cell centres
        b. inside the correct cell (real interface)
     ----------------------------------------------- */
-    bool flagb = (0.5     <= fszb && fszb <= 1.0+tol);
-    bool flagt = (0.0-tol <= fszt && fszt <= 0.5    );
+    bool flagb = (0.5     <= fszb && fszb <= 1.0+tolf);
+    bool flagt = (0.0-tolf <= fszt && fszt <= 0.5    );
    
     //if(i==46&&j==50&&k==76) boil::oout<<"VOF::cal_FS3 "<<fszb<<" "<<fszt<<boil::endl;
   
@@ -188,7 +188,7 @@ void VOF::cal_fs3() {
 
       /* calculate distance between the two candidate positions */
       real fsz_diff = fszt + 1.0 - fszb;
-      if(fabs(fsz_diff)<tol) { /* they are close to each other */
+      if(fabs(fsz_diff)<tolf) { /* they are close to each other */
         fs[m][i][j][k] = phi.zn(k);
       } else {  /* choose the "more real" value */
         fs[m][i][j][k] = (1.0-fszb>fszt) ? 

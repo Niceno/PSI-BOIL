@@ -28,6 +28,39 @@ void TIF::tint_field(const bool newstep) {
 
     Mass_src_effect();
 
+    if(weaklim)
+      for_vijk(tif,i,j,k) {
+        if(Interface(i,j,k)) {
+          tif[i][j][k] = std::min(tmax,
+                                  std::max(tmin,tif[i][j][k])
+                                  );
+        }
+      }
+
+    /* crude */
+    if(stronglim)
+      for_vijk(tif,i,j,k) {
+        if(Interface(i,j,k)) {
+          real locmin = tif[i][j][k];
+          real locmax = tif[i][j][k];
+          for(int ii = -1; ii < 2; ++ii)       
+            for(int jj = -1; jj < 2; ++jj)       
+              for(int kk = -1; kk < 2; ++kk) {
+                if((*clr)[i+ii][j+jj][k+kk]>clrsurf) {
+                  if((*tpr)[i+ii][j+jj][k+kk]<locmax)
+                    locmax = (*tpr)[i+ii][j+jj][k+kk]; 
+                } else {
+                  if((*tpr)[i+ii][j+jj][k+kk]>locmin)
+                    locmin = (*tpr)[i+ii][j+jj][k+kk]; 
+                }
+              }
+          tif[i][j][k] = std::min(locmax,
+                                  std::max(locmin,tif[i][j][k])
+                                  );
+  
+        }
+      }
+
     tif.exchange_all();
     Extend_tint();
 #endif

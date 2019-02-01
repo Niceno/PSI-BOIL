@@ -11,7 +11,9 @@ void VOF::fs_bnd() {
 
   /* tolerance is necessary because of errors */
   /* e.g. 1.0 approx 0.999 */
-  real tol = 0.5e-2;
+  real tolf = 0.0e-2;
+  /* tol is defined in header */
+  //real tol = 0.5e-2; /* consistent tol with update_at_walls: ie for clr */
 
   for( int b=0; b<phi.bc().count(); b++ ) {
 
@@ -87,11 +89,15 @@ void VOF::fs_bnd() {
           int jj = j+ofy;
           int kk = k+ofz;
           real fsval = fs_val(mcomp,ii,jj,kk);
-          bool flagm = (0.0+tol <= fsval && fsval <= 0.5    );
-          bool flagp = (0.5     <= fsval && fsval <= 1.0-tol);
-  
+          bool flagm = (0.0+tolf <= fsval && fsval <= 0.5    );
+          bool flagp = (0.5     <= fsval && fsval <= 1.0-tolf);
+         
+          /* erroneous interfaces */
+          real phiphi = phi[ii][jj][kk];
+          bool errint = (phiphi<tol||phiphi-1.0>-tol);
+
           /* interface exists in the dir we are interested in */
-          if((flagm && of)||(flagp && !of)) { 
+          if(((flagm && of)||(flagp && !of))&&!errint) { 
             if(mcomp==Comp::i()) {
               fs[mcomp][i+of][j][k] = phi.xn(ii) + phi.dxc(ii) * fsval;
             } else if(mcomp==Comp::j()) {
@@ -113,12 +119,18 @@ void VOF::fs_bnd() {
     Comp mcomp;
     /* cell[i][j][k] is wall adjacent cell in fluid domain */
     dom->ibody().ijk(cc,&i,&j,&k);
+         
+    /* erroneous interfaces */
+    real phiphi = phi[i][j][k];
+    bool errint = (phiphi<tol||phiphi-1.0>-tol);
+    if(errint)
+      continue;
 
     /* west is in solid domain */
     if (dom->ibody().off(i-1,j,k)) {
       mcomp = Comp::i();
       real fsval = fs_val(mcomp,i,j,k);
-      bool flagm = (0.0+tol <= fsval && fsval <= 0.5    );
+      bool flagm = (0.0+tolf <= fsval && fsval <= 0.5    );
       if(flagm)
         fs[mcomp][i  ][j][k] = phi.xn(i) + phi.dxc(i) * fsval;
     }
@@ -127,7 +139,7 @@ void VOF::fs_bnd() {
     if (dom->ibody().off(i+1,j,k)) {
       mcomp = Comp::i();
       real fsval = fs_val(mcomp,i,j,k);
-      bool flagp = (0.5     <= fsval && fsval <= 1.0-tol);
+      bool flagp = (0.5     <= fsval && fsval <= 1.0-tolf);
       if(flagp)
         fs[mcomp][i+1][j][k] = phi.xn(i) + phi.dxc(i) * fsval;
     }
@@ -136,7 +148,7 @@ void VOF::fs_bnd() {
     if (dom->ibody().off(i,j-1,k)) {
       mcomp = Comp::j();
       real fsval = fs_val(mcomp,i,j,k);
-      bool flagm = (0.0+tol <= fsval && fsval <= 0.5    );
+      bool flagm = (0.0+tolf <= fsval && fsval <= 0.5    );
       if(flagm)
         fs[mcomp][i][j  ][k] = phi.yn(j) + phi.dyc(j) * fsval;
     }
@@ -145,7 +157,7 @@ void VOF::fs_bnd() {
     if (dom->ibody().off(i,j+1,k)) {
       mcomp = Comp::j();
       real fsval = fs_val(mcomp,i,j,k);
-      bool flagp = (0.5     <= fsval && fsval <= 1.0-tol);
+      bool flagp = (0.5     <= fsval && fsval <= 1.0-tolf);
       if(flagp)
         fs[mcomp][i][j+1][k] = phi.yn(j) + phi.dyc(j) * fsval;
     }
@@ -154,7 +166,7 @@ void VOF::fs_bnd() {
     if (dom->ibody().off(i,j,k-1)) {
       mcomp = Comp::k();
       real fsval = fs_val(mcomp,i,j,k);
-      bool flagm = (0.0+tol <= fsval && fsval <= 0.5    );
+      bool flagm = (0.0+tolf <= fsval && fsval <= 0.5    );
       if(flagm)
         fs[mcomp][i][j][k  ] = phi.zn(k) + phi.dzc(k) * fsval;
     }
@@ -163,7 +175,7 @@ void VOF::fs_bnd() {
     if (dom->ibody().off(i,j,k+1)) {
       mcomp = Comp::k();
       real fsval = fs_val(mcomp,i,j,k);
-      bool flagp = (0.5     <= fsval && fsval <= 1.0-tol);
+      bool flagp = (0.5     <= fsval && fsval <= 1.0-tolf);
       if(flagp)
         fs[mcomp][i][j][k+1] = phi.zn(k) + phi.dzc(k) * fsval;
     }

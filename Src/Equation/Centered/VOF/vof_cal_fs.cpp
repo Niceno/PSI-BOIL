@@ -15,9 +15,9 @@ void VOF::cal_fs() {
 *******************************************************************************/
 
   // tolerance is necessary because the linear-planes are not closed
-  //real tol = 0.0e-3;  
-  //real tol = 2.0e-2;  
-  real tol = 5.0e-2;  
+  //real tolf = 0.0e-3;  
+  //real tolf = 2.0e-2;  
+  real tolf = 5.0e-2;  
 
   // initialize
   fsx=boil::yotta;
@@ -163,7 +163,7 @@ void VOF::cal_fs() {
       }
 #endif
       /* store data */
-      if (0.0-tol <= xuni && xuni <= 1.0+tol) {
+      if (0.0-tolf <= xuni && xuni <= 1.0+tolf) {
         //xuni = min(1.0,max(0.0,xuni));
         fsx[i][j][k] = phi.xn(i) + phi.dxc(i) * xuni;
         if (0.0<=xuni && xuni<=1.0) {
@@ -175,7 +175,7 @@ void VOF::cal_fs() {
         }
       }
 
-      if (0.0-tol <= yuni && yuni <= 1.0+tol) {
+      if (0.0-tolf <= yuni && yuni <= 1.0+tolf) {
         //yuni = min(1.0,max(0.0,yuni));
         fsy[i][j][k] = phi.yn(j) + phi.dyc(j) * yuni;
         if (0.0<=yuni && yuni<=1.0) {
@@ -187,7 +187,7 @@ void VOF::cal_fs() {
         }
       }
 
-      if (0.0-tol <= zuni && zuni <= 1.0+tol) {
+      if (0.0-tolf <= zuni && zuni <= 1.0+tolf) {
         //zuni = min(1.0,max(0.0,zuni));
         fsz[i][j][k] = phi.zn(k) + phi.dzc(k) * zuni;
         if (0.0<=zuni && zuni<=1.0) {

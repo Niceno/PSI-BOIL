@@ -78,8 +78,9 @@ VOF::VOF(const Scalar & PHI,
 
   epsnorm=1.0e-12;
   phisurf=0.5;
+  tol = 0.01; /* tolerance 0.99 \approx 1.0 near walls */
 
-/* set initial value */
+  /* set initial value */
   nlayer=4;
   n_ext_fs=5;
 

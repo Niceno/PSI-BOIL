@@ -60,6 +60,48 @@ void calculate_disjoint_pressure_x(Scalar & dp, const Vector & bndclr,
   dp.exchange();
 }
 
+void calculate_disjoint_pressure_z(Scalar & dp, const Scalar & clr, 
+                                   const Scalar & adens, const Vector & fs,
+                                   const real hamaker, const real delta0) {
+  Comp m = Comp::k();
+  for_vijk(dp,i,j,k) {
+    const bool intarr = adens[i][j][k]>boil::pico;
+    if(intarr) { /* interface exists */
+      const real izm = fs[m][i][j][k  ];
+      const real izp = fs[m][i][j][k+1];
+      bool cellm(false), cellp(false);
+      const bool intm = boil::realistic(izm);
+      const bool intp = boil::realistic(izp);
+      if(intm&&izm>=dp.zn(k  ))
+        cellm = true;
+      if(intp&&izp<=dp.zn(k+1))
+        cellp = true;
+
+      real delta;
+  
+      if       (cellm&&cellp) {/* degenerate case */
+        dp[i][j][k]=0.0;
+        continue;
+      } else if(cellm) {
+        delta = izm;
+      } else if(cellp) {
+        delta = izp;
+      } else { /* estimate */
+        delta = dp.zn(k) + clr[i][j][k]*dp.dzc(k);
+      }
+          
+      delta = std::max(delta,delta0);
+      dp[i][j][k] = -hamaker/pow(delta,3.0);
+    } else {
+      dp[i][j][k] = 0.0;
+    }
+  }
+ 
+  dp.exchange();
+ 
+  return;
+}
+
 void calculate_disjoint_pressure_x(Scalar & dp, const Scalar & clr, 
                                    const Scalar & adens, const Vector & fs,
                                    const real hamaker, const real delta0) {
@@ -85,13 +127,14 @@ void calculate_disjoint_pressure_x(Scalar & dp, const Scalar & clr,
         delta = ixm;
       } else if(cellp) {
         delta = ixp;
-      } else {
-        dp[i][j][k]=0.0;
-        continue;
+      } else { /* estimate */
+        delta = dp.zn(k) + clr[i][j][k]*dp.dzc(k);
       }
           
       delta = std::max(delta,delta0);
       dp[i][j][k] = -hamaker/pow(delta,3.0);
+    } else {
+      dp[i][j][k] = 0.0;
     }
   }
  
