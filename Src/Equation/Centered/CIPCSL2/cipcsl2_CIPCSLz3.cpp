@@ -16,12 +16,23 @@ void CIPCSL2::CIPCSLz3(const Scalar & f, const Vector & sz) {
   for(int k=0; k<=u->nk(m)-1; k++) {
     vel[i][j][k]=((*u)[m][i][j][k]+(*u)[m][i-1][j][k])/2.0;
   }}}
+  /* EXTENDED BUFFERS HINT:
+     Lines 14-16 could probably be replaced with this:
+  for(int i=u->si(m);   i<=u->ei(m)+1; i++) {
+  for(int j=u->sj(m)-1; j<=u->ej(m)+1; j++) {
+  for(int k=u->sk(m)-1; k<=u->ek(m)+1; k++) {
+  */
 
   /* Reset delrho */
   for(int i=0; i<=ni(); i++)
   for(int j=0; j<=nj(); j++)
   for(int k=0; k<=nk(); k++)
     delrho[i][j][k]=0.0;
+  /* EXTENDED BUFFERS HINT:
+     Lines 27-29 could probably be replaced with this:
+  for_aijk(i,j,k)
+    delrho[i][j][k]=0.0;
+  */
 
   /* CIPCSL 1D */
   const real dt= time->dt();

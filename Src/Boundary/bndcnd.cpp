@@ -187,20 +187,20 @@ void BndCnd::add(BndCnd bc) {
   /*---------------------------------------------------+
   |  2. set range for directions explicitelly defined  | 
   +---------------------------------------------------*/
-  if(bc.dir == Dir::imin()) {bc.ir.first(0);
-                             bc.ir.last (0);}
-  if(bc.dir == Dir::imax()) {bc.ir.first(dom->ni()-1);
-                             bc.ir.last (dom->ni()-1);}
+  if(bc.dir == Dir::imin()) {bc.ir.first(boil::BW-1);
+                             bc.ir.last (boil::BW-1);}
+  if(bc.dir == Dir::imax()) {bc.ir.first(dom->ni()-boil::BW);
+                             bc.ir.last (dom->ni()-boil::BW);}
 
-  if(bc.dir == Dir::jmin()) {bc.jr.first(0);
-                             bc.jr.last (0);}
-  if(bc.dir == Dir::jmax()) {bc.jr.first(dom->nj()-1);
-                             bc.jr.last (dom->nj()-1);}
+  if(bc.dir == Dir::jmin()) {bc.jr.first(boil::BW-1);
+                             bc.jr.last (boil::BW-1);}
+  if(bc.dir == Dir::jmax()) {bc.jr.first(dom->nj()-boil::BW);
+                             bc.jr.last (dom->nj()-boil::BW);}
 
-  if(bc.dir == Dir::kmin()) {bc.kr.first(0);
-                             bc.kr.last (0);}
-  if(bc.dir == Dir::kmax()) {bc.kr.first(dom->nk()-1);
-                             bc.kr.last (dom->nk()-1);}
+  if(bc.dir == Dir::kmin()) {bc.kr.first(boil::BW-1);
+                             bc.kr.last (boil::BW-1);}
+  if(bc.dir == Dir::kmax()) {bc.kr.first(dom->nk()-boil::BW);
+                             bc.kr.last (dom->nk()-boil::BW);}
 
   /*--------------------------------------+
   |  3. set the range for the directions  |
@@ -211,16 +211,16 @@ void BndCnd::add(BndCnd bc) {
   Range<int> czg = dom->czg(); 
 
   if( bc.ir.first() == 0 && bc.ir.last() == -1 ) {
-    bc.ir.first( cxg.first() ); // as sx()
-    bc.ir.last ( cxg.last()  ); // as ex()
+    bc.ir.first( cxg.first() + boil::BW - 1 ); // as sx()
+    bc.ir.last ( cxg.last()  + boil::BW - 1 ); // as ex()
   }
   if( bc.jr.first() == 0 && bc.jr.last() == -1 ) {
-    bc.jr.first( cyg.first() ); // as sy()
-    bc.jr.last ( cyg.last()  ); // as ey()
+    bc.jr.first( cyg.first() + boil::BW - 1 ); // as sy()
+    bc.jr.last ( cyg.last()  + boil::BW - 1 ); // as ey()
   }
   if( bc.kr.first() == 0 && bc.kr.last() == -1 ) {
-    bc.kr.first( czg.first() ); // as sz()
-    bc.kr.last ( czg.last()  ); // as ez()
+    bc.kr.first( czg.first() + boil::BW - 1 ); // as sz()
+    bc.kr.last ( czg.last()  + boil::BW - 1 ); // as ez()
   }
 
   /*---------------------------------------------------+

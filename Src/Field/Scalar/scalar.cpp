@@ -7,13 +7,13 @@ Scalar::Scalar(const Domain & d) : alias(false) {
 +--------------------------------------*/
 
   dom = & d;
-	
+
   allocate(d.ni(), d.nj(), d.nk());
 
   bndcnd = new BndCnd( *dom );
 
   nam = "";
-}	
+}
 
 /******************************************************************************/
 Scalar::Scalar(const Domain & d, const char * nm) : alias(false) {
@@ -22,13 +22,13 @@ Scalar::Scalar(const Domain & d, const char * nm) : alias(false) {
 +--------------------------------------*/
 
   dom = & d;
-	
+
   allocate(d.ni(), d.nj(), d.nk());
 
   bndcnd = new BndCnd( *dom );
 
   nam = nm;
-}	
+}
 
 /******************************************************************************/
 Scalar::Scalar(const Domain & d, BndCnd & b) : alias(false) {
@@ -43,7 +43,7 @@ Scalar::Scalar(const Domain & d, BndCnd & b) : alias(false) {
   bndcnd = & b; 
 
   nam = "";
-}	
+}
 
 /******************************************************************************/
 Scalar::Scalar(const Scalar & s) : alias(false) {
@@ -52,13 +52,13 @@ Scalar::Scalar(const Scalar & s) : alias(false) {
 +---------------------------------------------------------------------*/
 
   dom = s.domain();
-	
+
   allocate(s.ni(), s.nj(), s.nk());
 
   bndcnd = new BndCnd( *dom ); 
 
   nam = "";
-}	
+}
 
 /******************************************************************************/
 Scalar::Scalar(const Scalar * s) : alias(true), nam(s->nam) {
@@ -83,22 +83,22 @@ Scalar::Scalar(const Scalar * s) : alias(true), nam(s->nam) {
 
   dom    = s->domain();
   bndcnd = s->bndcnd;
-}	
+}
 
 /******************************************************************************/
 void Scalar::allocate(int ni, int nj, int nk) {
 
-  n_x = ni;   
-  n_y = nj;   
+  n_x = ni;
+  n_y = nj;
   n_z = nk;
-  s_x = 1;    
-  s_y = 1;    
-  s_z = 1;  
-  e_x = ni-2; 
-  e_y = nj-2; 
-  e_z = nk-2; 
-  o_x = 0;    
-  o_y = 0;    
+  s_x = boil::BW;
+  s_y = boil::BW;
+  s_z = boil::BW;
+  e_x = ni-boil::BW-1;
+  e_y = nj-boil::BW-1;
+  e_z = nk-boil::BW-1;
+  o_x = 0;
+  o_y = 0;
   o_z = 0;
 
   alloc3d( &val, ni, nj, nk );
@@ -110,7 +110,7 @@ void Scalar::deallocate() {
 |  this is called from Vector as well  |
 +-------------------------------------*/
 
-  /* deallocate memory */	
+  /* deallocate memory */
   dealloc3d( &val );
 }
 

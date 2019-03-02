@@ -64,5 +64,4 @@ Domain::Domain(const Grid1D * ogx, const Grid1D * ogy, const Grid1D * ogz,
   crsr = coarsen();
 
   boil::oout << "Domain level " << level() << " created !" << boil::endl;
-  //TMP if(boil::plot) boil::plot->plot(*this, name.c_str(), level());
-}	
+}

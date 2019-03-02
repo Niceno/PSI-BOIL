@@ -28,30 +28,6 @@ Vector::Vector(const Domain & d) : aliav(false), vec() {
   vec[Comp::v()].o_y++;
   vec[Comp::w()].o_z++;
 
-  /* correct offsets for each vector component */
-#if 0
-  vec[Comp::u()].s_X = 1;
-  vec[Comp::u()].e_X = d.gi()-1;
-  vec[Comp::u()].s_Y = 1;
-  vec[Comp::u()].e_Y = d.gj()-2;
-  vec[Comp::u()].s_Z = 1;
-  vec[Comp::u()].e_Z = d.gk()-2;
-
-  vec[Comp::v()].s_X = 1;
-  vec[Comp::v()].e_X = d.gi()-2;
-  vec[Comp::v()].s_Y = 1;
-  vec[Comp::v()].e_Y = d.gj()-1;
-  vec[Comp::v()].s_Z = 1;
-  vec[Comp::v()].e_Z = d.gk()-2;
-
-  vec[Comp::w()].s_X = 1;
-  vec[Comp::w()].e_X = d.gi()-2;
-  vec[Comp::w()].s_Y = 1;
-  vec[Comp::w()].e_Y = d.gj()-2;
-  vec[Comp::w()].s_Z = 1;
-  vec[Comp::w()].e_Z = d.gk()-1;
-#endif
-
   /* allocate memory for boundary conditions */
   for_m(m) 
     vec[m].bndcnd = new BndCnd( *dom );
@@ -75,21 +51,15 @@ Vector::Vector(const Vector * v) : aliav(true), vec(v->vec) {
   for_m(m) {
     vec[m].n_x = v->vec[m].n_x; 
     vec[m].s_x = v->vec[m].s_x; 
-    //vec[m].s_X = v->vec[m].s_X; 
     vec[m].e_x = v->vec[m].e_x;
-    //vec[m].e_X = v->vec[m].e_X;
     vec[m].o_x = v->vec[m].o_x;
     vec[m].n_y = v->vec[m].n_y; 
     vec[m].s_y = v->vec[m].s_y; 
-    //vec[m].s_Y = v->vec[m].s_Y; 
     vec[m].e_y = v->vec[m].e_y;
-    //vec[m].e_Y = v->vec[m].e_Y;
     vec[m].o_y = v->vec[m].o_y;
     vec[m].n_z = v->vec[m].n_z; 
     vec[m].s_z = v->vec[m].s_z; 
-    //vec[m].s_Z = v->vec[m].s_Z; 
     vec[m].e_z = v->vec[m].e_z;
-    //vec[m].e_Z = v->vec[m].e_Z;
     vec[m].o_z = v->vec[m].o_z;
 
     pnt_xc [~m] = v->pnt_xc [~m]; 

@@ -2,7 +2,7 @@
 
 /******************************************************************************/
 Grid1D::Grid1D(const Range<real> &  xr, const Range<real> & dxr,
-               const int & n, const Periodic & p) : N(n), 
+               const int & n, const Periodic & p) : nc_in(n), 
   period1(p), 
   periodN(p) {
 /*---------------------------+
@@ -12,14 +12,14 @@ Grid1D::Grid1D(const Range<real> &  xr, const Range<real> & dxr,
   allocate(); 
 
   distribute_nodes_inside( xr.first(),  xr.last(), 
-                          dxr.first(), dxr.last(), N);
-  
+                          dxr.first(), dxr.last());
+
   correct_boundaries();
-}  
+}
 
 /******************************************************************************/
 Grid1D::Grid1D(const Range<real> &  xr, 
-               const int & n, const Periodic & p) : N(n), 
+               const int & n, const Periodic & p) : nc_in(n), 
                period1(p), periodN(p) {
 /*-----------------------+
 |  creates uniform grid  | -> derived from above; could only one be used???
@@ -27,18 +27,17 @@ Grid1D::Grid1D(const Range<real> &  xr,
 
   allocate(); 
 
-  real dx = (xr.last() - xr.first()) / (real)N;
+  real dx = (xr.last() - xr.first()) / (real)nc_in;
 
-  distribute_nodes_inside( xr.first(),  xr.last(), dx, dx, N);
-  
+  distribute_nodes_inside( xr.first(),  xr.last(), dx, dx);
+
   correct_boundaries();
-}  
+}
 
 /******************************************************************************/
 Grid1D::Grid1D(const Grid1D & left, const Grid1D & right, 
-               const Periodic & p) : N(left.ncell()+right.ncell()), 
-  period1(p), 
-  periodN(p) {
+               const Periodic & p) : nc_in(left.ncell()+right.ncell()), 
+               period1(p), periodN(p) {
 /*---------------------------+
 |  creates non-uniform grid  |
 +---------------------------*/
@@ -59,14 +58,13 @@ Grid1D::Grid1D(const Grid1D & left, const Grid1D & right,
 /******************************************************************************/
 Grid1D::Grid1D(const Grid1D & left, const Grid1D & center, const Grid1D & right, 
                const Periodic & p) : 
-  N(left.ncell()+center.ncell()+right.ncell()), 
-  period1(p), 
-  periodN(p) {
+  nc_in(left.ncell()+center.ncell()+right.ncell()), 
+  period1(p), periodN(p) {
 /*---------------------------+
 |  creates non-uniform grid  |
 +---------------------------*/
 
-  allocate(); 
+  allocate();
 
   /* just copty the first grid */
   for(int i=1; i<=left.nnode(); i++)
@@ -93,13 +91,13 @@ Grid1D::Grid1D(const Grid1D & grid,
 /*-------------------------------------------------------------------------+
 |  copy constructor with possibility to coarsen. not sure if it is needed  | 
 |                                                                          |
-|                        N = 8                                             |
+|                    nc_in = 8                                             |
 |                                                                          |
 |        0   1   2   3   4   5   6   7   8   9                             |
 |      | o |-O-+-O-+-O-+-O-+-O-+-O-+-O-+-O-| o |                           |
 |      0   1   2   3   4   5   6   7   8   9  10                           |
 |                                                                          |
-|                        N = 4                                             |
+|                    nc_in = 4                                             |
 |                                                                          |
 |      0       1       2       3       4       5                           |
 |  |   o   |---O---+---O---+---O---+---O---|   o   |                       |
@@ -113,16 +111,13 @@ Grid1D::Grid1D(const Grid1D & grid,
   }
 
   /* if yes, create (coarser) grid */
-  N = grid.ncell()/step.size();
+  nc_in = grid.ncell()/step.size();
 
   allocate(); 
 
-  for(int i=1; i<N+2; i++)
-    x_node[i] = grid.xn(i*step.size()-step.size()+1);
+  for(int i=0; i<=nc_in; i++)
+    x_node[boil::BW + i] = grid.xn(boil::BW + i*step.size());
 
-  int i=N+2;
-  x_node[i] = 2.0 * x_node[i-1] - x_node[i-2];
-  
   correct_boundaries();
 }  
 
@@ -155,7 +150,7 @@ Grid1D::Grid1D(const Grid1D     & grid,
   const int cellN =  cr.last()/step.size();
 
   /* set the right number of cells */
-  N = cellN - cell1 + 1;
+  nc_in = cellN - cell1 + 1;
 
   allocate(); 
 
@@ -186,7 +181,7 @@ void Grid1D::allocate() {
 
 /******************************************************************************/
 Grid1D::~Grid1D() {
-  N = 0;
+  nc_in = 0;
   delete []  x_node;
   delete []  x_cell;
   delete [] dx_cell;
@@ -219,54 +214,3 @@ void Grid1D::print() const {
   if(periodicN()==true) boil::aout << ":::::::::::" << boil::endl;
 }
 
-/******************************************************************************/
-void Grid1D::plot(const char * name) const {
-
-  Board board;
-
-  /* grid dimensions and thick width */
-  const real l  = xn(nnode_b()-2) - xn(1);
-  const real hw = l/100.0;
-  const real rc = hw*0.5;
-
-  board.setLineWidth( 1.0 );
-
-  /*---------------------+
-  |  plot inside domain  |
-  +---------------------*/
-  board.setPenColorRGBi(  0, 0,  0);
-
-  /* domain */
-  board.drawLine( xn(0), 0, xn(nnode_b()-1), 0 );
-
-  /* nodes */
-  for(int i=0; i<ncell_b(); i++) {
-    board.drawLine( xn(i), -hw, xn(i), hw );
-  }
-
-  /* cells */
-  for(int i=1; i<ncell_b()-1; i++) {
-    
-    const real xc = 0.5*(xn(i)+xn(i+1));
-    board.fillCircle( xc, 0, rc );
-  }
-
-  /*----------------+
-  |  plot boundary  |
-  +----------------*/
-  board.setPenColorRGBi(255,  0,  0);
-
-  /* domain */
-  board.drawLine( xn(0),            0 , xn(1),           0  );
-  board.drawLine( xn(nnode_b()-1),  0 , xn(nnode_b()-2), 0  );
-
-  /* nodes */
-  board.drawLine( xn(0),           -hw, xn(0),           hw );
-  board.drawLine( xn(nnode_b()-1), -hw, xn(nnode_b()-1), hw );
-
-  /* cells */
-  board.fillCircle( 0.5*(xn(0)          +xn(1)          ), 0, rc );
-  board.fillCircle( 0.5*(xn(nnode_b()-1)+xn(nnode_b()-2)), 0, rc );
-
-  board.saveEPS( name );
-}

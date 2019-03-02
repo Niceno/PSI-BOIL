@@ -1,5 +1,6 @@
 noinst_LIBRARIES = libGlobal.a
 libGlobal_a_SOURCES = global_approx.h         \
+                      global_buffer_width.h   \
                       global_checking.h       \
                       global_constants.h      \
                       global_endl.h           \
@@ -13,6 +14,7 @@ libGlobal_a_SOURCES = global_approx.h         \
                       global_split_string.h   \
                       global_swap.h           \
                       global_approx.cpp       \
+                      global_buffer_width.cpp \
                       global_constants.cpp    \
                       global_endl.cpp         \
                       global_factor.cpp       \

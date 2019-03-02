@@ -29,6 +29,13 @@ void ScalarInt::exchange(const int dir) const {
   rbuff_s = new int [n*n];
   rbuff_e = new int [n*n];
 
+  /*-------------------------------+
+  |                                |
+  |  browse through buffer layers  |
+  |                                |
+  +-------------------------------*/
+  for(int b=boil::BW-1; b>=0; b--) {
+
   /*----------------+
   |  I - direction  |
   +----------------*/
@@ -43,8 +50,8 @@ void ScalarInt::exchange(const int dir) const {
         int v_min = bc().value(ib_min);
         int v_max = bc().value(ib_max);
         for_jk(j,k) {
-          val[e_x+1][j][k] = val[s_x + o_x][j][k] + v_max;
-          val[s_x-1][j][k] = val[e_x - o_x][j][k] + v_min;
+          val[e_x + 1 + b][j][k] = val[s_x + o_x + b][j][k] + v_max;
+          val[s_x - 1 - b][j][k] = val[e_x - o_x - b][j][k] + v_min;
         }
       }
     } 
@@ -54,10 +61,10 @@ void ScalarInt::exchange(const int dir) const {
       for_jk(j,k) {
         int l = k*nj()+j;
         assert(l < n*n);
-        sbuff_e[l] = val[e_x - o_x][j][k];   // buffer i end
-        sbuff_s[l] = val[s_x + o_x][j][k];   // buffer i start
-        rbuff_e[l] = val[e_x +  1 ][j][k];
-        rbuff_s[l] = val[s_x -  1 ][j][k];
+        sbuff_e[l] = val[e_x - o_x - b][j][k];   // buffer i end
+        sbuff_s[l] = val[s_x + o_x + b][j][k];   // buffer i start
+        rbuff_e[l] = val[e_x +  1  + b][j][k];
+        rbuff_s[l] = val[s_x -  1  - b][j][k];
       }
         /* send last and receive first */
         boil::cart.sendrecv(&sbuff_e[0], &rbuff_s[0], nj()*nk(),
@@ -72,8 +79,8 @@ void ScalarInt::exchange(const int dir) const {
       for_jk(j,k) {
         int l = k*nj()+j;
         assert(l < n*n);
-        rbuff_e[l] = val[e_x +  1 ][j][k];
-        rbuff_s[l] = val[s_x -  1 ][j][k];
+        rbuff_e[l] = val[e_x +  1 + b][j][k];
+        rbuff_s[l] = val[s_x -  1 - b][j][k];
       }
 
       if( dom->neighbour(Dir::imin()) != par_proc_null ) {
@@ -88,8 +95,8 @@ void ScalarInt::exchange(const int dir) const {
       for_jk(j,k) {
         int l = k*nj()+j;
         assert(l < n*n);
-        sbuff_e[l] = val[e_x - o_x][j][k];   // buffer i end
-        sbuff_s[l] = val[s_x + o_x][j][k];   // buffer i start
+        sbuff_e[l] = val[e_x - o_x - b][j][k];   // buffer i end
+        sbuff_s[l] = val[s_x + o_x + b][j][k];   // buffer i start
       }
 
       if( dom->neighbour(Dir::imax()) != par_proc_null ) {
@@ -123,12 +130,12 @@ void ScalarInt::exchange(const int dir) const {
       for_jk(j,k) {
         int l = k*nj()+j;
         assert(l < n*n);
-        val[e_x+1][j][k] = rbuff_e[l] + v_max;   // buffer i end
-        val[s_x-1][j][k] = rbuff_s[l] + v_min;   // buffer i start
+        val[e_x + 1 + b][j][k] = rbuff_e[l] + v_max;   // buffer i end
+        val[s_x - 1 - b][j][k] = rbuff_s[l] + v_min;   // buffer i start
       }
     }
   }
-  
+
   /*----------------+
   |  J - direction  |
   +----------------*/
@@ -143,8 +150,8 @@ void ScalarInt::exchange(const int dir) const {
         int v_min = bc().value(jb_min);
         int v_max = bc().value(jb_max);
         for_ik(i,k) {
-          val[i][e_y+1][k] = val[i][s_y + o_y][k] + v_max;
-          val[i][s_y-1][k] = val[i][e_y - o_y][k] + v_min;
+          val[i][e_y + 1 + b][k] = val[i][s_y + o_y + b][k] + v_max;
+          val[i][s_y - 1 - b][k] = val[i][e_y - o_y - b][k] + v_min;
         }
       }
     } 
@@ -154,10 +161,10 @@ void ScalarInt::exchange(const int dir) const {
       for_ik(i,k) {
         int l = k*ni()+i;
         assert(l < n*n);
-        sbuff_e[l] = val[i][e_y - o_y][k];   // buffer j end
-        sbuff_s[l] = val[i][s_y + o_y][k];   // buffer j start
-        rbuff_e[l] = val[i][e_y +  1 ][k];
-        rbuff_s[l] = val[i][s_y -  1 ][k];
+        sbuff_e[l] = val[i][e_y - o_y - b][k];   // buffer j end
+        sbuff_s[l] = val[i][s_y + o_y + b][k];   // buffer j start
+        rbuff_e[l] = val[i][e_y +  1  + b][k];
+        rbuff_s[l] = val[i][s_y -  1  - b][k];
       }
         /* send last and receive first */
         boil::cart.sendrecv(&sbuff_e[0], &rbuff_s[0], ni()*nk(),
@@ -172,8 +179,8 @@ void ScalarInt::exchange(const int dir) const {
       for_ik(i,k) {
         int l = k*ni()+i;
         assert(l < n*n);
-        rbuff_e[l] = val[i][e_y +  1 ][k];
-        rbuff_s[l] = val[i][s_y -  1 ][k];
+        rbuff_e[l] = val[i][e_y +  1 + b][k];
+        rbuff_s[l] = val[i][s_y -  1 - b][k];
       }
 
       if( dom->neighbour(Dir::jmin()) != par_proc_null ) {
@@ -188,8 +195,8 @@ void ScalarInt::exchange(const int dir) const {
       for_ik(i,k) {
         int l = k*ni()+i;
         assert(l < n*n);
-        sbuff_e[l] = val[i][e_y - o_y][k];   // buffer j end
-        sbuff_s[l] = val[i][s_y + o_y][k];   // buffer j start
+        sbuff_e[l] = val[i][e_y - o_y - b][k];   // buffer j end
+        sbuff_s[l] = val[i][s_y + o_y + b][k];   // buffer j start
       }
   
       if( dom->neighbour(Dir::jmax()) != par_proc_null ) {
@@ -223,8 +230,8 @@ void ScalarInt::exchange(const int dir) const {
       for_ik(i,k) {
         int l = k*ni()+i;
         assert(l < n*n);
-        val[i][e_y+1][k] = rbuff_e[l] + v_max;   // buffer j end
-        val[i][s_y-1][k] = rbuff_s[l] + v_min;   // buffer j start
+        val[i][e_y + 1 + b][k] = rbuff_e[l] + v_max;   // buffer j end
+        val[i][s_y - 1 - b][k] = rbuff_s[l] + v_min;   // buffer j start
       }
     }
   }
@@ -243,8 +250,8 @@ void ScalarInt::exchange(const int dir) const {
         int v_min = bc().value(kb_min);
         int v_max = bc().value(kb_max);
         for_ij(i,j) {
-          val[i][j][e_z+1] = val[i][j][s_z + o_z] + v_max;
-          val[i][j][s_z-1] = val[i][j][e_z - o_z] + v_min;
+          val[i][j][e_z + 1 + b] = val[i][j][s_z + o_z + b] + v_max;
+          val[i][j][s_z - 1 - b] = val[i][j][e_z - o_z - b] + v_min;
         }
       }
     } 
@@ -254,10 +261,10 @@ void ScalarInt::exchange(const int dir) const {
       for_ij(i,j) {
         int l = j*ni()+i;
         assert(l < n*n);
-        sbuff_e[l] = val[i][j][e_z - o_z];   // buffer k end
-        sbuff_s[l] = val[i][j][s_z + o_z];   // buffer k start
-        rbuff_e[l] = val[i][j][e_z +  1 ];
-        rbuff_s[l] = val[i][j][s_z -  1 ];
+        sbuff_e[l] = val[i][j][e_z - o_z - b];   // buffer k end
+        sbuff_s[l] = val[i][j][s_z + o_z + b];   // buffer k start
+        rbuff_e[l] = val[i][j][e_z +  1  + b];
+        rbuff_s[l] = val[i][j][s_z -  1  - b];
       }
         /* send last and receive first */
         boil::cart.sendrecv(&sbuff_e[0], &rbuff_s[0], ni()*nj(),
@@ -272,8 +279,8 @@ void ScalarInt::exchange(const int dir) const {
       for_ij(i,j) {
         int l = j*ni()+i;
         assert(l < n*n);
-        rbuff_e[l] = val[i][j][e_z +  1 ];
-        rbuff_s[l] = val[i][j][s_z -  1 ];
+        rbuff_e[l] = val[i][j][e_z +  1 + b];
+        rbuff_s[l] = val[i][j][s_z -  1 - b];
       }
 
       if( dom->neighbour(Dir::kmin()) != par_proc_null ) {
@@ -288,8 +295,8 @@ void ScalarInt::exchange(const int dir) const {
       for_ij(i,j) {
         int l = j*ni()+i;
         assert(l < n*n);
-        sbuff_e[l] = val[i][j][e_z - o_z];   // buffer k end
-        sbuff_s[l] = val[i][j][s_z + o_z];   // buffer k start
+        sbuff_e[l] = val[i][j][e_z - o_z - b];   // buffer k end
+        sbuff_s[l] = val[i][j][s_z + o_z + b];   // buffer k start
       }
 
       if( dom->neighbour(Dir::kmax()) != par_proc_null ) {
@@ -323,12 +330,13 @@ void ScalarInt::exchange(const int dir) const {
       for_ij(i,j) {
         int l = j*ni()+i;
         assert(l < n*n);
-        val[i][j][e_z+1] = rbuff_e[l] + v_max;   // buffer k end
-        val[i][j][s_z-1] = rbuff_s[l] + v_min;   // buffer k start
+        val[i][j][e_z + 1 + b] = rbuff_e[l] + v_max;   // buffer k end
+        val[i][j][s_z - 1 - b] = rbuff_s[l] + v_min;   // buffer k start
       }
     }
   }
-  
+  }
+
   delete [] sbuff_s;
   delete [] sbuff_e;
   delete [] rbuff_s;

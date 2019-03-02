@@ -36,6 +36,13 @@ void ScalarInt::exchange(const int * ical, const int dir) const {
 
   int irank = boil::cart.iam();
 
+  /*-------------------------------+
+  |                                |
+  |  browse through buffer layers  |
+  |                                |
+  +-------------------------------*/
+  for(int b=boil::BW-1; b>=0; b--) {
+
   /*----------------+
   |  I - direction  |
   +----------------*/
@@ -46,8 +53,8 @@ void ScalarInt::exchange(const int * ical, const int dir) const {
       if( bc().type(Dir::imin(), BndType::periodic()) && 
           bc().type(Dir::imax(), BndType::periodic()) )
         for_jk(j,k) {
-          val[e_x+1][j][k] = val[s_x + o_x][j][k];
-          val[s_x-1][j][k] = val[e_x - o_x][j][k];
+          val[e_x + 1 + b][j][k] = val[s_x + o_x + b][j][k];
+          val[s_x - 1 - b][j][k] = val[e_x - o_x - b][j][k];
         }
     } 
     /* decomposed */
@@ -55,10 +62,10 @@ void ScalarInt::exchange(const int * ical, const int dir) const {
 #ifdef SENDRECV
       for_jk(j,k) {
         int l = k*nj()+j;
-        sbuff_e[l] = val[e_x - o_x][j][k];   // buffer i end
-        sbuff_s[l] = val[s_x + o_x][j][k];   // buffer i start
-        rbuff_e[l] = val[e_x +  1 ][j][k];
-        rbuff_s[l] = val[s_x -  1 ][j][k];
+        sbuff_e[l] = val[e_x - o_x - b][j][k];   // buffer i end
+        sbuff_s[l] = val[s_x + o_x + b][j][k];   // buffer i start
+        rbuff_e[l] = val[e_x +  1  + b][j][k];
+        rbuff_s[l] = val[s_x -  1  - b][j][k];
       }
         /* send last and receive first */
         boil::cart.sendrecv(&sbuff_e[0], &rbuff_s[0], nj()*nk(),
@@ -71,8 +78,8 @@ void ScalarInt::exchange(const int * ical, const int dir) const {
 #else
       for_jk(j,k) {
         int l = k*nj()+j;
-        rbuff_e[l] = val[e_x +  1 ][j][k];
-        rbuff_s[l] = val[s_x -  1 ][j][k];
+        rbuff_e[l] = val[e_x +  1 + b][j][k];
+        rbuff_s[l] = val[s_x -  1 - b][j][k];
       }
 
       if( dom->neighbour(Dir::imin()) != par_proc_null ) {
@@ -90,8 +97,8 @@ void ScalarInt::exchange(const int * ical, const int dir) const {
 
       for_jk(j,k) {
         int l = k*nj()+j;
-        sbuff_e[l] = val[e_x - o_x][j][k];   // buffer i end
-        sbuff_s[l] = val[s_x + o_x][j][k];   // buffer i start
+        sbuff_e[l] = val[e_x - o_x - b][j][k];   // buffer i end
+        sbuff_s[l] = val[s_x + o_x + b][j][k];   // buffer i start
       }
 
       if( dom->neighbour(Dir::imax()) != par_proc_null ) {
@@ -130,12 +137,12 @@ void ScalarInt::exchange(const int * ical, const int dir) const {
 #endif
       for_jk(j,k) {
         int l = k*nj()+j;
-        val[e_x+1][j][k] = rbuff_e[l];   // buffer i end
-        val[s_x-1][j][k] = rbuff_s[l];   // buffer i start
+        val[e_x + 1 + b][j][k] = rbuff_e[l];   // buffer i end
+        val[s_x - 1 - b][j][k] = rbuff_s[l];   // buffer i start
       }
     }
   }
-  
+
   /*----------------+
   |  J - direction  |
   +----------------*/
@@ -146,8 +153,8 @@ void ScalarInt::exchange(const int * ical, const int dir) const {
       if( bc().type(Dir::jmin(), BndType::periodic()) && 
           bc().type(Dir::jmax(), BndType::periodic()) )
         for_ik(i,k) {
-          val[i][e_y+1][k] = val[i][s_y + o_y][k];
-          val[i][s_y-1][k] = val[i][e_y - o_y][k];
+          val[i][e_y + 1 + b][k] = val[i][s_y + o_y + b][k];
+          val[i][s_y - 1 - b][k] = val[i][e_y - o_y - b][k];
         }
     } 
     /* decomposed */
@@ -155,10 +162,10 @@ void ScalarInt::exchange(const int * ical, const int dir) const {
 #ifdef SENDRECV
       for_ik(i,k) {
         int l = k*ni()+i;
-        sbuff_e[l] = val[i][e_y - o_y][k];   // buffer j end
-        sbuff_s[l] = val[i][s_y + o_y][k];   // buffer j start
-        rbuff_e[l] = val[i][e_y +  1 ][k];
-        rbuff_s[l] = val[i][s_y -  1 ][k];
+        sbuff_e[l] = val[i][e_y - o_y - b][k];   // buffer j end
+        sbuff_s[l] = val[i][s_y + o_y + b][k];   // buffer j start
+        rbuff_e[l] = val[i][e_y +  1  + b][k];
+        rbuff_s[l] = val[i][s_y -  1  - b][k];
       }
         /* send last and receive first */
         boil::cart.sendrecv(&sbuff_e[0], &rbuff_s[0], ni()*nk(),
@@ -172,8 +179,8 @@ void ScalarInt::exchange(const int * ical, const int dir) const {
 #else
       for_ik(i,k) {
         int l = k*ni()+i;
-        rbuff_e[l] = val[i][e_y +  1 ][k];
-        rbuff_s[l] = val[i][s_y -  1 ][k];
+        rbuff_e[l] = val[i][e_y +  1 + b][k];
+        rbuff_s[l] = val[i][s_y -  1 - b][k];
       }
 
       if( dom->neighbour(Dir::jmin()) != par_proc_null ) {
@@ -189,10 +196,10 @@ void ScalarInt::exchange(const int * ical, const int dir) const {
 
       for_ik(i,k) {
         int l = k*ni()+i;
-        sbuff_e[l] = val[i][e_y - o_y][k];   // buffer j end
-        sbuff_s[l] = val[i][s_y + o_y][k];   // buffer j start
+        sbuff_e[l] = val[i][e_y - o_y - b][k];   // buffer j end
+        sbuff_s[l] = val[i][s_y + o_y + b][k];   // buffer j start
       }
-  
+
       if( dom->neighbour(Dir::jmax()) != par_proc_null ) {
         if( ical[irank] !=0 ){
           boil::cart.isend( &sbuff_e[0], ni()*nk(), par_int, 
@@ -219,12 +226,12 @@ void ScalarInt::exchange(const int * ical, const int dir) const {
 #endif
       for_ik(i,k) {
         int l = k*ni()+i;
-        val[i][e_y+1][k] = rbuff_e[l];   // buffer j end
-        val[i][s_y-1][k] = rbuff_s[l];   // buffer j start
+        val[i][e_y + 1 + b][k] = rbuff_e[l];   // buffer j end
+        val[i][s_y - 1 - b][k] = rbuff_s[l];   // buffer j start
       }
     }
   }
-  
+
   /*----------------+
   |  K - direction  |
   +----------------*/
@@ -235,8 +242,8 @@ void ScalarInt::exchange(const int * ical, const int dir) const {
       if( bc().type(Dir::kmin(), BndType::periodic()) && 
           bc().type(Dir::kmax(), BndType::periodic()) )
         for_ij(i,j) {
-          val[i][j][e_z+1] = val[i][j][s_z + o_z];
-          val[i][j][s_z-1] = val[i][j][e_z - o_z];
+          val[i][j][e_z + 1 + b] = val[i][j][s_z + o_z + b];
+          val[i][j][s_z - 1 - b] = val[i][j][e_z - o_z - b];
         }
     } 
     /* decomposed */
@@ -244,11 +251,11 @@ void ScalarInt::exchange(const int * ical, const int dir) const {
 #ifdef SENDRECV
       for_ij(i,j) {
         int l = j*ni()+i;
-        sbuff_e[l] = val[i][j][e_z - o_z];   // buffer k end
-        sbuff_s[l] = val[i][j][s_z + o_z];   // buffer k start
-        rbuff_e[l] = val[i][j][e_z +  1 ];
-        rbuff_s[l] = val[i][j][s_z -  1 ];
-      
+        sbuff_e[l] = val[i][j][e_z - o_z - b];   // buffer k end
+        sbuff_s[l] = val[i][j][s_z + o_z + b];   // buffer k start
+        rbuff_e[l] = val[i][j][e_z +  1  + b];
+        rbuff_s[l] = val[i][j][s_z -  1  - b];
+
         /* send last and receive first */
         boil::cart.sendrecv(&sbuff_e[0], &rbuff_s[0], ni()*nj(),
                             par_int, dom->neighbour(Dir::kmax()),
@@ -261,8 +268,8 @@ void ScalarInt::exchange(const int * ical, const int dir) const {
 #else
       for_ij(i,j) {
         int l = j*ni()+i;
-        rbuff_e[l] = val[i][j][e_z +  1 ];
-        rbuff_s[l] = val[i][j][s_z -  1 ];
+        rbuff_e[l] = val[i][j][e_z +  1 + b];
+        rbuff_s[l] = val[i][j][s_z -  1 - b];
       }
 
       if( dom->neighbour(Dir::kmin()) != par_proc_null ) {
@@ -278,8 +285,8 @@ void ScalarInt::exchange(const int * ical, const int dir) const {
 
       for_ij(i,j) {
         int l = j*ni()+i;
-        sbuff_e[l] = val[i][j][e_z - o_z];   // buffer k end
-        sbuff_s[l] = val[i][j][s_z + o_z];   // buffer k start
+        sbuff_e[l] = val[i][j][e_z - o_z - b];   // buffer k end
+        sbuff_s[l] = val[i][j][s_z + o_z + b];   // buffer k start
       }
 
       if( dom->neighbour(Dir::kmax()) != par_proc_null ) {
@@ -308,12 +315,13 @@ void ScalarInt::exchange(const int * ical, const int dir) const {
 #endif
       for_ij(i,j) {
         int l = j*ni()+i;
-        val[i][j][e_z+1] = rbuff_e[l];   // buffer k end
-        val[i][j][s_z-1] = rbuff_s[l];   // buffer k start
+        val[i][j][e_z + 1 + b] = rbuff_e[l];   // buffer k end
+        val[i][j][s_z - 1 - b] = rbuff_s[l];   // buffer k start
       }
     }
   }
-  
+  }
+
   delete [] sbuff_s;
   delete [] sbuff_e;
   delete [] rbuff_s;
