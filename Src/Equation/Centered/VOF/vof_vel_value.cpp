@@ -9,7 +9,7 @@ real VOF::vel_value(const Comp m, const int i, const int j, const int k) {
 *******************************************************************************/
    real uval = (*u)[m][i][j][k];
 
-#if 0
+#if 1
    if(mixture) {
      /* simplified approach */
      int ii(i), jj(j), kk(k);
@@ -73,6 +73,13 @@ real VOF::vel_value(const Comp m, const int i, const int j, const int k) {
          real coef = (rhol/rhov-1.0);
          uval += vel_correct(ii,jj,kk,dirx,diry,dirz,coef,mflxm);
          //boil::aout<<"M: "<<m<<" "<<ii<<" "<<jj<<" "<<kk<<" "<<mflxm<<" "<<bdphi<<" "<<phi[i][j][k]<<" "<<vel_correct(ii,jj,kk,dirx,diry,dirz,coef,mflxm)<<boil::endl;
+       }
+     } else if(pcplu) {
+       //if(bdphi<phisurf) {
+       if(phi[ii][jj][kk]<phisurf) {
+         real coef = (rhol/rhov-1.0);
+         uval += vel_correct(i ,j ,k ,dirx,diry,dirz,coef,mflxp);
+         //boil::aout<<"P: "<<m<<" "<<i<<" "<<j<<" "<<k<<" "<<mflxp<<" "<<bdphi<<" "<<phi[ii][jj][kk]<<" "<<vel_correct(i,j,k,dirx,diry,dirz,coef,mflxp)<<boil::endl;
        }
      }
   #endif
