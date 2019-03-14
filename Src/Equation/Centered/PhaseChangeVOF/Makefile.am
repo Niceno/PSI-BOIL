@@ -3,7 +3,6 @@ libPhaseChangeVOF_a_SOURCES = phasechangevof.h                  \
                               phasechangevof.cpp                \
                               phasechangevof_cal_gradt.cpp      \
                               phasechangevof_cal_massflux.cpp   \
-                              phasechangevof_cal_norm_vect.cpp  \
                               phasechangevof_ext_gradt.cpp      \
                               phasechangevof_grad_2nd.cpp       \
                               phasechangevof_gradt.cpp          \

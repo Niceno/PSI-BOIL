@@ -33,23 +33,17 @@ PhaseChangeVOF::PhaseChangeVOF(const Scalar & MDOT,
   clrs(&CLRS),
   M(&MFLX),
 #if 0
-  mx(&NX),
-  my(&NY),
-  mz(&NZ),
+  nx(&NX),
+  ny(&NY),
+  nz(&NZ),
   fs(&FS),
   adens(&ADENS),
-  nx(*NX.domain()),
-  ny(*NY.domain()),
-  nz(*NZ.domain()),
 #else
-  mx(&(vof.nx)),
-  my(&(vof.ny)),
-  mz(&(vof.nz)),
+  nx(&(vof.mx)),
+  ny(&(vof.my)),
+  nz(&(vof.mz)),
   fs(&(vof.fs)),
   adens(&(vof.adens)),
-  nx(*(vof.nx).domain()),
-  ny(*(vof.ny).domain()),
-  nz(*(vof.nz).domain()),
 #endif
   bndtpr ( *U   .domain() ),
   txv    ( *MDOT.domain()),
@@ -74,15 +68,6 @@ PhaseChangeVOF::PhaseChangeVOF(const Scalar & MDOT,
   stmp2   = MDOT.shape();
   delta   = MDOT.shape();
   iflag   = MDOT.shape();
-#if 0
-  nx  = NX.shape();
-  ny  = NY.shape();
-  nz  = NZ.shape();
-#else
-  nx  = (vof.nx).shape();
-  ny  = (vof.ny).shape();
-  nz  = (vof.nz).shape();
-#endif
   for_m(m) bndtpr(m) = U(m).shape(); /* a mistake? */
 
   /* set arguments */

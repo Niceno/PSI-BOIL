@@ -74,7 +74,6 @@ class PhaseChangeVOF : public Centered {
     void mdot_cut();
 #endif
     void mdot();
-    void cal_norm_vect();
     void cal_gradt(const Scalar * diff_eddy = NULL);
     void gradt(const Scalar * diff_eddy = NULL);
     void gradt_ib(const Scalar * diff_eddy = NULL);
@@ -127,7 +126,6 @@ class PhaseChangeVOF : public Centered {
     Scalar txl, tyl, tzl;
     Scalar tpr, tprs, clr, clrs;
     Scalar adens;
-    Scalar mx, my, mz;
     Scalar nx, ny, nz;
     Scalar stmp,stmp2,delta;
     Vector fs;

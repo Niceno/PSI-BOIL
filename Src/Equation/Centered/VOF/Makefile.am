@@ -33,6 +33,8 @@ libVof_a_SOURCES =      vof.h                 \
                         vof_norm_cc.cpp \
                         vof_set_iflag.cpp \
                         vof_vel_value.cpp \
+                        vof_true_norm_vect.cpp \
+                        vof_liq_vel.cpp \
                         vof_update_at_walls.cpp
                 
 INCLUDE = -I@top_srcdir@/

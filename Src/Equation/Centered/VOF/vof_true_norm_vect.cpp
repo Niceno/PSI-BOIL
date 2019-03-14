@@ -1,17 +1,17 @@
-#include "phasechangevof.h"
+#include "vof.h"
 
 /******************************************************************************/
-void PhaseChangeVOF::cal_norm_vect() {
+void VOF::true_norm_vect() {
 /***************************************************************************//**
 *  \brief Calculate normal vector at cell center.
-*         Results: nx, ny, nz
+*         Results: mx, my, mz -- true normal vector 
 *******************************************************************************/
 
   /* cell centered base, second order */
   for_aijk(i,j,k) {
-    real mmx = mx[i][j][k];
-    real mmy = my[i][j][k];
-    real mmz = mz[i][j][k];
+    real mmx = nx[i][j][k];
+    real mmy = ny[i][j][k];
+    real mmz = nz[i][j][k];
 
 #if 1
     real dnx = phi.dxc(i);
@@ -50,17 +50,17 @@ void PhaseChangeVOF::cal_norm_vect() {
     real nnz = mmz;
 #endif
 
-    nx[i][j][k] = nnx;
-    ny[i][j][k] = nny;
-    nz[i][j][k] = nnz;
+    mx[i][j][k] = nnx;
+    my[i][j][k] = nny;
+    mz[i][j][k] = nnz;
   }
 
-  //boil::plot->plot(nx,ny,nz, "nx-ny-nz", time->current_step());
+  //boil::plot->plot(mx,my,mz, "mx-my-mz", time->current_step());
   //exit(0);
 
-  nx.exchange_all();
-  ny.exchange_all();
-  nz.exchange_all();
+  mx.exchange_all();
+  my.exchange_all();
+  mz.exchange_all();
 
   return;
 }

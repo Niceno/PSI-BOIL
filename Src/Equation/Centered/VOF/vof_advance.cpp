@@ -3,6 +3,9 @@
 /******************************************************************************/
 void VOF::advance() {
 
+  /* calculate liquid velocity */
+  //cal_liq_vel();
+
   /*------------------------------+
   |  source term for phase change |
   +------------------------------*/
@@ -91,6 +94,9 @@ void VOF::advance() {
 
   /* calculate area */
   cal_adens();
+
+  /* calculate the real-space normal vector */
+  true_norm_vect(); 
 
   /* calculate phi in staggered cells */
   if(bndclr)

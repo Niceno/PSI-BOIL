@@ -20,6 +20,14 @@ VOF::VOF(const Scalar & PHI,
   nx( *PHI.domain() ),
   ny( *PHI.domain() ),
   nz( *PHI.domain() ),
+  mx( *PHI.domain() ),
+  my( *PHI.domain() ),
+  mz( *PHI.domain() ),
+  unliq( *PHI.domain() ),
+  utliq( *PHI.domain() ),
+  utx( *PHI.domain() ),
+  uty( *PHI.domain() ),
+  utz( *PHI.domain() ),
   nalpha( *PHI.domain() ),
   nmag( *PHI.domain() ),
   stmp( *PHI.domain() ),
@@ -42,6 +50,14 @@ VOF::VOF(const Scalar & PHI,
   nx        = phi.shape();
   ny        = phi.shape();
   nz        = phi.shape();
+  mx        = phi.shape();
+  my        = phi.shape();
+  mz        = phi.shape();
+  unliq     = phi.shape();
+  utliq     = phi.shape();
+  utx     = phi.shape();
+  uty     = phi.shape();
+  utz     = phi.shape();
   nmag      = phi.shape();
   nalpha    = phi.shape();
   stmp      = phi.shape();

@@ -47,10 +47,13 @@ class VOF : public Centered {
       return;
     }
 
+    Scalar unliq; /* normal component of liquid velocity */
+    Scalar utliq, utx, uty, utz; /* tangential component of liquid velocity */
     Vector fs;
     Vector * bndclr;
     Scalar nalpha;
     Scalar nx,ny,nz,nmag;/* normal to interface */
+    Scalar mx,my,mz;/* normal to interface, in real space */
     Scalar adens; /* area density */
   protected:
     void advance_x();
@@ -61,10 +64,12 @@ class VOF : public Centered {
     void ext_fs();
     //void cal_fs2();
     void cal_fs3();
+    void cal_liq_vel();
     void fs_bnd();
     void update_at_walls();
     void curv_HF();
     void extract_alpha();
+    void true_norm_vect();
     void insert_bc(const Scalar & g);
     void gradphi(const Scalar & g);
     void gradphic(const Scalar & g);

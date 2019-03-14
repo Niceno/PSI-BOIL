@@ -36,6 +36,9 @@ void VOF::curvature() {
   /* calculate area */
   cal_adens();
 
+  /* calculate the real-space normal vector */
+  true_norm_vect(); 
+
   /* calculate phi in staggered cells */
   if(bndclr)
     cal_bndclr();
