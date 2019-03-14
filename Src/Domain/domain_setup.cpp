@@ -20,12 +20,12 @@ void Domain::setup(const Decompose & dec) {
   per[1] = grid_y_original->periodic1();
   per[2] = grid_z_original->periodic1();
 
-  const real lx = grid_x_original->xn( grid_x_original->nnode() ) -
-                  grid_x_original->xn( 1 );
-  const real ly = grid_y_original->xn( grid_y_original->nnode() ) -
-                  grid_y_original->xn( 1 );
-  const real lz = grid_z_original->xn( grid_z_original->nnode() ) -
-                  grid_z_original->xn( 1 );
+  const real lx = grid_x_original->xn( boil::BW + grid_x_original->ncell() ) -
+                  grid_x_original->xn( boil::BW );
+  const real ly = grid_y_original->xn( boil::BW + grid_y_original->ncell() ) -
+                  grid_y_original->xn( boil::BW );
+  const real lz = grid_z_original->xn( boil::BW + grid_z_original->ncell() ) -
+                  grid_z_original->xn( boil::BW );
 
 
   /* initializes date for domain decomposition */

@@ -12,9 +12,10 @@ Centered::Centered(const Centered * fn, const Domain * d,
                fnew(*d), buff(*d), res(*d), 
                fnr(fn), crsr(NULL)
 { 
-  boil::oout << "Centered level " << ni()-2 << 
-                            " x " << nj()-2 << 
-                            " x " << nk()-2 << " created !" << boil::endl;
+  boil::oout << "Centered level "        <<
+                         ni()-2*boil::BW <<
+                " x " << nj()-2*boil::BW <<
+                " x " << nk()-2*boil::BW << " created !" << boil::endl;
 
   if(dom->coarser() != NULL)
     crsr = new Centered( this, this->dom->coarser(), phi.bc(), solver ); 
