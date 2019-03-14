@@ -18,6 +18,6 @@ stamp-h1
 Src/Parallel/mpi_macros.h
 **/*.o
 **/Boil
-**/main.cpp*
+Src/main.cpp*
 **/.deps/
 **/*.a
