@@ -10,7 +10,6 @@
 #include "../Ravioli/range.h"
 #include "../Parallel/Out/out.h"
 #include "../Parallel/Out/print.h"
-#include "../Board/board.h"
 
 #include "step.h"
 
@@ -52,10 +51,13 @@ class Grid1D {
     const Periodic periodic1() const {return period1;}
     const Periodic periodicN() const {return periodN;}
 
-    int ncell()   const {return N;}
-    int nnode()   const {return N+1;}
-    int ncell_b() const {return N+2;}
-    int nnode_b() const {return N+3;}
+    /* number of cells and nodes */
+    int ncell()   const {return nc_in;}
+    int nnode()   const {return nc_in + 1;}
+
+    /* number of cells and nodes including boundaries (or buffers) */
+    int ncell_b() const {return nc_in + 2 * boil::BW;}
+    int nnode_b() const {return nc_in + 2 * boil::BW + 1;}
 
     real xn (const int i) const {return  x_node[i];}
     real xc (const int i) const {return  x_cell[i];}
@@ -63,10 +65,9 @@ class Grid1D {
     real dxc(const int i) const {return dx_cell[i];}
     
     void print() const;
-    void plot(const char *) const;
 
-    real x_min() const {return x_node[1];}
-    real x_max() const {return x_node[N+1];}
+    real x_min() const {return x_node[        boil::BW];}
+    real x_max() const {return x_node[nc_in + boil::BW];}
 
     bool contains(real x) const {
       if( x >= x_min() && x <= x_max() ) return true;
@@ -74,7 +75,7 @@ class Grid1D {
     }
 
   private:
-    int    N;       /* number of cells inside!!! */
+    int     nc_in;       /* number of cells inside!!! */
     real *  x_node;
     real *  x_cell;
     real * dx_node;
@@ -83,8 +84,7 @@ class Grid1D {
     const    Grid1D * coarsen() const;
     void     allocate();
     void     distribute_nodes_inside(const real & x1, const real & xn,
-                                     const real & D1, const real & DN,
-                                     const int  & gx);
+                                     const real & D1, const real & DN);
     void     correct_boundaries();
 };
 

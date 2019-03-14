@@ -32,4 +32,3 @@ Site::Site (const real x, const real y, const real z,
 
 Site::~Site () {
 }
-

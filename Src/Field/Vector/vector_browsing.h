@@ -34,17 +34,18 @@
 
 #if 1
 
-/* w = v which does not skip walls */
-#define for_wmi(m,i) for(int i=1; i<ni(m)-1; i++)
-#define for_wmj(m,j) for(int j=1; j<nj(m)-1; j++)
-#define for_wmk(m,k) for(int k=1; k<nk(m)-1; k++)
+/* w = v which does not skip walls, hopefully correct */
+#define for_wmi(m,i) for(int i=boil::BW; i<ni(m)-boil::BW; i++)
+#define for_wmj(m,j) for(int j=boil::BW; j<nj(m)-boil::BW; j++)
+#define for_wmk(m,k) for(int k=boil::BW; k<nk(m)-boil::BW; k++)
 
 /* wv */
-#define for_wvmi(v,m,i) for(int i=1; i<v.ni(m)-1; i++)
-#define for_wvmj(v,m,j) for(int j=1; j<v.nj(m)-1; j++)
-#define for_wvmk(v,m,k) for(int k=1; k<v.nk(m)-1; k++)
+#define for_wvmi(v,m,i) for(int i=boil::BW; i<v.ni(m)-boil::BW; i++)
+#define for_wvmj(v,m,j) for(int j=boil::BW; j<v.nj(m)-boil::BW; j++)
+#define for_wvmk(v,m,k) for(int k=boil::BW; k<v.nk(m)-boil::BW; k++)
 
 #endif
+
 
 //----
 // 2D
@@ -69,6 +70,7 @@
 #define for_avmjk(v,m,j,k) for_avmj(v,m,j) for_avmk(v,m,k)
 
 #if 1
+
 /* w */
 #define for_wmij(m,i,j) for_wmi(m,i) for_wmj(m,j)
 #define for_wmik(m,i,k) for_wmi(m,i) for_wmk(m,k)
@@ -80,6 +82,7 @@
 #define for_wvmjk(v,m,j,k) for_wvmj(v,m,j) for_wvmk(v,m,k)
 
 #endif
+
 
 //----
 // 3D  
@@ -96,6 +99,7 @@
 #define for_avmijk(v,m,i,j,k) for_avmi(v,m,i) for_avmj(v,m,j) for_avmk(v,m,k)
 
 #if 1
+
 /* w */
 #define for_wmijk(m,i,j,k) for_wmi(m,i) for_wmj(m,j) for_wmk(m,k)
 
@@ -103,4 +107,6 @@
 #define for_wvmijk(v,m,i,j,k) for_wvmi(v,m,i) for_wvmj(v,m,j) for_wvmk(v,m,k)
 
 #endif
+
+
 #endif

@@ -24,7 +24,6 @@
 #include "../Timer/timer.h"
 #include "../Solver/Krylov/krylov.h"
 #include "../Matter/matter.h"
-#include "../Plot/GMV/plot_gmv.h"
 #include "../Plot/TEC/plot_tec.h"
 #include "../Plot/VTK/plot_vtk.h"
 #include "../Monitor/Rack/rack.h"

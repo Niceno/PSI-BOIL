@@ -3,52 +3,50 @@ bin_PROGRAMS = Boil
 Boil_SOURCES = main.cpp    \
                Ravioli/*.h
 
-SUBDIRS = Equation/Staggered/Momentum     \
-          Equation/Staggered              \
-          Solver                          \
-          Equation/Centered/Enthalpy      \
-          Equation/Centered/EnthalpyFD    \
-          Equation/Centered/EnthalpyTif   \
-          Equation/Centered/Concentration \
-          Equation/Centered/Pressure      \
-          Equation/Centered/PhaseChange   \
-          Equation/Centered/PhaseChangeVOF\
-          Equation/Centered/CIPCSL2       \
-          Equation/Centered/VOF           \
-          Equation/Centered/Distance      \
-          Equation/Centered               \
-          Equation/Dispersed              \
-          Equation/Floodfill              \
-          Equation/Heaviside              \
-          Equation/Tifmodel               \
-          Monitor/Rack                    \
-          Monitor/Location                \
-          Matter                          \
-          LookUpTable                     \
-          Grid                            \
-          Plot                            \
-          Plot/GMV                        \
-          Plot/TEC                        \
-          Plot/VTK                        \
-          Domain                          \
-          Board                           \
-          Body                            \
-          Model                           \
-          Field/Vector                    \
-          Field/Scalar                    \
-          Field/ScalarBool                \
-          Field/VectorBool                \
-          Field/ScalarInt                 \
-          Timer                           \
-          Formula                         \
-          Profile                         \
-          RandomFlow                      \
-          Global                          \
-          Boundary                        \
-          Ravioli                         \
-          SimulationTime                  \
-          Parallel/Out                    \
-          Parallel                        \
+SUBDIRS = Equation/Staggered/Momentum      \
+          Equation/Staggered               \
+          Solver                           \
+          Equation/Centered/Enthalpy       \
+          Equation/Centered/EnthalpyFD     \
+          Equation/Centered/EnthalpyTif    \
+          Equation/Centered/Concentration  \
+          Equation/Centered/Pressure       \
+          Equation/Centered/PhaseChange    \
+          Equation/Centered/PhaseChangeVOF \
+          Equation/Centered/CIPCSL2        \
+          Equation/Centered/VOF            \
+          Equation/Centered/Distance       \
+          Equation/Centered                \
+          Equation/Dispersed               \
+          Equation/Floodfill               \
+          Equation/Heaviside               \
+          Equation/Tifmodel                \
+          Monitor/Rack                     \
+          Monitor/Location                 \
+          Matter                           \
+          LookUpTable                      \
+          Grid                             \
+          Plot                             \
+          Plot/TEC                         \
+          Plot/VTK                         \
+          Domain                           \
+          Body                             \
+          Model                            \
+          Field/Vector                     \
+          Field/Scalar                     \
+          Field/ScalarBool                 \
+          Field/VectorBool                 \
+          Field/ScalarInt                  \
+          Timer                            \
+          Formula                          \
+          Profile                          \
+          RandomFlow                       \
+          Global                           \
+          Boundary                         \
+          Ravioli                          \
+          SimulationTime                   \
+          Parallel/Out                     \
+          Parallel                         \
           Template
 
 LDADD = Equation/Staggered/Momentum/libMomentum.a            \
@@ -75,11 +73,9 @@ LDADD = Equation/Staggered/Momentum/libMomentum.a            \
         LookUpTable/libLookUpTable.a                         \
         Grid/libGrid.a                                       \
         Plot/libPlot.a                                       \
-        Plot/GMV/libPlotGMV.a                                \
         Plot/TEC/libPlotTEC.a                                \
         Plot/VTK/libPlotVTK.a                                \
         Domain/libDomain.a                                   \
-        Board/libBoard.a                                     \
         Body/libBody.a                                       \
         Model/libModel.a                                     \
         Field/Vector/libVector.a                             \

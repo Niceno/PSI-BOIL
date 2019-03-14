@@ -16,7 +16,6 @@ VOF::VOF(const Scalar & PHI,
   jelly( *PHI.domain() ),
   Centered( PHI.domain(), PHI, F , & U, T, &jelly, NULL, S ),
   kappa( &K ),
-  clr( *PHI.domain() ),
   nx( *PHI.domain() ),
   ny( *PHI.domain() ),
   nz( *PHI.domain() ),
@@ -31,7 +30,8 @@ VOF::VOF(const Scalar & PHI,
   nalpha( *PHI.domain() ),
   nmag( *PHI.domain() ),
   stmp( *PHI.domain() ),
-  stmp2(*PHI.domain() ),
+  stmp2( *PHI.domain() ),
+  stmp3( *PHI.domain() ),
   fs( *U.domain() ),
   fsx( *PHI.domain() ),
   fsy( *PHI.domain() ),
@@ -46,7 +46,6 @@ VOF::VOF(const Scalar & PHI,
 |  this constructor is called only at the finest level  |
 +------------------------------------------------------*/
 { 
-  clr       = phi.shape();
   nx        = phi.shape();
   ny        = phi.shape();
   nz        = phi.shape();
@@ -61,6 +60,8 @@ VOF::VOF(const Scalar & PHI,
   nmag      = phi.shape();
   nalpha    = phi.shape();
   stmp      = phi.shape();
+  stmp2     = phi.shape();
+  stmp3     = phi.shape();
   fsx       = phi.shape();
   fsy       = phi.shape();
   fsz       = phi.shape();
@@ -101,6 +102,15 @@ VOF::VOF(const Scalar & PHI,
   n_ext_fs=5;
 
   //alloc3d(& iflag, phi.ni(), phi.nj(), phi.nk());
+
+#if 0
+  f_w=0.0;
+  f_e=0.0;
+  f_t=0.0;
+  f_b=0.0;
+  f_n=0.0;
+  f_s=0.0;
+#endif
 
   discretize();
 

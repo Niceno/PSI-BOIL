@@ -12,7 +12,7 @@ const Domain * Domain::coarsen() const {
 //return NULL;
 
   /* minimum resulution (with buffers) */
-  const int min_n =  6; //  4,  6, 10, 18, 34, 66
+  const int min_n =  4 + 2*boil::BW;
 
   /* coarsening factors */
   int c_fac_x = 2; 
@@ -31,9 +31,9 @@ const Domain * Domain::coarsen() const {
 
   /* estimate factors (only first one is important) */
   int c_factors[64], nf;
-  factor( ni()-2, c_factors, &nf); if(nf>0) c_fac_x = c_factors[0];
-  factor( nj()-2, c_factors, &nf); if(nf>0) c_fac_y = c_factors[0];
-  factor( nk()-2, c_factors, &nf); if(nf>0) c_fac_z = c_factors[0];
+  factor( ni()-2*boil::BW, c_factors, &nf); if(nf>0) c_fac_x = c_factors[0];
+  factor( nj()-2*boil::BW, c_factors, &nf); if(nf>0) c_fac_y = c_factors[0];
+  factor( nk()-2*boil::BW, c_factors, &nf); if(nf>0) c_fac_z = c_factors[0];
 
   const Grid1D * g_x_coarse = grid_x_local;
   const Grid1D * g_y_coarse = grid_y_local;
@@ -42,9 +42,18 @@ const Domain * Domain::coarsen() const {
   int ijk_crble[] = { 1, 1, 1 }; // coarsenable
 
   /* only domain */
-  if(((ni()-2)%c_fac_x!=0) || (ni()<=min_n) || ni()-2==c_fac_x) ijk_crble[0]=0;
-  if(((nj()-2)%c_fac_y!=0) || (nj()<=min_n) || nj()-2==c_fac_y) ijk_crble[1]=0;
-  if(((nk()-2)%c_fac_z!=0) || (nk()<=min_n) || nk()-2==c_fac_z) ijk_crble[2]=0;
+  if(    ((ni() - 2*boil::BW) % c_fac_x!=0)
+      ||  (ni() <= min_n) 
+      ||   ni() - 2*boil::BW == c_fac_x
+    ) ijk_crble[0] = 0;
+  if(    ((nj() - 2*boil::BW) % c_fac_y!=0) 
+      ||  (nj() <= min_n) 
+      ||   nj() - 2*boil::BW == c_fac_y
+    ) ijk_crble[1] = 0;
+  if(   ((nk() - 2*boil::BW) % c_fac_z!=0) 
+      || (nk() <= min_n) 
+      ||  nk() - 2*boil::BW == c_fac_z
+    ) ijk_crble[2] = 0;
 
   /* gather information over other domains */
   boil::cart.sum_int_n(ijk_crble, 3);

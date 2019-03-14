@@ -79,6 +79,11 @@ void VOF::advance() {
   #endif
 #endif
   }
+
+#if 0  
+  vf_limiter();
+#endif
+
   phi.bnd_update();
   phi.exchange_all();
 

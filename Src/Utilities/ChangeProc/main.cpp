@@ -18,43 +18,62 @@ main(int argc, char * argv[]) {
   cout<<"# Cange number of processors.\n";
 
   int nic, njc, nkc, ts, np, np_new;
-#if 1
-  cout<<"# Enter nicell, njcell, nkcell.\n";
-  cin>>nic>>njc>>nkc;
-  cout<<"# nicell= "<<nic<<" njcell= "<<njc<<" nkcell= "<<nkc<<"\n";
 
-  cout<<"# Enter time step.\n";
-  cin>>ts;
-  cout<<"# time step= "<<ts<<"\n";
+  //cout<<"# Enter nicell, njcell, nkcell.\n";
+  //cin>>nic>>njc>>nkc;
+  //cout<<"# nicell= "<<nic<<" njcell= "<<njc<<" nkcell= "<<nkc<<"\n";
+  nic = 128;
+  njc = 4;
+  nkc = 128;
 
-  cout<<"# Enter current np (No. processors).\n";
-  cin>>np;
-  cout<<"# np= "<<np<<"\n";
+  //cout<<"# Enter time step.\n";
+  //cin>>ts;
+  //cout<<"# time step= "<<ts<<"\n";
 
-  cout<<"# Enter new np (No. processors).\n";
-  cin>>np_new;
-  cout<<"# np_new= "<<np_new<<"\n";
-#else
-  nic=160; njc=160; nkc=124; ts=672000; np=128; np_new=16;
-#endif
+  //cout<<"# Enter current np (No. processors).\n";
+  //cin>>np;
+  //cout<<"# np= "<<np<<"\n";
+  np = 64;
 
+  //cout<<"# Enter new np (No. processors).\n";
+  //cin>>np_new;
+  //cout<<"# np_new= "<<np_new<<"\n";
+  np_new = 1;
 
-  while (true) {
+  cout<<"# Enter file name. (Example: press)\n";
+  cout<<"# In case of CIPCSL2, type object name (without -f, -sigx, etc.)\n";
+  string ss;
+  cin>>ss;
+  const char *nm = ss.c_str();
+
+  /* file type */
+  int itype;
+  cout<<"# Enter file type.  0:Scalar, 1:Vector, 2:CIPCSL2, 3:Nucleation\n";
+  cin>>itype;
+  cout<<"# file type = "<<itype<<"\n";
+
+  int ts_s, ts_e, ts_i;
+  cout<<"# Enter start, end & interval of time step.\n";
+  cin>>ts_s>>ts_e>>ts_i;
+  cout<<"# time step= "<<ts_s<<" "<<ts_e<<" "<<ts_i<<"\n";
+
+  //while (true) {
+  for (int ts = ts_s; ts <= ts_e; ts +=ts_i) {
 
     /* file name */
-    cout<<"# Enter file name. (Example: press)\n";
-    cout<<"# In case of CIPCSL2, type object name (without -f, -sigx, etc.)\n";
-    string ss;
-    cin>>ss;
-    const char *nm = ss.c_str();
+    //cout<<"# Enter file name. (Example: press)\n";
+    //cout<<"# In case of CIPCSL2, type object name (without -f, -sigx, etc.)\n";
+    //string ss;
+    //cin>>ss;
+    //const char *nm = ss.c_str();
     //string nmstr="nucl";
     //const char *nm=nmstr.c_str();
 
     /* file type */
-    int itype;
-    cout<<"# Enter file type.  0:Scalar, 1:Vector, 2:CIPCSL2, 3:Nucleation\n";
-    cin>>itype;
-    cout<<"# file type = "<<itype<<"\n";
+    //int itype;
+    //cout<<"# Enter file type.  0:Scalar, 1:Vector, 2:CIPCSL2, 3:Nucleation\n";
+    //cin>>itype;
+    //cout<<"# file type = "<<itype<<"\n";
 
     string str_tmp;
 
@@ -95,10 +114,10 @@ main(int argc, char * argv[]) {
         nucleation ( nm, nic, njc, nkc, ts, np, np_new );
     }
 
-    int ians;
-    cout<<"# continue? 1(yes) or 0(no).\n";
-    cin>>ians;
-    if (ians!=1) break;
+    //int ians;
+    //cout<<"# continue? 1(yes) or 0(no).\n";
+    //cin>>ians;
+    //if (ians!=1) break;
   }
 
   exit(0);
@@ -196,6 +215,9 @@ void scalar( const char *nm, const int nic, const int njc, const int nkc
       int imax=0; 
       int jmax=0; 
       int kmax=0; 
+      //for(int i=0; i<ni_dec; i++)
+      //  for(int j=0; j<nj_dec; j++)
+      //    for(int k=0; k<nk_dec; k++) {
       int istl=1; int jstl=1; int kstl=1;
       if (i_block==1) istl=0;
       if (j_block==1) jstl=0;
@@ -721,3 +743,6 @@ void decomp(int * dis, const int np_new
     assert(done);
   }
 }
+/*-----------------------------------------------------------------------------+
+ '$Id: main.cpp,v 1.3 2015/03/13 14:12:27 sato Exp $'/
++-----------------------------------------------------------------------------*/

@@ -44,4 +44,3 @@ Nucleation::Nucleation ( Scalar * c, Scalar *tp, Scalar *qs,
 /******************************************************************************/
 Nucleation::~Nucleation() {
 }
-

@@ -20,7 +20,7 @@ void VOF::tension(Vector * vec, const Matter matt) {
   |  1st step: curvature calculation  |
   +----------------------------------*/
   curv_HF();
-  //curvature();
+//curvature();
 
   /*-----------------------+
   |  2nd step: body force  |
@@ -48,7 +48,7 @@ void VOF::tension(Vector * vec, const Matter matt) {
               * vec->dV(m,i,j,k);
       }
     }
-    Comp::w();
+    m = Comp::w();
     for_vmijk((*vec),m,i,j,k) {
       if(dom->ibody().on(m,i,j,k)) {
         (*vec)[m][i][j][k] += matt.sigma(m,i,j,k)
@@ -93,6 +93,28 @@ void VOF::tension(Vector * vec, const Matter matt) {
     }
   }
   vec->exchange();
+
+#if 0
+  for_aijk(i,j,k) {
+    stmp2[i][j][k]=real(iflag[i][j][k]);
+  }
+  for_aijk(i,j,k) {
+    stmp3[i][j][k]=real(iflagx[i][j][k]);
+  }
+
+  if(time->current_step() == 1) {
+      boil::plot->plot(vec,phi,stmp2,stmp3, "vec-phi-iflag-iflagx", time->current_step());
+  }
+
+  if(time->current_step() % 2000 == 0) {
+      boil::plot->plot(vec,phi,stmp2,stmp3, "vec-phi-iflag-iflagx", time->current_step());
+  }
+
+
+  if(time->current_step() == 10266) {
+      boil::plot->plot(vec,phi,stmp2,stmp3, "vec-phi-iflag-iflagx", time->current_step());
+  }
+#endif
 
   boil::timer.stop("vof tension");
 }

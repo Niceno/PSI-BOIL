@@ -176,4 +176,3 @@ void PhaseChange::micro_shift() {
 
   return;
 }
-

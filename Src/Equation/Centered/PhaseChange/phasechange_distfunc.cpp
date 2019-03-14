@@ -244,4 +244,3 @@ void PhaseChange::distfunc(const Scalar & sca, const int itnum) {
 
   return;
 }
-

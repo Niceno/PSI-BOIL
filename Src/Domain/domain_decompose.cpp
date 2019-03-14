@@ -3,16 +3,15 @@
 #include "../Plot/plot.h"
 
 /******************************************************************************/
-void Domain::decompose(const int i, const int g, 
-                       Range<int> * cr) const {
+void Domain::decompose(const int i, const int g, Range<int> * cr) const {
 
   /* array which will store number of cells in this direction */
   /* it can be used later to find the offset numbers for each direction */
   int * n_dir = new int [ dims[i] ];
   
   /* number of global cells inside (without halo/border cells) */
-  const int g_in = g-2;
-  
+  const int g_in = g-2*boil::BW; 
+
   /* minimum number of cells in each processor */
   const int n_min = g_in / dims[i];
   

@@ -42,4 +42,3 @@ void Nucleation::save(std::ofstream & out) {
   }
 
 }
-

@@ -1,6 +1,5 @@
 #include "cipcsl2.h"
 #include <cmath>
-using namespace std;
 
 /******************************************************************************/
 void CIPCSL2::CIPCSLx2(const Scalar & f, const Vector & sx) {
@@ -28,12 +27,25 @@ void CIPCSL2::CIPCSLx2(const Scalar & f, const Vector & sx) {
     }}}
   }
 #endif
+ /* EXTENDED BUFFERS HINT:
+    Lines 14-16 could probably be replaced with this:
+  for(int i=u->si(m)-1; i<=u->ei(m)+1; i++) {
+  for(int j=u->sj(m)-1; j<=u->ej(m)+1; j++) {
+  for(int k=u->sk(m);   k<=u->ek(m)+1; k++) {
+ */
+
 
   /* Reset delrho */
   for(int i=0; i<=ni(); i++)
   for(int j=0; j<=nj(); j++)
   for(int k=0; k<=nk(); k++)
     delrho[i][j][k]=0.0;
+ /* EXTENDED BUFFERS HINT:
+    Lines 27-29 could probably be replaced with this:
+  for_aijk(i,j,k)
+    delrho[i][j][k]=0.0;
+ */
+
 
   /* CIPCSL 1D */
   const real dt= time->dt();

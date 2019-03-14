@@ -25,7 +25,7 @@ class VOF : public Centered {
 
     void new_time_step(){};
     void advance();
-    void curvature();
+    void ancillary(); /* calcs ancillary params such as adens w/o advance */
     void tension(Vector * vec, const Matter matt);
     void totalvol();
     void front_minmax();
@@ -60,20 +60,18 @@ class VOF : public Centered {
     void advance_y();
     void advance_z();
     void bdcurv(const Scalar & g, const real & v);
-    void cal_fs();
-    void ext_fs();
-    //void cal_fs2();
     void cal_fs3();
     void cal_liq_vel();
     void fs_bnd();
     void update_at_walls();
     void curv_HF();
+    void curv_HF_ext();
     void extract_alpha();
     void true_norm_vect();
     void insert_bc(const Scalar & g);
     void gradphi(const Scalar & g);
-    void gradphic(const Scalar & g);
-    void insert_bc_gradphic(const Scalar & g);
+    //void gradphic(const Scalar & g);
+    //void insert_bc_gradphic(const Scalar & g);
     void insert_bc_norm_cc(const Scalar & g);
     void insert_bc_norm();
     void norm_cc(const Scalar & g);
@@ -85,6 +83,7 @@ class VOF : public Centered {
                    const real r7, const real r8, const real r9,
                    const int i1,  const int i2,  const int i3);
     void set_iflag();
+    void smooth();
     void insert_bc_flag(ScalarInt & g, const bool b);
 
     real extrapolate_v(const int i, const int j, const int k,
@@ -109,14 +108,14 @@ class VOF : public Centered {
     void norm_cc_jmax(const Scalar &g, const int i,const int j, const int k);
     void norm_cc_kmin(const Scalar &g, const int i,const int j, const int k);
     void norm_cc_kmax(const Scalar &g, const int i,const int j, const int k);
+    void vf_limiter(); 
 
     real alpha_val(const int i, const int j, const int k);
     real fs_val(const Comp m, const int i, const int j, const int k);
     real frontPosition(const int i, const int j, const int k, const Comp m);
 
-    Scalar clr;     /* color function */
     Scalar kappa;        /* curvature */
-    Scalar stmp,stmp2;
+    Scalar stmp,stmp2,stmp3;
     Scalar fsx,fsy,fsz;
     ScalarInt iflag,iflagx,iflagy,iflagz;
 
@@ -132,6 +131,9 @@ class VOF : public Centered {
     real dxmin,ww;
     real epsnorm;
     real phisurf;
+#if 0
+    real f_w, f_e, f_t, f_b, f_n, f_s;
+#endif
 
     int nlayer, n_ext_fs;
     //int *** iflag;

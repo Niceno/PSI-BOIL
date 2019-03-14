@@ -559,4 +559,3 @@ void PhaseChange::micro(Vector * vec, const Scalar * diff_eddy) {
   str_dSprev();
 
 }
-

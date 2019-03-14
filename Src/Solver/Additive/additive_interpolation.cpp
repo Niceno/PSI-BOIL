@@ -30,32 +30,35 @@ void AC::interpolation(const Centered & H, Centered & h) const {
 |                                                                  |
 +-----------------------------------------------------------------*/
 
-  const int CI( (h.ni()-2) / (H.ni()-2) );
-  const int CJ( (h.nj()-2) / (H.nj()-2) );
-  const int CK( (h.nk()-2) / (H.nk()-2) );
+  const int CI( (h.ei()-h.si()+1) / (H.ei()-H.si()+1) );
+  const int CJ( (h.ej()-h.sj()+1) / (H.ej()-H.sj()+1) );
+  const int CK( (h.ek()-h.sk()+1) / (H.ek()-H.sk()+1) );
 
-  int ih_[CI+2], jh_[CJ+2], kh_[CK+2];
+  int ih[CI+2], jh[CJ+2], kh[CK+2];
 
-  for(int iH=1; iH < H.ni()-1; iH++) {
+  for(int iH=H.si(); iH<=H.ei(); iH++) {
+
+    /* create indexes */
+    ih[CI] = iH*CI - (H.si() - 1) * (CI - 1);
+    for(int i=1; i<=CI; i++) ih[CI-i] = ih[CI]-i;
+
+    for(int jH=H.sj(); jH<=H.ej(); jH++) {
+
+    /* create indexes */
+     jh[CJ] = jH*CJ - (H.sj() - 1) * (CJ - 1);
+     for(int j=1; j<=CJ; j++) jh[CJ-j] = jh[CJ]-j;
+
+     for(int kH=H.sk(); kH<=H.ek(); kH++) {
+
         /* create indexes */
-        ih_[CI]   = iH * CI;
-        for(int i=1; i<=CI; i++) ih_[CI-i] = ih_[CI]-i;
-
-    for(int jH=1; jH < H.nj()-1; jH++) {
-          /* create indexes */
-          jh_[CJ]   = jH * CJ;
-          for(int j=1; j<=CJ; j++) jh_[CJ-j] = jh_[CJ]-j;
-
-      for(int kH=1; kH < H.nk()-1; kH++) {
-            /* create indexes */
-            kh_[CK]   = kH * CK;
-            for(int k=1; k<=CK; k++) kh_[CK-k] = kh_[CK]-k;
+        kh[CK] = kH*CK - (H.sk() - 1) * (CK - 1);
+        for(int k=1; k<=CK; k++) kh[CK-k] = kh[CK]-k;
 
         for(int i=1; i<=CI; i++)
           for(int j=1; j<=CJ; j++)
             for(int k=1; k<=CK; k++)
-              h.phi[ih_[i]][jh_[j]][kh_[k]] += H.phi[iH][jH][kH];
-      }  
-    }  
-  }	  
+            h.phi[ih[i]][jh[j]][kh[k]] += H.phi[iH][jH][kH];
+      }
+    }
+  }
 }
