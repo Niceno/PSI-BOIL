@@ -7,7 +7,7 @@ void VOF::cal_adens() {
 *         Results: adens
 *******************************************************************************/
 
-  boil::timer.start("vof adens");
+  //boil::timer.start("vof adens");
 
   /* cell centered */
   for_vijk(adens,i,j,k) {
@@ -28,7 +28,7 @@ void VOF::cal_adens() {
   boil::oout<<"VOF::adens "<<count<<" "<<sum<<boil::endl;
 #endif
 
-  boil::timer.stop("vof adens");
+  //boil::timer.stop("vof adens");
 
   return;
 }

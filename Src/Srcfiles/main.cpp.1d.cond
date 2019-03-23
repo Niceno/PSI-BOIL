@@ -69,7 +69,7 @@ main(int argc, char * argv[]) {
   /*--------------------------------+
   |  choose the output file format  |
   +--------------------------------*/
-  boil::plot = new PlotVTK();
+  boil::plot = new PlotTEC();
 
   /*----------+
   |  grid(s)  |
@@ -306,7 +306,8 @@ main(int argc, char * argv[]) {
   conc.set_itsharpen(32);
 #else
   VOF conc  (c,  g, kappa, uvw, time, solver, &bndclr, &mixed);
-  conc.curvature();
+  //conc.set_tol(0.5);
+  conc.ancillary();
 #endif
   conc.front_minmax();
   conc.totalvol();
@@ -330,6 +331,7 @@ main(int argc, char * argv[]) {
   TIF tsat(Tsat);
   #else
   TIF tsat(Tsat, latent, resist, &mixed, conc.adens, mflx, &pcc); 
+  tsat.set_weak_limiting(Tsat,Tout);
   #endif
   EnthalpyTIF enthFD(tpr, q, c, uvw, time, solver, &mixed, tsat, 
                      NULL, &(conc.fs), &(conc.adens));
@@ -604,7 +606,7 @@ main(int argc, char * argv[]) {
 #endif
 
 #ifdef USE_VOF
-    conc.curvature();
+    conc.ancillary();
 #endif
     conc.front_minmax();
     boil::oout<<"x-min-front= "<<time.current_time()<<" "

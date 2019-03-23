@@ -4,7 +4,7 @@
 /*  unwanted volume fraction to the neighbour cells with volume fraction      */
 /*  between  zero and one.                                                    */
 /******************************************************************************/
-#if 0
+#if 1
 void VOF::vf_limiter(){
 
   int count=0;
@@ -259,7 +259,7 @@ void VOF::vf_limiter(){
 //This only works for 2D. 
 
 
-#if 1
+#if 0
 void VOF::vf_limiter(){
 
   int count=0;

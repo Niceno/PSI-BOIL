@@ -1,6 +1,7 @@
 #include "vof.h"
 #include <iostream>
 
+#if 0
 typedef struct {
   real x,y,z;
 } XYZ;
@@ -26,12 +27,13 @@ typedef struct {
    XYZ p[8];
    real val[8];
 } GRIDCELL;
+#endif
 
 /*
    Linearly interpolate the position where an isosurface cuts
    an edge between two vertices, each with their own scalar value
 */
-XYZ VertexInterpVOF(real isolevel, XYZ p1, XYZ p2, real valp1, real valp2)
+VOF::XYZ VOF::VertexInterpVOF(real isolevel, XYZ p1, XYZ p2, real valp1, real valp2)
 {
    real mu;
    XYZ p;
@@ -60,7 +62,7 @@ XYZ VertexInterpVOF(real isolevel, XYZ p1, XYZ p2, real valp1, real valp2)
 	0 will be returned if the grid cell is either totally above
    of totally below the isolevel.
 */
-real PolygoniseVOF(GRIDCELL grid, real isolevel)
+real VOF::PolygoniseVOF(GRIDCELL grid, real isolevel)
 {
    TRIANGLE triangles[5];
    int i,ntriang;

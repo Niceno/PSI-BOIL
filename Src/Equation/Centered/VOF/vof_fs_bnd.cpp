@@ -12,8 +12,9 @@ void VOF::fs_bnd() {
   /* tolerance is necessary because of errors */
   /* e.g. 1.0 approx 0.999 */
   real tolf = 0.0e-2;
-  /* tol is defined in header */
-  //real tol = 0.5e-2; /* consistent tol with update_at_walls: ie for clr */
+  /* tol_wall is defined in header */
+  //real tol_wall = 0.5e-2; 
+  /* consistent tol_wall with update_at_walls: ie for clr */
 
   for( int b=0; b<phi.bc().count(); b++ ) {
 
@@ -94,7 +95,7 @@ void VOF::fs_bnd() {
          
           /* erroneous interfaces */
           real phiphi = phi[ii][jj][kk];
-          bool errint = (phiphi<tol||phiphi-1.0>-tol);
+          bool errint = (phiphi<tol_wall||phiphi-1.0>-tol_wall);
 
           /* interface exists in the dir we are interested in */
           if(((flagm && of)||(flagp && !of))&&!errint) { 
@@ -122,7 +123,7 @@ void VOF::fs_bnd() {
          
     /* erroneous interfaces */
     real phiphi = phi[i][j][k];
-    bool errint = (phiphi<tol||phiphi-1.0>-tol);
+    bool errint = (phiphi<tol_wall||phiphi-1.0>-tol_wall);
     if(errint)
       continue;
 

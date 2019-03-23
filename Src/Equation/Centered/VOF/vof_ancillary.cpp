@@ -6,15 +6,20 @@ void VOF::ancillary() {
 *  \brief Calculate ancillary vof parameters.
 *******************************************************************************/
 
+#if 1
   /*--------------------------+
   |  flagging interface cells  |
   +--------------------------*/
-  set_iflag();
+  set_iflag();  /* done in curv_HF */
 
   /*-------------------------------+
   |  normal vector at cell center  |
   +-------------------------------*/
   norm_cc(phi);
+#else
+  curv_HF();
+#endif
+  boil::timer.start("vof ancillary");
 
   /* calculate alpha in cells */
   extract_alpha();
@@ -25,15 +30,18 @@ void VOF::ancillary() {
   /* prerequisite for marching cubes */
   update_at_walls();
 
-  /* calculate area */
-  cal_adens();
-
   /* calculate the real-space normal vector */
   true_norm_vect(); 
+
+  /* calculate area */
+  cal_adens();
+  cal_adens_geom(adens);
 
   /* calculate phi in staggered cells */
   if(bndclr)
     cal_bndclr();
+
+  boil::timer.stop("vof ancillary");
 
   return;
 }

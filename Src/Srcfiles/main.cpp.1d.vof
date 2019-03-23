@@ -10,7 +10,7 @@
 //#define MIRRORED /* mirror the geometry */
 #define ADIABATIC /* no thermal conductivity in vapor */
 
-const int level=8;
+const int level=2;
 real thickness = 5e-7;
 
 const int NX = 50*level;
@@ -69,7 +69,7 @@ main(int argc, char * argv[]) {
   /*--------------------------------+
   |  choose the output file format  |
   +--------------------------------*/
-  boil::plot = new PlotVTK();
+  boil::plot = new PlotTEC();
 
   /*----------+
   |  grid(s)  |
@@ -306,8 +306,9 @@ main(int argc, char * argv[]) {
   conc.set_itsharpen(32);
 #else
   VOF conc  (c,  g, kappa, uvw, time, solver, &bndclr, &mixed);
-  conc.set_tol(0.5);
-  conc.curvature();
+ //conc.set_tol(0.5);
+  conc.ancillary();
+
 #endif
   conc.front_minmax();
   conc.totalvol();
@@ -595,6 +596,7 @@ main(int argc, char * argv[]) {
 #endif
     if(time.current_step()<5 || time.current_step()>1500*level) conc.advance();
     //if(time.current_step()<5) conc.advance();
+    //conc.advance();
 #if 1 
     for_avi(c,i) {
       for_avjk(c,j,k) {
@@ -606,7 +608,7 @@ main(int argc, char * argv[]) {
 #endif
 
 #ifdef USE_VOF
-    conc.curvature();
+    conc.ancillary();
 #endif
     conc.front_minmax();
     boil::oout<<"x-min-front= "<<time.current_time()<<" "

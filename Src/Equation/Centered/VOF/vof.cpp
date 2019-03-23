@@ -27,6 +27,7 @@ VOF::VOF(const Scalar & PHI,
   utx( *PHI.domain() ),
   uty( *PHI.domain() ),
   utz( *PHI.domain() ),
+  uliq ( *U   .domain() ),
   nalpha( *PHI.domain() ),
   nmag( *PHI.domain() ),
   stmp( *PHI.domain() ),
@@ -40,7 +41,8 @@ VOF::VOF(const Scalar & PHI,
   iflagx(*PHI.domain() ),
   iflagy(*PHI.domain() ),
   iflagz(*PHI.domain() ),
-  adens(*PHI.domain() )
+  adens(*PHI.domain() ),
+  adensgeom(*PHI.domain() )
 
 /*------------------------------------------------------+
 |  this constructor is called only at the finest level  |
@@ -54,6 +56,7 @@ VOF::VOF(const Scalar & PHI,
   mz        = phi.shape();
   unliq     = phi.shape();
   utliq     = phi.shape();
+  for_m(m) uliq(m) = U(m).shape();
   utx     = phi.shape();
   uty     = phi.shape();
   utz     = phi.shape();
@@ -80,6 +83,7 @@ VOF::VOF(const Scalar & PHI,
   }
 
   adens = phi.shape();
+  adensgeom = phi.shape();
   for_m(m) {
     fs(m) = (*u)(m).shape();
   }
@@ -89,13 +93,17 @@ VOF::VOF(const Scalar & PHI,
   assert(PHI.domain() == F.domain());
 
   pi = acos(-1.0);
-  dxmin=std::min(phi.dxc(1),std::min(phi.dyc(1),phi.dzc(1)));
+  //dxmin=std::min(phi.dxc(3),std::min(phi.dyc(3),phi.dzc(3)));
+  dxmin = dom->dxyz_min();
   boil::cart.min_real(&dxmin);
   ww=1.0*dxmin;
 
   epsnorm=1.0e-12;
   phisurf=0.5;
-  tol = 0.01; /* tolerance 0.99 \approx 1.0 near walls */
+  tol_wall = 0.01; /* tolerance 0.99 \approx 1.0 near walls */
+  tol_flux = 3e-3; /* during inner iterations */
+  flux_cfl = 0.2;  /* used in case 3 flux calculations */
+  maxiter = 10;    /* maximal number of iterations */
 
   /* set initial value */
   nlayer=4;

@@ -1,7 +1,7 @@
 #include "Include/psi-boil.h"
-#define NEU
-#define PCC
-#define BDC
+#define NEU /* use etif */
+#define PCC /* use pcvof */
+#define BDC /* use bndcolor */
 
 /* computed parameters */
 const int Level = 8;  //Level = 1,2,4
@@ -224,7 +224,7 @@ main(int argc, char * argv[]) {
   #else
   VOF conc(c,  g, kappa, uvw, time, solver);
   #endif
-  conc.curvature();
+  conc.ancillary();
 #endif
   conc.front_minmax();
   conc.totalvol();
@@ -325,7 +325,7 @@ main(int argc, char * argv[]) {
     c.exchange_all();
 #endif
    
-    conc.curvature();
+    conc.ancillary();
     conc.front_minmax();
     boil::oout<<"x-min-front= "<<time.current_time()<<" "
               <<conc.get_xminft()<<"\n";

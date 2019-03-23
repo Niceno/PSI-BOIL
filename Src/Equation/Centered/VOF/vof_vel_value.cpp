@@ -7,9 +7,10 @@ real VOF::vel_value(const Comp m, const int i, const int j, const int k) {
     fext is related to mflx as follows:
     fext = -m'''/rhol = -m''*adens/rhol 
 *******************************************************************************/
-   real uval = (*u)[m][i][j][k];
+   //real uval = (*u)[m][i][j][k];
+   real uval = uliq[m][i][j][k];
 
-#if 1
+#if 0
    if(mixture) {
      /* simplified approach */
      int ii(i), jj(j), kk(k);
@@ -41,12 +42,14 @@ real VOF::vel_value(const Comp m, const int i, const int j, const int k) {
   #if 1 /* for 1D receding film, turn this off */
      /* phase change occurs in both cells: uval assumed to be the vol. avg */
      if(pcmin&pcplu) {
+     #if 1
        real coef = (1.0-bdphi)*(rhol/rhov-1.0); 
        uval += vel_correct(ii,jj,kk,dirx,diry,dirz,coef,mflxm);
        uval += vel_correct(i ,j ,k ,dirx,diry,dirz,coef,mflxp);
 
        //boil::aout<<"M+P: "<<m<<" "<<ii<<" "<<jj<<" "<<kk<<" "<<mflxm<<" "<<bdphi<<" "<<vel_correct(ii,jj,kk,dirx,diry,dirz,coef,mflxm)<<boil::endl;
        //boil::aout<<"M+P: "<<m<<" "<<i<<" "<<j<<" "<<k<<" "<<mflxp<<" "<<bdphi<<" "<<vel_correct(i,j,k,dirx,diry,dirz,coef,mflxp)<<boil::endl;
+     #endif
      /* phase change occurs in the minus cell: uval assumed to be single phase */ 
      } else if(pcmin) {
        /* staggered cell center does not correspond to normal cell boundary */

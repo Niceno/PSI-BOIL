@@ -7,6 +7,7 @@ void VOF::extract_alpha() {
     if there is no interface in the cell, unreal=yotta (=1e+24) is stored.
     plane: vm1*x + vm2*y + vm3*z = alpha
     output: nalpha
+    EDIT: I think the alpha is valid in standardized space
 *******************************************************************************/
 
   /* avoid singular cases */
@@ -15,7 +16,7 @@ void VOF::extract_alpha() {
   }
 
   /* calculate alpha value in the domain */
-  /* assumes positive normal vector but unnormalised */
+  /* assumes positive normal vector in normalized space */
   for_avijk(nalpha,i,j,k) {
     nalpha[i][j][k] = alpha_val(i,j,k);
   }

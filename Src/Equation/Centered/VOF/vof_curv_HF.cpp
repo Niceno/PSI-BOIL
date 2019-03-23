@@ -101,7 +101,7 @@ void VOF::curv_HF() {
   norm_cc(phi);
 
   /* curvature calculation */
-  kappa=0.0;
+  kappa=boil::unreal;
 
 #if 0
   std::cout<<"kmax=nk="<<nk()<<"\n";
@@ -576,7 +576,7 @@ void VOF::curv_HF() {
           stmp[i][j+1][k+ii]   = phi[i][j+1][k+ii];
           stmp[i+1][j+1][k+ii] = phi[i+1][j+1][k+ii];
         }
-      } else if(dirMax==10){
+      } else if(dirMax==2){
         // calculate height
         real hmm, hcm, hpm, hmc, hcc, hpc, hmp, hcp, hpp;
 
@@ -729,8 +729,8 @@ void VOF::curv_HF() {
       }
     }
   }
-  curv_HF_ext();
   kappa.exchange();
+  curv_HF_ext();
 
 #if 0
   for_aijk(i,j,k) {
@@ -819,12 +819,12 @@ void VOF::curv_HF() {
   std::cout<<"kappa_flag "<<kappa_flag<<"\n"; 
 #endif  
 
-#if 0
+#if 1
   nx.exchange_all();
   ny.exchange_all();
   nz.exchange_all();
   if(time->current_step() == 1) {
-    boil::plot->plot(phi,nx,ny,nz, "clr-nx-ny-nz", time->current_step());
+    boil::plot->plot(phi,kappa,nx,ny,nz, "clr-kappa-nx-ny-nz", time->current_step());
   }
 #endif
   return;

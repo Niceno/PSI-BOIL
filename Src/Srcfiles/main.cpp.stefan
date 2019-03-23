@@ -217,7 +217,7 @@ main(int argc, char * argv[]) {
 #else 
 
   VOF conc  (c,  g, kappa, uvw, time, solver, &bndclr);
-  conc.curvature();
+  conc.ancillary();
   conc.front_minmax();
   conc.totalvol();
 #endif
@@ -248,7 +248,7 @@ main(int argc, char * argv[]) {
 
 
 #ifdef USE_VOF
-  conc.curvature();
+  conc.ancillary();
 #endif
   EnthalpyFD enthFD(tpr, q, c, uvw, time, solver, &mixed, Tsat);
   enthFD.convection_set(TimeScheme::forward_euler());
@@ -390,7 +390,7 @@ main(int argc, char * argv[]) {
         c[i][j][k] = c[i][1][1];
     c.exchange();
   #endif
-   conc.curvature();
+   conc.ancillary();
 
   #if 0
     Comp mm = Comp::i();

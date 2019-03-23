@@ -18,7 +18,7 @@ void VOF::update_at_walls() {
   /* tolerance is necessary because of errors */
   /* e.g. 1.0 approx 0.999 */
   /* now defined in the header file */
-  //real tol = 0.5e-2;
+  //real tol_wall = 0.5e-2;
 
   /*-------------+
   | single walls |
@@ -491,7 +491,7 @@ real VOF::extrapolate_v(const int i, const int j, const int k,
   real phiphi = phi[ii][jj][kk];
 
   /* erroneous interfaces */
-  if(phiphi<tol||phiphi-1.0>-tol) {
+  if(phiphi<tol_wall||phiphi-1.0>-tol_wall) {
     return real(phiphi>phisurf);
   } 
 

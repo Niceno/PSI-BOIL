@@ -110,6 +110,72 @@ void VOF::curv_HF_ext(){
 }
 #endif
 
+#if 1
+void VOF::curv_HF_ext() {
+
+  for_aijk(i,j,k) {
+    iflag[i][j][k] = 0;
+    if(boil::realistic(kappa[i][j][k]))
+      iflag[i][j][k] = 1;
+  }
+  iflag.exchange();
+
+  for(int layer=0; layer<=2; layer++) {
+    for_ijk(i,j,k) {
+      if(iflag[i][j][k]==0) {
+        real kappa_val = 0.0;
+        int sum(0);
+        if(iflag[i+1][j][k]>0 && iflag[i+1][j][k]<layer+2) {
+          kappa_val += kappa[i+1][j][k];
+          sum++;
+        } 
+        if(iflag[i-1][j][k]>0 && iflag[i-1][j][k]<layer+2) {
+          kappa_val += kappa[i-1][j][k];
+          sum++;
+        } 
+        if(iflag[i][j+1][k]>0 && iflag[i][j+1][k]<layer+2) {
+          kappa_val += kappa[i][j+1][k];
+          sum++;
+        } 
+        if(iflag[i][j-1][k]>0 && iflag[i][j-1][k]<layer+2) {
+          kappa_val += kappa[i][j-1][k];
+          sum++;
+        } 
+        if(iflag[i][j][k+1]>0 && iflag[i][j][k+1]<layer+2) {
+          kappa_val += kappa[i][j][k+1];
+          sum++;
+        } 
+        if(iflag[i][j][k-1]>0 && iflag[i][j][k-1]<layer+2) {
+          kappa_val += kappa[i][j][k-1];
+          sum++;
+        } 
+
+        if(sum>0) {
+          kappa[i][j][k] = kappa_val /= sum;
+          iflag[i][j][k] = layer + 2;
+        }
+
+      } /* is iflag 0 */
+    } /* for each cell */
+    iflag.exchange();
+    kappa.exchange();
+
+  } /* outer iteration */
+
+#if 0
+  for_aijk(i,j,k) {
+    stmp[i][j][k]=real(iflag[i][j][k]);
+  }
+  if(time->current_step() == 1) {
+    boil::plot->plot(phi,kappa,stmp, "phi-kappa-iflag", time->current_step());
+    exit(0);
+  }
+#endif  
+
+  return;
+}
+# endif
+
 #if 0
 void VOF::curv_HF_ext(){
 
@@ -117,16 +183,10 @@ void VOF::curv_HF_ext(){
   real flag=0.0;
   real kappa_sum=0.0;
 
-  for_aijk(i,j,k) {
-    stmp2[i][j][k]=iflag[i][j][k];
-    stmp3[i][j][k]=iflagx[i][j][k];
-  }
-
-
-  for_aijk(i,j,k){
+  for_ijk(i,j,k){
       iflag[i][j][k] = iflagx[i][j][k];
   }
-  iflag.exchange();
+//  iflag.exchange();
 
   for(int layer=1; layer<=3; layer++){
     for_ijk(i,j,k){
@@ -134,9 +194,9 @@ void VOF::curv_HF_ext(){
         for(int ii=-1; ii<=1; ii++){
           sum += iflag[i+ii][j][k];
         } 
-        for(int jj=-1; jj<=1; jj++){
-          sum += iflag[i][j+jj][k];
-        }
+    //    for(int jj=-1; jj<=1; jj++){
+    //      sum += iflag[i][j+jj][k];
+    //    }
         for(int kk=-1; kk<=1; kk++){
           sum += iflag[i][j][k+kk];  
         }
@@ -148,12 +208,12 @@ void VOF::curv_HF_ext(){
               flag += 1.0; 
             }
           } 
-          for(int jj=-1; jj<=1; jj++){
-            if(iflag[i][j+jj][k]==1){
-              kappa_sum += kappa[i][j+jj][k];
-              flag += 1.0;
-            }
-          } 
+      //    for(int jj=-1; jj<=1; jj++){
+      //      if(iflag[i][j+jj][k]==1){
+      //        kappa_sum += kappa[i][j+jj][k];
+      //        flag += 1.0;
+      //      }
+      //    } 
           for(int kk=-1; kk<=1; kk++){
             if(iflag[i][j][k+kk]==1){
               kappa_sum += kappa[i][j][k+kk];
@@ -168,132 +228,22 @@ void VOF::curv_HF_ext(){
         kappa_sum = 0.0; 
       } 
     }
-    for_aijk(i,j,k){
+    for_ijk(i,j,k){
       iflag[i][j][k] = iflagx[i][j][k];
     } 
   }
-  for_aijk(i,j,k) {
-    iflag[i][j][k]=stmp2[i][j][k];
-    iflagx[i][j][k]=stmp3[i][j][k];
-  }
 
-
-  iflagx.exchange();
-  iflag.exchange();
+//  iflagx.exchange();
+//  iflag.exchange();
   
   return;
 }
-# endif
 
-/* 1 to ej() 2D */
-
-#if 1
-void VOF::curv_HF_ext(){
-
-  int sum=0;
-  real flag=0.0;
-  real kappa_sum=0.0;
-
-  for_aijk(i,j,k) {
-    stmp2[i][j][k]=iflag[i][j][k];
-    stmp3[i][j][k]=iflagx[i][j][k];
-    iflag[i][j][k] = iflagx[i][j][k];
-  }
-  iflag.exchange();
-
-  if(time->current_step()==2){
-    std::cout<<"iflag[10][3][16]= "<<iflag[10][3][16]<<"\n";
-    std::cout<<"iflagx[10][3][16]= "<<iflagx[10][3][16]<<"\n";
-  }
-
-  for(int layer=1; layer<=3; layer++){
-    for(int i=2; i<=ei()-1; i++){
-      for(int j=1; j<=ej(); j++){
-        for(int k=2; k<=ek()-1; k++){ 
-          if(iflag[i][j][k]==0){
-            for(int ii=-1; ii<=1; ii++){
-              sum += iflag[i+ii][j][k];
-            } 
-            for(int kk=-1; kk<=1; kk++){
-              sum += iflag[i][j][k+kk];
-            }
-#if 1
-            if(time->current_step()==2 && i==10 && j==3 && k==17 && layer==1){
-              std::cout<<"sum= "<<sum<<"\n";
-              std::cout<<"iflag[9][3][17]= "<<iflag[9][3][17]<<"\n";
-              std::cout<<"kappa[9][3][17]= "<<kappa[9][3][17]<<"\n";
-              std::cout<<"iflag[10][3][17]= "<<iflag[10][3][17]<<"\n";
-              std::cout<<"kappa[10][3][17]= "<<kappa[10][3][17]<<"\n";
-              std::cout<<"iflag[11][3][17]= "<<iflag[11][3][17]<<"\n";
-              std::cout<<"kappa[11][3][17]= "<<kappa[11][3][17]<<"\n";
-              std::cout<<"iflag[10][3][16]= "<<iflag[10][3][16]<<"\n";
-              std::cout<<"kappa[10][3][16]= "<<kappa[10][3][16]<<"\n";
-              std::cout<<"iflag[10][3][18]= "<<iflag[10][3][18]<<"\n";
-              std::cout<<"kappa[10][3][18]= "<<kappa[10][3][18]<<"\n";
-            }
-            if(time->current_step()==2 && i==10 && j==3 && k==16 && layer==1){
-              std::cout<<"sum= "<<sum<<"\n";
-              std::cout<<"iflag[9][3][16]= "<<iflag[9][3][16]<<"\n";
-              std::cout<<"kappa[9][3][16]= "<<kappa[9][3][16]<<"\n";
-              std::cout<<"iflag[10][3][16]= "<<iflag[10][3][16]<<"\n";
-              std::cout<<"kappa[10][3][16]= "<<kappa[10][3][16]<<"\n";
-              std::cout<<"iflag[11][3][16]= "<<iflag[11][3][16]<<"\n";
-              std::cout<<"kappa[11][3][16]= "<<kappa[11][3][16]<<"\n";
-              std::cout<<"iflag[10][3][15]= "<<iflag[10][3][15]<<"\n";
-              std::cout<<"kappa[10][3][15]= "<<kappa[10][3][15]<<"\n";
-              std::cout<<"iflag[10][3][17]= "<<iflag[10][3][17]<<"\n";
-              std::cout<<"kappa[10][3][17]= "<<kappa[10][3][17]<<"\n";
-            }
 
 #endif
 
-             
-            if(sum>0){
-              for(int ii=-1; ii<=1; ii++){
-                if(iflag[i+ii][j][k]==1){
-                  kappa_sum += kappa[i+ii][j][k];
-                  flag += 1.0; 
-                }
-              } 
-              for(int kk=-1; kk<=1; kk++){
-                if(iflag[i][j][k+kk]==1){
-                  kappa_sum += kappa[i][j][k+kk];
-                  flag +=1.0;
-                }
-              }
-#if 1
-            if(time->current_step()==2 && i==10 && j==3 && k==16 && layer==1){
-              std::cout<<"kappa_sum= "<<kappa_sum<<"flag= "<<flag<<"\n";
-            }
-#endif  
-              kappa[i][j][k] = kappa_sum / flag;
-              iflagx[i][j][k] = 1;
-            }
-            sum  = 0;
-            flag = 0.0;
-            kappa_sum = 0.0; 
-          }
-        }
-      } 
-    }
-    for_aijk(i,j,k){
-      iflag[i][j][k] = iflagx[i][j][k];
-    }
-    kappa.exchange();
-    iflag.exchange(); 
-  }
-  for_aijk(i,j,k) {
-    iflag[i][j][k]=stmp2[i][j][k];
-    iflagx[i][j][k]=stmp3[i][j][k];
-  }
 
 
-  iflagx.exchange();
-  iflag.exchange();
-  
-  return;
-}
-# endif
 
 
 

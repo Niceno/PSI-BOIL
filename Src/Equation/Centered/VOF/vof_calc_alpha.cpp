@@ -1,6 +1,7 @@
 #include "vof.h"
 
-real VOF::calc_alpha(real & v, real & vma, real & vmb, real & vmc){
+real VOF::calc_alpha(const real v,
+                     const real vma, const real vmb, const real vmc) {
 
   real w, v1, v3, vm1, vm2, vm3, vm12; 
   real a0, a1, a2, q0, sp, th;
@@ -27,7 +28,9 @@ real VOF::calc_alpha(real & v, real & vma, real & vmb, real & vmc){
   std::cout<<"v3 "<< 0.5 * vm12 / vm3 <<"\n";
   #endif
 
-  if (w < v1){
+  if(w == 0.5) {
+    alpha = 0.5;
+  } else if (w < v1){
     alpha = pow(6.0 * vm1 * vm2 * vm3 * w, 1.0/3.0);
   } else if(w < v1 + (vm2-vm1) / (2.0 * vm3)){
     alpha = 0.5 * (vm1 + sqrt(pow(vm1, 2) + 8.0 * vm2 * vm3 * (w - v1)));
