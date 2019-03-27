@@ -35,8 +35,8 @@ void PhaseChangeVOF::mdot() {
 
 #if 0
   for_vijk(phi,i,j,k) {
+    if(phi[i][j][k]>17300.&&phi[i][j][k]<17400.) {
  #if 0
-    if(phi[i][j][k]<-1.0) {
     
       real qv = -( txv[i][j][k]*nx[i][j][k]
                       + tyv[i][j][k]*ny[i][j][k]
@@ -53,11 +53,10 @@ void PhaseChangeVOF::mdot() {
                            <<boil::endl;
     }
   #else
-    if(tzv[i][j][k]>1e10) {
       real tm0;
       boil::aout<<"PCV::mdot "<<i<<" "<<j<<" "<<k<<" | "<<phi[i][j][k]
-                           <<" | "<<tzv[i][j][k]
-                           <<" | "<<tpr[i][j][k-1]<<" "<<tpr[i][j][k]<<" "<<tpr[i][j][k+1]
+                           <<" | "<<txl[i][j][k]
+                           <<" | "<<tpr[i-1][j][k]<<" "<<tpr[i][j][k]<<" "<<tpr[i+1][j][k]
                            //<<" | "<<gradtz9(+1,i,j,k)<<" "<<gradtz8(+1,i,j,k)
                            //<<" | "<<bndtpr[Comp::w()][i][j][k]<<" "<<bndtpr[Comp::w()][i][j][k+1]
                            //<<" | "<<gradtz9(-1,i,j,k)<<" "<<gradtz9(+1,i,j,k)

@@ -35,7 +35,8 @@ void VOF::ancillary() {
 
   /* calculate area */
   cal_adens();
-  cal_adens_geom(adens);
+  //cal_adens_geom(adens);
+  //set_adens(adensgeom);
 
   /* calculate phi in staggered cells */
   if(bndclr)

@@ -51,8 +51,10 @@ void PhaseChangeVOF::cal_gradt(const Scalar * diff_eddy) {
       txp = gradtx(-1,i,j,k);
       if((clrc-clrsurf)<0.0){
         txv[i][j][k] = txp; 
+        txl[i][j][k] = 0.0;
       } else {
         txl[i][j][k] = txp;
+        txv[i][j][k] = 0.0;
       }
       ii=1;
     }
@@ -60,9 +62,11 @@ void PhaseChangeVOF::cal_gradt(const Scalar * diff_eddy) {
     if((clre-clrsurf)*(clrc-clrsurf)<=0.0){
       txm = gradtx(+1,i,j,k);
       if((clrc-clrsurf)<0.0){
-        txv[i][j][k]=txm;
+        txv[i][j][k] = txm;
+        txl[i][j][k] = 0.0;
       } else {
         txl[i][j][k]=txm;
+        txv[i][j][k] = 0.0;
       }
       ii+=1;
     }
@@ -70,9 +74,11 @@ void PhaseChangeVOF::cal_gradt(const Scalar * diff_eddy) {
     if((clrs-clrsurf)*(clrc-clrsurf)<=0.0){
       typ = gradty(-1,i,j,k);
       if((clrc-clrsurf)<0.0){
-        tyv[i][j][k]=typ;
+        tyv[i][j][k] = typ;
+        tyl[i][j][k] = 0.0;
       } else {
         tyl[i][j][k]=typ;
+        tyv[i][j][k] = 0.0;
       }
       jj=1;
     }
@@ -80,9 +86,11 @@ void PhaseChangeVOF::cal_gradt(const Scalar * diff_eddy) {
     if((clrn-clrsurf)*(clrc-clrsurf)<=0.0){
       tym = gradty(+1,i,j,k);
       if((clrc-clrsurf)<0.0){
-        tyv[i][j][k]=tym;
+        tyv[i][j][k] = tym;
+        tyl[i][j][k] = 0.0;
       } else {
-        tyl[i][j][k]=tym;
+        tyl[i][j][k] = tym;
+        tyv[i][j][k] = 0.0;
       }
       jj+=1;
     }
@@ -90,9 +98,11 @@ void PhaseChangeVOF::cal_gradt(const Scalar * diff_eddy) {
     if((clrb-clrsurf)*(clrc-clrsurf)<=0.0){
       tzp = gradtz(-1,i,j,k);
       if((clrc-clrsurf)<0.0){
-        tzv[i][j][k]=tzp;
+        tzv[i][j][k] = tzp;
+        tzl[i][j][k] = 0.0;
       } else {
-        tzl[i][j][k]=tzp;
+        tzl[i][j][k] = tzp;
+        tzv[i][j][k] = 0.0;
       }
       kk=1;
     }
@@ -100,9 +110,11 @@ void PhaseChangeVOF::cal_gradt(const Scalar * diff_eddy) {
     if((clrt-clrsurf)*(clrc-clrsurf)<=0.0){
       tzm = gradtz(+1,i,j,k);
       if((clrc-clrsurf)<0.0){
-        tzv[i][j][k]=tzm;
+        tzv[i][j][k] = tzm;
+        tzl[i][j][k] = 0.0;
       } else {
-        tzl[i][j][k]=tzm;
+        tzl[i][j][k] = tzm;
+        tzv[i][j][k] = 0.0;
       }
       kk+=1;
     }

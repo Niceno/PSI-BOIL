@@ -6,6 +6,7 @@
 #include "../../../Parallel/communicator.h"
 #include "../../../Solver/Gauss/gauss.h"
 #include "../../../Timer/timer.h"
+#include "../../Heaviside/heaviside.h"
 #include "nucleation.h"
 
 #define IB
@@ -108,7 +109,7 @@ class PhaseChange : public Centered {
 
     void ext_gradt(Scalar & sca, const int iext);
     void m(const Scalar * diff_eddy = NULL);
-    real marching_cube(const int i, const int j, const int k);
+    //real marching_cube(const int i, const int j, const int k);
     real iso_length(const int i, const int j, const int k, const Dir d);
     void mdot_cut();
     void micro_shift();
@@ -134,6 +135,9 @@ class PhaseChange : public Centered {
     real Tint(const int i, const int j, const int k);
     real Tint(const int dir, const Comp &mcomp, const real frac,
               const int i, const int j, const int k);
+
+    Scalar adens;
+    Heaviside heavi;
 
     Nucleation * nucl;
     int nlayer,imodcal;

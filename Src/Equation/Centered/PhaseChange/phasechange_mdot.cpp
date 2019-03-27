@@ -9,6 +9,8 @@ void PhaseChange::mdot() {
 *         tempolary: stmp
 *******************************************************************************/
 
+  heavi.calculate_adens();
+
   for_ijk(i,j,k){
     if((iflag[i][j][k] == -1) || (iflag[i][j][k] == 1)){
       if(dom->ibody().on(i,j,k)){
@@ -16,7 +18,7 @@ void PhaseChange::mdot() {
         real vol = dV(i,j,k);
 
         /* iso-surface area */
-        real area = marching_cube(i,j,k);
+        real area = adens[i][j][k];
         phi[i][j][k] = mdotc * area / vol;
         phi[i][j][k] = mdot_cut(phi[i][j][k],clr[i][j][k]);
       } else {

@@ -87,6 +87,10 @@ void CIPCSL2::advance() {
   }
 #endif
 
+  update_at_walls();
+  cal_fs();
+
+
 #ifdef DEBUG
   boil::oout<<"cipcsl2_advance:end\n";
 #endif

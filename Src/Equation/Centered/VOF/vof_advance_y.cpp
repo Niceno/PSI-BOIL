@@ -8,9 +8,10 @@ void VOF::advance_y() {
   Comp m = Comp::v();
 
   //for_vmijk((*u),m,i,j,k){
-  for(int i = si(); i <=ei(); i++)
-  for(int j = sj(); j <=ej()+1; j++)
-  for(int k = sk(); k <=ek(); k++) {
+  //for(int i = si(); i <=ei(); i++)
+  //for(int j = sj(); j <=ej()+1; j++)
+  //for(int k = sk(); k <=ek(); k++) {
+  for_wvmijk((*u),m,i,j,k) { /* this expands to the three lines above */
 
     /* flux */
     real f;
@@ -64,7 +65,8 @@ void VOF::advance_y() {
       } else {
         f = phiup * dSy(i,j,k) * jv * dt;
       }    
-    } else if(!sourceup&!sourcedn) {
+    //} else if(!sourceup&!sourcedn) {
+    } else if(true) {
       /* calculate g: CFL upwind */
       real g = uval*dt/dyup;
       f = dV(i,jup,k)*calc_flux(g,phiup,ny[i][jup][k],
@@ -199,9 +201,15 @@ void VOF::advance_y() {
     f = sgnf*std::min(fabs(stmp[i][jup][k]),fabs(f));
 #endif
 
+#if 0
     /* update stmp */
     stmp[i][j-1][k] = stmp[i][j-1][k] - f;
     stmp[i][j  ][k] = stmp[i][j  ][k] + f;
+#else
+    fluxmax[m][i][j][k] = f;
+    sosflux[m][i][j][k] = f/3.0;
+#endif
+
 #if 0
     if(i==100&&j==3&&k==100) {
       std::cout<<"advance_y:"<<f<<" "<<j<<" "<<phi[i][j][k]<<"\n";

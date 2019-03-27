@@ -79,6 +79,7 @@ class PhaseChangeVOF : public Centered {
     void gradt_ib(const Scalar * diff_eddy = NULL);
 
     void ext_gradt(Scalar & sca, const int iext, const Comp mcomp);
+    void ext_gradt(Scalar & sca, const int iext);
     void insert_bc_ext(const Comp mcomp);
 
     void setflag();
@@ -124,6 +125,8 @@ class PhaseChangeVOF : public Centered {
     ScalarInt iflag;
     Scalar txv, tyv, tzv;
     Scalar txl, tyl, tzl;
+    Scalar tnv, tnl;
+
     Scalar tpr, tprs, clr, clrs;
     Scalar adens;
     Scalar nx, ny, nz;
@@ -133,6 +136,8 @@ class PhaseChangeVOF : public Centered {
     Scalar M;
 
     const TIF & tifmodel;
+ 
+    real tol_ext;
 
     real latent, rhol, rhov, lambdal, lambdav, cpl, cpv;
     real rhoave, rhodlt;

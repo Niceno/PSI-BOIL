@@ -2,6 +2,9 @@
 #define MARCHING_CUBE_H
 
 #include "../../Field/Scalar/scalar.h"
+#include <array>
+#include <iostream>
+#include <iomanip>
 
 /////////////////////
 //                 //
@@ -10,10 +13,7 @@
 /////////////////////
 class MarchingCube {
   public:
-    MarchingCube(const Scalar * CLR, const real CLRSURF = 0.5) {
-      clr = CLR;
-      clrsurf = CLRSURF;	
-    }  
+    MarchingCube(const Scalar * CLR, const real CLRSURF = 0.5);
     ~MarchingCube() {}
 
     real volume(const int i, const int j, const int k);
@@ -27,6 +27,25 @@ class MarchingCube {
               const int i, const int j, const int k);
 
   protected:
+    /* 3D */
+    typedef struct {
+      real x,y,z;
+    } XYZ;
+    typedef struct {
+       XYZ p[3];
+       XYZ v[3];
+    } TRIANGLE;
+    typedef struct {
+       XYZ p[8];
+       real val[8];
+    } GRIDCELL;
+    typedef struct {
+      XYZ v;
+      XYZ ref;
+      real refval;
+    } VERT;
+
+    /* 2D */
     typedef struct {
       real x,y;
     } XY;
@@ -51,6 +70,20 @@ class MarchingCube {
     real SurfaceArea4(XY v1, XY v2, XY v3, XY v4);
     real SurfaceArea5(XY v1, XY v2, XY v3, XY v4, XY v5);
 
+    XYZ VertexInterp3D(real isolevel, XYZ p1, XYZ p2, real valp1, real valp2);
+    XYZ CrossProduct(const XYZ p1, const XYZ p2);
+    real DotProduct(const XYZ p1, const XYZ p2);
+    XYZ NegateXYZ(const XYZ p);
+    XYZ PlusXYZ(const XYZ p1, const XYZ p2);
+
+    real polygonise_area(GRIDCELL grid, real isolevel);
+    real polygonise_volume(GRIDCELL grid, real isolevel);
+
+    real triangle_area(const TRIANGLE t);
+    real triangle_vol_area(const TRIANGLE t);
+
+    const std::array<const int,256> edgeTable_volume, edgeTable_area;
+    const std::array< const std::array<const int,16> , 256> triTable;
 };
 
 #endif

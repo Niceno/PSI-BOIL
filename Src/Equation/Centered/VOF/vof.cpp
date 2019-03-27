@@ -33,16 +33,19 @@ VOF::VOF(const Scalar & PHI,
   stmp( *PHI.domain() ),
   stmp2( *PHI.domain() ),
   stmp3( *PHI.domain() ),
+  stmp4( *PHI.domain() ),
+  stmp5( *PHI.domain() ),
+  stmp6( *PHI.domain() ),
   fs( *U.domain() ),
-  fsx( *PHI.domain() ),
-  fsy( *PHI.domain() ),
-  fsz( *PHI.domain() ),
+  fluxmax( *U.domain() ),
+  sosflux( *U.domain() ),
   iflag(*PHI.domain() ),
   iflagx(*PHI.domain() ),
   iflagy(*PHI.domain() ),
   iflagz(*PHI.domain() ),
   adens(*PHI.domain() ),
-  adensgeom(*PHI.domain() )
+  //adensgeom(*PHI.domain() ),
+  heavi(&phi, NULL, &adens)
 
 /*------------------------------------------------------+
 |  this constructor is called only at the finest level  |
@@ -65,9 +68,9 @@ VOF::VOF(const Scalar & PHI,
   stmp      = phi.shape();
   stmp2     = phi.shape();
   stmp3     = phi.shape();
-  fsx       = phi.shape();
-  fsy       = phi.shape();
-  fsz       = phi.shape();
+  stmp4     = phi.shape();
+  stmp5     = phi.shape();
+  stmp6     = phi.shape();
   iflag     = phi.shape();
   iflagx    = phi.shape();
   iflagy    = phi.shape();
@@ -83,9 +86,11 @@ VOF::VOF(const Scalar & PHI,
   }
 
   adens = phi.shape();
-  adensgeom = phi.shape();
+  //adensgeom = phi.shape();
   for_m(m) {
     fs(m) = (*u)(m).shape();
+    sosflux(m) = (*u)(m).shape();
+    fluxmax(m) = (*u)(m).shape();
   }
 
   bndclr = BNDCLR;
@@ -102,6 +107,7 @@ VOF::VOF(const Scalar & PHI,
   phisurf=0.5;
   tol_wall = 0.01; /* tolerance 0.99 \approx 1.0 near walls */
   tol_flux = 3e-3; /* during inner iterations */
+  tol_ext = 1e-7; /* extrapolation tolerance */
   flux_cfl = 0.2;  /* used in case 3 flux calculations */
   maxiter = 10;    /* maximal number of iterations */
 

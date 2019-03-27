@@ -2,11 +2,11 @@
 #include "../../../Parallel/Out/out.h"
 
 /******************************************************************************/
-void CIPCSL2::ext_fs(Scalar & sca) {
+void CIPCSL2::ext_sca(Scalar & sca) {
 /***************************************************************************//**
 *  \brief extrapolate sca 
 *         output : sca
-*         tempolary: iflag,fn
+*         temporary: iflag,fn
 *******************************************************************************/
 
 #ifdef DEBUG

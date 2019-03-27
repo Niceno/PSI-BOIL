@@ -42,20 +42,14 @@ void VOF::advance() {
     phi[i][j][k]=phi[i][j][k]+time->dt()*fext[i][j][k];
    #endif
   }
-  phi.bnd_update();
-  update_at_walls();
+  //phi.bnd_update();
+  //update_at_walls();
 
   phi.exchange_all();
   stmp2.exchange();
   stmp3.exchange();
 
   //boil::aout<<"VOF::advance: "<<stmp[13][2][2]<<" "<<stmp[14][2][2]<<" "<<stmp[15][2][2]<<" | "<<(*u)[Comp::u()][14][2][2]<<" "<<(*u)[Comp::u()][15][2][2]<<" | "<<uliq[Comp::u()][14][2][2]<<" "<<uliq[Comp::u()][15][2][2]<<"\n";
-
-  /*-------------------------------+
-  |  normal vector at cell center  |
-  +-------------------------------*/
-  //gradphic(phi);
-  norm_cc(phi);
 
 #if 0
   adens.exchange();
@@ -74,6 +68,9 @@ void VOF::advance() {
   // advance in z-direction
   advance_z();
 #endif
+  
+  /* superpose fluxes */
+  superpose();
 
   // update phi
   for_ijk(i,j,k){
@@ -118,6 +115,11 @@ void VOF::advance() {
   sharpen();
   #endif
 
+  /*-------------------------------+
+  |  normal vector at cell center  |
+  +-------------------------------*/
+  norm_cc(phi);
+
   /* calculate alpha in cells */
   extract_alpha();
 
@@ -132,8 +134,8 @@ void VOF::advance() {
 
   /* calculate area */
   cal_adens();
-  cal_adens_geom(adens);
-  set_adens(adensgeom);
+  //cal_adens_geom(adens);
+  //set_adens(adensgeom);
 
   /* calculate phi in staggered cells */
   if(bndclr)

@@ -1,6 +1,6 @@
 #include "cipcsl2.h"
 #include <iomanip>
-#define WALL
+//#define WALL
 //#define DEBUG
 using namespace std;
 
@@ -46,11 +46,11 @@ bool CIPCSL2::sharpen(Scalar & sca, const real epss, const int itmax, const bool
   boil::oout<<"sharpen:insert_bc \n";
 #endif
 
-#if 0
-  if(time->current_step()==1) {
-    boil::plot->plot(sca,nx,ny,nz, "clr-nx-ny-nz", time->current_step());
+#if 1
+  if(time->current_step()%1000==0) {
+    //boil::plot->plot(sca,nx,ny,nz, "clr-nx-ny-nz", time->current_step());
     boil::plot->plot(dist,nx,ny,nz, "dist-nx-ny-nz", time->current_step());
-    exit(0);
+    //exit(0);
   }
 #endif
 
@@ -130,6 +130,33 @@ bool CIPCSL2::sharpen(Scalar & sca, const real epss, const int itmax, const bool
           // set ldt=0 instead of flux=0
           if(i==si()   && imin) ldt=0.0;
           if(i==ei()+1 && imax) ldt=0.0;
+
+#if 0
+          if(k==sk() && kmin) {
+            fluxd = 0.0;
+            //fluxc = 0.0;
+          }
+#elif 0
+          if(k==sk() && kmin) {
+            fluxd = 0.0;
+            #if 1
+            real coef = 1.0;
+            real nnorm = 0.5*(nx[i-1][j][k]+nx[i  ][j][k]);
+
+            real valp = sca[i  ][j][k];
+            real valm = sca[i-1][j][k];
+
+            fluxc = coef*0.5*(
+                               (-valp + 0.5 * ( 1.0 + (2.0*valm-1.0+tanh(nnorm))
+                                    / ( 1.0 + (2.0*valm-1.0)*tanh(nnorm))))
+                               +
+                               ( valm - 0.5 * ( 1.0 + (2.0*valp-1.0+tanh(-nnorm))
+                                    / ( 1.0 + (2.0*valp-1.0)*tanh(-nnorm))))
+                             )*dSx(i,j,k);
+            #endif
+          }
+#endif
+
 #ifdef WALL
           if(i==si()+1 && iminw) ldt=0.0;
           if(i==ei()   && imaxw) ldt=0.0;
@@ -172,6 +199,33 @@ bool CIPCSL2::sharpen(Scalar & sca, const real epss, const int itmax, const bool
           // set ldt=0 instead of flux=0
           if(j==sj()   && jmin) ldt=0.0;
           if(j==ej()+1 && jmax) ldt=0.0;
+
+#if 0
+          if(k==sk() && kmin) {
+            fluxd = 0.0;
+            //fluxc = 0.0;
+          }
+#elif 0
+          if(k==sk() && kmin) {
+            fluxd = 0.0;
+            #if 1
+            real coef = 1.0;
+ 
+            real valp = sca[i][j  ][k];
+            real valm = sca[i][j-1][k];
+            real nny = 0.5*(ny[i][j][k]+ny[i][j-1][k]);
+            real nnx = 0.5*(nx[i][j][k]+nx[i][j-1][k]);
+
+            if(valp>valm) {
+              real A = tanh(+sin(cangle));
+              fluxc = coef*0.5*(valp-valm*(1.+A)/(1.+A-A*valm))*dSy(i,j,k);
+            } else {
+  
+            }
+            #endif
+          }
+#endif
+
 #ifdef WALL
           if(j==sj()+1 && jminw) ldt=0.0;
           if(j==ej()   && jmaxw) ldt=0.0;
@@ -210,6 +264,37 @@ bool CIPCSL2::sharpen(Scalar & sca, const real epss, const int itmax, const bool
           // set ldt=0 instead of flux=0
           if(k==sk()   && kmin) ldt=0.0;
           if(k==ek()+1 && kmax) ldt=0.0;
+ 
+#if 1
+          if(k==sk()+1 && kmin) {
+            fluxd = 0.0;
+            #if 0
+            real valval = std::max(0.0,std::min(1.0,sca[i][j][k]));
+            real coef = 1.0;
+            real nnorm = 1.0/sqrt(3.0); //nz[i][j][k];
+
+            fluxc = coef*0.5*((sca[i][j][k-1] - 0.5 * ( 1.0 + (2.0*valval-1.0+tanh(-nnorm))
+                                          / ( 1.0 + (2.0*valval-1.0)*tanh(-nnorm)))
+                              )
+                              //-(nz[i][j][k-1]-1.0)
+                        )*dSz(i,j,k);
+            //boil::oout<<i<<" "<<j<<" "<<sca[i][j][k-1]<<" "<<0.5 * ( 1.0 + (2.0*valval-1.0+tanh(-nnorm)) / ( 1.0 + (2.0*valval-1.0)*tanh(-nnorm)))<<" "<<-fluxc*coefc*ldt<<boil::endl;
+            #elif 1
+            real valval = std::max(0.0,std::min(1.0,sca[i][j][k-1]));
+            real coef = 1.0;
+            real nnorm = 1.0/sqrt(3.0); //nz[i][j][k];
+
+            fluxc = -coef*0.5*((sca[i][j][k] - 0.5 * ( 1.0 + (2.0*valval-1.0+tanh(nnorm))
+                                          / ( 1.0 + (2.0*valval-1.0)*tanh(nnorm)))
+                              )
+                        )*dSz(i,j,k);
+            #else 
+            fluxc = 0.0;
+            #endif
+          }
+#endif
+
+
 #ifdef WALL
           if(k==sk()+1 && kminw) ldt=0.0;
           if(k==ek()   && kmaxw) ldt=0.0;
@@ -272,6 +357,15 @@ bool CIPCSL2::sharpen(Scalar & sca, const real epss, const int itmax, const bool
     }
   }
 #endif
+
+
+  #if 1
+    for_vijk(clr,i,j,k) {
+      if(clr.zc(k)<clr.dzc(k)&&clr[i][j][k]>boil::micro&&i==6&&j==50&&k==1)
+         boil::aout<<i<<j<<k<<" | "<<nz[i][j][k]<<" "<<nz[i][j][k+1]<<" | "<<nx[i][j][k]<<" "<<nx[i][j][k+1]<<" | "<<ny[i][j][k]<<" "<<ny[i][j][k+1]<<boil::endl;
+    }
+
+  #endif
 
   return true;
 }

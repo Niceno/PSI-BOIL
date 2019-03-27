@@ -28,6 +28,7 @@ CIPCSL2::CIPCSL2(const Scalar & PHI,
   dist  ( *PHI.domain() ),
   alp   ( *PHI.domain() ),
   sxyz  ( *U.domain() ),
+  fs    ( *U.domain() ),
   kappa ( &K )
 
 /*------------------------------------------------------+
@@ -50,6 +51,7 @@ CIPCSL2::CIPCSL2(const Scalar & PHI,
 
   for_m(m){
     sxyz(m) = (*u)(m).shape();
+    fs(m)   = (*u)(m).shape();
   }
   assert(PHI.domain() == F.domain());
 
@@ -60,6 +62,7 @@ CIPCSL2::CIPCSL2(const Scalar & PHI,
   phisurf = 0.5*(phimin+phimax);
   dxmin = dom->dxyz_min();
   ww=1.0*dxmin; // default value for ww
+  tol_wall = 0.01;
 
   epsnorm=1.0e-12;
   eps_clr = 1.0e-4; // epsiron for color function

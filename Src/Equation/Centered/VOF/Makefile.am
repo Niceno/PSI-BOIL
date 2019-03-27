@@ -23,7 +23,6 @@ libVof_a_SOURCES =      vof.h                 \
                         vof_insert_bc.cpp     \
                         vof_insert_bc_flag.cpp     \
                         vof_iterate_flux.cpp \
-                        vof_marching_cube_area.cpp     \
                         vof_tension.cpp       \
                         vof_totalvol.cpp     \
                         vof_insert_bc_norm.cpp \
@@ -38,7 +37,7 @@ libVof_a_SOURCES =      vof.h                 \
                         vof_update_at_walls.cpp  \
                         vof_smooth.cpp \
                         vof_sharpen.cpp \
-			vof_adens_geom.cpp \
+			vof_superpose.cpp \
                         vof_vf_limiter.cpp 
                 
 INCLUDE = -I@top_srcdir@/

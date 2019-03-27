@@ -13,6 +13,8 @@ void VOF::cal_liq_vel() {
     real mmx = -mx[i][j][k];
     real mmy = -my[i][j][k];
     real mmz = -mz[i][j][k];
+ 
+    //boil::oout<<i<<" "<<j<<" "<<k<<" "<<mmx<<" "<<mmy<<" "<<mmz<<boil::endl;
 
     /* cell centre velocity */
     real uxc = 0.5 * ((*u)[Comp::u()][i][j][k] + (*u)[Comp::u()][i+1][j][k]);
@@ -148,9 +150,9 @@ void VOF::cal_liq_vel() {
 
   /* calculate cell-centred velocity */
   for_ijk(i,j,k) {
-    utx[i][j][k] += nx[i][j][k]*unliq[i][j][k];
-    uty[i][j][k] += ny[i][j][k]*unliq[i][j][k];
-    utz[i][j][k] += nz[i][j][k]*unliq[i][j][k];
+    utx[i][j][k] += -mx[i][j][k]*unliq[i][j][k];
+    uty[i][j][k] += -my[i][j][k]*unliq[i][j][k];
+    utz[i][j][k] += -mz[i][j][k]*unliq[i][j][k];
   }
   utx.exchange();
   uty.exchange();
@@ -189,6 +191,7 @@ void VOF::cal_liq_vel() {
                                  +ofy*(uty[i][j][k]+uty[ii][jj][kk]) 
                                  +ofz*(utz[i][j][k]+utz[ii][jj][kk]) ); 
       } 
+      //boil::oout<<"vof liq vel: "<<m<<" "<<i<< " "<<j<<" "<<k<<" "<<(*u)[m][i][j][k]<<" "<<uliq[m][i][j][k]<<" "<<vel_value(m,i,j,k)<<boil::endl;
     }
   }
   uliq.exchange();

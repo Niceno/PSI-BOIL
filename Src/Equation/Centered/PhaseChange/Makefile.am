@@ -41,7 +41,6 @@ libPhaseChange_a_SOURCES = site.h                         \
                            phasechange_insert_bc_norm.cpp       \
                            phasechange_iso_length.cpp           \
                            phasechange_m.cpp                    \
-                           phasechange_marching_cube.cpp        \
                            phasechange_micro.cpp                \
                            phasechange_micro_coef.cpp           \
                            phasechange_micro_shift.cpp          \

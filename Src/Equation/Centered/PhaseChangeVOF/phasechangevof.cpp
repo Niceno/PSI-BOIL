@@ -52,6 +52,8 @@ PhaseChangeVOF::PhaseChangeVOF(const Scalar & MDOT,
   txl    ( *MDOT.domain()),
   tyl    ( *MDOT.domain()),
   tzl    ( *MDOT.domain()),
+  tnl    ( *MDOT.domain()),
+  tnv    ( *MDOT.domain()),
   stmp   ( *MDOT.domain()),
   stmp2  ( *MDOT.domain()),
   delta  ( *MDOT.domain()),
@@ -64,6 +66,8 @@ PhaseChangeVOF::PhaseChangeVOF(const Scalar & MDOT,
   txl     = MDOT.shape();
   tyl     = MDOT.shape();
   tzl     = MDOT.shape();
+  tnl     = MDOT.shape();
+  tnv     = MDOT.shape();
   stmp    = MDOT.shape();
   stmp2   = MDOT.shape();
   delta   = MDOT.shape();
@@ -86,6 +90,7 @@ PhaseChangeVOF::PhaseChangeVOF(const Scalar & MDOT,
   clrsurf = 0.5;
   turbP = 0.9;
 
+  tol_ext = 1e-7;
   epsl = 5.0e-2;
   //epsl = 1.0e-2;
   dxmin = dom->dxyz_min();

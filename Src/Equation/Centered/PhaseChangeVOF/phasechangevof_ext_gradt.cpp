@@ -88,9 +88,15 @@ void PhaseChangeVOF::ext_gradt(Scalar & sca, const int iext, const Comp mcomp) {
       int ist,ied,iinc;
       int jst,jed,jinc;
       int kst,ked,kinc;
+#if 1
       if(it%2==0){ist=si();ied=ei();iinc=1;}else{ist=ei();ied=si();iinc=-1;}
       if(it%2==0){jst=sj();jed=ej();jinc=1;}else{jst=ej();jed=sj();jinc=-1;}
       if(it%2==0){kst=sk();ked=ek();kinc=1;}else{kst=ek();ked=sk();kinc=-1;}
+#else
+      if(it%2==1){ist=si();ied=ei();iinc=1;}else{ist=ei();ied=si();iinc=-1;}
+      if(it%2==1){jst=sj();jed=ej();jinc=1;}else{jst=ej();jed=sj();jinc=-1;}
+      if(it%2==1){kst=sk();ked=ek();kinc=1;}else{kst=ek();ked=sk();kinc=-1;}
+#endif
       for(int i=ist; i<=ied; i+=iinc){
       for(int j=jst; j<=jed; j+=jinc){
       for(int k=kst; k<=ked; k+=kinc){

@@ -3,8 +3,9 @@
 //#define USE_PC /* use old pc */
 //#define USE_ENTH /* use old enth */
 //#define PLOTALL
-//#define PLOTNONE
+#define PLOTNONE
 #define FULLSIM
+//#define INVERT
 
 /* computed parameters */
 const int gLevel = 2;  //grid level=2,4,8
@@ -15,7 +16,11 @@ const real LX = 187.5e-6;
 const real radius=50.0e-6;
 
 const real tsat0=373.15;
+#ifdef INVERT
+const real tout=tsat0-1.25;
+#else
 const real tout=tsat0+1.25;
+#endif
 const real dtsatdp=3.0/4.0;
 const real pi=acos(-1.0);
 
@@ -158,24 +163,36 @@ main(int argc, char ** argv) {
   liquid.cp    (4215.9*958.4);
   liquid.lambda(0.679);
   const real latent=2258.0*1e3;
+//#ifdef INVERT
+//  Matter mixed(vapor, liquid, & c, & bndclr);
+//#else
   Matter mixed(liquid, vapor, & c, & bndclr);
+//#endif
   mixed.sigma(5.9e-2);
   boil::oout<<"physical properties\n";
 
   /*-------------------+
   |  time-integration  |
   +-------------------*/
-  const int  ndt =  1000*gLevel;
+  const int  ndt =  1; //1000*gLevel;
   const int  nint =  350*gLevel;
 #ifdef PLOTALL
   const real tint = 2.0e-7;
 #elif defined PLOTNONE
   const real tint = 2.0;
 #else
+  #ifndef INVERT
   const real tint = 2.0e-5;
+  #else
+  const real tint = 0.04;
+  #endif
 #endif
   const real dxmin = LX/real(NX);
-  const real dt = 100.0 
+#ifdef INVERT
+  const real dt = 100000.0 
+#else
+  const real dt = 250.0 
+#endif
                 * pow(0.5*pow(dxmin,3.0)/(2.0*3.1415*mixed.sigma()->value())
                       , 0.5);
   Times time(ndt, dt);
@@ -195,7 +212,7 @@ main(int argc, char ** argv) {
   multigrid.min_cycles(3);
 
   VOF conc  (c,  g, kappa, uvw, time, solver, &bndclr, &mixed);
-  conc.curvature();
+  //conc.ancillary();
   conc.front_minmax();
   conc.totalvol();
 
@@ -288,9 +305,15 @@ main(int argc, char ** argv) {
         tpr[i][j][k] = tsat0;
       } else if(dist<=pow(radius2,2.0)) {
         real xi = sqrt(dist) - radius;
+#ifdef INVERT
+        real ttmp = -coef5*pow(xi,5.0) + -coef4*pow(xi,4.0) + -coef3*pow(xi,3.0)
+                  + -coef2*pow(xi,2.0) + -coef1*xi + tsat0;
+        tpr[i][j][k] = std::max(tout,ttmp);
+#else
         real ttmp = coef5*pow(xi,5.0) + coef4*pow(xi,4.0) + coef3*pow(xi,3.0)
                   + coef2*pow(xi,2.0) + coef1*xi + tsat0;
         tpr[i][j][k] = std::min(tout,ttmp);
+#endif
       } else {
         tpr[i][j][k] = tout;
       }
@@ -366,18 +389,22 @@ main(int argc, char ** argv) {
     }
   }
 
+#ifndef INVERT
   for_vijk(c,i,j,k)
     c[i][j][k] = 1.0-c[i][j][k];
+#endif
 
   c.bnd_update();
   c.exchange_all();
   tpr.exchange_all();
 
+    conc.ancillary();
+    //marker.cal_adens_geom(conc.adens);
+
     boil::plot->plot(uvw,c,tpr,press,mdot,conc.adens,"uvw-c-tpr-press-mdot-adens",0);
 
-    conc.curvature();
     /* verification */
-    real Realarea = 4./8.*acos(-1.0)*radius*radius;
+    real Realarea = 4.*acos(-1.0)*radius*radius;
     real Simarea(0.);
     int Simcount(0);
     for_vijk(conc.adens,i,j,k) {
@@ -412,12 +439,15 @@ main(int argc, char ** argv) {
     boil::oout << "########################" << boil::endl;
     boil::oout << " dt= " << time.dt() << boil::endl;
 
+#if 1
     /*------------------------+
     |  solve energy equation  |
     +------------------------*/
+#if 1
     enthFD.discretize();
     enthFD.new_time_step();
     enthFD.solve(ResRat(1e-16),"enthFD");
+#endif
 
     /*---------------+
     |  phase change  |
@@ -481,14 +511,13 @@ main(int argc, char ** argv) {
     /* dt control */
     time.control_dt(ns.cfl_max(),0.10,dt);
 
-    boil::plot->plot(uvw,c,tpr,press,mdot,conc.adens,"uvw-c-tpr-press-mdot-adens",time.current_step());
-
     /* output data */
     if((time.current_time()) / (tint) >= real(iint) ) {
       tpr.exchange_all();
       boil::plot->plot(uvw,c,tpr,press,mdot,conc.adens,"uvw-c-tpr-press-mdot-adens",iint);
       iint++;
     }
+    boil::plot->plot(uvw,c,tpr,press,mdot,conc.adens,"uvw-c-tpr-press-mdot-adens",time.current_step());
 
     if((time.current_step()) % (nint)==0 ) {
       uvw  .save("uvw",   time.current_step());

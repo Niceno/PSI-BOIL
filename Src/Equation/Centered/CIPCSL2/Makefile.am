@@ -31,8 +31,9 @@ libCipcsl2_a_SOURCES = cipcsl2.h                        \
                        cipcsl2_curv_interface.cpp       \
                        cipcsl2_curv_interface_ext.cpp   \
                        cipcsl2_distfunc.cpp             \
-                       cipcsl2_ext_fs.cpp               \
+                       cipcsl2_ext_sca.cpp              \
                        cipcsl2_front_minmax.cpp         \
+                       cipcsl2_fs.cpp                   \
                        cipcsl2_funclxyz.cpp             \
                        cipcsl2_gradphi.cpp              \
                        cipcsl2_gradphic.cpp             \
@@ -63,6 +64,7 @@ libCipcsl2_a_SOURCES = cipcsl2.h                        \
                        cipcsl2_tension.cpp              \
                        cipcsl2_totalvol.cpp             \
                        cipcsl2_update_node.cpp          \
+                       cipcsl2_update_at_walls.cpp      \
                        cipcsl2_wall_norm.cpp            \
                        scheme_bdcond.cpp
 

@@ -8,9 +8,10 @@ void VOF::advance_x() {
   Comp m = Comp::u();
 
   //for_vmijk((*u),m,i,j,k){
-  for(int i = si(); i <=ei()+1; i++)
-  for(int j = sj(); j <=ej(); j++)
-  for(int k = sk(); k <=ek(); k++) {
+  //for(int i = si(); i <=ei()+1; i++)
+  //for(int j = sj(); j <=ej(); j++)
+  //for(int k = sk(); k <=ek(); k++) {
+  for_wvmijk((*u),m,i,j,k) { /* this expands to the three lines above */
 
     /* flux */
     real f;
@@ -64,7 +65,8 @@ void VOF::advance_x() {
       } else {
         f = phiup * dSx(i,j,k) * jv * dt;
       }    
-    } else if(!sourceup&!sourcedn) {
+    //} else if(!sourceup&!sourcedn) {
+    } else if(true) {
       /* calculate g: CFL upwind */
       real g = uval*dt/dxup;
       f = dV(iup,j,k)*calc_flux(g,phiup,nx[iup][j][k],
@@ -137,7 +139,7 @@ void VOF::advance_x() {
         f = dV(iup,j,k)*volfactorup
             *calc_diabatic_flux(gj,gliq,ggas,phiup,
                                 nx[iup][j][k],ny[iup][j][k],nz[iup][j][k]);
-        boil::aout<<"case2x "<<iup<<" "<<j<<" "<<k<<" | "<<idn<<" "<<phiup<<" "<<stmp[iup][j][k]/dV(iup,j,k)<<" "<<f/dV(iup,j,k)<<" | "<<(stmp[idn][j][k]+fabs(f))/dV(idn,j,k)<<" "<<(stmp[iup][j][k]-fabs(f))/dV(iup,j,k)<<boil::endl;
+        boil::aout<<"case2x "<<iup<<" "<<j<<" "<<k<<" | "<<idn<<" "<<phiup<<" "<<stmp[iup][j][k]/dV(iup,j,k)<<" "<<f/dV(iup,j,k)<<" | "<<(stmp[idn][j][k]+fabs(f))/dV(idn,j,k)<<" "<<(stmp[iup][j][k]-fabs(f))/dV(iup,j,k)<<" "<<gliq<<" "<<ggas<<" | "<<gj<<" "<<uval<<" "<<(*u)[m][i][j][k]<<" "<<uliq[m][i][j][k]<<boil::endl;
 #endif
 
       /* case 3: both downwind and upwind oppose the flow */ 
@@ -236,9 +238,14 @@ void VOF::advance_x() {
     f = sgnf*std::min(fabs(stmp[iup][j][k]),fabs(f));
 #endif
 
+#if 0
     /* update stmp */
     stmp[i-1][j][k] = stmp[i-1][j][k] - f;
     stmp[i  ][j][k] = stmp[i  ][j][k] + f;
+#else
+    fluxmax[m][i][j][k] = f;
+    sosflux[m][i][j][k] = f/3.0;
+#endif
 
 #if 0
     if((i==100||i==101)&&j==3&&k==100) {

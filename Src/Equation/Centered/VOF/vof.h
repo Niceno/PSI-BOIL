@@ -2,10 +2,11 @@
 #define VOF_H
 
 #include <cmath>
+#include <list>
 #include "../centered.h"
 #include "../../../Parallel/communicator.h"
 #include "../../../Global/global_realistic.h"
-#include <list>
+#include "../../Heaviside/heaviside.h"
 
 
 ///////////
@@ -150,6 +151,7 @@ class VOF : public Centered {
                    const int i1,  const int i2,  const int i3);
     void set_iflag();
     void smooth();
+    void superpose();
     void insert_bc_flag(ScalarInt & g, const bool b);
 
     real extrapolate_v(const int i, const int j, const int k,
@@ -180,6 +182,7 @@ class VOF : public Centered {
     real fs_val(const Comp m, const int i, const int j, const int k);
     real frontPosition(const int i, const int j, const int k, const Comp m);
 
+#if 0
     /* adensgeom stuff */
     typedef struct {
       real x,y,z;
@@ -214,18 +217,21 @@ class VOF : public Centered {
          return(area);
        }
     } TRIANGLE;
+#endif
 
+    Heaviside heavi;
 
     Scalar kappa;        /* curvature */
     Scalar stmp,stmp2,stmp3;
-    Scalar fsx,fsy,fsz;
     ScalarInt iflag,iflagx,iflagy,iflagz;
+    Vector sosflux,fluxmax;
+    Scalar stmp4,stmp5,stmp6;
 
     real rhol, rhov; /* densities for velocity correction */
     const Matter * mixt() const {return mixture;}
     Matter * mixture;
 
-    real tol_wall, tol_flux, flux_cfl;
+    real tol_wall, tol_flux, tol_ext, flux_cfl;
     int maxiter;
 
     Matter jelly;   /* virtual fluid for level set transport */

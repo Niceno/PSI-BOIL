@@ -9,6 +9,7 @@ void VOF::cal_adens() {
 
   //boil::timer.start("vof adens");
 
+#if 0
   /* cell centered */
   for_vijk(adens,i,j,k) {
     real area = marching_cube_area(i,j,k);
@@ -16,6 +17,9 @@ void VOF::cal_adens() {
 
     adens[i][j][k] = area/volume;
   }
+#else
+  heavi.calculate_adens();
+#endif
 
 #if 0
   real sum(0.0);

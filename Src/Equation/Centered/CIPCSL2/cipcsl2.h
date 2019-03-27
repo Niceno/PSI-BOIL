@@ -5,6 +5,7 @@
 #include "../centered.h"
 #include "../../../Parallel/communicator.h"
 #include "../../../Global/global_constants.h"
+#include "../../../Global/global_realistic.h"
 
 #define RCIP
 //#define LOCAL_OLSSON
@@ -177,6 +178,7 @@ class CIPCSL2 : public Centered {
 
     /* moved to public */
     Vector sxyz;
+    Vector fs;
 
   protected:
     void bnd_sym_kappa();
@@ -188,7 +190,7 @@ class CIPCSL2 : public Centered {
     void bdcurv_interface();
     void bdcurv_interface_ext();
     void distfunc(const Scalar & g, const int i);
-    void ext_fs(Scalar & g);
+    void ext_sca(Scalar & g);
     void gradphi(const Scalar & g);
     void gradphic(const Scalar & g);
     void set_iflag();
@@ -245,16 +247,23 @@ class CIPCSL2 : public Centered {
     void set_maxval(real r) {maxclr=r;}
     real beta(const real a1, const real a2, const bool b);
 
+    void cal_fs();
+    void update_at_walls();
+    real extrapolate_c(const int i, const int j, const int k,
+                       const int ofx, const int ofy, const int ofz,
+                       const real rat);
+
     Scalar clr, sclr;            /* color function, smeared color function */
     Scalar nx,ny,nz;       /* normal to interface */
     Scalar dist;           /* distance function */
     Scalar kappa;          /* curvature function */
     Scalar alp;            /* coefficient for local sharpening */
-    Scalar fn, atmp, stmp; /* temporaly */
+    Scalar fn, atmp, stmp; /* temporary */
     ScalarInt iflag, wflag;
     Scheme scheme;
     Matter jelly;   /* virtual fluid for level set transport */
     real xminft,xmaxft,yminft,ymaxft,zminft,zmaxft; /* xyz min&max of front */
+    real tol_wall; /* wall tolerance for erroneous interfaces */
     real pi,phimin,phimax,phisurf;
     real dxmin,ww;
     real sum_outlet,sum_outletm,clrsum1,clrsum2;

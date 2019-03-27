@@ -63,7 +63,7 @@ real VOF::iterate_flux(const real jv, const real dirsgn, const real cflrat,
       j2 = j1;
     }
 
-    //boil::oout<<"Iteration: "<<iter<<" | "<<x0<<" "<<x2<<" | "<<j0<<" "<<j2<<" | "<<x1<<" "<<x3<<" | "<<j1<<" "<<j3<<boil::endl;
+    boil::oout<<"Iteration: "<<iter<<" | "<<x0<<" "<<x2<<" | "<<j0<<" "<<j2<<" | "<<x1<<" "<<x3<<" | "<<j1<<" "<<j3<<boil::endl;
 
 
   } /* iteration loop */
