@@ -21,6 +21,7 @@
 #include "../Equation/Heaviside/heaviside.h"
 #include "../Equation/Heaviside/marching_cube.h"
 #include "../Equation/Tifmodel/tif.h"
+#include "../Equation/Topology/topology.h"
 #include "../Timer/timer.h"
 #include "../Solver/Krylov/krylov.h"
 #include "../Matter/matter.h"

@@ -7,6 +7,7 @@
 #include "../../../Parallel/communicator.h"
 #include "../../../Global/global_realistic.h"
 #include "../../Heaviside/heaviside.h"
+#include "../../Topology/topology.h"
 
 
 ///////////
@@ -85,12 +86,9 @@ class VOF : public Centered {
     Scalar unliq; /* normal component of liquid velocity */
     Scalar utliq, utx, uty, utz; /* tangential component of liquid velocity */
     Vector uliq; /* liquid velocity */
-    Vector fs;
     Vector * bndclr;
-    Scalar nalpha;
-    Scalar nx,ny,nz,nmag;/* normal to interface */
-    Scalar mx,my,mz;/* normal to interface, in real space */
-    Scalar adens; /* area density */
+
+    Topology topo;
   protected:
     void advance_x();
     void advance_y();
@@ -218,6 +216,12 @@ class VOF : public Centered {
        }
     } TRIANGLE;
 #endif
+
+    Scalar nalpha;
+    Vector fs;
+    Scalar nx,ny,nz,nmag;/* normal to interface */
+    Scalar mx,my,mz;/* normal to interface, in real space */
+    Scalar adens; /* area density */
 
     Heaviside heavi;
 

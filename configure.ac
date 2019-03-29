@@ -40,6 +40,7 @@ AC_OUTPUT(Makefile                                     \
           Src/Equation/Floodfill/Makefile              \
           Src/Equation/Heaviside/Makefile              \
           Src/Equation/Tifmodel/Makefile               \
+          Src/Equation/Topology/Makefile               \
           Src/Boundary/Makefile                        \
           Src/Solver/Makefile                          \
           Src/Ravioli/Makefile                         \

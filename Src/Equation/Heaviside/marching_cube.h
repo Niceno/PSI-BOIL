@@ -83,7 +83,11 @@ class MarchingCube {
     real triangle_vol_area(const TRIANGLE t);
 
     const std::array<const int,256> edgeTable_volume, edgeTable_area;
+#if 0
     const std::array< const std::array<const int,16> , 256> triTable;
+#else
+    std::vector< std::vector<int> > triTable;
+#endif 
 };
 
 #endif

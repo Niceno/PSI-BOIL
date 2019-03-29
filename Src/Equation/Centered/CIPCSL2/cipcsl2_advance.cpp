@@ -86,11 +86,10 @@ void CIPCSL2::advance() {
     }
   }
 #endif
+  
+  /* ancillary functions */
+  ancillary();
 
-  update_at_walls();
-  cal_fs();
-
-   distfunc(clr,24);          // calculate distance function
   real clpos(-1e24), posI(-1e24), posII(-1e24), beta1(-1e24);
   /* flag of boundary conditions for stmp */
   for( int b=0; b<phi.bc().count(); b++ ) {

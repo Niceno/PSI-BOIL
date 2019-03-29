@@ -21,6 +21,7 @@ SUBDIRS = Equation/Staggered/Momentum      \
           Equation/Floodfill               \
           Equation/Heaviside               \
           Equation/Tifmodel                \
+          Equation/Topology                \
           Monitor/Rack                     \
           Monitor/Location                 \
           Matter                           \
@@ -67,6 +68,7 @@ LDADD = Equation/Staggered/Momentum/libMomentum.a            \
         Equation/Floodfill/libFloodfill.a                    \
 	Equation/Heaviside/libHeaviside.a                    \
         Equation/Tifmodel/libTif.a                           \
+        Equation/Topology/libTopology.a                      \
         Monitor/Rack/libRack.a                               \
         Monitor/Location/libLocation.a                       \
         Matter/libMatter.a                                   \

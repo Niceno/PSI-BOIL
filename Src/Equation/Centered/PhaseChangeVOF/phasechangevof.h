@@ -8,6 +8,7 @@
 #include "../../../Timer/timer.h"
 #include "../../../Global/global_realistic.h"
 #include "../../Tifmodel/tif.h"
+#include "../../Topology/topology.h"
 #include "../VOF/vof.h"
 //#include "nucleation.h"
 
@@ -23,12 +24,8 @@ class PhaseChangeVOF : public Centered {
                    const Scalar & clrs,
                    const Scalar & vs,
                    const Vector & u, 
-#if 0
-                   const Scalar & nx,
-                   const Scalar & ny,
-                   const Scalar & nz,
-                   const Scalar & adens,
-                   const Vector & fs,
+#if 1
+                   Topology & topo,
 #else
                    const VOF & vof,
 #endif
@@ -129,7 +126,9 @@ class PhaseChangeVOF : public Centered {
 
     Scalar tpr, tprs, clr, clrs;
     Scalar adens;
-    Scalar nx, ny, nz;
+    Scalar nx;
+    Scalar ny;
+    Scalar nz;
     Scalar stmp,stmp2,delta;
     Vector fs;
     Vector bndtpr;

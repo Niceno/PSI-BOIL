@@ -45,7 +45,8 @@ VOF::VOF(const Scalar & PHI,
   iflagz(*PHI.domain() ),
   adens(*PHI.domain() ),
   //adensgeom(*PHI.domain() ),
-  heavi(&phi, NULL, &adens)
+  heavi(&phi, NULL, &adens),
+  topo(&mx,&my,&mz,&adens,&fs)
 
 /*------------------------------------------------------+
 |  this constructor is called only at the finest level  |

@@ -9,12 +9,8 @@ PhaseChangeVOF::PhaseChangeVOF(const Scalar & MDOT,
                                const Scalar & CLRS,
                                const Scalar & VS,
                                const Vector & U, 
-#if 0
-                               const Scalar & NX,
-                               const Scalar & NY,
-                               const Scalar & NZ,
-                               const Scalar & ADENS,
-                               const Vector & FS,
+#if 1
+                               Topology & topo,
 #else
                                const VOF & vof,
 #endif
@@ -32,12 +28,12 @@ PhaseChangeVOF::PhaseChangeVOF(const Scalar & MDOT,
   clr(&CLR),
   clrs(&CLRS),
   M(&MFLX),
-#if 0
-  nx(&NX),
-  ny(&NY),
-  nz(&NZ),
-  fs(&FS),
-  adens(&ADENS),
+#if 1
+  nx(topo.nx),
+  ny(topo.ny),
+  nz(topo.nz),
+  fs(topo.fs),
+  adens(topo.adens),
 #else
   nx(&(vof.mx)),
   ny(&(vof.my)),

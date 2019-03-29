@@ -29,7 +29,10 @@ CIPCSL2::CIPCSL2(const Scalar & PHI,
   alp   ( *PHI.domain() ),
   sxyz  ( *U.domain() ),
   fs    ( *U.domain() ),
-  kappa ( &K )
+  adens ( *PHI.domain() ),
+  kappa ( &K ),
+  heavi(&phi, NULL, &adens),
+  topo(&nx,&ny,&nz,&adens,&fs)
 
 /*------------------------------------------------------+
 |  this constructor is called only at the finest level  |
@@ -47,6 +50,7 @@ CIPCSL2::CIPCSL2(const Scalar & PHI,
   fn      = phi.shape();
   dist    = phi.shape();
   alp     = phi.shape();
+  adens   = phi.shape();
   kappa   = phi.shape();
 
   for_m(m){

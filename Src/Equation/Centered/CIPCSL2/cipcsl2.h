@@ -6,6 +6,8 @@
 #include "../../../Parallel/communicator.h"
 #include "../../../Global/global_constants.h"
 #include "../../../Global/global_realistic.h"
+#include "../../Topology/topology.h"
+#include "../../Heaviside/heaviside.h"
 
 #define RCIP
 //#define LOCAL_OLSSON
@@ -177,9 +179,10 @@ class CIPCSL2 : public Centered {
     void color_minmax(); 
 
     /* moved to public */
+    Topology topo;
     Vector sxyz;
-    Vector fs;
-    void update_at_walls();
+    
+    void ancillary();
 
   protected:
     void bnd_sym_kappa();
@@ -252,8 +255,16 @@ class CIPCSL2 : public Centered {
     real extrapolate_c(const int i, const int j, const int k,
                        const int ofx, const int ofy, const int ofz,
                        const real rat);
+    void cal_adens();
+    void update_at_walls();
 
     Scalar clr, sclr;            /* color function, smeared color function */
+
+    /* ancillary */
+    Heaviside heavi;
+    Vector fs;
+    Scalar adens;
+
     Scalar nx,ny,nz;       /* normal to interface */
     Scalar dist;           /* distance function */
     Scalar kappa;          /* curvature function */

@@ -15,7 +15,8 @@ class Heaviside {
   public:
     Heaviside(const Scalar * CLR, Scalar * PHI = NULL, Scalar * ADENS = NULL,
               const real CLRSURF = 0.5) : 
-               dom((*CLR).domain()), phi(PHI), mc(CLR, CLRSURF), adens(ADENS) {}  
+               dom((*CLR).domain()), phi(PHI), adens(ADENS),
+               mc(CLR, CLRSURF) {}  
     ~Heaviside() {};
 
     const Domain * domain() const {return dom;}
@@ -36,7 +37,6 @@ class Heaviside {
             i, j, k); }
 #endif
 
-   
   protected:
     const Domain * dom; 
     Scalar * phi;
