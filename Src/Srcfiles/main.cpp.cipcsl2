@@ -48,8 +48,8 @@ main(int argc, char * argv[]) {
   /*-------------------+
   |  time-integration  |
   +-------------------*/
-  const int  ndt = 200000;
-  const int nint = 1000;
+  const int  ndt = 40000;
+  const int nint = 100;
   const int  bint = 20000;
   const real dt  = 0.25 * LX / real(NX);
   Times time(ndt, dt); 
@@ -86,7 +86,7 @@ main(int argc, char * argv[]) {
   +--------------------*/
   Comp m=Comp::u();
   for_vmijk(uvw,m,i,j,k)
-    uvw[m][i][j][k]=0.0;
+    uvw[m][i][j][k]=1.0;
 
   m=Comp::v();
   for_vmijk(uvw,m,i,j,k)
@@ -150,7 +150,7 @@ main(int argc, char * argv[]) {
   CIPCSL2 conc  (c, g, kappa, uvw, time, solver);
 #endif
   conc.totalvol();
-  conc.set_cangle(acos(-1.0)*(1.0-1.0/3.0));
+  //conc.set_cangle(acos(-1.0)*(1.0-1.0/3.0));
   //conc.set_cangle(acos(-1.0));
 
 
@@ -203,7 +203,7 @@ main(int argc, char * argv[]) {
     conc.advance();
     conc.totalvol();
 
-#if 1
+#if 0
     for_vijk(c,i,j,k) {
       if(c.zc(k)<c.dzc(k)&&c[i][j][k]>boil::micro&&i==6&&j==50&&k==1)
          boil::aout<<i<<" "<<j<<" "<<k<<" | "<<c[i][j][k]<<" "<<c[i][j][k+1]<<boil::endl;
