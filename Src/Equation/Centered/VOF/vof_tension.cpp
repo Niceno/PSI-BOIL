@@ -19,16 +19,72 @@ void VOF::tension(Vector * vec, const Matter matt) {
   /*----------------------------------+
   |  1st step: curvature calculation  |
   +----------------------------------*/
-  curv_HF();
-//curvature();
+  if(curv_method==0) {
+    curv_HF();
+  } else {
+    curv_smooth();
+  }
+  //curvature();
+  Comp m;
+  for_avijk(kappa,i,j,k) {
+    //kappa[i][j][k] = 1./1e-3;
+  }
 
+#if 0
+  m = Comp::u();
+  for_vmijk((*vec),m,i,j,k) {
+    if(adens[i-1][j][k]>0.0||adens[i][j][k]>0.0) {
+      real bdphi;
+      if(bndclr) {
+        bdphi = (*bndclr)[m][i][j][k];
+      } else {
+        bdphi = 0.5*(phi[i-1][j][k]+phi[i][j][k]);
+      }
+      real mult = bdphi*matt.sigma(m,i,j,k)*vec->dV(m,i,j,k);
+      (*vec)[m][i][j][k] -= mult*(kappa[i][j][k]-kappa[i-1][j][k])/vec->dxc(m,i);
+    }
+  }
+
+  m = Comp::v();
+  for_vmijk((*vec),m,i,j,k) {
+    if(adens[i][j-1][k]>0.0||adens[i][j][k]>0.0) {
+      real bdphi;
+      if(bndclr) {
+        bdphi = (*bndclr)[m][i][j][k];
+      } else {
+        bdphi = 0.5*(phi[i][j-1][k]+phi[i][j][k]);
+      }
+      real mult = bdphi*matt.sigma(m,i,j,k)*vec->dV(m,i,j,k);
+      (*vec)[m][i][j][k] -= mult*(kappa[i][j][k]-kappa[i][j-1][k])/vec->dyc(m,j);
+    }
+  }
+
+  m = Comp::w();
+  for_vmijk((*vec),m,i,j,k) {
+    if(adens[i][j][k-1]>0.0||adens[i][j][k]>0.0) {
+      real bdphi;
+      if(bndclr) {
+        bdphi = (*bndclr)[m][i][j][k];
+      } else {
+        bdphi = 0.5*(phi[i][j][k-1]+phi[i][j][k]);
+      }
+      real mult = bdphi*matt.sigma(m,i,j,k)*vec->dV(m,i,j,k);
+      (*vec)[m][i][j][k] -= mult*(kappa[i][j][k]-kappa[i][j][k-1])/vec->dzc(m,k);
+    }
+  }
+
+#else
   /*-----------------------+
   |  2nd step: body force  |
   +-----------------------*/
   real rho_diff = matt.rho(1)-matt.rho(0);
   real rho_ave = 0.5*(matt.rho(1)+matt.rho(0));
 
-  Comp m;
+#if 0
+  real val(0.0), rms(0.0), valmax(-100.0);
+  int cnt(0);
+  rho_diff=0.0;
+#endif
   if(rho_diff==0.0){
     m = Comp::u();
     for_vmijk((*vec),m,i,j,k) {
@@ -37,8 +93,25 @@ void VOF::tension(Vector * vec, const Matter matt) {
               * kappa_ave(kappa[i-1][j][k],kappa[i][j][k])
               * (phi[i][j][k] - phi[i-1][j][k])/vec->dxc(m,i)
               * vec->dV(m,i,j,k);
+#if 0
+        if((*vec)[m][i][j][k]>0.0&&j==3) {
+          val += kappa_ave(kappa[i-1][j][k],kappa[i][j][k]);
+          cnt++;
+          rms += pow(kappa_ave(kappa[i-1][j][k],kappa[i][j][k]),2.0);
+          if(valmax<kappa_ave(kappa[i-1][j][k],kappa[i][j][k]))
+            valmax = kappa_ave(kappa[i-1][j][k],kappa[i][j][k]);
+        }
+#endif
       }
     }
+#if 0
+    val /= real(cnt);
+    rms /= real(cnt);
+    rms -= val*val;
+    rms = sqrt(rms);
+    boil::oout<<val<<" +/- "<<rms<<" | "<<valmax<<boil::endl;
+    exit(0);
+#endif
     m = Comp::v();
     for_vmijk((*vec),m,i,j,k) {
       if(dom->ibody().on(m,i,j,k)) {
@@ -92,39 +165,24 @@ void VOF::tension(Vector * vec, const Matter matt) {
       }
     }
   }
-  vec->exchange();
-
-#if 0
-  for_aijk(i,j,k) {
-    stmp2[i][j][k]=real(iflag[i][j][k]);
-  }
-  for_aijk(i,j,k) {
-    stmp3[i][j][k]=real(iflagx[i][j][k]);
-  }
-
-  if(time->current_step() == 1) {
-      boil::plot->plot(vec,phi,stmp2,stmp3, "vec-phi-iflag-iflagx", time->current_step());
-  }
-
-  if(time->current_step() % 2000 == 0) {
-      boil::plot->plot(vec,phi,stmp2,stmp3, "vec-phi-iflag-iflagx", time->current_step());
-  }
-
-
-  if(time->current_step() == 10266) {
-      boil::plot->plot(vec,phi,stmp2,stmp3, "vec-phi-iflag-iflagx", time->current_step());
-  }
 #endif
+  vec->exchange();
 
   boil::timer.stop("vof tension");
 }
 /******************************************************************************/
-  real kappa_ave(const real r1, const real r2) {
+real VOF::kappa_ave(const real r1, const real r2) {
   real x;
   if (r1*r2>0.0) {
     x = 2.0 * r1 * r2 / (r1 + r2);
   } else {
-    x = 0.5*(r1+r2);
+    if (r1==kappa_non_cal) {
+      x = r2;
+    } else if (r2==kappa_non_cal) {
+      x = r1;
+    } else {
+      x = 0.5*(r1+r2);
+    }
   }
   return x;
 }

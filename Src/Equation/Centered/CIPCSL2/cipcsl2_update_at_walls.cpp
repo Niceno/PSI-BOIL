@@ -1,7 +1,7 @@
 #include "cipcsl2.h"
 
 /******************************************************************************/
-void CIPCSL2::update_at_walls() {
+void CIPCSL2::update_at_walls(Scalar & sca) {
 /***************************************************************************//**
 *  \brief Prepares color function for marching cube at boundaries.
 *         scalar_exchange(_all) should take account of periodic condition.
@@ -23,41 +23,41 @@ void CIPCSL2::update_at_walls() {
   /*-------------+
   | single walls |
   +-------------*/
-  for( int b=0; b<phi.bc().count(); b++ ) {
+  for( int b=0; b<sca.bc().count(); b++ ) {
 
-    if( phi.bc().type_decomp(b) ) continue;
+    if( sca.bc().type_decomp(b) ) continue;
 
-    if( phi.bc().type(b) == BndType::wall() ) {
+    if( sca.bc().type(b) == BndType::wall() ) {
 
-      Dir d = phi.bc().direction(b);
+      Dir d = sca.bc().direction(b);
       if(d != Dir::undefined()) {
         int ofx(0),ofy(0),ofz(0);
         real rat;
         
         if       (d == Dir::imin()) {
           ofx = +1;
-          rat = -phi.dxe(si())/phi.dxc(si());
+          rat = -sca.dxe(si())/sca.dxc(si());
         } else if(d == Dir::imax()) { 
           ofx = -1;
-          rat = -phi.dxw(ei())/phi.dxc(ei());
+          rat = -sca.dxw(ei())/sca.dxc(ei());
         } else if(d == Dir::jmin()) { 
           ofy = +1;
-          rat = -phi.dyn(sj())/phi.dyc(sj());
+          rat = -sca.dyn(sj())/sca.dyc(sj());
         } else if(d == Dir::jmax()) { 
           ofy = -1;
-          rat = -phi.dys(ej())/phi.dyc(ej());
+          rat = -sca.dys(ej())/sca.dyc(ej());
         } else if(d == Dir::kmin()) { 
           ofz = +1;
-          rat = -phi.dzt(sk())/phi.dzc(sk());
+          rat = -sca.dzt(sk())/sca.dzc(sk());
         } else if(d == Dir::kmax()) { 
           ofz = -1;
-          rat = -phi.dzb(ek())/phi.dzc(ek());
+          rat = -sca.dzb(ek())/sca.dzc(ek());
         } else {
           continue;
         }
 
-        for_vijk( phi.bc().at(b), i,j,k ) { 
-          phi[i][j][k] = extrapolate_c(i,j,k,ofx,ofy,ofz,rat);
+        for_vijk( sca.bc().at(b), i,j,k ) { 
+          sca[i][j][k] = extrapolate_c(sca,i,j,k,ofx,ofy,ofz,rat);
         } /* for loop */
       } /* dir not undefined */
     } /* is wall? */
@@ -69,8 +69,8 @@ void CIPCSL2::update_at_walls() {
   +---------------*/
   
   /* line i-min & j-min */
-  if(phi.bc().type_here(Dir::imin(), BndType::wall()) &&
-     phi.bc().type_here(Dir::jmin(), BndType::wall())   ) {
+  if(sca.bc().type_here(Dir::imin(), BndType::wall()) &&
+     sca.bc().type_here(Dir::jmin(), BndType::wall())   ) {
     int i=si()-1;
     int j=sj()-1;
     int ofx(0), ofy(0), ofz(0);
@@ -80,13 +80,13 @@ void CIPCSL2::update_at_walls() {
     xpos = -0.5;
     ypos = -0.5;
     for_k(k) {
-      phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
+      sca[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
     }
   }
 
   /* line i-min & j-max */
-  if(phi.bc().type_here(Dir::imin(), BndType::wall()) &&
-     phi.bc().type_here(Dir::jmax(), BndType::wall())   ) {
+  if(sca.bc().type_here(Dir::imin(), BndType::wall()) &&
+     sca.bc().type_here(Dir::jmax(), BndType::wall())   ) {
     int i=si()-1;
     int j=ej()+1;
     int ofx(0), ofy(0), ofz(0);
@@ -96,13 +96,13 @@ void CIPCSL2::update_at_walls() {
     xpos = -0.5;
     ypos = 1.5;
     for_k(k) {
-      phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
+      sca[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
     }
   }
 
   /* line i-max & j-min */
-  if(phi.bc().type_here(Dir::imax(), BndType::wall()) &&
-     phi.bc().type_here(Dir::jmin(), BndType::wall())   ) {
+  if(sca.bc().type_here(Dir::imax(), BndType::wall()) &&
+     sca.bc().type_here(Dir::jmin(), BndType::wall())   ) {
     int i=ei()+1;
     int j=sj()-1;
     int ofx(0), ofy(0), ofz(0);
@@ -112,13 +112,13 @@ void CIPCSL2::update_at_walls() {
     xpos = 1.5;
     ypos = -0.5;
     for_k(k) {
-      phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
+      sca[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
     }
   }
 
   /* line i-max & j-max */
-  if(phi.bc().type_here(Dir::imax(), BndType::wall()) &&
-     phi.bc().type_here(Dir::jmax(), BndType::wall())   ) {
+  if(sca.bc().type_here(Dir::imax(), BndType::wall()) &&
+     sca.bc().type_here(Dir::jmax(), BndType::wall())   ) {
     int i=ei()+1;
     int j=ej()+1;
     int ofx(0), ofy(0), ofz(0);
@@ -128,13 +128,13 @@ void CIPCSL2::update_at_walls() {
     xpos = 1.5;
     ypos = 1.5;
     for_k(k) {
-      phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
+      sca[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
     }
   }
 
   /* line i-min & k-min */
-  if(phi.bc().type_here(Dir::imin(), BndType::wall()) &&
-     phi.bc().type_here(Dir::kmin(), BndType::wall())   ) {
+  if(sca.bc().type_here(Dir::imin(), BndType::wall()) &&
+     sca.bc().type_here(Dir::kmin(), BndType::wall())   ) {
     int i=si()-1;
     int k=sk()-1;
     int ofx(0), ofy(0), ofz(0);
@@ -144,13 +144,13 @@ void CIPCSL2::update_at_walls() {
     xpos = -0.5;
     zpos = -0.5;
     for_j(j) {
-      phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
+      sca[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
     }
   }
 
   /* line i-min & k-max */
-  if(phi.bc().type_here(Dir::imin(), BndType::wall()) &&
-     phi.bc().type_here(Dir::kmax(), BndType::wall())   ) {
+  if(sca.bc().type_here(Dir::imin(), BndType::wall()) &&
+     sca.bc().type_here(Dir::kmax(), BndType::wall())   ) {
     int i=si()-1;
     int k=ek()+1;
     int ofx(0), ofy(0), ofz(0);
@@ -160,13 +160,13 @@ void CIPCSL2::update_at_walls() {
     xpos = -0.5;
     zpos = 1.5;
     for_j(j) {
-      phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
+      sca[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
     }
   }
 
   /* line i-max & k-min */
-  if(phi.bc().type_here(Dir::imax(), BndType::wall()) &&
-     phi.bc().type_here(Dir::kmin(), BndType::wall())   ) {
+  if(sca.bc().type_here(Dir::imax(), BndType::wall()) &&
+     sca.bc().type_here(Dir::kmin(), BndType::wall())   ) {
     int i=ei()+1;
     int k=sk()-1;
     int ofx(0), ofy(0), ofz(0);
@@ -176,13 +176,13 @@ void CIPCSL2::update_at_walls() {
     xpos = 1.5;
     zpos = -0.5;
     for_j(j) {
-      phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
+      sca[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
     }
   }
 
   /* line i-max & k-max */
-  if(phi.bc().type_here(Dir::imax(), BndType::wall()) &&
-     phi.bc().type_here(Dir::kmax(), BndType::wall())   ) {
+  if(sca.bc().type_here(Dir::imax(), BndType::wall()) &&
+     sca.bc().type_here(Dir::kmax(), BndType::wall())   ) {
     int i=ei()+1;
     int k=ek()+1;
     int ofx(0), ofy(0), ofz(0);
@@ -192,13 +192,13 @@ void CIPCSL2::update_at_walls() {
     ypos = 1.5;
     zpos = 1.5;
     for_j(j) {
-      phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
+      sca[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
     }
   }
 
   /* line j-min & k-min */
-  if(phi.bc().type_here(Dir::jmin(), BndType::wall()) &&
-     phi.bc().type_here(Dir::kmin(), BndType::wall())   ) {
+  if(sca.bc().type_here(Dir::jmin(), BndType::wall()) &&
+     sca.bc().type_here(Dir::kmin(), BndType::wall())   ) {
     int j=sj()-1;
     int k=sk()-1;
     int ofx(0), ofy(0), ofz(0);
@@ -208,13 +208,13 @@ void CIPCSL2::update_at_walls() {
     ypos = -0.5;
     zpos = -0.5;
     for_i(i) {
-      phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
+      sca[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
     }
   }
 
   /* line j-min & k-max */
-  if(phi.bc().type_here(Dir::jmin(), BndType::wall()) &&
-     phi.bc().type_here(Dir::kmax(), BndType::wall())   ) {
+  if(sca.bc().type_here(Dir::jmin(), BndType::wall()) &&
+     sca.bc().type_here(Dir::kmax(), BndType::wall())   ) {
     int j=sj()-1;
     int k=ek()+1;
     int ofx(0), ofy(0), ofz(0);
@@ -224,13 +224,13 @@ void CIPCSL2::update_at_walls() {
     ypos = -0.5;
     zpos = 1.5;
     for_i(i) {
-      phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
+      sca[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
     }
   }
 
   /* line j-max & k-min */
-  if(phi.bc().type_here(Dir::jmax(), BndType::wall()) &&
-     phi.bc().type_here(Dir::kmin(), BndType::wall())   ) {
+  if(sca.bc().type_here(Dir::jmax(), BndType::wall()) &&
+     sca.bc().type_here(Dir::kmin(), BndType::wall())   ) {
     int j=ej()+1;
     int k=sk()-1;
     int ofx(0), ofy(0), ofz(0);
@@ -240,13 +240,13 @@ void CIPCSL2::update_at_walls() {
     ypos = 1.5;
     zpos = -0.5;
     for_i(i) {
-      phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
+      sca[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
     }
   }
 
   /* line j-max & k-max */
-  if(phi.bc().type_here(Dir::jmax(), BndType::wall()) &&
-     phi.bc().type_here(Dir::kmax(), BndType::wall())   ) {
+  if(sca.bc().type_here(Dir::jmax(), BndType::wall()) &&
+     sca.bc().type_here(Dir::kmax(), BndType::wall())   ) {
     int j=ej()+1;
     int k=ek()+1;
     int ofx(0), ofy(0), ofz(0);
@@ -256,7 +256,7 @@ void CIPCSL2::update_at_walls() {
     ypos = 1.5;
     zpos = 1.5;
     for_i(i) {
-      phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
+      sca[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
     }
   }
 
@@ -265,9 +265,9 @@ void CIPCSL2::update_at_walls() {
   +-----------------*/
 
   /* corner i-min & j-min & k-min */
-  if(phi.bc().type_here(Dir::imin(), BndType::wall()) &&
-     phi.bc().type_here(Dir::jmin(), BndType::wall()) &&
-     phi.bc().type_here(Dir::kmin(), BndType::wall())   ) {
+  if(sca.bc().type_here(Dir::imin(), BndType::wall()) &&
+     sca.bc().type_here(Dir::jmin(), BndType::wall()) &&
+     sca.bc().type_here(Dir::kmin(), BndType::wall())   ) {
     int i=si()-1;
     int j=sj()-1;
     int k=sk()-1;
@@ -279,14 +279,14 @@ void CIPCSL2::update_at_walls() {
     xpos = -0.5;
     ypos = -0.5;
     zpos = -0.5;
-    phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
+    sca[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
   }
 
 
   /* corner i-min & j-min & k-max */
-  if(phi.bc().type_here(Dir::imin(), BndType::wall()) &&
-     phi.bc().type_here(Dir::jmin(), BndType::wall()) &&
-     phi.bc().type_here(Dir::kmax(), BndType::wall())   ) {
+  if(sca.bc().type_here(Dir::imin(), BndType::wall()) &&
+     sca.bc().type_here(Dir::jmin(), BndType::wall()) &&
+     sca.bc().type_here(Dir::kmax(), BndType::wall())   ) {
     int i=si()-1;
     int j=sj()-1;
     int k=ek()+1;
@@ -298,13 +298,13 @@ void CIPCSL2::update_at_walls() {
     xpos = -0.5;
     ypos = -0.5;
     zpos = 1.5;
-    phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
+    sca[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
   }
 
   /* corner i-min & j-max & k-min */
-  if(phi.bc().type_here(Dir::imin(), BndType::wall()) &&
-     phi.bc().type_here(Dir::jmax(), BndType::wall()) &&
-     phi.bc().type_here(Dir::kmin(), BndType::wall())   ) {
+  if(sca.bc().type_here(Dir::imin(), BndType::wall()) &&
+     sca.bc().type_here(Dir::jmax(), BndType::wall()) &&
+     sca.bc().type_here(Dir::kmin(), BndType::wall())   ) {
     int i=si()-1;
     int j=ej()+1;
     int k=sk()-1;
@@ -316,14 +316,14 @@ void CIPCSL2::update_at_walls() {
     xpos = -0.5;
     ypos = 1.5;
     zpos = -0.5;
-    phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
+    sca[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
   }
 
 
   /* corner i-min & j-max & k-max */
-  if(phi.bc().type_here(Dir::imin(), BndType::wall()) &&
-     phi.bc().type_here(Dir::jmax(), BndType::wall()) &&
-     phi.bc().type_here(Dir::kmax(), BndType::wall())   ) {
+  if(sca.bc().type_here(Dir::imin(), BndType::wall()) &&
+     sca.bc().type_here(Dir::jmax(), BndType::wall()) &&
+     sca.bc().type_here(Dir::kmax(), BndType::wall())   ) {
     int i=si()-1;
     int j=ej()+1;
     int k=ek()+1;
@@ -335,14 +335,14 @@ void CIPCSL2::update_at_walls() {
     xpos = -0.5;
     ypos = 1.5;
     zpos = 1.5;
-    phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
+    sca[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
   }
 
 
   /* corner i-max & j-min & k-min */
-  if(phi.bc().type_here(Dir::imax(), BndType::wall()) &&
-     phi.bc().type_here(Dir::jmin(), BndType::wall()) &&
-     phi.bc().type_here(Dir::kmin(), BndType::wall())   ) {
+  if(sca.bc().type_here(Dir::imax(), BndType::wall()) &&
+     sca.bc().type_here(Dir::jmin(), BndType::wall()) &&
+     sca.bc().type_here(Dir::kmin(), BndType::wall())   ) {
     int i=ei()+1;
     int j=sj()-1;
     int k=sk()-1;
@@ -354,13 +354,13 @@ void CIPCSL2::update_at_walls() {
     xpos = 1.5;
     ypos = -0.5;
     zpos = -0.5;
-    phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
+    sca[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
   }
 
   /* corner i-max & j-min & k-max */
-  if(phi.bc().type_here(Dir::imax(), BndType::wall()) &&
-     phi.bc().type_here(Dir::jmin(), BndType::wall()) &&
-     phi.bc().type_here(Dir::kmax(), BndType::wall())   ) {
+  if(sca.bc().type_here(Dir::imax(), BndType::wall()) &&
+     sca.bc().type_here(Dir::jmin(), BndType::wall()) &&
+     sca.bc().type_here(Dir::kmax(), BndType::wall())   ) {
     int i=ei()+1;
     int j=sj()-1;
     int k=ek()+1;
@@ -372,13 +372,13 @@ void CIPCSL2::update_at_walls() {
     xpos = 1.5;
     ypos = -0.5;
     zpos = 1.5;
-    phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
+    sca[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
   }
 
   /* corner i-max & j-max & k-min */
-  if(phi.bc().type_here(Dir::imax(), BndType::wall()) &&
-     phi.bc().type_here(Dir::jmax(), BndType::wall()) &&
-     phi.bc().type_here(Dir::kmin(), BndType::wall())   ) {
+  if(sca.bc().type_here(Dir::imax(), BndType::wall()) &&
+     sca.bc().type_here(Dir::jmax(), BndType::wall()) &&
+     sca.bc().type_here(Dir::kmin(), BndType::wall())   ) {
     int i=ei()+1;
     int j=ej()+1;
     int k=sk()-1;
@@ -390,13 +390,13 @@ void CIPCSL2::update_at_walls() {
     xpos = 1.5;
     ypos = 1.5;
     zpos = -0.5;
-    phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
+    sca[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
   }
 
   /* corner i-max & j-max & k-max */
-  if(phi.bc().type_here(Dir::imax(), BndType::wall()) &&
-     phi.bc().type_here(Dir::jmax(), BndType::wall()) &&
-     phi.bc().type_here(Dir::kmax(), BndType::wall())   ) {
+  if(sca.bc().type_here(Dir::imax(), BndType::wall()) &&
+     sca.bc().type_here(Dir::jmax(), BndType::wall()) &&
+     sca.bc().type_here(Dir::kmax(), BndType::wall())   ) {
     int i=ei()+1;
     int j=ej()+1;
     int k=ek()+1;
@@ -408,7 +408,7 @@ void CIPCSL2::update_at_walls() {
     xpos = 1.5;
     ypos = 1.5;
     zpos = 1.5;
-    phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
+    sca[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
   }
 #endif
 
@@ -424,52 +424,52 @@ void CIPCSL2::update_at_walls() {
     if(dom->ibody().off(i-1,j,k)) {
       int ofx(0), ofy(0), ofz(0);
       ofx = +1;
-      real rat = -phi.dxe(i)/phi.dxc(i);
-      phi[i-1][j][k] = extrapolate_c(i-1,j,k,ofx,ofy,ofz,rat);
+      real rat = -sca.dxe(i)/sca.dxc(i);
+      sca[i-1][j][k] = extrapolate_c(sca,i-1,j,k,ofx,ofy,ofz,rat);
     }
 
     /* east */
     if (dom->ibody().off(i+1,j,k)) {
       int ofx(0), ofy(0), ofz(0);
       ofx = -1;
-      real rat = -phi.dxw(i)/phi.dxc(i);
-      phi[i+1][j][k] = extrapolate_c(i+1,j,k,ofx,ofy,ofz,rat);
+      real rat = -sca.dxw(i)/sca.dxc(i);
+      sca[i+1][j][k] = extrapolate_c(sca,i+1,j,k,ofx,ofy,ofz,rat);
     }
 
     /* south */
     if (dom->ibody().off(i,j-1,k)) {
       int ofx(0), ofy(0), ofz(0);
       ofy = +1;
-      real rat = -phi.dyn(j)/phi.dyc(j);
-      phi[i][j-1][k] = extrapolate_c(i,j-1,k,ofx,ofy,ofz,rat);
+      real rat = -sca.dyn(j)/sca.dyc(j);
+      sca[i][j-1][k] = extrapolate_c(sca,i,j-1,k,ofx,ofy,ofz,rat);
     }
 
     /* north */
     if (dom->ibody().off(i,j+1,k)) {
       int ofx(0), ofy(0), ofz(0);
       ofy = -1;
-      real rat = -phi.dys(j)/phi.dyc(j);
-      phi[i][j+1][k] = extrapolate_c(i,j+1,k,ofx,ofy,ofz,rat);
+      real rat = -sca.dys(j)/sca.dyc(j);
+      sca[i][j+1][k] = extrapolate_c(sca,i,j+1,k,ofx,ofy,ofz,rat);
     }
 
     /* bottom */
     if (dom->ibody().off(i,j,k-1)) {
       int ofx(0), ofy(0), ofz(0);
       ofz = +1;
-      real rat = -phi.dzt(k)/phi.dzc(k);
-      phi[i][j][k-1] = extrapolate_c(i,j,k-1,ofx,ofy,ofz,rat);
+      real rat = -sca.dzt(k)/sca.dzc(k);
+      sca[i][j][k-1] = extrapolate_c(sca,i,j,k-1,ofx,ofy,ofz,rat);
     }
 
     /* top */
     if (dom->ibody().off(i,j,k+1)) {
       int ofx(0), ofy(0), ofz(0);
       ofy = -1;
-      real rat = -phi.dzb(k)/phi.dzc(k);
-      phi[i][j][k+1] = extrapolate_c(i,j,k+1,ofx,ofy,ofz,rat);
+      real rat = -sca.dzb(k)/sca.dzc(k);
+      sca[i][j][k+1] = extrapolate_c(sca,i,j,k+1,ofx,ofy,ofz,rat);
     }
   }
 
-  phi.exchange_all();
+  sca.exchange_all();
  
   return;
 }
@@ -477,7 +477,8 @@ void CIPCSL2::update_at_walls() {
 /*-------------------+
 | ancillary function |
 +-------------------*/
-real CIPCSL2::extrapolate_c(const int i, const int j, const int k,
+real CIPCSL2::extrapolate_c(const Scalar & sca,
+                            const int i, const int j, const int k,
                             const int ofx, const int ofy, const int ofz,
                             const real rat) {
 
@@ -491,16 +492,16 @@ real CIPCSL2::extrapolate_c(const int i, const int j, const int k,
    
 
   /* the picos are to avoid singularity for atanh */
-  real phi1 = std::max(boil::pico,std::min(1.-boil::pico,phi[ii1][jj1][kk1]));
-  real phi2 = std::max(boil::pico,std::min(1.-boil::pico,phi[ii2][jj2][kk2]));
+  real sca1 = std::max(boil::pico,std::min(1.-boil::pico,sca[ii1][jj1][kk1]));
+  real sca2 = std::max(boil::pico,std::min(1.-boil::pico,sca[ii2][jj2][kk2]));
 
   /* erroneous interfaces */
-  if(phi1<tol_wall||phi1-1.0>-tol_wall) {
-    return real(phi1>phisurf);
+  if(sca1<tol_wall||sca1-1.0>-tol_wall) {
+    return real(sca1>phisurf);
   } 
 
-  real val1 = atanh(2.*phi1-1.); 
-  real val2 = atanh(2.*phi2-1.); 
+  real val1 = atanh(2.*sca1-1.); 
+  real val2 = atanh(2.*sca2-1.); 
   real arg = val1 + rat*(val2-val1);
  
   return 0.5*(1.+tanh(arg));

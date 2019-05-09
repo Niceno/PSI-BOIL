@@ -76,6 +76,7 @@ VOF::VOF(const Scalar & PHI,
   iflagx    = phi.shape();
   iflagy    = phi.shape();
   iflagz    = phi.shape();
+  adens     = phi.shape();
  
   mixture = flu;
   if(mixture) {
@@ -86,7 +87,6 @@ VOF::VOF(const Scalar & PHI,
     rhov = 1.;
   }
 
-  adens = phi.shape();
   //adensgeom = phi.shape();
   for_m(m) {
     fs(m) = (*u)(m).shape();
@@ -106,32 +106,51 @@ VOF::VOF(const Scalar & PHI,
 
   epsnorm=1.0e-12;
   phisurf=0.5;
+  nlayer=2;
+  n_ext_fs=5;
   tol_wall = 0.01; /* tolerance 0.99 \approx 1.0 near walls */
   tol_flux = 3e-3; /* during inner iterations */
   tol_ext = 1e-7; /* extrapolation tolerance */
   flux_cfl = 0.2;  /* used in case 3 flux calculations */
   maxiter = 10;    /* maximal number of iterations */
-
-  /* set initial value */
-  nlayer=4;
-  n_ext_fs=5;
-
-  //alloc3d(& iflag, phi.ni(), phi.nj(), phi.nk());
-
-#if 0
-  f_w=0.0;
-  f_e=0.0;
-  f_t=0.0;
-  f_b=0.0;
-  f_n=0.0;
-  f_s=0.0;
-#endif
+  kappa_non_cal = 0.0;
+  curv_method = 0;
 
   discretize();
 
   /* apply boundary condition */
   phi.bnd_update();
   phi.exchange_all();
+
+  /* check boundary condition */
+  iminp = imaxp = jminp = jmaxp = kminp = kmaxp = false;
+  // imin
+  Dir d = Dir::imin();
+  if (phi.bc().type_decomp(d)) iminp=true;
+  if (phi.bc().type(d,BndType::periodic())) iminp=true;
+  // imax
+  d = Dir::imax();
+  if (phi.bc().type_decomp(d)) imaxp=true;
+  if (phi.bc().type(d,BndType::periodic())) imaxp=true;
+  // jmin
+  d = Dir::jmin();
+  if (phi.bc().type_decomp(d)) jminp=true;
+  if (phi.bc().type(d,BndType::periodic())) jminp=true;
+  // jmax
+  d = Dir::jmax();
+  if (phi.bc().type_decomp(d)) jmaxp=true;
+  if (phi.bc().type(d,BndType::periodic())) jmaxp=true;
+  // kmin
+  d = Dir::kmax();
+  if (phi.bc().type_decomp(d)) kminp=true;
+  if (phi.bc().type(d,BndType::periodic())) kminp=true;
+  // kmax
+  d = Dir::kmax();
+  if (phi.bc().type_decomp(d)) kmaxp=true;
+  if (phi.bc().type(d,BndType::periodic())) kmaxp=true;
+
+  boil::aout<<"curv_HF::Bnd= "<<iminp<<" "<<imaxp<<" "<<jminp<<" "<<jmaxp<<" "
+            <<kminp<<" "<<kmaxp<<"\n";
 
 }	
 

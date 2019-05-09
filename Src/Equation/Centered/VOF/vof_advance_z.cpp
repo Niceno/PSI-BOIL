@@ -72,7 +72,10 @@ void VOF::advance_z() {
       f = dV(i,j,kup)*calc_flux(g,phiup,nz[i][j][kup],
                                         ny[i][j][kup],
                                         nx[i][j][kup]);
+      //f *= volfactorup;
     } else {
+      exit(0);
+#if 0
       /* gas velocities */
       real gasvelup(-1000.0),gasveldn(-1000.0);
       int gasflowup(-1),gasflowdn(-1);
@@ -193,6 +196,7 @@ void VOF::advance_z() {
 
 #endif
       } /* cases */
+#endif
     } /* adiabatic-diabatic */
 
 #if 0

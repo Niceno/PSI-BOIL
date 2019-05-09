@@ -14,21 +14,26 @@ libVof_a_SOURCES =      vof.h                 \
                         vof_calc_v.cpp        \
                         vof_curv_HF.cpp          \
                         vof_curv_HF_ext.cpp     \
+                        vof_curv_smooth.cpp   \
                         vof_extract_alpha.cpp   \
                         vof_fext_cut.cpp          \
                         vof_fs_bnd.cpp          \
                         vof_fs3.cpp          \
+                        vof_fs_interp.cpp          \
                         vof_front_minmax.cpp  \
                         vof_gradphi.cpp  \
+                        vof_gradphic.cpp  \
                         vof_insert_bc.cpp     \
                         vof_insert_bc_flag.cpp     \
                         vof_iterate_flux.cpp \
                         vof_tension.cpp       \
                         vof_totalvol.cpp     \
+                        vof_insert_bc_gradphic.cpp \
                         vof_insert_bc_norm.cpp \
                         vof_insert_bc_norm_cc.cpp \
                         vof_normalize.cpp \
                         vof_norm_cc.cpp \
+                        vof_norm_young.cpp \
                         vof_set_iflag.cpp \
                         vof_vel_value.cpp \
                         vof_true_norm_vect.cpp \

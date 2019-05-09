@@ -4,25 +4,21 @@
 //#define USE_ENTH /* use old enth */
 //#define PLOTALL
 //#define PLOTNONE
-#define FULLSIM
-//#define INVERT
 
 /* computed parameters */
-const int gLevel = 4;  //grid level=2,4,8
-const int NX = 24*gLevel;
+const int NZ = 10;
+const int start = 2;
+const int slope = 2;
+const int NX = start+NZ*slope+10;
+const int NY = 2;
 
 /* domain dimensions (given by problem) */
-const real LX = 187.5e-6;
-const real radius=50.0e-6;
+const real LX = 2e-6;
+const real LY = LX*real(NY)/real(NX);
+const real LZ = LX*real(NZ)/real(NX);
 
 const real tsat0=373.15;
-#ifdef INVERT
-const real tout=tsat0-1.25;
-#else
 const real tout=tsat0+1.25;
-#endif
-const real dtsatdp=3.0/4.0;
-const real pi=acos(-1.0);
 
 /******************************************************************************/
 main(int argc, char ** argv) {
@@ -40,22 +36,20 @@ main(int argc, char ** argv) {
   /*--------------------------------+
   |  choose the output file format  |
   +--------------------------------*/
-  boil::plot = new PlotTEC();
-  //boil::plot = new PlotTEC(AsNodes::no(),Buffers::yes());
+  //boil::plot = new PlotTEC();
+  boil::plot = new PlotTEC(AsNodes::no(),Buffers::yes());
 
   /*----------+
   |  grid(s)  |
   +----------*/
-#ifdef FULLSIM
-  Grid1D gx( Range<real>(-LX,LX), 2*NX, Periodic::no() );
-#else
   Grid1D gx( Range<real>(0.0,LX), NX, Periodic::no() );
-#endif
+  Grid1D gy( Range<real>(0.0,LY), NY, Periodic::yes() );
+  Grid1D gz( Range<real>(0.0,LZ), NZ, Periodic::no() );
 
   /*---------+
   |  domain  |
   +---------*/
-  Domain d(gx, gx, gx);
+  Domain d(gx, gy, gz);
 
   /*----------------+
   |  linear solver  |
@@ -75,26 +69,16 @@ main(int argc, char ** argv) {
   Scalar mflx(d); // pc
   Vector bndclr(d), bndclrold(d);
 
-
   /*-----------------------------+ 
   |  insert boundary conditions  |
   +-----------------------------*/
   for_m(m) {
-#ifndef FULLSIM
-    uvw.bc(m).add( BndCnd( Dir::imin(), BndType::symmetry() ) );
+    uvw.bc(m).add( BndCnd( Dir::imin(), BndType::wall() ) );
     uvw.bc(m).add( BndCnd( Dir::imax(), BndType::outlet() ) );
-    uvw.bc(m).add( BndCnd( Dir::jmin(), BndType::symmetry() ) );
-    uvw.bc(m).add( BndCnd( Dir::jmax(), BndType::outlet() ) );
-    uvw.bc(m).add( BndCnd( Dir::kmin(), BndType::symmetry() ) );
-    uvw.bc(m).add( BndCnd( Dir::kmax(), BndType::outlet() ) );
-#else
-    uvw.bc(m).add( BndCnd( Dir::imin(), BndType::outlet() ) );
-    uvw.bc(m).add( BndCnd( Dir::imax(), BndType::outlet() ) );
-    uvw.bc(m).add( BndCnd( Dir::jmin(), BndType::outlet() ) );
-    uvw.bc(m).add( BndCnd( Dir::jmax(), BndType::outlet() ) );
-    uvw.bc(m).add( BndCnd( Dir::kmin(), BndType::outlet() ) );
-    uvw.bc(m).add( BndCnd( Dir::kmax(), BndType::outlet() ) );
-#endif
+    uvw.bc(m).add( BndCnd( Dir::jmin(), BndType::periodic() ) );
+    uvw.bc(m).add( BndCnd( Dir::jmax(), BndType::periodic() ) );
+    uvw.bc(m).add( BndCnd( Dir::kmin(), BndType::wall() ) );
+    uvw.bc(m).add( BndCnd( Dir::kmax(), BndType::wall() ) );
 
     bndclr(m)    = uvw(m).shape();
     bndclrold(m) = uvw(m).shape();
@@ -102,8 +86,8 @@ main(int argc, char ** argv) {
 
   p.bc().add( BndCnd( Dir::imin(), BndType::neumann() ) );
   p.bc().add( BndCnd( Dir::imax(), BndType::neumann() ) );
-  p.bc().add( BndCnd( Dir::jmin(), BndType::neumann() ) );
-  p.bc().add( BndCnd( Dir::jmax(), BndType::neumann() ) );
+  p.bc().add( BndCnd( Dir::jmin(), BndType::periodic() ) );
+  p.bc().add( BndCnd( Dir::jmax(), BndType::periodic() ) );
   p.bc().add( BndCnd( Dir::kmin(), BndType::neumann() ) );
   p.bc().add( BndCnd( Dir::kmax(), BndType::neumann() ) );
 
@@ -113,40 +97,22 @@ main(int argc, char ** argv) {
   mdot = p.shape();
   mflx = p.shape();
   q = p.shape();
+  g = p.shape();
 
-#ifndef FULLSIM
-  c.bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
+  c.bc().add( BndCnd( Dir::imin(), BndType::wall() ) );
   c.bc().add( BndCnd( Dir::imax(), BndType::outlet() ) );
-  c.bc().add( BndCnd( Dir::jmin(), BndType::symmetry() ) );
-  c.bc().add( BndCnd( Dir::jmax(), BndType::outlet() ) );
-  c.bc().add( BndCnd( Dir::kmin(), BndType::symmetry() ) );
-  c.bc().add( BndCnd( Dir::kmax(), BndType::outlet() ) );
-#else
-  c.bc().add( BndCnd( Dir::imin(), BndType::outlet() ) );
-  c.bc().add( BndCnd( Dir::imax(), BndType::outlet() ) );
-  c.bc().add( BndCnd( Dir::jmin(), BndType::outlet() ) );
-  c.bc().add( BndCnd( Dir::jmax(), BndType::outlet() ) );
-  c.bc().add( BndCnd( Dir::kmin(), BndType::outlet() ) );
-  c.bc().add( BndCnd( Dir::kmax(), BndType::outlet() ) );
-#endif
-  g = c.shape();
+  c.bc().add( BndCnd( Dir::jmin(), BndType::periodic() ) );
+  c.bc().add( BndCnd( Dir::jmax(), BndType::periodic() ) );
+  c.bc().add( BndCnd( Dir::kmin(), BndType::wall() ) );
+  c.bc().add( BndCnd( Dir::kmax(), BndType::wall() ) );
   cold = c.shape();
 
-#ifndef FULLSIM
-  tpr.bc().add( BndCnd( Dir::imin(), BndType::neumann() ) );
-  tpr.bc().add( BndCnd( Dir::imax(), BndType::dirichlet(), tout ) );
-  tpr.bc().add( BndCnd( Dir::jmin(), BndType::neumann() ) );
-  tpr.bc().add( BndCnd( Dir::jmax(), BndType::dirichlet(), tout ) );
-  tpr.bc().add( BndCnd( Dir::kmin(), BndType::neumann() ) );
-  tpr.bc().add( BndCnd( Dir::kmax(), BndType::dirichlet(), tout ) );
-#else
   tpr.bc().add( BndCnd( Dir::imin(), BndType::dirichlet(), tout ) );
-  tpr.bc().add( BndCnd( Dir::imax(), BndType::dirichlet(), tout ) );
-  tpr.bc().add( BndCnd( Dir::jmin(), BndType::dirichlet(), tout ) );
-  tpr.bc().add( BndCnd( Dir::jmax(), BndType::dirichlet(), tout ) );
-  tpr.bc().add( BndCnd( Dir::kmin(), BndType::dirichlet(), tout ) );
-  tpr.bc().add( BndCnd( Dir::kmax(), BndType::dirichlet(), tout ) );
-#endif
+  tpr.bc().add( BndCnd( Dir::imax(), BndType::dirichlet(), tsat0 ) );
+  tpr.bc().add( BndCnd( Dir::jmin(), BndType::periodic() ) );
+  tpr.bc().add( BndCnd( Dir::jmax(), BndType::periodic() ) );
+  tpr.bc().add( BndCnd( Dir::kmin(), BndType::neumann() ) );
+  tpr.bc().add( BndCnd( Dir::kmax(), BndType::neumann() ) );
 
   /*----------------------+
   |  physical properties  |
@@ -161,36 +127,24 @@ main(int argc, char ** argv) {
   liquid.cp    (4215.9*958.4);
   liquid.lambda(0.679);
   const real latent=2258.0*1e3;
-//#ifdef INVERT
-//  Matter mixed(vapor, liquid, & c, & bndclr);
-//#else
   Matter mixed(liquid, vapor, & c, & bndclr);
-//#endif
   mixed.sigma(5.9e-2);
   boil::oout<<"physical properties\n";
 
   /*-------------------+
   |  time-integration  |
   +-------------------*/
-  const int  ndt =  1000*gLevel;
-  const int  nint =  350*gLevel;
+  const int  ndt =  20; //1000*gLevel;
+  const int  nint =  300;
 #ifdef PLOTALL
   const real tint = 2.0e-7;
 #elif defined PLOTNONE
   const real tint = 2.0;
 #else
-  #ifndef INVERT
   const real tint = 2.0e-5;
-  #else
-  const real tint = 0.04;
-  #endif
 #endif
   const real dxmin = LX/real(NX);
-#ifdef INVERT
-  const real dt = 100000.0 
-#else
-  const real dt = 250.0 
-#endif
+  const real dt = 10.0 
                 * pow(0.5*pow(dxmin,3.0)/(2.0*3.1415*mixed.sigma()->value())
                       , 0.5);
   Times time(ndt, dt);
@@ -210,7 +164,7 @@ main(int argc, char ** argv) {
   multigrid.min_cycles(3);
 
   VOF conc  (c,  g, kappa, uvw, time, solver, &bndclr, &mixed);
-  //conc.ancillary();
+  conc.ancillary();
   conc.front_minmax();
   conc.totalvol();
 
@@ -283,141 +237,44 @@ main(int argc, char ** argv) {
     /*--------------------+
     |  initial condition  |
     +--------------------*/
-    for_vijk(c,i,j,k) 
+    for_vijk(c,i,j,k) { 
       c[i][j][k] = 0.0;
+      tpr[i][j][k] = tsat0;
+    }
 
-    const real xcent=0.0;
-    const real ycent=0.0;
-    const real zcent=0.0;
-    for_vijk(c,i,j,k) {
-      real dist = pow(c.xc(i)-xcent,2.0)
-                 +pow(c.yc(j)-ycent,2.0)
-                 +pow(c.zc(k)-zcent,2.0);
-
-      real radius2=70.0e-6;
-      real coef1 =  2.28023719E+05;
-      real coef2 = -8.71920915E+09;
-      real coef3 = -7.28351952E+14;
-      real coef4 =  6.46735617E+19;
-      real coef5 = -1.35949950E+24;
-      if (dist<=pow(radius,2.0)) {
-        tpr[i][j][k] = tsat0;
-      } else if(dist<=pow(radius2,2.0)) {
-        real xi = sqrt(dist) - radius;
-#ifdef INVERT
-        real ttmp = -coef5*pow(xi,5.0) + -coef4*pow(xi,4.0) + -coef3*pow(xi,3.0)
-                  + -coef2*pow(xi,2.0) + -coef1*xi + tsat0;
-        tpr[i][j][k] = std::max(tout,ttmp);
-#else
-        real ttmp = coef5*pow(xi,5.0) + coef4*pow(xi,4.0) + coef3*pow(xi,3.0)
-                  + coef2*pow(xi,2.0) + coef1*xi + tsat0;
-        tpr[i][j][k] = std::min(tout,ttmp);
-#endif
-      } else {
-        tpr[i][j][k] = tout;
+    for_vk(c,k) {
+      real number = real(start)+real(slope)*(c.zc(k)+0.5*c.dzc(k))/LZ*NZ;
+      real cxmax = (number-0.5)*LX/real(NX);
+      for_vij(c,i,j) {
+        if       (fabs(c.xc(i)-cxmax)<boil::atto) {
+          c[i][j][k] = 0.25;
+        } else if(fabs(c.xc(i)-cxmax+LX/real(NX))<boil::atto) {
+          c[i][j][k] = 0.75;
+          tpr[i][j][k] = (1.0-c.xc(i)/(cxmax-0.5*LX/real(NX))) * (tout-tsat0) + tsat0;
+        } else if(c.xc(i)<(cxmax-1.5*LX/real(NX))) {
+          c[i][j][k] = 1.0;
+          tpr[i][j][k] = (1.0-c.xc(i)/(cxmax-0.5*LX/real(NX))) * (tout-tsat0) + tsat0;
+        }
       }
     }
-
-  int Realsum(0);
-  for_vijk(c,i,j,k) {
-    real wsb_x = c.xc(i) - c.dxc(i)*0.5;
-    real wst_x = c.xc(i) - c.dxc(i)*0.5;
-    real wnb_x = c.xc(i) - c.dxc(i)*0.5;
-    real wnt_x = c.xc(i) - c.dxc(i)*0.5;
-    real esb_x = c.xc(i) + c.dxc(i)*0.5;
-    real est_x = c.xc(i) + c.dxc(i)*0.5;
-    real enb_x = c.xc(i) + c.dxc(i)*0.5;
-    real ent_x = c.xc(i) + c.dxc(i)*0.5;
-
-    real wsb_y = c.yc(j) - c.dyc(j)*0.5;
-    real wst_y = c.yc(j) - c.dyc(j)*0.5;
-    real wnb_y = c.yc(j) + c.dyc(j)*0.5;
-    real wnt_y = c.yc(j) + c.dyc(j)*0.5;
-    real esb_y = c.yc(j) - c.dyc(j)*0.5;
-    real est_y = c.yc(j) - c.dyc(j)*0.5;
-    real enb_y = c.yc(j) + c.dyc(j)*0.5;
-    real ent_y = c.yc(j) + c.dyc(j)*0.5;
-
-    real wsb_z = c.zc(k) - c.dzc(k)*0.5;
-    real wst_z = c.zc(k) + c.dzc(k)*0.5;
-    real wnb_z = c.zc(k) - c.dzc(k)*0.5;
-    real wnt_z = c.zc(k) + c.dzc(k)*0.5;
-    real esb_z = c.zc(k) - c.dzc(k)*0.5;
-    real est_z = c.zc(k) + c.dzc(k)*0.5;
-    real enb_z = c.zc(k) - c.dzc(k)*0.5;
-    real ent_z = c.zc(k) + c.dzc(k)*0.5;
-
-    real wsb_dist = sqrt(pow(wsb_x-xcent,2.0)+pow(wsb_y-ycent,2.0)+pow(wsb_z-zcent,2.0));
-    real wst_dist = sqrt(pow(wst_x-xcent,2.0)+pow(wst_y-ycent,2.0)+pow(wst_z-zcent,2.0));
-    real wnb_dist = sqrt(pow(wnb_x-xcent,2.0)+pow(wnb_y-ycent,2.0)+pow(wnb_z-zcent,2.0));
-    real wnt_dist = sqrt(pow(wnt_x-xcent,2.0)+pow(wnt_y-ycent,2.0)+pow(wnt_z-zcent,2.0));
-    real esb_dist = sqrt(pow(esb_x-xcent,2.0)+pow(esb_y-ycent,2.0)+pow(esb_z-zcent,2.0));
-    real est_dist = sqrt(pow(est_x-xcent,2.0)+pow(est_y-ycent,2.0)+pow(est_z-zcent,2.0));
-    real enb_dist = sqrt(pow(enb_x-xcent,2.0)+pow(enb_y-ycent,2.0)+pow(enb_z-zcent,2.0));
-    real ent_dist = sqrt(pow(ent_x-xcent,2.0)+pow(ent_y-ycent,2.0)+pow(ent_z-zcent,2.0));
-
-    if(wsb_dist<radius&&wst_dist<radius&&wnb_dist<radius&&wnt_dist<radius&&
-       esb_dist<radius&&est_dist<radius&&enb_dist<radius&&ent_dist<radius) {
-       c[i][j][k] = 1.0;
-    } else if(wsb_dist<=radius||wst_dist<=radius||wnb_dist<=radius||wnt_dist<=radius||
-              esb_dist<=radius||est_dist<=radius||enb_dist<=radius||ent_dist<=radius) {
-       Realsum++;
-       int mm=20;
-       real x0=d.xn(i);
-       real y0=d.yn(j);
-       real z0=d.zn(k);
-       real ddx=d.dxc(i)/real(mm);
-       real ddy=d.dyc(j)/real(mm);
-       real ddz=d.dzc(k)/real(mm);
-       int itmp=0;
-       for (int ii=0; ii<mm; ii++){
-         for (int jj=0; jj<mm; jj++){
-           for (int kk=0; kk<mm; kk++){
-             real xxc=x0+0.5*ddx+real(ii)*ddx;
-             real yyc=y0+0.5*ddy+real(jj)*ddy;
-             real zzc=z0+0.5*ddz+real(kk)*ddz;
-             real dist=sqrt(pow(xxc-xcent,2.0)
-                           +pow(yyc-ycent,2.0)+pow(zzc-zcent,2.0));
-             if (dist<radius){
-               itmp=itmp+1;
-             }
-           }
-         }
-       }
-       c[i][j][k]=real(itmp)/real(mm*mm*mm);
-    }
-  }
-
-#ifndef INVERT
-  for_vijk(c,i,j,k)
-    c[i][j][k] = 1.0-c[i][j][k];
-#endif
-
-  c.bnd_update();
-  c.exchange_all();
-  tpr.exchange_all();
+    c.bnd_update();
+    c.exchange_all();
 
     conc.ancillary();
-    //marker.cal_adens_geom(conc.adens);
+#if 0
+    for_avi(c,i) {
+      boil::oout<<i<<" "<<c.xc(i)<<" "<<c[i][1+boil::BW][5+boil::BW]<<boil::endl;
+    }
+
+    exit(0);
+#endif
+
+    tpr.bnd_update();
+    tpr.exchange_all();
 
     boil::plot->plot(uvw,c,tpr,press,mdot,conc.adens,"uvw-c-tpr-press-mdot-adens",0);
 
-    /* verification */
-    real Realarea = 4.*acos(-1.0)*radius*radius;
-    real Simarea(0.);
-    int Simcount(0);
-    for_vijk(conc.adens,i,j,k) {
-      Simarea += (conc.adens)[i][j][k]*c.dV(i,j,k);
-      if((conc.adens)[i][j][k]>boil::atto)
-        Simcount++;
-    }
-
-    boil::oout<<"Verif: "<<Realarea<<" "<<Realsum;
-    boil::oout<<" | "<<Simarea<<" "<<Simcount;
-    boil::oout<<" | "<<Simarea/Realarea-1.<<" "<<real(Simcount)/real(Realsum)-1.<<boil::endl;
-    //exit(0);
-
-
+    conc.ancillary();
   }
   input.close();
 
@@ -438,23 +295,19 @@ main(int argc, char ** argv) {
     boil::oout << "########################" << boil::endl;
     boil::oout << " dt= " << time.dt() << boil::endl;
 
+#if 1
     /*------------------------+
     |  solve energy equation  |
     +------------------------*/
-#if 1
     enthFD.discretize();
     enthFD.new_time_step();
     enthFD.solve(ResRat(1e-16),"enthFD");
-#endif
 
     /*---------------+
     |  phase change  |
     +---------------*/
     pc.update();
     ns.vol_phase_change(&f);
-
-    //for_vijk(c,i,j,k) boil::oout<<i<<" "<<j<<" "<<k<<" "<<c[i][j][k]<<" "<<conc.adens[i][j][k]<<" "<<mdot[i][j][k]<<c.xc(i)<<" "<<c.yc(j)<<" "<<c.zc(k)<<boil::endl;
-    //exit(0);
 
     /* essential for moving front */
     ns.discretize();
@@ -490,6 +343,7 @@ main(int argc, char ** argv) {
     for_vijk(press,i,j,k)
       press[i][j][k] -= pmin;
 
+#endif
     /*---------------------------+
     |  solve transport equation  |
     +---------------------------*/
@@ -497,7 +351,17 @@ main(int argc, char ** argv) {
     for_m(m)
       bndclrold(m) = bndclr(m);
 
-    if(time.current_step()>1) conc.advance();
+    conc.cal_liq_vel();
+#if 0
+    p2 = 0.0;
+    if(multigrid2.vcycle(ResRat(1e-6))) OMS(converged);
+    p2.exchange();
+    ns2.project(p2);
+#endif
+
+    boil::oout<<"vel: "<<uvw[Comp::u()][10+boil::BW][1+boil::BW][4+boil::BW]<<" "<<uvw[Comp::u()][11+boil::BW][1+boil::BW][4+boil::BW]<<" | "<<c[10+boil::BW][1+boil::BW][4+boil::BW]<<" "<<mdot[10+boil::BW][1+boil::BW][4+boil::BW]<<boil::endl;
+
+    conc.advance();
     conc.front_minmax();
     boil::oout<<"x-min-front= "<<time.current_time()<<" "<<conc.get_xminft()
               <<" "<<conc.get_xmaxft()<<"\n";
@@ -518,7 +382,7 @@ main(int argc, char ** argv) {
       boil::plot->plot(uvw,c,tpr,press,mdot,conc.adens,"uvw-c-tpr-press-mdot-adens",iint);
       iint++;
     }
-    //boil::plot->plot(uvw,c,tpr,mflx,mdot,conc.adens,"uvw-c-tpr-mflx-mdot-adens",time.current_step());
+    boil::plot->plot(uvw,c,tpr,press,mdot,conc.adens,"uvw-c-tpr-press-mdot-adens",time.current_step());
 
     if((time.current_step()) % (nint)==0 ) {
       uvw  .save("uvw",   time.current_step());

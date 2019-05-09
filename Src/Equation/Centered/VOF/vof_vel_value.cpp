@@ -7,8 +7,11 @@ real VOF::vel_value(const Comp m, const int i, const int j, const int k) {
     fext is related to mflx as follows:
     fext = -m'''/rhol = -m''*adens/rhol 
 *******************************************************************************/
-   //real uval = (*u)[m][i][j][k];
+#if 1
+   real uval = (*u)[m][i][j][k];
+#else
    real uval = uliq[m][i][j][k];
+#endif
 
 #if 0
    if(mixture) {

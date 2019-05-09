@@ -9,7 +9,7 @@ void CIPCSL2::ancillary() {
   boil::timer.start("cipcsl2 ancillary");
 
   /* wall values extrapolation */
-  update_at_walls();
+  update_at_walls(phi);
 
   /*  calculate free surface position */
   cal_fs();

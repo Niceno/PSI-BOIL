@@ -3,6 +3,7 @@
 
 #include "../../Field/Scalar/scalar.h"
 #include <array>
+#include <vector>
 #include <iostream>
 #include <iomanip>
 

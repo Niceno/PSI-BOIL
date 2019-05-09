@@ -49,6 +49,8 @@ class PhaseChangeVOF : public Centered {
     void finalize();
     void modify_vel(Vector & uvw, 
                     const Vector & cnew, const Vector & cold);
+    void modify_vel(Vector & uvw, 
+                    const Scalar & cnew, const Scalar & cold);
 
     bool get_upwind_flag() { return upwind_flag; }
     void set_upwind_flag(const bool flag = true) { upwind_flag = flag; }

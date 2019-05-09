@@ -43,7 +43,7 @@ PhaseChange::PhaseChange(const Scalar & MDOT,
   bndtpr( *U.domain() ),
   M     ( *MDOT.domain()),
   adens ( *MDOT.domain()),
-  heavi(&phi, NULL, &adens)
+  heavi(&clr, NULL, &adens)
 {
   dist   = MDOT.shape();
   dflag  = MDOT.shape();

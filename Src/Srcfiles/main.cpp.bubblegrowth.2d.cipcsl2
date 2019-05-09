@@ -208,7 +208,7 @@ main(int argc, char ** argv) {
 //#ifdef INVERT
 //  Matter mixed(vapor, liquid, & c, & bndclr);
 //#else
-  Matter mixed(liquid, vapor, & c, & bndclr);
+  Matter mixed(liquid, vapor, & c);
 //#endif
   mixed.sigma(5.9e-2);
   boil::oout<<"physical properties\n";
@@ -253,7 +253,9 @@ main(int argc, char ** argv) {
   multigrid.stop_if_diverging(true);
   multigrid.min_cycles(3);
 
-  VOF conc  (c,  g, kappa, uvw, time, solver, &bndclr, &mixed);
+  CIPCSL2 conc  (c,  g, kappa, uvw, time, solver);
+  conc.set_nredist(1);
+  conc.set_itsharpen(4);
   //conc.ancillary();
   conc.front_minmax();
   conc.totalvol();
@@ -455,9 +457,9 @@ main(int argc, char ** argv) {
   for_vijk(c,i,j,k)
     c[i][j][k] = 1.0-c[i][j][k];
 #endif
-
   c.bnd_update();
   c.exchange_all();
+  conc.init();
   tpr.exchange_all();
 
     conc.ancillary();
@@ -563,11 +565,19 @@ main(int argc, char ** argv) {
               <<" "<<conc.get_xmaxft()<<"\n";
     conc.totalvol();
 
-#ifndef USE_PC
-    pc.modify_vel(uvw,bndclr,bndclrold);
-#else
+    real Simarea(0.);
+    int Simcount(0);
+    for_vijk(c,i,j,k) {
+      Simarea += (*(conc.topo.adens))[i][j][k]*c.dV(i,j,k);
+      if((*(conc.topo.adens))[i][j][k]>boil::atto)
+        Simcount++;
+    }
+    boil::cart.sum_real(&Simarea);
+    boil::cart.sum_int(&Simcount);
+
+    boil::oout<<"Verif: "<<time.current_time()<<" "<<Simarea<<" "<<Simcount<<"\n";
+
     pc.modify_vel(uvw,c,cold);
-#endif
 
     /* dt control */
     time.control_dt(ns.cfl_max(),0.10,dt);

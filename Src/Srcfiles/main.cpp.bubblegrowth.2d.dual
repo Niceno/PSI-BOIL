@@ -83,6 +83,7 @@ main(int argc, char ** argv) {
 
   Scalar mflx(d); // pc
   Vector bndclr(d), bndclrold(d);
+  Scalar c2  (d), g2  (d), kappa2(d); // concentration
 
 
   /*-----------------------------+ 
@@ -165,6 +166,9 @@ main(int argc, char ** argv) {
 #endif
   g = c.shape();
   cold = c.shape();
+  g2 = c.shape();
+  c2 = c.shape();
+  kappa = c.shape();
 
 #ifndef FULLSIM
   tpr.bc().add( BndCnd( Dir::imin(), BndType::neumann() ) );
@@ -209,8 +213,10 @@ main(int argc, char ** argv) {
 //  Matter mixed(vapor, liquid, & c, & bndclr);
 //#else
   Matter mixed(liquid, vapor, & c, & bndclr);
+  Matter mixed2(vapor, liquid, & c2);
 //#endif
   mixed.sigma(5.9e-2);
+  mixed2.sigma(5.9e-2);
   boil::oout<<"physical properties\n";
 
   /*-------------------+
@@ -254,6 +260,7 @@ main(int argc, char ** argv) {
   multigrid.min_cycles(3);
 
   VOF conc  (c,  g, kappa, uvw, time, solver, &bndclr, &mixed);
+  VOF conc2 (c2, g2, kappa2, uvw, time, solver, NULL, &mixed2);
   //conc.ancillary();
   conc.front_minmax();
   conc.totalvol();
@@ -452,12 +459,16 @@ main(int argc, char ** argv) {
   }
 
 #ifndef INVERT
-  for_vijk(c,i,j,k)
+  for_vijk(c,i,j,k) {
+    c2[i][j][k] = c[i][j][k];
     c[i][j][k] = 1.0-c[i][j][k];
+  }
 #endif
 
   c.bnd_update();
   c.exchange_all();
+  c2.bnd_update();
+  c2.exchange_all();
   tpr.exchange_all();
 
     conc.ancillary();
@@ -557,11 +568,41 @@ main(int argc, char ** argv) {
     for_m(m)
       bndclrold(m) = bndclr(m);
 
-    if(time.current_step()>1) conc.advance();
+#if 1
+    for_avijk(c,i,j,k) {
+      c2[i][j][k] = 1.0 - c[i][j][k];
+      g2[i][j][k] = g[i][j][k]*(-liquid.rho()->value())/vapor.rho()->value(); 
+    }
+
+    if(time.current_step()>1) {
+      conc.advance();
+      conc2.advance();
+    }
+    for_avijk(c,i,j,k) {
+      c[i][j][k] = 0.5*(c[i][j][k] + 1.0 - c2[i][j][k]);
+    }
+    conc.ancillary();
+#else
+    if(time.current_step()>1) {
+      conc.advance();
+    }
+#endif
+
+
     conc.front_minmax();
     boil::oout<<"x-min-front= "<<time.current_time()<<" "<<conc.get_xminft()
               <<" "<<conc.get_xmaxft()<<"\n";
     conc.totalvol();
+
+    real Simarea(0.);
+    int Simcount(0);
+    for_vijk(c,i,j,k) {
+      Simarea += (*(conc.topo.adens))[i][j][k]*c.dV(i,j,k);
+      if((*(conc.topo.adens))[i][j][k]>boil::atto)
+        Simcount++;
+    }
+
+    boil::oout<<"Verif: "<<time.current_time()<<" "<<Simarea<<" "<<Simcount<<"\n";
 
 #ifndef USE_PC
     pc.modify_vel(uvw,bndclr,bndclrold);

@@ -108,7 +108,7 @@ void VOF::advance() {
   phi.exchange_all();
 
   boil::timer.stop("vof advance");
-#if 1
+#if 0
   boil::timer.start("vof ancillary");
 
   #if 0
@@ -118,7 +118,8 @@ void VOF::advance() {
   /*-------------------------------+
   |  normal vector at cell center  |
   +-------------------------------*/
-  norm_cc(phi);
+  //norm_cc(phi);
+  norm_young(phi);
 
   /* calculate alpha in cells */
   extract_alpha();
@@ -145,6 +146,8 @@ void VOF::advance() {
 
   /* calculate curvature */
   //curv_HF();
+#else
+  ancillary();
 #endif
   return;
 }

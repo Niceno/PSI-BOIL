@@ -85,9 +85,10 @@ real MarchingCube::area(const int i, const int j, const int k){
   grid.p[7].x=0.0; grid.p[7].y=1.0; grid.p[7].z=1.0; grid.val[7]=0.0;
 #endif
 
-  real area = polygonise_area(grid, clrsurf);
-  //std::cout<<"marching_cube "<<area<<"\n";
+  real areaval = polygonise_area(grid, clrsurf);
+  //std::cout<<"marching_cube "<<areaval<<"\n";
   //exit(0);
- 
-  return (area);
+  //boil::oout<<i<<" "<<j<<" "<<k<<" "<<areaval;
+
+  return (areaval);
 }

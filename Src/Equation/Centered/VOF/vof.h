@@ -9,7 +9,6 @@
 #include "../../Heaviside/heaviside.h"
 #include "../../Topology/topology.h"
 
-
 ///////////
 //       //
 //  VOF  //
@@ -43,15 +42,31 @@ class VOF : public Centered {
     real get_zminft() { return(zminft);};
     real get_zmaxft() { return(zmaxft);};
 
-    // getter/setter for wall value tolerance
+    // getter and setter for wall value tolerance
     real get_tol_wall() { return tol_wall; }
-    void set_tol_wall(real tolnew) { 
+    void set_tol_wall(real tolnew) {
       tol_wall = tolnew;
       boil::oout<<"VOF: New wall value tolerance: "<<tol_wall<<boil::endl;
       return;
     }
 
-    // getter/setter for flux iteration tolerance
+    // getter and setter for curv_method
+    int get_curv_method() {return curv_method;}
+    void set_curv_method(int i) {
+      curv_method=i;
+      if(i==0){
+        boil::oout<<"VOF: height function is used for curvature calculation.\n";
+      } else if(i==1){
+        boil::oout<<"VOF: smoothed VOF is used for curvature calculation.\n";
+      } else {
+        boil::oout<<"method should be 0 or 1.\n";
+        boil::oout<<"0 for height function.\n";
+        boil::oout<<"1 for smoothed VOF.\n";
+        exit(0);
+      }
+    }
+
+    // getter and setter for flux iteration tolerance
     real get_tol_flux() { return tol_flux; }
     void set_tol_flux(real tolnew) { 
       tol_flux = tolnew;
@@ -59,7 +74,7 @@ class VOF : public Centered {
       return;
     }
 
-    // getter/setter for flux iteration number
+    // getter and setter for flux iteration number
     real get_iter_flux() { return maxiter; }
     void set_iter_flux(int iternew) {
       maxiter = iternew;
@@ -95,20 +110,25 @@ class VOF : public Centered {
     void advance_z();
     void bdcurv(const Scalar & g, const real & v);
     void cal_fs3();
+    void cal_fs_interp();
     void ext_vel(Scalar & sca, const Scalar & eflag, const int sgn);
     void fs_bnd();
     void update_at_walls();
     void curv_HF();
     void curv_HF_ext();
+    void curv_smooth();
+    real kappa_ave(const real r1, const real r2);
+    void smooth(const Scalar & sca, Scalar & scb, const int itnum);
     void extract_alpha();
     void true_norm_vect();
     void insert_bc(const Scalar & g);
     void gradphi(const Scalar & g);
-    //void gradphic(const Scalar & g);
-    //void insert_bc_gradphic(const Scalar & g);
+    void gradphic(const Scalar & g);
+    void insert_bc_gradphic(const Scalar & g);
     void insert_bc_norm_cc(const Scalar & g);
     void insert_bc_norm();
     void norm_cc(const Scalar & g);
+    void norm_young(const Scalar & g);
     void normalize(real & r1, real & r2, real & r3);
     real calc_v(real r1, real r2, real r3, real r4);
     real calc_alpha(const real r1, const real r2, const real r3, const real r4);
@@ -148,7 +168,6 @@ class VOF : public Centered {
                    const real r7, const real r8, const real r9,
                    const int i1,  const int i2,  const int i3);
     void set_iflag();
-    void smooth();
     void superpose();
     void insert_bc_flag(ScalarInt & g, const bool b);
 
@@ -174,11 +193,13 @@ class VOF : public Centered {
     void norm_cc_jmax(const Scalar &g, const int i,const int j, const int k);
     void norm_cc_kmin(const Scalar &g, const int i,const int j, const int k);
     void norm_cc_kmax(const Scalar &g, const int i,const int j, const int k);
-    void vf_limiter(); 
+    void vf_limiter();   
 
     real alpha_val(const int i, const int j, const int k);
     real fs_val(const Comp m, const int i, const int j, const int k);
     real frontPosition(const int i, const int j, const int k, const Comp m);
+
+    Scalar clr;     /* color function */
 
 #if 0
     /* adensgeom stuff */
@@ -243,13 +264,16 @@ class VOF : public Centered {
     real pi,theta;
     real dxmin,ww;
     real epsnorm;
+    real kappa_non_cal;
+    bool iminp, imaxp, jminp, jmaxp, kminp, kmaxp; // periodic = true
+
     real phisurf;
 #if 0
     real f_w, f_e, f_t, f_b, f_n, f_s;
 #endif
 
     int nlayer, n_ext_fs;
-    //int *** iflag;
+    int curv_method;
 };	
 #endif
 

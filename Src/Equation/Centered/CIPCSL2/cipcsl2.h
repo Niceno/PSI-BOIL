@@ -203,6 +203,7 @@ class CIPCSL2 : public Centered {
     void normalize(real & r1, real & r2, real & r3);
     void smear(Scalar & g);
     bool sharpen(Scalar & g, const real e, const int i, const bool b);
+
     void insert_bc_alp(const Scalar & g);
     void insert_bc_dist(Scalar & g);
     void insert_bc_flag(ScalarInt & g, const bool b);
@@ -252,11 +253,11 @@ class CIPCSL2 : public Centered {
     real beta(const real a1, const real a2, const bool b);
 
     void cal_fs();
-    real extrapolate_c(const int i, const int j, const int k,
+    real extrapolate_c(const Scalar & sca, const int i, const int j, const int k,
                        const int ofx, const int ofy, const int ofz,
                        const real rat);
     void cal_adens();
-    void update_at_walls();
+    void update_at_walls(Scalar & sca);
 
     Scalar clr, sclr;            /* color function, smeared color function */
 
@@ -285,5 +286,9 @@ class CIPCSL2 : public Centered {
     real cangle;
     real minclr, maxclr;
     bool localSharpen, use_dist_for_kappa;
+
+#if 0 /* for CL position evaluation */
+    real cposold, cposnew;
+#endif 
 };
 #endif

@@ -1,5 +1,5 @@
 #include "momentum.h"
-//#define TWODXY
+#define TWODXY
 
 /******************************************************************************/
 void Momentum::scale_out() {

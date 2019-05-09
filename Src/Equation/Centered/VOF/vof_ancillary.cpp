@@ -15,7 +15,8 @@ void VOF::ancillary() {
   /*-------------------------------+
   |  normal vector at cell center  |
   +-------------------------------*/
-  norm_cc(phi);
+  //norm_cc(phi);
+  norm_young(phi);
 #else
   curv_HF();
 #endif
@@ -25,7 +26,8 @@ void VOF::ancillary() {
   extract_alpha();
 
   /*  calculate free surface position */
-  cal_fs3();
+  //cal_fs3();
+  cal_fs_interp();
 
   /* prerequisite for marching cubes */
   update_at_walls();

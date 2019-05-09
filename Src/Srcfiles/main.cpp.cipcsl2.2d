@@ -14,13 +14,12 @@ static void __attribute__ ((constructor)) trapfpe(void)
 /* domain dimensions (given by problem) */
 //const real LX =   0.5;
 const real LX =   0.2;
-const real LY =   0.2;
 const real LZ =   0.2;
 
 /* computed parameters */
-//const int NX = 4;
 const int NX = 100;
-const int NY = 100;
+const int NY = 4;
+const real LY =  LX*real(NY)/real(NX);
 const int NZ = 100;
 
 /******************************************************************************/
@@ -37,7 +36,7 @@ main(int argc, char * argv[]) {
   |  grid(s)  |
   +----------*/
   Grid1D gx( Range<real>( 0,LX), NX, Periodic::yes() );
-  Grid1D gy( Range<real>( 0,LY), NY, Periodic::no() );
+  Grid1D gy( Range<real>( 0,LY), NY, Periodic::yes() );
   Grid1D gz( Range<real>( 0,LZ), NZ, Periodic::no() );
 
   /*---------+
@@ -48,7 +47,7 @@ main(int argc, char * argv[]) {
   /*-------------------+
   |  time-integration  |
   +-------------------*/
-  const int  ndt = 3200;//8000;
+  const int  ndt = 4*3200;//8000;
   const int nint = 100;
   const int  bint = 20000;
   const real dt  = 0.25 * LX / real(NX);
@@ -69,16 +68,16 @@ main(int argc, char * argv[]) {
     uvw.bc(m).add( BndCnd( Dir::imax(), BndType::periodic() ) );
     uvw.bc(m).add( BndCnd( Dir::kmin(), BndType::wall() ) );
     uvw.bc(m).add( BndCnd( Dir::kmax(), BndType::wall() ) );
-    uvw.bc(m).add( BndCnd( Dir::jmin(), BndType::wall() ) );
-    uvw.bc(m).add( BndCnd( Dir::jmax(), BndType::wall() ) );
+    uvw.bc(m).add( BndCnd( Dir::jmin(), BndType::periodic() ) );
+    uvw.bc(m).add( BndCnd( Dir::jmax(), BndType::periodic() ) );
   }
 #endif
   c.bc().add( BndCnd( Dir::imin(), BndType::periodic() ) );
   c.bc().add( BndCnd( Dir::imax(), BndType::periodic() ) );
   c.bc().add( BndCnd( Dir::kmin(), BndType::wall() ) );
   c.bc().add( BndCnd( Dir::kmax(), BndType::wall() ) );
-  c.bc().add( BndCnd( Dir::jmin(), BndType::wall() ) );
-  c.bc().add( BndCnd( Dir::jmax(), BndType::wall() ) );
+  c.bc().add( BndCnd( Dir::jmin(), BndType::periodic() ) );
+  c.bc().add( BndCnd( Dir::jmax(), BndType::periodic() ) );
 
 
   /*--------------------+
@@ -106,7 +105,8 @@ main(int argc, char * argv[]) {
   const real zcent = LZ/4.0;
   for_vijk(c,i,j,k) {
     real dist=sqrt(pow(c.xc(i)-xcent,2.0)
-                  +pow(c.yc(j)-ycent,2.0)+pow(c.zc(k)-zcent,2.0));
+                  //+pow(c.yc(j)-ycent,2.0)
+                  +pow(c.zc(k)-zcent,2.0));
     if (dist<radius*0.80) {
       c[i][j][k]=1.0;
     } else if(dist<radius*1.2) {
@@ -125,7 +125,8 @@ main(int argc, char * argv[]) {
             real yyc=y0+0.5*ddy+real(jj)*ddy;
             real zzc=z0+0.5*ddz+real(kk)*ddz;
             real dist=sqrt(pow(xxc-xcent,2.0)
-                          +pow(yyc-ycent,2.0)+pow(zzc-zcent,2.0));
+                          //+pow(yyc-ycent,2.0)
+                          +pow(zzc-zcent,2.0));
             if (dist<radius){
               itmp=itmp+1;
             }
@@ -215,6 +216,14 @@ main(int argc, char * argv[]) {
 
   /* run */
   for(time.start(); time.end(); time.increase()) {
+
+    if(time.current_step()==3201) {
+      m = Comp::u();
+      for_avmijk(uvw,m,i,j,k)
+        uvw[m][i][j][k]=1.0;
+      //uvw.exchange();
+    }
+
 
     conc.advance();
     conc.totalvol();

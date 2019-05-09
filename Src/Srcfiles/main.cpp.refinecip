@@ -1,4 +1,5 @@
 #include "Include/psi-boil.h"
+#include "project.cpp"
 #include <fstream>
 //#define USE_VOF
 
@@ -14,15 +15,17 @@ static void __attribute__ ((constructor)) trapfpe(void)
 /* domain dimensions (given by problem) */
 //const real LX =   0.5;
 const real LX =   0.2;
-const real LY =   0.2;
 const real LZ =   0.2;
 
 /* computed parameters */
 //const int NX = 4;
 const int NX = 100;
-const int NY = 100;
+const int NY = 4;
 const int NZ = 100;
 
+const real DZ = LZ/real(NZ);
+
+const real LY =   real(NY)/real(NX)*LX;
 /******************************************************************************/
 main(int argc, char * argv[]) {
 
@@ -37,18 +40,22 @@ main(int argc, char * argv[]) {
   |  grid(s)  |
   +----------*/
   Grid1D gx( Range<real>( 0,LX), NX, Periodic::yes() );
-  Grid1D gy( Range<real>( 0,LY), NY, Periodic::no() );
+  Grid1D gy( Range<real>( -LY/2.,LY/2.), NY, Periodic::yes() );
   Grid1D gz( Range<real>( 0,LZ), NZ, Periodic::no() );
+
+  Grid1D gzc( Range<real>( -1*DZ,LZ), NZ+1, Periodic::no() );
 
   /*---------+
   |  domain  |
   +---------*/
   Domain d(gx, gy, gz);
 
+  Domain dc(gx, gy, gzc);
+
   /*-------------------+
   |  time-integration  |
   +-------------------*/
-  const int  ndt = 3200;//8000;
+  const int  ndt = 800;//8000;
   const int nint = 100;
   const int  bint = 20000;
   const real dt  = 0.25 * LX / real(NX);
@@ -60,6 +67,9 @@ main(int argc, char * argv[]) {
   Vector uvw(d); // vel
   Scalar c  (d), g  (d), kappa(d); // concentration
 
+  Vector uvw2(dc); // vel
+  Scalar c2(dc), g2(dc);
+
   /*-----------------------------+ 
   |  insert boundary conditions  |
   +-----------------------------*/
@@ -69,17 +79,29 @@ main(int argc, char * argv[]) {
     uvw.bc(m).add( BndCnd( Dir::imax(), BndType::periodic() ) );
     uvw.bc(m).add( BndCnd( Dir::kmin(), BndType::wall() ) );
     uvw.bc(m).add( BndCnd( Dir::kmax(), BndType::wall() ) );
-    uvw.bc(m).add( BndCnd( Dir::jmin(), BndType::wall() ) );
-    uvw.bc(m).add( BndCnd( Dir::jmax(), BndType::wall() ) );
+    uvw.bc(m).add( BndCnd( Dir::jmin(), BndType::periodic() ) );
+    uvw.bc(m).add( BndCnd( Dir::jmax(), BndType::periodic() ) );
+    uvw2.bc(m).add( BndCnd( Dir::imin(), BndType::periodic() ) );
+    uvw2.bc(m).add( BndCnd( Dir::imax(), BndType::periodic() ) );
+    uvw2.bc(m).add( BndCnd( Dir::kmin(), BndType::wall() ) );
+    uvw2.bc(m).add( BndCnd( Dir::kmax(), BndType::wall() ) );
+    uvw2.bc(m).add( BndCnd( Dir::jmin(), BndType::periodic() ) );
+    uvw2.bc(m).add( BndCnd( Dir::jmax(), BndType::periodic() ) );
   }
 #endif
   c.bc().add( BndCnd( Dir::imin(), BndType::periodic() ) );
   c.bc().add( BndCnd( Dir::imax(), BndType::periodic() ) );
   c.bc().add( BndCnd( Dir::kmin(), BndType::wall() ) );
   c.bc().add( BndCnd( Dir::kmax(), BndType::wall() ) );
-  c.bc().add( BndCnd( Dir::jmin(), BndType::wall() ) );
-  c.bc().add( BndCnd( Dir::jmax(), BndType::wall() ) );
+  c.bc().add( BndCnd( Dir::jmin(), BndType::periodic() ) );
+  c.bc().add( BndCnd( Dir::jmax(), BndType::periodic() ) );
 
+  c2.bc().add( BndCnd( Dir::imin(), BndType::periodic() ) );
+  c2.bc().add( BndCnd( Dir::imax(), BndType::periodic() ) );
+  c2.bc().add( BndCnd( Dir::kmin(), BndType::wall() ) );
+  c2.bc().add( BndCnd( Dir::kmax(), BndType::wall() ) );
+  c2.bc().add( BndCnd( Dir::jmin(), BndType::periodic() ) );
+  c2.bc().add( BndCnd( Dir::jmax(), BndType::periodic() ) );
 
   /*--------------------+
   |  initial condition  |
@@ -100,23 +122,23 @@ main(int argc, char * argv[]) {
   for_vijk(c,i,j,k) 
     c[i][j][k] = 0.0;
 
-  const real radius = LZ/4.0 - 0.5*LZ/real(NZ);
+  const real radius = LZ/4.0;
   const real xcent = LX/2.0;
-  const real ycent = LX/2.0;
+  const real ycent = 0.0;
   const real zcent = LZ/4.0;
-  for_vijk(c,i,j,k) {
-    real dist=sqrt(pow(c.xc(i)-xcent,2.0)
-                  +pow(c.yc(j)-ycent,2.0)+pow(c.zc(k)-zcent,2.0));
+  for_vijk(c2,i,j,k) {
+    real dist=sqrt(pow(c2.xc(i)-xcent,2.0)
+                  +pow(c2.zc(k)-zcent,2.0));
     if (dist<radius*0.80) {
-      c[i][j][k]=1.0;
+      c2[i][j][k]=1.0;
     } else if(dist<radius*1.2) {
       int mm=10;
-      real x0=d.xn(i);
-      real y0=d.yn(j);
-      real z0=d.zn(k);
-      real ddx=d.dxc(i)/real(mm);
-      real ddy=d.dyc(j)/real(mm);
-      real ddz=d.dzc(k)/real(mm);
+      real x0=dc.xn(i);
+      real y0=dc.yn(j);
+      real z0=dc.zn(k);
+      real ddx=dc.dxc(i)/real(mm);
+      real ddy=dc.dyc(j)/real(mm);
+      real ddz=dc.dzc(k)/real(mm);
       int itmp=0;
       for (int ii=0; ii<mm; ii++){
         for (int jj=0; jj<mm; jj++){
@@ -125,18 +147,22 @@ main(int argc, char * argv[]) {
             real yyc=y0+0.5*ddy+real(jj)*ddy;
             real zzc=z0+0.5*ddz+real(kk)*ddz;
             real dist=sqrt(pow(xxc-xcent,2.0)
-                          +pow(yyc-ycent,2.0)+pow(zzc-zcent,2.0));
+                          +pow(zzc-zcent,2.0));
             if (dist<radius){
               itmp=itmp+1;
             }
           }
         }
       }
-      c[i][j][k]=real(itmp)/real(mm*mm*mm);
+      c2[i][j][k]=real(itmp)/real(mm*mm*mm);
     }
   }
-  c.bnd_update();
-  c.exchange_all();
+  c2.bnd_update();
+  c2.exchange_all();
+
+  for_avijk(c,i,j,k) {
+      c[i][j][k] = c2[i][j][k+3];
+  }
 
   /*----------------+
   |  linear solver  |
@@ -147,28 +173,25 @@ main(int argc, char * argv[]) {
   VOF conc  (c, g, kappa, uvw, time, solver);
 #else
   CIPCSL2 conc  (c, g, kappa, uvw, time, solver);
+  CIPCSL2 conc2 (c2, g2, c2, uvw2, time, solver);
 #endif
   conc.totalvol();
   conc.set_cangle(180.);
 
-#if 0
-  for_avijk(c,i,j,k) {
-    if(c[i][j][k]<0.0)
-      c[i][j][k]=0.0;
-    if(c[i][j][k]>1.0)
-      c[i][j][k]=1.0;
-  }
-  conc.update_node(c);
-
+#if 1
   m=Comp::u();
   for_vmijk(uvw,m,i,j,k)
     uvw[m][i][j][k]=1.0;
+  for_vmijk(uvw2,m,i,j,k)
+    uvw2[m][i][j][k]=1.0;
 #endif
 
-  conc.set_itsharpen(4);
-  boil::plot->plot(uvw,c, "uvw-c", 0);
-  //exit(0);
+  conc.set_itsharpen(0);
+  conc.set_nredist(0);
+  conc2.set_itsharpen(4);
 
+  boil::plot->plot(uvw,c, "uvw-c", 0);
+  boil::plot->plot(c2, "c2", 0);
 
   /*-------------------+
   |  check if restart  |
@@ -220,6 +243,13 @@ main(int argc, char * argv[]) {
     conc.totalvol();
     boil::oout<<"MC: "<<time.current_time()<<" "<<conc.get_clrsum1()<<" "<<conc.get_clrsum2()<<boil::endl;
 
+    conc2.advance();
+    for_avijk(c,i,j,k) {
+        c[i][j][k] = c2[i][j][k+3];
+    }
+    conc.update_node(c);
+
+
 #if 0
     for_vijk(c,i,j,k) {
       if(c.zc(k)<c.dzc(k)&&c[i][j][k]>boil::micro&&i==6&&j==50&&k==1)
@@ -230,6 +260,7 @@ main(int argc, char * argv[]) {
     //if(time.current_step() == 400 || time.current_step() == ndt) {
     if(time.current_step() % 400 == 0 || time.current_step() == ndt) {
       boil::plot->plot(uvw, c, "uvw-c",  time.current_step());
+      boil::plot->plot(c2, "c2", time.current_step());
     }
 
     if(((time.current_step()) % (bint)==0) ) {

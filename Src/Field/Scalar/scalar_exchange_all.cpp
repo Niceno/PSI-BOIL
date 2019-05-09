@@ -7,7 +7,9 @@
 void Scalar::exchange_all(const int dir) const {
 	
   if( bc().count() == 0 ) {
-    OMS(Warning: exchanging a variable without boundary conditions);
+    //OMS(Warning: exchanging a variable without boundary conditions);
+    OMS(Fatal: exchanging a variable without boundary conditions);
+    exit(0);
   }
 
   /*-------------------------------+

@@ -12,16 +12,15 @@ static void __attribute__ ((constructor)) trapfpe(void)
 
 
 /* domain dimensions (given by problem) */
-//const real LX =   0.5;
-const real LX =   0.2;
-const real LY =   0.2;
-const real LZ =   0.2;
+const real LX = 4.;
 
 /* computed parameters */
-//const int NX = 4;
-const int NX = 100;
-const int NY = 100;
-const int NZ = 100;
+const int NX = 256;
+const int NY = 4;
+const int NZ = 128;
+
+const real LY = real(NY)/real(NX)*LX ;
+const real LZ = real(NZ)/real(NX)*LX ;
 
 /******************************************************************************/
 main(int argc, char * argv[]) {
@@ -31,14 +30,15 @@ main(int argc, char * argv[]) {
   /*--------------------------------+
   |  choose the output file format  |
   +--------------------------------*/
-  boil::plot = new PlotTEC(AsNodes::no(), Buffers::yes());
+  //boil::plot = new PlotTEC(AsNodes::no(), Buffers::yes());
+  boil::plot = new PlotTEC(AsNodes::no(), Buffers::no());
 
   /*----------+
   |  grid(s)  |
   +----------*/
-  Grid1D gx( Range<real>( 0,LX), NX, Periodic::yes() );
-  Grid1D gy( Range<real>( 0,LY), NY, Periodic::no() );
-  Grid1D gz( Range<real>( 0,LZ), NZ, Periodic::no() );
+  Grid1D gx( Range<real>( -LX/2.,LX/2.), NX, Periodic::yes() );
+  Grid1D gy( Range<real>( -LY/2.,LY/2.), NY, Periodic::yes() );
+  Grid1D gz( Range<real>( -LZ/2.,LZ/2.), NZ, Periodic::no() );
 
   /*---------+
   |  domain  |
@@ -48,84 +48,131 @@ main(int argc, char * argv[]) {
   /*-------------------+
   |  time-integration  |
   +-------------------*/
-  const int  ndt = 3200;//8000;
-  const int nint = 100;
-  const int  bint = 20000;
-  const real dt  = 0.25 * LX / real(NX);
+  const int  ndt = 300000;
+  const int nint = 1000;
+  const int  bint = 100000;
+  const real dt  = 1e-3; // 0.25 * LX / real(NX);
   Times time(ndt, dt); 
 	
   /*------------------+
   |  define unknowns  |
   +------------------*/
-  Vector uvw(d); // vel
+  Vector uvw(d), xyz(d); // vel
+  Scalar p  (d), f  (d), press(d); // pressure
   Scalar c  (d), g  (d), kappa(d); // concentration
+
+  /*----------------+
+  |  linear solver  |
+  +----------------*/
+  Krylov * solver = new CG(d, Prec::di());
 
   /*-----------------------------+ 
   |  insert boundary conditions  |
   +-----------------------------*/
-#if 1
   for_m(m) {
     uvw.bc(m).add( BndCnd( Dir::imin(), BndType::periodic() ) );
     uvw.bc(m).add( BndCnd( Dir::imax(), BndType::periodic() ) );
+    uvw.bc(m).add( BndCnd( Dir::jmin(), BndType::periodic() ) );
+    uvw.bc(m).add( BndCnd( Dir::jmax(), BndType::periodic() ) );
     uvw.bc(m).add( BndCnd( Dir::kmin(), BndType::wall() ) );
     uvw.bc(m).add( BndCnd( Dir::kmax(), BndType::wall() ) );
-    uvw.bc(m).add( BndCnd( Dir::jmin(), BndType::wall() ) );
-    uvw.bc(m).add( BndCnd( Dir::jmax(), BndType::wall() ) );
   }
-#endif
+
+  p.bc().add( BndCnd( Dir::imin(), BndType::periodic() ) );
+  p.bc().add( BndCnd( Dir::imax(), BndType::periodic() ) );
+  p.bc().add( BndCnd( Dir::jmin(), BndType::periodic() ) );
+  p.bc().add( BndCnd( Dir::jmax(), BndType::periodic() ) );
+  p.bc().add( BndCnd( Dir::kmin(), BndType::neumann() ) );
+  p.bc().add( BndCnd( Dir::kmax(), BndType::neumann() ) );
+
+  f = p.shape();
+  g = p.shape();
+  press = p.shape();
+
   c.bc().add( BndCnd( Dir::imin(), BndType::periodic() ) );
   c.bc().add( BndCnd( Dir::imax(), BndType::periodic() ) );
+  c.bc().add( BndCnd( Dir::jmin(), BndType::periodic() ) );
+  c.bc().add( BndCnd( Dir::jmax(), BndType::periodic() ) );
   c.bc().add( BndCnd( Dir::kmin(), BndType::wall() ) );
   c.bc().add( BndCnd( Dir::kmax(), BndType::wall() ) );
-  c.bc().add( BndCnd( Dir::jmin(), BndType::wall() ) );
-  c.bc().add( BndCnd( Dir::jmax(), BndType::wall() ) );
 
+  /*----------------------+
+  |  physical properties  |
+  +----------------------*/
+  Matter vapor(d), liquid(d);
+  vapor  .mu    (1.0);
+  vapor  .rho   (1.0);
+  vapor  .cp    (1.0);
+  vapor  .lambda(1.0);
+  liquid.mu     (1.0);
+  liquid.rho    (1.0);
+  liquid.cp     (1.0);
+  liquid.lambda (1.0);
+  const real cangle0 = 156./180.*boil::pi;
+
+#ifndef USE_VOF
+  Matter mixed(liquid, vapor,& c); //c=1: full of liquid, c=0: full of vapor
+#else
+  Matter mixed(liquid, vapor,& c,& bndclr); //c=1: full of liquid, c=0: full of vapor
+#endif
+  mixed.sigma(0.9428);
+
+  /*------------+
+  |  equations  |
+  +------------*/
+#ifdef USE_VOF
+  VOF conc  (c, g, kappa, uvw, time, solver);
+#else
+  CIPCSL2 conc  (c, g, kappa, uvw, time, solver);
+  //conc.set_nredist(1);
+  //conc.set_itsharpen(32);
+  conc.set_itsharpen(4);
+#endif
+  conc.totalvol();
+  //conc.set_cangle(boil::pi*19./180.);
+  //conc.set_cangle(cangle0);
+  conc.set_cangle(25.);
+
+  Momentum ns( uvw, xyz, time, solver, &mixed);
+  Pressure pr(p, f, uvw, time, solver, &mixed);
+  AC multigrid( &pr );
+  multigrid.stop_if_diverging(true);
+  multigrid.min_cycles(8);
 
   /*--------------------+
   |  initial condition  |
   +--------------------*/
-  Comp m=Comp::u();
-  for_vmijk(uvw,m,i,j,k)
-    uvw[m][i][j][k]=0.0;
-
-  m=Comp::v();
-  for_vmijk(uvw,m,i,j,k)
-    uvw[m][i][j][k]=0.0;
-
-  m=Comp::w();
-  for_vmijk(uvw,m,i,j,k)
-    uvw[m][i][j][k]=0.0;
-  uvw.exchange();
+  for_m(m)
+    for_avmijk(uvw,m,i,j,k)
+      uvw[m][i][j][k]=0.0;
 
   for_vijk(c,i,j,k) 
     c[i][j][k] = 0.0;
 
-  const real radius = LZ/4.0 - 0.5*LZ/real(NZ);
-  const real xcent = LX/2.0;
-  const real ycent = LX/2.0;
-  const real zcent = LZ/4.0;
+  const real radius = LZ/4.0;
+  const real xcent = 0.0;
+  const real zcent = radius*(1.-cos(cangle0))-radius-LZ/2.0;
   for_vijk(c,i,j,k) {
+    real alp=1.5*d.dxc(i);
     real dist=sqrt(pow(c.xc(i)-xcent,2.0)
-                  +pow(c.yc(j)-ycent,2.0)+pow(c.zc(k)-zcent,2.0));
-    if (dist<radius*0.80) {
+                  +pow(c.zc(k)-zcent,2.0));
+    if (dist<radius-alp) {
       c[i][j][k]=1.0;
-    } else if(dist<radius*1.2) {
+    } else if(dist<radius+alp) {
+#if 0
       int mm=10;
       real x0=d.xn(i);
-      real y0=d.yn(j);
       real z0=d.zn(k);
       real ddx=d.dxc(i)/real(mm);
-      real ddy=d.dyc(j)/real(mm);
       real ddz=d.dzc(k)/real(mm);
       int itmp=0;
       for (int ii=0; ii<mm; ii++){
         for (int jj=0; jj<mm; jj++){
           for (int kk=0; kk<mm; kk++){
             real xxc=x0+0.5*ddx+real(ii)*ddx;
-            real yyc=y0+0.5*ddy+real(jj)*ddy;
             real zzc=z0+0.5*ddz+real(kk)*ddz;
             real dist=sqrt(pow(xxc-xcent,2.0)
-                          +pow(yyc-ycent,2.0)+pow(zzc-zcent,2.0));
+                          +pow(zzc-zcent,2.0));
             if (dist<radius){
               itmp=itmp+1;
             }
@@ -133,40 +180,17 @@ main(int argc, char * argv[]) {
         }
       }
       c[i][j][k]=real(itmp)/real(mm*mm*mm);
+#else
+      c[i][j][k]=0.5-0.5*sin((0.5*boil::pi*(dist-radius))/alp);
+#endif
     }
   }
   c.bnd_update();
+  conc.init();
   c.exchange_all();
-
-  /*----------------+
-  |  linear solver  |
-  +----------------*/
-  Krylov * solver = new CG(d, Prec::di());
-
-#ifdef USE_VOF
-  VOF conc  (c, g, kappa, uvw, time, solver);
-#else
-  CIPCSL2 conc  (c, g, kappa, uvw, time, solver);
-#endif
-  conc.totalvol();
-  conc.set_cangle(180.);
-
-#if 0
-  for_avijk(c,i,j,k) {
-    if(c[i][j][k]<0.0)
-      c[i][j][k]=0.0;
-    if(c[i][j][k]>1.0)
-      c[i][j][k]=1.0;
-  }
-  conc.update_node(c);
-
-  m=Comp::u();
-  for_vmijk(uvw,m,i,j,k)
-    uvw[m][i][j][k]=1.0;
-#endif
-
-  conc.set_itsharpen(4);
+  conc.curvature();
   boil::plot->plot(uvw,c, "uvw-c", 0);
+
   //exit(0);
 
 
@@ -204,6 +228,7 @@ main(int argc, char * argv[]) {
     input >> t;
     input >> dtf;
     uvw.  load("uvw",ts);
+    press.load("press",   ts);
     conc. load("conc",ts);
     time.first_step(ts);
     time.current_time(t);
@@ -216,24 +241,55 @@ main(int argc, char * argv[]) {
   /* run */
   for(time.start(); time.end(); time.increase()) {
 
+#if 1
+    /* essential for moving front */
+    ns.discretize();
+    pr.discretize();
+
+    /* momentum */
+    ns.cfl_max();
+    ns.new_time_step();
+
+    for_m(m)
+      for_avmijk(xyz,m,i,j,k)
+	xyz[m][i][j][k]=0.0;
+    conc.tension(&xyz, mixed);
+
+    ns.grad(press);
+    ns.solve(ResRat(1.0e-14));
+    p = 0.0;
+    if(multigrid.vcycle(ResRat(1e-6))) OMS(converged);
+    p.exchange();
+    ns.project(p);
+    press += p;
+    press.exchange();
+
+
+    /* shift pressure */
+    real pmin=1.0e+300;
+    for_vijk(press,i,j,k){
+      if(pmin>press[i][j][k]) pmin=press[i][j][k];
+    }
+    boil::cart.min_real(&pmin);
+
+    for_vijk(press,i,j,k)
+      press[i][j][k] -= pmin;
+#endif
+    /*---------------------------+
+    |  solve transport equation  |
+    +---------------------------*/
     conc.advance();
     conc.totalvol();
     boil::oout<<"MC: "<<time.current_time()<<" "<<conc.get_clrsum1()<<" "<<conc.get_clrsum2()<<boil::endl;
 
-#if 0
-    for_vijk(c,i,j,k) {
-      if(c.zc(k)<c.dzc(k)&&c[i][j][k]>boil::micro&&i==6&&j==50&&k==1)
-         boil::aout<<i<<" "<<j<<" "<<k<<" | "<<c[i][j][k]<<" "<<c[i][j][k+1]<<boil::endl;
-    }
-#endif
 
-    //if(time.current_step() == 400 || time.current_step() == ndt) {
-    if(time.current_step() % 400 == 0 || time.current_step() == ndt) {
+    if(time.current_step() % nint == 0 || time.current_step() == 100) {
       boil::plot->plot(uvw, c, "uvw-c",  time.current_step());
     }
 
     if(((time.current_step()) % (bint)==0) ) {
       uvw  .save("uvw",   time.current_step());
+      press.save("press", time.current_step());
       conc .save("conc",  time.current_step());
       if( boil::cart.iam()==0) {
         std::fstream output;
@@ -254,6 +310,7 @@ main(int argc, char * argv[]) {
 
     if(time.current_step()==time.total_steps()) {
       uvw  .save("uvw",   time.current_step());
+      press.save("press", time.current_step());
       conc .save("conc",  time.current_step());
       std::fstream output;
       output << std::setprecision(16);
@@ -266,14 +323,10 @@ main(int argc, char * argv[]) {
       output << 0 << boil::endl;
       output.close();
       uvw  .rm("uvw", ts);
+      press.rm("press", ts);
       conc .rm("conc", ts);
     }
   }
-
-#if 0
-  for_wvmijk(conc.sxyz,Comp::k(),i,j,k)
-    boil::oout<<i<<" "<<j<<" "<<k<<" "<<conc.sxyz.zc(Comp::k(),k)<<" "<<conc.fs[Comp::k()][i][j][k]<<" "<<c[i][j][k-1]<<boil::endl;
-#endif
 
   boil::oout << "finished" << boil::endl;
 

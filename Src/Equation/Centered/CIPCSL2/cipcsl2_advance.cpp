@@ -87,8 +87,12 @@ void CIPCSL2::advance() {
   }
 #endif
   
+
   /* ancillary functions */
   ancillary();
+
+
+#if 0
 
   real clpos(-1e24), posI(-1e24), posII(-1e24), beta1(-1e24);
   /* flag of boundary conditions for stmp */
@@ -141,6 +145,10 @@ void CIPCSL2::advance() {
    boil::cart.max_real(&posI);
    boil::cart.max_real(&posII);
    boil::cart.max_real(&clpos);
+
+   cposold = cposnew;
+   cposnew = clpos;
+  
    /* regression fit */
    real nume = (posI-clpos)*phi.dzb(sk()+1)*0.5 + (posII-clpos)*phi.dzb(sk()+1)*1.5;
    real denom = (posI-clpos)*(posI-clpos) + (posII-clpos)*(posII-clpos); 
@@ -149,8 +157,11 @@ void CIPCSL2::advance() {
    real cangledist = atan(beta1);
    if(cangledist<0.0)
      cangledist = boil::pi+cangledist;
-   boil::oout<<"CL-CA: "<<time->current_time()<<" "<<-clpos<<" "<<cangledist<<boil::endl;
+   boil::oout<<"CL-CA: "<<time->current_time()<<" "<<-clpos<<" "<<cangledist<<" "<<(-cposnew+cposold)/time->dt()<<boil::endl;
    //boil::plot->plot((*u),phi,dist,nz,"uvw-c-dist-nz", time->current_step());
+
+#endif
+
 #ifdef DEBUG
   boil::oout<<"cipcsl2_advance:end\n";
 #endif
