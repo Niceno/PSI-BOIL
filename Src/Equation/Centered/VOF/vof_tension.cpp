@@ -1,9 +1,31 @@
 #include "vof.h"
 #include <iomanip>
 
-real kappa_ave(const real r1, const real r2);
 /******************************************************************************/
 void VOF::tension(Vector * vec, const Matter matt) {
+/******************************************************************************/
+
+  /*----------------------------------+
+  |  1st step: curvature calculation  |
+  +----------------------------------*/
+  curvature();
+#if 0
+  diffuse(kap,stmp4,4);
+  for_avijk(kap,i,j,k) {
+    //stmp2[i][j][k] = kap[i][j][k];
+    kap[i][j][k] = stmp4[i][j][k];
+  }
+
+  for_avijk(kap,i,j,k) {
+    //kap[i][j][k] = 1./1e-3;
+  }
+#endif
+
+  tension(vec,matt,kappa);
+}
+
+/******************************************************************************/
+void VOF::tension(Vector * vec, const Matter matt, const Scalar & kap) {
 /***************************************************************************//**
 *  \brief Calculate surface tension
 *         Algorithm
@@ -11,24 +33,12 @@ void VOF::tension(Vector * vec, const Matter matt) {
 *           2nd step: calculate body force
 *         Variables
 *           color function          : phi
-*           curvature               : kappa
+*           curvature               : kap
 *           body force              : vec
 *******************************************************************************/
   boil::timer.start("vof tension");
 
-  /*----------------------------------+
-  |  1st step: curvature calculation  |
-  +----------------------------------*/
-  if(curv_method==0) {
-    curv_HF();
-  } else {
-    curv_smooth();
-  }
-  //curvature();
   Comp m;
-  for_avijk(kappa,i,j,k) {
-    //kappa[i][j][k] = 1./1e-3;
-  }
 
 #if 0
   m = Comp::u();
@@ -41,7 +51,7 @@ void VOF::tension(Vector * vec, const Matter matt) {
         bdphi = 0.5*(phi[i-1][j][k]+phi[i][j][k]);
       }
       real mult = bdphi*matt.sigma(m,i,j,k)*vec->dV(m,i,j,k);
-      (*vec)[m][i][j][k] -= mult*(kappa[i][j][k]-kappa[i-1][j][k])/vec->dxc(m,i);
+      (*vec)[m][i][j][k] -= mult*(kap[i][j][k]-kap[i-1][j][k])/vec->dxc(m,i);
     }
   }
 
@@ -55,7 +65,7 @@ void VOF::tension(Vector * vec, const Matter matt) {
         bdphi = 0.5*(phi[i][j-1][k]+phi[i][j][k]);
       }
       real mult = bdphi*matt.sigma(m,i,j,k)*vec->dV(m,i,j,k);
-      (*vec)[m][i][j][k] -= mult*(kappa[i][j][k]-kappa[i][j-1][k])/vec->dyc(m,j);
+      (*vec)[m][i][j][k] -= mult*(kap[i][j][k]-kap[i][j-1][k])/vec->dyc(m,j);
     }
   }
 
@@ -69,7 +79,7 @@ void VOF::tension(Vector * vec, const Matter matt) {
         bdphi = 0.5*(phi[i][j][k-1]+phi[i][j][k]);
       }
       real mult = bdphi*matt.sigma(m,i,j,k)*vec->dV(m,i,j,k);
-      (*vec)[m][i][j][k] -= mult*(kappa[i][j][k]-kappa[i][j][k-1])/vec->dzc(m,k);
+      (*vec)[m][i][j][k] -= mult*(kap[i][j][k]-kap[i][j][k-1])/vec->dzc(m,k);
     }
   }
 
@@ -80,43 +90,21 @@ void VOF::tension(Vector * vec, const Matter matt) {
   real rho_diff = matt.rho(1)-matt.rho(0);
   real rho_ave = 0.5*(matt.rho(1)+matt.rho(0));
 
-#if 0
-  real val(0.0), rms(0.0), valmax(-100.0);
-  int cnt(0);
-  rho_diff=0.0;
-#endif
   if(rho_diff==0.0){
     m = Comp::u();
     for_vmijk((*vec),m,i,j,k) {
       if(dom->ibody().on(m,i,j,k)) {
         (*vec)[m][i][j][k] += matt.sigma(m,i,j,k)
-              * kappa_ave(kappa[i-1][j][k],kappa[i][j][k])
+              * kappa_ave(kap[i-1][j][k],kap[i][j][k])
               * (phi[i][j][k] - phi[i-1][j][k])/vec->dxc(m,i)
               * vec->dV(m,i,j,k);
-#if 0
-        if((*vec)[m][i][j][k]>0.0&&j==3) {
-          val += kappa_ave(kappa[i-1][j][k],kappa[i][j][k]);
-          cnt++;
-          rms += pow(kappa_ave(kappa[i-1][j][k],kappa[i][j][k]),2.0);
-          if(valmax<kappa_ave(kappa[i-1][j][k],kappa[i][j][k]))
-            valmax = kappa_ave(kappa[i-1][j][k],kappa[i][j][k]);
-        }
-#endif
       }
     }
-#if 0
-    val /= real(cnt);
-    rms /= real(cnt);
-    rms -= val*val;
-    rms = sqrt(rms);
-    boil::oout<<val<<" +/- "<<rms<<" | "<<valmax<<boil::endl;
-    exit(0);
-#endif
     m = Comp::v();
     for_vmijk((*vec),m,i,j,k) {
       if(dom->ibody().on(m,i,j,k)) {
         (*vec)[m][i][j][k] += matt.sigma(m,i,j,k)
-              * kappa_ave(kappa[i][j-1][k],kappa[i][j][k])
+              * kappa_ave(kap[i][j-1][k],kap[i][j][k])
               * (phi[i][j][k] - phi[i][j-1][k])/vec->dyc(m,j)
               * vec->dV(m,i,j,k);
       }
@@ -125,7 +113,7 @@ void VOF::tension(Vector * vec, const Matter matt) {
     for_vmijk((*vec),m,i,j,k) {
       if(dom->ibody().on(m,i,j,k)) {
         (*vec)[m][i][j][k] += matt.sigma(m,i,j,k)
-              * kappa_ave(kappa[i][j][k-1],kappa[i][j][k])
+              * kappa_ave(kap[i][j][k-1],kap[i][j][k])
               * (phi[i][j][k] - phi[i][j][k-1])/vec->dzc(m,k)
               * vec->dV(m,i,j,k);
       }
@@ -135,7 +123,7 @@ void VOF::tension(Vector * vec, const Matter matt) {
     for_vmijk((*vec),m,i,j,k) {
       if(dom->ibody().on(m,i,j,k)) {
         (*vec)[m][i][j][k] += matt.sigma(m,i,j,k)
-              * kappa_ave(kappa[i-1][j][k],kappa[i][j][k])
+              * kappa_ave(kap[i-1][j][k],kap[i][j][k])
               * (matt.rho(i,j,k)-matt.rho(i-1,j,k))/vec->dxc(m,i)
               / rho_diff * 0.5*(matt.rho(i,j,k)+matt.rho(i-1,j,k))
               / rho_ave
@@ -146,7 +134,7 @@ void VOF::tension(Vector * vec, const Matter matt) {
     for_vmijk((*vec),m,i,j,k) {
       if(dom->ibody().on(m,i,j,k)) {
         (*vec)[m][i][j][k] += matt.sigma(m,i,j,k)
-              * kappa_ave(kappa[i][j-1][k],kappa[i][j][k])
+              * kappa_ave(kap[i][j-1][k],kap[i][j][k])
               * (matt.rho(i,j,k)-matt.rho(i,j-1,k))/vec->dyc(m,j)
               / rho_diff * 0.5*(matt.rho(i,j,k)+matt.rho(i,j-1,k))
               / rho_ave
@@ -157,7 +145,7 @@ void VOF::tension(Vector * vec, const Matter matt) {
     for_vmijk((*vec),m,i,j,k) {
       if(dom->ibody().on(m,i,j,k)) {
         (*vec)[m][i][j][k] += matt.sigma(m,i,j,k)
-              * kappa_ave(kappa[i][j][k-1],kappa[i][j][k])
+              * kappa_ave(kap[i][j][k-1],kap[i][j][k])
               * (matt.rho(i,j,k)-matt.rho(i,j,k-1))/vec->dzc(m,k)
               / rho_diff * 0.5*(matt.rho(i,j,k)+matt.rho(i,j,k-1))
               / rho_ave
@@ -173,16 +161,16 @@ void VOF::tension(Vector * vec, const Matter matt) {
 /******************************************************************************/
 real VOF::kappa_ave(const real r1, const real r2) {
   real x;
-  if (r1*r2>0.0) {
+  if       (!boil::realistic(r1)&&!boil::realistic(r2)) {
+    x = 0.0;
+  } else if(!boil::realistic(r1)) {
+    x = r2;
+  } else if(!boil::realistic(r2)) {
+    x = r1;
+  } else if(r1*r2>0.0) {
     x = 2.0 * r1 * r2 / (r1 + r2);
   } else {
-    if (r1==kappa_non_cal) {
-      x = r2;
-    } else if (r2==kappa_non_cal) {
-      x = r1;
-    } else {
-      x = 0.5*(r1+r2);
-    }
+    x = 0.5*(r1+r2);
   }
   return x;
 }

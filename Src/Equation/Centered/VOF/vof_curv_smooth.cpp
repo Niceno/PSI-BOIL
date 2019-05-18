@@ -11,14 +11,14 @@ void VOF::curv_smooth() {
   smooth(phi,clr,4);
 
   gradphic(clr);
-
+  
   set_iflag();
 
   /* div.norm */
   for_ijk(i,j,k) {
-    //if(abs(iflag[i][j][k])>nlayer-3){
-    if(abs(iflag[i][j][k])!=0){
-      kappa[i][j][k]=kappa_non_cal;
+    if(abs(iflag[i][j][k])>nlayer-3){
+    //if(abs(iflag[i][j][k])!=0){
+      kappa[i][j][k]=boil::unreal;
     } else {
       real nw = nx[i-1][j][k];
       real ne = nx[i+1][j][k];
@@ -31,19 +31,15 @@ void VOF::curv_smooth() {
                       +(nn-ns)/(phi.dys(j)+phi.dyn(j))
                       +(nt-nb)/(phi.dzb(k)+phi.dzt(k)));
 #if 0
-      if(boil::cart.iam()==0&&i==9+2&&(j==1+2||j==2+2)&&k==
+      if(boil::cart.iam()==0&&i==9+2&&(j==1+2||j==2+2)&&k==16+2) {
+        std::cout<<i<<" "<<j<<" "<<k<<" "<<kappa[i][j][k]<<"\n";
+        std::cout<<ne<<" "<<nw<<" "
+                 <<nt<<" "<<nb<<"\n";
+      }
 #endif
     }
   }
-#if 1
-  if(boil::cart.iam()==0){
-    std::cout<<"kappa= "<<kappa[9+2][1+2][16+2]<<" "<<kappa[9+2][2+2][16+2]<<"\n";
-    std::cout<<"phi= "<<phi[9+2][1+2][16+2]<<" "<<phi[9+2][2+2][16+2]<<"\n";
-    std::cout<<"clr= "<<clr[9+2][1+2][16+2]<<" "<<clr[9+2][2+2][16+2]<<"\n";
-    std::cout<<"iflag= "<<iflag[9+2][1+2][16+2]<<" "<<iflag[9+2][2+2][16+2]<<"\n";
-  }
-  exit(0);
-#endif
+
   kappa.exchange();
 #ifdef DEBUG
   std::cout<<"curv::kappa "<<boil::cart.iam()<<"\n";

@@ -97,7 +97,7 @@ bool AC::vcycle(const ResRat & factor, int * ncyc) {
 
     //if(stop_if_div)
     if(stop_if_div && cycle >= min_cyc)
-      if(res1 > res0) {
+      if(res1 >= res0) {
         L[0]->phi = L[0]->fold; /* restore last "good" solution */
         boil::oout << "Failed to conv. " << cycle << " cycles!" << boil::endl;
 //        L[0] -> print();

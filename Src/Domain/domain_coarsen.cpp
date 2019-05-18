@@ -12,7 +12,7 @@ const Domain * Domain::coarsen() const {
 //return NULL;
 
   /* minimum resulution (with buffers) */
-  const int min_n =  4 + 2*boil::BW;
+  const int min_n =  std::max(4,boil::BW) + 2*boil::BW;
 
   /* coarsening factors */
   int c_fac_x = 2; 

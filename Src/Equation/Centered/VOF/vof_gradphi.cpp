@@ -36,7 +36,6 @@ void VOF::gradphi(const Scalar & sca) {
         nx[i][j][k] = ni;
         ny[i][j][k] = nj;
         nz[i][j][k] = nk;
-        nmag[i][j][k] = magn;
       }
     }
   }

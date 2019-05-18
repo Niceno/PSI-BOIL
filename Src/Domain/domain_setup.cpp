@@ -20,6 +20,13 @@ void Domain::setup(const Decompose & dec) {
   per[1] = grid_y_original->periodic1();
   per[2] = grid_z_original->periodic1();
 
+  ctf[0][0] = ( grid_x_original->cutoff1() == Cutoff::symmetry() );
+  ctf[0][1] = ( grid_x_original->cutoffN() == Cutoff::symmetry() );
+  ctf[1][0] = ( grid_y_original->cutoff1() == Cutoff::symmetry() );
+  ctf[1][1] = ( grid_y_original->cutoffN() == Cutoff::symmetry() );
+  ctf[2][0] = ( grid_z_original->cutoff1() == Cutoff::symmetry() );
+  ctf[2][1] = ( grid_z_original->cutoffN() == Cutoff::symmetry() );
+
   const real lx = grid_x_original->xn( boil::BW + grid_x_original->ncell() ) -
                   grid_x_original->xn( boil::BW );
   const real ly = grid_y_original->xn( boil::BW + grid_y_original->ncell() ) -

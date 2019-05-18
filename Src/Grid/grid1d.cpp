@@ -1,10 +1,35 @@
 #include "grid1d.h"
 
+/* If the cutoff at N is undefined, the same is used for both sides */
+/* Cutoffs are only relevant for non-periodic grids */
 /******************************************************************************/
 Grid1D::Grid1D(const Range<real> &  xr, const Range<real> & dxr,
-               const int & n, const Periodic & p) : nc_in(n), 
+               const int & n, const Periodic & p, 
+               const Cutoff & co1, const Cutoff & coN) : 
+  nc_in(n),
   period1(p), 
-  periodN(p) {
+  periodN(p),
+  ctf1(co1),
+  ctfN(coN) {
+
+   if(nc_in<boil::BW) {
+     boil::aout<<"At least as many cells as the buffer width ("<<boil::BW
+               <<") are required in each direction. Exiting."<<boil::endl;
+     exit(0);
+   }
+
+/*----------------+
+|  check cutoffs  |
++----------------*/
+  if(p == Periodic::no()&&ctf1 == Cutoff::undefined()) {
+    boil::aout<<"At least one cutoff must be specified for a non-periodic grid."
+              <<" Exiting."<<boil::endl;
+    exit(0);
+  }
+  if(p == Periodic::no()&&ctfN == Cutoff::undefined()) {
+    ctfN = ctf1;
+  }
+
 /*---------------------------+
 |  creates non-uniform grid  |
 +---------------------------*/
@@ -19,8 +44,28 @@ Grid1D::Grid1D(const Range<real> &  xr, const Range<real> & dxr,
 
 /******************************************************************************/
 Grid1D::Grid1D(const Range<real> &  xr,
-               const int & n, const Periodic & p) : nc_in(n),  
-               period1(p), periodN(p) {
+               const int & n, const Periodic & p,
+               const Cutoff & co1, const Cutoff & coN) :
+               nc_in(n), period1(p), periodN(p), ctf1(co1), ctfN(coN) {
+
+   if(nc_in<boil::BW) {
+     boil::aout<<"At least as many cells as the buffer width ("<<boil::BW
+               <<") are required in each direction. Exiting."<<boil::endl;
+     exit(0);
+   }
+
+/*----------------+
+|  check cutoffs  |
++----------------*/
+  if(p == Periodic::no()&&ctf1 == Cutoff::undefined()) {
+    boil::aout<<"At least one cutoff must be specified for a non-periodic grid."
+              <<" Exiting."<<boil::endl;
+    exit(0);
+  }
+  if(p == Periodic::no()&&ctfN == Cutoff::undefined()) {
+    ctfN = ctf1;
+  }
+
 /*-----------------------+
 |  creates uniform grid  | -> derived from above; could only one be used???
 +-----------------------*/
@@ -36,14 +81,28 @@ Grid1D::Grid1D(const Range<real> &  xr,
 
 /******************************************************************************/
 Grid1D::Grid1D(const Grid1D & left, const Grid1D & right,
-               const Periodic & p) : nc_in(left.ncell()+right.ncell()), 
-               period1(p), periodN(p) {
+               const Periodic & p, const Cutoff & co1, const Cutoff & coN) :
+               nc_in(left.ncell()+right.ncell()), 
+               period1(p), periodN(p), ctf1(co1), ctfN(coN) {
+/*----------------+
+|  check cutoffs  |
++----------------*/
+  if(p == Periodic::no()&&ctf1 == Cutoff::undefined()) {
+    boil::aout<<"At least one cutoff must be specified for a non-periodic grid."
+              <<" Exiting."<<boil::endl;
+    exit(0);
+  }
+  if(p == Periodic::no()&&ctfN == Cutoff::undefined()) {
+    ctfN = ctf1;
+  }
+
 /*---------------------------+
 |  creates non-uniform grid  |
 +---------------------------*/
 
   allocate(); 
 
+#if 0 /* this doesn't work with expanded buffers */
   /* just copty the first grid */
   for(int i=1; i<=left.nnode(); i++)
     x_node[i] = left.xn(i);
@@ -51,21 +110,45 @@ Grid1D::Grid1D(const Grid1D & left, const Grid1D & right,
   /* append the second grid */ 
   for(int i=2; i<=right.nnode(); i++)
     x_node[i+left.ncell()] = x_node[left.nnode()] + right.xn(i) - right.xn(1);
+#else
+  /* copy first grid */
+  for(int i=0; i<left.nnode(); i++)
+    x_node[i+boil::BW] = left.xn(i+boil::BW);
+
+  /* append the second grid */ 
+  for(int i=1; i<right.nnode(); i++)
+    x_node[i+left.nnode()+boil::BW-1] = x_node[left.nnode()+boil::BW-1]
+                                      + right.xn(i+boil::BW)
+                                      - right.xn(boil::BW);
+#endif
 
   correct_boundaries();
 }  
 
 /******************************************************************************/
 Grid1D::Grid1D(const Grid1D & left, const Grid1D & center, const Grid1D & right, 
-               const Periodic & p) :
+               const Periodic & p, const Cutoff & co1, const Cutoff & coN) :
   nc_in(left.ncell()+center.ncell()+right.ncell()), 
-  period1(p), periodN(p) {
+  period1(p), periodN(p), ctf1(co1), ctfN(coN) {
+/*----------------+
+|  check cutoffs  |
++----------------*/
+  if(p == Periodic::no()&&ctf1 == Cutoff::undefined()) {
+    boil::aout<<"At least one cutoff must be specified for a non-periodic grid."
+              <<" Exiting."<<boil::endl;
+    exit(0);
+  }
+  if(p == Periodic::no()&&ctfN == Cutoff::undefined()) {
+    ctfN = ctf1;
+  }
+
 /*---------------------------+
 |  creates non-uniform grid  |
 +---------------------------*/
 
   allocate();
 
+#if 0 /* this doesn't work with expanded buffers */
   /* just copty the first grid */
   for(int i=1; i<=left.nnode(); i++)
     x_node[i] = left.xn(i);
@@ -79,6 +162,24 @@ Grid1D::Grid1D(const Grid1D & left, const Grid1D & center, const Grid1D & right,
     x_node[i+left.ncell() + center.ncell()] 
     = 
     x_node[left.nnode() + center.nnode() - 1] + right.xn(i) - right.xn(1);
+#else
+  /* copy first grid */
+  for(int i=0; i<left.nnode(); i++)
+    x_node[i+boil::BW] = left.xn(i+boil::BW);
+
+  int first = boil::BW+left.nnode();
+  int i0 = 1; /* one node is common */
+  /* append the second grid */
+  for(int i=i0; i<center.nnode(); i++)
+    x_node[i+first-i0] = x_node[first-1]
+                       + center.xn(i+boil::BW) - center.xn(boil::BW);
+
+  first = boil::BW+left.nnode()+center.nnode()-i0; /* one node is common */
+  /* append the third grid */
+  for(int i=i0; i<right.nnode(); i++)
+    x_node[i+first-i0] = x_node[first-1]
+                       + right.xn(i+boil::BW) - right.xn(boil::BW);
+#endif
 
   correct_boundaries();
 }  
@@ -87,7 +188,9 @@ Grid1D::Grid1D(const Grid1D & left, const Grid1D & center, const Grid1D & right,
 Grid1D::Grid1D(const Grid1D & grid, 
                const Step   & step) // default step is Step(1)
   : period1(grid.periodic1()), 
-    periodN(grid.periodicN()) {
+    periodN(grid.periodicN()),
+    ctf1(grid.cutoff1()),
+    ctfN(grid.cutoffN()) {
 /*-------------------------------------------------------------------------+
 |  copy constructor with possibility to coarsen. not sure if it is needed  | 
 |                                                                          |
@@ -113,6 +216,12 @@ Grid1D::Grid1D(const Grid1D & grid,
   /* if yes, create (coarser) grid */
   nc_in = grid.ncell()/step.size();
 
+  if(nc_in<boil::BW) {
+     boil::aout<<"At least as many cells as the buffer width ("<<boil::BW
+               <<") are required in each direction. Exiting."<<boil::endl;
+     exit(0);
+  }
+
   allocate(); 
 
   for(int i=0; i<=nc_in; i++)
@@ -126,7 +235,9 @@ Grid1D::Grid1D(const Grid1D     & grid,
                const Range<int> & cr,     // first and last cell inside
                const Step       & step) 
   : period1(grid.periodic1()), 
-    periodN(grid.periodicN()) {
+    periodN(grid.periodicN()),
+    ctf1(grid.cutoff1()),
+    ctfN(grid.cutoffN()) {
 /*-------------------------------------------------------------------------+
 |  copy constructor which gets a subgrid.                                  | 
 |  the dissatvantage is that it allocates and de-allocates memory :-(      |
@@ -151,6 +262,14 @@ Grid1D::Grid1D(const Grid1D     & grid,
 
   /* set the right number of cells */
   nc_in = cellN - cell1 + 1;
+
+#if 0
+  if(nc_in<boil::BW) {
+     boil::aout<<"At least as many cells as the buffer width ("<<boil::BW
+               <<") are required in each direction. Exiting."<<boil::endl;
+     exit(0);
+  }
+#endif
 
   allocate(); 
 
@@ -196,7 +315,7 @@ void Grid1D::print() const {
              << boil::endl;
   if(periodic1()==true) boil::aout << ":::::::::::" << boil::endl;
   for(int i=0; i<nnode_b(); i++) {
-    if(i == 1 || i == nnode_b()-1) boil::aout << "- - - - - -" << boil::endl; 
+    if(i == boil::BW || i == nnode_b()-boil::BW) boil::aout << "- - - - - -" << boil::endl; 
     boil::aout << "i="<<i << "   xn="<<xn(i) << "   dxn="<<dxn(i) 
                << boil::endl;
   }
@@ -207,7 +326,7 @@ void Grid1D::print() const {
              << boil::endl;
   if(periodic1()==true) boil::aout << ":::::::::::" << boil::endl;
   for(int i=0; i<ncell_b(); i++) {
-    if(i == 1 || i == ncell_b()-1) boil::aout << "- - - - - -" << boil::endl; 
+    if(i == boil::BW || i == ncell_b()-boil::BW) boil::aout << "- - - - - -" << boil::endl; 
     boil::aout << "i="<<i << "   xc="<<xc(i) << "   dxc="<<dxc(i) 
                << boil::endl;
   }

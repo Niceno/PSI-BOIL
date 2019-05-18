@@ -85,6 +85,7 @@ class Momentum : public Staggered {
     void project(const Scalar & frc);
     void project_ghost(const Scalar & frc, const Scalar & c, const Scalar & k);
     void new_time_step();
+    void new_time_step(Vector & v);
     void grad(Scalar & p);
     void convection() {convection(&cnew);}
     real vol_phase_change(Scalar * psrc);

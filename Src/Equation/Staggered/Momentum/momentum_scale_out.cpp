@@ -89,7 +89,11 @@ void Momentum::scale_out() {
               if(iloop==1){
                 sumflx += -dSx(m,si(m)-1,j,k) * uabs * xx / rr;
               } else {
-                u[m][si(m)-1][j][k] = ratio1 * uabs * xx / rr;
+                /* value is only copied. The solid angle expansion
+                   in the buffers should be also considered...*/
+                //u[m][si(m)-1][j][k] = ratio1 * uabs * xx / rr;
+                for(int ii=1; ii<=boil::BW; ii++)
+                  u[m][si(m)-ii][j][k] = ratio1 * uabs * xx / rr;
               }
             }
           }
@@ -109,7 +113,11 @@ void Momentum::scale_out() {
               if(iloop==1){
                 sumflx += dSx(m,ei(m)+1,j,k) * uabs * xx / rr;
               } else {
-                u[m][ei(m)+1][j][k] = ratio1 * uabs * xx / rr;
+                /* value is only copied. The solid angle expansion
+                   in the buffers should be also considered...*/
+                //u[m][ei(m)+1][j][k] = ratio1 * uabs * xx / rr;
+                for(int ii=1; ii<=boil::BW; ii++)
+                  u[m][ei(m)+ii][j][k] = ratio1 * uabs * xx / rr;
               }
             }
           }
@@ -131,7 +139,11 @@ void Momentum::scale_out() {
               if(iloop==1){
                 sumflx += -dSy(m,i,sj(m)-1,k) * uabs * yy / rr;
               } else {
-                u[m][i][sj(m)-1][k] = ratio1 * uabs * yy / rr;
+                /* value is only copied. The solid angle expansion
+                   in the buffers should be also considered...*/
+                //u[m][i][sj(m)-1][k] = ratio1 * uabs * yy / rr;
+                for(int jj=1; jj<=boil::BW; jj++)
+                  u[m][i][sj(m)-jj][k] = ratio1 * uabs * yy / rr;
               }
             }
           }
@@ -151,7 +163,11 @@ void Momentum::scale_out() {
               if(iloop==1){
                 sumflx += dSy(m,i,ej(m)+1,k) * uabs * yy / rr;
               } else {
-                u[m][i][ej(m)+1][k] = ratio1 * uabs * yy / rr;
+                /* value is only copied. The solid angle expansion
+                   in the buffers should be also considered...*/
+                //u[m][i][ej(m)+1][k] = ratio1 * uabs * yy / rr;
+                for(int jj=1; jj<=boil::BW; jj++)
+                  u[m][i][ej(m)+jj][k] = ratio1 * uabs * yy / rr;
               }
             }
           }
@@ -167,7 +183,11 @@ void Momentum::scale_out() {
               if(iloop==1){
                 sumflx += -dSz(m,i,j,sk(m)-1) * uabs * zz / rr;
               } else {
-                u[m][i][j][sk(m)-1] = ratio1 * uabs * zz / rr;
+                /* value is only copied. The solid angle expansion
+                   in the buffers should be also considered...*/
+                //u[m][i][j][sk(m)-1] = ratio1 * uabs * zz / rr;
+                for(int kk=1; kk<=boil::BW; kk++)
+                  u[m][i][j][sk(m)-kk] = ratio1 * uabs * zz / rr;
               }
 #endif
             }
@@ -184,7 +204,11 @@ void Momentum::scale_out() {
               if(iloop==1){
                 sumflx += dSz(m,i,j,ek(m)+1) * uabs * zz / rr;
               } else {
-                u[m][i][j][ek(m)+1] = ratio1 * uabs * zz / rr;
+                /* value is only copied. The solid angle expansion
+                   in the buffers should be also considered...*/
+                //u[m][i][j][ek(m)+1] = ratio1 * uabs * zz / rr;
+                for(int jj=1; jj<=boil::BW; jj++)
+                  u[m][i][j][ek(m)+kk] = ratio1 * uabs * zz / rr;
               }
 #endif
             }
@@ -192,88 +216,6 @@ void Momentum::scale_out() {
         }
       }
     }
-  }
-#endif
-
-#if 0
-  /*------------------------+
-  |  nothing at the outlet  |
-  +------------------------*/
-  if( ratio > 2.0 || ratio <0.5 ) {
-    /* bad, code duplication, this has been coppied from insert_bc */
-    for_m(m){
-    for( int b=0; b<u.bc(m).count(); b++ ) {
-
-      if( u.bc(m).type_decomp(b) ) continue;
-
-      if( u.bc(m).type(b) == BndType::outlet() ) {
-
-        Dir d = u.bc(m).direction(b);
-
-        if( m == Comp::u() && d == Dir::imin() ){
-          //std::cout<<"dir= "<<d<<"m= "<<m<<"\n";
-          for_vjk(u.bc(m).at(b),j,k) u[m][si(m)-1][j][k] = -volf_in/asum;
-        }
-        if( m == Comp::u() && d == Dir::imax() ){
-          //std::cout<<"dir= "<<d<<"m= "<<m<<"\n";
-          for_vjk(u.bc(m).at(b),j,k) u[m][ei(m)+1][j][k] = volf_in/asum;
-        }
-
-        if( m == Comp::v() && d == Dir::jmin() ){
-          //std::cout<<"dir= "<<d<<"m= "<<m<<"\n";
-          for_vik(u.bc(m).at(b),i,k) u[m][i][sj(m)-1][k] = -volf_in/asum;
-        }
-        if( m == Comp::v() && d == Dir::jmax() ){
-          //std::cout<<"dir= "<<d<<"m= "<<m<<"\n";
-          for_vik(u.bc(m).at(b),i,k) u[m][i][ej(m)+1][k] = volf_in/asum;
-        }
-
-        if( m == Comp::w() && d == Dir::kmin() ){
-          //std::cout<<"dir= "<<d<<"m= "<<m<<"\n";
-          for_vij(u.bc(m).at(b),i,j) u[m][i][j][sk(m)-1] = -volf_in/asum;
-        }
-        if( m == Comp::w() && d == Dir::kmax() ){
-          //std::cout<<"dir= "<<d<<"m= "<<m<<"\n";
-          for_vij(u.bc(m).at(b),i,j) u[m][i][j][ek(m)+1] = volf_in/asum;
-        }
-      }
-    } /* b */
-    }
-  }
-  /*--------------------------+
-  |  something at the outlet  |
-  +--------------------------*/
-  else {
-    for_m(m) {              
-      /* again code duplication, this has been coppied from insert_bc */
-      for( int b=0; b<u.bc(m).count(); b++ ) {
-
-        if( u.bc(m).type_decomp(b) ) continue;
-
-        if( u.bc(m).type(b) == BndType::outlet() ) {
-
-          Dir d = u.bc(m).direction(b);
-
-          if( d == Dir::imin() ) 
-            for_vjk(u.bc(m).at(b),j,k) u[m][si(m)-1][j][k] *= ratio;    
-          if( d == Dir::imax() ) 
-            for_vjk(u.bc(m).at(b),j,k) u[m][ei(m)+1][j][k] *= ratio;    
-
-          if( d == Dir::jmin() ) 
-            for_vik(u.bc(m).at(b),i,k) u[m][i][sj(m)-1][k] *= ratio;    
-          if( d == Dir::jmax() ) 
-            for_vik(u.bc(m).at(b),i,k) u[m][i][ej(m)+1][k] *= ratio;    
-
-          if( d == Dir::kmin() ) 
-            for_vij(u.bc(m).at(b),i,j) u[m][i][j][sk(m)-1] *= ratio;    
-            //for_vij(u.bc(m).at(b),i,j) u[m][i][j][sk(m)+1] *= ratio;    
-          if( d == Dir::kmax() ) 
-            for_vij(u.bc(m).at(b),i,j) u[m][i][j][ek(m)+1] *= ratio;    
-            //for_vij(u.bc(m).at(b),i,j) u[m][i][j][ek(m)-1] *= ratio;    
-
-        }
-      } /* b */
-    } /* m */
   }
 #endif
 }

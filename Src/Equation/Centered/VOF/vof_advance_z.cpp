@@ -1,7 +1,7 @@
 #include "vof.h"
 
 /******************************************************************************/
-void VOF::advance_z() {
+void VOF::advance_z(Scalar & scp) {
 
   /* advance in the z-direction */
 
@@ -24,7 +24,7 @@ void VOF::advance_z() {
       kup = k; 
       kdn = k-1;
     }            
-    real dzup = phi.dzc(kup);
+    real dzup = scp.dzc(kup);
     real dt = time->dt();
 
     /* fext is related to mflx as follows:
@@ -33,7 +33,7 @@ void VOF::advance_z() {
     real fextdn = fext[i][j][kdn];
 
     /* volumetric conservation factor, calculated in vof_advance
-     * this factor represents the renormalisation of phi' after pc and must
+     * this factor represents the renormalisation of scp' after pc and must
      * be thus included in the real space flux after iteration */
     real volfactorup = stmp3[i][j][kup];
     real volfactordn = stmp3[i][j][kdn];
@@ -43,33 +43,33 @@ void VOF::advance_z() {
     if(fabs(fextup)<boil::pico) sourceup = false; 
     if(fabs(fextdn)<boil::pico) sourcedn = false; 
 
-    real phiup = phi[i][j][kup];
-    real phidn = phi[i][j][kdn];
+    real scpup = scp[i][j][kup];
+    real scpdn = scp[i][j][kdn];
 
-    if       (dzup==0.0||phiup<boil::pico) {
+    if       (dzup==0.0||scpup<boil::pico) {
       if(jv*uval<0.0) {
         f = 0.0;
       } else {
-        f = phiup * dSz(i,j,k) * jv * dt;
+        f = scpup * dSz(i,j,k) * jv * dt;
       }
-    } else if(phiup>(1.0-boil::pico)) {
+    } else if(scpup>(1.0-boil::pico)) {
       if       (jv*uval<0.0) {
         f = 0.0;
-      } else if(phidn>(1.0-boil::pico)) {
-        f = phiup * dSz(i,j,k) * jv * dt;
+      } else if(scpdn>(1.0-boil::pico)) {
+        f = scpup * dSz(i,j,k) * jv * dt;
 #if 0
         if(fabs(f)<boil::micro) {
           f = 0.0; /* remove spurious fluxes */
         }
 #endif
       } else {
-        f = phiup * dSz(i,j,k) * jv * dt;
+        f = scpup * dSz(i,j,k) * jv * dt;
       }    
     //} else if(!sourceup&!sourcedn) {
     } else if(true) {
       /* calculate g: CFL upwind */
       real g = uval*dt/dzup;
-      f = dV(i,j,kup)*calc_flux(g,phiup,nz[i][j][kup],
+      f = dV(i,j,kup)*calc_flux(g,scpup,nz[i][j][kup],
                                         ny[i][j][kup],
                                         nx[i][j][kup]);
       //f *= volfactorup;
@@ -125,7 +125,7 @@ void VOF::advance_z() {
         } else {
           f = dSz(i,j,k) * jv * dt;
         }
-        boil::aout<<"case1z "<<i<<" "<<j<<" "<<kup<<" | "<<kdn<<" "<<phiup<<" "<<stmp[i][j][kup]/dV(i,j,kup)<<" "<<f/dV(i,j,kup)<<" | "<<(stmp[i][j][kdn]+fabs(f))/dV(i,j,kdn)<<" "<<(stmp[i][j][kup]-fabs(f))/dV(i,j,kup)<<boil::endl;
+        boil::aout<<"case1z "<<i<<" "<<j<<" "<<kup<<" | "<<kdn<<" "<<scpup<<" "<<stmp[i][j][kup]/dV(i,j,kup)<<" "<<f/dV(i,j,kup)<<" | "<<(stmp[i][j][kdn]+fabs(f))/dV(i,j,kdn)<<" "<<(stmp[i][j][kup]-fabs(f))/dV(i,j,kup)<<boil::endl;
       /* case 2: both downwind and upwind follow the flow */
       } else if(gasflowup==1||gasflowdn==1) { 
         /* calculate gliq and ggas: CFL of liquid and gas upwind */
@@ -140,22 +140,22 @@ void VOF::advance_z() {
         real gj = jv*dt/dzup/volfactorup; 
 #if 1
         f = dV(i,j,kup)*volfactorup
-            *calc_diabatic_flux(gj,gliq,ggas,phiup,
+            *calc_diabatic_flux(gj,gliq,ggas,scpup,
                                 nz[i][j][kup],ny[i][j][kup],nx[i][j][kup]);
-        boil::aout<<"case2z "<<i<<" "<<j<<" "<<kup<<" | "<<kdn<<" "<<phiup<<" "<<stmp[i][j][kup]/dV(i,j,kup)<<" "<<f/dV(i,j,kup)<<" | "<<(stmp[i][j][kdn]+fabs(f))/dV(i,j,kdn)<<" "<<(stmp[i][j][kup]-fabs(f))/dV(i,j,kup)<<boil::endl;
+        boil::aout<<"case2z "<<i<<" "<<j<<" "<<kup<<" | "<<kdn<<" "<<scpup<<" "<<stmp[i][j][kup]/dV(i,j,kup)<<" "<<f/dV(i,j,kup)<<" | "<<(stmp[i][j][kdn]+fabs(f))/dV(i,j,kdn)<<" "<<(stmp[i][j][kup]-fabs(f))/dV(i,j,kup)<<boil::endl;
 #endif
 
       /* case 3: both downwind and upwind oppose the flow */ 
       } else if(gasflowdn==0||gasflowup==0) {
-        real dzdn = phi.dzc(kdn);
+        real dzdn = scp.dzc(kdn);
 
         /* degenerate case */
         if(dzdn==0.0) {
           real jgas;
           if(gasflowdn==0) {
-            jgas = (1.0-phi[i][j][kdn])*gasveldn;
+            jgas = (1.0-scp[i][j][kdn])*gasveldn;
           } else {
-            jgas = (1.0-phi[i][j][kdn])*gasvelup;
+            jgas = (1.0-scp[i][j][kdn])*gasvelup;
           }
           jv -= jgas;
 
@@ -165,7 +165,7 @@ void VOF::advance_z() {
           } else {
             f = dSz(i,j,k)*jv*dt;
           } 
-          boil::aout<<"case3z "<<i<<" "<<j<<" "<<kup<<" | "<<kdn<<" "<<phiup<<" "<<stmp[i][j][kup]/dV(i,j,kup)<<" "<<f/dV(i,j,kup)<<" | "<<(stmp[i][j][kdn]+fabs(f))/dV(i,j,kdn)<<" "<<(stmp[i][j][kup]-fabs(f))/dV(i,j,kup)<<boil::endl;
+          boil::aout<<"case3z "<<i<<" "<<j<<" "<<kup<<" | "<<kdn<<" "<<scpup<<" "<<stmp[i][j][kup]/dV(i,j,kup)<<" "<<f/dV(i,j,kup)<<" | "<<(stmp[i][j][kdn]+fabs(f))/dV(i,j,kdn)<<" "<<(stmp[i][j][kup]-fabs(f))/dV(i,j,kup)<<boil::endl;
         } else {
           /* calculate gliq and ggas: CFL of liquid upw and gas dnw */
           real gliq = uval*dt/dzup;
@@ -181,10 +181,10 @@ void VOF::advance_z() {
           real dzrat = dzdn/dzup*volfactordn/volfactorup;
 #if 1
           f = volfactorup*dV(i,j,kup)
-              *calc_diabatic_flux(gj,gliq,ggas,dzrat,phiup,phidn,
+              *calc_diabatic_flux(gj,gliq,ggas,dzrat,scpup,scpdn,
                                   nz[i][j][kup],ny[i][j][kup],nx[i][j][kup],
                                   nz[i][j][kdn],ny[i][j][kdn],nx[i][j][kdn]);
-          boil::aout<<"case3z "<<i<<" "<<j<<" "<<kup<<" | "<<kdn<<" "<<phiup<<" "<<stmp[i][j][kup]/dV(i,j,kup)<<" "<<f/dV(i,j,kup)<<" | "<<(stmp[i][j][kdn]+fabs(f))/dV(i,j,kdn)<<" "<<(stmp[i][j][kup]-fabs(f))/dV(i,j,kup)<<boil::endl;
+          boil::aout<<"case3z "<<i<<" "<<j<<" "<<kup<<" | "<<kdn<<" "<<scpup<<" "<<stmp[i][j][kup]/dV(i,j,kup)<<" "<<f/dV(i,j,kup)<<" | "<<(stmp[i][j][kdn]+fabs(f))/dV(i,j,kdn)<<" "<<(stmp[i][j][kup]-fabs(f))/dV(i,j,kup)<<boil::endl;
 #endif
         }
       /* case 4: downwind opposes flow, upwind follows: all three cross bnd */
@@ -216,7 +216,7 @@ void VOF::advance_z() {
 
 #if 0
     if((k==100||k==101)&&j==3&&i==100) {
-      std::cout<<"advance_z:"<<f<<" "<<k<<" "<<phi[i][j][k-1]<<"\n";
+      std::cout<<"advance_z:"<<f<<" "<<k<<" "<<scp[i][j][k-1]<<"\n";
     }
 #endif
 

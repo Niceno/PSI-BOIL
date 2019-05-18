@@ -6,6 +6,11 @@ void Scalar::bnd_grad_update(const Comp & com) {
 |  boundary condition for dval/dx, dval/dy, dval/dz                            |
 +-----------------------------------------------------------------------------*/
 
+  boil::oout<<"Possible underdevelopment due to changes in buffer treatment ("
+             <<"cutoff introduction). Review this function before using. "
+             <<"Exiting."<<boil::endl;
+  exit(0);
+
   if( bc().type_here(Dir::imin(),BndType::periodic())
     ||dom->coord(Comp::i()) !=0){
   } else if( bc().type_here(Dir::imin(),BndType::symmetry())

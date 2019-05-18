@@ -76,37 +76,37 @@ void PhaseChange::insert_bc_gradphic(const Scalar & val) {
         if(d == Dir::imin()){
           for_vijk( val.bc().at(b), i,j,k ){
             int ii=i+1; 
-            nx[ii][j][k] = (val[ii+1][j][k]-val[ii][j][k])/(2.0*dxw(ii)+dxe(ii));
+            nx[ii][j][k] = (val[ii+1][j][k]-val[ii][j][k])/(dxw(ii)+dxe(ii));
           }
         }
         if(d == Dir::imax()){
           for_vijk( val.bc().at(b), i,j,k ){
             int ii=i-1; 
-            nx[ii][j][k] = (val[ii][j][k]-val[ii-1][j][k])/(dxw(ii)+2.0*dxe(ii));
+            nx[ii][j][k] = (val[ii][j][k]-val[ii-1][j][k])/(dxw(ii)+dxe(ii));
           }
         }
         if(d == Dir::jmin()){
           for_vijk( val.bc().at(b), i,j,k ){
             int jj=j+1;
-            ny[i][jj][k] = (val[i][jj+1][k]-val[i][jj][k])/(2.0*dys(jj)+dyn(jj));
+            ny[i][jj][k] = (val[i][jj+1][k]-val[i][jj][k])/(dys(jj)+dyn(jj));
           }
         }
         if(d == Dir::jmax()){
           for_vijk( val.bc().at(b), i,j,k ){
             int jj=j-1;
-            ny[i][jj][k] = (val[i][jj][k]-val[i][jj-1][k])/(dys(j)+2.0*dyn(j));
+            ny[i][jj][k] = (val[i][jj][k]-val[i][jj-1][k])/(dys(j)+dyn(j));
           }
         }
         if(d == Dir::kmin()){
           for_vijk( val.bc().at(b), i,j,k ){
             int kk=k+1;
-            nz[i][j][kk] = (val[i][j][kk+1]-val[i][j][kk])/(2.0*dzb(kk)+dzt(kk));
+            nz[i][j][kk] = (val[i][j][kk+1]-val[i][j][kk])/(dzb(kk)+dzt(kk));
           }
         }
         if(d == Dir::kmax()){
           for_vijk( val.bc().at(b), i,j,k ){
             int kk=k-1;
-            nz[i][j][kk] = (val[i][j][kk]-val[i][j][kk-1])/(dzb(kk)+2.0*dzt(kk));
+            nz[i][j][kk] = (val[i][j][kk]-val[i][j][kk-1])/(dzb(kk)+dzt(kk));
           }
         }
       }

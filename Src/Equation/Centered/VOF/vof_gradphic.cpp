@@ -7,6 +7,8 @@ void VOF::gradphic(const Scalar & sca) {
 *         Resluts: nx, ny, nz
 *******************************************************************************/
 
+  sca.exchange_all();  // necessary for corner
+
   /* cell centered base */
   for_ijk(i,j,k) {
 #if 0
@@ -62,14 +64,10 @@ void VOF::gradphic(const Scalar & sca) {
                            + q011 - q001 + q111 - q101);
       nz[i][j][k] = 0.25 * ( q001 - q000 + q101 - q100
                            + q011 - q010 + q111 - q110);
-
 #endif
+
 #endif
   }
-
-//  std::cout<<"nx75 "<<nx[75][1][1]<<" "<<"nx76 "<<nx[76][1][1]<<"\n";
-//  std::cout<<"ny75 "<<ny[75][1][1]<<" "<<"ny76 "<<ny[76][1][1]<<"\n";
-//  std::cout<<"nz75 "<<nz[75][1][1]<<" "<<"nz76 "<<nz[76][1][1]<<"\n";
 
   /* normal vector at adjacent cells next to wall, symmetric and IB */
   insert_bc_gradphic(sca); 

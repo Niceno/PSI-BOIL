@@ -12,6 +12,7 @@
 #include "../Body/body.h"
 #include "../Body/Empty/empty.h"
 #include "../Ravioli/periodic.h"
+#include "../Ravioli/cutoff.h"
 #include "../Ravioli/dir.h"
 #include "../Ravioli/comp.h"
 #include "../Ravioli/decompose.h"
@@ -108,6 +109,7 @@ class Domain {
      {return dxc(i) * dyc(j) * dzc(k);}
 
     bool  period(const int i) const {return per[i];}
+    bool  cutoff(const int i, const int j) const {return ctf[i][j];}
     const Domain * coarser() const {return crsr;}
     
     const Body & ibody() const {return * body;}
@@ -176,6 +178,7 @@ class Domain {
     const int lev;               /* refinement level */
     Range<int> cr_x, cr_y, cr_z; /* cell range - for domain decomposition */
     bool  per[3];
+    bool  ctf[3][2];
     const Domain * crsr;
     const Domain * coarsen() const;
     void  setup(const Decompose & dec);

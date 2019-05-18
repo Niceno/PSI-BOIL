@@ -106,14 +106,13 @@ VOF::VOF(const Scalar & PHI,
 
   epsnorm=1.0e-12;
   phisurf=0.5;
-  nlayer=2;
+  nlayer=6;
   n_ext_fs=5;
   tol_wall = 0.01; /* tolerance 0.99 \approx 1.0 near walls */
   tol_flux = 3e-3; /* during inner iterations */
   tol_ext = 1e-7; /* extrapolation tolerance */
   flux_cfl = 0.2;  /* used in case 3 flux calculations */
   maxiter = 10;    /* maximal number of iterations */
-  kappa_non_cal = 0.0;
   curv_method = 0;
 
   discretize();

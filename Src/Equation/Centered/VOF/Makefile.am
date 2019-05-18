@@ -12,8 +12,8 @@ libVof_a_SOURCES =      vof.h                 \
                         vof_calc_diabatic_flux.cpp  \
                         vof_calc_flux.cpp     \
                         vof_calc_v.cpp        \
+                        vof_curvature.cpp      \
                         vof_curv_HF.cpp          \
-                        vof_curv_HF_ext.cpp     \
                         vof_curv_smooth.cpp   \
                         vof_extract_alpha.cpp   \
                         vof_fext_cut.cpp          \

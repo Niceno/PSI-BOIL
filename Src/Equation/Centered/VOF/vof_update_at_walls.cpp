@@ -473,6 +473,9 @@ void VOF::update_at_walls() {
   }
 
   phi.exchange_all();
+  nx.exchange_all();
+  ny.exchange_all();
+  nz.exchange_all();
  
   return;
 }
@@ -546,10 +549,13 @@ real VOF::extrapolate_v(const int i, const int j, const int k,
   /* x' = x - x(center of bnd cell) + (0.5,0.5,0.5)  */
   /* this affects alpha value: */
   /* m dot x' = alpha + m dot [(0.5,0.5,0.5) - x(cbc)] = alpha' */
-   alphaval += vm1*(0.5-xpos) + vm2*(0.5-ypos) + vm3*(0.5-zpos);
+  alphaval += vm1*(0.5-xpos) + vm2*(0.5-ypos) + vm3*(0.5-zpos);
 
   /* normalized alpha value */
   alphaval /= denom; 
+  vm1 /= denom;
+  vm2 /= denom;
+  vm3 /= denom;
 
 #if 0
   if(i==1&&j==0&&k==90) boil::oout<<ii<<" "<<jj<<" "<<kk<<" "<<alphaval<<" "<<vm1*(0.5-xpos) + vm2*(0.5-ypos) + vm3*(0.5-zpos)<<" "<<phiphi<<" "<<calc_v(alphaval,vm1,vm2,vm3)<<" | "<<vn1<<" "<<vn2<<" "<<vn3<<" "<<xpos<<" "<<ypos<<" "<<zpos<<" | "<<ofx<<" "<<ofy<<" "<<ofz<<boil::endl;

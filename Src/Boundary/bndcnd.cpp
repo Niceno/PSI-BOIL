@@ -124,9 +124,9 @@ void BndCnd::add(BndCnd bc) {
 
   bool fail;
 
-  /*-------------------------------------------------------------+
-  |  1. check consistency of (non) periodic boundary conditions  | 
-  +-------------------------------------------------------------*/
+  /*----------------------------------------------------------------------+
+  |  1. check consistency of (non) periodic/symmetry boundary conditions  | 
+  +----------------------------------------------------------------------*/
   fail = false;
   if( bc.typ == BndType::periodic() ) {
     if( bc.dir == Dir::imin() && !dom->period(0) ) fail = true;
@@ -154,6 +154,21 @@ void BndCnd::add(BndCnd bc) {
   if( fail ) {
     boil::oout << "Fatal: trying to define non-periodic b.c. " 
                << "to a periodic domain. Exiting!" << boil::endl;
+    exit(0);
+  }
+
+  fail = false;
+  if( bc.typ == BndType::symmetry() ) {
+    if( bc.dir == Dir::imin() && !dom->cutoff(0,0) ) fail = true;
+    if( bc.dir == Dir::imax() && !dom->cutoff(0,1) ) fail = true;
+    if( bc.dir == Dir::jmin() && !dom->cutoff(1,0) ) fail = true;
+    if( bc.dir == Dir::jmax() && !dom->cutoff(1,1) ) fail = true;
+    if( bc.dir == Dir::kmin() && !dom->cutoff(2,0) ) fail = true;
+    if( bc.dir == Dir::kmax() && !dom->cutoff(2,1) ) fail = true;
+  }
+  if( fail ) {
+    boil::oout << "Fatal: trying to define symmetry b.c. "
+               << "to a non-symmetric domain. Exiting!" << boil::endl;
     exit(0);
   }
 

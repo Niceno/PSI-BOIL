@@ -28,8 +28,12 @@ class VOF : public Centered {
 
     void new_time_step(){};
     void advance();
+    void advance(Scalar & sca);
+    void curvature();
+    void curvature(const Scalar & Phi, const bool anc_flag = true);
     void ancillary(); /* calcs ancillary params such as adens w/o advance */
     void tension(Vector * vec, const Matter matt);
+    void tension(Vector * vec, const Matter matt, const Scalar & kap);
     void totalvol();
     void front_minmax();
     void init(){};
@@ -105,19 +109,16 @@ class VOF : public Centered {
 
     Topology topo;
   protected:
-    void advance_x();
-    void advance_y();
-    void advance_z();
+    void advance_x(Scalar & sca);
+    void advance_y(Scalar & sca);
+    void advance_z(Scalar & sca);
     void bdcurv(const Scalar & g, const real & v);
     void cal_fs3();
     void cal_fs_interp();
-    void ext_vel(Scalar & sca, const Scalar & eflag, const int sgn);
     void fs_bnd();
-    void update_at_walls();
     void curv_HF();
-    void curv_HF_ext();
+    void curv_HF(const Scalar & Phi, const bool anc_flag = true);
     void curv_smooth();
-    real kappa_ave(const real r1, const real r2);
     void smooth(const Scalar & sca, Scalar & scb, const int itnum);
     void extract_alpha();
     void true_norm_vect();
@@ -130,6 +131,9 @@ class VOF : public Centered {
     void norm_cc(const Scalar & g);
     void norm_young(const Scalar & g);
     void normalize(real & r1, real & r2, real & r3);
+    void update_at_walls();
+    real kappa_ave(const real r1, const real r2);
+    void ext_vel(Scalar & sca, const Scalar & eflag, const int sgn);
     real calc_v(real r1, real r2, real r3, real r4);
     real calc_alpha(const real r1, const real r2, const real r3, const real r4);
     real calc_flux(const real g, real c, const real nx, const real ny, const real nz);
@@ -175,7 +179,6 @@ class VOF : public Centered {
                        const int ofx, const int ofy, const int ofz,
                        const real xp, const real yp, const real zp);
 
-    real marching_cube_area(const int i, const int j, const int k);
 #if 1
     real vel_value(const Comp m, const int i, const int j, const int k);
     real vel_correct(const int i, const int j, const int k,
@@ -264,7 +267,6 @@ class VOF : public Centered {
     real pi,theta;
     real dxmin,ww;
     real epsnorm;
-    real kappa_non_cal;
     bool iminp, imaxp, jminp, jmaxp, kminp, kmaxp; // periodic = true
 
     real phisurf;
