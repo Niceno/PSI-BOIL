@@ -6,7 +6,7 @@
 #include "../Global/global_checking.h"
 #include "../Global/global_endl.h"
 #include "../Global/global_precision.h"
-#include "../Ravioli/cutoff.h"
+#include "../Ravioli/bndgrid.h"
 #include "../Ravioli/periodic.h"
 #include "../Ravioli/range.h"
 #include "../Parallel/Out/out.h"
@@ -25,27 +25,27 @@ class Grid1D {
            const Range<real> & dxr,
            const int  & gx,
            const Periodic & p,
-           const Cutoff & co1 = Cutoff::wall(),
-           const Cutoff & coN = Cutoff::undefined());
+           const BndGrid & co1 = BndGrid::wall(),
+           const BndGrid & coN = BndGrid::undefined());
 
     Grid1D(const Range<real> &  xr, 
            const int  & gx,
            const Periodic & p,
-           const Cutoff & co1 = Cutoff::wall(),
-           const Cutoff & coN = Cutoff::undefined());
+           const BndGrid & co1 = BndGrid::wall(),
+           const BndGrid & coN = BndGrid::undefined());
 
     Grid1D(const Grid1D & left,
            const Grid1D & right,
            const Periodic & p,
-           const Cutoff & co1 = Cutoff::wall(),
-           const Cutoff & coN = Cutoff::undefined());
+           const BndGrid & co1 = BndGrid::wall(),
+           const BndGrid & coN = BndGrid::undefined());
 
     Grid1D(const Grid1D & left,
            const Grid1D & center, 
            const Grid1D & right,
            const Periodic & p,
-           const Cutoff & co1 = Cutoff::wall(),
-           const Cutoff & coN = Cutoff::undefined());
+           const BndGrid & co1 = BndGrid::wall(),
+           const BndGrid & coN = BndGrid::undefined());
 
     /* constructor which creates a coarser grid */
     Grid1D(const Grid1D & grid, const Step & step = Step(1));
@@ -61,8 +61,8 @@ class Grid1D {
     const Periodic periodicN() const {return periodN;}
 
     /* are these used? */
-    const Cutoff cutoff1() const {return ctf1;}
-    const Cutoff cutoffN() const {return ctfN;}
+    const BndGrid cutoff1() const {return ctf1;}
+    const BndGrid cutoffN() const {return ctfN;}
 
     /* number of cells and nodes */
     int ncell()   const {return nc_in;}
@@ -94,7 +94,7 @@ class Grid1D {
     real * dx_node;
     real * dx_cell;
     Periodic period1, periodN;
-    Cutoff ctf1, ctfN;
+    BndGrid ctf1, ctfN;
     const    Grid1D * coarsen() const;
     void     allocate();
     void     distribute_nodes_inside(const real & x1, const real & xn,

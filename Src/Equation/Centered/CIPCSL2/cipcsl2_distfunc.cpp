@@ -95,12 +95,13 @@ void CIPCSL2::distfunc(const Scalar & sca, const int itnum) {
           real d = stmp[i][j][k] / dpdxyz;
           fn[i][j][k] = dtau /dx * ( asgn * fabs(dist[i][j][k]) - d);
 #if 0
-          if(i==4&&j==17&&k==1) {
+          if(i==si()+0&&j==sj()+0&&k==sk()+15) {
             std::cout<<"dtam= "<<dtau<<" "<<dx<<" "<<asgn<<" "
                      <<dist[i][j][k]<<" "<<stmp[i][j][k]<<" "<<dpdxyz<<"\n";
             std::cout<<"dpdx: "<<dpdx<<" "<<dpdy<<" "<<dpdz<<"\n";
             std::cout<<"stmp: "<<stmp[i][j][k]<<" "<<stmp[i][j][k-1]<<"\n";
-            std::cout<<"iflag: "<<iflag[i][j][k-1]<<" "<<iflag[i][j][k+1]<<"\n";
+            std::cout<<"iflag: "<<iflag[i-1][j][k]<<" "<<iflag[i+1][j][k]<<"\n";
+            std::cout<<"dx: "<<phi.dxw(i)<<" "<<phi.dxe(i)<<"\n";
             exit(0);
           }
 #endif

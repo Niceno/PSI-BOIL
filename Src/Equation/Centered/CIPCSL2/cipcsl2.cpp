@@ -69,7 +69,7 @@ CIPCSL2::CIPCSL2(const Scalar & PHI,
   tol_wall = 0.01;
 
   epsnorm=1.0e-12;
-  eps_clr = 1.0e-4; // epsiron for color function
+  eps_clr = 1.0e-4; // epsilon for color function
 
   /* set initial value */
   nredist=1;

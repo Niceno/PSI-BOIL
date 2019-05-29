@@ -12,7 +12,7 @@
 #include "../Body/body.h"
 #include "../Body/Empty/empty.h"
 #include "../Ravioli/periodic.h"
-#include "../Ravioli/cutoff.h"
+#include "../Ravioli/bndgrid.h"
 #include "../Ravioli/dir.h"
 #include "../Ravioli/comp.h"
 #include "../Ravioli/decompose.h"
@@ -110,6 +110,7 @@ class Domain {
 
     bool  period(const int i) const {return per[i];}
     bool  cutoff(const int i, const int j) const {return ctf[i][j];}
+    bool  bnd_symmetry(const Dir d) const;
     const Domain * coarser() const {return crsr;}
     
     const Body & ibody() const {return * body;}
@@ -196,6 +197,7 @@ class Domain {
     real min_dxyz, max_dxyz;
     real min_dV, max_dV;
     real max_ar; /* aspect ratio */
+    bool imins,imaxs,jmins,jmaxs,kmins,kmaxs;
 };	
 
 #endif

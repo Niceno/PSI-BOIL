@@ -1,22 +1,19 @@
 #include "vof.h"
-
-void VOF::curvature() {
-  curvature(phi,true);
-
-  return;
-}
+using namespace std;
 
 /******************************************************************************/
-void VOF::curvature(const Scalar & Phi, const bool anc_flag) {
+void VOF::curvature() {
 /***************************************************************************//**
-*  \brief Calculate curvature
+*  \brief Calculate curvature using height function.
+*     output: kappa
 *******************************************************************************/
 
   if(curv_method==0) {
-    curv_HF(Phi,anc_flag);
+    curv_HF();
   } else {
     curv_smooth();
   }
 
   return;
 }
+

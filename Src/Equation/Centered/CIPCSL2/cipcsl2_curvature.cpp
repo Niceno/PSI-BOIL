@@ -43,12 +43,10 @@ void CIPCSL2::curvature() {
   }
 
 #if 0
-  if (time->current_step()>=18273 && time->current_step()<=18300) {
   boil::plot->plot(clr,nx,ny,nz, "clr-nx-ny-nz-bef", time->current_step());
   boil::plot->plot(clr,kappa,dist, "clr-kappa-dist-bef", time->current_step());
-  }
+  exit(0);
 #endif
-
 
   /* wall adhesion */
   //bdcurv(sclr);
@@ -56,7 +54,6 @@ void CIPCSL2::curvature() {
   //bdcurv(clr);
 
 #if 0
-  if (time->current_step()>=18273 && time->current_step()<=18300) {
   boil::plot->plot(clr,nx,ny,nz, "clr-nx-ny-nz-aft", time->current_step());
   boil::plot->plot(clr,kappa,dist, "clr-kappa-dist-aft", time->current_step());
   //exit(0);
@@ -65,3 +62,4 @@ void CIPCSL2::curvature() {
 
   boil::timer.stop("cipcsl2 curvature");
 }
+

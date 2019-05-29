@@ -32,6 +32,9 @@ void CIPCSL2::tension(Vector * vec, const Matter matt, Scalar & sca) {
   |  1st and 2nd step  |
   +-------------------*/
   curvature();
+#ifdef DEBUG
+  std::cout<<"curvature::end "<<boil::cart.iam()<<"\n";
+#endif
 
   /*-----------+
   |  3rd step  |
@@ -164,6 +167,14 @@ void CIPCSL2::tension(Vector * vec, const Matter matt, Scalar & sca) {
     }
   }
   vec->exchange();
+#if 0
+  if(time->current_step() % 5000 == 0) {
+      boil::plot->plot(vec,phi, "vec-phi", time->current_step());
+  }
+  if(time->current_step() == 24640) {
+      boil::plot->plot(vec,phi, "vec-phi", time->current_step());
+  }   
+#endif
 
   boil::timer.stop("cipcsl2 tension");
 }

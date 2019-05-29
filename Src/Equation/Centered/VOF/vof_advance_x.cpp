@@ -3,7 +3,7 @@
 /******************************************************************************/
 void VOF::advance_x(Scalar & scp) {
   
-  /* advance in the x-direction */
+  // advance in the x-direction
 
   Comp m = Comp::u();
 
@@ -15,241 +15,73 @@ void VOF::advance_x(Scalar & scp) {
 
     /* flux */
     real f;
-     
-    real jv   = (*u)[m][i][j][k];
-    real uval = vel_value(m,i,j,k);
-    /* upwind i-index */
-    int iup(i-1), idn(i);
-    if(uval<0.0) {
-      iup = i; 
-      idn = i-1;
-    }            
-    real dxup = scp.dxc(iup);
+
+    // upwind i-index
+    int iup = i-1;
+    if((*u)[m][i][j][k]<0.0) iup = i;             
+
     real dt = time->dt();
 
-    /* fext is related to mflx as follows:
-    * fext = -m'''/rhol = -m''*adens/rhol */
-    real fextup = fext[iup][j][k];
-    real fextdn = fext[idn][j][k];
+    if (scp[iup][j][k] < boil::pico) {
 
-    /* volumetric conservation factor, calculated in vof_advance
-     * this factor represents the renormalisation of scp' after pc and must
-     * be thus included in the real space flux after iteration */
-    real volfactorup = stmp3[iup][j][k];
-    real volfactordn = stmp3[idn][j][k];
+      f = scp[iup][j][k] * dSx(i,j,k) * ((*u)[m][i][j][k]) * dt;
 
-    bool sourceup(true), sourcedn(true);
+    } else if(scp[iup][j][k]>1.0-boil::pico) {
 
-    if(fabs(fextup)<boil::pico) sourceup = false; 
-    if(fabs(fextdn)<boil::pico) sourcedn = false; 
+      f = scp[iup][j][k] * dSx(i,j,k) * ((*u)[m][i][j][k]) * dt;
 
-    real scpup = scp[iup][j][k];
-    real scpdn = scp[idn][j][k];
-
-    if       (dxup==0.0||scpup<boil::pico) {
-      if(jv*uval<0.0) {
-        f = 0.0;
-      } else {
-        f = scpup * dSx(i,j,k) * jv * dt;
-      }
-    } else if(scpup>(1.0-boil::pico)) {
-      if       (jv*uval<0.0) {
-        f = 0.0;
-      } else if(scpdn>(1.0-boil::pico)) {
-        f = scpup * dSx(i,j,k) * jv * dt;
-#if 0
-        if(fabs(f)<boil::micro) {
-          f = 0.0; /* remove spurious fluxes */
-        }
-#endif
-      } else {
-        f = scpup * dSx(i,j,k) * jv * dt;
-      }    
-    //} else if(!sourceup&!sourcedn) {
-    } else if(true) {
-      /* calculate g: CFL upwind */
-      real g = uval*dt/dxup;
-      f = dV(iup,j,k)*calc_flux(g,scpup,nx[iup][j][k],
-                                        ny[iup][j][k],
-                                        nz[iup][j][k]);
-      //f *= volfactorup;
     } else {
-      exit(0);
-#if 0
-      /* gas velocities */
-      real gasvelup(-1000.0),gasveldn(-1000.0);
-      int gasflowup(-1),gasflowdn(-1);
-      real denscoef = 1.0-rhol/rhov;
 
-      if(sourceup) {
-        gasflowup++;
-        real adensup = adens[iup][j][k]+boil::pico;
-        real mmx = mx[iup][j][k]; /* mx towards the liquid in real space */
-        gasvelup = uval + (fextup*denscoef/adensup)*(-mmx);
+      if (scp.dxc(iup)==0.0 ) {
 
-        /* does gas flow in the same direction as liquid? */
-        if(gasvelup*uval>=0.0)
-          gasflowup++;
-      }
-      if(sourcedn) {
-        gasflowdn++;
-        real adensdn = adens[idn][j][k]+boil::pico;
-        real mmx = mx[idn][j][k];
-        gasveldn = uval + (fextdn*denscoef/adensdn)*(-mmx);
-        if(gasveldn*uval>=0.0)
-          gasflowdn++;
-      }
+        f = scp[iup][j][k] * dSx(i,j,k) * ((*u)[m][i][j][k]) * dt;
 
-      /* case 4: downwind opposes flow, upwind follows: all three cross bnd 
-       * -> underdeveloped: treated as either case 2 or case 3 */
-      if(gasflowup==1&&gasflowdn==0) {
-        real gasveldiff = gasvelup+gasveldn;
-        if(gasveldiff*uval<0.0) {
-          gasflowup = 0;
-          gasveldn = gasveldiff;
-          gasvelup = gasveldiff;
-        } else {
-          gasflowdn = 1; 
-          gasvelup = gasveldiff;
-          gasveldn = gasveldiff;
-        }
-      }
-
-      //boil::aout<<i<<" "<<j<<" "<<k<<" | "<<iup<<" "<<sourceup<<" "<<sourcedn<<" | "<<jv*dt/dxup<<" "<<uval<<" "<<gasvelup<<" "<<gasveldn<<" | "<<gasflowup<<" "<<gasflowdn<<boil::endl;
-
-      /* case 1: downwind follows flow, upwind opposes: only liq crosses bnd */
-      if       (gasflowup==0&&gasflowdn==1) {
-        /* unphysical case */
-        if(jv*uval<0.0) {
-          f = 0.0;
-        } else {
-          f = dSx(i,j,k) * jv * dt;
-        }
-        boil::aout<<"case1x "<<iup<<" "<<j<<" "<<k<<" | "<<idn<<" "<<scpup<<" "<<stmp[iup][j][k]/dV(iup,j,k)<<" "<<f/dV(iup,j,k)<<" | "<<(stmp[idn][j][k]+fabs(f))/dV(idn,j,k)<<" "<<(stmp[iup][j][k]-fabs(f))/dV(iup,j,k)<<boil::endl;
-      /* case 2: both downwind and upwind follow the flow */
-      } else if(gasflowup==1||gasflowdn==1) { 
-        /* calculate gliq and ggas: CFL of liquid and gas upwind */
-        real gliq = uval*dt/dxup;
-        real ggas;
-        if(gasflowup==1) {
-          ggas = gasvelup*dt/dxup;
-        } else {
-          ggas = gasveldn*dt/dxup;
-        }
-        /* dimensionless vol. flow = jv*dt*dS/dV*volfactor */
-        real gj = jv*dt/dxup/volfactorup; 
-#if 1
-        f = dV(iup,j,k)*volfactorup
-            *calc_diabatic_flux(gj,gliq,ggas,scpup,
-                                nx[iup][j][k],ny[iup][j][k],nz[iup][j][k]);
-        boil::aout<<"case2x "<<iup<<" "<<j<<" "<<k<<" | "<<idn<<" "<<scpup<<" "<<stmp[iup][j][k]/dV(iup,j,k)<<" "<<f/dV(iup,j,k)<<" | "<<(stmp[idn][j][k]+fabs(f))/dV(idn,j,k)<<" "<<(stmp[iup][j][k]-fabs(f))/dV(iup,j,k)<<" "<<gliq<<" "<<ggas<<" | "<<gj<<" "<<uval<<" "<<(*u)[m][i][j][k]<<" "<<uliq[m][i][j][k]<<boil::endl;
-#endif
-
-      /* case 3: both downwind and upwind oppose the flow */ 
-      } else if(gasflowdn==0||gasflowup==0) {
-        real dxdn = scp.dxc(idn);
-
-        /* degenerate case */
-        if(dxdn==0.0) {
-          real jgas;
-          if(gasflowdn==0) {
-            jgas = (1.0-scp[idn][j][k])*gasveldn;
-          } else {
-            jgas = (1.0-scp[idn][j][k])*gasvelup;
-          }
-          jv -= jgas;
-
-          /* unphysical case */
-          if(jv*uval<0.0) {
-            f = 0.0;
-          } else {
-            f = dSx(i,j,k)*jv*dt;
-          } 
-          boil::aout<<"case3x "<<iup<<" "<<j<<" "<<k<<" | "<<idn<<" "<<scpup<<" "<<stmp[iup][j][k]/dV(iup,j,k)<<" "<<f/dV(iup,j,k)<<" | "<<(stmp[idn][j][k]+fabs(f))/dV(idn,j,k)<<" "<<(stmp[iup][j][k]-fabs(f))/dV(iup,j,k)<<boil::endl;
-        } else {
-          /* calculate gliq and ggas: CFL of liquid upw and gas dnw */
-          real gliq = uval*dt/dxup;
-          real ggas;
-          if(gasflowdn==0) {
-            ggas = gasveldn*dt/dxdn;
-          } else {
-            ggas = gasvelup*dt/dxdn;
-          }
-          real gj = jv*dt/dxup/volfactorup;
-
-          /* calculate ratio of dx, including the effect of vol expansion */
-          real dxrat = dxdn/dxup*volfactordn/volfactorup;
-#if 1
-          f = volfactorup*dV(iup,j,k)
-              *calc_diabatic_flux(gj,gliq,ggas,dxrat,scpup,scpdn,
-                                  nx[iup][j][k],ny[iup][j][k],nz[iup][j][k],
-                                  nx[idn][j][k],ny[idn][j][k],nz[idn][j][k]);
-          boil::aout<<"case3x "<<iup<<" "<<j<<" "<<k<<" | "<<idn<<" "<<scpup<<" "<<stmp[iup][j][k]/dV(iup,j,k)<<" "<<f/dV(iup,j,k)<<" | "<<(stmp[idn][j][k]+fabs(f))/dV(idn,j,k)<<" "<<(stmp[iup][j][k]-fabs(f))/dV(iup,j,k)<<boil::endl;
-#endif
-        }
-      /* case 4: downwind opposes flow, upwind follows: all three cross bnd */
       } else {
-        /* underdevelopment */
-        boil::oout<<"VOF_advance_x: underdevelopment! Exiting."<<boil::endl;
-        exit(0);
-#if 0
-        real dxdn = scp.dxc(idn);
 
-        /* degenerate case */
-        if(dxdn==0.0) {
-          real jgas = (1.0-scp[idn][j][k])*gasveldn;
-          jv -= jgas;
-
-          /* unphysical case */
-          if(jv*uval<0.0) {
-            f = 0.0;
-          } else {
-            real gliq = uval*dt/dxup;
-            real ggas = gasvelup*dt/dxup;
-            real gj = jv*dt/dxup/volfactorup;
-  #if 1
-            f = volfactorup*dV(iup,j,k)
-                *calc_diabatic_flux(gj,gliq,ggas,scpup,
-                                    nx[iup][j][k],ny[iup][j][k],nz[iup][j][k]);
-  #endif
-          }
+        // calculate g: CFL upwind
+        real g = ((*u)[m][i][j][k])*dt/scp.dxc(iup);
+#if 1
+        real scpup = scp[iup][j][k];
+        f = dV(iup,j,k)*calc_flux(g,scpup,nx[iup][j][k],
+                                          ny[iup][j][k],
+                                          nz[iup][j][k]);
+#else
+        if (g==0.0) {
+          f=0.0;
         } else {
-          /* calculate gliq and ggas: CFL of liquid and gas upwind */
-          real gliq = uval*dt/dxup;
-          real ggasup = gasvelup*dt/dxup;
-          real ggasdn = gasveldn*dt/dxdn;
-          real gj = jv*dt/dxup;
+          // color function upwind
+          real c = scp[iup][j][k];
+  
+          // calculate vn1, vn2, vn3: normal vector at face center
+          real vn1 = -nx[iup][j][k];
+          real vn2 = -ny[iup][j][k];
+          real vn3 = -nz[iup][j][k];
 
-          /* calculate ratio of dx, including the effect of vol expansion */
-          real dxrat = dxdn/dxup*volfactordn/volfactorup;
+          real absg = fabs(g);
+          real vm1 = fabs(vn1);
+          real vm2 = fabs(vn2);
+          real vm3 = fabs(vn3)+boil::pico;
+          real qa = 1.0/(vm1+vm2+vm3);
+          vm1 *= qa;
+          vm2 *= qa;
+          vm3 *= qa;
+          real alpha = calc_alpha(c, vm1, vm2, vm3);
+      
+          real ra = vm1 * (1.0 - absg);
+          qa = 1.0/(1.0-ra);
+          if (g*vn1 > 0) alpha = alpha -ra;
+          vm1 = vm1 * absg;
 
-          real scpdn = scp[idn][j][k];
-  #if 1
-          f = volfactorup*dV(iup,j,k)
-              *calc_diabatic_flux(gj,gliq,ggasup,ggasdn,dxrat,scpup,scpdn,
-                                  nx[iup][j][k],ny[iup][j][k],nz[iup][j][k],
-                                  nx[idn][j][k],ny[idn][j][k],nz[idn][j][k]);
-  #endif
+          // calculate f: flux
+          f = calc_v(alpha*qa, vm1*qa, vm2*qa, vm3*qa) * g * dV(iup,j,k);
         }
 #endif
-      } /* cases */
-#endif
-    } /* adiabatic-diabatic */
+      }
+    }
 
-#if 0
-    /* limit flux */
-    real sgnf = (f>0.0)-(f<0.0);
-    f = sgnf*std::min(fabs(stmp[iup][j][k]),fabs(f));
-#endif
-
-#if 0
-    /* update stmp */
+    // update stmp
     stmp[i-1][j][k] = stmp[i-1][j][k] - f;
     stmp[i  ][j][k] = stmp[i  ][j][k] + f;
-#else
-    fluxmax[m][i][j][k] = f;
-    sosflux[m][i][j][k] = f/3.0;
-#endif
 
 #if 0
     if((i==100||i==101)&&j==3&&k==100) {

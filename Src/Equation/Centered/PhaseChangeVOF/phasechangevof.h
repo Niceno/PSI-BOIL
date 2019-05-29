@@ -68,7 +68,7 @@ class PhaseChangeVOF : public Centered {
     bool Interface1D_z(const int i, const int j, const int k, const int dir);
 #endif
     void m(const Scalar * diff_eddy = NULL);
-#if 0
+#if 1
     real mdot_cut(real m, real c);
     void mdot_cut();
 #endif

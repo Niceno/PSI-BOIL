@@ -12,7 +12,6 @@ libCipcsl2_a_SOURCES = cipcsl2.h                        \
                        cipcsl2_bdphiface_check.cpp      \
                        cipcsl2_bnd_insert.cpp           \
                        cipcsl2_bnd_extract.cpp          \
-                       cipcsl2_bnd_sym_kappa.cpp        \
                        cipcsl2_bnd_wall_kappa.cpp       \
                        cipcsl2_color_minmax.cpp         \
                        cipcsl2_CIPCSLx1.cpp             \

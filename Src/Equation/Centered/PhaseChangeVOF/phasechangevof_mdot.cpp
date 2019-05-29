@@ -18,7 +18,7 @@ void PhaseChangeVOF::mdot() {
 
         /* iso-surface area */
         phi[i][j][k] = mdotc * adens[i][j][k];
-        //phi[i][j][k] = mdot_cut(phi[i][j][k],clr[i][j][k]);
+        phi[i][j][k] = mdot_cut(phi[i][j][k],clr[i][j][k]);
       } else {
         phi[i][j][k] = 0.0;
       }

@@ -1,32 +1,34 @@
 #include "grid1d.h"
 
 /* If the cutoff at N is undefined, the same is used for both sides */
-/* Cutoffs are only relevant for non-periodic grids */
+/* BndGrids are only relevant for non-periodic grids */
 /******************************************************************************/
 Grid1D::Grid1D(const Range<real> &  xr, const Range<real> & dxr,
                const int & n, const Periodic & p, 
-               const Cutoff & co1, const Cutoff & coN) : 
+               const BndGrid & co1, const BndGrid & coN) : 
   nc_in(n),
   period1(p), 
   periodN(p),
   ctf1(co1),
   ctfN(coN) {
 
+#if 1
    if(nc_in<boil::BW) {
      boil::aout<<"At least as many cells as the buffer width ("<<boil::BW
                <<") are required in each direction. Exiting."<<boil::endl;
      exit(0);
    }
+#endif
 
 /*----------------+
 |  check cutoffs  |
 +----------------*/
-  if(p == Periodic::no()&&ctf1 == Cutoff::undefined()) {
+  if(p == Periodic::no()&&ctf1 == BndGrid::undefined()) {
     boil::aout<<"At least one cutoff must be specified for a non-periodic grid."
               <<" Exiting."<<boil::endl;
     exit(0);
   }
-  if(p == Periodic::no()&&ctfN == Cutoff::undefined()) {
+  if(p == Periodic::no()&&ctfN == BndGrid::undefined()) {
     ctfN = ctf1;
   }
 
@@ -45,24 +47,26 @@ Grid1D::Grid1D(const Range<real> &  xr, const Range<real> & dxr,
 /******************************************************************************/
 Grid1D::Grid1D(const Range<real> &  xr,
                const int & n, const Periodic & p,
-               const Cutoff & co1, const Cutoff & coN) :
+               const BndGrid & co1, const BndGrid & coN) :
                nc_in(n), period1(p), periodN(p), ctf1(co1), ctfN(coN) {
 
+#if 1
    if(nc_in<boil::BW) {
      boil::aout<<"At least as many cells as the buffer width ("<<boil::BW
                <<") are required in each direction. Exiting."<<boil::endl;
      exit(0);
    }
+#endif
 
 /*----------------+
 |  check cutoffs  |
 +----------------*/
-  if(p == Periodic::no()&&ctf1 == Cutoff::undefined()) {
+  if(p == Periodic::no()&&ctf1 == BndGrid::undefined()) {
     boil::aout<<"At least one cutoff must be specified for a non-periodic grid."
               <<" Exiting."<<boil::endl;
     exit(0);
   }
-  if(p == Periodic::no()&&ctfN == Cutoff::undefined()) {
+  if(p == Periodic::no()&&ctfN == BndGrid::undefined()) {
     ctfN = ctf1;
   }
 
@@ -81,18 +85,18 @@ Grid1D::Grid1D(const Range<real> &  xr,
 
 /******************************************************************************/
 Grid1D::Grid1D(const Grid1D & left, const Grid1D & right,
-               const Periodic & p, const Cutoff & co1, const Cutoff & coN) :
+               const Periodic & p, const BndGrid & co1, const BndGrid & coN) :
                nc_in(left.ncell()+right.ncell()), 
                period1(p), periodN(p), ctf1(co1), ctfN(coN) {
 /*----------------+
 |  check cutoffs  |
 +----------------*/
-  if(p == Periodic::no()&&ctf1 == Cutoff::undefined()) {
+  if(p == Periodic::no()&&ctf1 == BndGrid::undefined()) {
     boil::aout<<"At least one cutoff must be specified for a non-periodic grid."
               <<" Exiting."<<boil::endl;
     exit(0);
   }
-  if(p == Periodic::no()&&ctfN == Cutoff::undefined()) {
+  if(p == Periodic::no()&&ctfN == BndGrid::undefined()) {
     ctfN = ctf1;
   }
 
@@ -127,18 +131,18 @@ Grid1D::Grid1D(const Grid1D & left, const Grid1D & right,
 
 /******************************************************************************/
 Grid1D::Grid1D(const Grid1D & left, const Grid1D & center, const Grid1D & right, 
-               const Periodic & p, const Cutoff & co1, const Cutoff & coN) :
+               const Periodic & p, const BndGrid & co1, const BndGrid & coN) :
   nc_in(left.ncell()+center.ncell()+right.ncell()), 
   period1(p), periodN(p), ctf1(co1), ctfN(coN) {
 /*----------------+
 |  check cutoffs  |
 +----------------*/
-  if(p == Periodic::no()&&ctf1 == Cutoff::undefined()) {
+  if(p == Periodic::no()&&ctf1 == BndGrid::undefined()) {
     boil::aout<<"At least one cutoff must be specified for a non-periodic grid."
               <<" Exiting."<<boil::endl;
     exit(0);
   }
-  if(p == Periodic::no()&&ctfN == Cutoff::undefined()) {
+  if(p == Periodic::no()&&ctfN == BndGrid::undefined()) {
     ctfN = ctf1;
   }
 
@@ -216,11 +220,13 @@ Grid1D::Grid1D(const Grid1D & grid,
   /* if yes, create (coarser) grid */
   nc_in = grid.ncell()/step.size();
 
+#if 1
   if(nc_in<boil::BW) {
      boil::aout<<"At least as many cells as the buffer width ("<<boil::BW
                <<") are required in each direction. Exiting."<<boil::endl;
      exit(0);
   }
+#endif
 
   allocate(); 
 
@@ -263,7 +269,7 @@ Grid1D::Grid1D(const Grid1D     & grid,
   /* set the right number of cells */
   nc_in = cellN - cell1 + 1;
 
-#if 0
+#if 1
   if(nc_in<boil::BW) {
      boil::aout<<"At least as many cells as the buffer width ("<<boil::BW
                <<") are required in each direction. Exiting."<<boil::endl;

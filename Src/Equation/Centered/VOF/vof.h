@@ -2,7 +2,6 @@
 #define VOF_H
 
 #include <cmath>
-#include <list>
 #include "../centered.h"
 #include "../../../Parallel/communicator.h"
 #include "../../../Global/global_realistic.h"
@@ -30,10 +29,8 @@ class VOF : public Centered {
     void advance();
     void advance(Scalar & sca);
     void curvature();
-    void curvature(const Scalar & Phi, const bool anc_flag = true);
     void ancillary(); /* calcs ancillary params such as adens w/o advance */
     void tension(Vector * vec, const Matter matt);
-    void tension(Vector * vec, const Matter matt, const Scalar & kap);
     void totalvol();
     void front_minmax();
     void init(){};
@@ -70,44 +67,26 @@ class VOF : public Centered {
       }
     }
 
-    // getter and setter for flux iteration tolerance
-    real get_tol_flux() { return tol_flux; }
-    void set_tol_flux(real tolnew) { 
-      tol_flux = tolnew;
-      boil::oout<<"VOF: New flux iteration tolerance: "<<tol_flux<<boil::endl;
-      return;
+    /* setter for cangle */
+    void set_cangle(const real r) {
+      cangle=r/180.0*acos(-1.0);
+      boil::oout<<"set_cangle: cangle= "<<r<<"\n";
+      boil::oout<<"#############################################\n";
+      boil::oout<<"# WARNING!!! cangle is not implemented yet. #\n";
+      boil::oout<<"#############################################\n";
     }
+    /* getter for cangle */
+    real get_cangle() { return(cangle/acos(-1.0)*180.0);};
 
-    // getter and setter for flux iteration number
-    real get_iter_flux() { return maxiter; }
-    void set_iter_flux(int iternew) {
-      maxiter = iternew;
-      boil::oout<<"VOF: New flux iteration number: "<<maxiter<<boil::endl;
-      return;
-    }
-
-    // getter/setter for flux cfl
-    real get_flux_cfl() { return flux_cfl; }
-    void set_flux_cfl(real cflnew) {
-      flux_cfl = cflnew;
-      boil::oout<<"VOF: New flux CFL number: "<<flux_cfl<<boil::endl;
-      return;
-    }
-
-
-    void cal_liq_vel();
-    void set_adens(const Scalar & newadens) {
-      for_aijk(i,j,k)
-        adens[i][j][k] = newadens[i][j][k];
-    }
-    void sharpen();
-
-    Scalar unliq; /* normal component of liquid velocity */
-    Scalar utliq, utx, uty, utz; /* tangential component of liquid velocity */
-    Vector uliq; /* liquid velocity */
+    Vector fs;
     Vector * bndclr;
+    Topology  topo;
 
-    Topology topo;
+    Scalar nalpha;
+    Scalar nx,ny,nz;/* normal to interface */
+    Scalar adens;
+    Scalar mx,my,mz;/* normal to interface, in real space */
+
   protected:
     void advance_x(Scalar & sca);
     void advance_y(Scalar & sca);
@@ -117,7 +96,6 @@ class VOF : public Centered {
     void cal_fs_interp();
     void fs_bnd();
     void curv_HF();
-    void curv_HF(const Scalar & Phi, const bool anc_flag = true);
     void curv_smooth();
     void smooth(const Scalar & sca, Scalar & scb, const int itnum);
     void extract_alpha();
@@ -133,62 +111,30 @@ class VOF : public Centered {
     void normalize(real & r1, real & r2, real & r3);
     void update_at_walls();
     real kappa_ave(const real r1, const real r2);
-    void ext_vel(Scalar & sca, const Scalar & eflag, const int sgn);
+    real kappa_ave(const real r1, const real r2, const int i1, const int i2);
+
     real calc_v(real r1, real r2, real r3, real r4);
     real calc_alpha(const real r1, const real r2, const real r3, const real r4);
     real calc_flux(const real g, real c, const real nx, const real ny, const real nz);
 
-    real calc_diabatic_flux(const real jv, const real gliq, const real ggas,
-                            real phiup,
-                            const real nx, const real ny, const real nz);
-    real calc_diabatic_flux(real & jv, const real gliq, const real ggas,
-                            const real dxrat, real phiup, real phidn,
-                            const real nxup, const real nyup, const real nzup,
-                            const real nxdn, const real nydn, const real nzdn);
-/* underdevelopment */
-#if 0
-    real calc_diabatic_flux(const real jv, const real gliq, 
-                            const real ggasup,const real ggasdn,
-                            const real dxrat, real phiup, real phidn,
-                            const real nxup, const real nyup, const real nzup,
-                            const real nxdn, const real nydn, const real nzdn);
-#endif
-
-    real iterate_flux(const real jv, const real dirsgn, const real cflrat,
-                      const real alphaliq, const real alphagas,
-                      const real vm1, const real vm2, const real vm3);
-    real iterate_flux(const real jv, const real dirsgnup, const real dirsgndn,
-                      const real cflrat, const real alphaup,
-                      const real vm1up, const real vm2up, const real vm3up,
-                      const real alphadn,
-                      const real vm1dn, const real vm2dn, const real vm3dn,
-                      const real x0start, const real x2start);
-
-    real calc_v_iter(const real alpha, const real vm1, const real vm2,
-                     const real vm3, const real absg, const real dirsgn);
- 
     void selectMax(const real r1, const real r2, const real r3,
                    const real r4, const real r5, const real r6,
                    const real r7, const real r8, const real r9,
                    const int i1,  const int i2,  const int i3);
     void set_iflag();
-    void superpose();
     void insert_bc_flag(ScalarInt & g, const bool b);
+
+    void cal_adens();
+    void cal_bndclr();
+
+    void set_adens(const Scalar & newadens) {
+      for_aijk(i,j,k)
+        adens[i][j][k] = newadens[i][j][k];
+    }
 
     real extrapolate_v(const int i, const int j, const int k,
                        const int ofx, const int ofy, const int ofz,
                        const real xp, const real yp, const real zp);
-
-#if 1
-    real vel_value(const Comp m, const int i, const int j, const int k);
-    real vel_correct(const int i, const int j, const int k,
-                     const bool dirx, const bool diry, const bool dirz,
-                     const real coef, const real mflx);
-#endif
-    real fext_cut(const int i, const int j, const int k, const real fval);
-
-    void cal_adens();
-    void cal_bndclr();
 
     void norm_cc_imin(const Scalar &g, const int i,const int j, const int k);
     void norm_cc_imax(const Scalar &g, const int i,const int j, const int k);
@@ -203,79 +149,29 @@ class VOF : public Centered {
     real frontPosition(const int i, const int j, const int k, const Comp m);
 
     Scalar clr;     /* color function */
-
-#if 0
-    /* adensgeom stuff */
-    typedef struct {
-      real x,y,z;
-    } XYZ;
-    real calc_area(const std::vector<XYZ> &vect, const XYZ norm);
-    XYZ PlusXYZ(const XYZ p1, const XYZ p2);
-    real DotProduct(const XYZ p1, const XYZ p2);
-    XYZ CrossProduct(const XYZ p1, const XYZ p2);
-    void cal_adens_geom(Scalar & eval);
-    Scalar adensgeom; /* area density (geometric) */
-
-    /* mc stuff */
-    typedef struct {
-       XYZ p[8];
-       real val[8];
-    } GRIDCELL;
-    XYZ VertexInterpVOF(real isolevel, XYZ p1, XYZ p2, real valp1, real valp2);
-    real PolygoniseVOF(GRIDCELL grid, real isolevel);
-    typedef struct {
-       XYZ p[3];
-       real area(){
-         real x1 = p[1].x-p[0].x;
-         real y1 = p[1].y-p[0].y;
-         real z1 = p[1].z-p[0].z;
-         real x2 = p[2].x-p[0].x;
-         real y2 = p[2].y-p[0].y;
-         real z2 = p[2].z-p[0].z;
-         real area=  (y1*z2-z1*y2)*(y1*z2-z1*y2)
-                    +(z1*x2-x1*z2)*(z1*x2-x1*z2)
-                    +(x1*y2-y1*x2)*(x1*y2-y1*x2);
-         area = 0.5 * sqrt(area);
-         return(area);
-       }
-    } TRIANGLE;
-#endif
-
-    Scalar nalpha;
-    Vector fs;
-    Scalar nx,ny,nz,nmag;/* normal to interface */
-    Scalar mx,my,mz;/* normal to interface, in real space */
-    Scalar adens; /* area density */
-
-    Heaviside heavi;
-
     Scalar kappa;        /* curvature */
-    Scalar stmp,stmp2,stmp3;
+    Scalar stmp;
     ScalarInt iflag,iflagx,iflagy,iflagz;
-    Vector sosflux,fluxmax;
-    Scalar stmp4,stmp5,stmp6;
 
     real rhol, rhov; /* densities for velocity correction */
     const Matter * mixt() const {return mixture;}
     Matter * mixture;
 
-    real tol_wall, tol_flux, tol_ext, flux_cfl;
-    int maxiter;
-
     Matter jelly;   /* virtual fluid for level set transport */
     real xminft,xmaxft,yminft,ymaxft,zminft,zmaxft; /* xyz min&max of front */
-    real pi,theta;
-    real dxmin,ww;
+    real theta;
     real epsnorm;
-    bool iminp, imaxp, jminp, jmaxp, kminp, kmaxp; // periodic = true
-
     real phisurf;
-#if 0
-    real f_w, f_e, f_t, f_b, f_n, f_s;
-#endif
+    real tol_wall, tol_flux, tol_ext, flux_cfl;
+    real ww, dxmin;
+    bool iminp, imaxp, jminp, jmaxp, kminp, kmaxp; // true = periodic
+    bool iminc, imaxc, jminc, jmaxc, kminc, kmaxc; // true = cut-stencil
 
-    int nlayer, n_ext_fs;
+    Heaviside heavi;
+
+    int nlayer;
     int curv_method;
+    real cangle;
 };	
 #endif
 

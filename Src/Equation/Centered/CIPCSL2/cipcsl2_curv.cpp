@@ -39,10 +39,6 @@ void CIPCSL2::curv(const Scalar & sca) {
   exit(0);
 #endif
 
-  /* curvature for symmetric plane (adjacent cells)
-     exactly satisfy symmetricity */
-  bnd_sym_kappa();
-
   /* curvature for wall (adjacent cells and on boundary plane) 
      kappa in adjacent cell is necessary for interpolation, curv_interface() */
   bnd_wall_kappa();
@@ -80,3 +76,4 @@ void CIPCSL2::curv(const Scalar & sca) {
   boil::timer.stop("cipcsl2 curv");
   return;
 }
+
