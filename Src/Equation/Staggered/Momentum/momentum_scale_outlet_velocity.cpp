@@ -1,50 +1,28 @@
 #include "momentum.h"
 #define TWODXY
+#define SYM
 
 /******************************************************************************/
-void Momentum::scale_out() {
-/*----------------------------------+ 
-|  set bulk velocity at the outlet  |
-+----------------------------------*/
+void Momentum::scale_outlet_velocity(const real ubo, const real ratio) {
 
-  Comp m;
+#ifdef TWODXY
+  #ifdef SYM
+  const real prefact = 2.0/4.0;
+  #else
+  const real prefact = 2.0;
+  #endif
+#else
+  #ifdef SYM
+  const real prefact = 4.0/8.0;
+  #else
+  const real prefact = 4.0;
+  #endif
+#endif
 
-  /*---------------------------------+
-  |  if outlet does not exist, exit  |
-  +---------------------------------*/
-  if( 
-      !u.bc( Comp::u() ).exists( BndType::outlet() ) &&
-      !u.bc( Comp::v() ).exists( BndType::outlet() ) && 
-      !u.bc( Comp::w() ).exists( BndType::outlet() ) 
-    ) return;
+  const real volf_in  = volf_bct( BndType::inlet() )
+                      + volf_bct( BndType::insert() )
+                      + v_phase_change;
 
-  /*----------------------------+
-  |  get volume flux the inlet  |
-  +----------------------------*/
-  // v_phase_change() should be called from main.cpp
-  const real volf_in  = volf_bct( BndType::inlet() ) + v_phase_change;
-  OPR(volf_in);
-  //assert(volf_in != 0.0);
-
-  /*----------------------------------------+
-  |  get current volume flux at the outlet  |
-  +----------------------------------------*/
-  real ax=0.0, ay=0.0, az=0.0;
-  const real volf_out = volf_bct( BndType::outlet(), &ax, &ay, &az );
-  //real am = boil::maxr(ax, ay, az);
-  //std::cout<<"ax,ay,az= "<<ax<<" "<<ay<<" "<<" "<<az<<"\n";
-  real asum = ax + ay + az;
-
-  real ratio;
-  if(volf_out==0.0 && volf_in==0.0){
-    ratio=0.0;
-  } else if(volf_out==0.0 && volf_in!=0.0){
-    ratio=1.0e+12;
-  } else {
-    ratio= -volf_in / volf_out;
-  }
-
-#if 1
   /*---------------------------------------------+
   |  special outlet condition for bubble growth  |
   +---------------------------------------------*/
@@ -81,10 +59,10 @@ void Momentum::scale_out() {
               real zz = u.zc(m,k);
 #ifdef TWODXY
               real rr = sqrt(xx*xx + yy*yy);
-              real uabs = volf_in/(2.0*pi*rr*deltz);
+              real uabs = volf_in/(prefact*pi*rr*deltz);
 #else
               real rr = sqrt(xx*xx + yy*yy + zz*zz);
-              real uabs = volf_in/(4.0*pi*rr*rr);
+              real uabs = volf_in/(prefact*pi*rr*rr);
 #endif
               if(iloop==1){
                 sumflx += -dSx(m,si(m)-1,j,k) * uabs * xx / rr;
@@ -105,10 +83,10 @@ void Momentum::scale_out() {
               real zz = u.zc(m,k);
 #ifdef TWODXY
               real rr = sqrt(xx*xx + yy*yy);
-              real uabs = volf_in/(2.0*pi*rr*deltz);
+              real uabs = volf_in/(prefact*pi*rr*deltz);
 #else
               real rr = sqrt(xx*xx + yy*yy + zz*zz);
-              real uabs = volf_in/(4.0*pi*rr*rr);
+              real uabs = volf_in/(prefact*pi*rr*rr);
 #endif
               if(iloop==1){
                 sumflx += dSx(m,ei(m)+1,j,k) * uabs * xx / rr;
@@ -129,11 +107,11 @@ void Momentum::scale_out() {
               real zz = u.zc(m,k);
 #ifdef TWODXY
               real rr = sqrt(xx*xx + yy*yy);
-              real uabs = volf_in/(2.0*pi*rr*deltz);
+              real uabs = volf_in/(prefact*pi*rr*deltz);
               u[m][i][sj(m)-1][k] = uabs * yy / rr;
 #else
               real rr = sqrt(xx*xx + yy*yy + zz*zz);
-              real uabs = volf_in/(4.0*pi*rr*rr);
+              real uabs = volf_in/(prefact*pi*rr*rr);
               u[m][i][sj(m)-1][k] = uabs * yy / rr;
 #endif
               if(iloop==1){
@@ -155,10 +133,10 @@ void Momentum::scale_out() {
               real zz = u.zc(m,k);
 #ifdef TWODXY
               real rr = sqrt(xx*xx + yy*yy);
-              real uabs = volf_in/(2.0*pi*rr*deltz);
+              real uabs = volf_in/(prefact*pi*rr*deltz);
 #else
               real rr = sqrt(xx*xx + yy*yy + zz*zz);
-              real uabs = volf_in/(4.0*pi*rr*rr);
+              real uabs = volf_in/(prefact*pi*rr*rr);
 #endif
               if(iloop==1){
                 sumflx += dSy(m,i,ej(m)+1,k) * uabs * yy / rr;
@@ -179,7 +157,7 @@ void Momentum::scale_out() {
               real zz = u.zc(m,sk(m)-1);
 #ifndef TWODXY
               real rr = sqrt(xx*xx + yy*yy + zz*zz);
-              real uabs = volf_in/(4.0*pi*rr*rr);
+              real uabs = volf_in/(prefact*pi*rr*rr);
               if(iloop==1){
                 sumflx += -dSz(m,i,j,sk(m)-1) * uabs * zz / rr;
               } else {
@@ -200,22 +178,23 @@ void Momentum::scale_out() {
               real zz = u.zc(m,ek(m)+1);
 #ifndef TWODXY
               real rr = sqrt(xx*xx + yy*yy + zz*zz);
-              real uabs = volf_in/(4.0*pi*rr*rr);
+              real uabs = volf_in/(prefact*pi*rr*rr);
               if(iloop==1){
                 sumflx += dSz(m,i,j,ek(m)+1) * uabs * zz / rr;
               } else {
                 /* value is only copied. The solid angle expansion
                    in the buffers should be also considered...*/
                 //u[m][i][j][ek(m)+1] = ratio1 * uabs * zz / rr;
-                for(int jj=1; jj<=boil::BW; jj++)
+                for(int kk=1; kk<=boil::BW; kk++)
                   u[m][i][j][ek(m)+kk] = ratio1 * uabs * zz / rr;
               }
 #endif
             }
-         }
-        }
-      }
-    }
-  }
-#endif
+          }
+        } /* bc == outlet */
+      } /* bcs */
+    } /* components */
+  } /* loops */
+
+  return;
 }

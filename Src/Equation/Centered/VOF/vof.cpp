@@ -89,7 +89,8 @@ VOF::VOF(const Scalar & PHI,
 
   /* check boundary condition */
   iminp = imaxp = jminp = jmaxp = kminp = kmaxp = false; // true for periodic
-  iminc = imaxc = jminc = jmaxc = kminc = kmaxc = true; // true for cut-stencil
+  iminc = imaxc = jminc = jmaxc = kminc = kmaxc = true;  // true for cut-stencil
+  iminw = imaxw = jminw = jmaxw = kminw = kmaxw = false; // true for wall
   // imin
   Dir d = Dir::imin();
   if (phi.bc().type_decomp(d)) {
@@ -99,7 +100,10 @@ VOF::VOF(const Scalar & PHI,
     if (phi.bc().type(d,BndType::periodic())) {
       iminp=true;
       iminc=false;
+    } else if (phi.bc().type(d,BndType::wall())) {
+      iminw=true;
     }
+
     if (dom->bnd_symmetry(d)) iminc=false;
   }
   // imax
@@ -111,6 +115,8 @@ VOF::VOF(const Scalar & PHI,
     if (phi.bc().type(d,BndType::periodic())) {
       imaxp=true;
       imaxc=false;
+    } else if (phi.bc().type(d,BndType::wall())) {
+      imaxw=true;
     }
     if (dom->bnd_symmetry(d)) imaxc=false;
   }
@@ -123,6 +129,8 @@ VOF::VOF(const Scalar & PHI,
     if (phi.bc().type(d,BndType::periodic())) {
       jminp=true;
       jminc=false;
+    } else if (phi.bc().type(d,BndType::wall())) {
+      jminw=true;
     }
     if (dom->bnd_symmetry(d)) jminc=false;
   }
@@ -135,6 +143,8 @@ VOF::VOF(const Scalar & PHI,
     if (phi.bc().type(d,BndType::periodic())) {
       jmaxp=true;
       jmaxc=false;
+    } else if (phi.bc().type(d,BndType::wall())) {
+      jmaxw=true;
     }
     if (dom->bnd_symmetry(d)) jmaxc=false;
   }
@@ -147,6 +157,8 @@ VOF::VOF(const Scalar & PHI,
     if (phi.bc().type(d,BndType::periodic())) {
       kminp=true;
       kminc=false;
+    } else if (phi.bc().type(d,BndType::wall())) {
+      kminw=true;
     }
     if (dom->bnd_symmetry(d)) kminc=false;
   }
@@ -159,6 +171,8 @@ VOF::VOF(const Scalar & PHI,
     if (phi.bc().type(d,BndType::periodic())) {
       kmaxp=true;
       kmaxc=false;
+    } else if (phi.bc().type(d,BndType::wall())) {
+      kmaxw=true;
     }
     if (dom->bnd_symmetry(d)) kmaxc=false;
   }
@@ -167,6 +181,11 @@ VOF::VOF(const Scalar & PHI,
             <<iminp<<" "<<imaxp<<" "
             <<jminp<<" "<<jmaxp<<" "
             <<kminp<<" "<<kmaxp<<"\n";
+
+  boil::aout<<"curv_HF::wall= "<<boil::cart.iam()<<" "
+            <<iminw<<" "<<imaxw<<" "
+            <<jminw<<" "<<jmaxw<<" "
+            <<kminw<<" "<<kmaxw<<"\n";
 
   boil::aout<<"curv_HF::cut-stencil= "<<boil::cart.iam()<<" "
             <<iminc<<" "<<imaxc<<" "

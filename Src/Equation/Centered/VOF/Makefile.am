@@ -32,6 +32,7 @@ libVof_a_SOURCES =      vof.h                 \
                         vof_norm_young.cpp \
                         vof_set_iflag.cpp \
                         vof_smooth.cpp   \
+                        vof_standardized_norm_vect.cpp \
                         vof_tension.cpp       \
                         vof_totalvol.cpp     \
                         vof_true_norm_vect.cpp \

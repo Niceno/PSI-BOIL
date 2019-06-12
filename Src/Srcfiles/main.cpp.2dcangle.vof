@@ -4,6 +4,8 @@
 #define USE_VOF
 //#define AVEJ
 #define SYM
+//#define WLLX
+#define WLLY
 
 /* computed parameters */
 const int gLevel = 4;
@@ -12,24 +14,33 @@ const int NX = 16*gLevel;
 #else
 const int NX = 32*gLevel;
 #endif
-const int NZ = NX;
-const int NY = 3;
-
-/* domain dimensions (given by problem) */
-//const real LX =   1.0;
-const real LX =   4.0e-3;
-const real LZ =   LX;
-#ifdef SYM
-const real LY =   0.5*LX/real(NX)*real(NY);
-#else
-const real LY =   LX/real(NX)*real(NY);
-#endif
+const int NY = NX;
+const int NZ = 3;
 
 #ifdef USE_VOF
 const int mSimple = 4;
-const int Nsmooth = 3;
 #else
 const int mSimple = 1;
+#endif
+
+const real cangle0(180.0);
+const real cangle1(90.0);
+
+const real radius = 1e-3;
+
+const real xcent = 0.0;
+const real ycent = radius*(1.-cos(cangle0/180.0*acos(-1.0)))-radius;
+const real zcent = 0.0;
+
+/* domain dimensions (given by problem) */
+const real Area = radius*radius/2.*(2.*cangle0/180.0*acos(-1.0)-sin(cangle0/180.0*acos(-1.0)));
+const real equivrad = sqrt(Area/acos(-1.0));
+const real LX =   8.*equivrad;
+const real LY =   LX;
+#ifdef SYM
+const real LZ =   0.5*LX/real(NX)*real(NZ);
+#else
+const real LZ =   LX/real(NX)*real(NZ);
 #endif
 
 /******************************************************************************/
@@ -46,21 +57,27 @@ main(int argc, char * argv[]) {
   |  grid(s)  |
   +----------*/
 #ifdef SYM
-  //Grid1D gx( Range<real>(0.0,0.5*LX), NX, Periodic::no(), BndGrid::symmetry() );
-  //Grid1D gz( Range<real>(0.0,0.5*LZ), NZ, Periodic::no(), BndGrid::symmetry() );
+  #ifdef WLLX
   Grid1D gx( Range<real>(0.0,0.5*LX), NX, Periodic::no(),
-             BndGrid::symmetry(), BndGrid::extrapolate() );
-  Grid1D gz( Range<real>(0.0,0.5*LZ), NZ, Periodic::no(),
-             BndGrid::symmetry(), BndGrid::extrapolate() );
+             BndGrid::symmetry(), BndGrid::wall() );
+  #else
+  Grid1D gx( Range<real>(0.0,0.5*LX), NX, Periodic::no(), BndGrid::symmetry() );
+  #endif
+  #ifdef WLLY
+  Grid1D gy( Range<real>(0.0,0.5*LY), NY, Periodic::no(),
+             BndGrid::symmetry(), BndGrid::wall() );
+  #else
+  Grid1D gy( Range<real>(0.0,0.5*LY), NY, Periodic::no(), BndGrid::symmetry() );
+  #endif
 #else
   Grid1D gx( Range<real>(-0.5*LX,0.5*LX), NX, Periodic::no() );
-  Grid1D gz( Range<real>(-0.5*LZ,0.5*LZ), NZ, Periodic::no() );
+  Grid1D gy( Range<real>(-0.5*LY,0.5*LY), NY, Periodic::no() );
 #endif
-  Grid1D gy( Range<real>(-0.5*LY,0.5*LY), NY, Periodic::yes() );
+  Grid1D gz( Range<real>(-0.5*LZ,0.5*LZ), NZ, Periodic::yes() );
   /*---------+
   |  domain  |
   +---------*/
-  Domain d(gx, gz, gy);
+  Domain d(gx, gy, gz);
 
   /*------------------+
   |  define unknowns  |
@@ -76,9 +93,17 @@ main(int argc, char * argv[]) {
   +-----------------------------*/
   for_m(m) {
 #ifdef SYM
+  #ifdef WLLX
+    uvw.bc(m).add( BndCnd( Dir::imin(), BndType::wall() ) );
+  #else
     uvw.bc(m).add( BndCnd( Dir::imin(), BndType::symmetry() ) );
+  #endif
     uvw.bc(m).add( BndCnd( Dir::imax(), BndType::outlet() ) );
+  #ifdef WLLY
+    uvw.bc(m).add( BndCnd( Dir::jmin(), BndType::wall() ) );
+  #else
     uvw.bc(m).add( BndCnd( Dir::jmin(), BndType::symmetry() ) );
+  #endif
     uvw.bc(m).add( BndCnd( Dir::jmax(), BndType::outlet() ) );
 #else
     uvw.bc(m).add( BndCnd( Dir::imin(), BndType::outlet() ) );
@@ -92,9 +117,17 @@ main(int argc, char * argv[]) {
   }
 
 #ifdef SYM
+  #ifdef WLLX
+  c.bc().add( BndCnd( Dir::imin(), BndType::wall() ) );
+  #else
   c.bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
+  #endif
   c.bc().add( BndCnd( Dir::imax(), BndType::outlet() ) );
+  #ifdef WLLY
+  c.bc().add( BndCnd( Dir::jmin(), BndType::wall() ) );
+  #else
   c.bc().add( BndCnd( Dir::jmin(), BndType::symmetry() ) );
+  #endif
   c.bc().add( BndCnd( Dir::jmax(), BndType::outlet() ) );
 #else
   c.bc().add( BndCnd( Dir::imin(), BndType::outlet() ) );
@@ -126,7 +159,6 @@ main(int argc, char * argv[]) {
   water.rho   (1.0000e+3);
 
   Matter mixed(water, air, &c);
-  //Matter mixed(water, air, &sc);
   mixed.sigma (0.07);
 #endif
 
@@ -178,15 +210,11 @@ main(int argc, char * argv[]) {
 
   c = 0.0;
 
-  const real xcent = 0.0;
-  const real ycent = 0.0;
-  const real zcent = 0.0;
-
-  // set theoretical value of single droplet for color function
-  const real radius = LX/4.0;
   setup_circle(c,radius,xcent,ycent);
+#if 0
   for_avijk(c,i,j,k)
-    c[i][j][k] = 1.0-c[i][j][k];
+    c[i][j][k] = 1. - c[i][j][k];
+#endif
 
   c.bnd_update();
   c.exchange_all();
@@ -213,11 +241,8 @@ main(int argc, char * argv[]) {
   VOF conc  (c, g, kappa, uvw, time, solver);
   conc.set_curv_method(0);  // height function
   //conc.set_curv_method(1);  // smoothed VOF
+  conc.set_cangle(cangle1);
   conc.ancillary();
-#if 0
-  if(Nsmooth>0)
-    conc.smooth(c,sc,Nsmooth);
-#endif
 #else
   CIPCSL2 conc  (c, g, kappa, uvw, time, solver);
   conc.set_itsharpen(8);
@@ -225,118 +250,6 @@ main(int argc, char * argv[]) {
 #endif
   conc.totalvol();
 
+  boil::plot->plot(uvw,c,press, "uvw-c-press", 0);
 
-  for(time.start(); time.end(); time.increase()) {
-
-    // store velocity
-    for_m(m)
-      uvw_old(m) = uvw(m);
-    // store color function
-    cold = c;
-
-    /* inner loop */
-    for(int mloop=0; mloop<mSimple; mloop++) {
-
-      //reset body force
-      for_m(m)
-        for_avmijk(xyz,m,i,j,k)
-          xyz[m][i][j][k]=0.0;
-
-      /* surface tension */
-      conc.tension(&xyz, mixed);
-
-      /* essential for moving front */
-      ns.discretize();
-      pr.discretize();
-      pr.coarsen();
-
-      /* momentum */
-      ns.new_time_step(uvw_old);
-      ns.convection();
-      ns.grad(press);
-      ns.solve(ResRat(1e-8));
-
-      p=0.0;
-      if (multigrid.vcycle(ResRat(1e-6))) OMS(converged);
-
-      ns.project(p);
-      press += p;
-      press.exchange();
-
-      ns.cfl_max();
-
-#ifdef USE_VOF
-      conc.advance(cold);
-#else
-      conc.advance();
-#endif
-      conc.totalvol();
-#ifndef USE_VOF
-      boil::oout<<"totalvol: "<<time.current_time()<<" "<< conc.get_clrsum1()<<" "<<conc.get_clrsum2()<<"\n";
-#endif
-
-    }
-    /* post process */
-    //velocity
-    real umax=0.0, vmax=0.0, wmax=0.0;
-    real usum=0.0, vsum=0.0, wsum=0.0;
-    int icount=0;
-    for_vijk(c,i,j,k) {
-      real utmp=fabs(0.5*(uvw[Comp::u()][i][j][k]+uvw[Comp::u()][i+1][j][k]));
-      real vtmp=fabs(0.5*(uvw[Comp::v()][i][j][k]+uvw[Comp::v()][i][j+1][k]));
-      real wtmp=fabs(0.5*(uvw[Comp::w()][i][j][k]+uvw[Comp::w()][i][j][k+1]));
-      if (umax<utmp) umax=utmp;
-      if (vmax<vtmp) vmax=vtmp;
-      if (wmax<wtmp) wmax=wtmp;
-      usum += utmp;
-      vsum += vtmp;
-      wsum += wtmp;
-      icount++;
-    }
-    boil::cart.max_real(&umax);
-    boil::cart.max_real(&vmax);
-    boil::cart.max_real(&wmax);
-    boil::cart.sum_real(&usum);
-    boil::cart.sum_real(&vsum);
-    boil::cart.sum_real(&wsum);
-    boil::cart.sum_int(&icount);
-    usum /= real(icount);
-    vsum /= real(icount);
-    wsum /= real(icount);
-    boil::oout<<"velocity= "<<time.current_time()<<" "
-                <<umax<<" "<<vmax<<" "<<wmax<<" "
-                <<usum<<" "<<vsum<<" "<<wsum<<"\n";
-
-    if(time.current_step() % nint == 0 || time.current_step()==1 ) {
-      boil::plot->plot(uvw, c, press,"uvw-c-press",  time.current_step());
-      boil::plot->plot(xyz, c, kappa,"xyz-c-kappa",  time.current_step());
-    }
-
-    if(time.current_step() % nint == 0) {
-      uvw  .save("uvw",   time.current_step());
-      press.save("press", time.current_step());
-      c    .save("c",  time.current_step());
-      if( boil::cart.iam()==0) {
-        std::fstream output;
-        std::stringstream ss;
-        ss <<"time-"<<time.current_step()<<".txt";
-        std::string fname = ss.str();
-        int len = fname.length();
-        char * cfname = new char[len+1];
-        memcpy(cfname, fname.c_str(), len+1);
-        output << std::setprecision(16);
-        output.open(cfname, std::ios::out);
-        output << time.current_step() << "\n";
-        output << time.current_time()+time.dt() << "\n";
-        output << time.dt() << "\n";
-        output.close();
-      }
-    }
-  }
-
-  boil::oout << "finished" << boil::endl;
-
-  boil::timer.stop();
-  boil::timer.report();
-
-}	
+}

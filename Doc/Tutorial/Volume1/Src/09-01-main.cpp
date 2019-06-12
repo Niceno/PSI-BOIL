@@ -81,6 +81,7 @@ main(int argc, char * argv[]) {
   Momentum ns( uvw, xyz, time, solver, &fluid);
 
   AC multigrid( &pr );
+  multigrid.stop_if_diverging(false);
 
   Location loc("monitor", d, NX1, NY/2, NZ/2);
 
@@ -112,7 +113,7 @@ main(int argc, char * argv[]) {
     loc.print(uvw, Comp::v());
  
     if( time.current_step() % 100 == 0)
-      boil::plot->plot(uvw,  p, "uvw,p",  time.current_step());
+      boil::plot->plot(uvw,  p, "uvw-p",  time.current_step());
   }
 
   boil::timer.stop();

@@ -16,6 +16,7 @@ void Centered::create_system_bnd(const Property * f_prop) {
   for( int b=0; b<phi.bc().count(); b++ ) {
 
     if( phi.bc().type(b) == BndType::neumann() ||
+        phi.bc().type(b) == BndType::symmetry() ||
         phi.bc().type(b) == BndType::outlet() ) {
 
       Dir d = phi.bc().direction(b);

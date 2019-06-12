@@ -2,27 +2,38 @@
 
 //#define USE_PC /* use old pc */
 //#define USE_ENTH /* use old enth */
-//#define PLOTALL
-//#define PLOTNONE
-#define FULLSIM
-//#define INVERT
+#define SYM
+#define USE_VOF
 
 /* computed parameters */
 const int gLevel = 4;  //grid level=2,4,8
+#ifdef SYM
 const int NX = 24*gLevel;
+#else
+const int NX = 48*gLevel;
+#endif
+const int NY = NX;
+const int NZ = NX;
 
 /* domain dimensions (given by problem) */
 const real LX = 187.5e-6;
+const real DX = LX/real(NX);
 const real radius=50.0e-6;
 
 const real tsat0=373.15;
-#ifdef INVERT
-const real tout=tsat0-1.25;
-#else
 const real tout=tsat0+1.25;
-#endif
 const real dtsatdp=3.0/4.0;
 const real pi=acos(-1.0);
+
+const real LY = LX;
+const real LZ = LX;
+
+#ifdef USE_VOF
+const int mSimple = 4;
+const int Nsmooth = 0;
+#else
+const int mSimple = 1;
+#endif
 
 /******************************************************************************/
 main(int argc, char ** argv) {
@@ -46,41 +57,38 @@ main(int argc, char ** argv) {
   /*----------+
   |  grid(s)  |
   +----------*/
-#ifdef FULLSIM
-  Grid1D gx( Range<real>(-LX,LX), 2*NX, Periodic::no() );
+#ifndef SYM
+  Grid1D gx( Range<real>(-LX,LX), NX, Periodic::no() );
+  Grid1D gy( Range<real>(-LY,LY), NY, Periodic::no() );
+  Grid1D gz( Range<real>(-LZ,LZ), NZ, Periodic::no() );
 #else
-  Grid1D gx( Range<real>(0.0,LX), NX, Periodic::no() );
+  Grid1D gx( Range<real>(0.0,LX), NX, Periodic::no(), BndGrid::symmetry(), BndGrid::wall() );
+  Grid1D gy( Range<real>(0.0,LY), NY, Periodic::no(), BndGrid::symmetry(), BndGrid::wall() );
+  Grid1D gz( Range<real>(0.0,LZ), NZ, Periodic::no(), BndGrid::symmetry(), BndGrid::wall() );
 #endif
 
   /*---------+
   |  domain  |
   +---------*/
-  Domain d(gx, gx, gx);
-
-  /*----------------+
-  |  linear solver  |
-  +----------------*/
-  Krylov * solver = new CG(d, Prec::ic2());
+  Domain d(gx, gy, gz);
 
   /*------------------+
   |  define unknowns  |
   +------------------*/
-  Vector uvw(d), xyz(d); // vel
-  Scalar p  (d), f  (d); // pressure
+  Vector uvw(d), uvw_old(d); // vel
+  Vector xyz(d); // body force
   Scalar c  (d), g  (d), kappa(d), cold(d); // concentration
-  Scalar press(d);
+  Scalar press  (d), p(d), f  (d);
+
   Scalar tpr(d), q  (d); // temperature
   Scalar mdot(d);        // phase-change
-
   Scalar mflx(d); // pc
-  Vector bndclr(d), bndclrold(d);
 
-
-  /*-----------------------------+ 
+  /*-----------------------------+
   |  insert boundary conditions  |
   +-----------------------------*/
   for_m(m) {
-#ifndef FULLSIM
+#ifdef SYM
     uvw.bc(m).add( BndCnd( Dir::imin(), BndType::symmetry() ) );
     uvw.bc(m).add( BndCnd( Dir::imax(), BndType::outlet() ) );
     uvw.bc(m).add( BndCnd( Dir::jmin(), BndType::symmetry() ) );
@@ -95,26 +103,10 @@ main(int argc, char ** argv) {
     uvw.bc(m).add( BndCnd( Dir::kmin(), BndType::outlet() ) );
     uvw.bc(m).add( BndCnd( Dir::kmax(), BndType::outlet() ) );
 #endif
-
-    bndclr(m)    = uvw(m).shape();
-    bndclrold(m) = uvw(m).shape();
+    uvw_old(m)=uvw(m).shape();
   }
 
-  p.bc().add( BndCnd( Dir::imin(), BndType::neumann() ) );
-  p.bc().add( BndCnd( Dir::imax(), BndType::neumann() ) );
-  p.bc().add( BndCnd( Dir::jmin(), BndType::neumann() ) );
-  p.bc().add( BndCnd( Dir::jmax(), BndType::neumann() ) );
-  p.bc().add( BndCnd( Dir::kmin(), BndType::neumann() ) );
-  p.bc().add( BndCnd( Dir::kmax(), BndType::neumann() ) );
-
-  /* copy b.c. from p */
-  press = p.shape();
-  f = p.shape();
-  mdot = p.shape();
-  mflx = p.shape();
-  q = p.shape();
-
-#ifndef FULLSIM
+#ifdef SYM
   c.bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
   c.bc().add( BndCnd( Dir::imax(), BndType::outlet() ) );
   c.bc().add( BndCnd( Dir::jmin(), BndType::symmetry() ) );
@@ -129,15 +121,24 @@ main(int argc, char ** argv) {
   c.bc().add( BndCnd( Dir::kmin(), BndType::outlet() ) );
   c.bc().add( BndCnd( Dir::kmax(), BndType::outlet() ) );
 #endif
-  g = c.shape();
-  cold = c.shape();
 
-#ifndef FULLSIM
-  tpr.bc().add( BndCnd( Dir::imin(), BndType::neumann() ) );
+  press=c.shape();
+  p=c.shape();
+  kappa=c.shape();
+  cold=c.shape();
+
+  f = p.shape();
+  mdot = p.shape();
+  mflx = p.shape();
+  q = p.shape();
+  g = c.shape();
+
+#ifdef SYM
+  tpr.bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
   tpr.bc().add( BndCnd( Dir::imax(), BndType::dirichlet(), tout ) );
-  tpr.bc().add( BndCnd( Dir::jmin(), BndType::neumann() ) );
+  tpr.bc().add( BndCnd( Dir::jmin(), BndType::symmetry() ) );
   tpr.bc().add( BndCnd( Dir::jmax(), BndType::dirichlet(), tout ) );
-  tpr.bc().add( BndCnd( Dir::kmin(), BndType::neumann() ) );
+  tpr.bc().add( BndCnd( Dir::kmin(), BndType::symmetry() ) );
   tpr.bc().add( BndCnd( Dir::kmax(), BndType::dirichlet(), tout ) );
 #else
   tpr.bc().add( BndCnd( Dir::imin(), BndType::dirichlet(), tout ) );
@@ -161,73 +162,71 @@ main(int argc, char ** argv) {
   liquid.cp    (4215.9*958.4);
   liquid.lambda(0.679);
   const real latent=2258.0*1e3;
-//#ifdef INVERT
-//  Matter mixed(vapor, liquid, & c, & bndclr);
-//#else
-  Matter mixed(liquid, vapor, & c, & bndclr);
-//#endif
+  Matter mixed(liquid, vapor, & c);
   mixed.sigma(5.9e-2);
   boil::oout<<"physical properties\n";
 
   /*-------------------+
   |  time-integration  |
   +-------------------*/
-  const int  ndt =  1000*gLevel;
-  const int  nint =  350*gLevel;
-#ifdef PLOTALL
-  const real tint = 2.0e-7;
-#elif defined PLOTNONE
-  const real tint = 2.0;
-#else
-  #ifndef INVERT
-  const real tint = 2.0e-5;
-  #else
-  const real tint = 0.04;
-  #endif
-#endif
-  const real dxmin = LX/real(NX);
-#ifdef INVERT
-  const real dt = 100000.0 
-#else
-  const real dt = 250.0 
-#endif
-                * pow(0.5*pow(dxmin,3.0)/(2.0*3.1415*mixed.sigma()->value())
-                      , 0.5);
+  real dxmin = d.dxyz_min();
+  const real dt = 10.0 * pow(vapor.rho()->value()*pow(dxmin,3.0)
+                           /(2.0*3.1415*mixed.sigma()->value()),0.5);
+  //const real tend = 0.003;
+  const real tend = 0.0009;
+  const int ndt = tend/dt;
+  const int nint = ndt/2;
+  const real tint = tend/25.;
   Times time(ndt, dt);
-  OPR(  dt );
-  time.print_time(false);
-  
-  /*-----------------+
-  |  define solvers  |
-  +-----------------*/
+
+#if 1
+  boil::oout<<"si= "<<c.si()<<" ei= "<<c.ei()<<"\n";
+  boil::oout<<"sj= "<<c.sj()<<" ei= "<<c.ej()<<"\n";
+  boil::oout<<"sk= "<<c.sk()<<" ei= "<<c.ek()<<"\n";
+#endif
+
+  /*----------------+
+  |  linear solver  |
+  +----------------*/
+  Krylov * solver = new CG(d, Prec::ic2());
+  //Krylov * solver = new CG(d, Prec::di());
   Momentum ns( uvw, xyz, time, solver, &mixed);
-  ns.diffusion_set (TimeScheme::backward_euler());
-  ns.convection_set(ConvScheme::upwind());
-
+  ns.convection_set(TimeScheme::backward_euler()); //ns.convection is mandatory
+  ns.diffusion_set(TimeScheme::backward_euler());
   Pressure pr(p, f, uvw, time, solver, &mixed);
-  AC multigrid( &pr );
-  multigrid.stop_if_diverging(true);
-  multigrid.min_cycles(3);
 
-  VOF conc  (c,  g, kappa, uvw, time, solver, &bndclr, &mixed);
-  //conc.ancillary();
-  conc.front_minmax();
+  AC multigrid( &pr );
+  multigrid.min_cycles(4);  // 4
+  multigrid.max_cycles(8); // 8
+  multigrid.stop_if_diverging(true);
+
+#ifdef USE_VOF
+  VOF conc  (c, g, kappa, uvw, time, solver);
+  //VOF conc  (c,  g, kappa, uvw, time, solver, NULL, &mixed);
+  conc.set_curv_method(0);  // height function
+  //conc.set_curv_method(1);  // smoothed VOF
+  conc.ancillary();
+#else
+  CIPCSL2 conc  (c, g, kappa, uvw, time, solver);
+  conc.set_itsharpen(8);
+  conc.set_globalSharpen();
+#endif
   conc.totalvol();
 
   TIF tsat(tsat0);
 #ifndef USE_ENTH
   EnthalpyTIF enthFD(tpr, q, c, uvw, time, solver, &mixed, tsat,
-                     NULL, &(conc.fs), &(conc.adens));
+                     NULL, conc.topo.fs, conc.topo.adens);
 #else
   EnthalpyTIF enthFD(tpr, q, c, uvw, time, solver, &mixed, tsat,
-                     NULL, NULL, &(conc.adens));
+                     NULL, NULL, conc.topo.adens);
                      //NULL, NULL, NULL);
 #endif
   enthFD.convection_set(TimeScheme::forward_euler());
   enthFD.diffusion_set(TimeScheme::backward_euler());
 
 #ifndef USE_PC
-  PhaseChangeVOF pc(mdot, mflx, tpr, q, c, g, f, uvw, conc,
+  PhaseChangeVOF pc(mdot, mflx, tpr, q, c, g, f, uvw, conc.topo,
                     tsat, time, &mixed, latent);
 #else
   PhaseChange pc(mdot, tpr, q, c, g, f, c, uvw, time, &mixed, latent, tsat0);
@@ -304,19 +303,14 @@ main(int argc, char ** argv) {
         tpr[i][j][k] = tsat0;
       } else if(dist<=pow(radius2,2.0)) {
         real xi = sqrt(dist) - radius;
-#ifdef INVERT
-        real ttmp = -coef5*pow(xi,5.0) + -coef4*pow(xi,4.0) + -coef3*pow(xi,3.0)
-                  + -coef2*pow(xi,2.0) + -coef1*xi + tsat0;
-        tpr[i][j][k] = std::max(tout,ttmp);
-#else
         real ttmp = coef5*pow(xi,5.0) + coef4*pow(xi,4.0) + coef3*pow(xi,3.0)
                   + coef2*pow(xi,2.0) + coef1*xi + tsat0;
         tpr[i][j][k] = std::min(tout,ttmp);
-#endif
       } else {
         tpr[i][j][k] = tout;
       }
     }
+  tpr.exchange_all();
 
   int Realsum(0);
   for_vijk(c,i,j,k) {
@@ -388,36 +382,16 @@ main(int argc, char ** argv) {
     }
   }
 
-#ifndef INVERT
   for_vijk(c,i,j,k)
     c[i][j][k] = 1.0-c[i][j][k];
-#endif
 
   c.bnd_update();
   c.exchange_all();
-  tpr.exchange_all();
+  conc.init();
+  conc.ancillary();
 
-    conc.ancillary();
-    //marker.cal_adens_geom(conc.adens);
-
-    boil::plot->plot(uvw,c,tpr,press,mdot,conc.adens,"uvw-c-tpr-press-mdot-adens",0);
-
-    /* verification */
-    real Realarea = 4.*acos(-1.0)*radius*radius;
-    real Simarea(0.);
-    int Simcount(0);
-    for_vijk(conc.adens,i,j,k) {
-      Simarea += (conc.adens)[i][j][k]*c.dV(i,j,k);
-      if((conc.adens)[i][j][k]>boil::atto)
-        Simcount++;
-    }
-
-    boil::oout<<"Verif: "<<Realarea<<" "<<Realsum;
-    boil::oout<<" | "<<Simarea<<" "<<Simcount;
-    boil::oout<<" | "<<Simarea/Realarea-1.<<" "<<real(Simcount)/real(Realsum)-1.<<boil::endl;
+    boil::plot->plot(uvw,c,tpr,press,mdot,*(conc.topo.adens),"uvw-c-tpr-press-mdot-adens",0); 
     //exit(0);
-
-
   }
   input.close();
 
@@ -430,14 +404,6 @@ main(int argc, char ** argv) {
   +------------*/
   for(time.start(); time.end(); time.increase()) {
 
-    boil::oout << "########################" << boil::endl;
-    boil::oout << "# TIME:      " << time.current_time() << boil::endl;
-    boil::oout << "# TIME STEP: " << time.current_step() 
-               << "/"             << time.total_steps() << boil::endl;
-    boil::oout << "# WTIME:     " << boil::timer.current_min() << boil::endl;
-    boil::oout << "########################" << boil::endl;
-    boil::oout << " dt= " << time.dt() << boil::endl;
-
     /*------------------------+
     |  solve energy equation  |
     +------------------------*/
@@ -445,85 +411,81 @@ main(int argc, char ** argv) {
     enthFD.discretize();
     enthFD.new_time_step();
     enthFD.solve(ResRat(1e-16),"enthFD");
-#endif
 
     /*---------------+
     |  phase change  |
     +---------------*/
     pc.update();
     ns.vol_phase_change(&f);
+#endif
 
-    //for_vijk(c,i,j,k) boil::oout<<i<<" "<<j<<" "<<k<<" "<<c[i][j][k]<<" "<<conc.adens[i][j][k]<<" "<<mdot[i][j][k]<<c.xc(i)<<" "<<c.yc(j)<<" "<<c.zc(k)<<boil::endl;
-    //exit(0);
-
-    /* essential for moving front */
-    ns.discretize();
-    pr.discretize();
-
-    /* momentum */
-    ns.cfl_max();
-    ns.new_time_step();
-
+    // store velocity
     for_m(m)
-      for_avmijk(xyz,m,i,j,k)
-        xyz[m][i][j][k]=0.0;
-
-    //conc.tension(&xyz, mixed);
-
-    ns.grad(press);
-    ns.solve(ResRat(1.0e-14));
-    p = 0.0;
-    if(multigrid.vcycle(ResRat(1e-6))) OMS(converged);
-    p.exchange();
-    ns.project(p);
-    press += p;
-    press.exchange();
-
-
-    /* shift pressure */
-    real pmin=1.0e+300;
-    for_vijk(press,i,j,k){
-      if(pmin>press[i][j][k]) pmin=press[i][j][k];
-    }
-    boil::cart.min_real(&pmin);
-
-    for_vijk(press,i,j,k)
-      press[i][j][k] -= pmin;
-
-    /*---------------------------+
-    |  solve transport equation  |
-    +---------------------------*/
+      uvw_old(m) = uvw(m);
+    // store color function
     cold = c;
-    for_m(m)
-      bndclrold(m) = bndclr(m);
 
-    if(time.current_step()>1) conc.advance();
+    /* inner loop */
+    for(int mloop=0; mloop<mSimple; mloop++) {
+
+      //reset body force
+      for_m(m)
+        for_avmijk(xyz,m,i,j,k)
+          xyz[m][i][j][k]=0.0;
+
+      /* surface tension */
+      conc.tension(&xyz, mixed);
+
+      /* essential for moving front */
+      ns.discretize();
+      pr.discretize();
+      pr.coarsen();
+
+      /* momentum */
+      ns.new_time_step(uvw_old);
+      ns.convection();
+      ns.grad(press);
+      ns.solve(ResRat(1e-8));
+
+      p=0.0;
+      if (multigrid.vcycle(ResRat(1e-6))) OMS(converged);
+
+      ns.project(p);
+      press += p;
+      press.exchange();
+
+      ns.cfl_max();
+
+#ifdef USE_VOF
+      conc.advance(cold);
+#else
+      conc.advance();
+#endif
+      conc.totalvol();
+#ifndef USE_VOF
+      boil::oout<<"totalvol: "<<time.current_time()<<" "<< conc.get_clrsum1()<<" "<<conc.get_clrsum2()<<"\n";
+#endif
+
+      pc.modify_vel(uvw,c,cold);
+    }
+
     conc.front_minmax();
     boil::oout<<"x-min-front= "<<time.current_time()<<" "<<conc.get_xminft()
               <<" "<<conc.get_xmaxft()<<"\n";
-    conc.totalvol();
-
-#ifndef USE_PC
-    pc.modify_vel(uvw,bndclr,bndclrold);
-#else
-    pc.modify_vel(uvw,c,cold);
-#endif
 
     /* dt control */
     time.control_dt(ns.cfl_max(),0.10,dt);
 
     /* output data */
-    if((time.current_time()) / (tint) >= real(iint) ) {
-      tpr.exchange_all();
-      boil::plot->plot(uvw,c,tpr,press,mdot,conc.adens,"uvw-c-tpr-press-mdot-adens",iint);
+    if(time.current_step() % nint == 0 || time.current_step()==1 ) {
+      boil::plot->plot(uvw,c,tpr,press,mdot,*(conc.topo.adens),"uvw-c-tpr-press-mdot-adens",iint);
       iint++;
     }
-    //boil::plot->plot(uvw,c,tpr,mflx,mdot,conc.adens,"uvw-c-tpr-mflx-mdot-adens",time.current_step());
 
     if((time.current_step()) % (nint)==0 ) {
       uvw  .save("uvw",   time.current_step());
       press.save("press", time.current_step());
-      conc .save("conc",  time.current_step());
+      c .save("conc",  time.current_step());
       tpr  .save("tpr",   time.current_step());
     }
 

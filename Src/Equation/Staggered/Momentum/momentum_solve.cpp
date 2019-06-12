@@ -69,6 +69,7 @@ void Momentum::solve(const ResRat & factor) {
     }
   }
 
+  insert_bc();
   u.exchange_all();
 
   boil::timer.stop("momentum solver");
@@ -80,5 +81,4 @@ void Momentum::solve(const ResRat & factor) {
   |  scale velocities at the outlet  |
   +---------------------------------*/
   outlet();
-  scale_out();
 }

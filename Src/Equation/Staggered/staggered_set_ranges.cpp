@@ -28,12 +28,16 @@ void Staggered::set_ranges(const Dir & d, const Comp & m,
   +--------------*/
   if( d == Dir::imin() || d == Dir::imax() ) {
     if(m==Comp::v()) {
-      if( j->first() == 1 )           j->first( u.sj(m) );
-      if( j->last()  == dom->nj()-2 ) j->last ( u.ej(m) );
+#if 1
+      //std::cout<<"set_ranges:j= "<<j->first()<<" "<<u.sj(m)<<"\n";
+      std::cout<<"set_ranges:j= "<<j->last()<<" "<<dom->nj()<<" "<<u.ej(m)<<"\n";
+#endif
+      if( j->first() == boil::BW )             j->first( u.sj(m) );
+      if( j->last()  == dom->nj()-boil::BW-1 ) j->last ( u.ej(m) );
     }
     if(m==Comp::w()) {
-      if( k->first() == 1 )           k->first( u.sk(m) );
-      if( k->last()  == dom->nk()-2 ) k->last ( u.ek(m) );
+      if( k->first() == boil::BW )             k->first( u.sk(m) );
+      if( k->last()  == dom->nk()-boil::BW-1 ) k->last ( u.ek(m) );
     }
   }
 
@@ -42,12 +46,12 @@ void Staggered::set_ranges(const Dir & d, const Comp & m,
   +--------------*/
   if( d == Dir::jmin() || d == Dir::jmax() ) {
     if(m==Comp::u()) {
-      if( i->first() == 1 )           i->first( u.si(m) );
-      if( i->last()  == dom->ni()-2 ) i->last ( u.ei(m) );
+      if( i->first() == boil::BW )             i->first( u.si(m) );
+      if( i->last()  == dom->ni()-boil::BW-1 ) i->last ( u.ei(m) );
     }
     if(m==Comp::w()) {
-      if( k->first() == 1 )           k->first( u.sk(m) );
-      if( k->last()  == dom->nk()-2 ) k->last ( u.ek(m) );
+      if( k->first() == boil::BW )             k->first( u.sk(m) );
+      if( k->last()  == dom->nk()-boil::BW-1 ) k->last ( u.ek(m) );
     }
   }
 
@@ -56,12 +60,12 @@ void Staggered::set_ranges(const Dir & d, const Comp & m,
   +--------------*/
   if( d == Dir::kmin() || d == Dir::kmax() ) {
     if(m==Comp::u()) {
-      if( i->first() == 1 )           i->first( u.si(m) );
-      if( i->last()  == dom->ni()-2 ) i->last ( u.ei(m) );
+      if( i->first() == boil::BW )             i->first( u.si(m) );
+      if( i->last()  == dom->ni()-boil::BW-1 ) i->last ( u.ei(m) );
     }
     if(m==Comp::v()) {
-      if( j->first() == 1 )           j->first( u.sj(m) );
-      if( j->last()  == dom->nj()-2 ) j->last ( u.ej(m) );
+      if( j->first() == boil::BW )             j->first( u.sj(m) );
+      if( j->last()  == dom->nj()-boil::BW-1 ) j->last ( u.ej(m) );
     }
   }
 }

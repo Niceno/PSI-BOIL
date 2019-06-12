@@ -34,6 +34,7 @@ class VOF : public Centered {
     void totalvol();
     void front_minmax();
     void init(){};
+    void smooth(const Scalar & sca, Scalar & scb, const int itnum);
 
     // getter for front_minmax
     real get_xminft() { return(xminft);};
@@ -97,9 +98,9 @@ class VOF : public Centered {
     void fs_bnd();
     void curv_HF();
     void curv_smooth();
-    void smooth(const Scalar & sca, Scalar & scb, const int itnum);
     void extract_alpha();
     void true_norm_vect();
+    void standardized_norm_vect();
     void insert_bc(const Scalar & g);
     void gradphi(const Scalar & g);
     void gradphic(const Scalar & g);
@@ -109,6 +110,8 @@ class VOF : public Centered {
     void norm_cc(const Scalar & g);
     void norm_young(const Scalar & g);
     void normalize(real & r1, real & r2, real & r3);
+    void wall_adhesion_norm(real & nx, real & ny, real & nz,
+                            const real nwx, const real nwy, const real nwz);
     void update_at_walls();
     real kappa_ave(const real r1, const real r2);
     real kappa_ave(const real r1, const real r2, const int i1, const int i2);
@@ -165,6 +168,7 @@ class VOF : public Centered {
     real tol_wall, tol_flux, tol_ext, flux_cfl;
     real ww, dxmin;
     bool iminp, imaxp, jminp, jmaxp, kminp, kmaxp; // true = periodic
+    bool iminw, imaxw, jminw, jmaxw, kminw, kmaxw; // true = wall
     bool iminc, imaxc, jminc, jmaxc, kminc, kmaxc; // true = cut-stencil
 
     Heaviside heavi;

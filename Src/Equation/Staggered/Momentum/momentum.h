@@ -98,8 +98,9 @@ class Momentum : public Staggered {
   private:
     
     void create_system(const Scalar * mu_eddy);
-    void scale_out();
     void outlet();
+    void extrapolate_outlet_velocity(const real ubo, const real ratio);
+    void scale_outlet_velocity(const real ubo, const real ratio);
     real volf_bct(const BndType & bc_type, 
                   real * Ax=NULL, real * Ay=NULL, real * Az=NULL) const;
 

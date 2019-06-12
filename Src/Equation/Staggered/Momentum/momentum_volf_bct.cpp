@@ -62,9 +62,11 @@ real Momentum::volf_bct(const BndType & bc_type,
                 a_x *= dom->ibody().fSe(m,i,j,k);              
                 volf_x -= a_x * u[m][i+1][j][k];
                 A_x    += a_x;
+                //boil::oout<<i<<" "<<j<<" "<<k<<" "<<a_x<<boil::endl;
               }
             }
             //std::cout<<"volf_bct imax"<<A_x<<"\n";
+            //exit(0);
           }
 
         } /* if(imin || imax) */

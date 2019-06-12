@@ -21,6 +21,7 @@ void VOF::curv_HF() {
   |  Step 4: calculate area density using marching cube  |
   |  Step 5: define iflag                                |
   +-----------------------------------------------------*/
+#if 0
   /* calculate normal vector */
   //norm_cc(phi);
   norm_young(phi);  // Young's method is good for low resolution
@@ -36,6 +37,9 @@ void VOF::curv_HF() {
 
   /* normal vector */
   true_norm_vect();
+#else
+  ancillary();
+#endif
 
   iflag=0;
   for_ijk(i,j,k) {

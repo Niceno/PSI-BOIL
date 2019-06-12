@@ -225,6 +225,7 @@ void BndCnd::add(BndCnd bc) {
   Range<int> cyg = dom->cyg(); 
   Range<int> czg = dom->czg(); 
 
+  // What is this ??? (Yohei)
   if( bc.ir.first() == 0 && bc.ir.last() == -1 ) {
     bc.ir.first( cxg.first() + boil::BW - 1 ); // as sx()
     bc.ir.last ( cxg.last()  + boil::BW - 1 ); // as ex()
@@ -259,7 +260,7 @@ void BndCnd::add(BndCnd bc) {
       if(cxg.contains(bc.ir.first())) bc.ir.first(bc.ir.first()-cxg.first()+1);
       else                          bc.ir.first(1);
       if(cxg.contains(bc.ir.last())) bc.ir.last(bc.ir.last()-cxg.first()+1);
-      else                         bc.ir.last(dom->ni()-2);
+      else                         bc.ir.last(dom->ni()-boil::BW-1);
     }
   } /* j || k || b */
 
@@ -275,7 +276,7 @@ void BndCnd::add(BndCnd bc) {
       if(cyg.contains(bc.jr.first())) bc.jr.first(bc.jr.first()-cyg.first()+1);
       else                          bc.jr.first(1);
       if(cyg.contains(bc.jr.last())) bc.jr.last(bc.jr.last()-cyg.first()+1);
-      else                         bc.jr.last(dom->nj()-2);
+      else                          bc.jr.last(dom->nj()-boil::BW-1);
     }
   } /* i || k || b */
 
@@ -291,11 +292,16 @@ void BndCnd::add(BndCnd bc) {
       if(czg.contains(bc.kr.first())) bc.kr.first(bc.kr.first()-czg.first()+1);
       else                          bc.kr.first(1);
       if(czg.contains(bc.kr.last())) bc.kr.last(bc.kr.last()-czg.first()+1);
-      else                         bc.kr.last(dom->nk()-2);
+      else                          bc.kr.last(dom->nk()-boil::BW-1);
     }
   } /* i || j || b */
 
   section.push_back(bc);
+
+  /*-------------------------------------------------------------------+
+  |  Note: loop range for vector used for Momentum object is reset in: |
+  |  staggered_set_ranges.cpp                                          | 
+  +-------------------------------------------------------------------*/
 }
 
 /******************************************************************************/
