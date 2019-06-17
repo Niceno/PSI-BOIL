@@ -21,25 +21,7 @@ void VOF::curv_HF() {
   |  Step 4: calculate area density using marching cube  |
   |  Step 5: define iflag                                |
   +-----------------------------------------------------*/
-#if 0
-  /* calculate normal vector */
-  //norm_cc(phi);
-  norm_young(phi);  // Young's method is good for low resolution
-
-  /* calculate alpha in cells */
-  extract_alpha();
-
-  /* prerequisite for marching cubes */
-  update_at_walls();
-
-  /* calculate area density */
-  cal_adens();
-
-  /* normal vector */
-  true_norm_vect();
-#else
-  ancillary();
-#endif
+  norm_young(phi);
 
   iflag=0;
   for_ijk(i,j,k) {
@@ -73,14 +55,14 @@ void VOF::curv_HF() {
 
       /* select direction of stencil-7 */
       int dirMax=0;
-      if (fabs(mx[i][j][k])<fabs(my[i][j][k])) {
-        if (fabs(my[i][j][k])<fabs(mz[i][j][k])) {
+      if (fabs(nx[i][j][k])<fabs(ny[i][j][k])) {
+        if (fabs(ny[i][j][k])<fabs(nz[i][j][k])) {
           dirMax=3;
         } else {
           dirMax=2;
         }
       } else {
-        if (fabs(mx[i][j][k])<fabs(mz[i][j][k])) {
+        if (fabs(nx[i][j][k])<fabs(nz[i][j][k])) {
           dirMax=3;
         } else {
           dirMax=1;
@@ -102,7 +84,7 @@ void VOF::curv_HF() {
         /* Calculate Eq. (2) in J.Lopez et al. */
         for (int ii=-1; ii>=imin; ii--) {
           if(imin==0)std::cout<<"enter\n";
-          real nxc = mx[i][j][k];
+          real nxc = nx[i][j][k];
           for (int jj=-1; jj<=1; jj++) {
           for (int kk=-1; kk<=1; kk++) {
             if (copysign(1.0, nxc)
@@ -116,7 +98,7 @@ void VOF::curv_HF() {
         }
 
         for (int ii=1; ii<=imax; ii++) {
-          real nxc = mx[i][j][k];
+          real nxc = nx[i][j][k];
           for (int jj=-1; jj<=1; jj++) {
           for (int kk=-1; kk<=1; kk++) {
             if (copysign(1.0, nxc)
@@ -171,7 +153,7 @@ void VOF::curv_HF() {
 
         /* Calculate Eq. (2) in J.Lopez et al. */
         for (int jj=-1; jj>=jmin; jj--) {
-          real nyc = my[i][j][k];
+          real nyc = ny[i][j][k];
           for (int ii=-1; ii<=1; ii++) {
           for (int kk=-1; kk<=1; kk++) {
             if (copysign(1.0, nyc)
@@ -185,7 +167,7 @@ void VOF::curv_HF() {
         }
 
         for (int jj=1; jj<=jmax; jj++) {
-          real nyc = my[i][j][k];
+          real nyc = ny[i][j][k];
          for (int ii=-1; ii<=1; ii++) {
           for (int kk=-1; kk<=1; kk++) {
             if (copysign(1.0, nyc)
@@ -251,7 +233,7 @@ void VOF::curv_HF() {
 
         /* Calculate Eq. (2) in J.Lopez et al. */
         for (int kk=-1; kk>=kmin; kk--) {
-          real nzc = mz[i][j][k];
+          real nzc = nz[i][j][k];
 #if 0
         if (boil::cart.iam()==0){
           if(i==si()-1+5 && j==sj()-1+1 && k==sk()-1+64){
@@ -272,7 +254,7 @@ void VOF::curv_HF() {
         }
 
         for (int kk=1; kk<=kmax; kk++) { 
-          real nzc = mz[i][j][k];
+          real nzc = nz[i][j][k];
          for (int ii=-1; ii<=1; ii++) {
           for (int jj=-1; jj<=1; jj++) {
             if (copysign(1.0, nzc)

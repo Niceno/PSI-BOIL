@@ -37,17 +37,15 @@ void VOF::ancillary() {
   /* prerequisite for marching cubes */
   update_at_walls();
 
-  /* for curvature calculations */
-  norm_young(phi);
-#if 0 /* norm_young produces the real-space normal vector as a byproduct */
   /* calculate the real-space normal vector */
   true_norm_vect(); 
-#endif
 
   /* calculate area */
   cal_adens();
-  //cal_adens_geom(adens);
-  //set_adens(adensgeom);
+#if 0
+  cal_adens_geom(adens);
+  set_adens(adensgeom);
+#endif
 
   /* calculate phi in staggered cells */
   if(bndclr)

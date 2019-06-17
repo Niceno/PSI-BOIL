@@ -8,12 +8,12 @@ void VOF::norm_young(const Scalar & sca) {
 *  Young's method in E.Aulisa,JCP,225(2007),2301-2319, Section 2.2.2.1
 *  Young's method is used by J.Lopez et al., An improved height function...
 *  Comput. Methods Appl. Mech. Engrg. 198 (2009) 2555-2564
-*         Results: mx, my, mz : true normal vector
+*         Results: nx, ny, nz : true normal vector
 *                  nx, ny, nz : normal vector in the VOF space
 *******************************************************************************/
-  mx=0.0;
-  my=0.0;
-  mz=0.0;
+  nx=0.0;
+  ny=0.0;
+  nz=0.0;
 #if 0
   nx=0.0;
   ny=0.0;
@@ -23,7 +23,7 @@ void VOF::norm_young(const Scalar & sca) {
   for_ijk(i,j,k){
 
     int jflag, sum_jflag=0;
-    real mxave=0.0, myave=0.0, mzave=0.0;
+    real nxave=0.0, nyave=0.0, nzave=0.0;
 
     for (int ii=0; ii<=1; ii++) {
     for (int jj=0; jj<=1; jj++) {
@@ -31,24 +31,24 @@ void VOF::norm_young(const Scalar & sca) {
       int iii=i+ii;
       int jjj=j+jj;
       int kkk=k+kk;
-      real mxtmp,mytmp,mztmp; // normal at corner
-      mxtmp = 0.25 * (sca[iii  ][jjj][kkk  ]+sca[iii  ][jjj-1][kkk  ]
+      real nxtmp,nytmp,nztmp; // normal at corner
+      nxtmp = 0.25 * (sca[iii  ][jjj][kkk  ]+sca[iii  ][jjj-1][kkk  ]
                     + sca[iii  ][jjj][kkk-1]+sca[iii  ][jjj-1][kkk-1])
              -0.25 * (sca[iii-1][jjj][kkk  ]+sca[iii-1][jjj-1][kkk  ]
                     + sca[iii-1][jjj][kkk-1]+sca[iii-1][jjj-1][kkk-1]);
-      mxtmp /= (sca.xc(iii)-sca.xc(iii-1));
-      mytmp = 0.25 * (sca[iii][jjj  ][kkk  ]+sca[iii-1][jjj  ][kkk  ]
+      nxtmp /= (sca.xc(iii)-sca.xc(iii-1));
+      nytmp = 0.25 * (sca[iii][jjj  ][kkk  ]+sca[iii-1][jjj  ][kkk  ]
                     + sca[iii][jjj  ][kkk-1]+sca[iii-1][jjj  ][kkk-1])
              -0.25 * (sca[iii][jjj-1][kkk  ]+sca[iii-1][jjj-1][kkk  ]
                     + sca[iii][jjj-1][kkk-1]+sca[iii-1][jjj-1][kkk-1]);
-      mytmp /= (sca.yc(jjj)-sca.yc(jjj-1));
-      mztmp = 0.25 * (sca[iii][jjj  ][kkk  ]+sca[iii-1][jjj  ][kkk  ]
+      nytmp /= (sca.yc(jjj)-sca.yc(jjj-1));
+      nztmp = 0.25 * (sca[iii][jjj  ][kkk  ]+sca[iii-1][jjj  ][kkk  ]
                     + sca[iii][jjj-1][kkk  ]+sca[iii-1][jjj-1][kkk  ])
              -0.25 * (sca[iii][jjj  ][kkk-1]+sca[iii-1][jjj  ][kkk-1]
                     + sca[iii][jjj-1][kkk-1]+sca[iii-1][jjj-1][kkk-1]);
-      mztmp /= (sca.zc(kkk)-sca.zc(kkk-1));
+      nztmp /= (sca.zc(kkk)-sca.zc(kkk-1));
 
-      normalize(mxtmp,mytmp,mztmp);
+      normalize(nxtmp,nytmp,nztmp);
 
       /* check boundary condition */
       jflag=1;
@@ -62,60 +62,60 @@ void VOF::norm_young(const Scalar & sca) {
 #elif 1
       /* planes */
       if (iii  ==si() && iminw==true)
-        wall_adhesion_norm(mxtmp,mytmp,mztmp,-1,0,0);
+        wall_adhesion_norm(nxtmp,nytmp,nztmp,-1,0,0);
       if (iii-1==ei() && imaxw==true)
-        wall_adhesion_norm(mxtmp,mytmp,mztmp, 1,0,0);
+        wall_adhesion_norm(nxtmp,nytmp,nztmp, 1,0,0);
       if (jjj  ==sj() && jminw==true)
-        wall_adhesion_norm(mxtmp,mytmp,mztmp,0,-1,0);
+        wall_adhesion_norm(nxtmp,nytmp,nztmp,0,-1,0);
       if (jjj-1==ej() && jmaxw==true)
-        wall_adhesion_norm(mxtmp,mytmp,mztmp,0, 1,0);
+        wall_adhesion_norm(nxtmp,nytmp,nztmp,0, 1,0);
       if (kkk  ==sk() && kminw==true)
-        wall_adhesion_norm(mxtmp,mytmp,mztmp,0,0,-1);
+        wall_adhesion_norm(nxtmp,nytmp,nztmp,0,0,-1);
       if (kkk-1==ek() && kmaxw==true)
-        wall_adhesion_norm(mxtmp,mytmp,mztmp,0,0, 1);
+        wall_adhesion_norm(nxtmp,nytmp,nztmp,0,0, 1);
       
       /* lines */
 
       /* imin and ... */
       if (iii  ==si() && iminw==true &&
           jjj  ==sj() && jminw==true)
-        wall_adhesion_norm(mxtmp,mytmp,mztmp,-0.5*sqrt(2.0),-0.5*sqrt(2.0),0);
+        wall_adhesion_norm(nxtmp,nytmp,nztmp,-0.5*sqrt(2.0),-0.5*sqrt(2.0),0);
       if (iii  ==si() && iminw==true &&
           jjj-1==ej() && jmaxw==true)
-        wall_adhesion_norm(mxtmp,mytmp,mztmp,-0.5*sqrt(2.0), 0.5*sqrt(2.0),0);
+        wall_adhesion_norm(nxtmp,nytmp,nztmp,-0.5*sqrt(2.0), 0.5*sqrt(2.0),0);
       if (iii  ==si() && iminw==true &&
           kkk  ==sk() && kminw==true)
-        wall_adhesion_norm(mxtmp,mytmp,mztmp,-0.5*sqrt(2.0),0,-0.5*sqrt(2.0));
+        wall_adhesion_norm(nxtmp,nytmp,nztmp,-0.5*sqrt(2.0),0,-0.5*sqrt(2.0));
       if (iii  ==si() && iminw==true &&
           kkk-1==ek() && kmaxw==true)
-        wall_adhesion_norm(mxtmp,mytmp,mztmp,-0.5*sqrt(2.0),0, 0.5*sqrt(2.0));
+        wall_adhesion_norm(nxtmp,nytmp,nztmp,-0.5*sqrt(2.0),0, 0.5*sqrt(2.0));
       /* imax and ... */
       if (iii-1==ei() && imaxw==true &&
           jjj  ==sj() && jminw==true)
-        wall_adhesion_norm(mxtmp,mytmp,mztmp, 0.5*sqrt(2.0),-0.5*sqrt(2.0),0);
+        wall_adhesion_norm(nxtmp,nytmp,nztmp, 0.5*sqrt(2.0),-0.5*sqrt(2.0),0);
       if (iii-1==ei() && imaxw==true &&
           jjj-1==ej() && jmaxw==true)
-        wall_adhesion_norm(mxtmp,mytmp,mztmp, 0.5*sqrt(2.0), 0.5*sqrt(2.0),0);
+        wall_adhesion_norm(nxtmp,nytmp,nztmp, 0.5*sqrt(2.0), 0.5*sqrt(2.0),0);
       if (iii-1==ei() && imaxw==true &&
           kkk  ==sk() && kminw==true)
-        wall_adhesion_norm(mxtmp,mytmp,mztmp, 0.5*sqrt(2.0),0,-0.5*sqrt(2.0));
+        wall_adhesion_norm(nxtmp,nytmp,nztmp, 0.5*sqrt(2.0),0,-0.5*sqrt(2.0));
       if (iii-1==ei() && imaxw==true &&
           kkk-1==ek() && kmaxw==true)
-        wall_adhesion_norm(mxtmp,mytmp,mztmp, 0.5*sqrt(2.0),0, 0.5*sqrt(2.0));
+        wall_adhesion_norm(nxtmp,nytmp,nztmp, 0.5*sqrt(2.0),0, 0.5*sqrt(2.0));
       /* jmin and k.. */
       if (jjj  ==sj() && jminw==true &&
           kkk  ==sk() && kminw==true)
-        wall_adhesion_norm(mxtmp,mytmp,mztmp,0,-0.5*sqrt(2.0),-0.5*sqrt(2.0));
+        wall_adhesion_norm(nxtmp,nytmp,nztmp,0,-0.5*sqrt(2.0),-0.5*sqrt(2.0));
       if (jjj  ==sj() && jminw==true &&
           kkk-1==ek() && kmaxw==true)
-        wall_adhesion_norm(mxtmp,mytmp,mztmp,0,-0.5*sqrt(2.0), 0.5*sqrt(2.0));
+        wall_adhesion_norm(nxtmp,nytmp,nztmp,0,-0.5*sqrt(2.0), 0.5*sqrt(2.0));
       /* jmax and k.. */
       if (jjj-1==ej() && jmaxw==true &&
           kkk  ==sk() && kminw==true)
-        wall_adhesion_norm(mxtmp,mytmp,mztmp,0, 0.5*sqrt(2.0),-0.5*sqrt(2.0));
+        wall_adhesion_norm(nxtmp,nytmp,nztmp,0, 0.5*sqrt(2.0),-0.5*sqrt(2.0));
       if (jjj-1==ej() && jmaxw==true &&
           kkk-1==ek() && kmaxw==true)
-        wall_adhesion_norm(mxtmp,mytmp,mztmp,0, 0.5*sqrt(2.0), 0.5*sqrt(2.0));
+        wall_adhesion_norm(nxtmp,nytmp,nztmp,0, 0.5*sqrt(2.0), 0.5*sqrt(2.0));
 
       /* corners */
 
@@ -123,50 +123,50 @@ void VOF::norm_young(const Scalar & sca) {
       if (iii  ==si() && iminw==true &&
           jjj  ==sj() && jminw==true &&
           kkk  ==sk() && kminw==true)
-        wall_adhesion_norm(mxtmp,mytmp,mztmp,-sqrt(1./3.),-sqrt(1./3.),-sqrt(1./3.));
+        wall_adhesion_norm(nxtmp,nytmp,nztmp,-sqrt(1./3.),-sqrt(1./3.),-sqrt(1./3.));
       if (iii  ==si() && iminw==true &&
           jjj-1==ej() && jmaxw==true &&
           kkk  ==sk() && kminw==true)
-        wall_adhesion_norm(mxtmp,mytmp,mztmp,-sqrt(1./3.), sqrt(1./3.),-sqrt(1./3.));
+        wall_adhesion_norm(nxtmp,nytmp,nztmp,-sqrt(1./3.), sqrt(1./3.),-sqrt(1./3.));
       if (iii  ==si() && iminw==true &&
           jjj  ==sj() && jminw==true &&
           kkk-1==ek() && kmaxw==true)
-        wall_adhesion_norm(mxtmp,mytmp,mztmp,-sqrt(1./3.),-sqrt(1./3.), sqrt(1./3.));
+        wall_adhesion_norm(nxtmp,nytmp,nztmp,-sqrt(1./3.),-sqrt(1./3.), sqrt(1./3.));
       if (iii  ==si() && iminw==true &&
           jjj-1==ej() && jmaxw==true &&
           kkk-1==ek() && kmaxw==true)
-        wall_adhesion_norm(mxtmp,mytmp,mztmp,-sqrt(1./3.), sqrt(1./3.), sqrt(1./3.));
+        wall_adhesion_norm(nxtmp,nytmp,nztmp,-sqrt(1./3.), sqrt(1./3.), sqrt(1./3.));
       /* imax and ... */
       if (iii-1==ei() && imaxw==true &&
           jjj  ==sj() && jminw==true &&
           kkk  ==sk() && kminw==true)
-        wall_adhesion_norm(mxtmp,mytmp,mztmp, sqrt(1./3.),-sqrt(1./3.),-sqrt(1./3.));
+        wall_adhesion_norm(nxtmp,nytmp,nztmp, sqrt(1./3.),-sqrt(1./3.),-sqrt(1./3.));
       if (iii-1==ei() && imaxw==true &&
           jjj-1==ej() && jmaxw==true &&
           kkk  ==sk() && kminw==true)
-        wall_adhesion_norm(mxtmp,mytmp,mztmp, sqrt(1./3.), sqrt(1./3.),-sqrt(1./3.));
+        wall_adhesion_norm(nxtmp,nytmp,nztmp, sqrt(1./3.), sqrt(1./3.),-sqrt(1./3.));
       if (iii-1==ei() && imaxw==true &&
           jjj  ==sj() && jminw==true &&
           kkk-1==ek() && kmaxw==true)
-        wall_adhesion_norm(mxtmp,mytmp,mztmp, sqrt(1./3.),-sqrt(1./3.), sqrt(1./3.));
+        wall_adhesion_norm(nxtmp,nytmp,nztmp, sqrt(1./3.),-sqrt(1./3.), sqrt(1./3.));
       if (iii-1==ei() && imaxw==true &&
           jjj-1==ej() && jmaxw==true &&
           kkk-1==ek() && kmaxw==true)
-        wall_adhesion_norm(mxtmp,mytmp,mztmp, sqrt(1./3.), sqrt(1./3.), sqrt(1./3.));
+        wall_adhesion_norm(nxtmp,nytmp,nztmp, sqrt(1./3.), sqrt(1./3.), sqrt(1./3.));
 #endif
 
       sum_jflag += jflag;
 
-      mxave += real(jflag) * mxtmp;
-      myave += real(jflag) * mytmp;
-      mzave += real(jflag) * mztmp;
+      nxave += real(jflag) * nxtmp;
+      nyave += real(jflag) * nytmp;
+      nzave += real(jflag) * nztmp;
 
     }}}
 
     /* average norm at coner */
-    mxave /= sum_jflag;
-    myave /= sum_jflag;
-    mzave /= sum_jflag;
+    nxave /= sum_jflag;
+    nyave /= sum_jflag;
+    nzave /= sum_jflag;
 
 #if 0
     if (sum_jflag==0) {
@@ -174,25 +174,20 @@ void VOF::norm_young(const Scalar & sca) {
     }
 #endif
 
-    normalize(mxave,myave,mzave);
+    normalize(nxave,nyave,nzave);
 
-    mx[i][j][k]=mxave;
-    my[i][j][k]=myave;
-    mz[i][j][k]=mzave;
+    nx[i][j][k]=nxave;
+    ny[i][j][k]=nyave;
+    nz[i][j][k]=nzave;
 
   }
 
-  mx.exchange_all();
-  my.exchange_all();
-  mz.exchange_all();
+  nx.exchange_all();
+  ny.exchange_all();
+  nz.exchange_all();
 
 #if 0
-  /* nx, ny, nz is calculated */
-  standardized_norm_vect();
-#endif
-
-#if 0
-  boil::plot->plot(sca,mx,my,mz, "clr-mx-my-mz", time->current_step());
+  boil::plot->plot(sca,nx,ny,nz, "clr-nx-ny-nz", time->current_step());
   boil::plot->plot(sca,nx,ny,nz, "clr-nx-ny-nz", time->current_step());
   exit(0);
 #endif

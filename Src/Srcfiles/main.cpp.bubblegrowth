@@ -29,7 +29,7 @@ const real LY = LX;
 const real LZ = LX;
 
 #ifdef USE_VOF
-const int mSimple = 4;
+const int mSimple = 1;
 const int Nsmooth = 0;
 #else
 const int mSimple = 1;
@@ -173,7 +173,7 @@ main(int argc, char ** argv) {
   const real dt = 10.0 * pow(vapor.rho()->value()*pow(dxmin,3.0)
                            /(2.0*3.1415*mixed.sigma()->value()),0.5);
   //const real tend = 0.003;
-  const real tend = 0.0009;
+  const real tend = 0.0012;
   const int ndt = tend/dt;
   const int nint = ndt/2;
   const real tint = tend/25.;
