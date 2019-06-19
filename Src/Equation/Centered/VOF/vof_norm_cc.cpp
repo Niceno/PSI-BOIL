@@ -10,6 +10,7 @@ void VOF::norm_cc(const Scalar & sca) {
 *******************************************************************************/
 
   for_ijk(i,j,k) {
+#if 1
     real mxX, myX, mzX;
     mxX = copysign(1.0,+(sca[i+1][j][k]-sca[i-1][j][k]));
     myX = 0.5 * ( (sca[i+1][j+1][k]+sca[i][j+1][k]+sca[i-1][j+1][k])
@@ -55,6 +56,13 @@ void VOF::norm_cc(const Scalar & sca) {
         nz[i][j][k]=mzX;
       }
     }
+#else
+        nx[i][j][k]=phi.xc(i);
+        ny[i][j][k]=phi.yc(j);
+        nz[i][j][k]=0.0;
+
+        normalize(nx[i][j][k],ny[i][j][k],nz[i][j][k]);
+#endif
   }
 
   /* normal vector at adjacent cells next to wall, symmetric and IB */

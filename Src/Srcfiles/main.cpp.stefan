@@ -2,7 +2,6 @@
 //#include "update_step.cpp"
 #include "disjoint_pressure.cpp"
 
-//#define STANDARD
 #define USE_VOF
 
 const int Level=2;
@@ -37,7 +36,7 @@ main(int argc, char * argv[]) {
   /*--------------------------------+
   |  choose the output file format  |
   +--------------------------------*/
-  boil::plot = new PlotVTK();
+  boil::plot = new PlotTEC();
   //boil::plot = new PlotTEC(AsNodes::no(), Buffers::yes());
 
   /*----------+
@@ -70,13 +69,8 @@ main(int argc, char * argv[]) {
   Scalar tpr(d), q  (d), step(d); // temperature
   Scalar tp2(d);
   Scalar mdot(d);        // phase-change
-  Scalar mdo2(d);        // phase-change
   Scalar mflx(d);        // phase-change
   Scalar sflag(d);        // phase-change
-  Scalar g2(d),f2(d);
-
-  Scalar heaviside(d);
-  Vector bndclr(d), bndclrold(d);
 
   /*-----------------------------+ 
   |  insert boundary conditions  |
@@ -88,9 +82,6 @@ main(int argc, char * argv[]) {
     uvw.bc(m).add( BndCnd( Dir::kmax(), BndType::periodic() ) );
     uvw.bc(m).add( BndCnd( Dir::jmin(), BndType::periodic() ) );
     uvw.bc(m).add( BndCnd( Dir::jmax(), BndType::periodic() ) );
-
-    bndclr(m)    = uvw(m).shape();
-    bndclrold(m) = uvw(m).shape();
   }
 
   p.bc().add( BndCnd( Dir::imin(), BndType::neumann() ) );
@@ -103,12 +94,9 @@ main(int argc, char * argv[]) {
   /* copy b.c. from p */
   press = p.shape();
   f = p.shape();
-  f2 = p.shape();
   mdot = p.shape();
-  mdo2 = p.shape();
   mflx = p.shape();
   q = p.shape();
-  g2 = p.shape();
 
   c.bc().add( BndCnd( Dir::imin(), BndType::wall() ) );
   c.bc().add( BndCnd( Dir::imax(), BndType::outlet() ) );
@@ -128,10 +116,6 @@ main(int argc, char * argv[]) {
   tpr.bc().add( BndCnd( Dir::jmin(), BndType::periodic() ) );
   tpr.bc().add( BndCnd( Dir::jmax(), BndType::periodic() ) );
   OPR( Tout );
-
-  tp2 = tpr.shape();
-
-  heaviside = c.shape();
 
   /*----------------------+
   |  physical properties  |
@@ -159,7 +143,7 @@ main(int argc, char * argv[]) {
 #ifndef USE_VOF
   Matter mixed(liquid, vapor,& step); //c=1: full of liquid, c=0: full of vapor
 #else
-  Matter mixed(liquid, vapor,& c,& bndclr); //c=1: full of liquid, c=0: full of vapor
+  Matter mixed(liquid, vapor,& c); //c=1: full of liquid, c=0: full of vapor
 #endif
   mixed.sigma(2.3610e-2);
 
@@ -181,9 +165,9 @@ main(int argc, char * argv[]) {
     c[i][j][k] = 1.0;
 #if 1
   for_vijk(c,i,j,k) {
-    if(i==1) {
+    if(i==boil::BW) {
       c[i][j][k]=0.0;
-    } else if (i==2) {
+    } else if (i==1+boil::BW) {
       c[i][j][k]=0.99;
     } else {
       c[i][j][k]=1.0;
@@ -197,7 +181,6 @@ main(int argc, char * argv[]) {
     tpr[i][j][k] = c[i][j][k]*Tsat
                  + (1.0-c[i][j][k])*Tout;
   }
-  tp2 = tpr;
   //boil::plot->plot(uvw, c, tpr, tp2, mdot, "uvw-c-tpr-tp2-mdot", 0);
 
   for_avijk(c,i,j,k){
@@ -215,17 +198,13 @@ main(int argc, char * argv[]) {
   conc.set_nredist(1);
   conc.set_itsharpen(4);
 #else 
-
-  VOF conc  (c,  g, kappa, uvw, time, solver, &bndclr);
-  conc.ancillary();
+  VOF conc  (c,  g, kappa, uvw, time, solver);
   conc.front_minmax();
   conc.totalvol();
 #endif
   AC multigrid( &pr );
   multigrid.stop_if_diverging(false);
   multigrid.min_cycles(3);
-
-  Heaviside indicator(heaviside, &c);
 
   /*--------------------+
   |  initial condition  |
@@ -234,59 +213,37 @@ main(int argc, char * argv[]) {
     c[i][j][k] = 0.0;
 
   for_vijk(c,i,j,k) {
-    if(i==1) {
+    if(i==boil::BW) {
       c[i][j][k]=0.0;
-    } else if (i==2) {
+    } else if (i==1+boil::BW) {
       c[i][j][k]=0.99;
     } else {
       c[i][j][k]=1.0;
     }
   }
+  conc.init();
+  c.exchange_all();
+  conc.ancillary();
   conc.front_minmax();
   conc.totalvol();
-  c.exchange_all();
 
-
-#ifdef USE_VOF
-  conc.ancillary();
-#endif
-  EnthalpyFD enthFD(tpr, q, c, uvw, time, solver, &mixed, Tsat);
-  enthFD.convection_set(TimeScheme::forward_euler());
-  enthFD.diffusion_set(TimeScheme::backward_euler());
-#ifdef USE_VOF
   TIF tsat(Tsat);
-  EnthalpyTIF enthVOF(tp2, q, c, uvw, time, solver, &mixed, tsat, NULL, &(conc.fs));
+  EnthalpyTIF enthVOF(tpr, q, c, uvw, time, solver, &mixed, tsat,
+                      NULL, conc.topo.fs, conc.topo.adens);
   enthVOF.convection_set(TimeScheme::forward_euler());
   enthVOF.diffusion_set(TimeScheme::backward_euler());
-#endif
-#ifdef STANDARD
-  PhaseChange pc (mdot, tpr, q, c, g, f, step, uvw, time, &mixed, latent, Tsat, NULL);
-  #ifdef USE_VOF
-  PhaseChangeVOF pc2(mdo2, mflx, tp2, q, c, g2, f2, uvw, conc, tsat, time, &mixed, latent);
-  #endif
-#else /* pc2 is the real one */
-  PhaseChange    pc (mdo2,       tpr, q, c, g2, f2, step, uvw, time, &mixed, latent, Tsat);
-  PhaseChangeVOF pc2(mdot, mflx, tp2, q, c, g , f , uvw, conc, tsat, time, &mixed, latent);
-#endif
+  PhaseChangeVOF pc(mdot, mflx, tpr, q, c, g , f , uvw, conc.topo,
+                     tsat, time, &mixed, latent);
 
   for_avijk(tpr,i,j,k){
     tpr[i][j][k] = c[i][j][k]*Tsat
                  + (1.0-c[i][j][k])*Tout;
   }
-  tp2 = tpr;
-  boil::plot->plot(uvw, c, tpr, tp2, mdot, "uvw-c-tpr-tp2-mdot", 0);
+  boil::plot->plot(uvw, c, tpr, mdot, "uvw-c-tpr-mdot", 0);
 
   for_avijk(c,i,j,k){
     step[i][j][k]=c[i][j][k];
   }
-
-#if 0
-  Comp mm=Comp::u();
-  for_avmi(bndclr,mm,i) {
-    boil::oout<<i<<" "<<bndclr[mm][i][1][1]<<boil::endl;
-  }
-  exit(0);
-#endif
 
   /*------------+
   |  time loop  |
@@ -302,40 +259,19 @@ main(int argc, char * argv[]) {
     boil::oout << "#                       " << boil::endl;
     boil::oout << "########################" << boil::endl;
 
-    indicator.calculate(); 
-
     /*------------------------+
     |  solve energy equation  |
     +------------------------*/
-    enthFD.discretize();
-    enthFD.new_time_step();
-    enthFD.solve(ResRat(1e-4));
-
-#ifdef USE_VOF
     enthVOF.discretize();
     enthVOF.new_time_step();
     enthVOF.solve(ResRat(1e-4));
-#endif
 
     /*---------------+
     |  phase change  |
     +---------------*/
-#ifdef USE_VOF
-    pc2.update();
-#endif
     pc.update();
 
-#ifndef USE_VOF
     ns.vol_phase_change(&f);
-#else
-    #ifdef STANDARD
-    ns.vol_phase_change(&f);
-    ns.vol_phase_change(&f2);
-    #else
-    ns.vol_phase_change(&f2);
-    ns.vol_phase_change(&f);
-    #endif
-#endif
 
 #if 0 
     for_m(m)
@@ -368,7 +304,7 @@ main(int argc, char * argv[]) {
     press.exchange();
 
     //exit(0);
-#if 1
+#if 0
     /* this part does not work in parallel computation */
     real dltp = press[1][1][1];
     for_vijk(press,i,j,k)
@@ -379,27 +315,16 @@ main(int argc, char * argv[]) {
     |  solve transport equation  |
     +---------------------------*/
     cold=c;
-    for_m(m)
-      bndclrold(m) = bndclr(m);
     conc.advance();
  
 #ifdef USE_VOF
   #if 1
    for_avi(c,i)
       for_avjk(c,j,k)
-        c[i][j][k] = c[i][1][1];
+        c[i][j][k] = c[i][1+boil::BW][1+boil::BW];
     c.exchange();
   #endif
    conc.ancillary();
-
-  #if 0
-    Comp mm = Comp::i();
-    for_vmijk(conc.fs,mm,i,j,k) {
-      if(conc.fs[mm][i][j][k]<boil::zetta)
-      boil::oout<<i<<" "<<j<<" "<<k<<" "<<c[i-1][j][k]<<" "<<c[i][j][k]<<" "<<conc.fs[mm][i][j][k]<<" "<<boil::endl;
-    }
-  #endif
-
 #endif
 
     conc.front_minmax();
@@ -411,16 +336,12 @@ main(int argc, char * argv[]) {
       step[i][j][k]=c[i][j][k];
     }
 
-#ifdef STANDARD
     pc.modify_vel(uvw,c,cold);
-#else
-    pc2.modify_vel(uvw,bndclr,bndclrold);
-#endif
 
 #if 1
-    boil::oout<<"c[2]= "<<c[2][1][1]<<" "<<c[3][1][1]<<" "
-                        <<tpr[2][1][1]<<" "<<tpr[3][1][1]<<" "
-                        <<tp2[2][1][1]<<" "<<tp2[3][1][1]<<" "
+    boil::oout<<"c[2]= "<<c[1+boil::BW][0+boil::BW][0+boil::BW]<<" "<<c[2+boil::BW][0+boil::BW][0+boil::BW]<<" "
+                        <<tpr[2+boil::BW][0+boil::BW][0+boil::BW]<<" "<<tpr[2+boil::BW][0+boil::BW][0+boil::BW]<<" "
+                        <<tp2[2+boil::BW][0+boil::BW][0+boil::BW]<<" "<<tp2[2+boil::BW][0+boil::BW][0+boil::BW]<<" "
                         <<boil::endl;
 #endif
 
@@ -445,13 +366,13 @@ main(int argc, char * argv[]) {
 
       fout.open("mdot.txt");
       for_vi(c,i) {
-        fout << c.xc(i) << "  " << mdot[i][1][1] << " "<<mdo2[i][1][1] << "\n";
+        fout << c.xc(i) << "  " << mdot[i][1][1] << "\n";
       }
       fout.close();
 
       fout.open("temperature.txt");
       for_vi(tpr,i) {
-        fout << tpr.xc(i) << "  " << tpr[i][1][1] <<" "<< tp2[i][1][1]<<"\n";
+        fout << tpr.xc(i) << "  " << tpr[i][1][1] << "\n";
       }
       fout.close();
     }
@@ -474,13 +395,13 @@ main(int argc, char * argv[]) {
 
   fout.open("temperature.txt");
   for_vi(tpr,i) {
-        fout << tpr.xc(i) << "  " << tpr[i][1][1] <<" "<< tp2[i][1][1]<<"\n";
+        fout << tpr.xc(i) << "  " << tpr[i][1][1] << "\n";
   }
   fout.close();
 
   fout.open("mdot.txt");
   for_vi(tpr,i) {
-        fout << c.xc(i) << "  " << mdot[i][1][1] << " "<<mdo2[i][1][1] << "\n";
+        fout << c.xc(i) << "  " << mdot[i][1][1] << "\n";
   }
   fout.close();
 #endif
@@ -495,6 +416,3 @@ main(int argc, char * argv[]) {
   boil::timer.report();
 
 }	
-/*-----------------------------------------------------------------------------+
- '$Id: main-JCP-phaseChange-stefan.cpp,v 1.3 2018/04/30 08:45:18 sato Exp $'/
-+-----------------------------------------------------------------------------*/
