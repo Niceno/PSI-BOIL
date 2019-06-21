@@ -18,12 +18,14 @@ void VOF::tension(Vector * vec, const Matter matt) {
   /*----------------------------------+
   |  1st step: curvature calculation  |
   +----------------------------------*/
+#if 0
   if(curv_method==0) {
     curv_HF();
   } else {
     curv_smooth();
   }
-  //curvature();
+#endif
+  curvature();
 
   /*-----------------------+
   |  2nd step: body force  |

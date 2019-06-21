@@ -9,7 +9,7 @@ void PhaseChangeVOF::m(const Scalar * diff_eddy) {
 
   boil::timer.start("phasechangevof m");
 
-#if 0
+#if 1
   for_ijk(i,j,k){
     if(Interface(i,j,k)){
       real lv = lambdav;
