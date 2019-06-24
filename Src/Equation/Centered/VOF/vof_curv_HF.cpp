@@ -21,18 +21,57 @@ void VOF::curv_HF() {
   |  Step 4: calculate area density using marching cube  |
   |  Step 5: define iflag                                |
   +-----------------------------------------------------*/
-  norm_young(phi);
 
   iflag=0;
+#if 0  // don't use this. Yohei
+  /* calculate alpha in cells */
+  norm_cc(phi);     // nx, ny, nz are necessary for extract_alpha
+  extract_alpha();  // this is necesarry for update_at_walls
+
+  /* prerequisite for marching cubes */
+  update_at_walls();
+  //boil::plot->plot(phi, "phi", time->current_step());
+
+  /* calculate area density */
+  cal_adens();  // it access nx, ny and nz
   for_ijk(i,j,k) {
     if (adens[i][j][k]>0.0) iflag[i][j][k]=1;
   }
+#else
+  for_ijk(i,j,k) {
+    if(dom->ibody().on(i,j,k)) {
+      if((phi[i-1][j][k]-0.5)*(phi[i][j][k]-0.5)<=0.0){ iflag[i][j][k]=1;}
+      if((phi[i+1][j][k]-0.5)*(phi[i][j][k]-0.5)<=0.0){ iflag[i][j][k]=1;}
+      if((phi[i][j-1][k]-0.5)*(phi[i][j][k]-0.5)<=0.0){ iflag[i][j][k]=1;}
+      if((phi[i][j+1][k]-0.5)*(phi[i][j][k]-0.5)<=0.0){ iflag[i][j][k]=1;}
+      if((phi[i][j][k-1]-0.5)*(phi[i][j][k]-0.5)<=0.0){ iflag[i][j][k]=1;}
+      if((phi[i][j][k+1]-0.5)*(phi[i][j][k]-0.5)<=0.0){ iflag[i][j][k]=1;}
+    }
+  }
+#endif
   iflag.exchange();
+
+#if 0
+  if(boil::cart.iam()==6){
+    std::cout<<"curv_HF:proc6: "<<phi[si()-1+32][sj()-1+1][sk()-1+0]<<" "
+                                <<phi[si()-1+32][sj()-1+1][sk()-1+1]<<"\n";
+    std::cout<<"curv_HF:iflag: "<<iflag[si()-1+32][sj()-1+1][sk()-1+0]<<" "
+                                <<iflag[si()-1+32][sj()-1+1][sk()-1+1]<<"\n";
+  }
+#endif
+
+  /* calculate normal vector */
+  //true_norm_vect();
+  norm_young(phi);  // Young's method is good for low resolution
 
   /*------------------------+
   |  curvature calculation  |
   +------------------------*/
+  //kappa=boil::unreal;
+  //kappa=0.0;  // use iflag for marking cal/non-cal of body-force
   kappa=boil::unreal;
+
+
 #if 0
   int ist=phi.si()-1;
   int jst=phi.sj()-1;
@@ -80,6 +119,10 @@ void VOF::curv_HF() {
         int imax=3;  // normal stencil size 7 (=3+1+3)
         if (iminc) imin=max(-3,si()-i);  // limit stencil size for cut-stencil
         if (imaxc) imax=min( 3,ei()-i);
+        if (dom->ibody().off(i-1,j,k)) { imin=-1; }  // use wall adjacent phi
+        else if(dom->ibody().off(i-2,j,k)) { imin=-2; } // in solid
+        if (dom->ibody().off(i+1,j,k)) { imax=1; }
+        else if(dom->ibody().off(i+2,j,k)) { imax=2; }
 
         /* Calculate Eq. (2) in J.Lopez et al. */
         for (int ii=-1; ii>=imin; ii--) {
@@ -150,6 +193,10 @@ void VOF::curv_HF() {
         if (jminc) jmin=max(-3,sj()-j);  // limit stencil size for cut-stencil
         if (jmaxc) jmax=min( 3,ej()-j);
         //std::cout<<"j,jmin,jmax=: "<<j<<" "<<jmin<<" "<<jmax<<"\n";
+        if (dom->ibody().off(i,j-1,k)) { jmin=-1; }
+        else if(dom->ibody().off(i,j-2,k)) { jmin=-2; }
+        if (dom->ibody().off(i,j+1,k)) { jmax=1; }
+        else if(dom->ibody().off(i,j+2,k)) { jmax=2; }
 
         /* Calculate Eq. (2) in J.Lopez et al. */
         for (int jj=-1; jj>=jmin; jj--) {
@@ -218,6 +265,11 @@ void VOF::curv_HF() {
         int kmax=3;  // normal stencil size 7 (=3+1+3)
         if (kminc) kmin=max(-3,sk()-k);  // limit stencil size for cut-stencil
         if (kmaxc) kmax=min( 3,ek()-k);
+
+        if (dom->ibody().off(i,j,k-1)) { kmin=-1; }
+        else if(dom->ibody().off(i,j,k-2)) { kmin=-2; }
+        if (dom->ibody().off(i,j,k+1)) { kmax=1; }
+        else if(dom->ibody().off(i,j,k+2)) { kmax=2; }
 #if 0
         if (boil::cart.iam()==0){
           if(i==si()-1+5 && j==sj()-1+1 && k==sk()-1+64){
@@ -369,6 +421,7 @@ void VOF::curv_HF() {
   //for(int iloop=1; iloop<2; iloop++) {
   for(int iloop=1; iloop<3; iloop++) {
     for_ijk(i,j,k) {
+      if(dom->ibody().off(i,j,k)) continue;
       if(iflag[i][j][k]==0) {
         int inb =  iflag[i-1][j][k] + iflag[i+1][j][k]
                  + iflag[i][j-1][k] + iflag[i][j+1][k]
@@ -392,27 +445,18 @@ void VOF::curv_HF() {
   }
 #endif
 
-#if 0
-  //int iproc=boil::cart.iam();
-  iproc=boil::cart.iam();
-  if (iproc==0){
-    std::cout<<"curv_HF: "<<kappa[si()-1+5][sj()-1+1][sk()-1+64]<<"\n";
-  }
-  if (iproc==1){
-    std::cout<<"curv_HF: "<<kappa[si()-1+5][sj()-1+1][sk()-1+1]<<"\n";
-  }
-  exit(0);
-#endif
+  bdcurv();
 
 #if 0
   if(time->current_step()==1) {
+  //if(time->current_step()%100==0) {
   /* visualize iflag */
   boil::plot->plot(phi,nx,ny,nz, "clr-nx-ny-nz", time->current_step());
   for_ijk(i,j,k){
     stmp[i][j][k]=iflag[i][j][k];
   }
   boil::plot->plot(phi,kappa,stmp, "clr-kappa-iflag", time->current_step());
-  exit(0);
+  //exit(0);
   } 
 #endif
   return;

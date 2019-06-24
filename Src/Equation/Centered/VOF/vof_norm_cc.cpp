@@ -11,49 +11,49 @@ void VOF::norm_cc(const Scalar & sca) {
 
   for_ijk(i,j,k) {
 #if 1
-    real mxX, myX, mzX;
-    mxX = copysign(1.0,+(sca[i+1][j][k]-sca[i-1][j][k]));
-    myX = 0.5 * ( (sca[i+1][j+1][k]+sca[i][j+1][k]+sca[i-1][j+1][k])
+    real nxX, nyX, nzX;
+    nxX = copysign(1.0,+(sca[i+1][j][k]-sca[i-1][j][k]));
+    nyX = 0.5 * ( (sca[i+1][j+1][k]+sca[i][j+1][k]+sca[i-1][j+1][k])
                 - (sca[i+1][j-1][k]+sca[i][j-1][k]+sca[i-1][j-1][k])); 
-    mzX = 0.5 * ( (sca[i+1][j][k+1]+sca[i][j][k+1]+sca[i-1][j][k+1])
+    nzX = 0.5 * ( (sca[i+1][j][k+1]+sca[i][j][k+1]+sca[i-1][j][k+1])
                 - (sca[i+1][j][k-1]+sca[i][j][k-1]+sca[i-1][j][k-1])); 
-    normalize(mxX,myX,mzX);
+    normalize(nxX,nyX,nzX);
 
-    real mxY, myY, mzY;
-    mxY = 0.5 * ( (sca[i+1][j-1][k]+sca[i+1][j][k]+sca[i+1][j+1][k])
+    real nxY, nyY, nzY;
+    nxY = 0.5 * ( (sca[i+1][j-1][k]+sca[i+1][j][k]+sca[i+1][j+1][k])
                 - (sca[i-1][j-1][k]+sca[i-1][j][k]+sca[i-1][j+1][k])); 
-    myY = copysign(1.0,+(sca[i][j+1][k]-sca[i][j-1][k]));
-    mzY = 0.5 * ( (sca[i][j-1][k+1]+sca[i][j][k+1]+sca[i][j+1][k+1])
+    nyY = copysign(1.0,+(sca[i][j+1][k]-sca[i][j-1][k]));
+    nzY = 0.5 * ( (sca[i][j-1][k+1]+sca[i][j][k+1]+sca[i][j+1][k+1])
                 - (sca[i][j-1][k-1]+sca[i][j][k-1]+sca[i][j+1][k-1]));
-    normalize(mxY,myY,mzY);
+    normalize(nxY,nyY,nzY);
 
-    real mxZ, myZ, mzZ;
-    mxZ = 0.5 * ( (sca[i+1][j][k-1]+sca[i+1][j][k]+sca[i+1][j][k+1])
+    real nxZ, nyZ, nzZ;
+    nxZ = 0.5 * ( (sca[i+1][j][k-1]+sca[i+1][j][k]+sca[i+1][j][k+1])
                 - (sca[i-1][j][k-1]+sca[i-1][j][k]+sca[i-1][j][k+1])); 
-    myZ = 0.5 * ( (sca[i][j+1][k-1]+sca[i][j+1][k]+sca[i][j+1][k+1])
+    nyZ = 0.5 * ( (sca[i][j+1][k-1]+sca[i][j+1][k]+sca[i][j+1][k+1])
                 - (sca[i][j-1][k-1]+sca[i][j-1][k]+sca[i][j-1][k+1])); 
-    mzZ = copysign(1.0,+(sca[i][j][k+1]-sca[i][j][k-1]));
-    normalize(mxZ,myZ,mzZ);
+    nzZ = copysign(1.0,+(sca[i][j][k+1]-sca[i][j][k-1]));
+    normalize(nxZ,nyZ,nzZ);
 
-    if (fabs(mxX)<fabs(myY)) {
-      if (fabs(myY)<fabs(mzZ)) {
-        nx[i][j][k]=mxZ;
-        ny[i][j][k]=myZ;
-        nz[i][j][k]=mzZ;
+    if (fabs(nxX)<fabs(nyY)) {
+      if (fabs(nyY)<fabs(nzZ)) {
+        nx[i][j][k]=nxZ;
+        ny[i][j][k]=nyZ;
+        nz[i][j][k]=nzZ;
       } else {
-        nx[i][j][k]=mxY;
-        ny[i][j][k]=myY;
-        nz[i][j][k]=mzY;
+        nx[i][j][k]=nxY;
+        ny[i][j][k]=nyY;
+        nz[i][j][k]=nzY;
       }
     } else {
-      if (fabs(mxX)<fabs(mzZ)) {
-        nx[i][j][k]=mxZ;
-        ny[i][j][k]=myZ;
-        nz[i][j][k]=mzZ;
+      if (fabs(nxX)<fabs(nzZ)) {
+        nx[i][j][k]=nxZ;
+        ny[i][j][k]=nyZ;
+        nz[i][j][k]=nzZ;
       } else {
-        nx[i][j][k]=mxX;
-        ny[i][j][k]=myX;
-        nz[i][j][k]=mzX;
+        nx[i][j][k]=nxX;
+        ny[i][j][k]=nyX;
+        nz[i][j][k]=nzX;
       }
     }
 #else
@@ -73,11 +73,18 @@ void VOF::norm_cc(const Scalar & sca) {
   ny.bnd_update();
   nz.bnd_update();
   insert_bc_norm_cc(sca);
-
+  
   /* normalize */
   //for_avijk(sca,i,j,k) {
   //  normalize(nx[i][j][k],ny[i][j][k],nz[i][j][k]);
   //}
+ 
+#if 0
+  for_avijk(sca,i,j,k)
+    if(k==boil::BW && ny[i][j][k] != 0.0)
+      boil::oout<<i<<" "<<j<<" "<<sca[i][j][k]<<" "<<nx[i][j][k]<<" "<<ny[i][j][k]<<" "<<nz[i][j][k]<<boil::endl;
+  exit(0);
+#endif
 
   nx.exchange_all();
   ny.exchange_all();

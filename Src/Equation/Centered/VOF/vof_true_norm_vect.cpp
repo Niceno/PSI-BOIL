@@ -27,14 +27,9 @@ void VOF::true_norm_vect() {
       nny = mmy/phi.dyc(j);
       nnz = mmz/phi.dzc(k);
     }
- 
-    real nnorm = nnx*nnx+nny*nny+nnz*nnz;
-    nnorm = sqrt(nnorm)+boil::pico;
 
-    nnx /= nnorm;
-    nny /= nnorm;
-    nnz /= nnorm;
-  
+    normalize(nnx,nny,nnz);
+ 
 #elif 0
     nnx = phi.xc(i)/sqrt(1.74505e-06*1.74505e-06-phi.xc(i)*phi.xc(i));
     nny = 0.0;
@@ -53,6 +48,7 @@ void VOF::true_norm_vect() {
     mx[i][j][k] = nnx;
     my[i][j][k] = nny;
     mz[i][j][k] = nnz;
+
   }
 
   //boil::plot->plot(mx,my,mz, "mx-my-mz", time->current_step());

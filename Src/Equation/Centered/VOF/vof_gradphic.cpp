@@ -6,8 +6,6 @@ void VOF::gradphic(const Scalar & sca) {
 *  \brief Calculate grad(csa)/|grad(csa)| at cell center.
 *         Resluts: nx, ny, nz
 *******************************************************************************/
-
-  sca.bnd_update();
   sca.exchange_all();  // necessary for corner
 
   /* cell centered base */

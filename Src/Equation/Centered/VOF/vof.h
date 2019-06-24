@@ -8,6 +8,8 @@
 #include "../../Heaviside/heaviside.h"
 #include "../../Topology/topology.h"
 
+#define IB
+
 ///////////
 //       //
 //  VOF  //
@@ -34,7 +36,6 @@ class VOF : public Centered {
     void totalvol();
     void front_minmax();
     void init(){};
-    void smooth(const Scalar & sca, Scalar & scb, const int itnum);
 
     // getter for front_minmax
     real get_xminft() { return(xminft);};
@@ -92,27 +93,37 @@ class VOF : public Centered {
     void advance_x(Scalar & sca);
     void advance_y(Scalar & sca);
     void advance_z(Scalar & sca);
-    void bdcurv(const Scalar & g, const real & v);
+    void bdcurv();
     void cal_fs3();
     void cal_fs_interp();
-    void fs_bnd();
     void curv_HF();
     void curv_smooth();
     void extract_alpha();
-    void true_norm_vect();
+    void fs_bnd();
     void standardized_norm_vect();
-    void insert_bc(const Scalar & g);
     void gradphi(const Scalar & g);
     void gradphic(const Scalar & g);
+    void ib_norm(const Scalar & g);
+    void ib_norm_cal(const int cc, const int i, const int j, const int k);
+    void insert_bc(const Scalar & g);
     void insert_bc_gradphic(const Scalar & g);
+    void insert_bc_gradphi(const Scalar & g);
     void insert_bc_norm_cc(const Scalar & g);
     void insert_bc_norm();
+    void nib(const real & n1, const real & n2, const real & n3
+           , const real & n4, const real & n5, const real & n6
+           , real r[]);
     void norm_cc(const Scalar & g);
     void norm_young(const Scalar & g);
     void normalize(real & r1, real & r2, real & r3);
-    void wall_adhesion_norm(real & nx, real & ny, real & nz,
-                            const real nwx, const real nwy, const real nwz);
+    void nwall(const Scalar & g
+             , const real & r1, const real & r2, const real & r3
+             , const int & i1, const int & i2, const int &i3
+             , real r[] );
+    void smooth(const Scalar & sca, Scalar & scb, const int itnum);
+    void true_norm_vect();
     void update_at_walls();
+    void wall_norm(const Scalar & sca);
     real kappa_ave(const real r1, const real r2);
     real kappa_ave(const real r1, const real r2, const int i1, const int i2);
 

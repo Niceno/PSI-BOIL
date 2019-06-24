@@ -101,6 +101,8 @@ VOF::VOF(const Scalar & PHI,
   nlayer=6;
   tol_wall = 0.01; /* tolerance 0.99 \approx 1.0 near walls */
   curv_method = 0;
+  cangle=90.0/180.0*boil::pi;
+
 
   discretize();
 

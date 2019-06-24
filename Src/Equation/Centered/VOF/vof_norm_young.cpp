@@ -8,17 +8,11 @@ void VOF::norm_young(const Scalar & sca) {
 *  Young's method in E.Aulisa,JCP,225(2007),2301-2319, Section 2.2.2.1
 *  Young's method is used by J.Lopez et al., An improved height function...
 *  Comput. Methods Appl. Mech. Engrg. 198 (2009) 2555-2564
-*         Results: nx, ny, nz : true normal vector
-*                  nx, ny, nz : normal vector in the VOF space
+*         Results: nx, ny, nz : normal vector in the VOF space
 *******************************************************************************/
   nx=0.0;
   ny=0.0;
   nz=0.0;
-#if 0
-  nx=0.0;
-  ny=0.0;
-  nz=0.0;
-#endif
 
   for_ijk(i,j,k){
 
@@ -52,108 +46,12 @@ void VOF::norm_young(const Scalar & sca) {
 
       /* check boundary condition */
       jflag=1;
-#if 0
       if (iii  ==si() && iminp==false) jflag=0;
       if (iii-1==ei() && imaxp==false) jflag=0;
       if (jjj  ==sj() && jminp==false) jflag=0;
       if (jjj-1==ej() && jmaxp==false) jflag=0;
       if (kkk  ==sk() && kminp==false) jflag=0;
       if (kkk-1==ek() && kmaxp==false) jflag=0;
-#elif 1
-      /* planes */
-      if (iii  ==si() && iminw==true)
-        wall_adhesion_norm(nxtmp,nytmp,nztmp,-1,0,0);
-      if (iii-1==ei() && imaxw==true)
-        wall_adhesion_norm(nxtmp,nytmp,nztmp, 1,0,0);
-      if (jjj  ==sj() && jminw==true)
-        wall_adhesion_norm(nxtmp,nytmp,nztmp,0,-1,0);
-      if (jjj-1==ej() && jmaxw==true)
-        wall_adhesion_norm(nxtmp,nytmp,nztmp,0, 1,0);
-      if (kkk  ==sk() && kminw==true)
-        wall_adhesion_norm(nxtmp,nytmp,nztmp,0,0,-1);
-      if (kkk-1==ek() && kmaxw==true)
-        wall_adhesion_norm(nxtmp,nytmp,nztmp,0,0, 1);
-      
-      /* lines */
-
-      /* imin and ... */
-      if (iii  ==si() && iminw==true &&
-          jjj  ==sj() && jminw==true)
-        wall_adhesion_norm(nxtmp,nytmp,nztmp,-0.5*sqrt(2.0),-0.5*sqrt(2.0),0);
-      if (iii  ==si() && iminw==true &&
-          jjj-1==ej() && jmaxw==true)
-        wall_adhesion_norm(nxtmp,nytmp,nztmp,-0.5*sqrt(2.0), 0.5*sqrt(2.0),0);
-      if (iii  ==si() && iminw==true &&
-          kkk  ==sk() && kminw==true)
-        wall_adhesion_norm(nxtmp,nytmp,nztmp,-0.5*sqrt(2.0),0,-0.5*sqrt(2.0));
-      if (iii  ==si() && iminw==true &&
-          kkk-1==ek() && kmaxw==true)
-        wall_adhesion_norm(nxtmp,nytmp,nztmp,-0.5*sqrt(2.0),0, 0.5*sqrt(2.0));
-      /* imax and ... */
-      if (iii-1==ei() && imaxw==true &&
-          jjj  ==sj() && jminw==true)
-        wall_adhesion_norm(nxtmp,nytmp,nztmp, 0.5*sqrt(2.0),-0.5*sqrt(2.0),0);
-      if (iii-1==ei() && imaxw==true &&
-          jjj-1==ej() && jmaxw==true)
-        wall_adhesion_norm(nxtmp,nytmp,nztmp, 0.5*sqrt(2.0), 0.5*sqrt(2.0),0);
-      if (iii-1==ei() && imaxw==true &&
-          kkk  ==sk() && kminw==true)
-        wall_adhesion_norm(nxtmp,nytmp,nztmp, 0.5*sqrt(2.0),0,-0.5*sqrt(2.0));
-      if (iii-1==ei() && imaxw==true &&
-          kkk-1==ek() && kmaxw==true)
-        wall_adhesion_norm(nxtmp,nytmp,nztmp, 0.5*sqrt(2.0),0, 0.5*sqrt(2.0));
-      /* jmin and k.. */
-      if (jjj  ==sj() && jminw==true &&
-          kkk  ==sk() && kminw==true)
-        wall_adhesion_norm(nxtmp,nytmp,nztmp,0,-0.5*sqrt(2.0),-0.5*sqrt(2.0));
-      if (jjj  ==sj() && jminw==true &&
-          kkk-1==ek() && kmaxw==true)
-        wall_adhesion_norm(nxtmp,nytmp,nztmp,0,-0.5*sqrt(2.0), 0.5*sqrt(2.0));
-      /* jmax and k.. */
-      if (jjj-1==ej() && jmaxw==true &&
-          kkk  ==sk() && kminw==true)
-        wall_adhesion_norm(nxtmp,nytmp,nztmp,0, 0.5*sqrt(2.0),-0.5*sqrt(2.0));
-      if (jjj-1==ej() && jmaxw==true &&
-          kkk-1==ek() && kmaxw==true)
-        wall_adhesion_norm(nxtmp,nytmp,nztmp,0, 0.5*sqrt(2.0), 0.5*sqrt(2.0));
-
-      /* corners */
-
-      /* imin and ... */
-      if (iii  ==si() && iminw==true &&
-          jjj  ==sj() && jminw==true &&
-          kkk  ==sk() && kminw==true)
-        wall_adhesion_norm(nxtmp,nytmp,nztmp,-sqrt(1./3.),-sqrt(1./3.),-sqrt(1./3.));
-      if (iii  ==si() && iminw==true &&
-          jjj-1==ej() && jmaxw==true &&
-          kkk  ==sk() && kminw==true)
-        wall_adhesion_norm(nxtmp,nytmp,nztmp,-sqrt(1./3.), sqrt(1./3.),-sqrt(1./3.));
-      if (iii  ==si() && iminw==true &&
-          jjj  ==sj() && jminw==true &&
-          kkk-1==ek() && kmaxw==true)
-        wall_adhesion_norm(nxtmp,nytmp,nztmp,-sqrt(1./3.),-sqrt(1./3.), sqrt(1./3.));
-      if (iii  ==si() && iminw==true &&
-          jjj-1==ej() && jmaxw==true &&
-          kkk-1==ek() && kmaxw==true)
-        wall_adhesion_norm(nxtmp,nytmp,nztmp,-sqrt(1./3.), sqrt(1./3.), sqrt(1./3.));
-      /* imax and ... */
-      if (iii-1==ei() && imaxw==true &&
-          jjj  ==sj() && jminw==true &&
-          kkk  ==sk() && kminw==true)
-        wall_adhesion_norm(nxtmp,nytmp,nztmp, sqrt(1./3.),-sqrt(1./3.),-sqrt(1./3.));
-      if (iii-1==ei() && imaxw==true &&
-          jjj-1==ej() && jmaxw==true &&
-          kkk  ==sk() && kminw==true)
-        wall_adhesion_norm(nxtmp,nytmp,nztmp, sqrt(1./3.), sqrt(1./3.),-sqrt(1./3.));
-      if (iii-1==ei() && imaxw==true &&
-          jjj  ==sj() && jminw==true &&
-          kkk-1==ek() && kmaxw==true)
-        wall_adhesion_norm(nxtmp,nytmp,nztmp, sqrt(1./3.),-sqrt(1./3.), sqrt(1./3.));
-      if (iii-1==ei() && imaxw==true &&
-          jjj-1==ej() && jmaxw==true &&
-          kkk-1==ek() && kmaxw==true)
-        wall_adhesion_norm(nxtmp,nytmp,nztmp, sqrt(1./3.), sqrt(1./3.), sqrt(1./3.));
-#endif
 
       sum_jflag += jflag;
 
@@ -186,31 +84,8 @@ void VOF::norm_young(const Scalar & sca) {
   ny.exchange_all();
   nz.exchange_all();
 
-#if 0
-  boil::plot->plot(sca,nx,ny,nz, "clr-nx-ny-nz", time->current_step());
-  boil::plot->plot(sca,nx,ny,nz, "clr-nx-ny-nz", time->current_step());
-  exit(0);
-#endif
-
-  return;
-}
-
-/* ancillary function */
-void VOF::wall_adhesion_norm(real & nx, real & ny, real & nz,
-                             const real nwx, const real nwy, const real nwz) {
-  /* n is a normal vector tangent to wall obtained by mirroring clr to wall
-   * Brackbill, 1991; p. 341 (section D) */
-
-  /* n_wall = nwl * cos(cangle) + ntan * sin(cangle) */
-  real nnx = nwx*cos(cangle) + nx*sin(cangle);
-  real nny = nwy*cos(cangle) + ny*sin(cangle);
-  real nnz = nwz*cos(cangle) + nz*sin(cangle);
-
-  normalize(nnx,nny,nnz);
-
-  nx = nnx;
-  ny = nny;
-  nz = nnz;
+  //boil::plot->plot(sca,nx,ny,nz, "clr-nx-ny-nz", time->current_step());
+  //exit(0);
 
   return;
 }

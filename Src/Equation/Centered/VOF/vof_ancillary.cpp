@@ -22,6 +22,9 @@ void VOF::ancillary() {
   +-------------------------------*/
   norm_cc(phi);
 
+  /* calculate the real-space normal vector */
+  true_norm_vect(); 
+
   boil::timer.start("vof ancillary");
 
   /* calculate alpha in cells */
@@ -36,9 +39,6 @@ void VOF::ancillary() {
 
   /* prerequisite for marching cubes */
   update_at_walls();
-
-  /* calculate the real-space normal vector */
-  true_norm_vect(); 
 
   /* calculate area */
   cal_adens();
