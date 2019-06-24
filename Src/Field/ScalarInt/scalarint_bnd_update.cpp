@@ -101,6 +101,7 @@ void ScalarInt::bnd_update() {
     +==========*/
     if( bc().type(b) == BndType::neumann()  ||
         bc().type(b) == BndType::wall()     ||
+        bc().type(b) == BndType::pseudo()   ||
         bc().type(b) == BndType::outlet() ) {
 
       Dir d = bc().direction(b);

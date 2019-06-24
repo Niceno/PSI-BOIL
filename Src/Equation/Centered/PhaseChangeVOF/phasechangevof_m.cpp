@@ -75,6 +75,7 @@ void PhaseChangeVOF::m(const Scalar * diff_eddy) {
   }
 #endif
 
+  M.bnd_update();
   M.exchange_all();
 
   boil::timer.stop("phasechangevof m");

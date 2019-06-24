@@ -3,7 +3,7 @@
 /******************************************************************************/
 void Centered::coarsen() 
 {
-  OMS(coarsenig);
+  OMS(coarsening);
 
   if(dom->coarser() != NULL && crsr == NULL)
     crsr = new Centered( this, this->dom->coarser(), phi.bc(), solver ); 

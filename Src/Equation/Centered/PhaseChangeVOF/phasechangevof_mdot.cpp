@@ -27,7 +27,9 @@ void PhaseChangeVOF::mdot() {
     }
   }
 #if 1
+  phi.bnd_update();
   phi.exchange_all();
+
 #else
   /* cut */
   mdot_cut();

@@ -9,7 +9,6 @@
 #include "../../../Global/global_realistic.h"
 #include "../../Tifmodel/tif.h"
 #include "../../Topology/topology.h"
-#include "../VOF/vof.h"
 //#include "nucleation.h"
 
 //#define IB

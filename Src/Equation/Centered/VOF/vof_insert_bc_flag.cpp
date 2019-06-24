@@ -20,6 +20,7 @@ void VOF::insert_bc_flag(ScalarInt & val, const bool adj) {
       ||val.bc().type(b) == BndType::dirichlet()
       ||val.bc().type(b) == BndType::inlet()
       ||val.bc().type(b) == BndType::outlet()
+      ||val.bc().type(b) == BndType::pseudo()
       ||val.bc().type(b) == BndType::insert() ) {
 
       int iof=0, jof=0, kof=0;

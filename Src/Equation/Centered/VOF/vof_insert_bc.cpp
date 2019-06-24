@@ -77,6 +77,7 @@ void VOF::insert_bc(const Scalar & val) {
     if( val.bc().type(b) == BndType::neumann()
       ||val.bc().type(b) == BndType::symmetry() 
       ||val.bc().type(b) == BndType::wall()
+      ||val.bc().type(b) == BndType::pseudo()
       ||val.bc().type(b) == BndType::outlet() ) {
 
       int iof=0, jof=0, kof=0;

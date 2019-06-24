@@ -7,6 +7,7 @@ void VOF::gradphic(const Scalar & sca) {
 *         Resluts: nx, ny, nz
 *******************************************************************************/
 
+  sca.bnd_update();
   sca.exchange_all();  // necessary for corner
 
   /* cell centered base */

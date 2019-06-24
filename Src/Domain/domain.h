@@ -109,6 +109,7 @@ class Domain {
      {return dxc(i) * dyc(j) * dzc(k);}
 
     bool  period(const int i) const {return per[i];}
+    bool  is_dummy(const int i) const {return dummy[i];}
     bool  cutoff(const int i, const int j) const {return ctf[i][j];}
     bool  bnd_symmetry(const Dir d) const;
     const Domain * coarser() const {return crsr;}
@@ -123,16 +124,16 @@ class Domain {
       return contains_I(I) && contains_J(J) && contains_K(K);
     } 
     /* these functions check the local cell range (excluding buffers) */
-    bool contains_i(int i) const {return i>0 && i<ni()-1;}
-    bool contains_j(int j) const {return j>0 && j<nj()-1;}
-    bool contains_k(int k) const {return k>0 && k<nk()-1;}
+    bool contains_i(int i) const {return i>boil::BW && i<ni()-boil::BW;}
+    bool contains_j(int j) const {return j>boil::BW && j<nj()-boil::BW;}
+    bool contains_k(int k) const {return k>boil::BW && k<nk()-boil::BW;}
     bool contains_ijk(int i, int j, int k) const {
       return contains_i(i) && contains_j(j) && contains_k(k);
     } 
     /* these functions check the local coordinate range (excluding buffers) */
-    bool contains_x(real x) const { return x>=xn(1) && x<=xn(ni()-1);}
-    bool contains_y(real y) const { return y>=yn(1) && y<=yn(nj()-1);}
-    bool contains_z(real z) const { return z>=zn(1) && z<=zn(nk()-1);}
+    bool contains_x(real x) const { return x>=xn(boil::BW) && x<=xn(ni()-boil::BW);}
+    bool contains_y(real y) const { return y>=yn(boil::BW) && y<=yn(nj()-boil::BW);}
+    bool contains_z(real z) const { return z>=zn(boil::BW) && z<=zn(nk()-boil::BW);}
     bool contains_xyz(real x, real y, real z) const {
       return contains_x(x) && contains_y(y) && contains_z(z);
     } 
@@ -178,8 +179,9 @@ class Domain {
 
     const int lev;               /* refinement level */
     Range<int> cr_x, cr_y, cr_z; /* cell range - for domain decomposition */
-    bool  per[3];
-    bool  ctf[3][2];
+    bool  per[3]; /* periodicity */
+    bool  ctf[3][2]; /* bndgrid */
+    bool  dummy[3];  /* dummy directions */
     const Domain * crsr;
     const Domain * coarsen() const;
     void  setup(const Decompose & dec);

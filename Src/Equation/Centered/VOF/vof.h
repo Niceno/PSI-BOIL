@@ -170,6 +170,7 @@ class VOF : public Centered {
     bool iminp, imaxp, jminp, jmaxp, kminp, kmaxp; // true = periodic
     bool iminw, imaxw, jminw, jmaxw, kminw, kmaxw; // true = wall
     bool iminc, imaxc, jminc, jmaxc, kminc, kmaxc; // true = cut-stencil
+    bool ifull, jfull, kfull; // true = not a dummy direction
 
     Heaviside heavi;
 

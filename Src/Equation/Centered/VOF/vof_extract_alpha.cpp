@@ -17,7 +17,7 @@ void VOF::extract_alpha() {
 
   /* calculate alpha value in the domain */
   /* assumes positive normal vector in normalized space */
-  for_avijk(nalpha,i,j,k) {
+  for_vijk(nalpha,i,j,k) {
     nalpha[i][j][k] = alpha_val(i,j,k);
   }
 }

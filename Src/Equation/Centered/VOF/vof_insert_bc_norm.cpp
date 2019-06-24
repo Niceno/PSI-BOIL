@@ -18,6 +18,7 @@ void VOF::insert_bc_norm() {
       ||phi.bc().type(b) == BndType::dirichlet()
       ||phi.bc().type(b) == BndType::inlet()
       ||phi.bc().type(b) == BndType::outlet()
+      ||phi.bc().type(b) == BndType::pseudo()
       ||phi.bc().type(b) == BndType::insert() ) {
 
       int iof=0, jof=0, kof=0;

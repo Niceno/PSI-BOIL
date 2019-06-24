@@ -38,8 +38,15 @@ VOF::VOF(const Scalar & PHI,
 |  this constructor is called only at the finest level  |
 +------------------------------------------------------*/
 { 
-  kappa     = phi.shape();
+  //kappa     = phi.shape();
   clr       = phi.shape();
+  stmp      = phi.shape();
+  iflag     = phi.shape();
+  iflagx    = phi.shape();
+  iflagy    = phi.shape();
+  iflagz    = phi.shape();
+  adens     = phi.shape();
+
   nx        = phi.shape();
   ny        = phi.shape();
   nz        = phi.shape();
@@ -47,12 +54,26 @@ VOF::VOF(const Scalar & PHI,
   my        = phi.shape();
   mz        = phi.shape();
   nalpha    = phi.shape();
-  stmp      = phi.shape();
-  iflag     = phi.shape();
-  iflagx    = phi.shape();
-  iflagy    = phi.shape();
-  iflagz    = phi.shape();
-  adens     = phi.shape();
+
+  for( int b=0; b<phi.bc().count(); b++ ) {
+    if(    phi.bc().type(b) == BndType::dirichlet()
+        || phi.bc().type(b) == BndType::inlet()
+        || phi.bc().type(b) == BndType::insert()
+        || phi.bc().type(b) == BndType::convective()
+       ) {
+       nx.bc().type(b) = BndType::neumann();
+       ny.bc().type(b) = BndType::neumann();
+       nx.bc().type(b) = BndType::neumann();
+       nalpha.bc().type(b) = BndType::neumann();
+       mx.bc().type(b) = BndType::neumann();
+       my.bc().type(b) = BndType::neumann();
+       mx.bc().type(b) = BndType::neumann();
+
+       boil::oout << "Adjusting b.c.s for geometrical properties at " << b
+                  << boil::endl;
+    }
+  }
+
  
   mixture = flu;
   if(mixture) {
@@ -91,6 +112,7 @@ VOF::VOF(const Scalar & PHI,
   iminp = imaxp = jminp = jmaxp = kminp = kmaxp = false; // true for periodic
   iminc = imaxc = jminc = jmaxc = kminc = kmaxc = true;  // true for cut-stencil
   iminw = imaxw = jminw = jmaxw = kminw = kmaxw = false; // true for wall
+  ifull = jfull = kfull = true; // true for not a dummy direction
   // imin
   Dir d = Dir::imin();
   if (phi.bc().type_decomp(d)) {
@@ -102,6 +124,8 @@ VOF::VOF(const Scalar & PHI,
       iminc=false;
     } else if (phi.bc().type(d,BndType::wall())) {
       iminw=true;
+    } else if (phi.bc().type(d,BndType::pseudo())) {
+      ifull = false;
     }
 
     if (dom->bnd_symmetry(d)) iminc=false;
@@ -131,6 +155,8 @@ VOF::VOF(const Scalar & PHI,
       jminc=false;
     } else if (phi.bc().type(d,BndType::wall())) {
       jminw=true;
+    } else if (phi.bc().type(d,BndType::pseudo())) {
+      jfull = false;
     }
     if (dom->bnd_symmetry(d)) jminc=false;
   }
@@ -159,6 +185,8 @@ VOF::VOF(const Scalar & PHI,
       kminc=false;
     } else if (phi.bc().type(d,BndType::wall())) {
       kminw=true;
+    } else if (phi.bc().type(d,BndType::pseudo())) {
+      kfull = false;
     }
     if (dom->bnd_symmetry(d)) kminc=false;
   }

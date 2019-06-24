@@ -40,6 +40,7 @@ void VOF::curv_smooth() {
     }
   }
 
+  kappa.bnd_update();
   kappa.exchange();
 #ifdef DEBUG
   std::cout<<"curv::kappa "<<boil::cart.iam()<<"\n";

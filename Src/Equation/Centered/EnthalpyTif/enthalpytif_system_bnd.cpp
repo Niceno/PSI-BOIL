@@ -17,6 +17,7 @@ void EnthalpyTIF::create_system_bnd() {
 
     if( phi.bc().type(b) == BndType::neumann() ||
         phi.bc().type(b) == BndType::symmetry()  ||
+        phi.bc().type(b) == BndType::pseudo() ||
         phi.bc().type(b) == BndType::outlet() ) {
 
       Dir d = phi.bc().direction(b);

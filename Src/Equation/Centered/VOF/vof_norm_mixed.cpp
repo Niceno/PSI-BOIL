@@ -186,7 +186,10 @@ for_ijk(i,j,k) {
   //insert_bc_gradphic(sca); 
   
   /* normal vector on boundary plane */
-    insert_bc_norm_cc(sca);
+  nx.bnd_update();
+  ny.bnd_update();
+  nz.bnd_update();
+  insert_bc_norm_cc(sca);
   
   //      /* normalize */
   // for_avijk(sca,i,j,k) {

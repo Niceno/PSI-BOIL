@@ -125,11 +125,11 @@ void VOF::curv_HF() {
 
         //if (3*phi.dxc(i)<hcc && hcc<(4.0)*phi.dxc(i)) {
         if (hc_limit<=hcc && hcc<=(hc_limit+phi.dxc(i))) {
-        real hy  = (hpc-hmc)/(dys(j)+dyn(j));
-        real hz  = (hcp-hcm)/(dzb(k)+dzt(k));
-        real hyy = (hpc-2.0*hcc+hmc)/(phi.dyc(j)*phi.dyc(j));
-        real hzz = (hcp-2.0*hcc+hcm)/(phi.dzc(k)*phi.dzc(k));
-        real hyz = (hpp-hpm-hmp+hmm) / (4.0*phi.dyc(j)*phi.dzc(k));
+        real hy  = jfull*(hpc-hmc)/(dys(j)+dyn(j));
+        real hz  = kfull*(hcp-hcm)/(dzb(k)+dzt(k));
+        real hyy = jfull*(hpc-2.0*hcc+hmc)/(phi.dyc(j)*phi.dyc(j));
+        real hzz = kfull*(hcp-2.0*hcc+hcm)/(phi.dzc(k)*phi.dzc(k));
+        real hyz = jfull*kfull*(hpp-hpm-hmp+hmm) / (4.0*phi.dyc(j)*phi.dzc(k));
         kappa[i][j][k] = -1.0
                        * (hyy + hzz + hyy*hz*hz + hzz*hy*hy - 2.0*hyz*hy*hz)
                        / pow(1.0 + hy*hy + hz*hz, 1.5);
@@ -194,11 +194,11 @@ void VOF::curv_HF() {
 
         if (hc_limit<=hcc && hcc<=(hc_limit+phi.dyc(j))) {
         //if (3*phi.dyc(j)<hcc && hcc<(4.0)*phi.dyc(j)) {
-        real hx  = (hpc-hmc)/(dxw(i)+dxe(i));
-        real hz  = (hcp-hcm)/(dzb(k)+dzt(k));
-        real hxx = (hpc-2.0*hcc+hmc)/(phi.dxc(i)*phi.dxc(i));
-        real hzz = (hcp-2.0*hcc+hcm)/(phi.dzc(k)*phi.dzc(k));
-        real hxz = (hpp-hpm-hmp+hmm) / (4.0*phi.dxc(i)*phi.dzc(k));
+        real hx  = ifull*(hpc-hmc)/(dxw(i)+dxe(i));
+        real hz  = kfull*(hcp-hcm)/(dzb(k)+dzt(k));
+        real hxx = ifull*(hpc-2.0*hcc+hmc)/(phi.dxc(i)*phi.dxc(i));
+        real hzz = kfull*(hcp-2.0*hcc+hcm)/(phi.dzc(k)*phi.dzc(k));
+        real hxz = ifull*kfull*(hpp-hpm-hmp+hmm) / (4.0*phi.dxc(i)*phi.dzc(k));
         kappa[i][j][k] = -1.0
                        * (hxx + hzz + hxx*hz*hz + hzz*hx*hx - 2.0*hxz*hx*hz)
                        / pow(1.0 + hx*hx + hz*hz, 1.5);
@@ -288,11 +288,11 @@ void VOF::curv_HF() {
 #endif
         if (hc_limit<hcc && hcc<(hc_limit+phi.dzc(k))) {
         //if (3*phi.dzc(k)<hcc && hcc<(4.0)*phi.dzc(k)) {
-        real hx  = (hpc-hmc)/(dxw(i)+dxe(i));
-        real hy  = (hcp-hcm)/(dys(j)+dyn(j));
-        real hxx = (hpc-2.0*hcc+hmc)/(phi.dxc(i)*phi.dxc(i));
-        real hyy = (hcp-2.0*hcc+hcm)/(phi.dyc(j)*phi.dyc(j));
-        real hxy = (hpp-hpm-hmp+hmm) / (4.0*phi.dxc(i)*phi.dyc(j));
+        real hx  = ifull*(hpc-hmc)/(dxw(i)+dxe(i));
+        real hy  = jfull*(hcp-hcm)/(dys(j)+dyn(j));
+        real hxx = ifull*(hpc-2.0*hcc+hmc)/(phi.dxc(i)*phi.dxc(i));
+        real hyy = jfull*(hcp-2.0*hcc+hcm)/(phi.dyc(j)*phi.dyc(j));
+        real hxy = ifull*jfull*(hpp-hpm-hmp+hmm) / (4.0*phi.dxc(i)*phi.dyc(j));
         kappa[i][j][k] = -1.0
                        * (hxx + hyy + hxx*hy*hy + hyy*hx*hx - 2.0*hxy*hx*hy)
                        / pow(1.0 + hx*hx + hy*hy, 1.5);
@@ -309,6 +309,7 @@ void VOF::curv_HF() {
       }
     }
   }
+  kappa.bnd_update();
   kappa.exchange();
   iflag.exchange();
 

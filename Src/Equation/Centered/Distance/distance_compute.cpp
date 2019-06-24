@@ -55,6 +55,8 @@ void Distance::compute() {
                 MaxIter(1000), "distance", 
                 ResRat(boil::micro), ResTol(boil::pico));
 
+  phi.bnd_update();
+
   /*-------------------+
   |  compute distance  |
   +-------------------*/

@@ -124,9 +124,9 @@ void BndCnd::add(BndCnd bc) {
 
   bool fail;
 
-  /*----------------------------------------------------------------------+
-  |  1. check consistency of (non) periodic/symmetry boundary conditions  | 
-  +----------------------------------------------------------------------*/
+  /*----------------------------------------------+
+  |  1. check consistency of boundary conditions  | 
+  +----------------------------------------------*/
   fail = false;
   if( bc.typ == BndType::periodic() ) {
     if( bc.dir == Dir::imin() && !dom->period(0) ) fail = true;
@@ -143,7 +143,7 @@ void BndCnd::add(BndCnd bc) {
   }
 
   fail = false;
-  if( bc.typ != BndType::periodic() ) {
+  if( bc.typ != BndType::periodic() && bc.typ != BndType::pseudo() ) {
     if( bc.dir == Dir::imin() && dom->period(0) ) fail = true;
     if( bc.dir == Dir::imax() && dom->period(0) ) fail = true;
     if( bc.dir == Dir::jmin() && dom->period(1) ) fail = true;
@@ -154,6 +154,36 @@ void BndCnd::add(BndCnd bc) {
   if( fail ) {
     boil::oout << "Fatal: trying to define non-periodic b.c. " 
                << "to a periodic domain. Exiting!" << boil::endl;
+    exit(0);
+  }
+
+  fail = false;
+  if( bc.typ == BndType::pseudo() ) {
+    if( bc.dir == Dir::imin() && !dom->is_dummy(0) ) fail = true;
+    if( bc.dir == Dir::imax() && !dom->is_dummy(0) ) fail = true;
+    if( bc.dir == Dir::jmin() && !dom->is_dummy(1) ) fail = true;
+    if( bc.dir == Dir::jmax() && !dom->is_dummy(1) ) fail = true;
+    if( bc.dir == Dir::kmin() && !dom->is_dummy(2) ) fail = true;
+    if( bc.dir == Dir::kmax() && !dom->is_dummy(2) ) fail = true;
+  }
+  if( fail ) {
+    boil::oout << "Fatal: trying to define a dummy b.c. "
+               << "in a real direction. Exiting!" << boil::endl;
+    exit(0);
+  }
+
+  fail = false;
+  if( bc.typ != BndType::pseudo() ) {
+    if( bc.dir == Dir::imin() && dom->is_dummy(0) ) fail = true;
+    if( bc.dir == Dir::imax() && dom->is_dummy(0) ) fail = true;
+    if( bc.dir == Dir::jmin() && dom->is_dummy(1) ) fail = true;
+    if( bc.dir == Dir::jmax() && dom->is_dummy(1) ) fail = true;
+    if( bc.dir == Dir::kmin() && dom->is_dummy(2) ) fail = true;
+    if( bc.dir == Dir::kmax() && dom->is_dummy(2) ) fail = true;
+  }
+  if( fail ) {
+    boil::oout << "Fatal: trying to a b.c. "
+               << "in a pseudo-direction. Exiting!" << boil::endl;
     exit(0);
   }
 

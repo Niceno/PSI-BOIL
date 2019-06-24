@@ -9,8 +9,8 @@ const Domain * Domain::coarsen() const {
 +---------------------------------------------*/
 
   /* to disable coarsening, uncomment the following line */
-//return NULL;
-
+  //return NULL;
+ 
   /* minimum resulution (with buffers) */
   const int min_n =  std::max(4,boil::BW) + 2*boil::BW;
 
@@ -21,7 +21,7 @@ const Domain * Domain::coarsen() const {
 
   /* accumulated steps (multiplication of coarsening factors) */
   /*------------------------------------------+ 
-  |  be very carefull with this since static  |
+  |  be very careful with this since static   |
   |  variables are shared between objects of  |
   |             the same class!!!             |
   +------------------------------------------*/
@@ -31,9 +31,18 @@ const Domain * Domain::coarsen() const {
 
   /* estimate factors (only first one is important) */
   int c_factors[64], nf;
-  factor( ni()-2*boil::BW, c_factors, &nf); if(nf>0) c_fac_x = c_factors[0];
-  factor( nj()-2*boil::BW, c_factors, &nf); if(nf>0) c_fac_y = c_factors[0];
-  factor( nk()-2*boil::BW, c_factors, &nf); if(nf>0) c_fac_z = c_factors[0];
+  if(!grid_x_local->is_dummy()) {
+    factor( ni()-2*boil::BW, c_factors, &nf); 
+    if(nf>0) c_fac_x = c_factors[0];
+  }
+  if(!grid_y_local->is_dummy()) {
+    factor( nj()-2*boil::BW, c_factors, &nf); 
+    if(nf>0) c_fac_y = c_factors[0];
+  }
+  if(!grid_z_local->is_dummy()) {
+    factor( nk()-2*boil::BW, c_factors, &nf);
+    if(nf>0) c_fac_z = c_factors[0];
+  }
 
   const Grid1D * g_x_coarse = grid_x_local;
   const Grid1D * g_y_coarse = grid_y_local;
@@ -73,7 +82,8 @@ const Domain * Domain::coarsen() const {
     g_z_coarse = new Grid1D( *grid_z_original, cr_z, Step( step_z ));
   }
 
-  /* if anj direction is coarsened */
+
+  /* if any direction is coarsened */
   if( (g_x_coarse != grid_x_local) || 
       (g_y_coarse != grid_y_local) ||
       (g_z_coarse != grid_z_local) ) {

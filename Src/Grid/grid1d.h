@@ -47,6 +47,9 @@ class Grid1D {
            const BndGrid & co1 = BndGrid::wall(),
            const BndGrid & coN = BndGrid::undefined());
 
+    /* constructor to create a dummy grid (for lower dim simulations) */
+    Grid1D(const real dx);
+
     /* constructor which creates a coarser grid */
     Grid1D(const Grid1D & grid, const Step & step = Step(1));
 
@@ -69,8 +72,8 @@ class Grid1D {
     int nnode()   const {return nc_in + 1;}
 
     /* number of cells and nodes including boundaries (or buffers) */
-    int ncell_b() const {return nc_in + 2 * boil::BW;}
-    int nnode_b() const {return nc_in + 2 * boil::BW + 1;}
+    int ncell_b() const {return nc_tot;}
+    int nnode_b() const {return nc_tot + 1;}
 
     real xn (const int i) const {return  x_node[i];}
     real xc (const int i) const {return  x_cell[i];}
@@ -79,16 +82,28 @@ class Grid1D {
     
     void print() const;
 
-    real x_min() const {return x_node[        boil::BW];}
-    real x_max() const {return x_node[nc_in + boil::BW];}
+    real x_min() const {
+      return x_node[boil::BW];
+    }
+    real x_max() const {
+      return x_node[nc_in + boil::BW];
+    }
+
+    real lx() const {
+      return x_max() - x_min();
+    }
 
     bool contains(real x) const {
       if( x >= x_min() && x <= x_max() ) return true;
       return false;
     }
 
+    bool is_dummy() const { return dummy_grid; }
+
   private:
     int     nc_in;       /* number of cells inside!!! */
+    int     nc_tot;      /* number of cells in total  */
+    bool dummy_grid;     /* is this a dummy grid? */
     real *  x_node;
     real *  x_cell;
     real * dx_node;
@@ -99,6 +114,7 @@ class Grid1D {
     void     allocate();
     void     distribute_nodes_inside(const real & x1, const real & xn,
                                      const real & D1, const real & DN);
+    void     dummy_setup(const real dx);
     void     correct_boundaries();
 };
 

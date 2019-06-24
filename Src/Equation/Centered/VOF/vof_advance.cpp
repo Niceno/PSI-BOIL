@@ -40,13 +40,16 @@ void VOF::advance(Scalar & scp) {
   }
 
   // advance in x-direction
-  advance_x(scp);
+  if(ifull)
+    advance_x(scp);
 
   // advance in y-direction
-  advance_y(scp);
+  if(jfull)
+    advance_y(scp);
   
   // advance in z-direction
-  advance_z(scp);
+  if(kfull)
+    advance_z(scp);
 
   // update phi
   for_ijk(i,j,k){

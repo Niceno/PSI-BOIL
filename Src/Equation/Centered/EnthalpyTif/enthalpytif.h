@@ -207,4 +207,3 @@ class EnthalpyTIF : public Centered {
                          const int dir, real & tint, real & dist);
 };	
 #endif
-
