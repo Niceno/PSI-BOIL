@@ -315,12 +315,13 @@ void Momentum::create_system(const Scalar * mu_eddy) {
 
   for_m(m) { 
 
-    /*----------------------+ 
-    |  symmetry and outlet  |
-    +----------------------*/
+    /*-------------------------------------+ 
+    |  symmetry and outlet and pseudo-b.c. |
+    +-------------------------------------*/
     for( int b=0; b<u.bc(m).count(); b++ ) {
 
       if( u.bc(m).type(b) == BndType::symmetry() ||
+          u.bc(m).type(b) == BndType::pseudo() ||
           u.bc(m).type(b) == BndType::outlet() ) {
 
         Dir d = u.bc(m).direction(b);
@@ -349,7 +350,7 @@ void Momentum::create_system(const Scalar * mu_eddy) {
           for_vij(u.bc(m).at(b),i,j) 
             A[~m]->t[i][j][ek(m)]  = 0.0;
 
-      } // symmetry or outlet
+      } // symmetry or outlet or pseudo
     } // b
 
     for_mijk(m,i,j,k) 

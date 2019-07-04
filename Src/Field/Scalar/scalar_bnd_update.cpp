@@ -21,7 +21,7 @@ void Scalar::bnd_update() {
 
     // set loop range
     int ist,ied,jst,jed,kst,ked;
-    if(bc().at(b).si()==bc().at(b).ei()){
+    if(bc().at(b).si()==bc().at(b).ei()&&!domain()->is_dummy(~Comp::i())){
       if(bc().at(b).si()>boil::BW) {
         ist=ei()+1;
         ied=ei()+boil::BW;
@@ -35,7 +35,7 @@ void Scalar::bnd_update() {
       if(bc().at(b).ei()==ei()){ied=ei()+boil::BW;}
       else{ied=bc().at(b).ei();}
     }
-    if(bc().at(b).sj()==bc().at(b).ej()){
+    if(bc().at(b).sj()==bc().at(b).ej()&&!domain()->is_dummy(~Comp::j())){
       if(bc().at(b).sj()>boil::BW) {
         jst=ej()+1;
         jed=ej()+boil::BW;
@@ -49,7 +49,7 @@ void Scalar::bnd_update() {
       if(bc().at(b).ej()==ej()){jed=ej()+boil::BW;}
       else{jed=bc().at(b).ej();}
     }
-    if(bc().at(b).sk()==bc().at(b).ek()){
+    if(bc().at(b).sk()==bc().at(b).ek()&&!domain()->is_dummy(~Comp::k())){
       if(bc().at(b).sk()>boil::BW) {
         kst=ek()+1;
         ked=ek()+boil::BW;
@@ -281,6 +281,11 @@ void Scalar::bnd_update() {
             for(j=jst; j!=jed+jinc; j += jinc) {
               for(k=kst; k!=ked+kinc; k += kinc) {
                 val[i][j][k]=val[*iref][*jref][*kref];
+#if 0
+                if(d == Dir::imin()) {
+                  boil::oout<<"Scalar bnd "<<i<<" "<<j<<" "<<k<<" "<<val[i][j][k]<<" "<<val[*iref][*jref][*kref]<<" | "<<*iref<<" "<<*jref<<" "<<*kref<<boil::endl;
+                }
+#endif
               }
             }
           }

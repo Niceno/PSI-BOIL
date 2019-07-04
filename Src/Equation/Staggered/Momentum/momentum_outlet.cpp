@@ -64,7 +64,7 @@ void Momentum::outlet() {
 
   scale_outlet_velocity(ubo,ratio);
 
-#if 1
+#if 0
   /* debug */
   volf_out = volf_bct( BndType::outlet(), &aox, &aoy, &aoz );
   ubo = volf_out / (aox + aoy + aoz);
@@ -76,6 +76,7 @@ void Momentum::outlet() {
     ratio= -volf_in / volf_out;
   }
   boil::oout<<"Momentum::outlet: "<<time->current_time()<<" "<<volf_in<<" "<<volf_out<<" "<<ratio<<boil::endl;
+  exit(0);
 #endif
 
   return;

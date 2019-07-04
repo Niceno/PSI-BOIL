@@ -29,6 +29,7 @@ void Heaviside::calculate_adens() {
 
   for_vijk((*adens),i,j,k)
     (*adens)[i][j][k] = mc.area(i,j,k)/adens->dV(i,j,k);
+  (*adens).bnd_update();
   (*adens).exchange();
  
   return;

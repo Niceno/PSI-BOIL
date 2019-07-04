@@ -473,9 +473,9 @@ void VOF::update_at_walls() {
   }
 
   phi.exchange_all();
-  nx.exchange_all();
-  ny.exchange_all();
-  nz.exchange_all();
+  //nx.exchange_all();
+  //ny.exchange_all();
+  //nz.exchange_all();
  
   return;
 }

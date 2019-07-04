@@ -49,24 +49,24 @@ void Domain::setup(const Decompose & dec) {
   init(dec);
 
   /* get the local resolution ... */
-  if(!grid_x_original->is_dummy()) {
+  //if(!grid_x_original->is_dummy()) {
     decompose(0, gi(), & cr_x);
-  } else {
-    cr_x.first(1);
-    cr_x.last (1);
-  }
-  if(!grid_y_original->is_dummy()) {
+  //} else {
+  //  cr_x.first(1);
+  //  cr_x.last (1);
+ // }
+ // if(!grid_y_original->is_dummy()) {
     decompose(1, gj(), & cr_y);
-  } else {
-    cr_y.first(1);
-    cr_y.last (1);
-  }
-  if(!grid_z_original->is_dummy()) {
+ // } else {
+//    cr_y.first(1);
+  //  cr_y.last (1);
+ // }
+  //if(!grid_z_original->is_dummy()) {
     decompose(2, gk(), & cr_z);
-  } else {
-    cr_z.first(1);
-    cr_z.last (1);
-  }
+ // } else {
+  //  cr_z.first(1);
+  //  cr_z.last (1);
+ // }
 
   /* ... and create local grids */
   grid_x_local = new Grid1D( *grid_x_original, cr_x );
@@ -83,13 +83,15 @@ void Domain::setup(const Decompose & dec) {
              << grid_z_local->ncell_b() << boil::endl;
 #endif
 
-  // aout << "Decomposed the domain " << boil::endl;
-  // aout << " c1x = " << cr_x.first() << boil::endl;
-  // aout << " cNx = " << cr_x.last () << boil::endl;
-  // aout << " c1y = " << cr_y.first() << boil::endl;
-  // aout << " cNy = " << cr_y.last () << boil::endl;
-  // aout << " c1z = " << cr_z.first() << boil::endl;
-  // aout << " cNz = " << cr_z.last () << boil::endl;
+#if 0
+  boil::aout << "Decomposed the domain " << boil::endl;
+  boil::aout << " c1x = " << cr_x.first() << boil::endl;
+  boil::aout << " cNx = " << cr_x.last () << boil::endl;
+  boil::aout << " c1y = " << cr_y.first() << boil::endl;
+  boil::aout << " cNy = " << cr_y.last () << boil::endl;
+  boil::aout << " c1z = " << cr_z.first() << boil::endl;
+  boil::aout << " cNz = " << cr_z.last () << boil::endl;
+#endif
 
   crsr = coarsen();
 

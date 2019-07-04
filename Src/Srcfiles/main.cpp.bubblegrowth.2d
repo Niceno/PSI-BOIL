@@ -8,14 +8,14 @@
 //#define USE_ENTH /* use old enth */
 
 /* computed parameters */
-const int gLevel = 2;  //grid level=2,4,8
+const int gLevel = 4;  //grid level=2,4,8
 #ifdef SYM
 const int NX = 24*gLevel;
 #else
 const int NX = 48*gLevel;
 #endif
 const int NY = NX;
-const int NZ = 3;
+const int NZ = 1;
 
 /* domain dimensions (given by problem) */
 const real LX = 187.5e-6;
@@ -35,7 +35,7 @@ const real LZ =   LX/real(NX)*real(NZ);
 #endif
 
 #ifdef USE_VOF
-const int mSimple = 4;
+const int mSimple = 1;
 const int Nsmooth = 0;
 #else
 const int mSimple = 1;
@@ -72,7 +72,7 @@ main(int argc, char ** argv) {
   Grid1D gx( Range<real>(-LX,LX), NX, Periodic::no() );
   Grid1D gy( Range<real>(-LY,LY), NY, Periodic::no() );
 #endif
-  Grid1D gz( Range<real>(-LZ,LZ), NZ, Periodic::yes() );
+  Grid1D gz(LZ/real(NZ));
   /*---------+
   |  domain  |
   +---------*/
@@ -107,8 +107,8 @@ main(int argc, char ** argv) {
     uvw.bc(m).add( BndCnd( Dir::jmin(), BndType::outlet() ) );
     uvw.bc(m).add( BndCnd( Dir::jmax(), BndType::outlet() ) );
 #endif
-    uvw.bc(m).add( BndCnd( Dir::kmin(), BndType::periodic() ) );
-    uvw.bc(m).add( BndCnd( Dir::kmax(), BndType::periodic() ) );
+    uvw.bc(m).add( BndCnd( Dir::kmin(), BndType::pseudo() ) );
+    uvw.bc(m).add( BndCnd( Dir::kmax(), BndType::pseudo() ) );
     uvw_old(m)=uvw(m).shape();
   }
 
@@ -123,15 +123,15 @@ main(int argc, char ** argv) {
   c.bc().add( BndCnd( Dir::jmin(), BndType::outlet() ) );
   c.bc().add( BndCnd( Dir::jmax(), BndType::outlet() ) );
 #endif
-  c.bc().add( BndCnd( Dir::kmin(), BndType::periodic() ) );
-  c.bc().add( BndCnd( Dir::kmax(), BndType::periodic() ) );
+  c.bc().add( BndCnd( Dir::kmin(), BndType::pseudo() ) );
+  c.bc().add( BndCnd( Dir::kmax(), BndType::pseudo() ) );
 
   press.bc().add( BndCnd( Dir::imin(), BndType::neumann() ) );
   press.bc().add( BndCnd( Dir::imax(), BndType::neumann() ) );
   press.bc().add( BndCnd( Dir::jmin(), BndType::neumann() ) );
   press.bc().add( BndCnd( Dir::jmax(), BndType::neumann() ) );
-  press.bc().add( BndCnd( Dir::kmin(), BndType::periodic() ) );
-  press.bc().add( BndCnd( Dir::kmax(), BndType::periodic() ) );
+  press.bc().add( BndCnd( Dir::kmin(), BndType::pseudo() ) );
+  press.bc().add( BndCnd( Dir::kmax(), BndType::pseudo() ) );
 
   p=press.shape();
   kappa=c.shape();
@@ -155,8 +155,8 @@ main(int argc, char ** argv) {
   tpr.bc().add( BndCnd( Dir::jmin(), BndType::dirichlet(), tout ) );
   tpr.bc().add( BndCnd( Dir::jmax(), BndType::dirichlet(), tout ) );
 #endif
-  tpr.bc().add( BndCnd( Dir::kmin(), BndType::periodic() ) );
-  tpr.bc().add( BndCnd( Dir::kmax(), BndType::periodic() ) );
+  tpr.bc().add( BndCnd( Dir::kmin(), BndType::pseudo() ) );
+  tpr.bc().add( BndCnd( Dir::kmax(), BndType::pseudo() ) );
 
   /*----------------------+
   |  physical properties  |
@@ -188,7 +188,7 @@ main(int argc, char ** argv) {
   //const real tend = 0.003;
   const real tend = 0.0009;
   const int ndt = tend/dt;
-  const int nint = ndt/2;
+  const int nint = ndt/10;
   const real tint = tend/25.;
   Times time(ndt, dt); 
 	
@@ -219,9 +219,9 @@ main(int argc, char ** argv) {
   conc.set_curv_method(0);  // height function
   //conc.set_curv_method(1);  // smoothed VOF
   conc.ancillary();
-  if(Nsmooth>0)
-    conc.smooth(c,sc,Nsmooth);
-  else
+  //if(Nsmooth>0)
+  //  conc.smooth(c,sc,Nsmooth);
+  //else
     for_avijk(c,i,j,k)
       sc[i][j][k] = c[i][j][k];
 #else
@@ -317,9 +317,9 @@ main(int argc, char ** argv) {
     c.bnd_update();
     c.exchange_all();
 #ifdef USE_VOF
-    if(Nsmooth>0)
-      conc.smooth(c,sc,Nsmooth);
-    else
+    //if(Nsmooth>0)
+    //  conc.smooth(c,sc,Nsmooth);
+    //else
       for_avijk(c,i,j,k)
         sc[i][j][k] = c[i][j][k];
 #endif
@@ -348,6 +348,7 @@ main(int argc, char ** argv) {
         tpr[i][j][k] = tout;
       }
     }
+    tpr.bnd_update();
     tpr.exchange_all();
 
     boil::plot->plot(uvw,c,tpr,press,mdot,mflx,"uvw-c-tpr-press-mdot-mflx",0);
@@ -426,9 +427,9 @@ main(int argc, char ** argv) {
 
 #ifdef USE_VOF
       conc.advance(cold);
-      if(Nsmooth>0)
-        conc.smooth(c,sc,Nsmooth);
-      else
+      //if(Nsmooth>0)
+      //  conc.smooth(c,sc,Nsmooth);
+      //else
         for_avijk(c,i,j,k)
           sc[i][j][k] = c[i][j][k];
 #else

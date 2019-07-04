@@ -115,6 +115,7 @@ class Momentum : public Staggered {
     real bulk_k(const real & zp) const;
 
     real v_phase_change;
+    bool ifull, jfull, kfull;
 
 };
 

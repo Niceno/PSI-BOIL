@@ -20,7 +20,8 @@ void VOF::ancillary() {
   /*-------------------------------+
   |  normal vector at cell center  |
   +-------------------------------*/
-  norm_cc(phi);
+  //norm_cc(phi);
+  norm_elvira(phi);
 
   /* calculate the real-space normal vector */
   true_norm_vect(); 
@@ -31,7 +32,7 @@ void VOF::ancillary() {
   extract_alpha();
 
   /*  calculate free surface position */
-#if 0
+#if 1
   cal_fs3();
 #else
   cal_fs_interp();

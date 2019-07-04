@@ -21,6 +21,14 @@ void VOF::curv_HF() {
   |  Step 4: calculate area density using marching cube  |
   |  Step 5: define iflag                                |
   +-----------------------------------------------------*/
+#if 0
+  for_aijk(i,j,k) {
+    nx[i][j][k] = -nx[i][j][k];
+    ny[i][j][k] = -ny[i][j][k];
+    nz[i][j][k] = -nz[i][j][k];
+    phi[i][j][k] = 1.-phi[i][j][k];
+  }
+#endif
 
   iflag=0;
 #if 0  // don't use this. Yohei
@@ -62,7 +70,15 @@ void VOF::curv_HF() {
 
   /* calculate normal vector */
   //true_norm_vect();
+#if 0
   norm_young(phi);  // Young's method is good for low resolution
+#else
+  for_avijk(phi,i,j,k) {
+    nx[i][j][k] = mx[i][j][k];
+    ny[i][j][k] = my[i][j][k];
+    nz[i][j][k] = mz[i][j][k];
+  }
+#endif
 
   /*------------------------+
   |  curvature calculation  |
@@ -107,6 +123,11 @@ void VOF::curv_HF() {
           dirMax=1;
         }
       }
+      
+#if 0
+      if(i==5&&j==19)
+        boil::oout<<"dirmax "<<i<<" "<<j<<" "<<k<<" "<<dirMax<<" | "<<nx[i][j][k]<<" "<<ny[i][j][k]<<" "<<nz[i][j][k]<<" | "<<mx[i][j][k]<<" "<<my[i][j][k]<<" "<<mz[i][j][k]<<boil::endl;
+#endif
 
       real hmm = 0.0, hcm = 0.0, hpm = 0.0;
       real hmc = 0.0, hcc = 0.0, hpc = 0.0;
@@ -114,6 +135,12 @@ void VOF::curv_HF() {
       real hc_limit = 0.0;
 
       if (dirMax==1) {
+        if(!ifull) {
+          boil::oout<<"Curv_HF: Pseudo direction selected at "<<i<<" "<<j<<" "
+                    <<k<<" with dirMax="<<dirMax<<" ; exiting."<<boil::endl;
+          exit(0);
+        }
+
         /* check stencil size */
         int imin=-3;
         int imax=3;  // normal stencil size 7 (=3+1+3)
@@ -187,6 +214,12 @@ void VOF::curv_HF() {
         }}}
 
       } else if (dirMax==2) {
+        if(!jfull) {
+          boil::oout<<"Curv_HF: Pseudo direction selected at "<<i<<" "<<j<<" "
+                    <<k<<" with dirMax="<<dirMax<<" ; exiting."<<boil::endl;
+          exit(0);
+        }
+
         /* check stencil size */
         int jmin=-3;
         int jmax=3;  // normal stencil size 7 (=3+1+3)
@@ -249,6 +282,8 @@ void VOF::curv_HF() {
         kappa[i][j][k] = -1.0
                        * (hxx + hzz + hxx*hz*hz + hzz*hx*hx - 2.0*hxz*hx*hz)
                        / pow(1.0 + hx*hx + hz*hz, 1.5);
+
+        //boil::oout<<j<<" "<<hx<<" "<<hz<<" "<<hxx<<" "<<hzz<<" "<<hxz<<" "<<kappa[i][j][k]<<" | "<<stmp[i-1][j][k]<<" "<<stmp[i][j][k]<<" "<<stmp[i+1][j][k]<<boil::endl;
         } else {
           iflag[i][j][k]=0;
         }
@@ -260,6 +295,12 @@ void VOF::curv_HF() {
         }}}
 
       } else if (dirMax==3) {
+        if(!kfull) {
+          boil::oout<<"Curv_HF: Pseudo direction selected at "<<i<<" "<<j<<" "
+                    <<k<<" with dirMax="<<dirMax<<" ; exiting."<<boil::endl;
+          exit(0);
+        }
+
         /* check stencil size */
         int kmin=-3;
         int kmax=3;  // normal stencil size 7 (=3+1+3)
@@ -393,7 +434,7 @@ void VOF::curv_HF() {
 #endif
 
 #if 0
-  if(time->current_step()==2) {
+  //if(time->current_step()==2) {
   /* visualize iflag */
   boil::plot->plot(phi,nx,ny,nz, "clr-nx-ny-nz", time->current_step());
   for_ijk(i,j,k){
@@ -401,7 +442,7 @@ void VOF::curv_HF() {
   }
   boil::plot->plot(phi,kappa,stmp, "clr-kappa-iflag", time->current_step());
   exit(0);
-  } 
+  //} 
 #endif
 #if 0
   int iproc=boil::cart.iam();
@@ -448,7 +489,11 @@ void VOF::curv_HF() {
   bdcurv();
 
 #if 0
-  if(time->current_step()==1) {
+  for_ijk(i,j,k) {
+    if(iflag[i][j][k]==1&&fabs(kappa[i][j][k])<700.)
+      boil::oout<<"test "<<i<<" "<<j<<" "<<k<<" "<<kappa[i][j][k]<<boil::endl;
+  }
+  //if(time->current_step()==1) {
   //if(time->current_step()%100==0) {
   /* visualize iflag */
   boil::plot->plot(phi,nx,ny,nz, "clr-nx-ny-nz", time->current_step());
@@ -457,8 +502,20 @@ void VOF::curv_HF() {
   }
   boil::plot->plot(phi,kappa,stmp, "clr-kappa-iflag", time->current_step());
   //exit(0);
-  } 
+  //} 
 #endif
+
+#if 0
+  for_aijk(i,j,k) {
+    nx[i][j][k] = -nx[i][j][k];
+    ny[i][j][k] = -ny[i][j][k];
+    nz[i][j][k] = -nz[i][j][k];
+    phi[i][j][k] = 1.-phi[i][j][k];
+    //if(boil::realistic(kappa[i][j][k]))
+    //    kappa[i][j][k] = -kappa[i][j][k];
+  }
+#endif
+
   return;
 }
 

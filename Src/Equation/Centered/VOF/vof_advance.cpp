@@ -12,7 +12,8 @@ void VOF::advance(Scalar & scp) {
   /*-------------------------------+
   |  normal vector at cell center  |
   +-------------------------------*/
-  norm_cc(scp);
+  //norm_cc(scp);
+  norm_elvira(scp);
 
   /*------------------------------+
   |  source term for phase change |

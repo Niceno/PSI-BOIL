@@ -24,12 +24,16 @@ VOF::VOF(const Scalar & PHI,
   my( *PHI.domain() ),
   mz( *PHI.domain() ),
   nalpha( *PHI.domain() ),
+  utx( *PHI.domain() ),
+  uty( *PHI.domain() ),
+  utz( *PHI.domain() ),
+  unliq( *PHI.domain() ),
   stmp( *PHI.domain() ),
+  stmp2( *PHI.domain() ),
+  stmp3( *PHI.domain() ),
   fs( *U.domain() ),
   iflag(*PHI.domain() ),
   iflagx(*PHI.domain() ),
-  iflagy(*PHI.domain() ),
-  iflagz(*PHI.domain() ),
   adens(*PHI.domain() ),
   heavi(&phi, NULL, &adens),
   topo(&mx,&my,&mz,&adens,&fs)
@@ -41,11 +45,10 @@ VOF::VOF(const Scalar & PHI,
   //kappa     = phi.shape();
   clr       = phi.shape();
   stmp      = phi.shape();
+  stmp2     = phi.shape();
+  stmp3     = phi.shape();
   iflag     = phi.shape();
   iflagx    = phi.shape();
-  iflagy    = phi.shape();
-  iflagz    = phi.shape();
-  adens     = phi.shape();
 
   nx        = phi.shape();
   ny        = phi.shape();
@@ -54,6 +57,12 @@ VOF::VOF(const Scalar & PHI,
   my        = phi.shape();
   mz        = phi.shape();
   nalpha    = phi.shape();
+  adens     = phi.shape();
+
+  utx = phi.shape();
+  uty = phi.shape();
+  utz = phi.shape();
+  unliq = phi.shape();
 
   for( int b=0; b<phi.bc().count(); b++ ) {
     if(    phi.bc().type(b) == BndType::dirichlet()
@@ -65,9 +74,15 @@ VOF::VOF(const Scalar & PHI,
        ny.bc().type(b) = BndType::neumann();
        nx.bc().type(b) = BndType::neumann();
        nalpha.bc().type(b) = BndType::neumann();
+       adens.bc().type(b) = BndType::neumann();
        mx.bc().type(b) = BndType::neumann();
        my.bc().type(b) = BndType::neumann();
        mx.bc().type(b) = BndType::neumann();
+
+       utx.bc().type(b) = BndType::neumann();
+       uty.bc().type(b) = BndType::neumann();
+       utz.bc().type(b) = BndType::neumann();
+       unliq.bc().type(b) = BndType::neumann();
 
        boil::oout << "Adjusting b.c.s for geometrical properties at " << b
                   << boil::endl;
@@ -127,6 +142,8 @@ VOF::VOF(const Scalar & PHI,
     } else if (phi.bc().type(d,BndType::wall())) {
       iminw=true;
     } else if (phi.bc().type(d,BndType::pseudo())) {
+      iminp=true;
+      iminc=false;
       ifull = false;
     }
 
@@ -143,6 +160,10 @@ VOF::VOF(const Scalar & PHI,
       imaxc=false;
     } else if (phi.bc().type(d,BndType::wall())) {
       imaxw=true;
+    } else if (phi.bc().type(d,BndType::pseudo())) {
+      imaxp=true;
+      imaxc=false;
+      ifull = false;
     }
     if (dom->bnd_symmetry(d)) imaxc=false;
   }
@@ -158,6 +179,8 @@ VOF::VOF(const Scalar & PHI,
     } else if (phi.bc().type(d,BndType::wall())) {
       jminw=true;
     } else if (phi.bc().type(d,BndType::pseudo())) {
+      jminp=true;
+      jminc=false;
       jfull = false;
     }
     if (dom->bnd_symmetry(d)) jminc=false;
@@ -173,6 +196,10 @@ VOF::VOF(const Scalar & PHI,
       jmaxc=false;
     } else if (phi.bc().type(d,BndType::wall())) {
       jmaxw=true;
+    } else if (phi.bc().type(d,BndType::pseudo())) {
+      jmaxp=true;
+      jmaxc=false;
+      jfull = false;
     }
     if (dom->bnd_symmetry(d)) jmaxc=false;
   }
@@ -188,6 +215,8 @@ VOF::VOF(const Scalar & PHI,
     } else if (phi.bc().type(d,BndType::wall())) {
       kminw=true;
     } else if (phi.bc().type(d,BndType::pseudo())) {
+      kminp=true;
+      kminc=false;
       kfull = false;
     }
     if (dom->bnd_symmetry(d)) kminc=false;
@@ -203,6 +232,10 @@ VOF::VOF(const Scalar & PHI,
       kmaxc=false;
     } else if (phi.bc().type(d,BndType::wall())) {
       kmaxw=true;
+    } else if (phi.bc().type(d,BndType::pseudo())) {
+      kmaxp=true;
+      kmaxc=false;
+      kfull = false;
     }
     if (dom->bnd_symmetry(d)) kmaxc=false;
   }
@@ -221,6 +254,8 @@ VOF::VOF(const Scalar & PHI,
             <<iminc<<" "<<imaxc<<" "
             <<jminc<<" "<<jmaxc<<" "
             <<kminc<<" "<<kmaxc<<"\n";
+
+  boil::oout<<"VOF-full: "<<ifull<<" "<<jfull<<" "<<kfull<<boil::endl;
 
 }	
 

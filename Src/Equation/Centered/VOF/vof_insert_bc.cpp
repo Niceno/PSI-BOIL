@@ -10,6 +10,9 @@ void VOF::insert_bc(const Scalar & val) {
 *           2nd: phi.exchange_all();
 *******************************************************************************/
 
+  boil::oout<<"Obsolete! Use bnd_update instead. Exiting."<<boil::endl;
+  exit(0);
+
   Formula form;
 
   int i,j,k;

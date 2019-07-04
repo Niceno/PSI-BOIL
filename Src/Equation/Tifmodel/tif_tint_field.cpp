@@ -61,6 +61,7 @@ void TIF::tint_field(const bool newstep) {
         }
       }
 
+    tif.bnd_update();
     tif.exchange_all();
     Extend_tint();
 #endif
@@ -81,9 +82,13 @@ void TIF::tint_field(const bool newstep) {
       boil::oout<<"TIFmodel::tint_field()  initialize tif"<<"\n";
       store_tif = true;
     } 
+    tifold.bnd_update();
     tifold.exchange_all();
+    tif   .bnd_update();
     tif   .exchange_all();
   }
+
+  return;
 }
 
 void TIF::Extend_tint() { /* crude code */

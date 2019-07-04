@@ -77,4 +77,33 @@ void Momentum::insert_bc() {
         } /* if wall or inlet */
       } /* if boundary exists */
     } /* m & b */
+
+#if 1
+  /* pseudo b.c. */
+  for_m(m)
+    for( int b=0; b<u.bc(m).count(); b++ ) {
+      if( u.bc(m).type(b) == BndType::pseudo() ) {
+        Dir d = u.bc(m).direction(b);
+        if(
+           m == Comp::u() && ( d != Dir::imin() && d != Dir::imax()) ||
+           m == Comp::v() && ( d != Dir::jmin() && d != Dir::jmax()) ||
+           m == Comp::w() && ( d != Dir::kmin() && d != Dir::kmax())
+          ) {
+          int ii(0), jj(0), kk(0);
+          if(d == Dir::imin()) ii =  1;
+          if(d == Dir::imax()) ii = -1;
+          if(d == Dir::jmin()) jj =  1;
+          if(d == Dir::jmax()) jj = -1;
+          if(d == Dir::kmin()) kk =  1;
+          if(d == Dir::kmax()) kk = -1;
+          for_vijk(u.bc(m).at(b), i,j,k) {
+            u[m][i][j][k] = u[m][i+ii][j+jj][k+kk];
+          }
+        }  
+      }
+    }
+#endif
+
+  return;
+  
 }

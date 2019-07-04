@@ -54,6 +54,10 @@ void VOF::true_norm_vect() {
   //boil::plot->plot(mx,my,mz, "mx-my-mz", time->current_step());
   //exit(0);
 
+  mx.bnd_update();
+  my.bnd_update();
+  mz.bnd_update();
+
   mx.exchange_all();
   my.exchange_all();
   mz.exchange_all();

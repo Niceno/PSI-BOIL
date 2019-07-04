@@ -51,14 +51,29 @@ void Momentum::solve(const ResRat & factor) {
     Matrix * Am = A[~m];
 
     if(m==Comp::u()) 
-      solver->solve(*Am, u(m), fnew(m), 
-                     MaxIter(10), "u", factor);
+      if(ifull) {
+        solver->solve(*Am, u(m), fnew(m), 
+                       MaxIter(10), "u", factor);
+      } else {
+        for_avmijk(u,m,i,j,k) 
+          u[m][i][j][k] = 0.0;
+      }
     if(m==Comp::v()) 
-      solver->solve(*Am, u(m), fnew(m), 
-                     MaxIter(10), "v", factor);
+      if(jfull) {
+        solver->solve(*Am, u(m), fnew(m), 
+                       MaxIter(10), "v", factor);
+      } else {
+        for_avmijk(u,m,i,j,k) 
+          u[m][i][j][k] = 0.0;
+      }
     if(m==Comp::w()) 
-      solver->solve(*Am, u(m), fnew(m), 
-                     MaxIter(10), "w", factor);
+      if(kfull) {
+        solver->solve(*Am, u(m), fnew(m), 
+                       MaxIter(10), "w", factor);
+      } else {
+        for_avmijk(u,m,i,j,k) 
+          u[m][i][j][k] = 0.0;
+      }
   }
 
   /* set velocity in solid zero */

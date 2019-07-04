@@ -2,6 +2,8 @@
 #define VOF_H
 
 #include <cmath>
+#include <vector>
+#include <algorithm>
 #include "../centered.h"
 #include "../../../Parallel/communicator.h"
 #include "../../../Global/global_realistic.h"
@@ -36,6 +38,10 @@ class VOF : public Centered {
     void totalvol();
     void front_minmax();
     void init(){};
+
+    void cal_liq_vel(Vector * umass, Vector * uliq);
+    void ext_vel(Scalar & sca, const Scalar & eflag, const int sgn);
+    void smooth(const Scalar & sca, Scalar & scb, const int itnum);
 
     // getter for front_minmax
     real get_xminft() { return(xminft);};
@@ -120,7 +126,6 @@ class VOF : public Centered {
              , const real & r1, const real & r2, const real & r3
              , const int & i1, const int & i2, const int &i3
              , real r[] );
-    void smooth(const Scalar & sca, Scalar & scb, const int itnum);
     void true_norm_vect();
     void update_at_walls();
     void wall_norm(const Scalar & sca);
@@ -158,14 +163,33 @@ class VOF : public Centered {
     void norm_cc_kmax(const Scalar &g, const int i,const int j, const int k);
     void vf_limiter();   
 
-    real alpha_val(const int i, const int j, const int k);
+    /* elvira functions */
+    void norm_elvira(Scalar & sca);
+    void norm_elvira(int i,int j,int k,
+                     real valcc,real valmc,real valpc,real valcm,
+                     real valcp,real valmm,real valpm,real valmp,real valpp);
+    void normalize_elvira(const real m, const real sig, 
+                          real & nnx, real & nny, real & nnz);
+    real elvira_l2(const real alp,const real nnx,const real nny,const real nnz,
+                   const real valcc,const real valmc,const real valpc,
+                   const real valcm,const real valcp,const real valmm,
+                   const real valpm,const real valmp,const real valpp);
+    real ext_v(const real xp, const real yp, const real zp, 
+               const real vv1, const real vv2, const real vv3,
+               const real vn1, const real vn2, const real vn3,
+               const real denom, const real alp);
+    void norm_cc(Scalar & sca,int i,int j,int k);
+
+    real alpha_val(const real c, const real nnx, const real nny, const real nnz);
     real fs_val(const Comp m, const int i, const int j, const int k);
     real frontPosition(const int i, const int j, const int k, const Comp m);
 
     Scalar clr;     /* color function */
     Scalar kappa;        /* curvature */
-    Scalar stmp;
-    ScalarInt iflag,iflagx,iflagy,iflagz;
+    Scalar stmp, stmp2, stmp3;
+    ScalarInt iflag,iflagx;
+
+    Scalar utx, uty, utz, unliq;
 
     real rhol, rhov; /* densities for velocity correction */
     const Matter * mixt() const {return mixture;}
