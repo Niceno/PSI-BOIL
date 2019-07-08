@@ -2,6 +2,7 @@
 #define VOF_H
 
 #include <cmath>
+#include <list>
 #include <vector>
 #include <algorithm>
 #include "../centered.h"
@@ -150,6 +151,44 @@ class VOF : public Centered {
       for_aijk(i,j,k)
         adens[i][j][k] = newadens[i][j][k];
     }
+
+#if 1
+    /* adensgeom stuff */
+    typedef struct {
+      real x,y,z;
+    } XYZ;
+    real calc_area(const std::vector<XYZ> &vect, const XYZ norm);
+    XYZ PlusXYZ(const XYZ p1, const XYZ p2);
+    real DotProduct(const XYZ p1, const XYZ p2);
+    XYZ CrossProduct(const XYZ p1, const XYZ p2);
+    void cal_adens_geom(Scalar & eval);
+    Scalar adensgeom; /* area density (geometric) */
+
+    /* mc stuff */
+    typedef struct {
+       XYZ p[8];
+       real val[8];
+    } GRIDCELL;
+    XYZ VertexInterpVOF(real isolevel, XYZ p1, XYZ p2, real valp1, real valp2);
+    real PolygoniseVOF(GRIDCELL grid, real isolevel);
+    typedef struct {
+       XYZ p[3];
+       real area(){
+         real x1 = p[1].x-p[0].x;
+         real y1 = p[1].y-p[0].y;
+         real z1 = p[1].z-p[0].z;
+         real x2 = p[2].x-p[0].x;
+         real y2 = p[2].y-p[0].y;
+         real z2 = p[2].z-p[0].z;
+         real area=  (y1*z2-z1*y2)*(y1*z2-z1*y2)
+                    +(z1*x2-x1*z2)*(z1*x2-x1*z2)
+                    +(x1*y2-y1*x2)*(x1*y2-y1*x2);
+         area = 0.5 * sqrt(area);
+         return(area);
+       }
+    } TRIANGLE;
+#endif
+
 
     real extrapolate_v(const int i, const int j, const int k,
                        const int ofx, const int ofy, const int ofz,

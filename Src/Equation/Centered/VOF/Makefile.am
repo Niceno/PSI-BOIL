@@ -2,6 +2,7 @@ noinst_LIBRARIES = libVof.a
 libVof_a_SOURCES =      vof.h                 \
                         vof.cpp               \
                         vof_adens.cpp         \
+                        vof_adens_geom.cpp    \
                         vof_advance.cpp       \
                         vof_advance_x.cpp     \
                         vof_advance_y.cpp     \

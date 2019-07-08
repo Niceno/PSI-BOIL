@@ -35,6 +35,7 @@ VOF::VOF(const Scalar & PHI,
   iflag(*PHI.domain() ),
   iflagx(*PHI.domain() ),
   adens(*PHI.domain() ),
+  adensgeom(*PHI.domain() ),
   heavi(&phi, NULL, &adens),
   topo(&mx,&my,&mz,&adens,&fs)
 
@@ -58,6 +59,7 @@ VOF::VOF(const Scalar & PHI,
   mz        = phi.shape();
   nalpha    = phi.shape();
   adens     = phi.shape();
+  adensgeom = phi.shape();
 
   utx = phi.shape();
   uty = phi.shape();
@@ -75,6 +77,7 @@ VOF::VOF(const Scalar & PHI,
        nx.bc().type(b) = BndType::neumann();
        nalpha.bc().type(b) = BndType::neumann();
        adens.bc().type(b) = BndType::neumann();
+       adensgeom.bc().type(b) = BndType::neumann();
        mx.bc().type(b) = BndType::neumann();
        my.bc().type(b) = BndType::neumann();
        mx.bc().type(b) = BndType::neumann();

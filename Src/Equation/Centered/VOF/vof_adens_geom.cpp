@@ -65,6 +65,28 @@ void VOF::cal_adens_geom(Scalar & eval) {
     vicinity |= eval[i][j-1][k]>boil::pico;
     vicinity |= eval[i][j][k+1]>boil::pico;
     vicinity |= eval[i][j][k-1]>boil::pico;
+
+    /* 2D algorithm, assumed x and y */
+    real valcc = phi[i  ][j  ][k];
+    real valmc = phi[i-1][j  ][k];
+    real valpc = phi[i+1][j  ][k];
+    real valcm = phi[i  ][j-1][k];
+    real valcp = phi[i  ][j+1][k];
+    real valmm = phi[i-1][j-1][k];
+    real valpm = phi[i+1][j-1][k];
+    real valmp = phi[i-1][j+1][k];
+    real valpp = phi[i+1][j+1][k];
+
+    if(  (valcc-phisurf)*(valmc-phisurf)<=0.0
+       ||(valcc-phisurf)*(valpc-phisurf)<=0.0
+       ||(valcc-phisurf)*(valcm-phisurf)<=0.0
+       ||(valcc-phisurf)*(valcp-phisurf)<=0.0
+       ||(valcc-phisurf)*(valmm-phisurf)<=0.0
+       ||(valcc-phisurf)*(valpm-phisurf)<=0.0
+       ||(valcc-phisurf)*(valmp-phisurf)<=0.0
+       ||(valcc-phisurf)*(valpp-phisurf)<=0.0) {
+      interface = true;
+    }
  
     if(interface||(vicinity&&phi[i][j][k]-1.<-boil::micro)) {
       /* n points to the gas, in normalized space */
@@ -441,7 +463,7 @@ void VOF::cal_adens_geom(Scalar & eval) {
   } /* for vijk */
   adensgeom.exchange();
 
-#if 0
+#if 1
   real sum(0.0), sum2(0.0);
   int count(0), count2(0);
   for_vijk(eval,i,j,k) {
@@ -452,10 +474,13 @@ void VOF::cal_adens_geom(Scalar & eval) {
     sum += sumplus;
     sum2 += sum2plus;
   }
-  boil::oout<<"VOF::finescalar_adens "<<count<<" "<<sum<<boil::endl;
-  boil::oout<<"VOF::finescalar_adensgeom "<<count2<<" "<<sum2<<boil::endl;
+  boil::cart.sum_int(&count);
+  boil::cart.sum_int(&count2);
+  boil::cart.sum_real(&sum);
+  boil::cart.sum_real(&sum2);
+  boil::oout<<"VOF::finescalar_adensgeom "<<count<<" "<<sum<<" | "<<count2<<" "<<sum2<<boil::endl;
 
-  boil::plot->plot(phi,eval,adensgeom,"clr-adens-adensgeom",time->current_step());
+  //boil::plot->plot(phi,eval,adensgeom,"clr-adens-adensgeom",time->current_step());
   //exit(0);
 #endif
 

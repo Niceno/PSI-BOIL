@@ -4,10 +4,11 @@
 #define USE_VOF
 //#define AVEJ
 #define SYM
-#define INVERT
+//#define INVERT
+#define USE_LIQ_VEL
 
 /* computed parameters */
-const int gLevel = 2;
+const int gLevel = 6;
 #ifdef SYM
 const int NX = 16*gLevel;
 #else
@@ -71,6 +72,9 @@ int main(int argc, char * argv[]) {
   Scalar c  (d), g  (d), kappa(d), cold(d); // concentration
   Scalar press  (d), p(d), f  (d);
 
+#ifdef USE_LIQ_VEL
+  Vector uvw_liq(d);
+#endif
 
   /*-----------------------------+ 
   |  insert boundary conditions  |
@@ -90,6 +94,9 @@ int main(int argc, char * argv[]) {
     uvw.bc(m).add( BndCnd( Dir::kmin(), BndType::pseudo() ) );
     uvw.bc(m).add( BndCnd( Dir::kmax(), BndType::pseudo() ) );
     uvw_old(m)=uvw(m).shape();
+#ifdef USE_LIQ_VEL
+    uvw_liq(m)=uvw(m).shape();
+#endif    
   }
 
 #ifdef SYM
@@ -222,7 +229,11 @@ int main(int argc, char * argv[]) {
   multigrid.stop_if_diverging(true);
 
 #ifdef USE_VOF
+  #ifdef USE_LIQ_VEL
+  VOF conc  (c, g, kappa, uvw_liq, time, solver);
+  #else
   VOF conc  (c, g, kappa, uvw, time, solver);
+  #endif
   conc.set_curv_method(0);  // height function
   //conc.set_curv_method(1);  // smoothed VOF
   conc.ancillary();
@@ -280,6 +291,9 @@ int main(int argc, char * argv[]) {
       ns.cfl_max();
 
 #ifdef USE_VOF
+  #ifdef USE_LIQ_VEL
+      conc.cal_liq_vel(&uvw,&uvw_liq);
+  #endif
       conc.advance(cold);
 #else
       conc.advance();
