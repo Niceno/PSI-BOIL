@@ -28,7 +28,7 @@ const real tsat0   = 0.0E+02;
 const real tout = tsat0+3.1;
 
 #ifdef USE_VOF
-const int mSimple = 1;
+const int mSimple = 3;
 const int Nsmooth = 0;
 #else
 const int mSimple = 1;
@@ -171,13 +171,13 @@ main(int argc, char ** argv) {
   /*-------------------+
   |  time-integration  |
   +-------------------*/
-  const int  ndt = 100000;
-  const real tint = 0.005;
-  const int  nint2= 25000;
+  const int  ndt = 25000;
+  const real tint = 0.001;
+  const int  nint2= ndt/3;
   const real dxmin = d.dxyz_min();
   boil::oout<<"main:dxmin= "<<dxmin<<" "<<boil::cart.iam()<<"\n";
   const real dt  =100.0*pow(0.5*pow(dxmin,3.0)
-                 / (2.0*3.1415*mixed.sigma()->value()),0.5);
+                 / (2.0*3.1415*mixed.sigma()->value()),0.5)/2.5;
   Times time(ndt, dt);
 
   /*-----------------+
@@ -211,7 +211,10 @@ main(int argc, char ** argv) {
                     tsat, time, &mixed, latent);
 
   Momentum ns( uvw, xyz, time, solver, &mixed);
-  ns.convection_set(TimeScheme::forward_euler());
+  if(mSimple==0)
+    ns.convection_set(TimeScheme::forward_euler());
+  else
+    ns.convection_set(TimeScheme::backward_euler());
   ns.diffusion_set(TimeScheme::backward_euler());
   Pressure pr(p, f, uvw, time, solver, &mixed);
   AC multigrid( &pr );
@@ -257,7 +260,7 @@ main(int argc, char ** argv) {
 #ifndef USE_VOF
     conc. load("conc", ts);
 #else
-    c. load("conc", ts);
+    c. load("c", ts);
 #endif
     tpr.  load("tpr", ts);
     time.first_step(ts);
@@ -322,8 +325,6 @@ main(int argc, char ** argv) {
       c[i][j][k] = 1.0-c[i][j][k];
 
     c.exchange_all();
-    conc.init();
-    conc.ancillary();
     conc.totalvol();
 
     tpr.bnd_update();
@@ -335,6 +336,8 @@ main(int argc, char ** argv) {
 #ifndef USE_VOF
   update_step(c, step, sflag);
 #endif
+  conc.init();
+  conc.ancillary();
 
   /* set iint */
   int iint = int(time.current_time()/tint) + 1;
@@ -470,7 +473,7 @@ main(int argc, char ** argv) {
 #ifndef USE_VOF
       conc .save("conc",  time.current_step());
 #else
-      c .save("conc",  time.current_step());
+      c .save("c",  time.current_step());
 #endif
       tpr  .save("tpr",   time.current_step());
     } 
@@ -481,7 +484,7 @@ main(int argc, char ** argv) {
 #ifndef USE_VOF
       conc .save("conc",  time.current_step());
 #else
-      c .save("conc",  time.current_step());
+      c .save("c",  time.current_step());
 #endif
       tpr  .save("tpr",   time.current_step());
       std::fstream output;
@@ -500,7 +503,7 @@ main(int argc, char ** argv) {
 #ifndef USE_VOF
       conc .rm("conc", ts);
 #else
-      c .rm("conc", ts);
+      c .rm("c", ts);
 #endif
       tpr  .rm("tpr", ts);
       exit(0); 
