@@ -73,6 +73,12 @@ void CIPCSL2::CIPCSLy4(const Vector & f, const Scalar & sy) {
           jof=0; jof2=0;
         }
         for_vijk( clr.bc().at(b), i,j,k ) {
+          if (i<=si()-1) continue;
+          if (i>=ei()+1) continue;
+          if (j<=sj()-2) continue;
+          if (j>=ej()+2) continue;
+          if (k<=sk()-1) continue;
+          if (k>=ek()+1) continue;
           real dx=clr.dxc(i);
           real dz=clr.dzc(k);
           delrho[i][j+jof2][k]=phi[i][j][k]*vel[i][j+jof][k]*dt*dx*dz;
@@ -88,6 +94,12 @@ void CIPCSL2::CIPCSLy4(const Vector & f, const Scalar & sy) {
           jof=-1; jof2=0;
         }
         for_vijk( clr.bc().at(b), i,j,k ) {
+          if (i<=si()-1) continue;
+          if (i>=ei()+1) continue;
+          if (j<=sj()-2) continue;
+          if (j>=ej()+2) continue;
+          if (k<=sk()-1) continue;
+          if (k>=ek()+1) continue;
           real dy=clr.dyc(j+jof);
           delrho[i][j+jof2][k]=clr[i][j+jof][k]/dy*vel[i][j+jof2][k]*dt;
           sum_outlet += -real(jof)*delrho[i][j+jof2][k];

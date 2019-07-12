@@ -178,10 +178,7 @@ class CIPCSL2 : public Centered {
     real maxval() {return maxclr;}
     void color_minmax(); 
 
-    /* moved to public */
     Topology topo;
-    Vector sxyz;
-    
     void ancillary();
 
   protected:
@@ -202,7 +199,6 @@ class CIPCSL2 : public Centered {
     void normalize(real & r1, real & r2, real & r3);
     void smear(Scalar & g);
     bool sharpen(Scalar & g, const real e, const int i, const bool b);
-
     void insert_bc_alp(const Scalar & g);
     void insert_bc_dist(Scalar & g);
     void insert_bc_flag(ScalarInt & g, const bool b);
@@ -282,12 +278,9 @@ class CIPCSL2 : public Centered {
     real *** vel;
     real *** delrho;
     real epsnorm,epss,eps_clr,eps_st;
+    Vector sxyz;
     real cangle;
     real minclr, maxclr;
     bool localSharpen, use_dist_for_kappa;
-
-#if 0 /* for CL position evaluation */
-    real cposold, cposnew;
-#endif 
 };
 #endif

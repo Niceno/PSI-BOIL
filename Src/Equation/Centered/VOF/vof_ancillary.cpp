@@ -10,13 +10,6 @@ void VOF::ancillary() {
    * update_at_walls should be called */
   phi.bnd_update();
 
-#if 0
-  /*---------------------------+
-  |  flagging interface cells  |
-  +---------------------------*/
-  set_iflag();  /* done in curv_HF */
-#endif
-
   /*-------------------------------+
   |  normal vector at cell center  |
   +-------------------------------*/

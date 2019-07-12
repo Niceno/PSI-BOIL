@@ -13,7 +13,7 @@ void CIPCSL2::curv_interface_ext() {
 #endif
 
   const real dtau = 0.25*dxmin;
-  real flux,isgn;
+  real isgn;
   int mmax=8;  
 
   /*------------+
@@ -220,7 +220,6 @@ void CIPCSL2::curv_interface_ext() {
       }
     }
 
-    //bnd_sym_kappa();       // must not call here
     insert_bc_kappa(kappa);  // boundary condition
     kappa.exchange_all();
   }

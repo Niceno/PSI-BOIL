@@ -7,24 +7,18 @@ void CIPCSL2::insert_bc_gradphi(const Scalar & val) {
 *         val is supporsed to be color function 
 *******************************************************************************/
 
-  int i,j,k;
-
   for( int b=0; b<val.bc().count(); b++ ) {
 
     if(val.bc().type_decomp(b)) continue;
 
-    if(  val.bc().type(b) == BndType::symmetry()
-      || val.bc().type(b) == BndType::neumann() ) {
+    if(  val.bc().type(b) == BndType::symmetry() ) {
 
       int iof=0, jof=0, kof=0;
 
       Dir d      = val.bc().direction(b);
 
-      /*------------+
-      |  direction  |
-      +------------*/
       if(d != Dir::undefined()) {
-        real ni,nj,nk,magn;
+
         if(d == Dir::imin() || d == Dir::imax()){
           int ii=si();
           if(d == Dir::imax()) ii=ei()+1;
@@ -37,6 +31,7 @@ void CIPCSL2::insert_bc_gradphi(const Scalar & val) {
             nx[ii][j][k] = 0.0;
           } }
         }
+
         if(d == Dir::jmin() || d == Dir::jmax()){
           int jj=sj();
           if(d == Dir::jmax()) jj=ej()+1;
@@ -49,6 +44,7 @@ void CIPCSL2::insert_bc_gradphi(const Scalar & val) {
             ny[i][jj][k] = 0.0;
           } }
         }
+
         if(d == Dir::kmin() ||d == Dir::kmax()){
           int kk=sk();
           if(d == Dir::kmax()) kk=ek()+1;
@@ -61,6 +57,7 @@ void CIPCSL2::insert_bc_gradphi(const Scalar & val) {
             nz[i][j][kk] = 0.0;
           } }
         }
+
       }
     }
   }

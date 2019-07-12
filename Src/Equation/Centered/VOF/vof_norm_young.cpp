@@ -42,7 +42,7 @@ void VOF::norm_young(const Scalar & sca) {
                     + sca[iii][jjj-1][kkk-1]+sca[iii-1][jjj-1][kkk-1]);
       nztmp /= (sca.zc(kkk)-sca.zc(kkk-1));
 
-      //normalize(nxtmp,nytmp,nztmp);
+      //normalize(nxtmp,nytmp,nztmp);  // comment out 2019.07.03
 
       /* check boundary condition */
       jflag=1;
@@ -58,12 +58,6 @@ void VOF::norm_young(const Scalar & sca) {
       nxave += real(jflag) * nxtmp;
       nyave += real(jflag) * nytmp;
       nzave += real(jflag) * nztmp;
-
-#if 0
-      if(i==5&&j==19)
-        boil::oout<<"normyoung "<<i<<" "<<j<<" "<<nxtmp<<" "<<nytmp<<" "<<nztmp<<boil::endl;
-#endif
-
 
     }}}
 

@@ -38,6 +38,12 @@ void CIPCSL2::insert_bc_alp(const Scalar & val) {
         if(d == Dir::kmin()) kof++; if(d == Dir::kmax()) kof--;
 
         for_vijk( val.bc().at(b), i,j,k )
+          if (i<=si()-2) continue;
+          if (i>=ei()+2) continue;
+          if (j<=sj()-2) continue;
+          if (j>=ej()+2) continue;
+          if (k<=sk()-2) continue;
+          if (k>=ek()+2) continue;
           val[i][j][k]=val[i+iof][j+jof][k+kof];
       }
     }

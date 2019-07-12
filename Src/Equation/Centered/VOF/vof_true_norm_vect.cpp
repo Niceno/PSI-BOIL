@@ -13,7 +13,6 @@ void VOF::true_norm_vect() {
     real mmy = ny[i][j][k];
     real mmz = nz[i][j][k];
 
-#if 1
     real dnx = phi.dxc(i);
     real dny = phi.dyc(j);
     real dnz = phi.dzc(k);
@@ -30,21 +29,6 @@ void VOF::true_norm_vect() {
 
     normalize(nnx,nny,nnz);
  
-#elif 0
-    nnx = phi.xc(i)/sqrt(1.74505e-06*1.74505e-06-phi.xc(i)*phi.xc(i));
-    nny = 0.0;
-    nnz = -1.0;
-    nnorm = nnx*nnx+nny*nny+nnz*nnz;
-    nnorm = sqrt(nnorm)+boil::pico;
-    nnx /= nnorm;
-    nny /= nnorm;
-    nnz /= nnorm;
-#else
-    real nnx = mmx;
-    real nny = mmy;
-    real nnz = mmz;
-#endif
-
     mx[i][j][k] = nnx;
     my[i][j][k] = nny;
     mz[i][j][k] = nnz;

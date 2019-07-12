@@ -11,8 +11,6 @@ void CIPCSL2::insert_bc_kappa(Scalar & val) {
       val[i][j][k]=0.0;
   }
 
-  int i,j,k;
-
   for( int b=0; b<val.bc().count(); b++ ) {
 
     if( val.bc().type_decomp(b) ) continue;
@@ -25,14 +23,11 @@ void CIPCSL2::insert_bc_kappa(Scalar & val) {
       ||val.bc().type(b) == BndType::outlet()
       ||val.bc().type(b) == BndType::insert() ) {
 
-      int iof=0, jof=0, kof=0;
-
       Dir d      = val.bc().direction(b);
 
-      /*------------+
-      |  direction  |
-      +------------*/
       if(d != Dir::undefined()) {
+
+        int iof=0, jof=0, kof=0;
 
         if(d == Dir::imin()) iof++; if(d == Dir::imax()) iof--;
         if(d == Dir::jmin()) jof++; if(d == Dir::jmax()) jof--;
@@ -47,7 +42,7 @@ void CIPCSL2::insert_bc_kappa(Scalar & val) {
           else{ist=val.bc().at(b).si();}
           if(val.bc().at(b).ei()==ei()){ied=ei()+1;}
           else{ied=val.bc().at(b).ei();}
-        }
+        } 
         if(val.bc().at(b).sj()==val.bc().at(b).ej()){
           jst=jed=val.bc().at(b).sj();
         } else {
@@ -66,11 +61,11 @@ void CIPCSL2::insert_bc_kappa(Scalar & val) {
         }
 
         //for_vijk( val.bc().at(b), i,j,k )
-        for(i=ist; i<=ied; i++)
-          for(j=jst; j<=jed; j++)
-            for(k=kst; k<=ked; k++) {
+        for(int i=ist; i<=ied; i++)
+          for(int j=jst; j<=jed; j++)
+            for(int k=kst; k<=ked; k++) {
           val[i][j][k]=val[i+iof][j+jof][k+kof];
-        }
+        } 
       }
     }
   }

@@ -31,12 +31,14 @@ void VOF::advance(Scalar & scp) {
     /* liquid content */
     stmp[i][j][k] = phival * dV(i,j,k);
 
+#if 0
     /* intermediate phi value */
     /* fext is related to mdot as follows:
      * fext = -m'''/rhol  */
     real denscoef = 1.0-rhol/rhov;
     real denom = std::max(1.0 + denscoef*fval,boil::pico);
     phival /= denom;
+#endif
     scp[i][j][k] = std::max(0.0,std::min(1.0,phival));
   }
 
@@ -53,17 +55,17 @@ void VOF::advance(Scalar & scp) {
     advance_z(scp);
 
   // update phi
-  for_ijk(i,j,k){
-    real phi_tmp = stmp[i][j][k] / dV(i,j,k);
-#if 0
-    // limit C
-    phi[i][j][k] = std::min(1.0,std::max(0.0,phi_tmp));
-#else
-    // unlimit C
-    phi[i][j][k] = phi_tmp;
-#endif
-
+  if (limit_color) {
+    for_ijk(i,j,k){
+      real phi_tmp = stmp[i][j][k] / dV(i,j,k);
+      phi[i][j][k] = std::min(1.0,std::max(0.0,phi_tmp));
+    }
+  } else {
+    for_ijk(i,j,k){
+      phi[i][j][k] = stmp[i][j][k] / dV(i,j,k);
+    }
   }
+
   phi.bnd_update();
   phi.exchange_all();
 

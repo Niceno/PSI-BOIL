@@ -2,13 +2,13 @@
 //#include "update_step.cpp"
 #include "disjoint_pressure.cpp"
 
-#define USE_VOF
+//#define USE_VOF
 
-const int Level=2;
+const int Level=8;
 
 /* computed parameters */
 const int NX = 50*Level;
-const int NZ = 4;
+const int NZ = 3;
 
 /* domain dimensions (given by problem) */
 const real LX =   0.001; //Hardt
@@ -165,9 +165,9 @@ main(int argc, char * argv[]) {
     c[i][j][k] = 1.0;
 #if 1
   for_vijk(c,i,j,k) {
-    if(i==boil::BW) {
+    if(i==boil::BW&&(c.xc(boil::BW)<2.*c.dxc(boil::BW))) {
       c[i][j][k]=0.0;
-    } else if (i==1+boil::BW) {
+    } else if (i==1+boil::BW&&(c.xc(boil::BW)<2.*c.dxc(boil::BW))) {
       c[i][j][k]=0.99;
     } else {
       c[i][j][k]=1.0;
@@ -213,14 +213,15 @@ main(int argc, char * argv[]) {
     c[i][j][k] = 0.0;
 
   for_vijk(c,i,j,k) {
-    if(i==boil::BW) {
+    if(i==boil::BW&&(c.xc(boil::BW)<2.*c.dxc(boil::BW))) {
       c[i][j][k]=0.0;
-    } else if (i==1+boil::BW) {
+    } else if (i==1+boil::BW&&(c.xc(boil::BW)<2.*c.dxc(boil::BW))) {
       c[i][j][k]=0.99;
     } else {
       c[i][j][k]=1.0;
     }
   }
+
   conc.init();
   c.exchange_all();
   conc.ancillary();
@@ -297,7 +298,7 @@ main(int argc, char * argv[]) {
     //boil::plot->plot(uvw, c, tpr, tp2, mdot, "uvw-c-tpr-tp2-mdot", 0);
 
     p = 0.0;
-    if (multigrid.vcycle(ResRat(1e-8))) OMS(converged);
+    if (multigrid.vcycle(ResRat(5e-7))) OMS(converged);
     p.exchange();
     ns.project(p);
     press += p;

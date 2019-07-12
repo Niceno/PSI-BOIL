@@ -52,16 +52,15 @@ void CIPCSL2::insert_bc_dist(Scalar & val) {
         if(d == Dir::kmin() || d == Dir::kmax()){
           kst=ked=val.bc().at(b).sk();
         }
+        //if(ist==si()-1 || jst==sj()-1 || kst ==sk()-1) continue;
 
-        if(ist==-1 || jst==-1 || kst ==-1) continue;
-
-        //for_vijk( val.bc().at(b), i,j,k ){
         for(int i=ist; i<=ied; i++){
         for(int j=jst; j<=jed; j++){
         for(int k=kst; k<=ked; k++){
           val[i][j][k]=val[i+iof][j+jof][k+kof];
           //do not use extrapolation. it causes trouble in bdcurv!
         } } }
+
       }
     }
   }

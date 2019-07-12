@@ -27,6 +27,10 @@ void CIPCSL2::set_wflag2() {
   +-------------*/
   wflag = -1001;
 
+  /*----------------------------+
+  |  wall adjacent cell = 1001  |
+  |  otherwise = -1001          |
+  +----------------------------*/
   for( int b=0; b<phi.bc().count(); b++ ) {
     if(phi.bc().type_decomp(b)) continue;
     if( phi.bc().type(b) == BndType::wall() ) {
@@ -40,16 +44,27 @@ void CIPCSL2::set_wflag2() {
         if(d == Dir::imin()) iof++; if(d == Dir::imax()) iof--;
         if(d == Dir::jmin()) jof++; if(d == Dir::jmax()) jof--;
         if(d == Dir::kmin()) kof++; if(d == Dir::kmax()) kof--;
+
+        int abs_iof = abs(iof);
+        int abs_jof = abs(jof);
+        int abs_kof = abs(kof);
+
         for_vijk( phi.bc().at(b), i,j,k ){
+          if (i<si()-abs_iof) continue;
+          if (i>ei()+abs_iof) continue;
+          if (j<sj()-abs_jof) continue;
+          if (j>ej()+abs_jof) continue;
+          if (k<sk()-abs_kof) continue;
+          if (k>ek()+abs_kof) continue;
           wflag[i+iof][j+jof][k+kof]=1001;
         }
       }
     }
   }
 
-  /*-----------+
-  |  set flag  |
-  +-----------*/
+  /*-----------------------------------+
+  |  set flag for wall adjacent cells  |
+  +-----------------------------------*/
   for_ijk(i,j,k) {
     if (wflag[i][j][k]>1000) {
       if(clr[i][j][k]<phisurf){

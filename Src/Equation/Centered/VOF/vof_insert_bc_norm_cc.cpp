@@ -67,6 +67,7 @@ void VOF::insert_bc_norm_cc(const Scalar & val) {
     }
 
 #if 0
+    // Symmetry can be calculated in normal way in norm_cc
     if( val.bc().type(b) == BndType::symmetry() ) {
 
       /*-----------+

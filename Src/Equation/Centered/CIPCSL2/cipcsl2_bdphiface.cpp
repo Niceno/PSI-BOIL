@@ -16,7 +16,10 @@ void CIPCSL2::bdphiface(const Vector & vec
   int iof,iof2;
   if(m==Comp::i()){
     for( int b=0; b<sca.bc().count(); b++ ) {
+
       if( sca.bc().type_decomp(b) ) continue;
+
+      /* i-min or i-max */
       if ( phi.bc().direction(b)==Dir::imin()
         || phi.bc().direction(b)==Dir::imax() ){
         if (phi.bc().direction(b)==Dir::imin()){
@@ -30,9 +33,14 @@ void CIPCSL2::bdphiface(const Vector & vec
           ||phi.bc().type(b) == BndType::dirichlet()
           ||phi.bc().type(b) == BndType::insert() ){
           for_vijk( phi.bc().at(b), i,j,k ) {
+            if (i<=si()-2) continue;
+            if (i>=ei()+2) continue;
+            if (j<=sj()-1) continue;
+            if (j>=ej()+1) continue;
+            if (k<=sk()-1) continue;
+            if (k>=ek()+1) continue;
             real dy=phi.dyc(j);
             real dz=phi.dzc(k);
-            //vec[m][i+iof2][j][k]=dy*dz*sca[i][j][k];
             real stmp = min(1.0,max(0.0,sca[i][j][k]));
             vec[m][i+iof2][j][k] = dy*dz*stmp;
           }
@@ -43,10 +51,14 @@ void CIPCSL2::bdphiface(const Vector & vec
           ||phi.bc().type(b) == BndType::wall()
           ||phi.bc().type(b) == BndType::outlet() ) {
           for_vijk( phi.bc().at(b), i,j,k ) {
+            if (i<=si()-2) continue;
+            if (i>=ei()+2) continue;
+            if (j<=sj()-1) continue;
+            if (j>=ej()+1) continue;
+            if (k<=sk()-1) continue;
+            if (k>=ek()+1) continue;
             real dy=phi.dyc(j);
             real dz=phi.dzc(k);
-            ////vec[m][i+iof2][j][k]=dy*dz*0.5*(sca[i][j][k]+sca[i+iof][j][k]);
-            //vec[m][i+iof2][j][k]=dy*dz*sca[i+iof][j][k];
             real stmp = min(1.0,max(0.0,sca[i+iof][j][k]));
             vec[m][i+iof2][j][k] = dy*dz*stmp;
           }
@@ -59,7 +71,10 @@ void CIPCSL2::bdphiface(const Vector & vec
   int jof,jof2;
   if(m==Comp::j()){
     for( int b=0; b<sca.bc().count(); b++ ) {
+
       if( sca.bc().type_decomp(b) ) continue;
+
+      /* j-min or j-max */
       if ( phi.bc().direction(b)==Dir::jmin()
         || phi.bc().direction(b)==Dir::jmax() ){
         if (phi.bc().direction(b)==Dir::jmin()){
@@ -73,9 +88,14 @@ void CIPCSL2::bdphiface(const Vector & vec
           ||phi.bc().type(b) == BndType::dirichlet()
           ||phi.bc().type(b) == BndType::insert() ){
           for_vijk( phi.bc().at(b), i,j,k ) {
+            if (i<=si()-1) continue;
+            if (i>=ei()+1) continue;
+            if (j<=sj()-2) continue;
+            if (j>=ej()+2) continue;
+            if (k<=sk()-1) continue;
+            if (k>=ek()+1) continue;
             real dx=phi.dxc(i);
             real dz=phi.dzc(k);
-            //vec[m][i][j+jof2][k]=dx*dz*sca[i][j][k];
             real stmp = min(1.0,max(0.0,sca[i][j][k]));
             vec[m][i][j+jof2][k] = dx*dz*stmp;
           }
@@ -86,10 +106,14 @@ void CIPCSL2::bdphiface(const Vector & vec
           ||phi.bc().type(b) == BndType::wall()
           ||phi.bc().type(b) == BndType::outlet() ) {
           for_vijk( phi.bc().at(b), i,j,k ) {
+            if (i<=si()-1) continue;
+            if (i>=ei()+1) continue;
+            if (j<=sj()-2) continue;
+            if (j>=ej()+2) continue;
+            if (k<=sk()-1) continue;
+            if (k>=ek()+1) continue;
             real dx=phi.dxc(i);
             real dz=phi.dzc(k);
-            ////vec[m][i][j+jof2][k]=dx*dz*0.5*(sca[i][j][k]+sca[i][j+jof][k]);
-            //vec[m][i][j+jof2][k]=dx*dz*sca[i][j+jof][k];
             real stmp = min(1.0,max(0.0,sca[i][j+jof][k]));
             vec[m][i][j+jof2][k] = dx*dz*stmp;
           }
@@ -102,7 +126,9 @@ void CIPCSL2::bdphiface(const Vector & vec
   int kof,kof2;
   if(m==Comp::k()){
     for( int b=0; b<sca.bc().count(); b++ ) {
+
       if( sca.bc().type_decomp(b) ) continue;
+
       if ( phi.bc().direction(b)==Dir::kmin()
         || phi.bc().direction(b)==Dir::kmax() ){
         if (phi.bc().direction(b)==Dir::kmin()){
@@ -116,9 +142,14 @@ void CIPCSL2::bdphiface(const Vector & vec
           ||phi.bc().type(b) == BndType::dirichlet()
           ||phi.bc().type(b) == BndType::insert() ){
           for_vijk( phi.bc().at(b), i,j,k ) {
+            if (i<=si()-1) continue;
+            if (i>=ei()+1) continue;
+            if (j<=sj()-1) continue;
+            if (j>=ej()+1) continue;
+            if (k<=sk()-2) continue;
+            if (k>=ek()+2) continue;
             real dx=phi.dxc(i);
             real dy=phi.dyc(j);
-            //vec[m][i][j][k+kof2]=dx*dy*sca[i][j][k];
             real stmp = min(1.0,max(0.0,sca[i][j][k]));
             vec[m][i][j][k+kof2] = dx*dy*stmp;
           }
@@ -129,10 +160,14 @@ void CIPCSL2::bdphiface(const Vector & vec
           ||phi.bc().type(b) == BndType::wall()
           ||phi.bc().type(b) == BndType::outlet() ) {
           for_vijk( phi.bc().at(b), i,j,k ) {
+            if (i<=si()-1) continue;
+            if (i>=ei()+1) continue;
+            if (j<=sj()-1) continue;
+            if (j>=ej()+1) continue;
+            if (k<=sk()-2) continue;
+            if (k>=ek()+2) continue;
             real dx=phi.dxc(i);
             real dy=phi.dyc(j);
-            ////vec[m][i][j][k+kof2]=dx*dy*0.5*(sca[i][j][k]+sca[i][j][k+kof]);
-            //vec[m][i][j][k+kof2]=dx*dy*(sca[i][j][k+kof]);
             real stmp = min(1.0,max(0.0,sca[i][j][k+kof]));
             vec[m][i][j][k+kof2] = dx*dy*stmp;
           }

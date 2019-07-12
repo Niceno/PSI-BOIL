@@ -36,6 +36,7 @@ class VOF : public Centered {
     void curvature();
     void ancillary(); /* calcs ancillary params such as adens w/o advance */
     void tension(Vector * vec, const Matter matt);
+    void tension(Vector * vec, const Matter matt, const Scalar & scp);
     void totalvol();
     void front_minmax();
     void init(){};
@@ -86,6 +87,15 @@ class VOF : public Centered {
     }
     /* getter for cangle */
     real get_cangle() { return(cangle/acos(-1.0)*180.0);};
+
+    /* setter for cangle */
+    void set_limit_color(const bool b) {
+      limit_color=b;
+      boil::oout<<"set_limit_color= "<<b<<"\n";
+    }
+    /* getter for cangle */
+    bool get_limit_color() { return(limit_color);};
+
 
     Vector fs;
     Vector * bndclr;
@@ -245,6 +255,7 @@ class VOF : public Centered {
     bool iminw, imaxw, jminw, jmaxw, kminw, kmaxw; // true = wall
     bool iminc, imaxc, jminc, jmaxc, kminc, kmaxc; // true = cut-stencil
     bool ifull, jfull, kfull; // true = not a dummy direction
+    bool limit_color;
 
     Heaviside heavi;
 

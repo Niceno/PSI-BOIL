@@ -18,8 +18,8 @@ void CIPCSL2::wall_norm(const Scalar & sca) {
   /* i-min plane */
   if(sca.bc().type_here(Dir::imin(), BndType::wall())) {
     int i=si();
-    for(int j=1; j<=sca.ej()+1; j++){
-      for(int k=1; k<=sca.ek()+1; k++){
+    for(int j=sj(); j<=ej()+1; j++){
+      for(int k=sk(); k<=ek()+1; k++){
         /* unit normal vector directed into the wall */
         nwlx =-1.0;
         nwly = 0.0;
@@ -35,8 +35,8 @@ void CIPCSL2::wall_norm(const Scalar & sca) {
   /* i-max plane */
   if(sca.bc().type_here(Dir::imax(), BndType::wall())) {
     int i=ei()+1;
-    for(int j=1; j<=sca.ej()+1; j++){
-      for(int k=1; k<=sca.ek()+1; k++){
+    for(int j=sj(); j<=ej()+1; j++){
+      for(int k=sk(); k<=ek()+1; k++){
         /* unit normal vector directed into the wall */
         nwlx = 1.0;
         nwly = 0.0;
@@ -52,8 +52,8 @@ void CIPCSL2::wall_norm(const Scalar & sca) {
   /* j-min plane */
   if(sca.bc().type_here(Dir::jmin(), BndType::wall())) {
     int j=sj();
-    for(int i=1; i<=sca.ei()+1; i++){
-      for(int k=1; k<=sca.ek()+1; k++){
+    for(int i=si(); i<=ei()+1; i++){
+      for(int k=sk(); k<=ek()+1; k++){
         /* unit normal vector directed into the wall */
         nwlx = 0.0;
         nwly =-1.0;
@@ -69,8 +69,8 @@ void CIPCSL2::wall_norm(const Scalar & sca) {
   /* j-max plane */
   if(sca.bc().type_here(Dir::jmax(), BndType::wall())) {
     int j=ej()+1;
-    for(int i=1; i<=sca.ei()+1; i++){
-      for(int k=1; k<=sca.ek()+1; k++){
+    for(int i=si(); i<=ei()+1; i++){
+      for(int k=sk(); k<=ek()+1; k++){
         /* unit normal vector directed into the wall */
         nwlx = 0.0;
         nwly = 1.0;
@@ -86,8 +86,8 @@ void CIPCSL2::wall_norm(const Scalar & sca) {
   /* k-min plane */
   if(sca.bc().type_here(Dir::kmin(), BndType::wall())) {
     int k=sk();
-    for(int i=1; i<=sca.ei()+1; i++){
-      for(int j=1; j<=sca.ej()+1; j++){
+    for(int i=si(); i<=ei()+1; i++){
+      for(int j=sj(); j<=ej()+1; j++){
         /* unit normal vector directed into the wall */
         nwlx = 0.0;
         nwly = 0.0;
@@ -103,8 +103,8 @@ void CIPCSL2::wall_norm(const Scalar & sca) {
   /* k-max plane */
   if(sca.bc().type_here(Dir::kmax(), BndType::wall())) {
     int k=ek()+1;
-    for(int i=1; i<=sca.ei()+1; i++){
-      for(int j=1; j<=sca.ej()+1; j++){
+    for(int i=si(); i<=ei()+1; i++){
+      for(int j=sj(); j<=ej()+1; j++){
         /* unit normal vector directed into the wall */
         nwlx = 0.0;
         nwly = 0.0;
@@ -122,7 +122,7 @@ void CIPCSL2::wall_norm(const Scalar & sca) {
      sca.bc().type_here(Dir::jmin(), BndType::wall())   ) {
     int i=si();
     int j=sj();
-    for(int k=1; k<=sca.ek()+1; k++){
+    for(int k=sk(); k<=ek()+1; k++){
       nwlx =-0.5*sqrt(2.0);
       nwly =-0.5*sqrt(2.0);
       nwlz = 0.0;
@@ -138,7 +138,7 @@ void CIPCSL2::wall_norm(const Scalar & sca) {
      sca.bc().type_here(Dir::jmax(), BndType::wall())   ) {
     int i=si();
     int j=ej()+1;
-    for(int k=1; k<=sca.ek()+1; k++){
+    for(int k=sk(); k<=ek()+1; k++){
       nwlx =-0.5*sqrt(2.0);
       nwly = 0.5*sqrt(2.0);
       nwlz = 0.0;
@@ -154,7 +154,7 @@ void CIPCSL2::wall_norm(const Scalar & sca) {
      sca.bc().type_here(Dir::kmin(), BndType::wall())   ) {
     int i=si();
     int k=sk();
-    for(int j=1; j<=sca.ej()+1; j++){
+    for(int j=sj(); j<=ej()+1; j++){
       nwlx =-0.5*sqrt(2.0);
       nwly = 0.0;
       nwlz =-0.5*sqrt(2.0);
@@ -170,7 +170,7 @@ void CIPCSL2::wall_norm(const Scalar & sca) {
      sca.bc().type_here(Dir::kmax(), BndType::wall())   ) {
     int i=si();
     int k=ek()+1;
-    for(int j=1; j<=sca.ej()+1; j++){
+    for(int j=sj(); j<=ej()+1; j++){
       nwlx =-0.5*sqrt(2.0);
       nwly = 0.0;
       nwlz = 0.5*sqrt(2.0);
@@ -186,7 +186,7 @@ void CIPCSL2::wall_norm(const Scalar & sca) {
      sca.bc().type_here(Dir::jmin(), BndType::wall())   ) {
     int i=ei()+1;
     int j=sj();
-    for(int k=1; k<=sca.ek()+1; k++){
+    for(int k=sk(); k<=ek()+1; k++){
       nwlx = 0.5*sqrt(2.0);
       nwly =-0.5*sqrt(2.0);
       nwlz = 0.0;
@@ -202,7 +202,7 @@ void CIPCSL2::wall_norm(const Scalar & sca) {
      sca.bc().type_here(Dir::jmax(), BndType::wall())   ) {
     int i=ei()+1;
     int j=ej()+1;
-    for(int k=1; k<=sca.ek()+1; k++){
+    for(int k=sk(); k<=ek()+1; k++){
       nwlx = 0.5*sqrt(2.0);
       nwly = 0.5*sqrt(2.0);
       nwlz = 0.0;
@@ -217,8 +217,8 @@ void CIPCSL2::wall_norm(const Scalar & sca) {
   if(sca.bc().type_here(Dir::imax(), BndType::wall()) &&
      sca.bc().type_here(Dir::kmin(), BndType::wall())   ) {
     int i=ei()+1;
-    int k=si();
-    for(int j=1; j<=sca.ej()+1; j++){
+    int k=sk();
+    for(int j=sj(); j<=ej()+1; j++){
       nwlx = 0.5*sqrt(2.0);
       nwly = 0.0;
       nwlz =-0.5*sqrt(2.0);
@@ -234,7 +234,7 @@ void CIPCSL2::wall_norm(const Scalar & sca) {
      sca.bc().type_here(Dir::kmax(), BndType::wall())   ) {
     int i=ei()+1;
     int k=ek()+1;
-    for(int j=1; j<=sca.ej()+1; j++){
+    for(int j=sj(); j<=ej()+1; j++){
       nwlx = 0.5*sqrt(2.0);
       nwly = 0.0;
       nwlz = 0.5*sqrt(2.0);
@@ -250,7 +250,7 @@ void CIPCSL2::wall_norm(const Scalar & sca) {
      sca.bc().type_here(Dir::kmin(), BndType::wall())   ) {
     int j=sj();
     int k=sk();
-    for(int i=1; i<=sca.ei()+1; i++){
+    for(int i=si(); i<=ei()+1; i++){
       nwlx = 0.0;
       nwly =-0.5*sqrt(2.0);
       nwlz =-0.5*sqrt(2.0);
@@ -266,7 +266,7 @@ void CIPCSL2::wall_norm(const Scalar & sca) {
      sca.bc().type_here(Dir::kmax(), BndType::wall())   ) {
     int j=sj();
     int k=ek()+1;
-    for(int i=1; i<=sca.ei()+1; i++){
+    for(int i=si(); i<=ei()+1; i++){
       nwlx = 0.0;
       nwly =-0.5*sqrt(2.0);
       nwlz = 0.5*sqrt(2.0);
@@ -282,7 +282,7 @@ void CIPCSL2::wall_norm(const Scalar & sca) {
      sca.bc().type_here(Dir::kmin(), BndType::wall())   ) {
     int j=ej()+1;
     int k=sk();
-    for(int i=1; i<=sca.ei()+1; i++){
+    for(int i=si(); i<=ei()+1; i++){
       nwlx = 0.0;
       nwly = 0.5*sqrt(2.0);
       nwlz =-0.5*sqrt(2.0);
@@ -298,7 +298,7 @@ void CIPCSL2::wall_norm(const Scalar & sca) {
      sca.bc().type_here(Dir::kmax(), BndType::wall())   ) {
     int j=ej()+1;
     int k=ek()+1;
-    for(int i=1; i<=sca.ei()+1; i++){
+    for(int i=si(); i<=ei()+1; i++){
       nwlx = 0.0;
       nwly = 0.5*sqrt(2.0);
       nwlz = 0.5*sqrt(2.0);
@@ -480,28 +480,28 @@ void CIPCSL2::nwall(const Scalar & sca
 
   /* dphidx,dphidy,dphidz */
   int ii=i;
-  if(i==sca.si() 
+  if(i==si() 
      && sca.bc().type_here(Dir::imin(), BndType::wall())){
-    ii=sca.si()+1;
-  } else if(i==sca.ei()+1
+    ii=si()+1;
+  } else if(i==ei()+1
      && sca.bc().type_here(Dir::imax(), BndType::wall())){
-    ii=sca.ei();
+    ii=ei();
   }
   int jj=j;
-  if(j==sca.sj()
+  if(j==sj()
      && sca.bc().type_here(Dir::jmin(), BndType::wall())){
-    jj=sca.sj()+1;
-  } else if(j==sca.ej()+1
+    jj=sj()+1;
+  } else if(j==ej()+1
      && sca.bc().type_here(Dir::jmax(), BndType::wall())){
-    jj=sca.ej();
+    jj=ej();
   }
   int kk=k;
-  if(k==sca.sk()
+  if(k==sk()
      && sca.bc().type_here(Dir::kmin(), BndType::wall())){
-    kk=sca.sk()+1;
-  } else if(k==sca.ek()+1
+    kk=sk()+1;
+  } else if(k==ek()+1
      && sca.bc().type_here(Dir::kmax(), BndType::wall())){
-    kk=sca.ek();
+    kk=ek();
   }
 
   real dx=sca.dxw(ii);
@@ -521,24 +521,24 @@ void CIPCSL2::nwall(const Scalar & sca
                       +(sca[i-1][j  ][kk]-sca[i-1][j  ][kk-1])/dz
                       +(sca[i-1][j-1][kk]-sca[i-1][j-1][kk-1])/dz);
 
-  if(i==sca.si()
+  if(i==si()
      && sca.bc().type_here(Dir::imin(), BndType::symmetry())){
     dphidx=0.0;
-  } else if(i==sca.ei()+1
+  } else if(i==ei()+1
      && sca.bc().type_here(Dir::imax(), BndType::symmetry())){
     dphidx=0.0;
   }
-  if(j==sca.sj()
+  if(j==sj()
      && sca.bc().type_here(Dir::jmin(), BndType::symmetry())){
     dphidy=0.0;
-  } else if(j==sca.ej()+1
+  } else if(j==ej()+1
      && sca.bc().type_here(Dir::jmax(), BndType::symmetry())){
     dphidy=0.0;
   }
-  if(k==sca.sk()
+  if(k==sk()
      && sca.bc().type_here(Dir::kmin(), BndType::symmetry())){
     dphidz=0.0;
-  } else if(k==sca.ek()+1
+  } else if(k==ek()+1
      && sca.bc().type_here(Dir::kmax(), BndType::symmetry())){
     dphidz=0.0;
   }

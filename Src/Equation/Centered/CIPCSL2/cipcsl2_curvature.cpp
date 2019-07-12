@@ -56,8 +56,7 @@ void CIPCSL2::curvature() {
 #if 0
   boil::plot->plot(clr,nx,ny,nz, "clr-nx-ny-nz-aft", time->current_step());
   boil::plot->plot(clr,kappa,dist, "clr-kappa-dist-aft", time->current_step());
-  //exit(0);
-  }
+  exit(0);
 #endif
 
   boil::timer.stop("cipcsl2 curvature");

@@ -150,9 +150,6 @@ void CIPCSL2::distfunc(const Scalar & sca, const int itnum) {
       }
     }
 
-#if 0
-    std::cout<<"update= "<<fn[4][17][1]<<"\n";
-#endif
     /* update Jakobi */
     for_ijk(i,j,k){
       if(abs(iflag[i][j][k])<=nlayer){
@@ -175,7 +172,9 @@ void CIPCSL2::distfunc(const Scalar & sca, const int itnum) {
   dist.exchange_all();
 
 #if 0
-  boil::plot->plot(clr,dist,iflag,
+  for_aijk(i,j,k)
+    stmp[i][j][k]=iflag[i][j][k];
+  boil::plot->plot(clr,dist,stmp,
     "distfunc_clr-dist-iflag", time->current_step());
   exit(0);
 #endif

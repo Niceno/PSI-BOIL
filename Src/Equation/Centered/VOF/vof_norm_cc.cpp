@@ -10,7 +10,6 @@ void VOF::norm_cc(const Scalar & sca) {
 *******************************************************************************/
 
   for_ijk(i,j,k) {
-#if 1
     real nxX, nyX, nzX;
     nxX = copysign(1.0,+(sca[i+1][j][k]-sca[i-1][j][k]));
     nyX = 0.5 * ( (sca[i+1][j+1][k]+sca[i][j+1][k]+sca[i-1][j+1][k])
@@ -56,13 +55,6 @@ void VOF::norm_cc(const Scalar & sca) {
         nz[i][j][k]=nzX;
       }
     }
-#else
-        nx[i][j][k]=phi.xc(i);
-        ny[i][j][k]=phi.yc(j);
-        nz[i][j][k]=0.0;
-
-        normalize(nx[i][j][k],ny[i][j][k],nz[i][j][k]);
-#endif
   }
 
   /* normal vector at adjacent cells next to wall, symmetric and IB */
@@ -73,18 +65,11 @@ void VOF::norm_cc(const Scalar & sca) {
   ny.bnd_update();
   nz.bnd_update();
   insert_bc_norm_cc(sca);
-  
+
   /* normalize */
   //for_avijk(sca,i,j,k) {
   //  normalize(nx[i][j][k],ny[i][j][k],nz[i][j][k]);
   //}
- 
-#if 0
-  for_avijk(sca,i,j,k)
-    if(k==boil::BW && ny[i][j][k] != 0.0)
-      boil::oout<<i<<" "<<j<<" "<<sca[i][j][k]<<" "<<nx[i][j][k]<<" "<<ny[i][j][k]<<" "<<nz[i][j][k]<<boil::endl;
-  exit(0);
-#endif
 
   nx.exchange_all();
   ny.exchange_all();

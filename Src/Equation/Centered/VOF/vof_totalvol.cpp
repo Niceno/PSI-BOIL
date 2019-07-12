@@ -8,8 +8,10 @@ void VOF::totalvol() {
    +---------*/
    real phisum = 0.0;
 
-   for_ijk(i,j,k)
+   for_ijk(i,j,k){
+     if(dom->ibody().off(i,j,k)) continue;
      phisum += phi[i][j][k] * dV(i,j,k);
+   }
 
    boil::cart.sum_real(&phisum);
 
