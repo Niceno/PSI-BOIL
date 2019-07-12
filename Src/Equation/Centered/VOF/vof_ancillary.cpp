@@ -20,8 +20,8 @@ void VOF::ancillary() {
   /*-------------------------------+
   |  normal vector at cell center  |
   +-------------------------------*/
-  //norm_cc(phi);
-  norm_elvira(phi);
+  norm_cc(phi);
+  //norm_elvira(phi);
 
   /* calculate the real-space normal vector */
   true_norm_vect(); 

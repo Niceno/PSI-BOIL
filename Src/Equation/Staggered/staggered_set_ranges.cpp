@@ -28,7 +28,7 @@ void Staggered::set_ranges(const Dir & d, const Comp & m,
   +--------------*/
   if( d == Dir::imin() || d == Dir::imax() ) {
     if(m==Comp::v()) {
-#if 1
+#if 0
       //std::cout<<"set_ranges:j= "<<j->first()<<" "<<u.sj(m)<<"\n";
       std::cout<<"set_ranges:j= "<<j->last()<<" "<<dom->nj()<<" "<<u.ej(m)<<"\n";
 #endif

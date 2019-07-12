@@ -53,7 +53,7 @@ void Momentum::outlet() {
 
   /* due to step 1, volf_out has changed */
   volf_out = volf_bct( BndType::outlet(), &aox, &aoy, &aoz ); 
-  ubo = volf_out / (aox + aoy + aoz);
+  ubo = volf_in / (aox + aoy + aoz);
   if(volf_out==0.0 && volf_in==0.0){
     ratio=1.0;
   } else if(volf_out==0.0 && volf_in!=0.0){
