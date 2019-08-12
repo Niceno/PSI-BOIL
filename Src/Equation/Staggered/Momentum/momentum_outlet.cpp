@@ -76,7 +76,7 @@ void Momentum::outlet() {
     ratio= -volf_in / volf_out;
   }
   boil::oout<<"Momentum::outlet: "<<time->current_time()<<" "<<volf_in<<" "<<volf_out<<" "<<ratio<<boil::endl;
-  exit(0);
+  //exit(0);
 #endif
 
   return;

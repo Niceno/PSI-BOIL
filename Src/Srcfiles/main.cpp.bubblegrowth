@@ -6,7 +6,7 @@
 #define USE_VOF
 
 /* computed parameters */
-const int gLevel = 2;  //grid level=2,4,8
+const int gLevel = 9;  //grid level=2,4,8
 #ifdef SYM
 const int NX = 24*gLevel;
 #else
@@ -29,7 +29,7 @@ const real LY = LX;
 const real LZ = LX;
 
 #ifdef USE_VOF
-const int mSimple = 4;
+const int mSimple = 1;
 const int Nsmooth = 0;
 #else
 const int mSimple = 1;
@@ -198,16 +198,20 @@ main(int argc, char ** argv) {
   Pressure pr(p, f, uvw, time, solver, &mixed);
 
   AC multigrid( &pr );
-  multigrid.min_cycles(4);  // 4
-  multigrid.max_cycles(8); // 8
-  multigrid.stop_if_diverging(true);
+  if(mSimple>1) {
+    multigrid.min_cycles(4);  // 4
+    multigrid.max_cycles(8); // 8
+  } else {
+    multigrid.min_cycles(6);  // 4
+  }
+
+  multigrid.stop_if_diverging(false);
 
   Momentum ns2( uvw2, xyz, time, solver, &mixed);
   Pressure pr2(p, f, uvw2, time, solver, &mixed);
 
   AC multigrid2( &pr2 );
-  multigrid2.min_cycles(4);  // 4
-  multigrid2.max_cycles(8); // 8
+  multigrid2.min_cycles(6); 
   multigrid2.stop_if_diverging(true);
 
 #ifdef USE_VOF
@@ -401,13 +405,13 @@ main(int argc, char ** argv) {
 
   c.bnd_update();
   c.exchange_all();
-  conc.init();
-  conc.ancillary();
 
     boil::plot->plot(uvw,c,tpr,press,mdot,mflx,"uvw-c-tpr-press-mdot-mflx",0); 
     //exit(0);
 
   } // restart
+  conc.init();
+  conc.ancillary();
   input.close();
 
   /* set iint */
@@ -535,6 +539,30 @@ main(int argc, char ** argv) {
         output << time.dt() << "\n";
         output.close();
       }
+    }
+
+    if( boil::timer.current_min() > wmin-12.0
+      || time.current_step()==time.total_steps()) {
+      uvw  .save("uvw",   time.current_step());
+      press.save("press", time.current_step());
+      c .save("c",  time.current_step());
+      tpr  .save("tpr",   time.current_step());
+      std::fstream output;
+      output.open("time.txt", std::ios::out);
+      output << time.current_step() << boil::endl;
+      output << time.current_time()+time.dt() << boil::endl;
+      output << time.dt() << boil::endl;
+      output.close();
+      output.open("run.txt", std::ios::out);
+      output << 0 << boil::endl;
+      output.close();
+      boil::timer.stop();
+      boil::timer.report();
+      uvw  .rm("uvw", ts);
+      press.rm("press", ts);
+      c .rm("c", ts);
+      tpr  .rm("tpr", ts);
+      exit(0); 
     }
   }
 

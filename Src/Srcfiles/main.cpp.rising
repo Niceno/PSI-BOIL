@@ -18,7 +18,7 @@ const real radius=2.1e-4;
 const real LX1 = 0.0015;
 const real LX2 = 0.004;
 const real LZ  = 0.02;
-const int gLevel = 4;  //grid level=2,4,8
+const int gLevel = 6;  //grid level=2,4,8
 const int NX1 = 24*gLevel;
 const int NX2 = 18*gLevel;
 
@@ -28,7 +28,7 @@ const real tsat0   = 0.0E+02;
 const real tout = tsat0+3.1;
 
 #ifdef USE_VOF
-const int mSimple = 3;
+const int mSimple = 1;
 const int Nsmooth = 0;
 #else
 const int mSimple = 1;
@@ -171,8 +171,9 @@ main(int argc, char ** argv) {
   /*-------------------+
   |  time-integration  |
   +-------------------*/
-  const int  ndt = 25000;
-  const real tint = 0.001;
+  const int ssndt= 250*gLevel;
+  const int  ndt = 7000*gLevel + ssndt;
+  const real tint = 0.005;
   const int  nint2= ndt/3;
   const real dxmin = d.dxyz_min();
   boil::oout<<"main:dxmin= "<<dxmin<<" "<<boil::cart.iam()<<"\n";
@@ -218,8 +219,12 @@ main(int argc, char ** argv) {
   ns.diffusion_set(TimeScheme::backward_euler());
   Pressure pr(p, f, uvw, time, solver, &mixed);
   AC multigrid( &pr );
-  multigrid.min_cycles(4);
-  multigrid.max_cycles(8);
+  if(mSimple>1) {
+    multigrid.min_cycles(3);
+    multigrid.max_cycles(8);
+  } else {
+    multigrid.min_cycles(6);
+  }
   multigrid.stop_if_diverging(true);
 
   /*-------------------+
@@ -356,19 +361,21 @@ main(int argc, char ** argv) {
     boil::oout << "# WTIME:     " << boil::timer.current_min() << boil::endl;
     boil::oout << "########################" << boil::endl;
 
-    /*------------------------+
-    |  solve energy equation  |
-    +------------------------*/
-    enthFD.discretize();
-    enthFD.new_time_step();
-    enthFD.solve(ResRat(1e-16),"enthFD");
+    if(time.current_step()>ssndt) {
+      /*------------------------+
+      |  solve energy equation  |
+      +------------------------*/
+      enthFD.discretize();
+      enthFD.new_time_step();
+      enthFD.solve(ResRat(1e-16),"enthFD");
 
-    /*---------------+
-    |  phase change  |
-    +---------------*/
-    pc.update();
-    //boil::plot->plot(xyz,c,tpr,press,mdot,"xyz-c-tpr-press-mdot",1);
-    ns.vol_phase_change(&f);
+      /*---------------+
+      |  phase change  |
+      +---------------*/
+      pc.update();
+      //boil::plot->plot(xyz,c,tpr,press,mdot,"xyz-c-tpr-press-mdot",1);
+      ns.vol_phase_change(&f);
+    }
 
     // store velocity
     for_m(m)
@@ -387,9 +394,10 @@ main(int argc, char ** argv) {
       /* surface tension */
       conc.tension(&xyz, mixed);
 
-      /* gravity force */
-      const Comp m = Comp::w();
-      for_vmijk(xyz,m,i,j,k){
+      if(time.current_step()>ssndt) {
+        /* gravity force */
+        const Comp m = Comp::w();
+        for_vmijk(xyz,m,i,j,k){
 #ifndef USE_VOF
         real phil=step[i][j][k];
 #else
@@ -400,6 +408,7 @@ main(int argc, char ** argv) {
         real rhomix = liquid.rho()->value()*phil
                     + vapor.rho()->value() *phiv;
         xyz[m][i][j][k] += -gravity * xyz.dV(m,i,j,k) * rhomix;
+      }
       }
 
       /* essential for moving front */
