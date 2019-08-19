@@ -109,6 +109,8 @@ void PhaseChange::micro(Vector * vec, const Scalar * diff_eddy) {
               hflux_vapor[ndir] += lc*(tpr[i][j][k]-tpr[i+iof][j+jof][k+kof])
                                 /alen*area;
 
+              //phi[ii][jj][kk] = 0.0;  // 2019.0809
+
 	    } else {
 
               /* micro layer exists */

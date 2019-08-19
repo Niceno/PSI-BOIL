@@ -20,7 +20,7 @@ void EnthalpyTIF::update_ftif(const real TS0, const real TSm, const bool nst,
     +------------------------*/
     for_ijk(i,j,k){
       real lc,cp_mass;
-      if((*clr)[i][j][k]>=0.5){
+      if((*clr)[i][j][k]>=clrsurf){
         lc = lambdal;
         cp_mass = cpl/rhol;
       } else {
@@ -37,12 +37,13 @@ void EnthalpyTIF::update_ftif(const real TS0, const real TSm, const bool nst,
       const real pc = phi[i][j][k];
       real xm,xp,pm,pp,aflagm,aflagp;
       aflagm=aflagp=0.0;
-      if((clrw-0.5)*(clrc-0.5)>=0){
+      //if((clrw-clrsurf)*(clrc-clrsurf)>=0){
+      if(!Interface(-1,Comp::i(),i,j,k)){
         xm=phi.dxw(i);
         pm=phi[i-1][j][k];
       } else {
         if(!fs) {
-          real frac = std::max((0.5-clrc)/(clrw-clrc),epsl);
+          real frac = std::max((clrsurf-clrc)/(clrw-clrc),epsl);
           xm=frac*phi.dxw(i);
           pm=Tint(-1,Comp::i(),frac,i,j,k);
         } else {
@@ -50,12 +51,13 @@ void EnthalpyTIF::update_ftif(const real TS0, const real TSm, const bool nst,
         }
         aflagm=1.0;
       }
-      if((clrc-0.5)*(clre-0.5)>=0){
+      //if((clrc-clrsurf)*(clre-clrsurf)>=0){
+      if(!Interface(+1,Comp::i(),i,j,k)){
         xp=phi.dxe(i);
         pp=phi[i+1][j][k];
       } else {
         if(!fs) {
-          real frac = std::max((0.5-clrc)/(clre-clrc),epsl);
+          real frac = std::max((clrsurf-clrc)/(clre-clrc),epsl);
           xp=frac*phi.dxe(i);
           pp=Tint(+1,Comp::i(),frac,i,j,k);
         } else {
@@ -74,7 +76,7 @@ void EnthalpyTIF::update_ftif(const real TS0, const real TSm, const bool nst,
     +------------------------*/
     for_ijk(i,j,k){
       real lc,cp_mass;
-      if((*clr)[i][j][k]>=0.5){
+      if((*clr)[i][j][k]>=clrsurf){
         lc = lambdal;
         cp_mass = cpl/rhol;
       } else {
@@ -91,12 +93,13 @@ void EnthalpyTIF::update_ftif(const real TS0, const real TSm, const bool nst,
       const real pc = phi[i][j][k];
       real ym,yp,pm,pp,aflagm,aflagp;
       aflagm=aflagp=0.0;
-      if((clrs-0.5)*(clrc-0.5)>=0){
+      //if((clrs-clrsurf)*(clrc-clrsurf)>=0){
+      if(!Interface(-1,Comp::j(),i,j,k)){
         ym=phi.dys(j);
         pm=phi[i][j-1][k];
       } else {
         if(!fs) {
-          real frac = std::max((0.5-clrc)/(clrs-clrc),epsl);
+          real frac = std::max((clrsurf-clrc)/(clrs-clrc),epsl);
           ym=frac*phi.dys(j);
           pm=Tint(-1,Comp::j(),frac,i,j,k);
         } else {
@@ -104,12 +107,13 @@ void EnthalpyTIF::update_ftif(const real TS0, const real TSm, const bool nst,
         }
         aflagm=1.0;
       }
-      if((clrc-0.5)*(clrn-0.5)>=0){
+      //if((clrc-clrsurf)*(clrn-clrsurf)>=0){
+      if(!Interface(+1,Comp::j(),i,j,k)){
         yp=phi.dyn(j);
         pp=phi[i][j+1][k];
       } else {
         if(!fs) {
-          real frac = std::max((0.5-clrc)/(clrn-clrc),epsl);
+          real frac = std::max((clrsurf-clrc)/(clrn-clrc),epsl);
           yp=frac*phi.dyn(j);
           pp=Tint(+1,Comp::j(),frac,i,j,k);
         } else {
@@ -128,7 +132,7 @@ void EnthalpyTIF::update_ftif(const real TS0, const real TSm, const bool nst,
     +------------------------*/
     for_ijk(i,j,k){
       real lc,cp_mass;
-      if((*clr)[i][j][k]>=0.5){
+      if((*clr)[i][j][k]>=clrsurf){
         lc = lambdal;
         cp_mass = cpl/rhol;
       } else {
@@ -145,12 +149,13 @@ void EnthalpyTIF::update_ftif(const real TS0, const real TSm, const bool nst,
       const real pc = phi[i][j][k];
       real zm,zp,pm,pp,aflagm,aflagp;
       aflagm=aflagp=0.0;
-      if((clrb-0.5)*(clrc-0.5)>=0){
+      //if((clrb-clrsurf)*(clrc-clrsurf)>=0){
+      if(!Interface(-1,Comp::k(),i,j,k)){
         zm=phi.dzb(k);
         pm=phi[i][j][k-1];
       } else {
         if(!fs) {
-          real frac = std::max((0.5-clrc)/(clrb-clrc),epsl);
+          real frac = std::max((clrsurf-clrc)/(clrb-clrc),epsl);
           zm=frac*phi.dzb(k);
           pm=Tint(-1,Comp::k(),frac,i,j,k);
         } else {
@@ -158,12 +163,13 @@ void EnthalpyTIF::update_ftif(const real TS0, const real TSm, const bool nst,
         }
         aflagm=1.0;
       }
-      if((clrc-0.5)*(clrt-0.5)>=0){
+      //if((clrc-clrsurf)*(clrt-clrsurf)>=0){
+      if(!Interface(+1,Comp::k(),i,j,k)){
         zp=phi.dzt(k);
         pp=phi[i][j][k+1];
       } else {
         if(!fs) {
-          real frac = std::max((0.5-clrc)/(clrt-clrc),epsl);
+          real frac = std::max((clrsurf-clrc)/(clrt-clrc),epsl);
           zp=frac*phi.dzt(k);
           pp=Tint(+1,Comp::k(),frac,i,j,k);
         } else {

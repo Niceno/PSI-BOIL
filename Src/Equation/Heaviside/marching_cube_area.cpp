@@ -5,6 +5,9 @@ real MarchingCube::area(const int i, const int j, const int k){
 /***************************************************************************//**
 *  \brief calculate iso-surface area of cell (i,j,k)
 *******************************************************************************/
+
+  if(dom->ibody().off(i,j,k)) return 0.0;
+
   GRIDCELL grid;
 
   int isum=0;
@@ -89,6 +92,14 @@ real MarchingCube::area(const int i, const int j, const int k){
   //std::cout<<"marching_cube "<<areaval<<"\n";
   //exit(0);
   //boil::oout<<i<<" "<<j<<" "<<k<<" "<<areaval;
+
+#if 0
+  if(i==3&&j==3&&k==7) {
+    for(int i(0); i < 8; ++i)
+      boil::oout<<grid.val[i]<<boil::endl;
+    boil::oout<<areaval<<boil::endl;
+  }
+#endif
 
   return (areaval);
 }

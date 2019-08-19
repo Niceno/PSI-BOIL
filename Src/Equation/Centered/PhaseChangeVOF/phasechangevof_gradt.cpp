@@ -20,9 +20,9 @@ void PhaseChangeVOF::gradt(const Scalar * diff_eddy) {
                  + tyl[i][j][k]*ny[i][j][k]
                  + tzl[i][j][k]*nz[i][j][k];
   }
-  ext_gradt(tnv, 1);
-  ext_gradt(tnl,-1);
-
+  /* extrapolate grad(tpr) */
+  extrapolate(tnv, 1);
+  extrapolate(tnl,-1);
 #else
   /* extrapolate grad(tpr) */
   ext_gradt(txv, 1, Comp::i());
@@ -33,16 +33,12 @@ void PhaseChangeVOF::gradt(const Scalar * diff_eddy) {
   ext_gradt(tzl,-1, Comp::k());
 #endif
 
-#if 0 
-    for_avi(tzv,i)
-       boil::oout<<i<<" "<<clr[i][48][48]<<" "<<txl[i][48][48]<<" "<<txv[i][48][48]
-                 <<" | "<<clr[i][48][49]<<" "<<txl[i][48][49]<<" "<<txv[i][48][49]
-                 <<" | "<<clr[i][49][48]<<" "<<txl[i][49][48]<<" "<<txv[i][49][48]
-                 <<" | "<<clr[i][49][49]<<" "<<txl[i][49][49]<<" "<<txv[i][49][49]<<boil::endl;
+#if 0
+  /* subgrid treatment */
+  subgrid();
 #endif
 
 #if 0
-  //boil::plot->plot(clr,txv,tyv,tzv,"clr-txv-tyv-tzv",time->current_step());
   boil::plot->plot(clr,tnl,tnv,"clr-tnl-tnv",time->current_step());
   exit(0);
 #endif

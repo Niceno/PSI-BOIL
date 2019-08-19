@@ -1,24 +1,21 @@
 #include "phasechange.h"
-#include <cmath>
 
 /******************************************************************************/
 void PhaseChange::setflag() {
 /***************************************************************************//**
 *  \brief set flag.
-          vapor cell  = -3
-          nFSv cell   = -2
+          vapor cell  = -2
           FSv cell    = -1
           FSl cell    = 1
-          nFSl cell   = 2
-          liquid cell = 3
+          liquid cell = 2
           ibody  cell = -1000
 *******************************************************************************/
 
   for_vijk(clr,i,j,k) {
     if(clr[i][j][k]>=phisurf){
-      iflag[i][j][k]=3;
+      iflag[i][j][k]=2;
     } else {
-      iflag[i][j][k]=-3;
+      iflag[i][j][k]=-2;
     }
   }
   /* i-direction */
@@ -59,46 +56,6 @@ void PhaseChange::setflag() {
         } else {
           iflag[i][j][k  ]=1;
           iflag[i][j][k+1]=-1;
-        }
-      }
-    }
-  }
-
-  iflag.exchange_all();
-  /* cells in vicinity of free surface cells */
-
-  /* i-direction */
-  for(int i=clr.si()-1; i<=clr.ei(); i++){
-    for_vjk(clr,j,k){
-      if(!(fabs(iflag[i][j][k])==1) != !(fabs(iflag[i+1][j][k])==1)){ /* xor */
-        if(fabs(iflag[i][j][k]) == 1){
-           iflag[i+1][j][k] = copysign(2,iflag[i  ][j][k]);
-        } else {
-           iflag[i  ][j][k] = copysign(2,iflag[i+1][j][k]);
-        }
-      }
-    }
-  }
-  /* j-direction */
-  for(int j=clr.sj()-1; j<=clr.ej(); j++){
-    for_vik(clr,i,k){
-      if(!(fabs(iflag[i][j][k])==1) != !(fabs(iflag[i][j+1][k])==1)){ /* xor */
-        if(fabs(iflag[i][j][k]) == 1){
-           iflag[i][j+1][k] = copysign(2,iflag[i][j  ][k]);
-        } else {
-           iflag[i][j  ][k] = copysign(2,iflag[i][j+1][k]);
-        }
-      }
-    }
-  }
-  /* k-direction */
-  for(int k=clr.sk()-1; k<=clr.ek(); k++){
-    for_vij(clr,i,j){
-      if(!(fabs(iflag[i][j][k])==1) != !(fabs(iflag[i][j][k+1])==1)){ /* xor */
-        if(fabs(iflag[i][j][k]) == 1){
-           iflag[i][j][k+1] = copysign(2,iflag[i][j][k  ]);
-        } else {
-           iflag[i][j][k  ] = copysign(2,iflag[i][j][k+1]);
         }
       }
     }

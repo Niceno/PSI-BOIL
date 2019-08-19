@@ -18,7 +18,7 @@ void EnthalpyTIF::create_system_diffusive(const Scalar * diff_eddy) {
     /* coefficients in i direction (w and e) */
     for_ijk(i,j,k) {
       real lc, cp_mass;
-      if((*clr)[i][j][k]>=0.5){
+      if((*clr)[i][j][k]>=clrsurf){
         lc = lambdal;
         cp_mass = cpl/rhol;
       } else {
@@ -34,22 +34,24 @@ void EnthalpyTIF::create_system_diffusive(const Scalar * diff_eddy) {
       const real clre = std::min(std::max((*clr)[i+1][j][k],0.0),1.0);
       real xm,xp,aflagm,aflagp;
       aflagm=aflagp=1.0;
-      if((clrw-0.5)*(clrc-0.5)>=0){
+      //if((clrw-clrsurf)*(clrc-clrsurf)>=0){
+      if(!Interface(-1,Comp::i(),i,j,k)){
         xm=phi.dxw(i);
       } else {
         if(!fs) {
-          xm=std::max((0.5-clrc)/(clrw-clrc),epsl)*phi.dxw(i);
+          xm=std::max((clrsurf-clrc)/(clrw-clrc),epsl)*phi.dxw(i);
         } else {
           real ts;
           xm = std::max(epsl*phi.dxw(i),distance_x(i,j,k,-1,ts));
         }        
         aflagm=0.0;
       }
-      if((clrc-0.5)*(clre-0.5)>=0){
+      //if((clrc-clrsurf)*(clre-clrsurf)>=0){
+      if(!Interface(+1,Comp::i(),i,j,k)){
         xp=phi.dxe(i);
       } else {
         if(!fs) {
-          xp=std::max((0.5-clrc)/(clre-clrc),epsl)*phi.dxe(i);
+          xp=std::max((clrsurf-clrc)/(clre-clrc),epsl)*phi.dxe(i);
         } else {
           real ts;
           xp = std::max(epsl*phi.dxe(i),distance_x(i,j,k,+1,ts));
@@ -64,7 +66,7 @@ void EnthalpyTIF::create_system_diffusive(const Scalar * diff_eddy) {
     /* coefficients in j direction (s and n) */
     for_ijk(i,j,k) {
       real lc, cp_mass;
-      if((*clr)[i][j][k]>=0.5){
+      if((*clr)[i][j][k]>=clrsurf){
         lc = lambdal;
         cp_mass = cpl/rhol;
       } else {
@@ -80,22 +82,24 @@ void EnthalpyTIF::create_system_diffusive(const Scalar * diff_eddy) {
       const real clrn = std::min(std::max((*clr)[i][j+1][k],0.0),1.0);
       real ym,yp,aflagm,aflagp;
       aflagm=aflagp=1.0;
-      if((clrs-0.5)*(clrc-0.5)>=0){
+      //if((clrs-clrsurf)*(clrc-clrsurf)>=0){
+      if(!Interface(-1,Comp::j(),i,j,k)){
         ym=phi.dys(j);
       } else {
         if(!fs) {
-          ym=std::max((0.5-clrc)/(clrs-clrc),epsl)*phi.dys(j);
+          ym=std::max((clrsurf-clrc)/(clrs-clrc),epsl)*phi.dys(j);
         } else {
           real ts;
           ym = std::max(epsl*phi.dys(j),distance_y(i,j,k,-1,ts));
         }
         aflagm=0.0;
       }
-      if((clrc-0.5)*(clrn-0.5)>=0){
+      //if((clrc-clrsurf)*(clrn-clrsurf)>=0){
+      if(!Interface(+1,Comp::j(),i,j,k)){
         yp=phi.dyn(j);
       } else {
         if(!fs) {
-          yp=std::max((0.5-clrc)/(clrn-clrc),epsl)*phi.dyn(j);
+          yp=std::max((clrsurf-clrc)/(clrn-clrc),epsl)*phi.dyn(j);
         } else {
           real ts;
           yp = std::max(epsl*phi.dyn(j),distance_y(i,j,k,+1,ts));
@@ -110,7 +114,7 @@ void EnthalpyTIF::create_system_diffusive(const Scalar * diff_eddy) {
     /* coefficients in k direction (b and t) */
     for_ijk(i,j,k) {
       real lc, cp_mass;
-      if((*clr)[i][j][k]>=0.5){
+      if((*clr)[i][j][k]>=clrsurf){
         lc = lambdal;
         cp_mass = cpl/rhol;
       } else {
@@ -126,22 +130,24 @@ void EnthalpyTIF::create_system_diffusive(const Scalar * diff_eddy) {
       const real clrt = std::min(std::max((*clr)[i][j][k+1],0.0),1.0);
       real zm,zp,aflagm,aflagp;
       aflagm=aflagp=1.0;
-      if((clrb-0.5)*(clrc-0.5)>=0){
+      //if((clrb-clrsurf)*(clrc-clrsurf)>=0){
+      if(!Interface(-1,Comp::k(),i,j,k)){
         zm=phi.dzb(k);
       } else {
         if(!fs) {
-          zm=std::max((0.5-clrc)/(clrb-clrc),epsl)*phi.dzb(k);
+          zm=std::max((clrsurf-clrc)/(clrb-clrc),epsl)*phi.dzb(k);
         } else {
           real ts;
           zm = std::max(epsl*phi.dzb(k),distance_z(i,j,k,-1,ts));
         }
         aflagm=0.0;
       }
-      if((clrc-0.5)*(clrt-0.5)>=0){
+      //if((clrc-clrsurf)*(clrt-clrsurf)>=0){
+      if(!Interface(+1,Comp::k(),i,j,k)){
         zp=phi.dzt(k);
       } else {
         if(!fs) {
-          zp=std::max((0.5-clrc)/(clrt-clrc),epsl)*phi.dzt(k);
+          zp=std::max((clrsurf-clrc)/(clrt-clrc),epsl)*phi.dzt(k);
         } else {
           real ts;
           zp = std::max(epsl*phi.dzt(k),distance_z(i,j,k,+1,ts));

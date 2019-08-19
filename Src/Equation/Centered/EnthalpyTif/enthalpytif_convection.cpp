@@ -199,7 +199,8 @@ void EnthalpyTIF::convection(Scalar * conv) {
 
       // dtdxm
       real clrw = clrold[i-1][j][k];
-      if((clrc-clrsurf)*(clrw-clrsurf)<0.0){
+      //if((clrc-clrsurf)*(clrw-clrsurf)<0.0){
+      if(Interface_old(-1,Comp::i(),i,j,k)) {
         real dxm, ts;
         if(!fs) {
           dxm = max(epsl,(clrsurf-clrc)/(clrw-clrc));
@@ -218,7 +219,8 @@ void EnthalpyTIF::convection(Scalar * conv) {
 
       // dtdxp
       real clre = clrold[i+1][j][k];
-      if((clrc-clrsurf)*(clre-clrsurf)<0.0){
+      //if((clrc-clrsurf)*(clre-clrsurf)<0.0){
+      if(Interface_old(+1,Comp::i(),i,j,k)) {
         real dxp, ts;
         if(!fs) {
           dxp = max(epsl,(clrsurf-clrc)/(clre-clrc));
@@ -237,7 +239,8 @@ void EnthalpyTIF::convection(Scalar * conv) {
 
       // dtdym
       real clrs = clrold[i][j-1][k];
-      if((clrc-clrsurf)*(clrs-clrsurf)<0.0){
+      //if((clrc-clrsurf)*(clrs-clrsurf)<0.0){
+      if(Interface_old(-1,Comp::j(),i,j,k)) {
         real dym, ts;
         if(!fs) {
           dym = max(epsl,(clrsurf-clrc)/(clrs-clrc));
@@ -256,7 +259,8 @@ void EnthalpyTIF::convection(Scalar * conv) {
 
       // dtdyp
       real clrn = clrold[i][j+1][k];
-      if((clrc-clrsurf)*(clrn-clrsurf)<0.0){
+      //if((clrc-clrsurf)*(clrn-clrsurf)<0.0){
+      if(Interface_old(+1,Comp::j(),i,j,k)) {
         real dyp, ts;
         if(!fs) {
           dyp = max(epsl,(clrsurf-clrc)/(clrn-clrc));
@@ -275,7 +279,8 @@ void EnthalpyTIF::convection(Scalar * conv) {
 
       // dtdzm
       real clrb = clrold[i][j][k-1];
-      if((clrc-clrsurf)*(clrb-clrsurf)<0.0){
+      //if((clrc-clrsurf)*(clrb-clrsurf)<0.0){
+      if(Interface_old(-1,Comp::k(),i,j,k)) {
         real dzm, ts;
         if(!fs) {
           dzm = max(epsl,(clrsurf-clrc)/(clrb-clrc));
@@ -294,7 +299,8 @@ void EnthalpyTIF::convection(Scalar * conv) {
 
       // dtdzp
       real clrt = clrold[i][j][k+1];
-      if((clrc-clrsurf)*(clrt-clrsurf)<0.0){
+      //if((clrc-clrsurf)*(clrt-clrsurf)<0.0){
+      if(Interface_old(+1,Comp::k(),i,j,k)) {
         real dzp, ts;
         if(!fs) {
           dzp = max(epsl,(clrsurf-clrc)/(clrt-clrc));

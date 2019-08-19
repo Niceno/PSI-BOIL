@@ -1,46 +1,23 @@
 noinst_LIBRARIES = libPhaseChange.a
-libPhaseChange_a_SOURCES = site.h                         \
-                           site.cpp                       \
-                           nucleation.h                   \
-                           nucleation.cpp                 \
-                           nucleation_add.cpp             \
-                           nucleation_area_vapor.cpp      \
-                           nucleation_area_vapor_sum.cpp  \
-                           nucleation_clr_site.cpp        \
-                           nucleation_cutneck.cpp         \
-                           nucleation_dmicro0.cpp         \
-                           nucleation_load.cpp            \
-                           nucleation_plant.cpp           \
-                           nucleation_replant.cpp         \
-                           nucleation_rm.cpp              \
-                           nucleation_save.cpp            \
-                           nucleation_set_range.cpp       \
-                           nucleation_st_active.cpp       \
-                           nucleation_tpr_site.cpp        \
-                           nucleation_zftmin.cpp          \
-                           nucleation_zoning.cpp          \
-                           phasechange.h                        \
+libPhaseChange_a_SOURCES = phasechange.h                        \
                            phasechange.cpp                      \
                            phasechange_cal_gradt.cpp            \
-                           phasechange_cal_massflux.cpp         \
                            phasechange_distfunc.cpp             \
                            phasechange_dmicro_intermediate.cpp  \
                            phasechange_ext_gradt.cpp            \
-                           phasechange_finalize.cpp             \
                            phasechange_gradphic.cpp             \
                            phasechange_gradt.cpp                \
                            phasechange_gradt5.cpp               \
-                           phasechange_gradt8.cpp               \
                            phasechange_ib_ext_scalar.cpp        \
                            phasechange_ib_set_dflag.cpp         \
                            phasechange_incl_no_interface.cpp    \
-                           phasechange_initialize.cpp           \
                            phasechange_insert_bc_gradphic.cpp   \
                            phasechange_insert_bc_dist.cpp       \
                            phasechange_insert_bc_flag.cpp       \
                            phasechange_insert_bc_norm.cpp       \
                            phasechange_iso_length.cpp           \
                            phasechange_m.cpp                    \
+                           phasechange_marching_cube.cpp        \
                            phasechange_micro.cpp                \
                            phasechange_micro_coef.cpp           \
                            phasechange_micro_shift.cpp          \
@@ -54,7 +31,5 @@ libPhaseChange_a_SOURCES = site.h                         \
                            phasechange_sources_sum.cpp          \
                            phasechange_sources_tprs.cpp         \
                            phasechange_str_dSprev.cpp           \
-                           phasechange_surface_color.cpp        \
-                           phasechange_tint.cpp                 \
                            phasechange_update.cpp
 INCLUDE = -I@top_srcdir@/

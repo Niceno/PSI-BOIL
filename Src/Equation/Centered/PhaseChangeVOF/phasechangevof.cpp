@@ -9,11 +9,7 @@ PhaseChangeVOF::PhaseChangeVOF(const Scalar & MDOT,
                                const Scalar & CLRS,
                                const Scalar & VS,
                                const Vector & U, 
-#if 1
                                Topology & topo,
-#else
-                               const VOF & vof,
-#endif
                                const TIF & TIFMODEL,
                                Times & T, 
                                Matter * f,
@@ -28,19 +24,11 @@ PhaseChangeVOF::PhaseChangeVOF(const Scalar & MDOT,
   clr(&CLR),
   clrs(&CLRS),
   M(&MFLX),
-#if 1
   nx(topo.nx),
   ny(topo.ny),
   nz(topo.nz),
   fs(topo.fs),
   adens(topo.adens),
-#else
-  nx(&(vof.mx)),
-  ny(&(vof.my)),
-  nz(&(vof.mz)),
-  fs(&(vof.fs)),
-  adens(&(vof.adens)),
-#endif
   bndtpr ( *U   .domain() ),
   txv    ( *MDOT.domain()),
   tyv    ( *MDOT.domain()),

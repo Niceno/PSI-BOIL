@@ -110,7 +110,7 @@ class Domain {
 
     bool  period(const int i) const {return per[i];}
     bool  is_dummy(const int i) const {return dummy[i];}
-    bool  cutoff(const int i, const int j) const {return ctf[i][j];}
+    //bool  cutoff(const int i, const int j) const {return ctf[i][j];}
     bool  bnd_symmetry(const Dir d) const;
     const Domain * coarser() const {return crsr;}
     
@@ -199,7 +199,6 @@ class Domain {
     real min_dxyz, max_dxyz;
     real min_dV, max_dV;
     real max_ar; /* aspect ratio */
-    bool imins,imaxs,jmins,jmaxs,kmins,kmaxs;
 };	
 
 #endif

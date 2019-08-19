@@ -1,11 +1,11 @@
 #ifndef NUCLEATION_H
 #define NUCLEATION_H
 
-#include "../../../Parallel/mpi_macros.h"
-#include "../../../Field/Scalar/scalar.h"
-#include "../../../Global/global_constants.h"
-#include "../../../SimulationTime/simulation_time.h"
-#include "../../../Matter/matter.h"
+#include "../../Parallel/mpi_macros.h"
+#include "../../Field/Scalar/scalar.h"
+#include "../../Global/global_constants.h"
+#include "../../SimulationTime/simulation_time.h"
+#include "../../Matter/matter.h"
 #include "site.h"
 
 /////////////

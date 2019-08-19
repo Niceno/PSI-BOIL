@@ -11,7 +11,7 @@
 #include "../../Topology/topology.h"
 //#include "nucleation.h"
 
-//#define IB
+#define IB
 
 class PhaseChangeVOF : public Centered {
   public:
@@ -76,14 +76,18 @@ class PhaseChangeVOF : public Centered {
     void gradt(const Scalar * diff_eddy = NULL);
     void gradt_ib(const Scalar * diff_eddy = NULL);
 
-    void ext_gradt(Scalar & sca, const int iext, const Comp mcomp);
-    void ext_gradt(Scalar & sca, const int iext);
+    //void ext_gradt(Scalar & sca, const int iext, const Comp mcomp);
+    void extrapolate(Scalar & sca, const int iext);
     void insert_bc_ext(const Comp mcomp);
 
     void setflag();
 
-    void insert_bc_gradt(const Scalar * diff_eddy = NULL);
-    void prepare_gradt8();
+    void subgrid();
+    void subgrid_gradt();
+    void subgrid_setflag();
+
+    //void insert_bc_gradt(const Scalar * diff_eddy = NULL);
+    void calculate_node_temperature(const Scalar * diff_eddy = NULL);
 
     real grad_2nd(const real tm0, const real tm1, const real tm2,
                   const real dm1, const real dm2);
@@ -117,6 +121,9 @@ class PhaseChangeVOF : public Centered {
                       const int dir, real & tint, real & dist);
  
     real Tint(const int i, const int j, const int k);
+
+    real temperature_node(real len_s, real lam_s, real tmp_s
+                        , real len_f, real lam_f, real tmp_f);
 
     bool upwind_flag;
 

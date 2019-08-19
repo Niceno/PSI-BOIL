@@ -201,7 +201,11 @@ void VOF::cal_fs3() {
   } 
 
   /* correct at boundaries */
+#if 0
   fs_bnd();
+#else
+  fs_bnd_nosubgrid();
+#endif
   //fs.exchange_all();
 
   //boil::plot->plot(fs,phi, "fs-clr", 0);

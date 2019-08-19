@@ -19,7 +19,8 @@ void Domain::init(const Decompose & dec) {
   if( dec == Decompose::no() ) return;
 
   /* get the resolution in each direction */
-  int res[] = { gi()-2*boil::BW , gj()-2*boil::BW , gk()-2*boil::BW };
+  //int res[] = { gi()-2 , gj()-2 , gk()-2 };
+  int res[] = { gi()-2*boil::BW , gj()-2*boil::BW , gk()-2*boil::BW }; //2019.0615
 
   /* take care of constrained decompositions */
   if( dec != Decompose::x()  && 

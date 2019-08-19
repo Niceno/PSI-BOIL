@@ -1,84 +1,115 @@
 #include "vof.h"
 
-real frontPosition(real xyz1, real xyz2, real phi1, real phi2);
-
 /******************************************************************************/
 void VOF::front_minmax() {
+  front_minmax(Range<real>(-boil::exa, boil::exa),
+               Range<real>(-boil::exa, boil::exa),
+               Range<real>(-boil::exa, boil::exa) );
+}
+
+/******************************************************************************/
+void VOF::front_minmax(Range<real> xr,
+                       Range<real> yr,
+                       Range<real> zr ) {
 /***************************************************************************//**
-*  \brief Detect maximu and minimum of free surface position.
+*  \brief Detect maximum and minimum of free surface position.
 *           results: xminft,xmaxft,yminft,ymaxft,zminft,zmaxft
 *******************************************************************************/
 
-   xminft=1.0E300; xmaxft=-1.0E300;
-   yminft=1.0E300; ymaxft=-1.0E300;
-   zminft=1.0E300; zmaxft=-1.0E300;
+   xminft=boil::exa; xmaxft=-boil::exa;
+   yminft=boil::exa; ymaxft=-boil::exa;
+   zminft=boil::exa; zmaxft=-boil::exa;
    bool frontExist=false;
 
    real xfront, yfront, zfront;
    real phim, phip;
 
    /* i-direction */
-   for(int i=si(); i<=ei()+1; i++)
-   for(int j=sj(); j<=ej()  ; j++)
-   for(int k=sk(); k<=ek()  ; k++) {
-
-     phim=phi[i-1][j][k];
-     phip=phi[i  ][j][k];
-     if((phim-phisurf)*(phip-phisurf)<=0.0) {
-       frontExist=true;
-       xfront=frontPosition(i,j,k,Comp::i());
-       yfront=phi.yc(j);
-       zfront=phi.zc(k);
-       if(xfront<xminft) xminft=xfront;
-       if(xfront>xmaxft) xmaxft=xfront;
-       if(yfront<yminft) yminft=yfront;
-       if(yfront>ymaxft) ymaxft=yfront;
-       if(zfront<zminft) zminft=zfront;
-       if(zfront>zmaxft) zmaxft=zfront;
-     }
-   }
+   for(int i=si(); i<=ei()+1; i++) {
+     if (phi.xc(i  )<xr.first()) continue;
+     if (phi.xc(i+1)>xr.last() ) continue;
+     for(int j=sj(); j<=ej()  ; j++) {
+       if (phi.yc(j  )<yr.first()) continue;
+       if (phi.yc(j  )>yr.last() ) continue;
+       for(int k=sk(); k<=ek()  ; k++) {
+         if (phi.zc(k  )<zr.first()) continue;
+         if (phi.zc(k  )>zr.last() ) continue;
+         if ( dom->ibody().off(i,j,k) || dom->ibody().off(i+1,j,k)) continue;
+         phim=phi[i-1][j][k];
+         phip=phi[i  ][j][k];
+         if((phim-phisurf)*(phip-phisurf)<=0.0) {
+           frontExist=true;
+           xfront=frontPosition(i,j,k,Comp::i());
+           yfront=phi.yc(j);
+           zfront=phi.zc(k);
+           if(xfront<xminft) xminft=xfront;
+           if(xfront>xmaxft) xmaxft=xfront;
+           if(yfront<yminft) yminft=yfront;
+           if(yfront>ymaxft) ymaxft=yfront;
+           if(zfront<zminft) zminft=zfront;
+           if(zfront>zmaxft) zmaxft=zfront;
+         }
+       }  /* k */
+     }  /* j */
+   } /* i */
 
    /* j-direction */
-   for(int i=si(); i<=ei()  ; i++)
-   for(int j=sj(); j<=ej()+1; j++)
-   for(int k=sk(); k<=ek()  ; k++) {
-  
-     phim=phi[i][j-1][k];
-     phip=phi[i][j  ][k];
-     if((phim-phisurf)*(phip-phisurf)<=0.0) {
-       frontExist=true;
-       xfront=phi.xc(i);
-       yfront=frontPosition(i,j,k,Comp::j());
-       zfront=phi.zc(k);
-       if(xfront<xminft) xminft=xfront;
-       if(xfront>xmaxft) xmaxft=xfront;
-       if(yfront<yminft) yminft=yfront;
-       if(yfront>ymaxft) ymaxft=yfront;
-       if(zfront<zminft) zminft=zfront;
-       if(zfront>zmaxft) zmaxft=zfront;
-     } 
-   }
+   for(int i=si(); i<=ei()  ; i++) {
+     if (phi.xc(i  )<xr.first()) continue;
+     if (phi.xc(i  )>xr.last() ) continue;
+     for(int j=sj(); j<=ej()+1; j++) {
+       if (phi.yc(j  )<yr.first()) continue;
+       if (phi.yc(j+1)>yr.last() ) continue;
+       for(int k=sk(); k<=ek()  ; k++) {
+         if (phi.zc(k  )<zr.first()) continue;
+         if (phi.zc(k  )>zr.last() ) continue;
+         if ( dom->ibody().off(i,j,k) || dom->ibody().off(i,j+1,k)) continue;
+         phim=phi[i][j-1][k];
+         phip=phi[i][j  ][k];
+         if((phim-phisurf)*(phip-phisurf)<=0.0) {
+           frontExist=true;
+           xfront=phi.xc(i);
+           yfront=frontPosition(i,j,k,Comp::j());
+           zfront=phi.zc(k);
+           if(xfront<xminft) xminft=xfront;
+           if(xfront>xmaxft) xmaxft=xfront;
+           if(yfront<yminft) yminft=yfront;
+           if(yfront>ymaxft) ymaxft=yfront;
+           if(zfront<zminft) zminft=zfront;
+           if(zfront>zmaxft) zmaxft=zfront;
+         } 
+       } /* k */
+     } /* j */
+   } /* i */
 
    /* k-direction */
-   for(int i=si(); i<=ei()  ; i++)
-   for(int j=sj(); j<=ej()  ; j++)
-   for(int k=sk(); k<=ek()+1; k++) {
-  
-     phim=phi[i][j][k-1];
-     phip=phi[i][j][k  ];
-     if((phim-phisurf)*(phip-phisurf)<=0.0) {
-       frontExist=true;
-       xfront=phi.xc(i);
-       yfront=phi.yc(j);
-       zfront=frontPosition(i,j,k,Comp::k());
-       if(xfront<xminft) xminft=xfront;
-       if(xfront>xmaxft) xmaxft=xfront;
-       if(yfront<yminft) yminft=yfront;
-       if(yfront>ymaxft) ymaxft=yfront;
-       if(zfront<zminft) zminft=zfront;
-       if(zfront>zmaxft) zmaxft=zfront;
-     }
-   }
+   for(int i=si(); i<=ei()  ; i++) {
+     if (phi.xc(i  )<xr.first()) continue;
+     if (phi.xc(i  )>xr.last() ) continue;
+     for(int j=sj(); j<=ej()  ; j++) {
+       if (phi.yc(j  )<yr.first()) continue;
+       if (phi.yc(j  )>yr.last() ) continue;
+       for(int k=sk(); k<=ek()+1; k++) {
+         if (phi.zc(k  )<zr.first()) continue;
+         if (phi.zc(k+1)>zr.last() ) continue;
+         if ( dom->ibody().off(i,j,k) || dom->ibody().off(i,j,k+1)) continue;
+         phim=phi[i][j][k-1];
+         phip=phi[i][j][k  ];
+         if((phim-phisurf)*(phip-phisurf)<=0.0) {
+           frontExist=true;
+           xfront=phi.xc(i);
+           yfront=phi.yc(j);
+           zfront=frontPosition(i,j,k,Comp::k());
+           if(xfront<xminft) xminft=xfront;
+           if(xfront>xmaxft) xmaxft=xfront;
+           if(yfront<yminft) yminft=yfront;
+           if(yfront>ymaxft) ymaxft=yfront;
+           if(zfront<zminft) zminft=zfront;
+           if(zfront>zmaxft) zmaxft=zfront;
+         }
+       } /* k */
+     } /* j */
+   } /* i */
 
    boil::cart.min_real(&xminft);
    boil::cart.max_real(&xmaxft);

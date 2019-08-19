@@ -9,10 +9,6 @@ void PhaseChange::mdot() {
 *         tempolary: stmp
 *******************************************************************************/
 
-  heavi.calculate_adens();
-  //boil::plot->plot(adens,"adens",time->current_step());
-  //exit(0);
-
   for_ijk(i,j,k){
     if((iflag[i][j][k] == -1) || (iflag[i][j][k] == 1)){
       if(dom->ibody().on(i,j,k)){
@@ -20,8 +16,8 @@ void PhaseChange::mdot() {
         real vol = dV(i,j,k);
 
         /* iso-surface area */
-        real ardens = adens[i][j][k];
-        phi[i][j][k] = mdotc * ardens;
+        real area = marching_cube(i,j,k);
+        phi[i][j][k] = mdotc * area / vol;
         phi[i][j][k] = mdot_cut(phi[i][j][k],clr[i][j][k]);
       } else {
         phi[i][j][k] = 0.0;
@@ -32,12 +28,5 @@ void PhaseChange::mdot() {
   }
   phi.exchange_all();
 
-#if 0
-  for_ijk(i,j,k) {
-    if(fabs(phi[i][j][k])>boil::atto) boil::oout<<"PC::mdot "<<i<<" "<<txv[i][j][k]<<" "<<txl[i][j][k]<<" "<<nx[i][j][k]<<" "<<M[i][j][k]<<" "<<phi[i][j][k]<<" "<<adens[i][j][k]<<boil::endl;
-  }
-#endif
-
   return;
 }
-

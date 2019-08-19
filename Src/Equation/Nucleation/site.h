@@ -2,8 +2,8 @@
 #define SITE_H
 
 #include <vector>
-#include "../../../Global/global_precision.h"
-#include "../../../Global/global_constants.h"
+#include "../../Global/global_precision.h"
+#include "../../Global/global_constants.h"
 
 ////////////
 //        //

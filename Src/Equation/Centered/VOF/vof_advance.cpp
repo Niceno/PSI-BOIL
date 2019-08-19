@@ -9,12 +9,6 @@ void VOF::advance(Scalar & scp) {
  
   boil::timer.start("vof advance");
 
-  /*-------------------------------+
-  |  normal vector at cell center  |
-  +-------------------------------*/
-  norm_cc(scp);
-  //norm_elvira(scp);
-
   /*------------------------------+
   |  source term for phase change |
   +------------------------------*/
@@ -24,22 +18,14 @@ void VOF::advance(Scalar & scp) {
   scp.bnd_update();
   scp.exchange_all();
 
+  /*-------------------------------+
+  |  normal vector at cell center  |
+  +-------------------------------*/
+  norm_cc(scp);
+  //norm_elvira(scp);
+
   for_aijk(i,j,k){
-    real phival = scp[i][j][k];
-    real fval = fext[i][j][k]*time->dt();
-
-    /* liquid content */
-    stmp[i][j][k] = phival * dV(i,j,k);
-
-#if 0
-    /* intermediate phi value */
-    /* fext is related to mdot as follows:
-     * fext = -m'''/rhol  */
-    real denscoef = 1.0-rhol/rhov;
-    real denom = std::max(1.0 + denscoef*fval,boil::pico);
-    phival /= denom;
-#endif
-    scp[i][j][k] = std::max(0.0,std::min(1.0,phival));
+    stmp[i][j][k] = scp[i][j][k] * dV(i,j,k);
   }
 
   // advance in x-direction

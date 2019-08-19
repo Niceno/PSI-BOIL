@@ -25,7 +25,7 @@ real EnthalpyTIF::hflux_wall_ib(const Scalar * diff_eddy) {
 
     tf = phi[i][j][k];
     real cp_mass;
-    if ((*clr)[i][j][k]<0.5) {
+    if ((*clr)[i][j][k]<clrsurf) {
       lf = lambdav;
       cp_mass = cpv/rhov;
     } else {

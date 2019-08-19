@@ -2,17 +2,28 @@
 
 /******************************************************************************/
 bool Domain::bnd_symmetry(const Dir d) const {
-  if(d==Dir::imin()) {
-    return imins;
+
+  int axis(0), dir(0);
+
+  if       (d==Dir::imin()) {
+    axis = 0;
+    dir  = 0;
   } else if(d==Dir::imax()) {
-    return imaxs;
+    axis = 0;
+    dir  = 1;
   } else if(d==Dir::jmin()) {
-    return jmins;
+    axis = 1;
+    dir  = 0;
   } else if(d==Dir::jmax()) {
-    return jmaxs;
+    axis = 1;
+    dir  = 1;
   } else if(d==Dir::kmin()) {
-    return kmins;
+    axis = 2;
+    dir  = 0;
   } else if(d==Dir::kmax()) {
-    return kmaxs;
+    axis = 2;
+    dir  = 1;
   }
+
+  return ctf[axis][dir];
 }

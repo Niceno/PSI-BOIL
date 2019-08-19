@@ -14,7 +14,7 @@
 /////////////////////
 class MarchingCube {
   public:
-    MarchingCube(const Scalar * CLR, const real CLRSURF = 0.5);
+    MarchingCube(const Scalar * CLR, const Domain * dom, const real CLRSURF = 0.5);
     ~MarchingCube() {}
 
     real volume(const int i, const int j, const int k);
@@ -28,6 +28,8 @@ class MarchingCube {
               const int i, const int j, const int k);
 
   protected:
+    const Domain * domain() const {return dom;}
+
     /* 3D */
     typedef struct {
       real x,y,z;
@@ -60,6 +62,7 @@ class MarchingCube {
     } FACEVAL;
 
     const Scalar * clr;
+    const Domain * dom; 
     real clrsurf;
     
     real surfval(CELLFACE grid, real isolevel);

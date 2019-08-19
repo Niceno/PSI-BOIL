@@ -29,47 +29,9 @@ void PhaseChangeVOF::mdot() {
 #if 1
   phi.bnd_update();
   phi.exchange_all();
-
 #else
   /* cut */
   mdot_cut();
-#endif
-
-#if 0
-  for_vijk(phi,i,j,k) {
-    if(phi[i][j][k]>17300.&&phi[i][j][k]<17400.) {
- #if 0
-    
-      real qv = -( txv[i][j][k]*nx[i][j][k]
-                      + tyv[i][j][k]*ny[i][j][k]
-                      + tzv[i][j][k]*nz[i][j][k]);
-      real ql =  ( txl[i][j][k]*nx[i][j][k]
-                      + tyl[i][j][k]*ny[i][j][k]
-                      + tzl[i][j][k]*nz[i][j][k]);
-      boil::aout<<"PCV::mdot "<<i<<" "<<j<<" "<<k<<" | "<<phi[i][j][k]
-                           <<" | "<<txv[i][j][k]<<" "<<txl[i][j][k]
-                           <<" | "<<tyv[i][j][k]<<" "<<tyl[i][j][k]
-                           <<" | "<<tzv[i][j][k]<<" "<<tzl[i][j][k]
-                           <<" | "<<iflag[i][j][k]<<" "<<qv<<" "<<ql
-                           <<" | "<<nx[i][j][k]<<" "<<ny[i][j][k]<<" "<<nz[i][j][k]
-                           <<boil::endl;
-    }
-  #else
-      real tm0;
-      boil::aout<<"PCV::mdot "<<i<<" "<<j<<" "<<k<<" | "<<phi[i][j][k]
-                           <<" | "<<txl[i][j][k]
-                           <<" | "<<tpr[i-1][j][k]<<" "<<tpr[i][j][k]<<" "<<tpr[i+1][j][k]
-                           //<<" | "<<gradtz9(+1,i,j,k)<<" "<<gradtz8(+1,i,j,k)
-                           //<<" | "<<bndtpr[Comp::w()][i][j][k]<<" "<<bndtpr[Comp::w()][i][j][k+1]
-                           //<<" | "<<gradtz9(-1,i,j,k)<<" "<<gradtz9(+1,i,j,k)
-                           //<<" | "<<gradtz8(-1,i,j,k)<<" "<<gradtz8(+1,i,j,k)
-                           //<<" | "<<distance_z(i,j,k,-1,tm0)<<" "<<distance_z(i,j,k,+1,tm0)
-                           //<<" | "<<distance_z(i,j,k,-1,tm0)/clr.dzc(k)<<" "<<distance_z(i,j,k,+1,tm0)/clr.dzc(k)
-                           <<boil::endl;
-
-    }
-  #endif
-  }
 #endif
 
   return;

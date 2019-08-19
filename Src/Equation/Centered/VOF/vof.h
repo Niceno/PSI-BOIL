@@ -2,9 +2,6 @@
 #define VOF_H
 
 #include <cmath>
-#include <list>
-#include <vector>
-#include <algorithm>
 #include "../centered.h"
 #include "../../../Parallel/communicator.h"
 #include "../../../Global/global_realistic.h"
@@ -26,8 +23,7 @@ class VOF : public Centered {
         const Vector & u, 
         Times & t,
         Krylov * S,
-        Vector * bndclr = NULL,
-        Matter * flu = NULL);
+        Vector * bndclr = NULL);
     ~VOF();
 
     void new_time_step(){};
@@ -39,11 +35,11 @@ class VOF : public Centered {
     void tension(Vector * vec, const Matter matt, const Scalar & scp);
     void totalvol();
     void front_minmax();
-    void init(){};
+    void front_minmax( Range<real> xr
+                     , Range<real> yr
+                     , Range<real> zr );
 
-    void cal_liq_vel(Vector * umass, Vector * uliq);
-    void ext_vel(Scalar & sca, const Scalar & eflag, const int sgn);
-    void smooth(const Scalar & sca, Scalar & scb, const int itnum);
+    void init(){ ancillary(); };
 
     // getter for front_minmax
     real get_xminft() { return(xminft);};
@@ -81,9 +77,6 @@ class VOF : public Centered {
     void set_cangle(const real r) {
       cangle=r/180.0*acos(-1.0);
       boil::oout<<"set_cangle: cangle= "<<r<<"\n";
-      boil::oout<<"#############################################\n";
-      boil::oout<<"# WARNING!!! cangle is not implemented yet. #\n";
-      boil::oout<<"#############################################\n";
     }
     /* getter for cangle */
     real get_cangle() { return(cangle/acos(-1.0)*180.0);};
@@ -96,6 +89,12 @@ class VOF : public Centered {
     /* getter for cangle */
     bool get_limit_color() { return(limit_color);};
 
+    /* min and max of color function in fluid domain */
+    real minval() {return minclr;}
+    real maxval() {return maxclr;}
+    void color_minmax();
+    void set_minval(real r) {minclr=r;}
+    void set_maxval(real r) {maxclr=r;}
 
     Vector fs;
     Vector * bndclr;
@@ -117,6 +116,7 @@ class VOF : public Centered {
     void curv_smooth();
     void extract_alpha();
     void fs_bnd();
+    void fs_bnd_nosubgrid();
     void standardized_norm_vect();
     void gradphi(const Scalar & g);
     void gradphic(const Scalar & g);
@@ -137,6 +137,7 @@ class VOF : public Centered {
              , const real & r1, const real & r2, const real & r3
              , const int & i1, const int & i2, const int &i3
              , real r[] );
+    void smooth(const Scalar & sca, Scalar & scb, const int itnum);
     void true_norm_vect();
     void update_at_walls();
     void wall_norm(const Scalar & sca);
@@ -161,44 +162,6 @@ class VOF : public Centered {
       for_aijk(i,j,k)
         adens[i][j][k] = newadens[i][j][k];
     }
-
-#if 1
-    /* adensgeom stuff */
-    typedef struct {
-      real x,y,z;
-    } XYZ;
-    real calc_area(const std::vector<XYZ> &vect, const XYZ norm);
-    XYZ PlusXYZ(const XYZ p1, const XYZ p2);
-    real DotProduct(const XYZ p1, const XYZ p2);
-    XYZ CrossProduct(const XYZ p1, const XYZ p2);
-    void cal_adens_geom(Scalar & eval);
-    Scalar adensgeom; /* area density (geometric) */
-
-    /* mc stuff */
-    typedef struct {
-       XYZ p[8];
-       real val[8];
-    } GRIDCELL;
-    XYZ VertexInterpVOF(real isolevel, XYZ p1, XYZ p2, real valp1, real valp2);
-    real PolygoniseVOF(GRIDCELL grid, real isolevel);
-    typedef struct {
-       XYZ p[3];
-       real area(){
-         real x1 = p[1].x-p[0].x;
-         real y1 = p[1].y-p[0].y;
-         real z1 = p[1].z-p[0].z;
-         real x2 = p[2].x-p[0].x;
-         real y2 = p[2].y-p[0].y;
-         real z2 = p[2].z-p[0].z;
-         real area=  (y1*z2-z1*y2)*(y1*z2-z1*y2)
-                    +(z1*x2-x1*z2)*(z1*x2-x1*z2)
-                    +(x1*y2-y1*x2)*(x1*y2-y1*x2);
-         area = 0.5 * sqrt(area);
-         return(area);
-       }
-    } TRIANGLE;
-#endif
-
 
     real extrapolate_v(const int i, const int j, const int k,
                        const int ofx, const int ofy, const int ofz,
@@ -233,16 +196,9 @@ class VOF : public Centered {
     real fs_val(const Comp m, const int i, const int j, const int k);
     real frontPosition(const int i, const int j, const int k, const Comp m);
 
-    Scalar clr;     /* color function */
     Scalar kappa;        /* curvature */
-    Scalar stmp, stmp2, stmp3;
+    Scalar stmp;
     ScalarInt iflag,iflagx;
-
-    Scalar utx, uty, utz, unliq;
-
-    real rhol, rhov; /* densities for velocity correction */
-    const Matter * mixt() const {return mixture;}
-    Matter * mixture;
 
     Matter jelly;   /* virtual fluid for level set transport */
     real xminft,xmaxft,yminft,ymaxft,zminft,zmaxft; /* xyz min&max of front */
@@ -256,6 +212,7 @@ class VOF : public Centered {
     bool iminc, imaxc, jminc, jmaxc, kminc, kmaxc; // true = cut-stencil
     bool ifull, jfull, kfull; // true = not a dummy direction
     bool limit_color;
+    real minclr, maxclr;
 
     Heaviside heavi;
 

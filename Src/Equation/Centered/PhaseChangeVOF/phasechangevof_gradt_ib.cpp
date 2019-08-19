@@ -1,8 +1,6 @@
 #include "phasechangevof.h"
 using namespace std;
 
-static real temperature_node(real len_s, real lam_s, real tmp_s
-                    , real len_f, real lam_f, real tmp_f);
 static real grad3(real ww, real dm, real dp, real tm, real tc, real tp, real epsl);
 /******************************************************************************/
 void PhaseChangeVOF::gradt_ib(const Scalar * diff_eddy) {
@@ -24,8 +22,10 @@ void PhaseChangeVOF::gradt_ib(const Scalar * diff_eddy) {
     real t_e  = tpr[i+1][j][k];
 
     /* west is in wall & there is no interface in west */
-    if(dom->ibody().off(m,i,j,k)&&!Interface(-1,m,i,j,k)) {
+    //if(dom->ibody().off(m,i,j,k)&&!Interface(-1,m,i,j,k)) {
+    if(dom->ibody().off(i-1,j,k)&&!Interface(-1,m,i,j,k)) {
       dx_w *= dom->ibody().fdxw(cc);
+#if 0
       real len_s = phi.dxw(i) - 0.5*phi.dxc(i);
       real lam_s = solid()->lambda(i-1,j,k);
       real tmp_s = tpr[i-1][j][k];
@@ -40,6 +40,10 @@ void PhaseChangeVOF::gradt_ib(const Scalar * diff_eddy) {
       }
       real tmp_f = tpr[i][j][k];
       t_w = temperature_node(len_s, lam_s, tmp_s, len_f, lam_f, tmp_f);
+#else
+      t_w = bndtpr[m][i][j][k];
+      assert(boil::realistic(t_w));
+#endif
       real dtdx = (t_e-t_w)/(dx_w+dx_e);
 
       /* interface in east */
@@ -60,8 +64,10 @@ void PhaseChangeVOF::gradt_ib(const Scalar * diff_eddy) {
     }
 
     /* east is in wall & there is no interface in east */
-    if(dom->ibody().off(m,i+1,j,k)&&!Interface(+1,m,i,j,k)) {
+    //if(dom->ibody().off(m,i+1,j,k)&&!Interface(+1,m,i,j,k)) {
+    if(dom->ibody().off(i+1,j,k)&&!Interface(+1,m,i,j,k)) {
       dx_e *= dom->ibody().fdxe(cc);
+#if 0
       real len_s = phi.dxe(i) - 0.5*phi.dxc(i);
       real lam_s = solid()->lambda(i+1,j,k);
       real tmp_s = tpr[i+1][j][k];
@@ -76,6 +82,10 @@ void PhaseChangeVOF::gradt_ib(const Scalar * diff_eddy) {
       }
       real tmp_f = tpr[i][j][k];
       t_e = temperature_node(len_s, lam_s, tmp_s, len_f, lam_f, tmp_f);
+#else
+      t_e = bndtpr[m][i+1][j][k];
+      assert(boil::realistic(t_e));
+#endif
       real dtdx = (t_e-t_w)/(dx_w+dx_e);
 
       /* interface in west */
@@ -103,8 +113,10 @@ void PhaseChangeVOF::gradt_ib(const Scalar * diff_eddy) {
     real t_n  = tpr[i][j+1][k];
 
     /* south is in wall & there is no interface in south */
-    if(dom->ibody().off(m,i,j,k)&&!Interface(-1,m,i,j,k)) {
+    //if(dom->ibody().off(m,i,j,k)&&!Interface(-1,m,i,j,k)) {
+    if(dom->ibody().off(i,j-1,k)&&!Interface(-1,m,i,j,k)) {
       dy_s *= dom->ibody().fdys(cc);
+#if 0
       real len_s = phi.dys(j) - 0.5*phi.dyc(j);
       real lam_s = solid()->lambda(i,j-1,k);
       real tmp_s = tpr[i][j-1][k];
@@ -119,6 +131,10 @@ void PhaseChangeVOF::gradt_ib(const Scalar * diff_eddy) {
       }
       real tmp_f = tpr[i][j][k];
       t_s = temperature_node(len_s, lam_s, tmp_s, len_f, lam_f, tmp_f);
+#else
+      t_s = bndtpr[m][i][j][k];
+      assert(boil::realistic(t_s));
+#endif
       real dtdy = (t_n-t_s)/(dy_s+dy_n);
 
       /* interface in north */
@@ -139,8 +155,10 @@ void PhaseChangeVOF::gradt_ib(const Scalar * diff_eddy) {
     }
 
     /* north is in wall & there is no interface in north */
-    if(dom->ibody().off(m,i,j+1,k)&&!Interface(+1,m,i,j,k)) {
+    //if(dom->ibody().off(m,i,j+1,k)&&!Interface(+1,m,i,j,k)) {
+    if(dom->ibody().off(i,j+1,k)&&!Interface(+1,m,i,j,k)) {
       dy_n *= dom->ibody().fdyn(cc);
+#if 0
       real len_s = phi.dyn(j) - 0.5*phi.dyc(j);
       real lam_s = solid()->lambda(i,j+1,k);
       real tmp_s = tpr[i][j+1][k];
@@ -155,6 +173,10 @@ void PhaseChangeVOF::gradt_ib(const Scalar * diff_eddy) {
       }
       real tmp_f = tpr[i][j][k];
       t_n = temperature_node(len_s, lam_s, tmp_s, len_f, lam_f, tmp_f);
+#else
+      t_n = bndtpr[m][i][j+1][k];
+      assert(boil::realistic(t_n));
+#endif
       real dtdy = (t_n-t_s)/(dy_s+dy_n);
 
       /* interface in south */
@@ -182,9 +204,10 @@ void PhaseChangeVOF::gradt_ib(const Scalar * diff_eddy) {
     real t_t  = tpr[i][j][k+1];
 
     /* bottom is in wall & there is no interface in bottom */
-    if(dom->ibody().off(m,i,j,k)&&!Interface(-1,m,i,j,k)) {
+    //if(dom->ibody().off(m,i,j,k)&&!Interface(-1,m,i,j,k)) {
+    if(dom->ibody().off(i,j,k-1)&&!Interface(-1,m,i,j,k)) {
       dz_b *= dom->ibody().fdzb(cc);
-#if 1
+#if 0
       real len_s = phi.dzb(k) - 0.5*phi.dzc(k);
       real lam_s = solid()->lambda(i,j,k-1);
       real tmp_s = tpr[i][j][k-1];
@@ -200,7 +223,8 @@ void PhaseChangeVOF::gradt_ib(const Scalar * diff_eddy) {
       real tmp_f = tpr[i][j][k];
       t_b = temperature_node(len_s, lam_s, tmp_s, len_f, lam_f, tmp_f);
 #else
-      t_b = 109.444;  // special setting for verification!!!
+      t_b = bndtpr[m][i][j][k];
+      assert(boil::realistic(t_b));
 #endif
       real dtdz = (t_t-t_b)/(dz_b+dz_t);
 
@@ -232,8 +256,10 @@ void PhaseChangeVOF::gradt_ib(const Scalar * diff_eddy) {
     }
 
     /* top is in wall & there is no interface in top */
-    if(dom->ibody().off(m,i,j,k+1)&&!Interface(+1,m,i,j,k)) {
+    //if(dom->ibody().off(m,i,j,k+1)&&!Interface(+1,m,i,j,k)) {
+    if(dom->ibody().off(i,j,k+1)&&!Interface(+1,m,i,j,k)) {
       dz_t *= dom->ibody().fdzt(cc);
+#if 0
       real len_s = phi.dzt(k) - 0.5*phi.dzc(k);
       real lam_s = solid()->lambda(i,j,k+1);
       real tmp_s = tpr[i][j][k+1];
@@ -248,6 +274,10 @@ void PhaseChangeVOF::gradt_ib(const Scalar * diff_eddy) {
       }
       real tmp_f = tpr[i][j][k];
       t_t = temperature_node(len_s, lam_s, tmp_s, len_f, lam_f, tmp_f);
+#else
+      t_t = bndtpr[m][i][j][k+1];
+      assert(boil::realistic(t_t));
+#endif
       real dtdz = (t_t-t_b)/(dz_b+dz_t);
 
       /* interface in bottom */
@@ -282,19 +312,6 @@ void PhaseChangeVOF::gradt_ib(const Scalar * diff_eddy) {
   }
 
   return;
-}
-
-/******************************************************************************/
-real temperature_node(real len_s, real lam_s, real tmp_s
-                    , real len_f, real lam_f, real tmp_f) {
-/***************************************************************************//**
-*  \brief calculate temperature at node point
-*             len_s         len_f
-*             lam_s         lam_f
-*         *-------------*------------*
-*       tmp_s       tmp_node        tmp_f
-*******************************************************************************/
-  return (len_s*lam_s*tmp_s + len_f*lam_f*tmp_f)/(len_s*lam_s + len_f*lam_f);
 }
 
 /******************************************************************************/

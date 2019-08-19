@@ -26,12 +26,12 @@ real EnthalpyTIF::distance_x(const int i, const int j, const int k,
     }
   }
 
-  boil::oout<<"EnthalpyTIF::int_dist_x: Error! Flag inconsistent w/ vol. fraction!\n";
+  boil::aout<<"EnthalpyTIF::int_dist_x: Error! Flag inconsistent w/ vol. fraction!\n";
   if(!old)
-    boil::oout<<"new "<<i<<" "<<j<<" "<<k<<" "<<dir<<" "
+    boil::aout<<"new "<<i<<" "<<j<<" "<<k<<" "<<dir<<" "
               <<(*clr)[i][j][k]<<" "<<(*clr)[i+of][j][k]<<boil::endl;
   else
-    boil::oout<<"old "<<i<<" "<<j<<" "<<k<<" "<<dir<<" "
+    boil::aout<<"old "<<i<<" "<<j<<" "<<k<<" "<<dir<<" "
               <<clrold[i][j][k]<<" "<<clrold[i+of][j][k]<<boil::endl;
   exit(0);
  
@@ -126,13 +126,13 @@ real EnthalpyTIF::distance_y(const int i, const int j, const int k,
     }
   }
 
-  boil::oout<<"EnthalpyTIF::int_dist_y: Error! Flag inconsistent w/ vol. fraction!\n";
+  boil::aout<<"EnthalpyTIF::int_dist_y: Error! Flag inconsistent w/ vol. fraction!\n";
   if(!old)
-    boil::oout<<"new "<<i<<" "<<j<<" "<<k<<" "<<dir<<" "
+    boil::aout<<"new "<<i<<" "<<j<<" "<<k<<" "<<dir<<" "
               <<phi.yc(j)<<" "<<phi.yc(j+of)<<" "<<(*fs)[Comp::j()][i][j+(of>0)][k]<<" "
               <<(*clr)[i][j][k]<<" "<<(*clr)[i][j+of][k]<<boil::endl;
   else
-    boil::oout<<"old "<<i<<" "<<j<<" "<<k<<" "<<dir<<" "
+    boil::aout<<"old "<<i<<" "<<j<<" "<<k<<" "<<dir<<" "
               <<clrold[i][j][k]<<" "<<clrold[i][j+of][k]<<boil::endl;
   exit(0);
  
@@ -227,12 +227,12 @@ real EnthalpyTIF::distance_z(const int i, const int j, const int k,
     }
   }
 
-  boil::oout<<"EnthalpyTIF::int_dist_z: Error! Flag inconsistent w/ vol. fraction!\n";
+  boil::aout<<"EnthalpyTIF::int_dist_z: Error! Flag inconsistent w/ vol. fraction!\n";
   if(!old)
-    boil::oout<<"new "<<i<<" "<<j<<" "<<k<<" "<<dir<<" "
+    boil::aout<<"new "<<i<<" "<<j<<" "<<k<<" "<<dir<<" "
               <<(*clr)[i][j][k]<<" "<<(*clr)[i][j][k+of]<<boil::endl;
   else
-    boil::oout<<"old "<<i<<" "<<j<<" "<<k<<" "<<dir<<" "
+    boil::aout<<"old "<<i<<" "<<j<<" "<<k<<" "<<dir<<" "
               <<clrold[i][j][k]<<" "<<clrold[i][j][k+of]<<boil::endl;
   exit(0);
  

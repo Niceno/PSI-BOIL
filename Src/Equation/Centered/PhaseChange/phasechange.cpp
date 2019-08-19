@@ -12,8 +12,6 @@ PhaseChange::PhaseChange(const Scalar & MDOT,
                    Times & T, 
                    Matter * f,
                    real r1, real r2,
-                   Scalar * TIF,
-                   const Vector * BNDCLR,
                    Matter * s,
                    Nucleation * NUCL ) :
 /*---------------------+ 
@@ -40,10 +38,7 @@ PhaseChange::PhaseChange(const Scalar & MDOT,
   txl   ( *MDOT.domain()),
   tyl   ( *MDOT.domain()),
   tzl   ( *MDOT.domain()),
-  bndtpr( *U.domain() ),
-  M     ( *MDOT.domain()),
-  adens ( *MDOT.domain()),
-  heavi(&clr, NULL, &adens)
+  M     ( *MDOT.domain())
 {
   dist   = MDOT.shape();
   dflag  = MDOT.shape();
@@ -61,12 +56,7 @@ PhaseChange::PhaseChange(const Scalar & MDOT,
   tyl    = MDOT.shape();
   tzl    = MDOT.shape();
   M      = MDOT.shape();
-  adens  = MDOT.shape();
   nucl   = NUCL;
-
-  tif = TIF;
-  bndclr = BNDCLR;
-  if (bndclr) for_m(m) bndtpr(m) = U(m).shape(); /* a mistake? */
 
   /* set arguments */
   latent = r1;
@@ -110,5 +100,4 @@ PhaseChange::PhaseChange(const Scalar & MDOT,
 
 /******************************************************************************/
 PhaseChange::~PhaseChange() {
-}	
-
+}

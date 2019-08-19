@@ -157,6 +157,7 @@ void BndCnd::add(BndCnd bc) {
     exit(0);
   }
 
+#if 1
   fail = false;
   if( bc.typ == BndType::pseudo() ) {
     if( bc.dir == Dir::imin() && !dom->is_dummy(0) ) fail = true;
@@ -182,23 +183,39 @@ void BndCnd::add(BndCnd bc) {
     if( bc.dir == Dir::kmax() && dom->is_dummy(2) ) fail = true;
   }
   if( fail ) {
-    boil::oout << "Fatal: trying to a b.c. "
+    boil::oout << "Fatal: trying to define a real b.c. "
                << "in a pseudo-direction. Exiting!" << boil::endl;
     exit(0);
   }
+#endif
 
   fail = false;
   if( bc.typ == BndType::symmetry() ) {
-    if( bc.dir == Dir::imin() && !dom->cutoff(0,0) ) fail = true;
-    if( bc.dir == Dir::imax() && !dom->cutoff(0,1) ) fail = true;
-    if( bc.dir == Dir::jmin() && !dom->cutoff(1,0) ) fail = true;
-    if( bc.dir == Dir::jmax() && !dom->cutoff(1,1) ) fail = true;
-    if( bc.dir == Dir::kmin() && !dom->cutoff(2,0) ) fail = true;
-    if( bc.dir == Dir::kmax() && !dom->cutoff(2,1) ) fail = true;
+    if( bc.dir == Dir::imin() && !dom->bnd_symmetry(Dir::imin()) ) fail = true;
+    if( bc.dir == Dir::imax() && !dom->bnd_symmetry(Dir::imax()) ) fail = true;
+    if( bc.dir == Dir::jmin() && !dom->bnd_symmetry(Dir::jmin()) ) fail = true;
+    if( bc.dir == Dir::jmax() && !dom->bnd_symmetry(Dir::jmax()) ) fail = true;
+    if( bc.dir == Dir::kmin() && !dom->bnd_symmetry(Dir::kmin()) ) fail = true;
+    if( bc.dir == Dir::kmax() && !dom->bnd_symmetry(Dir::kmax()) ) fail = true;
   }
   if( fail ) {
     boil::oout << "Fatal: trying to define symmetry b.c. "
                << "to a non-symmetric domain. Exiting!" << boil::endl;
+    exit(0);
+  }
+
+  fail = false;
+  if( bc.typ != BndType::symmetry() ) {
+    if( bc.dir == Dir::imin() && dom->bnd_symmetry(Dir::imin()) ) fail = true;
+    if( bc.dir == Dir::imax() && dom->bnd_symmetry(Dir::imax()) ) fail = true;
+    if( bc.dir == Dir::jmin() && dom->bnd_symmetry(Dir::jmin()) ) fail = true;
+    if( bc.dir == Dir::jmax() && dom->bnd_symmetry(Dir::jmax()) ) fail = true;
+    if( bc.dir == Dir::kmin() && dom->bnd_symmetry(Dir::kmin()) ) fail = true;
+    if( bc.dir == Dir::kmax() && dom->bnd_symmetry(Dir::kmax()) ) fail = true;
+  }
+  if( fail ) {
+    boil::oout << "Fatal: trying to define non-symmetric b.c. "
+               << "to a symmetric domain. Exiting!" << boil::endl;
     exit(0);
   }
 

@@ -106,7 +106,7 @@ void VOF::bdcurv() {
   for(int cc=0; cc<dom->ibody().nccells(); cc++){
     int i,j,k;
     dom->ibody().ijk(cc,&i,&j,&k);
-    if (iflag[i][j][k]!=0) {
+    if (iflag[i][j][k]==1) {
       kappa[i][j][k] = divnorm(nx,ny,nz,i,j,k);
     } else {
         iflag[i][j][k]=0;

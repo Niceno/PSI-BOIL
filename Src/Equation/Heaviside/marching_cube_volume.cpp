@@ -5,6 +5,9 @@ real MarchingCube::volume(const int i, const int j, const int k){
 /***************************************************************************//**
 *  \brief calculate fraction of volume of cell (i,j,k) below isosurface
 *******************************************************************************/
+
+  if(dom->ibody().off(i,j,k)) return 0.0;
+
   GRIDCELL grid;
 
   int isum=0;

@@ -6,7 +6,7 @@ void VOF::norm_cc(const Scalar & sca) {
 /***************************************************************************//**
 *  \brief Calculate normal vector at interface
 *  Centered Columns method in E.Aulisa,JCP,225(2007),2301-2319
-*         Resluts: nx, ny, nz
+*         Results: nx, ny, nz
 *******************************************************************************/
 
   for_ijk(i,j,k) {

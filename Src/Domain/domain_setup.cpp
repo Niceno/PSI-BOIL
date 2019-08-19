@@ -20,12 +20,12 @@ void Domain::setup(const Decompose & dec) {
   per[1] = grid_y_original->periodic1();
   per[2] = grid_z_original->periodic1();
 
-  ctf[0][0] = ( grid_x_original->cutoff1() == BndGrid::symmetry() );
-  ctf[0][1] = ( grid_x_original->cutoffN() == BndGrid::symmetry() );
-  ctf[1][0] = ( grid_y_original->cutoff1() == BndGrid::symmetry() );
-  ctf[1][1] = ( grid_y_original->cutoffN() == BndGrid::symmetry() );
-  ctf[2][0] = ( grid_z_original->cutoff1() == BndGrid::symmetry() );
-  ctf[2][1] = ( grid_z_original->cutoffN() == BndGrid::symmetry() );
+  ctf[0][0] = ( per[0]==0 && grid_x_original->cutoff1() == BndGrid::symmetry() );
+  ctf[0][1] = ( per[0]==0 && grid_x_original->cutoffN() == BndGrid::symmetry() );
+  ctf[1][0] = ( per[1]==0 && grid_y_original->cutoff1() == BndGrid::symmetry() );
+  ctf[1][1] = ( per[1]==0 && grid_y_original->cutoffN() == BndGrid::symmetry() );
+  ctf[2][0] = ( per[2]==0 && grid_z_original->cutoff1() == BndGrid::symmetry() );
+  ctf[2][1] = ( per[2]==0 && grid_z_original->cutoffN() == BndGrid::symmetry() );
 
   dummy[0] = grid_x_original->is_dummy();
   dummy[1] = grid_y_original->is_dummy();
@@ -47,26 +47,11 @@ void Domain::setup(const Decompose & dec) {
   /* initializes date for domain decomposition */
   /* (dims, coords, neighbours) */
   init(dec);
-
+  
   /* get the local resolution ... */
-  //if(!grid_x_original->is_dummy()) {
-    decompose(0, gi(), & cr_x);
-  //} else {
-  //  cr_x.first(1);
-  //  cr_x.last (1);
- // }
- // if(!grid_y_original->is_dummy()) {
-    decompose(1, gj(), & cr_y);
- // } else {
-//    cr_y.first(1);
-  //  cr_y.last (1);
- // }
-  //if(!grid_z_original->is_dummy()) {
-    decompose(2, gk(), & cr_z);
- // } else {
-  //  cr_z.first(1);
-  //  cr_z.last (1);
- // }
+  decompose(0, gi(), & cr_x);
+  decompose(1, gj(), & cr_y);
+  decompose(2, gk(), & cr_z);
 
   /* ... and create local grids */
   grid_x_local = new Grid1D( *grid_x_original, cr_x );

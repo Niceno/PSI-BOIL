@@ -8,9 +8,9 @@ void VOF::curv_smooth() {
 *     output: kappa
 *******************************************************************************/
 
-  smooth(phi,clr,4);
+  smooth(phi,stmp,4);
 
-  gradphic(clr);
+  gradphic(stmp);
   
   set_iflag();
 

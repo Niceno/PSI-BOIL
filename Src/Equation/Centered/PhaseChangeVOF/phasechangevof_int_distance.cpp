@@ -32,8 +32,8 @@ real PhaseChangeVOF::distance_x(const int i, const int j, const int k,
     return dist;
   }
 
-  boil::oout<<"PhaseChangeVOF::int_dist_x: Error! Flag inconsistent w/ vol. fraction!\n";
-  boil::oout<<"new "<<i<<" "<<j<<" "<<k<<" "<<dir<<" "
+  boil::aout<<"PhaseChangeVOF::int_dist_x: Error! Flag inconsistent w/ vol. fraction!\n";
+  boil::aout<<"new "<<i<<" "<<j<<" "<<k<<" "<<dir<<" "
             <<iflag[i][j][k]<<" "<<iflag[i+of][j][k]<<" "
             <<(clr)[i][j][k]<<" "<<(clr)[i+of][j][k]<<boil::endl;
   exit(0);
@@ -87,8 +87,8 @@ real PhaseChangeVOF::distance_y(const int i, const int j, const int k,
     return dist;
   }
 
-  boil::oout<<"PhaseChangeVOF::int_dist_y: Error! Flag inconsistent w/ vol. fraction!\n";
-  boil::oout<<"new "<<i<<" "<<j<<" "<<k<<" "<<dir<<" "
+  boil::aout<<"PhaseChangeVOF::int_dist_y: Error! Flag inconsistent w/ vol. fraction!\n";
+  boil::aout<<"new "<<i<<" "<<j<<" "<<k<<" "<<dir<<" "
             <<iflag[i][j][k]<<" "<<iflag[i][j+of][k]<<" "
             <<(clr)[i][j][k]<<" "<<(clr)[i][j+of][k]<<boil::endl;
   exit(0);
@@ -142,8 +142,8 @@ real PhaseChangeVOF::distance_z(const int i, const int j, const int k,
     return dist;
   }
 
-  boil::oout<<"PhaseChangeVOF::int_dist_z: Error! Flag inconsistent w/ vol. fraction!\n";
-  boil::oout<<"new "<<i<<" "<<j<<" "<<k<<" "<<dir<<" "
+  boil::aout<<"PhaseChangeVOF::int_dist_z: Error! Flag inconsistent w/ vol. fraction!\n";
+  boil::aout<<"new "<<i<<" "<<j<<" "<<k<<" "<<dir<<" "
             <<iflag[i][j][k]<<" "<<iflag[i][j][k+of]<<" "
             <<(clr)[i][j][k]<<" "<<(clr)[i][j][k+of]<<boil::endl;
   exit(0);

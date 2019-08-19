@@ -31,6 +31,11 @@ const Domain * Domain::coarsen() const {
 
   /* estimate factors (only first one is important) */
   int c_factors[64], nf;
+#if 0
+  factor( ni()-2*boil::BW, c_factors, &nf); if(nf>0) c_fac_x = c_factors[0];
+  factor( nj()-2*boil::BW, c_factors, &nf); if(nf>0) c_fac_y = c_factors[0];
+  factor( nk()-2*boil::BW, c_factors, &nf); if(nf>0) c_fac_z = c_factors[0];
+#else
   if(!grid_x_local->is_dummy()) {
     factor( ni()-2*boil::BW, c_factors, &nf); 
     if(nf>0) c_fac_x = c_factors[0];
@@ -43,6 +48,7 @@ const Domain * Domain::coarsen() const {
     factor( nk()-2*boil::BW, c_factors, &nf);
     if(nf>0) c_fac_z = c_factors[0];
   }
+#endif
 
   const Grid1D * g_x_coarse = grid_x_local;
   const Grid1D * g_y_coarse = grid_y_local;

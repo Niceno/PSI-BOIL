@@ -1,4 +1,4 @@
-#include "phasechange.h"
+#include "nucleation.h"
 
 real area_triangle( real x1, real y1, real z1, real x2, real y2, real z2
                   , real x3, real y3, real z3);

@@ -46,7 +46,7 @@ real EnthalpyTIF::hflux_wall(const Scalar & val, const Dir din
             areaw += area;
             real lc=lambdav;
             real cp_mass = cpv/rhov;
-            if((*clr)[i+iof][j+jof][k+kof]>=0.5){
+            if((*clr)[i+iof][j+jof][k+kof]>=clrsurf){
               lc = lambdal;
               cp_mass = cpl/rhol;
             }

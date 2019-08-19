@@ -1,10 +1,9 @@
 #include "vof.h"
 
 /******************************************************************************/
-void VOF::fs_bnd() {
+void VOF::fs_bnd_nosubgrid() {
 /***************************************************************************//**
-*  \brief Corrects fs at boundaries.
-*         scalar_exchange(_all) should take account of periodic condition.
+*  \brief Corrects fs at boundaries. No subgrid interfaces are considered.
 *         IMPORTANT: does not work when immersed boundaries do not correspond
 *                    to cell boundaries!!!
 ******************************************************************************/
@@ -94,28 +93,6 @@ void VOF::fs_bnd() {
           } else {
             fs[mcomp][i][j][k+of] = boil::unreal;
           }
-
-          int ii = i+ofx;
-          int jj = j+ofy;
-          int kk = k+ofz;
-          real fsval = fs_val(mcomp,ii,jj,kk);
-          bool flagm = (0.0+tolf <= fsval && fsval <= 0.5    );
-          bool flagp = (0.5     <= fsval && fsval <= 1.0-tolf);
-         
-          /* erroneous interfaces */
-          real phiphi = phi[ii][jj][kk];
-          bool errint = (phiphi<tol_wall||phiphi-1.0>-tol_wall);
-
-          /* interface exists in the dir we are interested in */
-          if(((flagm && of)||(flagp && !of))&&!errint) { 
-            if(mcomp==Comp::i()) {
-              fs[mcomp][i+of][j][k] = phi.xn(ii) + phi.dxc(ii) * fsval;
-            } else if(mcomp==Comp::j()) {
-              fs[mcomp][i][j+of][k] = phi.yn(jj) + phi.dyc(jj) * fsval;   
-            } else {
-              fs[mcomp][i][j][k+of] = phi.zn(kk) + phi.dzc(kk) * fsval;
-            }
-          }
         }
       } /* dir not undefined */
     } /* is wall? */
@@ -141,10 +118,7 @@ void VOF::fs_bnd() {
       mcomp = Comp::i();
       real fsval = fs_val(mcomp,i,j,k);
       bool flagm = (0.0+tolf <= fsval && fsval <= 0.5    );
-      if(flagm)
-        fs[mcomp][i  ][j][k] = phi.xn(i) + phi.dxc(i) * fsval;
-      else
-        fs[mcomp][i  ][j][k] = boil::unreal;
+      fs[mcomp][i  ][j][k] = boil::unreal;
     }
 
     /* east */
@@ -152,10 +126,7 @@ void VOF::fs_bnd() {
       mcomp = Comp::i();
       real fsval = fs_val(mcomp,i,j,k);
       bool flagp = (0.5     <= fsval && fsval <= 1.0-tolf);
-      if(flagp)
-        fs[mcomp][i+1][j][k] = phi.xn(i) + phi.dxc(i) * fsval;
-      else
-        fs[mcomp][i+1][j][k] = boil::unreal;
+      fs[mcomp][i+1][j][k] = boil::unreal;
     }
 
     /* south */
@@ -163,10 +134,7 @@ void VOF::fs_bnd() {
       mcomp = Comp::j();
       real fsval = fs_val(mcomp,i,j,k);
       bool flagm = (0.0+tolf <= fsval && fsval <= 0.5    );
-      if(flagm)
-        fs[mcomp][i][j  ][k] = phi.yn(j) + phi.dyc(j) * fsval;
-      else
-        fs[mcomp][i][j  ][k] = boil::unreal;
+      fs[mcomp][i][j  ][k] = boil::unreal;
     }
 
     /* north */
@@ -174,10 +142,7 @@ void VOF::fs_bnd() {
       mcomp = Comp::j();
       real fsval = fs_val(mcomp,i,j,k);
       bool flagp = (0.5     <= fsval && fsval <= 1.0-tolf);
-      if(flagp)
-        fs[mcomp][i][j+1][k] = phi.yn(j) + phi.dyc(j) * fsval;
-      else
-        fs[mcomp][i][j+1][k] = boil::unreal;
+      fs[mcomp][i][j+1][k] = boil::unreal;
     }
 
     /* bottom */
@@ -185,10 +150,7 @@ void VOF::fs_bnd() {
       mcomp = Comp::k();
       real fsval = fs_val(mcomp,i,j,k);
       bool flagm = (0.0+tolf <= fsval && fsval <= 0.5    );
-      if(flagm)
-        fs[mcomp][i][j][k  ] = phi.zn(k) + phi.dzc(k) * fsval;
-      else
-        fs[mcomp][i][j][k  ] = boil::unreal;
+      fs[mcomp][i][j][k  ] = boil::unreal;
       
       //boil::oout<<"VOF-fs_bnd "<<i<<" "<<j<<" "<<k<<" | "<<phi.zn(k)<<" "<<fsval<<" "<<phi.dzc(k)<<" "<<fs[mcomp][i][j][k  ]<<boil::endl;
     }
@@ -198,11 +160,9 @@ void VOF::fs_bnd() {
       mcomp = Comp::k();
       real fsval = fs_val(mcomp,i,j,k);
       bool flagp = (0.5     <= fsval && fsval <= 1.0-tolf);
-      if(flagp)
-        fs[mcomp][i][j][k+1] = phi.zn(k) + phi.dzc(k) * fsval;
-      else
-        fs[mcomp][i][j][k+1] = boil::unreal;
+      fs[mcomp][i][j][k+1] = boil::unreal;
     }
   }
 
+  return;
 }

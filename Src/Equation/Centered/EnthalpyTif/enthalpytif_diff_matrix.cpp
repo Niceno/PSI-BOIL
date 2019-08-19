@@ -26,7 +26,7 @@ void EnthalpyTIF::diff_matrix(real & am, real & ac, real & ap
   +--------------------*/
   // minus
   if(onm){
-    if(clm>=0.5){
+    if(clm>=clrsurf){
       lm = lambdal + edm*cpl/rhol/turbP;
     } else {
       lm = lambdav + edm*cpv/rhov/turbP;
@@ -37,7 +37,7 @@ void EnthalpyTIF::diff_matrix(real & am, real & ac, real & ap
 
   // center
   if(onc){
-    if(clc>=0.5){
+    if(clc>=clrsurf){
       lc = lambdal + edc*cpl/rhol/turbP;
     } else {
       lc = lambdav + edc*cpv/rhov/turbP;
@@ -50,7 +50,7 @@ void EnthalpyTIF::diff_matrix(real & am, real & ac, real & ap
 
   // plus
   if(onp){
-    if(clp>=0.5){
+    if(clp>=clrsurf){
       lp = lambdal + edp*cpl/rhol/turbP;
     } else {
       lp = lambdav + edp*cpv/rhov/turbP;
@@ -102,7 +102,7 @@ void EnthalpyTIF::diff_matrix(real & am, real & ac, real & ap
         /* dxm is corrected */
         dxm = dxm * fdm;
         /* lambdaf is inverted */
-        if(clm>=0.5){
+        if(clm>=clrsurf){
           lm = lambdav + edm*cpv/rhov/turbP;
         } else {
           lm = lambdal + edm*cpl/rhol/turbP;
@@ -145,7 +145,7 @@ void EnthalpyTIF::diff_matrix(real & am, real & ac, real & ap
         /* dxp is corrected */
         dxp = dxp * fdp;
         /* lambdaf is inverted */
-        if(clp>=0.5){
+        if(clp>=clrsurf){
           lp = lambdav + edp*cpv/rhov/turbP;
         } else {
           lp = lambdal + edp*cpl/rhol/turbP;
@@ -186,11 +186,12 @@ void EnthalpyTIF::diff_matrix(real & am, real & ac, real & ap
 
     if(onm && onp){
       /* f-f-f */
-      if((clm-0.5)*(clc-0.5)>=0){
+      //if((clm-clrsurf)*(clc-clrsurf)>=0){
+      if(!Interface(-1,m,i,j,k)){
         dxm=dxm;
       } else {
         if(!fs) {
-          real frac = std::max((0.5-clc)/(clm-clc),epsl);
+          real frac = std::max((clrsurf-clc)/(clm-clc),epsl);
           dxm=frac*dxm;
           tm = Tint(-1,m,frac,i,j,k);
         } else {
@@ -203,11 +204,12 @@ void EnthalpyTIF::diff_matrix(real & am, real & ac, real & ap
         }
         aflagm=0.0;
       }
-      if((clc-0.5)*(clp-0.5)>=0){
+      //if((clc-clrsurf)*(clp-clrsurf)>=0){
+      if(!Interface(+1,m,i,j,k)){
         dxp=dxp;
       } else {
         if(!fs) {
-          real frac = std::max((0.5-clc)/(clp-clc),epsl);
+          real frac = std::max((clrsurf-clc)/(clp-clc),epsl);
           dxp=frac*dxp;
           tp = Tint(+1,m,frac,i,j,k);
         } else {
@@ -242,11 +244,12 @@ void EnthalpyTIF::diff_matrix(real & am, real & ac, real & ap
 #endif
     } else if(ofm && onp){ 
       /* s-f-f */
-      if((clc-0.5)*(clp-0.5)>=0){
+      //if((clc-clrsurf)*(clp-clrsurf)>=0){
+      if(!Interface(+1,m,i,j,k)){
         dxp=dxp;
       } else {
         if(!fs) {
-          real frac = std::max((0.5-clc)/(clp-clc),epsl);
+          real frac = std::max((clrsurf-clc)/(clp-clc),epsl);
           dxp=frac*dxp;
           tp = Tint(+1,m,frac,i,j,k);
         } else {
@@ -298,11 +301,12 @@ void EnthalpyTIF::diff_matrix(real & am, real & ac, real & ap
 #endif
     } else if(onm && ofp){
       /* f-f-s */
-      if((clm-0.5)*(clc-0.5)>=0){
+      //if((clm-clrsurf)*(clc-clrsurf)>=0){
+      if(!Interface(-1,m,i,j,k)){
         dxm=dxm;
       } else {
         if(!fs) {
-          real frac = std::max((0.5-clc)/(clm-clc),epsl);
+          real frac = std::max((clrsurf-clc)/(clm-clc),epsl);
           dxm=frac*dxm;
           tm = Tint(-1,m,frac,i,j,k);
         } else {

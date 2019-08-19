@@ -176,6 +176,8 @@ class EnthalpyTIF : public Centered {
 
     bool Interface(const int dir, const Comp m,
                    const int i, const int j, const int k);
+    bool Interface_old(const int dir, const Comp m,
+                       const int i, const int j, const int k);
 
     real Tint(const int dir, const Comp &mcomp, const real frac,
               const int i, const int j, const int k);

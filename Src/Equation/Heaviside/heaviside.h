@@ -16,7 +16,7 @@ class Heaviside {
     Heaviside(const Scalar * CLR, Scalar * PHI = NULL, Scalar * ADENS = NULL,
               const real CLRSURF = 0.5) : 
                dom((*CLR).domain()), phi(PHI), adens(ADENS),
-               mc(CLR, CLRSURF) {}  
+               mc(CLR, dom, CLRSURF) {}  
     ~Heaviside() {};
 
     const Domain * domain() const {return dom;}

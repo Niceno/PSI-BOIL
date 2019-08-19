@@ -8,15 +8,13 @@ VOF::VOF(const Scalar & PHI,
          const Vector & U, 
          Times & T,
          Krylov * S,
-         Vector * BNDCLR,
-         Matter * flu) :
+         Vector * BNDCLR) :
 /*---------------------+ 
 |  initialize parent   | NULL is for solid
 +---------------------*/
   jelly( *PHI.domain() ),
   Centered( PHI.domain(), PHI, F , & U, T, &jelly, NULL, S ),
   kappa( &K ),
-  clr( *PHI.domain() ),
   nx( *PHI.domain() ),
   ny( *PHI.domain() ),
   nz( *PHI.domain() ),
@@ -24,18 +22,11 @@ VOF::VOF(const Scalar & PHI,
   my( *PHI.domain() ),
   mz( *PHI.domain() ),
   nalpha( *PHI.domain() ),
-  utx( *PHI.domain() ),
-  uty( *PHI.domain() ),
-  utz( *PHI.domain() ),
-  unliq( *PHI.domain() ),
   stmp( *PHI.domain() ),
-  stmp2( *PHI.domain() ),
-  stmp3( *PHI.domain() ),
   fs( *U.domain() ),
   iflag(*PHI.domain() ),
   iflagx(*PHI.domain() ),
   adens(*PHI.domain() ),
-  adensgeom(*PHI.domain() ),
   heavi(&phi, NULL, &adens),
   topo(&mx,&my,&mz,&adens,&fs)
 
@@ -43,14 +34,6 @@ VOF::VOF(const Scalar & PHI,
 |  this constructor is called only at the finest level  |
 +------------------------------------------------------*/
 { 
-  //kappa     = phi.shape();
-  clr       = phi.shape();
-  stmp      = phi.shape();
-  stmp2     = phi.shape();
-  stmp3     = phi.shape();
-  iflag     = phi.shape();
-  iflagx    = phi.shape();
-
   nx        = phi.shape();
   ny        = phi.shape();
   nz        = phi.shape();
@@ -58,13 +41,10 @@ VOF::VOF(const Scalar & PHI,
   my        = phi.shape();
   mz        = phi.shape();
   nalpha    = phi.shape();
+  stmp      = phi.shape();
+  iflag     = phi.shape();
+  iflagx    = phi.shape();
   adens     = phi.shape();
-  adensgeom = phi.shape();
-
-  utx = phi.shape();
-  uty = phi.shape();
-  utz = phi.shape();
-  unliq = phi.shape();
 
   for( int b=0; b<phi.bc().count(); b++ ) {
     if(    phi.bc().type(b) == BndType::dirichlet()
@@ -77,33 +57,22 @@ VOF::VOF(const Scalar & PHI,
        nx.bc().type(b) = BndType::neumann();
        nalpha.bc().type(b) = BndType::neumann();
        adens.bc().type(b) = BndType::neumann();
-       adensgeom.bc().type(b) = BndType::neumann();
        mx.bc().type(b) = BndType::neumann();
        my.bc().type(b) = BndType::neumann();
        mx.bc().type(b) = BndType::neumann();
-
-       utx.bc().type(b) = BndType::neumann();
-       uty.bc().type(b) = BndType::neumann();
-       utz.bc().type(b) = BndType::neumann();
-       unliq.bc().type(b) = BndType::neumann();
 
        boil::oout << "Adjusting b.c.s for geometrical properties at " << b
                   << boil::endl;
     }
   }
 
- 
-  mixture = flu;
-  if(mixture) {
-    rhol = mixt()->rho(1);
-    rhov = mixt()->rho(0);
-  } else {
-    rhol = 1.;
-    rhov = 1.;
-  }
-
   for_m(m)
     fs(m) = (*u)(m).shape();
+
+  for_m(m)
+    for_avmijk(fs,m,i,j,k)
+      fs[m][i][j][k] = boil::unreal;
+
   bndclr = BNDCLR;
 
   assert(PHI.domain() == F.domain());
@@ -142,14 +111,7 @@ VOF::VOF(const Scalar & PHI,
     if (phi.bc().type(d,BndType::periodic())) {
       iminp=true;
       iminc=false;
-    } else if (phi.bc().type(d,BndType::wall())) {
-      iminw=true;
-    } else if (phi.bc().type(d,BndType::pseudo())) {
-      iminp=true;
-      iminc=false;
-      ifull = false;
     }
-
     if (dom->bnd_symmetry(d)) iminc=false;
   }
   // imax
@@ -243,6 +205,7 @@ VOF::VOF(const Scalar & PHI,
     if (dom->bnd_symmetry(d)) kmaxc=false;
   }
 
+#if 0
   boil::aout<<"curv_HF::periodic= "<<boil::cart.iam()<<" "
             <<iminp<<" "<<imaxp<<" "
             <<jminp<<" "<<jmaxp<<" "
@@ -259,6 +222,7 @@ VOF::VOF(const Scalar & PHI,
             <<kminc<<" "<<kmaxc<<"\n";
 
   boil::oout<<"VOF-full: "<<ifull<<" "<<jfull<<" "<<kfull<<boil::endl;
+#endif
 
 }	
 

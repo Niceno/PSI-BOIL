@@ -1,6 +1,9 @@
 #include "marching_cube.h"
 
-MarchingCube::MarchingCube(const Scalar * CLR, const real CLRSURF) : 
+MarchingCube::MarchingCube(const Scalar * CLR,
+                           const Domain * DOM,
+                           const real CLRSURF) :
+ dom(DOM),
 
  edgeTable_volume( {
 0x0  , 0x109, 0x203, 0x30a, 0x406, 0x50f, 0x605, 0x70c,

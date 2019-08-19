@@ -9,13 +9,16 @@ void PhaseChangeVOF::cal_gradt(const Scalar * diff_eddy) {
 *         txv,tyv,tzv: gradient of vapor  tempereture in x,y,z-direction
 *******************************************************************************/
 
-  /* this is for increased precision near cell centre */
+  /* used by gradt_ib and gradt8 */
+  /* -> increased precision near cell centre */
   /* achieved by switching to upwind/downwind differencing */
   /* it is also possible to use purely upw/dwnw through the upwind_flag */
   /* this is however not recommended <- lower precision */
-  prepare_gradt8();
+  calculate_node_temperature();
 
   for_vijk(tpr,i,j,k){
+
+    if(dom->ibody().off(i,j,k)) continue;
 
     /* normal cell, 2nd order */
     real dtdx,dtdy,dtdz;
@@ -24,7 +27,13 @@ void PhaseChangeVOF::cal_gradt(const Scalar * diff_eddy) {
       txl[i][j][k]=dtdx;
       tyl[i][j][k]=dtdy;
       tzl[i][j][k]=dtdz;
+      txv[i][j][k]=0.0;
+      tyv[i][j][k]=0.0;
+      tzv[i][j][k]=0.0;
     } else {
+      txl[i][j][k]=0.0;
+      tyl[i][j][k]=0.0;
+      tzl[i][j][k]=0.0;
       txv[i][j][k]=dtdx;
       tyv[i][j][k]=dtdy;
       tzv[i][j][k]=dtdz;
@@ -43,11 +52,9 @@ void PhaseChangeVOF::cal_gradt(const Scalar * diff_eddy) {
 
     ii=jj=kk=0;
 
-    /* the clrsurf check should work as long as update_at_walls
-     * is called in VOF! */
-
     /* west */
-    if((clrw-clrsurf)*(clrc-clrsurf)<=0.0){
+    //if((clrw-clrsurf)*(clrc-clrsurf)<=0.0){
+    if(Interface(-1,Comp::i(),i,j,k)) {
       txp = gradtx(-1,i,j,k);
       if((clrc-clrsurf)<0.0){
         txv[i][j][k] = txp; 
@@ -59,7 +66,8 @@ void PhaseChangeVOF::cal_gradt(const Scalar * diff_eddy) {
       ii=1;
     }
     /* east */
-    if((clre-clrsurf)*(clrc-clrsurf)<=0.0){
+    //if((clre-clrsurf)*(clrc-clrsurf)<=0.0){
+    if(Interface(+1,Comp::i(),i,j,k)) {
       txm = gradtx(+1,i,j,k);
       if((clrc-clrsurf)<0.0){
         txv[i][j][k] = txm;
@@ -71,7 +79,8 @@ void PhaseChangeVOF::cal_gradt(const Scalar * diff_eddy) {
       ii+=1;
     }
     /* south */
-    if((clrs-clrsurf)*(clrc-clrsurf)<=0.0){
+    //if((clrs-clrsurf)*(clrc-clrsurf)<=0.0){
+    if(Interface(-1,Comp::j(),i,j,k)) {
       typ = gradty(-1,i,j,k);
       if((clrc-clrsurf)<0.0){
         tyv[i][j][k] = typ;
@@ -83,7 +92,8 @@ void PhaseChangeVOF::cal_gradt(const Scalar * diff_eddy) {
       jj=1;
     }
     /* north */
-    if((clrn-clrsurf)*(clrc-clrsurf)<=0.0){
+    //if((clrn-clrsurf)*(clrc-clrsurf)<=0.0){
+    if(Interface(+1,Comp::j(),i,j,k)) {
       tym = gradty(+1,i,j,k);
       if((clrc-clrsurf)<0.0){
         tyv[i][j][k] = tym;
@@ -95,7 +105,8 @@ void PhaseChangeVOF::cal_gradt(const Scalar * diff_eddy) {
       jj+=1;
     }
     /* bottom */
-    if((clrb-clrsurf)*(clrc-clrsurf)<=0.0){
+    //if((clrb-clrsurf)*(clrc-clrsurf)<=0.0){
+    if(Interface(-1,Comp::k(),i,j,k)) {
       tzp = gradtz(-1,i,j,k);
       if((clrc-clrsurf)<0.0){
         tzv[i][j][k] = tzp;
@@ -107,7 +118,8 @@ void PhaseChangeVOF::cal_gradt(const Scalar * diff_eddy) {
       kk=1;
     }
     /* top */
-    if((clrt-clrsurf)*(clrc-clrsurf)<=0.0){
+    //if((clrt-clrsurf)*(clrc-clrsurf)<=0.0){
+    if(Interface(+1,Comp::k(),i,j,k)) {
       tzm = gradtz(+1,i,j,k);
       if((clrc-clrsurf)<0.0){
         tzv[i][j][k] = tzm;
@@ -130,8 +142,10 @@ void PhaseChangeVOF::cal_gradt(const Scalar * diff_eddy) {
   gradt_ib(diff_eddy);
 #endif
   
+#if 0  /* replaced by elaborate subgrid treatment */
   /* correct at walls */
   insert_bc_gradt(diff_eddy);
+#endif
 
   txl.exchange_all();
   tyl.exchange_all();
