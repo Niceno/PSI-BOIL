@@ -9,6 +9,7 @@ libEnthalpyTif_a_SOURCES = enthalpytif.h                   \
                           enthalpytif_convection.cpp       \
                           enthalpytif_diff_matrix.cpp      \
                           enthalpytif_diffusion_fd.cpp     \
+                          enthalpytif_gradt_ib.cpp         \
                           enthalpytif_hflux_wall.cpp       \
                           enthalpytif_hflux_wall_ib.cpp    \
                           enthalpytif_int_distance.cpp     \
@@ -17,6 +18,7 @@ libEnthalpyTif_a_SOURCES = enthalpytif.h                   \
                           enthalpytif_solve.cpp            \
                           enthalpytif_solve_sor.cpp        \
                           enthalpytif_tint_val.cpp         \
+                          enthalpytif_temperature_node.cpp \
                           enthalpytif_update_rhs.cpp       \
                           enthalpytif_update_ftif.cpp      
 

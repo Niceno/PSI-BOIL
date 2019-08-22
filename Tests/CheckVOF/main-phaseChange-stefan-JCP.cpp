@@ -5,7 +5,7 @@ const int Level=2;
 
 /* computed parameters */
 const int NX = 50*Level;
-const int NZ = 2;
+const int NZ = 3;
 
 /* domain dimensions (given by problem) */
 const real LX =   0.001; //Hardt

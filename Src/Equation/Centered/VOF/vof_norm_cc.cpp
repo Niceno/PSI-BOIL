@@ -10,60 +10,24 @@ void VOF::norm_cc(const Scalar & sca) {
 *******************************************************************************/
 
   for_ijk(i,j,k) {
-    real nxX, nyX, nzX;
-    nxX = copysign(1.0,+(sca[i+1][j][k]-sca[i-1][j][k]));
-    nyX = 0.5 * ( (sca[i+1][j+1][k]+sca[i][j+1][k]+sca[i-1][j+1][k])
-                - (sca[i+1][j-1][k]+sca[i][j-1][k]+sca[i-1][j-1][k])); 
-    nzX = 0.5 * ( (sca[i+1][j][k+1]+sca[i][j][k+1]+sca[i-1][j][k+1])
-                - (sca[i+1][j][k-1]+sca[i][j][k-1]+sca[i-1][j][k-1])); 
-    normalize(nxX,nyX,nzX);
+    real nxx, nyy, nzz;
+    Comp mcomp;
+    norm_cc(nxx, nyy, nzz, mcomp, i,j,k, sca);
 
-    real nxY, nyY, nzY;
-    nxY = 0.5 * ( (sca[i+1][j-1][k]+sca[i+1][j][k]+sca[i+1][j+1][k])
-                - (sca[i-1][j-1][k]+sca[i-1][j][k]+sca[i-1][j+1][k])); 
-    nyY = copysign(1.0,+(sca[i][j+1][k]-sca[i][j-1][k]));
-    nzY = 0.5 * ( (sca[i][j-1][k+1]+sca[i][j][k+1]+sca[i][j+1][k+1])
-                - (sca[i][j-1][k-1]+sca[i][j][k-1]+sca[i][j+1][k-1]));
-    normalize(nxY,nyY,nzY);
-
-    real nxZ, nyZ, nzZ;
-    nxZ = 0.5 * ( (sca[i+1][j][k-1]+sca[i+1][j][k]+sca[i+1][j][k+1])
-                - (sca[i-1][j][k-1]+sca[i-1][j][k]+sca[i-1][j][k+1])); 
-    nyZ = 0.5 * ( (sca[i][j+1][k-1]+sca[i][j+1][k]+sca[i][j+1][k+1])
-                - (sca[i][j-1][k-1]+sca[i][j-1][k]+sca[i][j-1][k+1])); 
-    nzZ = copysign(1.0,+(sca[i][j][k+1]-sca[i][j][k-1]));
-    normalize(nxZ,nyZ,nzZ);
-
-    if (fabs(nxX)<fabs(nyY)) {
-      if (fabs(nyY)<fabs(nzZ)) {
-        nx[i][j][k]=nxZ;
-        ny[i][j][k]=nyZ;
-        nz[i][j][k]=nzZ;
-      } else {
-        nx[i][j][k]=nxY;
-        ny[i][j][k]=nyY;
-        nz[i][j][k]=nzY;
-      }
-    } else {
-      if (fabs(nxX)<fabs(nzZ)) {
-        nx[i][j][k]=nxZ;
-        ny[i][j][k]=nyZ;
-        nz[i][j][k]=nzZ;
-      } else {
-        nx[i][j][k]=nxX;
-        ny[i][j][k]=nyX;
-        nz[i][j][k]=nzX;
-      }
-    }
+    nx[i][j][k] = nxx;
+    ny[i][j][k] = nyy;
+    nz[i][j][k] = nzz;
   }
 
   /* normal vector at adjacent cells next to wall, symmetric and IB */
   //insert_bc_gradphic(sca); 
 
   /* normal vector on boundary plane */
+#if 1
   nx.bnd_update();
   ny.bnd_update();
   nz.bnd_update();
+#endif
   insert_bc_norm_cc(sca);
 
   /* normalize */
@@ -78,6 +42,39 @@ void VOF::norm_cc(const Scalar & sca) {
   //boil::plot->plot(sca,nx,ny,nz, "clr-nx-ny-nz", time->current_step());
   //exit(0);
 
+
+  return;
+}
+
+void VOF::norm_cc(real & nx_val, real & ny_val, real & nz_val,
+                  Comp & mcomp,
+                  const int i, const int j, const int k,
+                  const Scalar & sca) {
+
+  real nxX, nyX, nzX;
+  nxX = copysign(1.0,+(sca[i+1][j][k]-sca[i-1][j][k]));
+  nyX = 0.5 * ( (sca[i+1][j+1][k]+sca[i][j+1][k]+sca[i-1][j+1][k])
+              - (sca[i+1][j-1][k]+sca[i][j-1][k]+sca[i-1][j-1][k])); 
+  nzX = 0.5 * ( (sca[i+1][j][k+1]+sca[i][j][k+1]+sca[i-1][j][k+1])
+              - (sca[i+1][j][k-1]+sca[i][j][k-1]+sca[i-1][j][k-1])); 
+
+  real nxY, nyY, nzY;
+  nxY = 0.5 * ( (sca[i+1][j-1][k]+sca[i+1][j][k]+sca[i+1][j+1][k])
+              - (sca[i-1][j-1][k]+sca[i-1][j][k]+sca[i-1][j+1][k])); 
+  nyY = copysign(1.0,+(sca[i][j+1][k]-sca[i][j-1][k]));
+  nzY = 0.5 * ( (sca[i][j-1][k+1]+sca[i][j][k+1]+sca[i][j+1][k+1])
+              - (sca[i][j-1][k-1]+sca[i][j][k-1]+sca[i][j+1][k-1]));
+
+  real nxZ, nyZ, nzZ;
+  nxZ = 0.5 * ( (sca[i+1][j][k-1]+sca[i+1][j][k]+sca[i+1][j][k+1])
+              - (sca[i-1][j][k-1]+sca[i-1][j][k]+sca[i-1][j][k+1])); 
+  nyZ = 0.5 * ( (sca[i][j+1][k-1]+sca[i][j+1][k]+sca[i][j+1][k+1])
+              - (sca[i][j-1][k-1]+sca[i][j-1][k]+sca[i][j-1][k+1])); 
+  nzZ = copysign(1.0,+(sca[i][j][k+1]-sca[i][j][k-1]));
+
+  select_norm_cc(nx_val, ny_val, nz_val,
+                 nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ,
+                 mcomp);
 
   return;
 }

@@ -19,37 +19,14 @@ void PhaseChangeVOF::calculate_node_temperature(const Scalar * diff_eddy) {
       temp = tpr[i][j][k]*tpr.dxc(i-1) + tpr[i-1][j][k]*tpr.dxc(i);
       temp /= (tpr.dxc(i) + tpr.dxc(i-1));
 #else
-      real len_1 = phi.dxw(i) - 0.5*phi.dxc(i);
-      real len_2 = 0.5*phi.dxc(i);
+      real len_1 = 0.5*phi.dxc(i);
+      real len_2 = 0.5*phi.dxc(i-1);
 
       real tpr_1 = tpr[i][j][k];
       real tpr_2 = tpr[i-1][j][k];
 
-      real lam_1,lam_2;
-
-      if(dom->ibody().off(i,j,k)) {
-        lam_1 = solid()->lambda(i,j,k);
-      } else {
-        if(clr[i][j][k]<clrsurf) {
-          lam_1=lambdav;
-          if(diff_eddy) lam_1 += (*diff_eddy)[i][j][k]*cpv/rhov/turbP; 
-        } else {
-          lam_1=lambdal;
-          if(diff_eddy) lam_1 += (*diff_eddy)[i][j][k]*cpl/rhol/turbP;
-        }
-      }
-  
-      if(dom->ibody().off(i-1,j,k)) {
-        lam_2 = solid()->lambda(i-1,j,k);
-      } else {
-        if(clr[i-1][j][k]<clrsurf) {
-          lam_2=lambdav;
-          if(diff_eddy) lam_2 += (*diff_eddy)[i-1][j][k]*cpv/rhov/turbP;
-        } else {
-          lam_2=lambdal;
-          if(diff_eddy) lam_2 += (*diff_eddy)[i-1][j][k]*cpl/rhol/turbP;
-        }
-      }
+      real lam_1 = lambda(i,j,k);
+      real lam_2 = lambda(i-1,j,k);
 
       temp = temperature_node(len_1, lam_1, tpr_1, len_2, lam_2, tpr_2);
 #endif
@@ -67,37 +44,14 @@ void PhaseChangeVOF::calculate_node_temperature(const Scalar * diff_eddy) {
       temp = tpr[i][j][k]*tpr.dyc(j-1) + tpr[i][j-1][k]*tpr.dyc(j);
       temp /= (tpr.dyc(j) + tpr.dyc(j-1));
 #else
-      real len_1 = phi.dys(j) - 0.5*phi.dyc(j);
-      real len_2 = 0.5*phi.dyc(j);
+      real len_1 = 0.5*phi.dyc(j);
+      real len_2 = 0.5*phi.dyc(j-1);
 
       real tpr_1 = tpr[i][j][k];
       real tpr_2 = tpr[i][j-1][k];
 
-      real lam_1,lam_2;
-
-      if(dom->ibody().off(i,j,k)) {
-        lam_1 = solid()->lambda(i,j,k);
-      } else {
-        if(clr[i][j][k]<clrsurf) {
-          lam_1=lambdav;
-          if(diff_eddy) lam_1 += (*diff_eddy)[i][j][k]*cpv/rhov/turbP; 
-        } else {
-          lam_1=lambdal;
-          if(diff_eddy) lam_1 += (*diff_eddy)[i][j][k]*cpl/rhol/turbP;
-        }
-      }
-  
-      if(dom->ibody().off(i,j-1,k)) {
-        lam_2 = solid()->lambda(i,j-1,k);
-      } else {
-        if(clr[i][j-1][k]<clrsurf) {
-          lam_2=lambdav;
-          if(diff_eddy) lam_2 += (*diff_eddy)[i][j-1][k]*cpv/rhov/turbP;
-        } else {
-          lam_2=lambdal;
-          if(diff_eddy) lam_2 += (*diff_eddy)[i][j-1][k]*cpl/rhol/turbP;
-        }
-      }
+      real lam_1 = lambda(i,j,k);
+      real lam_2 = lambda(i,j-1,k);
 
       temp = temperature_node(len_1, lam_1, tpr_1, len_2, lam_2, tpr_2);
 #endif
@@ -115,43 +69,41 @@ void PhaseChangeVOF::calculate_node_temperature(const Scalar * diff_eddy) {
       temp = tpr[i][j][k]*tpr.dzc(k-1) + tpr[i][j][k-1]*tpr.dzc(k);
       temp /= (tpr.dzc(k) + tpr.dzc(k-1));
 #else
-      real len_1 = phi.dzb(k) - 0.5*phi.dzc(k);
-      real len_2 = 0.5*phi.dzc(k);
+      real len_1 = 0.5*phi.dzc(k);
+      real len_2 = 0.5*phi.dzc(k-1);
 
       real tpr_1 = tpr[i][j][k];
       real tpr_2 = tpr[i][j][k-1];
 
-      real lam_1,lam_2;
-
-      if(dom->ibody().off(i,j,k)) {
-        lam_1 = solid()->lambda(i,j,k);
-      } else {
-        if(clr[i][j][k]<clrsurf) {
-          lam_1=lambdav;
-          if(diff_eddy) lam_1 += (*diff_eddy)[i][j][k]*cpv/rhov/turbP; 
-        } else {
-          lam_1=lambdal;
-          if(diff_eddy) lam_1 += (*diff_eddy)[i][j][k]*cpl/rhol/turbP;
-        }
-      }
-  
-      if(dom->ibody().off(i,j,k-1)) {
-        lam_2 = solid()->lambda(i,j,k-1);
-      } else {
-        if(clr[i][j][k-1]<clrsurf) {
-          lam_2=lambdav;
-          if(diff_eddy) lam_2 += (*diff_eddy)[i][j][k-1]*cpv/rhov/turbP;
-        } else {
-          lam_2=lambdal;
-          if(diff_eddy) lam_2 += (*diff_eddy)[i][j][k-1]*cpl/rhol/turbP;
-        }
-      }
+      real lam_1 = lambda(i,j,k);
+      real lam_2 = lambda(i,j,k-1);
 
       temp = temperature_node(len_1, lam_1, tpr_1, len_2, lam_2, tpr_2);
 #endif
     }
     bndtpr[m][i][j][k] = temp;
   }
+
+#if 0
+  for_vijk(clr,i,j,k) {
+    //if(adens[i][j][k]>boil::atto) {
+    if(i<10&&j<10&&k<10 && i>boil::BW&&j>boil::BW&&k>boil::BW) {
+      boil::oout<<i<<" "<<j<<" "<<k<<" "<<adens[i][j][k]<<" | "<<tpr[i][j][k-1]<<" "<<tpr[i][j][k]<<" "<<tpr[i][j][k+1]<<" "
+                <<"| "<<bndtpr[Comp::w()][i][j][k]<<" "<<bndtpr[Comp::w()][i][j][k+1]<<" | "
+                <<(lambda(i,j,k-1)*tpr[i][j][k-1]*0.5*phi.dzc(k)+lambda(i,j,k)*tpr[i][j][k]*0.5*phi.dzc(k-1))/(lambda(i,j,k-1)*0.5*phi.dzc(k)+lambda(i,j,k)*0.5*phi.dzc(k-1))<<" "
+                <<(lambda(i,j,k+1)*tpr[i][j][k+1]*0.5*phi.dzc(k)+lambda(i,j,k)*tpr[i][j][k]*0.5*phi.dzc(k+1))/(lambda(i,j,k+1)*0.5*phi.dzc(k)+lambda(i,j,k)*0.5*phi.dzc(k+1))<<" | "
+                <<lambda(i,j,k+1)*(tpr[i][j][k+1]-bndtpr[Comp::w()][i][j][k+1])/(0.5*phi.dzc(k+1))
+                 -lambda(i,j,k)*(bndtpr[Comp::w()][i][j][k+1]-tpr[i][j][k])/(0.5*phi.dzc(k))
+                <<" "
+                <<lambda(i,j,k)*(tpr[i][j][k]-bndtpr[Comp::w()][i][j][k])/(0.5*phi.dzc(k))
+                 -lambda(i,j,k-1)*(bndtpr[Comp::w()][i][j][k]-tpr[i][j][k-1])/(0.5*phi.dzc(k-1))
+                <<" | "<<lambda(i,j,k+1)*(tpr[i][j][k+1]-bndtpr[Comp::w()][i][j][k+1])/(0.5*phi.dzc(k+1))<<" "<<lambda(i,j,k)*(bndtpr[Comp::w()][i][j][k+1]-tpr[i][j][k])/(0.5*phi.dzc(k))
+<<" "<<lambda(i,j,k)*(tpr[i][j][k]-bndtpr[Comp::w()][i][j][k])/(0.5*phi.dzc(k))<<" "<<lambda(i,j,k-1)*(bndtpr[Comp::w()][i][j][k]-tpr[i][j][k-1])/(0.5*phi.dzc(k-1))
+                <<" | "<<lambda(i,j,k-1)<<" "<<lambda(i,j,k)<<" "<<lambda(i,j,k+1)<<boil::endl;
+    }
+  }
+  exit(0);
+#endif
 
   bndtpr.exchange_all();
 }

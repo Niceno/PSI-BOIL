@@ -124,6 +124,10 @@ class PhaseChangeVOF : public Centered {
 
     real temperature_node(real len_s, real lam_s, real tmp_s
                         , real len_f, real lam_f, real tmp_f);
+ 
+    real lambda(const int i, const int j, const int k,
+                const Scalar * diff_eddy = NULL) const;
+
 
     bool upwind_flag;
 

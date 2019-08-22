@@ -138,9 +138,7 @@ void PhaseChangeVOF::cal_gradt(const Scalar * diff_eddy) {
 #endif
   }
 
-#ifdef IB
   gradt_ib(diff_eddy);
-#endif
   
 #if 0  /* replaced by elaborate subgrid treatment */
   /* correct at walls */

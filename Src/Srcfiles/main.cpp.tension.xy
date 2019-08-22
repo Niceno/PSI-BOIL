@@ -292,7 +292,7 @@ main(int argc, char * argv[]) {
     }
   }
 #else
-  setup_circle(c,radius,xcent,ycent);
+  setup_circle_xy(c,radius,xcent,ycent);
 #endif
 #if 1
   for_avijk(c,i,j,k)

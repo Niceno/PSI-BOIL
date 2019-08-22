@@ -1,4 +1,4 @@
-void setup_circle(Scalar & c, const real radius, const real xcent, const real ycent) {  
+void setup_circle_xy(Scalar & c, const real radius, const real xcent, const real ycent) {  
 #if 1
   // set theoretical value of single droplet for color function
   for_vijk(c,i,j,k){
@@ -178,6 +178,120 @@ void setup_circle(Scalar & c, const real radius, const real xcent, const real yc
     }
   }
 #endif
+
+  return;
+}
+
+void setup_circle_xz(Scalar & c, const real radius, const real xcent, const real zcent) {  
+  // set theoretical value of single droplet for color function
+  for_vijk(c,i,j,k){
+    int inm,inp,knm,knp;
+    if (c.xc(i)>xcent && c.zc(k)>zcent) {
+      inm=i; inp=i+1; knm=j; knp=j+1;
+    } else if (c.xc(i)>xcent && c.zc(k)<zcent) {
+      inm=i; inp=i+1; knm=j+1; knp=j; 
+    } else if (c.xc(i)<xcent && c.zc(k)>zcent) {
+      inm=i+1; inp=i; knm=j; knp=j+1;
+    } else {
+      inm=i+1; inp=i; knm=j+1; knp=j;
+    }
+
+    // check vertex
+    int imm=0, imp=0, ipm=0, ipp=0;
+
+    real dtmp = sqrt(pow(c.xn(inm)-xcent,2.0) + pow(c.zn(knm)-zcent,2.0));
+    if (dtmp<=radius) imm=1;
+
+    dtmp = sqrt(pow(c.xn(inm)-xcent,2.0) + pow(c.zn(knp)-zcent,2.0));
+    if (dtmp<=radius) imp=1;
+
+    dtmp = sqrt(pow(c.xn(inp)-xcent,2.0) + pow(c.zn(knm)-zcent,2.0));
+    if (dtmp<=radius) ipm=1;
+
+    dtmp = sqrt(pow(c.xn(inp)-xcent,2.0) + pow(c.zn(knp)-zcent,2.0));
+    if (dtmp<=radius) ipp=1;
+
+    if (imm+imp+ipm+ipp==4) {
+
+      // full of liquid
+      c[i][j][k] = 1.0;
+
+    } else if(imm+imp+ipm+ipp==0){
+
+      // full of gas
+      c[i][j][k] = 0.0;
+
+    } else if(imm+imp+ipm+ipp==1) {
+
+      // one vertex is in liquid
+      real theta1 = asin(fabs(c.zn(knm)-zcent)/radius);
+      real theta2 = acos(fabs(c.xn(inm)-xcent)/radius);
+
+      if (approx(theta2-theta1,0.0)) {
+
+        //exception
+        c[i][j][k]=0.0;
+      } else {
+
+        real area = radius*radius*(theta2-theta1)*0.5;
+        real a = fabs(c.zn(knm)-zcent)/(radius*cos(theta1));
+        real zz = a*fabs(c.xn(inm)-xcent);
+        area = area - (radius*sin(theta2)-zz)*fabs(c.xn(inm)-xcent)*0.5
+                    - (fabs(c.zn(knm)-zcent)-zz)
+                     *(radius*cos(theta1)-fabs(c.xn(inm)-xcent))*0.5;
+        c[i][j][k] = area/(fabs(c.dxc(inm))*fabs(c.dzc(knm)));
+        //std::cout<<area<<"\n";
+        
+      }
+#if 1
+    } else if (imm+imp+ipm+ipp==3) {
+
+      // one vertex is in gas
+      real theta1 = acos(fabs(c.xn(inp)-xcent)/radius);
+      real theta2 = asin(fabs(c.zn(knp)-zcent)/radius);
+
+      real area = (fabs(c.xn(inp)-xcent)-radius*cos(theta2))*fabs(c.zn(knp)-zcent)*0.5
+                + (fabs(c.zn(knp)-zcent)-radius*sin(theta1))*fabs(c.xn(inp)-xcent)*0.5;
+      area -= radius*radius*(theta2-theta1)*0.5;
+      area = c.dxc(i)*c.dzc(k)-area;
+      c[i][j][k] = area/(c.dxc(i)*c.dzc(k));
+      //std::cout<<c[i][j][k]<<"\n";
+
+    } else if (imm+imp+ipm+ipp==2) {
+
+      // two vertices are in gas
+      if (ipm==1) {
+        // imm and ipm are in liquid
+        real theta1 = acos(fabs(c.xn(inp)-xcent)/radius);
+        real theta2 = acos(fabs(c.xn(inm)-xcent)/radius);
+
+        real area = radius*radius*(theta2-theta1)*0.5;
+        real a1 = radius*sin(theta1)/fabs(c.xn(inp)-xcent);
+        area += (fabs(c.xn(inp)-xcent)-fabs(c.zn(knm)-zcent)/a1)
+               *(radius*sin(theta1)-fabs(c.zn(knm)-zcent))*0.5;
+        area -= (fabs(c.zn(knm)-zcent)/a1-fabs(c.xn(inm)-xcent))*fabs(c.zn(knm)-zcent)*0.5;
+        area -= (radius*sin(theta2)-fabs(c.zn(knm)-zcent))*fabs(c.xn(inm)-xcent)*0.5;
+        c[i][j][k] = area/(c.dxc(i)*c.dzc(k));
+        //std::cout<<c[i][j][k]<<"\n";
+      } else if (imp==1) {
+        // imm and imp are in liquid
+        real theta1 = asin(fabs(c.zn(knm)-zcent)/radius);
+        real theta2 = asin(fabs(c.zn(knp)-zcent)/radius);
+
+        real area = radius*radius*(theta2-theta1)*0.5;
+        real a2 = fabs(c.zn(knp)-zcent)/(radius*cos(theta2));
+        area += (radius*cos(theta2)-fabs(c.xn(inm)-xcent))
+               *(fabs(c.zn(knp)-zcent)-a2*fabs(c.xn(inm)-xcent))*0.5;
+        area -= (a2*fabs(c.xn(inm)-xcent)-fabs(c.zn(knm)-zcent))*fabs(c.xn(inm)-xcent)*0.5;
+        area -= (radius*cos(theta1)-fabs(c.xn(inm)-xcent))*fabs(c.zn(knm)-zcent)*0.5;
+        c[i][j][k] = area/(c.dxc(i)*c.dzc(k));
+      } else {
+        std::cout<<"Error!!!\n";
+        exit(0);
+      }
+#endif
+    }
+  }
 
   return;
 }

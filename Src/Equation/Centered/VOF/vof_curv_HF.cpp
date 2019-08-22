@@ -27,6 +27,12 @@ void VOF::curv_HF() {
   // Normal vector is used for (i) dirMax and (ii) Eq. (2) in J.Lopez et al.
 #if 0
   norm_young(phi);  // Young's method is good for low resolution
+  true_norm_vect();
+  for_aijk(i,j,k) {
+    nx[i][j][k] = mx[i][j][k];
+    ny[i][j][k] = my[i][j][k];
+    nz[i][j][k] = mz[i][j][k];
+  }
 #else
   for_aijk(i,j,k) {
     nx[i][j][k] = mx[i][j][k];

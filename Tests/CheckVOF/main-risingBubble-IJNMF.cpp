@@ -85,6 +85,9 @@ main(int argc, char * argv[]) {
   p.bc().add( BndCnd( Dir::kmin(), BndType::neumann() ) );
   p.bc().add( BndCnd( Dir::kmax(), BndType::neumann() ) );
   press = p.shape();
+  f = p.shape();
+  g = p.shape();
+  kappa = p.shape();
   
   c.bc().add( BndCnd( Dir::imin(), BndType::wall() ) );
   c.bc().add( BndCnd( Dir::imax(), BndType::wall() ) );

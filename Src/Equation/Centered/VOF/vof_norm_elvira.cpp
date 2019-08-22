@@ -31,10 +31,10 @@ void VOF::norm_elvira(Scalar & sca) {
        ||(valcc-phisurf)*(valpp-phisurf)<=0.0) {
       norm_elvira(i,j,k,valcc,valmc,valpc,valcm,valcp,
                         valmm,valpm,valmp,valpp);
-    /* otherwise, centered-columns are used */
+    /* otherwise, standard method is used */
     } else {
-      //nx[i][j][k] = ny[i][j][k] = nz[i][j][k] = 0.0;
-      norm_cc(sca,i,j,k);
+      norm_mixed(nx[i][j][k], ny[i][j][k], nz[i][j][k], i,j,k, sca);
+      //norm_cc(sca,i,j,k);
     }
   }
 
@@ -343,33 +343,4 @@ real VOF::ext_v(const real xp, const real yp, const real zp,
   /* volume fraction */
   return calc_v(alphaval,vm1,vm2,vm3);
 
-}
-
-
-void VOF::norm_cc(Scalar & sca,int i,int j,int k) {
-    real nxX, nyX, nzX;
-    nxX = copysign(1.0,+(sca[i+1][j][k]-sca[i-1][j][k]));
-    nyX = 0.5 * ( (sca[i+1][j+1][k]+sca[i][j+1][k]+sca[i-1][j+1][k])
-                - (sca[i+1][j-1][k]+sca[i][j-1][k]+sca[i-1][j-1][k]));
-    nzX = 0.0;
-    normalize(nxX,nyX,nzX);
-
-    real nxY, nyY, nzY;
-    nxY = 0.5 * ( (sca[i+1][j-1][k]+sca[i+1][j][k]+sca[i+1][j+1][k])
-                - (sca[i-1][j-1][k]+sca[i-1][j][k]+sca[i-1][j+1][k]));
-    nyY = copysign(1.0,+(sca[i][j+1][k]-sca[i][j-1][k]));
-    nzY = 0.0;
-    normalize(nxY,nyY,nzY);
-
-    if(fabs(nxX)<fabs(nyY)) {
-      nx[i][j][k]=nxY;
-      ny[i][j][k]=nyY;
-      nz[i][j][k]=nzY;
-    } else {
-      nx[i][j][k]=nxX;
-      ny[i][j][k]=nyX;
-      nz[i][j][k]=nzX;
-    }
-
-    return;
 }

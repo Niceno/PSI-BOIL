@@ -15,40 +15,43 @@ void EnthalpyTIF::setflag() {
       iflag[i][j][k]=1;
   }
 
-  for_aijk(i,j,k) {
-    if (dom->ibody().off(i,j,k)) 
-      iflag[i][j][k]=-1000;
-  }
-
   /* i-direction */
   for(int i=si()-1; i<=ei(); i++){
     for_jk(j,k){
-       if((clrold[i][j][k]-clrsurf)*(clrold[i+1][j][k]-clrsurf)<=0.0
-          &&iflag[i][j][k]+iflag[i+1][j][k]>-500) {
-          iflag[i  ][j][k]=0;
-          iflag[i+1][j][k]=0;
-       }
+      //if((clrold[i][j][k]-clrsurf)*(clrold[i+1][j][k]-clrsurf)<=0.0
+      //   &&iflag[i][j][k]+iflag[i+1][j][k]>-500) {
+      if(Interface_old(+1,Comp::i(),i,j,k)) {
+        iflag[i  ][j][k]=0;
+        iflag[i+1][j][k]=0;
+      }
     }
   }
   /* j-direction */
   for(int j=sj()-1; j<=ej(); j++){
     for_ik(i,k){
-      if((clrold[i][j][k]-clrsurf)*(clrold[i][j+1][k]-clrsurf)<=0.0
-          &&iflag[i][j][k]+iflag[i][j+1][k]>-500) {
-          iflag[i][j  ][k]=0;
-          iflag[i][j+1][k]=0;
-       }
+      //if((clrold[i][j][k]-clrsurf)*(clrold[i][j+1][k]-clrsurf)<=0.0
+      //    &&iflag[i][j][k]+iflag[i][j+1][k]>-500) {
+      if(Interface_old(+1,Comp::j(),i,j,k)) {
+        iflag[i][j  ][k]=0;
+        iflag[i][j+1][k]=0;
+      }
     }
   }
   /* k-direction */
   for(int k=sk()-1; k<=ek(); k++){
     for_ij(i,j){
-       if((clrold[i][j][k]-clrsurf)*(clrold[i][j][k+1]-clrsurf)<=0.0
-          &&iflag[i][j][k]+iflag[i][j][k+1]>-500) {
-          iflag[i][j][k  ]=0;
-          iflag[i][j][k+1]=0;
-       }
+      //if((clrold[i][j][k]-clrsurf)*(clrold[i][j][k+1]-clrsurf)<=0.0
+      //    &&iflag[i][j][k]+iflag[i][j][k+1]>-500) {
+      if(Interface_old(+1,Comp::k(),i,j,k)) {
+        iflag[i][j][k  ]=0;
+        iflag[i][j][k+1]=0;
+      }
     }
+  }
+
+  for_aijk(i,j,k) {
+    if(dom->ibody().off(i,j,k)) 
+      iflag[i][j][k]=-1000;
   }
 
 #if 0

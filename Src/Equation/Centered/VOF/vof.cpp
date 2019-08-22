@@ -90,6 +90,7 @@ VOF::VOF(const Scalar & PHI,
   curv_method = 0;
   cangle=90.0/180.0*boil::pi;
   limit_color=false;
+  use_subgrid=false;
 
   discretize();
 

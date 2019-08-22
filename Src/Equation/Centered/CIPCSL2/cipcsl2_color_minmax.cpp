@@ -64,8 +64,10 @@ void CIPCSL2::color_minmax() {
     if (cminLocal<-1.0 || cmaxLocal>2.0) { 
       boil::aout<<"proc= "<<boil::cart.iam()
         <<" min= "<<cminLocal<<" max= "<<cmaxLocal
-        <<" i_min= "<<i_cmin<<" j_min= "<<j_cmin<<" k_min= "<<k_cmin
-        <<" i_max= "<<i_cmax<<" j_max= "<<j_cmax<<" k_min= "<<k_cmax<<"\n";
+        <<" i_min= "<<i_cmin-si()+1<<" j_min= "<<j_cmin-sj()+1
+        <<" k_min= "<<k_cmin-sk()+1
+        <<" i_max= "<<i_cmax-si()+1<<" j_max= "<<j_cmax-sj()+1
+        <<" k_min= "<<k_cmax-sk()+1<<"\n";
     }
     boil::plot->plot((*u),clr,kappa, "uvw-clr-kappa", time->current_step());
     exit(0);

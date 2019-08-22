@@ -110,8 +110,33 @@ void VOF::fs_bnd_nosubgrid() {
     /* erroneous interfaces */
     real phiphi = phi[i][j][k];
     bool errint = (phiphi<tol_wall||phiphi-1.0>-tol_wall);
-    if(errint)
+    if(errint) {
+      if(dom->ibody().off(i-1,j,k)) {
+        mcomp = Comp::i();
+        fs[mcomp][i  ][j][k] = boil::unreal;
+      }
+      if(dom->ibody().off(i+1,j,k)) {
+        mcomp = Comp::i();
+        fs[mcomp][i+1][j][k] = boil::unreal;
+      }
+      if(dom->ibody().off(i,j-1,k)) {
+        mcomp = Comp::j();
+        fs[mcomp][i][j  ][k] = boil::unreal;
+      }
+      if(dom->ibody().off(i,j+1,k)) {
+        mcomp = Comp::j();
+        fs[mcomp][i][j+1][k] = boil::unreal;
+      }
+      if(dom->ibody().off(i,j,k-1)) {
+        mcomp = Comp::k();
+        fs[mcomp][i][j][k  ] = boil::unreal;
+      }
+      if(dom->ibody().off(i,j,k+1)) {
+        mcomp = Comp::k();
+        fs[mcomp][i][j][k+1] = boil::unreal;
+      }
       continue;
+    }
 
     /* west is in solid domain */
     if (dom->ibody().off(i-1,j,k)) {

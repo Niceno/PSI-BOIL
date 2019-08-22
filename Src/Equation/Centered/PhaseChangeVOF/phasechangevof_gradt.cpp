@@ -10,6 +10,12 @@ void PhaseChangeVOF::gradt(const Scalar * diff_eddy) {
   /* calculate grad(tpr) */
   cal_gradt(diff_eddy);
 
+#if 0
+  boil::plot->plot(clr,txv,tyv,tzv,"clr-txv-tyv-tzv",time->current_step());
+  boil::plot->plot(clr,txl,tyl,tzl,"clr-txl-tyl-tzl",time->current_step());
+  exit(0);
+#endif
+
 #if 1
   /* calculate the normal component */
   for_aijk(i,j,k) {
@@ -25,12 +31,27 @@ void PhaseChangeVOF::gradt(const Scalar * diff_eddy) {
   extrapolate(tnl,-1);
 #else
   /* extrapolate grad(tpr) */
-  ext_gradt(txv, 1, Comp::i());
-  ext_gradt(tyv, 1, Comp::j());
-  ext_gradt(tzv, 1, Comp::k());
-  ext_gradt(txl,-1, Comp::i());
-  ext_gradt(tyl,-1, Comp::j());
-  ext_gradt(tzl,-1, Comp::k());
+  extrapolate(txv, 1);
+  extrapolate(tyv, 1);
+  extrapolate(tzv, 1);
+  extrapolate(txl,-1);
+  extrapolate(tyl,-1);
+  extrapolate(tzl,-1);
+  for_aijk(i,j,k) {
+    tnv[i][j][k] = txv[i][j][k]*nx[i][j][k]
+                 + tyv[i][j][k]*ny[i][j][k]
+                 + tzv[i][j][k]*nz[i][j][k];
+    tnl[i][j][k] = txl[i][j][k]*nx[i][j][k]
+                 + tyl[i][j][k]*ny[i][j][k]
+                 + tzl[i][j][k]*nz[i][j][k];
+  }
+  
+#if 0
+  boil::plot->plot(clr,txv,tyv,tzv,"clr-txv-tyv-tzv",time->current_step());
+  boil::plot->plot(clr,txl,tyl,tzl,"clr-txl-tyl-tzl",time->current_step());
+  exit(0);
+#endif
+
 #endif
 
 #if 0

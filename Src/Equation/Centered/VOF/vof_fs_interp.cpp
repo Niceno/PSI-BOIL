@@ -22,6 +22,10 @@ void VOF::cal_fs_interp() {
   m = Comp::i();
   for_wvmijk(fs,m,i,j,k) {  /* don't use vmijk. wall will be skipped! */
 
+    /* immersed body */
+    if(dom->ibody().off(i-1,j,k)&&dom->ibody().off(i,j,k))
+      continue;
+
     /* degenerate cases */
     real clrw = phi[i-1][j][k];
     real clre = phi[i  ][j][k];
@@ -50,6 +54,10 @@ void VOF::cal_fs_interp() {
   m = Comp::j();
   for_wvmijk(fs,m,i,j,k) {  /* don't use vmijk. wall will be skipped! */
 
+    /* immersed body */
+    if(dom->ibody().off(i,j-1,k)&&dom->ibody().off(i,j,k))
+      continue;
+
     /* degenerate cases */
     real clrs = phi[i][j-1][k];
     real clrn = phi[i][j  ][k];
@@ -77,6 +85,10 @@ void VOF::cal_fs_interp() {
 
   m = Comp::k();
   for_wvmijk(fs,m,i,j,k) {  /* don't use vmijk. wall will be skipped! */
+
+    /* immersed body */
+    if(dom->ibody().off(i,j,k-1)&&dom->ibody().off(i,j,k))
+      continue;
 
     /* degenerate cases */
     real clrb = phi[i][j][k-1];

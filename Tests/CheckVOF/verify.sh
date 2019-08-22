@@ -25,9 +25,6 @@ mkdir Result_tmp
 mkdir Result_tmp/SrcVOF
 cp ../Equation/Centered/VOF/*.cpp Result_tmp/SrcVOF
 cp ../Equation/Centered/VOF/*.h   Result_tmp/SrcVOF
-mkdir Result_tmp/SrcPhaseChange
-cp ../Equation/Centered/PhaseChange/*.cpp Result_tmp/SrcPhaseChange
-cp ../Equation/Centered/PhaseChange/*.h Result_tmp/SrcPhaseChange
 cd ..
 
 echo '###############'
@@ -50,7 +47,7 @@ cp ../../vol.gnu .
 gnuplot vol.gnu >& /dev/null
 
 cp ../../zalesak.gth .
-gather.exe < zalesak.gth >& /dev/null
+dogather
   
 if ( $1 =~ "tec" ) then
   # tecplot     
@@ -87,7 +84,7 @@ cp ../../vol.gnu .
 gnuplot vol.gnu >& /dev/null
 
 cp ../../circleVortex.gth .
-gather.exe < circleVortex.gth >& /dev/null
+dogather
 
 if ( $1 =~ "tec" ) then
   # tecplot
@@ -124,7 +121,7 @@ cp ../../vol.gnu .
 gnuplot vol.gnu >& /dev/null
 
 cp ../../cornerFlow.gth .
-gather.exe < cornerFlow.gth >& /dev/null
+dogather
 
 if ( $1 =~ "tec" ) then
   # tecplot
@@ -161,7 +158,7 @@ cp ../../vol.gnu .
 gnuplot vol.gnu >& /dev/null
 
 cp ../../slidingSphare.gth .
-gather.exe < slidingSphare.gth >& /dev/null
+dogather
 
 if ( $1 =~ "tec" ) then
   # tecplot 1
@@ -209,7 +206,7 @@ cat log.txt |grep totalvol > vol.out
 cp ../../vol.gnu .
 gnuplot vol.gnu >& /dev/null
 cp ../../slidingSphare.gth .
-gather.exe < slidingSphare.gth >& /dev/null
+dogather
 
 if ( $1 =~ "tec" ) then
   # tecplot
@@ -228,79 +225,6 @@ else
   cp ../../slidingSphareIB-iso.py .
   visit -cli -nowin -s slidingSphareIB-iso.py >& /dev/null
   mv visit0000.png slidingSphareIB-iso.png
-endif
-cd ../../..
-
-echo '#########################'
-echo '### 1D Stefan problem ###'
-echo '#########################'
-mkdir CheckVOF/Result_tmp/1D-stefan
-cp CheckVOF/main-phaseChange-stefan-JCP.cpp main.cpp
-make >& /dev/null
-cd CheckVOF/Result_tmp/1D-stefan
-cp ../../../Boil .
-cp ../../../main.cpp .
-set sec0 = `date +%s`
-Boil > log.txt
-set sec1 = `date +%s`
-@ difft = $sec1 - $sec0
-echo $difft sec.
-cat log.txt |grep x-min > front.out
-foreach i (*.dat)
-  preplot $i >& /dev/null
-end
-rm *.dat
-cp ../../front.gnu .
-gnuplot front.gnu >& /dev/null
-
-if ( $1 =~ "tec" ) then
-  # tecplot
-  cp ../../make_png.mcr .
-  cp ../../1D-stefan.lay .
-  tec360 1D-stefan.lay -b make_png.mcr >& /dev/null
-  mv tmp.png 1D-stefan.png
-else
-  # visit
-  cp ../../1D-stefan.py .
-  visit -cli -nowin -s 1D-stefan.py >& /dev/null
-  mv visit0000.png 1D-stefan.png
-endif
-cd ../../..
-
-echo '##########################'
-echo '### 1D sucking problem ###'
-echo '##########################'
-mkdir CheckVOF/Result_tmp/1D-sucking
-cp CheckVOF/main-phaseChange-sucking-JCP.cpp main.cpp
-make >& /dev/null
-cd CheckVOF/Result_tmp/1D-sucking
-cp ../../../Boil .
-cp ../../../main.cpp .
-cp ../../input.txt .
-set sec0 = `date +%s`
-Boil > log.txt
-set sec1 = `date +%s`
-@ difft = $sec1 - $sec0
-echo $difft sec.
-cat log.txt |grep x-min > front.out
-foreach i (*.dat)
-  preplot $i >& /dev/null
-end
-rm *.dat
-cp ../../front.gnu .
-gnuplot front.gnu >& /dev/null
-
-if ( $1 =~ "tec" ) then
-  # tecplot
-  cp ../../make_png.mcr .
-  cp ../../1D-sucking.lay .
-  tec360 1D-sucking.lay -b make_png.mcr >& /dev/null
-  mv tmp.png 1D-sucking.png
-else
-  # visit
-  cp ../../1D-sucking.py .
-  visit -cli -nowin -s 1D-sucking.py >& /dev/null
-  mv visit0000.png 1D-sucking.png
 endif
 cd ../../..
 
@@ -326,7 +250,7 @@ cat log.txt |grep velocity > vel.out
 cp ../../vel.gnu .
 gnuplot vel.gnu >& /dev/null
 cp ../../tension2D.gth .
-gather.exe < tension2D.gth >& /dev/null
+dogather
 
 if ( $1 =~ "tec" ) then
   # tecplot
@@ -367,9 +291,9 @@ cat log.txt |grep kappa_min_max > kappa.out
 cp ../../kappa.gnu .
 gnuplot kappa.gnu >& /dev/null
 cp ../../tension3D.gth .
-gather.exe < tension3D.gth >& /dev/null
+dogather
 cp ../../tension3D2.gth . 
-gather.exe < tension3D2.gth >& /dev/null
+dogather
 
 if ( $1 =~ "tec" ) then
   # tecplot
@@ -403,12 +327,12 @@ if ( $2 =~ "sbatch" ) then
   echo 'cp ../../vol.gnu .' >> post.sh
   echo 'gnuplot vol.gnu >& /dev/null' >> post.sh
   echo 'cp ../../enright.gth .' >> post.sh
-  echo 'gather.exe < enright.gth >& /dev/null' >> post.sh
+  echo 'dogather' >> post.sh
   echo 'cp ../../enright.py .' >>post.sh
   echo 'visit -cli -nowin -s enright.py >& /dev/null' >>post.sh
   chmod 777 post.sh
 else
-  mpirun -np 8 Boil > log.txt
+  mpirun -np 16 Boil > log.txt
   set sec1 = `date +%s`
   @ difft = $sec1 - $sec0
   echo $difft sec.
@@ -417,7 +341,7 @@ else
   cp ../../vol.gnu .
   gnuplot vol.gnu >& /dev/null
   cp ../../enright.gth .
-  gather.exe < enright.gth >& /dev/null
+  dogather
 
   if ( $1 =~ "tec" ) then
     # tecplot
@@ -456,9 +380,9 @@ if ( $2 =~ "sbatch" ) then
   echo 'cp ../../front-z.gnu .' >>post.sh
   echo 'gnuplot front-z.gnu >& /dev/null' >>post.sh
   echo 'cp ../../risingBubble-uvw.gth .' >>post.sh
-  echo 'gather.exe < risingBubble-uvw.gth >& /dev/null' >>post.sh
+  echo 'dogather' >>post.sh
   echo 'cp ../../risingBubble-xyz.gth .' >>post.sh
-  echo 'gather.exe < risingBubble-xyz.gth >& /dev/null' >>post.sh
+  echo 'dogather' >>post.sh
   echo 'cp ../../risingBubble-kappa.py .' >>post.sh
   echo 'visit -cli -nowin -s risingBubble-kappa.py >& /dev/null' >>post.sh
   echo 'mv visit0000.png risingBubble-kappa.png' >>post.sh
@@ -481,9 +405,9 @@ else
   cp ../../front-z.gnu .
   gnuplot front-z.gnu >& /dev/null
   cp ../../risingBubble-uvw.gth .
-  gather.exe < risingBubble-uvw.gth >& /dev/null
+  dogather
   cp ../../risingBubble-xyz.gth .
-  gather.exe < risingBubble-xyz.gth >& /dev/null
+  dogather
 
   if ( $1 =~ "tec" ) then
     # tecplot

@@ -207,5 +207,12 @@ class EnthalpyTIF : public Centered {
                          const int dir, real & tint, real & dist);
     bool distance1D_zold(const int i, const int j, const int k,
                          const int dir, real & tint, real & dist);
+
+    real temperature_node(real len_s, real lam_s, real tmp_s
+                        , real len_f, real lam_f, real tmp_f);
+
+    real gradt_ib(const int dir, const Comp & mcomp,
+                  const int i, const int j, const int k);
+
 };	
 #endif

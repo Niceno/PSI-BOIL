@@ -81,27 +81,28 @@ real PropertyMix::value(const Comp & m,
     oz--;
   }
 
-  real col_a;
-  if(bndc_a) 
-    col_a = (*bndc_a)[m][i][j][k];
-  else
-    col_a = 0.5*((*c_a)[i][j][k]+(*c_a)[i+ox][j+oy][k+oz]);
+  if(!bndc_a) {
+    return 0.5*(value(i,j,k)+value(i+ox,j+oy,k+oz));
+  } else {
 
-  if( col_a > 1.0 ) col_a = 1.0;
-  if( col_a < 0.0 ) col_a = 0.0;
+    real col_a = (*bndc_a)[m][i][j][k];
 
-  /* volume fraction of dispersed is treated using interpolation... */
-  if( c_disp_a != NULL ) {
-    real cdispa = 0.5*((*c_disp_a)[i][j][k]+(*c_disp_a)[i+ox][j+oy][k+oz]);
-    if( (*c_disp_a)[i][j][k] > 0.0 ) 
-       col_a = col_a + cdispa;
+    if( col_a > 1.0 ) col_a = 1.0;
+    if( col_a < 0.0 ) col_a = 0.0;
+
+    /* volume fraction of dispersed is treated using interpolation... */
+    if( c_disp_a != NULL ) {
+      real cdispa = 0.5*((*c_disp_a)[i][j][k]+(*c_disp_a)[i+ox][j+oy][k+oz]);
+      if( cdispa > 0.0 ) 
+         col_a = col_a + cdispa;
+    }
+    if( c_disp_b != NULL ) {
+      real cdispb = 0.5*((*c_disp_b)[i][j][k]+(*c_disp_b)[i+ox][j+oy][k+oz]);
+      if( cdispb < 1.0 ) 
+           col_a = col_a + cdispb - 1.0;
+    }
+
+     return a -> value(m,i,j,k) * col_a +
+            b -> value(m,i,j,k) * (1.0 - col_a);
   }
-  if( c_disp_b != NULL ) {
-    real cdispb = 0.5*((*c_disp_b)[i][j][k]+(*c_disp_b)[i+ox][j+oy][k+oz]);
-    if( (*c_disp_b)[i][j][k] < 1.0 ) 
-         col_a = col_a + cdispb - 1.0;
-  }
-
-   return a -> value(i,j,k) * col_a +
-          b -> value(i,j,k) * (1.0 - col_a);
 }

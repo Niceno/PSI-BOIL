@@ -27,8 +27,8 @@ class VOF : public Centered {
     ~VOF();
 
     void new_time_step(){};
-    void advance();
-    void advance(Scalar & sca);
+    void advance(const bool anci = true);
+    void advance(Scalar & sca, const bool anci = true);
     void curvature();
     void ancillary(); /* calcs ancillary params such as adens w/o advance */
     void tension(Vector * vec, const Matter matt);
@@ -81,13 +81,21 @@ class VOF : public Centered {
     /* getter for cangle */
     real get_cangle() { return(cangle/acos(-1.0)*180.0);};
 
-    /* setter for cangle */
+    /* setter for limit_color */
     void set_limit_color(const bool b) {
       limit_color=b;
       boil::oout<<"set_limit_color= "<<b<<"\n";
     }
-    /* getter for cangle */
+    /* getter for limit_color */
     bool get_limit_color() { return(limit_color);};
+
+    /* setter for use_subgrid */
+    void set_use_subgrid(const bool b) {
+      use_subgrid=b;
+      boil::oout<<"set_use_subgrid= "<<b<<"\n";
+    }
+    /* getter for use_subgrid */
+    bool get_use_subgrid() { return(use_subgrid);};    
 
     /* min and max of color function in fluid domain */
     real minval() {return minclr;}
@@ -130,9 +138,27 @@ class VOF : public Centered {
     void nib(const real & n1, const real & n2, const real & n3
            , const real & n4, const real & n5, const real & n6
            , real r[]);
+
     void norm_cc(const Scalar & g);
+    void norm_cc(real & nx_val, real & ny_val, real & nz_val, Comp & mcomp,
+                 const int i, const int j, const int z, const Scalar & sca);
+
     void norm_young(const Scalar & g);
+    void norm_young(real & nx_val, real & ny_val, real & nz_val,
+                    const int i, const int j, const int z, const Scalar & sca);
+
+    void norm_mixed(const Scalar & g);
+    void norm_mixed(real & nx_val, real & ny_val, real & nz_val,
+                    const int i, const int j, const int k,
+                    const Scalar & sca);
+
+    void bdnorm();
+    void extend_norm(const Scalar & g);
+
     void normalize(real & r1, real & r2, real & r3);
+    void normalize_l1(real & nx_l1, real & ny_l1, real & nz_l1,
+                      const real nx, const real ny, const real nz);
+
     void nwall(const Scalar & g
              , const real & r1, const real & r2, const real & r3
              , const int & i1, const int & i2, const int &i3
@@ -148,10 +174,17 @@ class VOF : public Centered {
     real calc_alpha(const real r1, const real r2, const real r3, const real r4);
     real calc_flux(const real g, real c, const real nx, const real ny, const real nz);
 
-    void selectMax(const real r1, const real r2, const real r3,
-                   const real r4, const real r5, const real r6,
-                   const real r7, const real r8, const real r9,
-                   const int i1,  const int i2,  const int i3);
+    void select_norm_cc(real & nx_val, real & ny_val, real & nz_val,
+                        real & NxX, real & NyX, real & NzX,
+                        real & NxY, real & NyY, real & NzY,
+                        real & NxZ, real & NyZ, real & NzZ,
+                        Comp & mcomp);
+    void select_norm_myc(real & nx_val, real & ny_val, real & nz_val,
+                         const real & nx_cc, const real & ny_cc, const real & nz_cc,
+                         const real & nx_young, const real & ny_young, const real & nz_young,
+                         const Comp & mcomp);
+
+
     void set_iflag();
     void insert_bc_flag(ScalarInt & g, const bool b);
 
@@ -190,7 +223,6 @@ class VOF : public Centered {
                const real vv1, const real vv2, const real vv3,
                const real vn1, const real vn2, const real vn3,
                const real denom, const real alp);
-    void norm_cc(Scalar & sca,int i,int j,int k);
 
     real alpha_val(const real c, const real nnx, const real nny, const real nnz);
     real fs_val(const Comp m, const int i, const int j, const int k);
@@ -212,6 +244,7 @@ class VOF : public Centered {
     bool iminc, imaxc, jminc, jmaxc, kminc, kmaxc; // true = cut-stencil
     bool ifull, jfull, kfull; // true = not a dummy direction
     bool limit_color;
+    bool use_subgrid;
     real minclr, maxclr;
 
     Heaviside heavi;

@@ -97,6 +97,11 @@ main(int argc, char * argv[]) {
   press.bc().add( BndCnd( Dir::kmin(), BndType::neumann() ) );
   press.bc().add( BndCnd( Dir::kmax(), BndType::neumann() ) );
 
+  kappa = press.shape();
+  p = press.shape();
+  g = press.shape();
+  f = press.shape();
+
   Matter air(d), water(d);
   air  .mu    (2.0000e-5);
   air  .rho   (1.2500e+0);

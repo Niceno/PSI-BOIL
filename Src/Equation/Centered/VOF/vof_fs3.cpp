@@ -29,6 +29,10 @@ void VOF::cal_fs3() {
   for(int i=si(); i<=ei()+1; i++)
   for(int j=sj(); j<=ej()  ; j++)
   for(int k=sk(); k<=ek()  ; k++) {
+
+    /* immersed body */
+    if(dom->ibody().off(i-1,j,k)||dom->ibody().off(i,j,k))
+      continue;
   
     /* degenerate cases */
     real clrw = phi[i-1][j][k];
@@ -89,6 +93,10 @@ void VOF::cal_fs3() {
   for(int i=si(); i<=ei()  ; i++)
   for(int j=sj(); j<=ej()+1; j++)
   for(int k=sk(); k<=ek()  ; k++) {
+
+    /* immersed body */
+    if(dom->ibody().off(i,j-1,k)||dom->ibody().off(i,j,k))
+      continue;
                
     /* degenerate cases */
     real clrs = phi[i][j-1][k];
@@ -148,6 +156,10 @@ void VOF::cal_fs3() {
   for(int i=si(); i<=ei()  ; i++)
   for(int j=sj(); j<=ej()  ; j++)
   for(int k=sk(); k<=ek()+1; k++) {
+
+    /* immersed body */
+    if(dom->ibody().off(i,j,k-1)||dom->ibody().off(i,j,k))
+      continue;
                
     /* degenerate cases */
     real clrb = phi[i][j][k-1];
@@ -201,11 +213,10 @@ void VOF::cal_fs3() {
   } 
 
   /* correct at boundaries */
-#if 0
-  fs_bnd();
-#else
-  fs_bnd_nosubgrid();
-#endif
+  if(use_subgrid)
+    fs_bnd();
+  else
+    fs_bnd_nosubgrid();
   //fs.exchange_all();
 
   //boil::plot->plot(fs,phi, "fs-clr", 0);

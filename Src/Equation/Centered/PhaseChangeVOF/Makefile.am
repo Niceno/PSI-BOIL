@@ -15,6 +15,7 @@ libPhaseChangeVOF_a_SOURCES = phasechangevof.h                           \
                               phasechangevof_insert_bc_ext.cpp           \
                               phasechangevof_interface.cpp               \
                               phasechangevof_int_distance.cpp            \
+                              phasechangevof_lambda.cpp                  \
                               phasechangevof_m.cpp                       \
                               phasechangevof_mdot.cpp                    \
                               phasechangevof_mdot_cut.cpp                \

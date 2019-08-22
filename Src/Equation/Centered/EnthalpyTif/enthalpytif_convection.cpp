@@ -214,7 +214,11 @@ void EnthalpyTIF::convection(Scalar * conv) {
         umf = upf;
 #endif
       } else {
-        dtdxm = (phi[i  ][j][k]-phi[i-1][j][k])/dxw(i);
+        if(dom->ibody().off(i-1,j,k)) {
+          dtdxm = gradt_ib(-1,Comp::i(),i,j,k);
+        } else {
+          dtdxm = (phi[i  ][j][k]-phi[i-1][j][k])/dxw(i);
+        }
       }
 
       // dtdxp
@@ -234,7 +238,11 @@ void EnthalpyTIF::convection(Scalar * conv) {
         upf = umf;
 #endif
       } else {
-        dtdxp = (phi[i+1][j][k]-phi[i  ][j][k])/dxe(i);
+        if(dom->ibody().off(i+1,j,k)) {
+          dtdxp = gradt_ib(+1,Comp::i(),i,j,k);
+        } else {
+          dtdxp = (phi[i+1][j][k]-phi[i  ][j][k])/dxe(i);
+        }
       }
 
       // dtdym
@@ -254,7 +262,11 @@ void EnthalpyTIF::convection(Scalar * conv) {
         vmf = vpf;
 #endif
       } else {
-        dtdym = (phi[i][j  ][k]-phi[i][j-1][k])/dys(j);
+        if(dom->ibody().off(i,j-1,k)) {
+          dtdym = gradt_ib(-1,Comp::j(),i,j,k);
+        } else {
+          dtdym = (phi[i][j  ][k]-phi[i][j-1][k])/dys(j);
+        }
       }
 
       // dtdyp
@@ -274,7 +286,11 @@ void EnthalpyTIF::convection(Scalar * conv) {
         vpf = vmf;
 #endif
       } else {
-        dtdyp = (phi[i][j+1][k]-phi[i][j  ][k])/dyn(j);
+        if(dom->ibody().off(i,j+1,k)) {
+          dtdyp = gradt_ib(+1,Comp::j(),i,j,k);
+        } else {
+          dtdyp = (phi[i][j+1][k]-phi[i][j  ][k])/dyn(j);
+        }
       }
 
       // dtdzm
@@ -294,7 +310,11 @@ void EnthalpyTIF::convection(Scalar * conv) {
         wmf = wpf;
 #endif
       } else {
-        dtdzm = (phi[i][j][k  ]-phi[i][j][k-1])/dzb(k);
+        if(dom->ibody().off(i,j,k-1)) {
+          dtdzm = gradt_ib(-1,Comp::k(),i,j,k);
+        } else {
+          dtdzm = (phi[i][j][k  ]-phi[i][j][k-1])/dzb(k);
+        }
       }
 
       // dtdzp
@@ -314,7 +334,11 @@ void EnthalpyTIF::convection(Scalar * conv) {
         wpf = wmf;
 #endif
       } else {
-        dtdzp = (phi[i][j][k+1]-phi[i][j][k  ])/dzt(k);
+        if(dom->ibody().off(i,j,k+1)) {
+          dtdzp = gradt_ib(+1,Comp::k(),i,j,k);
+        } else {
+          dtdzp = (phi[i][j][k+1]-phi[i][j][k  ])/dzt(k);
+        }
       }
 
       uc  = 0.5*(umf+upf);

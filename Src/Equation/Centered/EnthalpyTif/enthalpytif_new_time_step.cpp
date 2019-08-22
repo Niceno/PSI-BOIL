@@ -102,17 +102,19 @@ void EnthalpyTIF::new_time_step(const Scalar * diff_eddy) {
       }
       real t_new = fold[i][j][k] / (c * dV(i,j,k)) / dti;
 
-#if 0
+#if 1
       /* phase change */
       if( ((*clr)[i][j][k]-clrsurf)*(clrold[i][j][k]-clrsurf) < 0.0){
-        if( (phi[i][j][k]-tifmodel.tref())*(t_new-tifmodel.tref())<=0.0 ){
-          t_new = tifmodel.tref();     /* crude code */
+        if( (phi[i][j][k]-tifmodel.Tint(i,j,k))*(t_new-tifmodel.Tint(i,j,k))<=0.0 ){
+          t_new = tifmodel.Tint(i,j,k);     /* crude code */
         }
+  #if 0
       /* phase does not change */
       } else {
-        if( (phi[i][j][k]-tifmodel.tref())*(t_new-tifmodel.tref())<0.0 ){
-          t_new = tifmodel.tref();     /* crude code: Is this necessary? */
+        if( (phi[i][j][k]-tifmodel.Tint(i,j,k))*(t_new-tifmodel.Tint(i,j,k))<0.0 ){
+          t_new = tifmodel.Tint(i,j,k);     /* crude code: Is this necessary? */
         }
+  #endif
       }
 #endif
 

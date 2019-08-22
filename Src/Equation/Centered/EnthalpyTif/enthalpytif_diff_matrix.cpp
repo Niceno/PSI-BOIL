@@ -1,6 +1,8 @@
 #include "enthalpytif.h"
 using namespace std;
 
+#define USE_FDM
+
 /***************************************************************************//**
 *  \brief Creates diffusive part of the system matrix \f$ [A] \f$.
 *******************************************************************************/
@@ -69,7 +71,7 @@ void EnthalpyTIF::diff_matrix(real & am, real & ac, real & ap
 
     if(ofm && ofp){
       /* s-s-s */
-#if 1
+#ifdef USE_FDM
       /* FDM */
       am = lc * vol * 2.0 / (dxm*(dxm+dxp));
       ac = lc * vol * 2.0 / (dxm*dxp);
@@ -111,7 +113,7 @@ void EnthalpyTIF::diff_matrix(real & am, real & ac, real & ap
         fdm = max(fdm,epsl);
         dxm = dxm * fdm;
       }
-#if 1
+#ifdef USE_FDM
       /* FDM */
       am = lc*vol*2.0/(dxm*(dxm+dxp))*fdm*lm/(fdm*lm+(1.0-fdm)*lc);
       ac = lc*vol*2.0/(dxm*dxp)
@@ -154,7 +156,7 @@ void EnthalpyTIF::diff_matrix(real & am, real & ac, real & ap
         fdp = max(fdp,epsl);
         dxp = dxp * fdp;
       }
-#if 1
+#ifdef USE_FDM
       /* FDM */
       am = lc*vol*2.0/(dxm*(dxm+dxp));
       ac = lc*vol*2.0/(dxm*dxp)
@@ -225,13 +227,17 @@ void EnthalpyTIF::diff_matrix(real & am, real & ac, real & ap
 	std::cout<<"aflagp=0.0: " <<i<<" "<<j<<" "<<k<<"\n";
 #endif
       }
-#if 1 /* now, finite difference is applied always, as in system_diffusive */
-      //if(aflagm==0.0 || aflagp==0.0) {
+#ifdef USE_FDM /* now, finite difference is applied always, as in system_diffusive */
+      /* FDM */
+      am = lc * vol * 2.0 / (dxm*(dxm+dxp));
+      ac = lc * vol * 2.0 / (dxm*dxp);
+      ap = lc * vol * 2.0 / (dxp*(dxm+dxp));
+#else
+      if(aflagm==0.0 || aflagp==0.0) {
         /* FDM */
         am = lc * vol * 2.0 / (dxm*(dxm+dxp));
         ac = lc * vol * 2.0 / (dxm*dxp);
         ap = lc * vol * 2.0 / (dxp*(dxm+dxp));
-#else
       } else { 
         /* FVM */
         am = 0.5 * (lc + lm) * area / dxm;
@@ -280,20 +286,25 @@ void EnthalpyTIF::diff_matrix(real & am, real & ac, real & ap
       } else {
         fdm = max(fdm,epsl);
         dxm = dxm * fdm;
-#if 1 /* now, finite difference is applied always, as in system_diffusive */
-      //if(aflagp==0.0) {
+#ifdef USE_FDM /* now, finite difference is applied always, as in system_diffusive */
         /* FDM */
         am = lc*vol*2.0/(dxm*(dxm+dxp))*fdm*lm/(fdm*lm+(1.0-fdm)*lc);
         ac = lc*vol*2.0/(dxm*dxp)
            - lc*vol*2.0/(dxm*(dxm+dxp))*(1.0-fdm)*lc/(fdm*lm+(1.0-fdm)*lc);
         ap = lc*vol*2.0/(dxp*(dxm+dxp));
 #else
-      } else {
-        /* FVM */
-        am = lc * area / dxm * fdm * lm / (fdm*lm+(1.0-fdm)*lc);
-        ap = 0.5 * (lc + lp) * area / dxp;
-        ac = am + ap;
-      }
+        if(aflagp==0.0) {
+          /* FDM */
+          am = lc*vol*2.0/(dxm*(dxm+dxp))*fdm*lm/(fdm*lm+(1.0-fdm)*lc);
+          ac = lc*vol*2.0/(dxm*dxp)
+             - lc*vol*2.0/(dxm*(dxm+dxp))*(1.0-fdm)*lc/(fdm*lm+(1.0-fdm)*lc);
+          ap = lc*vol*2.0/(dxp*(dxm+dxp));
+        } else {
+          /* FVM */
+          am = lc * area / dxm * fdm * lm / (fdm*lm+(1.0-fdm)*lc);
+          ap = 0.5 * (lc + lp) * area / dxp;
+          ac = am + ap;
+        }
 #endif
       }
 #if 0
@@ -337,20 +348,25 @@ void EnthalpyTIF::diff_matrix(real & am, real & ac, real & ap
       } else {
         fdp = max(fdp,epsl);
         dxp = dxp * fdp;
-#if 1 /* now, finite difference is applied always, as in system_diffusive */
-      //if (aflagm==0.0) {
-        /* FVM */
+#ifdef USE_FDM /* now, finite difference is applied always, as in system_diffusive */
+        /* FDM */
         am = lc*vol*2.0/(dxm*(dxm+dxp));
         ac = lc*vol*2.0/(dxm*dxp)
            - lc*vol*2.0/(dxp*(dxm+dxp))*(1.0-fdp)*lc/((1.0-fdp)*lc+fdp*lp);
         ap = lc*vol*2.0/(dxp*(dxm+dxp))*fdp*lp/((1.0-fdp)*lc+fdp*lp);
 #else
-      } else {
-        /* FVM */
-        am = 0.5 * (lc + lm) * area / dxm;
-        ap = lc * area / dxp * fdp * lp / (fdp*lp+(1.0-fdp)*lc);
-        ac = am + ap;
-      }
+        if(aflagm==0.0) {
+          /* FVM */
+          am = lc*vol*2.0/(dxm*(dxm+dxp));
+          ac = lc*vol*2.0/(dxm*dxp)
+             - lc*vol*2.0/(dxp*(dxm+dxp))*(1.0-fdp)*lc/((1.0-fdp)*lc+fdp*lp);
+          ap = lc*vol*2.0/(dxp*(dxm+dxp))*fdp*lp/((1.0-fdp)*lc+fdp*lp);
+        } else {
+          /* FVM */
+          am = 0.5 * (lc + lm) * area / dxm;
+          ap = lc * area / dxp * fdp * lp / (fdp*lp+(1.0-fdp)*lc);
+          ac = am + ap;
+        }
 #endif
       }
 #if 0

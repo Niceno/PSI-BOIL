@@ -1,11 +1,11 @@
 #include "vof.h"
 
 /******************************************************************************/
-void VOF::advance() {
-  advance(phi);
+void VOF::advance(const bool anci) {
+  advance(phi,anci);
 }
 
-void VOF::advance(Scalar & scp) {
+void VOF::advance(Scalar & scp, const bool anci) {
  
   boil::timer.start("vof advance");
 
@@ -21,7 +21,8 @@ void VOF::advance(Scalar & scp) {
   /*-------------------------------+
   |  normal vector at cell center  |
   +-------------------------------*/
-  norm_cc(scp);
+  norm_mixed(scp);
+  //norm_cc(scp);
   //norm_elvira(scp);
 
   for_aijk(i,j,k){
@@ -57,7 +58,8 @@ void VOF::advance(Scalar & scp) {
 
   boil::timer.stop("vof advance");
 
-  ancillary();
+  if(anci)
+    ancillary();
 
   return;
 }

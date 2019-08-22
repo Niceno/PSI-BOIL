@@ -20,56 +20,56 @@ else
     autoconf
     autoheader
     automake --add-missing
-    ./configure CC=mpicc CXX=mpiCC CXXFLAGS='-O3'
+    ./configure CC=mpicc CXX=mpiCC CXXFLAGS='-O3 -std=c++11'
     cd Src/Parallel; ln -f -s parallel.h mpi_macros.h; cd ../../
   elif [ $1 = "OPEN-INTEL" ]; then
     aclocal
     autoconf
     autoheader
     automake --add-missing
-    ./configure CC=mpicc CXX=mpiCC CXXFLAGS='-O2 -w2'
+    ./configure CC=mpicc CXX=mpiCC CXXFLAGS='-O2 -w2 -std=c++11'
     cd Src/Parallel; ln -f -s parallel.h mpi_macros.h; cd ../../
   elif [ $1 = "OPEN-INTEL-CHECK" ]; then
     aclocal
     autoconf
     autoheader
     automake --add-missing
-    ./configure CC=mpicc CXX=mpiCC CXXFLAGS='-w2 -check=uninit -traceback -fstack-protector-all -fp-trap=common -fp-stack-check -check-pointers=rw -check-pointers-undimensioned'
+    ./configure CC=mpicc CXX=mpiCC CXXFLAGS='-w2  -std=c++11 -check=uninit -traceback -fstack-protector-all -fp-trap=common -fp-stack-check -check-pointers=rw -check-pointers-undimensioned'
     cd Src/Parallel; ln -f -s parallel.h mpi_macros.h; cd ../../
   elif [ $1 = "MPICH" ]; then
     aclocal
     autoconf
     autoheader
     automake --add-missing
-    ./configure CC=mpicc CXX=mpicxx CXXFLAGS='-O3'
+    ./configure CC=mpicc CXX=mpicxx CXXFLAGS='-O3 -std=c++11'
     cd Src/Parallel; ln -f -s parallel.h mpi_macros.h; cd ../../
   elif [ $1 = "CSCS" ]; then
     aclocal
     autoconf
     autoheader
     automake --add-missing
-    ./configure CC=cc CXX=CC CXXFLAGS='-O2'
+    ./configure CC=cc CXX=CC CXXFLAGS='-O2 -std=c++11'
     cd Src/Parallel; ln -f -s parallel.h mpi_macros.h; cd ../../
   elif [ $1 = "CSCS-INTEL" ]; then
     aclocal
     autoconf
     autoheader
     automake --add-missing
-    ./configure CC=cc CXX=CC CXXFLAGS='-O2 -w2'
+    ./configure CC=cc CXX=CC CXXFLAGS='-O2 -w2 -std=c++11'
     cd Src/Parallel; ln -f -s parallel.h mpi_macros.h; cd ../../
   elif [ $1 = "JULIER" ]; then
     aclocal
     autoconf
     autoheader
     automake --add-missing
-    ./configure CC=mpicc CXX=mpicxx CXXFLAGS='-O3'
+    ./configure CC=mpicc CXX=mpicxx CXXFLAGS='-O3 -std=c++11'
     cd Src/Parallel; ln -f -s parallel.h mpi_macros.h; cd ../../
   elif [ $1 = "NOMPI" ]; then
     aclocal
     autoconf
     autoheader
     automake --add-missing
-    ./configure CC=gcc CXX=g++ CXXFLAGS='-O3'
+    ./configure CC=gcc CXX=g++ CXXFLAGS='-O3 -std=c++11'
     cd Src/Parallel; ln -f -s sequential.h mpi_macros.h; cd ../../
   elif [ $1 = "INTEL" ]; then
     aclocal
@@ -77,21 +77,21 @@ else
     autoheader
     automake --add-missing
     #./configure CC=mpiicc CXX=mpiicpc CXXFLAGS='-O3 -opt-report=4'
-    ./configure CC=mpiicc CXX=mpiicpc CXXFLAGS='-O3'
+    ./configure CC=mpiicc CXX=mpiicpc CXXFLAGS='-O3 -std=c++11'
     cd Src/Parallel; ln -f -s parallel.h mpi_macros.h; cd ../../
   elif [ $1 = "NOMPI-INTEL" ]; then
     aclocal
     autoconf
     autoheader
     automake --add-missing
-    ./configure CC=icpc CXX=icpc CXXFLAGS='-g -w2 -debug full -O0 -check=uninit -traceback -fstack-protector-all -fp-trap=common -fp-stack-check -check-pointers=rw'
+    ./configure CC=icpc CXX=icpc CXXFLAGS='-g -w2  -std=c++11 -debug full -O0 -std=c++11 -check=uninit -traceback -fstack-protector-all -fp-trap=common -fp-stack-check -check-pointers=rw'
     cd Src/Parallel; ln -f -s sequential.h mpi_macros.h; cd ../../
   elif [ $1 = "INTEL-PHI" ]; then
     aclocal
     autoconf
     autoheader
     automake --add-missing
-    ./configure CC=mpiicc CXX=mpiicpc CXXFLAGS='-O2 -mmic -no-offload -opt-threads-per-core=1'
+    ./configure CC=mpiicc CXX=mpiicpc CXXFLAGS='-O2  -std=c++11 -mmic -no-offload -opt-threads-per-core=1'
     cd Src/Parallel; ln -f -s parallel.h mpi_macros.h; cd ../../
   else
     echo "Wrong syntax!"
