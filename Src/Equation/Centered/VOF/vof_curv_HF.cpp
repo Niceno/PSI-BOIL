@@ -25,7 +25,7 @@ void VOF::curv_HF() {
 
   /* calculate normal vector */
   // Normal vector is used for (i) dirMax and (ii) Eq. (2) in J.Lopez et al.
-#if 0
+#if 1
   norm_young(phi);  // Young's method is good for low resolution
   true_norm_vect();
   for_aijk(i,j,k) {
@@ -401,7 +401,7 @@ void VOF::curv_HF() {
           hc  += stmp[i  ][j  ][k+kk];
         }
 
-        if (hc_limit<hc && hc<(hc_limit+1.0)) {
+        if (hc_limit<=hc && hc<=(hc_limit+1.0)) {
           real theta = acos(max_abs_n);
           real g = 0.0;
           if (theta < theta_crit) {   // Eq.6 Lopez (2009) Comp Methods Appl

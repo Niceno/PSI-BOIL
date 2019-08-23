@@ -26,7 +26,7 @@ const real LZ =   LX/real(NX)*real(NZ);
 #endif
 
 #ifdef USE_VOF
-const int mSimple = 4;
+const int mSimple = 1;
 #else
 const int mSimple = 1;
 #endif

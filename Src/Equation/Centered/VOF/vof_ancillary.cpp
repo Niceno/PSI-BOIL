@@ -20,8 +20,9 @@ void VOF::ancillary(Scalar & scp) {
   |  normal vector at cell center  |
   +-------------------------------*/
 #if 1
+  #if 1
   norm_mixed(scp);
-  #if 0
+  #else
   norm_cc(scp);
   #endif
 #else
