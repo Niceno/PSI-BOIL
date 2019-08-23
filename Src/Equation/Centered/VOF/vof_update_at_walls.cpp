@@ -1,7 +1,7 @@
 #include "vof.h"
 
 /******************************************************************************/
-void VOF::update_at_walls() {
+void VOF::update_at_walls(Scalar & scp) {
 /***************************************************************************//**
 *  \brief Prepares volume fraction for marching cube at boundaries.
 *         scalar_exchange(_all) should take account of periodic condition.
@@ -23,13 +23,13 @@ void VOF::update_at_walls() {
   /*-------------+
   | single walls |
   +-------------*/
-  for( int b=0; b<phi.bc().count(); b++ ) {
+  for( int b=0; b<scp.bc().count(); b++ ) {
 
-    if( phi.bc().type_decomp(b) ) continue;
+    if( scp.bc().type_decomp(b) ) continue;
 
-    if( phi.bc().type(b) == BndType::wall() ) {
+    if( scp.bc().type(b) == BndType::wall() ) {
 
-      Dir d = phi.bc().direction(b);
+      Dir d = scp.bc().direction(b);
       if(d != Dir::undefined()) {
         int ofx(0), ofy(0), ofz(0);
         real xpos(0.5), ypos(0.5), zpos(0.5);
@@ -55,8 +55,8 @@ void VOF::update_at_walls() {
           continue;
         }
        
-        for_vijk( phi.bc().at(b), i,j,k ) { 
-          phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
+        for_vijk( scp.bc().at(b), i,j,k ) { 
+          scp[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp);
         }
       } /* dir not undefined */
     } /* is wall? */
@@ -67,8 +67,8 @@ void VOF::update_at_walls() {
   +---------------*/
   
   /* line i-min & j-min */
-  if(phi.bc().type_here(Dir::imin(), BndType::wall()) &&
-     phi.bc().type_here(Dir::jmin(), BndType::wall())   ) {
+  if(scp.bc().type_here(Dir::imin(), BndType::wall()) &&
+     scp.bc().type_here(Dir::jmin(), BndType::wall())   ) {
     int i=si()-1;
     int j=sj()-1;
     int ofx(0), ofy(0), ofz(0);
@@ -78,13 +78,13 @@ void VOF::update_at_walls() {
     xpos = -0.5;
     ypos = -0.5;
     for_k(k) {
-      phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
+      scp[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp);
     }
   }
 
   /* line i-min & j-max */
-  if(phi.bc().type_here(Dir::imin(), BndType::wall()) &&
-     phi.bc().type_here(Dir::jmax(), BndType::wall())   ) {
+  if(scp.bc().type_here(Dir::imin(), BndType::wall()) &&
+     scp.bc().type_here(Dir::jmax(), BndType::wall())   ) {
     int i=si()-1;
     int j=ej()+1;
     int ofx(0), ofy(0), ofz(0);
@@ -94,13 +94,13 @@ void VOF::update_at_walls() {
     xpos = -0.5;
     ypos = 1.5;
     for_k(k) {
-      phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
+      scp[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp);
     }
   }
 
   /* line i-max & j-min */
-  if(phi.bc().type_here(Dir::imax(), BndType::wall()) &&
-     phi.bc().type_here(Dir::jmin(), BndType::wall())   ) {
+  if(scp.bc().type_here(Dir::imax(), BndType::wall()) &&
+     scp.bc().type_here(Dir::jmin(), BndType::wall())   ) {
     int i=ei()+1;
     int j=sj()-1;
     int ofx(0), ofy(0), ofz(0);
@@ -110,13 +110,13 @@ void VOF::update_at_walls() {
     xpos = 1.5;
     ypos = -0.5;
     for_k(k) {
-      phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
+      scp[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp);
     }
   }
 
   /* line i-max & j-max */
-  if(phi.bc().type_here(Dir::imax(), BndType::wall()) &&
-     phi.bc().type_here(Dir::jmax(), BndType::wall())   ) {
+  if(scp.bc().type_here(Dir::imax(), BndType::wall()) &&
+     scp.bc().type_here(Dir::jmax(), BndType::wall())   ) {
     int i=ei()+1;
     int j=ej()+1;
     int ofx(0), ofy(0), ofz(0);
@@ -126,13 +126,13 @@ void VOF::update_at_walls() {
     xpos = 1.5;
     ypos = 1.5;
     for_k(k) {
-      phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
+      scp[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp);
     }
   }
 
   /* line i-min & k-min */
-  if(phi.bc().type_here(Dir::imin(), BndType::wall()) &&
-     phi.bc().type_here(Dir::kmin(), BndType::wall())   ) {
+  if(scp.bc().type_here(Dir::imin(), BndType::wall()) &&
+     scp.bc().type_here(Dir::kmin(), BndType::wall())   ) {
     int i=si()-1;
     int k=sk()-1;
     int ofx(0), ofy(0), ofz(0);
@@ -142,13 +142,13 @@ void VOF::update_at_walls() {
     xpos = -0.5;
     zpos = -0.5;
     for_j(j) {
-      phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
+      scp[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp);
     }
   }
 
   /* line i-min & k-max */
-  if(phi.bc().type_here(Dir::imin(), BndType::wall()) &&
-     phi.bc().type_here(Dir::kmax(), BndType::wall())   ) {
+  if(scp.bc().type_here(Dir::imin(), BndType::wall()) &&
+     scp.bc().type_here(Dir::kmax(), BndType::wall())   ) {
     int i=si()-1;
     int k=ek()+1;
     int ofx(0), ofy(0), ofz(0);
@@ -158,13 +158,13 @@ void VOF::update_at_walls() {
     xpos = -0.5;
     zpos = 1.5;
     for_j(j) {
-      phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
+      scp[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp);
     }
   }
 
   /* line i-max & k-min */
-  if(phi.bc().type_here(Dir::imax(), BndType::wall()) &&
-     phi.bc().type_here(Dir::kmin(), BndType::wall())   ) {
+  if(scp.bc().type_here(Dir::imax(), BndType::wall()) &&
+     scp.bc().type_here(Dir::kmin(), BndType::wall())   ) {
     int i=ei()+1;
     int k=sk()-1;
     int ofx(0), ofy(0), ofz(0);
@@ -174,13 +174,13 @@ void VOF::update_at_walls() {
     xpos = 1.5;
     zpos = -0.5;
     for_j(j) {
-      phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
+      scp[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp);
     }
   }
 
   /* line i-max & k-max */
-  if(phi.bc().type_here(Dir::imax(), BndType::wall()) &&
-     phi.bc().type_here(Dir::kmax(), BndType::wall())   ) {
+  if(scp.bc().type_here(Dir::imax(), BndType::wall()) &&
+     scp.bc().type_here(Dir::kmax(), BndType::wall())   ) {
     int i=ei()+1;
     int k=ek()+1;
     int ofx(0), ofy(0), ofz(0);
@@ -190,13 +190,13 @@ void VOF::update_at_walls() {
     ypos = 1.5;
     zpos = 1.5;
     for_j(j) {
-      phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
+      scp[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp);
     }
   }
 
   /* line j-min & k-min */
-  if(phi.bc().type_here(Dir::jmin(), BndType::wall()) &&
-     phi.bc().type_here(Dir::kmin(), BndType::wall())   ) {
+  if(scp.bc().type_here(Dir::jmin(), BndType::wall()) &&
+     scp.bc().type_here(Dir::kmin(), BndType::wall())   ) {
     int j=sj()-1;
     int k=sk()-1;
     int ofx(0), ofy(0), ofz(0);
@@ -206,13 +206,13 @@ void VOF::update_at_walls() {
     ypos = -0.5;
     zpos = -0.5;
     for_i(i) {
-      phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
+      scp[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp);
     }
   }
 
   /* line j-min & k-max */
-  if(phi.bc().type_here(Dir::jmin(), BndType::wall()) &&
-     phi.bc().type_here(Dir::kmax(), BndType::wall())   ) {
+  if(scp.bc().type_here(Dir::jmin(), BndType::wall()) &&
+     scp.bc().type_here(Dir::kmax(), BndType::wall())   ) {
     int j=sj()-1;
     int k=ek()+1;
     int ofx(0), ofy(0), ofz(0);
@@ -222,13 +222,13 @@ void VOF::update_at_walls() {
     ypos = -0.5;
     zpos = 1.5;
     for_i(i) {
-      phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
+      scp[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp);
     }
   }
 
   /* line j-max & k-min */
-  if(phi.bc().type_here(Dir::jmax(), BndType::wall()) &&
-     phi.bc().type_here(Dir::kmin(), BndType::wall())   ) {
+  if(scp.bc().type_here(Dir::jmax(), BndType::wall()) &&
+     scp.bc().type_here(Dir::kmin(), BndType::wall())   ) {
     int j=ej()+1;
     int k=sk()-1;
     int ofx(0), ofy(0), ofz(0);
@@ -238,13 +238,13 @@ void VOF::update_at_walls() {
     ypos = 1.5;
     zpos = -0.5;
     for_i(i) {
-      phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
+      scp[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp);
     }
   }
 
   /* line j-max & k-max */
-  if(phi.bc().type_here(Dir::jmax(), BndType::wall()) &&
-     phi.bc().type_here(Dir::kmax(), BndType::wall())   ) {
+  if(scp.bc().type_here(Dir::jmax(), BndType::wall()) &&
+     scp.bc().type_here(Dir::kmax(), BndType::wall())   ) {
     int j=ej()+1;
     int k=ek()+1;
     int ofx(0), ofy(0), ofz(0);
@@ -254,7 +254,7 @@ void VOF::update_at_walls() {
     ypos = 1.5;
     zpos = 1.5;
     for_i(i) {
-      phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
+      scp[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp);
     }
   }
 
@@ -263,9 +263,9 @@ void VOF::update_at_walls() {
   +-----------------*/
 
   /* corner i-min & j-min & k-min */
-  if(phi.bc().type_here(Dir::imin(), BndType::wall()) &&
-     phi.bc().type_here(Dir::jmin(), BndType::wall()) &&
-     phi.bc().type_here(Dir::kmin(), BndType::wall())   ) {
+  if(scp.bc().type_here(Dir::imin(), BndType::wall()) &&
+     scp.bc().type_here(Dir::jmin(), BndType::wall()) &&
+     scp.bc().type_here(Dir::kmin(), BndType::wall())   ) {
     int i=si()-1;
     int j=sj()-1;
     int k=sk()-1;
@@ -277,14 +277,14 @@ void VOF::update_at_walls() {
     xpos = -0.5;
     ypos = -0.5;
     zpos = -0.5;
-    phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
+    scp[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp);
   }
 
 
   /* corner i-min & j-min & k-max */
-  if(phi.bc().type_here(Dir::imin(), BndType::wall()) &&
-     phi.bc().type_here(Dir::jmin(), BndType::wall()) &&
-     phi.bc().type_here(Dir::kmax(), BndType::wall())   ) {
+  if(scp.bc().type_here(Dir::imin(), BndType::wall()) &&
+     scp.bc().type_here(Dir::jmin(), BndType::wall()) &&
+     scp.bc().type_here(Dir::kmax(), BndType::wall())   ) {
     int i=si()-1;
     int j=sj()-1;
     int k=ek()+1;
@@ -296,13 +296,13 @@ void VOF::update_at_walls() {
     xpos = -0.5;
     ypos = -0.5;
     zpos = 1.5;
-    phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
+    scp[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp);
   }
 
   /* corner i-min & j-max & k-min */
-  if(phi.bc().type_here(Dir::imin(), BndType::wall()) &&
-     phi.bc().type_here(Dir::jmax(), BndType::wall()) &&
-     phi.bc().type_here(Dir::kmin(), BndType::wall())   ) {
+  if(scp.bc().type_here(Dir::imin(), BndType::wall()) &&
+     scp.bc().type_here(Dir::jmax(), BndType::wall()) &&
+     scp.bc().type_here(Dir::kmin(), BndType::wall())   ) {
     int i=si()-1;
     int j=ej()+1;
     int k=sk()-1;
@@ -314,14 +314,14 @@ void VOF::update_at_walls() {
     xpos = -0.5;
     ypos = 1.5;
     zpos = -0.5;
-    phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
+    scp[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp);
   }
 
 
   /* corner i-min & j-max & k-max */
-  if(phi.bc().type_here(Dir::imin(), BndType::wall()) &&
-     phi.bc().type_here(Dir::jmax(), BndType::wall()) &&
-     phi.bc().type_here(Dir::kmax(), BndType::wall())   ) {
+  if(scp.bc().type_here(Dir::imin(), BndType::wall()) &&
+     scp.bc().type_here(Dir::jmax(), BndType::wall()) &&
+     scp.bc().type_here(Dir::kmax(), BndType::wall())   ) {
     int i=si()-1;
     int j=ej()+1;
     int k=ek()+1;
@@ -333,14 +333,14 @@ void VOF::update_at_walls() {
     xpos = -0.5;
     ypos = 1.5;
     zpos = 1.5;
-    phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
+    scp[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp);
   }
 
 
   /* corner i-max & j-min & k-min */
-  if(phi.bc().type_here(Dir::imax(), BndType::wall()) &&
-     phi.bc().type_here(Dir::jmin(), BndType::wall()) &&
-     phi.bc().type_here(Dir::kmin(), BndType::wall())   ) {
+  if(scp.bc().type_here(Dir::imax(), BndType::wall()) &&
+     scp.bc().type_here(Dir::jmin(), BndType::wall()) &&
+     scp.bc().type_here(Dir::kmin(), BndType::wall())   ) {
     int i=ei()+1;
     int j=sj()-1;
     int k=sk()-1;
@@ -352,13 +352,13 @@ void VOF::update_at_walls() {
     xpos = 1.5;
     ypos = -0.5;
     zpos = -0.5;
-    phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
+    scp[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp);
   }
 
   /* corner i-max & j-min & k-max */
-  if(phi.bc().type_here(Dir::imax(), BndType::wall()) &&
-     phi.bc().type_here(Dir::jmin(), BndType::wall()) &&
-     phi.bc().type_here(Dir::kmax(), BndType::wall())   ) {
+  if(scp.bc().type_here(Dir::imax(), BndType::wall()) &&
+     scp.bc().type_here(Dir::jmin(), BndType::wall()) &&
+     scp.bc().type_here(Dir::kmax(), BndType::wall())   ) {
     int i=ei()+1;
     int j=sj()-1;
     int k=ek()+1;
@@ -370,13 +370,13 @@ void VOF::update_at_walls() {
     xpos = 1.5;
     ypos = -0.5;
     zpos = 1.5;
-    phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
+    scp[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp);
   }
 
   /* corner i-max & j-max & k-min */
-  if(phi.bc().type_here(Dir::imax(), BndType::wall()) &&
-     phi.bc().type_here(Dir::jmax(), BndType::wall()) &&
-     phi.bc().type_here(Dir::kmin(), BndType::wall())   ) {
+  if(scp.bc().type_here(Dir::imax(), BndType::wall()) &&
+     scp.bc().type_here(Dir::jmax(), BndType::wall()) &&
+     scp.bc().type_here(Dir::kmin(), BndType::wall())   ) {
     int i=ei()+1;
     int j=ej()+1;
     int k=sk()-1;
@@ -388,13 +388,13 @@ void VOF::update_at_walls() {
     xpos = 1.5;
     ypos = 1.5;
     zpos = -0.5;
-    phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
+    scp[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp);
   }
 
   /* corner i-max & j-max & k-max */
-  if(phi.bc().type_here(Dir::imax(), BndType::wall()) &&
-     phi.bc().type_here(Dir::jmax(), BndType::wall()) &&
-     phi.bc().type_here(Dir::kmax(), BndType::wall())   ) {
+  if(scp.bc().type_here(Dir::imax(), BndType::wall()) &&
+     scp.bc().type_here(Dir::jmax(), BndType::wall()) &&
+     scp.bc().type_here(Dir::kmax(), BndType::wall())   ) {
     int i=ei()+1;
     int j=ej()+1;
     int k=ek()+1;
@@ -406,7 +406,7 @@ void VOF::update_at_walls() {
     xpos = 1.5;
     ypos = 1.5;
     zpos = 1.5;
-    phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
+    scp[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp);
   }
 
   /*--------------+
@@ -423,7 +423,7 @@ void VOF::update_at_walls() {
       real xpos(0.5), ypos(0.5), zpos(0.5);
       ofx = +1;
       xpos = -0.5;
-      phi[i-1][j][k] = extrapolate_v(i-1,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
+      scp[i-1][j][k] = extrapolate_v(i-1,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp);
     }
 
     /* east */
@@ -432,7 +432,7 @@ void VOF::update_at_walls() {
       real xpos(0.5), ypos(0.5), zpos(0.5);
       ofx = -1;
       xpos = 1.5;
-      phi[i+1][j][k] = extrapolate_v(i+1,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
+      scp[i+1][j][k] = extrapolate_v(i+1,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp);
     }
 
     /* south */
@@ -441,7 +441,7 @@ void VOF::update_at_walls() {
       real xpos(0.5), ypos(0.5), zpos(0.5);
       ofy = +1;
       ypos = -0.5;
-      phi[i][j-1][k] = extrapolate_v(i,j-1,k,ofx,ofy,ofz,xpos,ypos,zpos);
+      scp[i][j-1][k] = extrapolate_v(i,j-1,k,ofx,ofy,ofz,xpos,ypos,zpos,scp);
     }
 
     /* north */
@@ -450,7 +450,7 @@ void VOF::update_at_walls() {
       real xpos(0.5), ypos(0.5), zpos(0.5);
       ofy = -1;
       ypos = 1.5;
-      phi[i][j+1][k] = extrapolate_v(i,j+1,k,ofx,ofy,ofz,xpos,ypos,zpos);
+      scp[i][j+1][k] = extrapolate_v(i,j+1,k,ofx,ofy,ofz,xpos,ypos,zpos,scp);
     }
 
     /* bottom */
@@ -459,7 +459,7 @@ void VOF::update_at_walls() {
       real xpos(0.5), ypos(0.5), zpos(0.5);
       ofz = +1;
       zpos = -0.5;
-      phi[i][j][k-1] = extrapolate_v(i,j,k-1,ofx,ofy,ofz,xpos,ypos,zpos);
+      scp[i][j][k-1] = extrapolate_v(i,j,k-1,ofx,ofy,ofz,xpos,ypos,zpos,scp);
     }
 
     /* top */
@@ -468,11 +468,11 @@ void VOF::update_at_walls() {
       real xpos(0.5), ypos(0.5), zpos(0.5);
       ofy = -1;
       ypos = 1.5;
-      phi[i][j][k+1] = extrapolate_v(i,j,k+1,ofx,ofy,ofz,xpos,ypos,zpos);
+      scp[i][j][k+1] = extrapolate_v(i,j,k+1,ofx,ofy,ofz,xpos,ypos,zpos,scp);
     }
   }
 
-  phi.exchange_all();
+  scp.exchange_all();
   nx.exchange_all();
   ny.exchange_all();
   nz.exchange_all();
@@ -485,17 +485,18 @@ void VOF::update_at_walls() {
 +-------------------*/
 real VOF::extrapolate_v(const int i, const int j, const int k,
                         const int ofx, const int ofy, const int ofz,
-                        const real xp, const real yp, const real zp) {
+                        const real xp, const real yp, const real zp,
+                        const Scalar & scp) {
 
   int ii = i+ofx;
   int jj = j+ofy;
   int kk = k+ofz;
    
-  real phiphi = phi[ii][jj][kk];
+  real scpscp = scp[ii][jj][kk];
 
   /* erroneous interfaces */
-  if(phiphi<tol_wall||phiphi-1.0>-tol_wall) {
-    return real(phiphi>phisurf);
+  if(scpscp<tol_wall||scpscp-1.0>-tol_wall) {
+    return real(scpscp>phisurf);
   } 
 
   /* unnormalized alpha value */
@@ -503,7 +504,7 @@ real VOF::extrapolate_v(const int i, const int j, const int k,
           
   /* degenerate case I */
   if(!boil::realistic(alphaval)) {
-    return real(phiphi>phisurf);
+    return real(scpscp>phisurf);
   } 
 
   /* calculate vn1, vn2, vn3: normal vector at cell center */
@@ -526,7 +527,7 @@ real VOF::extrapolate_v(const int i, const int j, const int k,
 
   /* degenerate case II */
   if(denom<boil::pico) {
-    return real(phiphi>phisurf);
+    return real(scpscp>phisurf);
   }
          
   real xpos = xp;
@@ -558,8 +559,8 @@ real VOF::extrapolate_v(const int i, const int j, const int k,
   vm3 /= denom;
 
 #if 0
-  if(i==1&&j==0&&k==90) boil::oout<<ii<<" "<<jj<<" "<<kk<<" "<<alphaval<<" "<<vm1*(0.5-xpos) + vm2*(0.5-ypos) + vm3*(0.5-zpos)<<" "<<phiphi<<" "<<calc_v(alphaval,vm1,vm2,vm3)<<" | "<<vn1<<" "<<vn2<<" "<<vn3<<" "<<xpos<<" "<<ypos<<" "<<zpos<<" | "<<ofx<<" "<<ofy<<" "<<ofz<<boil::endl;
-  //if(i==0&&j==1&&k==89) boil::oout<<ii<<" "<<jj<<" "<<kk<<" "<<alphaval<<" "<<vm1*(0.5-xpos) + vm2*(0.5-ypos) + vm3*(0.5-zpos)<<" "<<phiphi<<" "<<calc_v(alphaval,vm1,vm2,vm3)<<" | "<<vn1<<" "<<vn2<<" "<<vn3<<" "<<xpos<<" "<<ypos<<" "<<zpos<<" | "<<ofx<<" "<<ofy<<" "<<ofz<<boil::endl;
+  if(i==1&&j==0&&k==90) boil::oout<<ii<<" "<<jj<<" "<<kk<<" "<<alphaval<<" "<<vm1*(0.5-xpos) + vm2*(0.5-ypos) + vm3*(0.5-zpos)<<" "<<scpscp<<" "<<calc_v(alphaval,vm1,vm2,vm3)<<" | "<<vn1<<" "<<vn2<<" "<<vn3<<" "<<xpos<<" "<<ypos<<" "<<zpos<<" | "<<ofx<<" "<<ofy<<" "<<ofz<<boil::endl;
+  //if(i==0&&j==1&&k==89) boil::oout<<ii<<" "<<jj<<" "<<kk<<" "<<alphaval<<" "<<vm1*(0.5-xpos) + vm2*(0.5-ypos) + vm3*(0.5-zpos)<<" "<<scpscp<<" "<<calc_v(alphaval,vm1,vm2,vm3)<<" | "<<vn1<<" "<<vn2<<" "<<vn3<<" "<<xpos<<" "<<ypos<<" "<<zpos<<" | "<<ofx<<" "<<ofy<<" "<<ofz<<boil::endl;
 #endif
 
   /* volume fraction */

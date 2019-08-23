@@ -213,7 +213,7 @@ main(int argc, char * argv[]) {
   #ifdef BDC
   VOF conc(c,  g, kappa, uvw, time, solver, &bndclr, &mixed);
   #else
-  VOF conc(c,  g, kappa, uvw, time, solver, NULL, NULL);
+  VOF conc(c,  g, kappa, uvw, time, solver);
   #endif   
 #endif
   conc.init();

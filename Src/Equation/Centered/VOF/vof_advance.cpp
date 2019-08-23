@@ -21,9 +21,16 @@ void VOF::advance(Scalar & scp, const bool anci) {
   /*-------------------------------+
   |  normal vector at cell center  |
   +-------------------------------*/
+#if 1
+  #if 1
   norm_mixed(scp);
-  //norm_cc(scp);
-  //norm_elvira(scp);
+  #else
+  norm_cc(scp);
+  #endif
+#else
+  norm_elvira(scp);
+#endif
+  bdnorm(scp);
 
   for_aijk(i,j,k){
     stmp[i][j][k] = scp[i][j][k] * dV(i,j,k);
@@ -59,7 +66,7 @@ void VOF::advance(Scalar & scp, const bool anci) {
   boil::timer.stop("vof advance");
 
   if(anci)
-    ancillary();
+    ancillary(phi);
 
   return;
 }

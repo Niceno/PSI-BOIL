@@ -1,39 +1,42 @@
 #include "Include/psi-boil.h"
-#include "setup_circle.cpp"
 #include <fstream>
 #define USE_VOF
 //#define AVEJ
 #define SYM
 
 /* computed parameters */
+//const int NX = 50;
 const int gLevel = 4;
 #ifdef SYM
 const int NX = 16*gLevel;
 #else
 const int NX = 32*gLevel;
 #endif
+const int NY = NX;
 const int NZ = NX;
-const int NY = 3;
 
 /* domain dimensions (given by problem) */
 //const real LX =   1.0;
 const real LX =   4.0e-3;
-const real LZ =   LX;
-#ifdef SYM
-const real LY =   0.5*LX/real(NX)*real(NY);
-#else
-const real LY =   LX/real(NX)*real(NY);
-#endif
+const real LY =   LX;
+const real LZ =   LY;
 
 #ifdef USE_VOF
-const int mSimple = 4;
-const int Nsmooth = 3;
+const int mSimple = 1;
 #else
 const int mSimple = 1;
 #endif
 
 /******************************************************************************/
-main(int argc, char * argv[]) {
+int main(int argc, char * argv[]) {
+
+  if(argc==1){
+    boil::oout<<"An argument is required!"<<"\n";
+    boil::oout<<"./Boil wmin (wmin::wall time in minute)"<<"\n";
+    exit(0);
+  }
+  int wmin=atoi(argv[1]);
+  boil::oout<<"wmin= "<<wmin<<"\n";
 
   boil::timer.start();
 
@@ -47,20 +50,22 @@ main(int argc, char * argv[]) {
   +----------*/
 #ifdef SYM
   //Grid1D gx( Range<real>(0.0,0.5*LX), NX, Periodic::no(), BndGrid::symmetry() );
-  //Grid1D gz( Range<real>(0.0,0.5*LZ), NZ, Periodic::no(), BndGrid::symmetry() );
+  //Grid1D gy( Range<real>(0.0,0.5*LY), NY, Periodic::no(), BndGrid::symmetry() );
   Grid1D gx( Range<real>(0.0,0.5*LX), NX, Periodic::no(),
-             BndGrid::symmetry(), BndGrid::extrapolate() );
+             BndGrid::symmetry(), BndGrid::wall() );
+  Grid1D gy( Range<real>(0.0,0.5*LY), NY, Periodic::no(),
+             BndGrid::symmetry(), BndGrid::wall() );
   Grid1D gz( Range<real>(0.0,0.5*LZ), NZ, Periodic::no(),
-             BndGrid::symmetry(), BndGrid::extrapolate() );
+             BndGrid::symmetry(), BndGrid::wall() );
 #else
   Grid1D gx( Range<real>(-0.5*LX,0.5*LX), NX, Periodic::no() );
+  Grid1D gy( Range<real>(-0.5*LY,0.5*LY), NY, Periodic::no() );
   Grid1D gz( Range<real>(-0.5*LZ,0.5*LZ), NZ, Periodic::no() );
 #endif
-  Grid1D gy( Range<real>(-0.5*LY,0.5*LY), NY, Periodic::yes() );
   /*---------+
   |  domain  |
   +---------*/
-  Domain d(gx, gz, gy);
+  Domain d(gx, gy, gz);
 
   /*------------------+
   |  define unknowns  |
@@ -80,14 +85,16 @@ main(int argc, char * argv[]) {
     uvw.bc(m).add( BndCnd( Dir::imax(), BndType::outlet() ) );
     uvw.bc(m).add( BndCnd( Dir::jmin(), BndType::symmetry() ) );
     uvw.bc(m).add( BndCnd( Dir::jmax(), BndType::outlet() ) );
+    uvw.bc(m).add( BndCnd( Dir::kmin(), BndType::symmetry() ) );
+    uvw.bc(m).add( BndCnd( Dir::kmax(), BndType::outlet() ) );
 #else
     uvw.bc(m).add( BndCnd( Dir::imin(), BndType::outlet() ) );
     uvw.bc(m).add( BndCnd( Dir::imax(), BndType::outlet() ) );
     uvw.bc(m).add( BndCnd( Dir::jmin(), BndType::outlet() ) );
     uvw.bc(m).add( BndCnd( Dir::jmax(), BndType::outlet() ) );
+    uvw.bc(m).add( BndCnd( Dir::kmin(), BndType::outlet() ) );
+    uvw.bc(m).add( BndCnd( Dir::kmax(), BndType::outlet() ) );
 #endif
-    uvw.bc(m).add( BndCnd( Dir::kmin(), BndType::periodic() ) );
-    uvw.bc(m).add( BndCnd( Dir::kmax(), BndType::periodic() ) );
     uvw_old(m)=uvw(m).shape();
   }
 
@@ -96,14 +103,16 @@ main(int argc, char * argv[]) {
   c.bc().add( BndCnd( Dir::imax(), BndType::outlet() ) );
   c.bc().add( BndCnd( Dir::jmin(), BndType::symmetry() ) );
   c.bc().add( BndCnd( Dir::jmax(), BndType::outlet() ) );
+  c.bc().add( BndCnd( Dir::kmin(), BndType::symmetry() ) );
+  c.bc().add( BndCnd( Dir::kmax(), BndType::outlet() ) );
 #else
   c.bc().add( BndCnd( Dir::imin(), BndType::outlet() ) );
   c.bc().add( BndCnd( Dir::imax(), BndType::outlet() ) );
   c.bc().add( BndCnd( Dir::jmin(), BndType::outlet() ) );
   c.bc().add( BndCnd( Dir::jmax(), BndType::outlet() ) );
+  c.bc().add( BndCnd( Dir::kmin(), BndType::outlet() ) );
+  c.bc().add( BndCnd( Dir::kmax(), BndType::outlet() ) );
 #endif
-  c.bc().add( BndCnd( Dir::kmin(), BndType::periodic() ) );
-  c.bc().add( BndCnd( Dir::kmax(), BndType::periodic() ) );
 
   press=c.shape();
   p=c.shape();
@@ -126,7 +135,6 @@ main(int argc, char * argv[]) {
   water.rho   (1.0000e+3);
 
   Matter mixed(water, air, &c);
-  //Matter mixed(water, air, &sc);
   mixed.sigma (0.07);
 #endif
 
@@ -147,7 +155,32 @@ main(int argc, char * argv[]) {
   boil::oout<<"sk= "<<c.sk()<<" ei= "<<c.ek()<<"\n";
 #endif
 
+  /*-------------------+
+  |  check if restart  |
+  +-------------------*/
   std::fstream input;
+  int irun = 0;
+  if(boil::cart.iam()==0){
+    input.open("run.txt", std::ios::in);
+    if( !input.fail() ) {
+      input >> irun;
+      std::cout<<"read irun.  irun= "<<irun<<"\n";
+    }
+    input.close();
+  }
+  boil::cart.sum_int(&irun);
+  if (irun==1){
+    boil::oout<<"exit job due to irun=1"<<"\n";
+    exit(0);
+  }
+
+  if(boil::cart.iam()==0){
+    std::fstream output;
+    output.open("run.txt", std::ios::out);
+    output << 1 << boil::endl;
+    output.close();
+  }
+
   input.open("time.txt", std::ios::in);
   bool restart = false;
 
@@ -176,23 +209,55 @@ main(int argc, char * argv[]) {
     for_avmijk(uvw,m,i,j,k)
       uvw[m][i][j][k]=0.0;
 
-  c = 0.0;
-
-  const real xcent = 0.0;
-  const real ycent = 0.0;
-  const real zcent = 0.0;
-
-  // set theoretical value of single droplet for color function
-  const real radius = LX/4.0;
-  setup_circle(c,radius,xcent,ycent);
+    for_vijk(c,i,j,k) 
+      c[i][j][k] = 0.0;
+  
+    const real xcent = 0.0;
+    const real ycent = 0.0;
+    const real zcent = 0.0;
+    const real radius = LX/4.0;
+    for_vijk(c,i,j,k) {
+      real dist=sqrt(pow(c.xc(i)-xcent,2.0)
+                    +pow(c.yc(j)-ycent,2.0)+pow(c.zc(k)-zcent,2.0));
+      if (dist<radius*0.80) {
+        c[i][j][k]=1.0;
+      } else if(dist<radius*1.2) {
+        int mm=20;
+        real x0=d.xn(i);
+        real y0=d.yn(j);
+        real z0=d.zn(k);
+        real ddx=d.dxc(i)/real(mm);
+        real ddy=d.dyc(j)/real(mm);
+        real ddz=d.dzc(k)/real(mm);
+        int itmp=0;
+        for (int ii=0; ii<mm; ii++){
+          for (int jj=0; jj<mm; jj++){
+            for (int kk=0; kk<mm; kk++){
+              real xxc=x0+0.5*ddx+real(ii)*ddx;
+              real yyc=y0+0.5*ddy+real(jj)*ddy;
+              real zzc=z0+0.5*ddz+real(kk)*ddz;
+              real dist=sqrt(pow(xxc-xcent,2.0)
+                            +pow(yyc-ycent,2.0)+pow(zzc-zcent,2.0));
+              if (dist<radius){
+                itmp=itmp+1;
+              }
+            }
+          }
+        }
+        c[i][j][k]=real(itmp)/real(mm*mm*mm);
+      }
+    }
+    c.bnd_update();
+    c.exchange_all();
+    boil::plot->plot(uvw,c,press, "uvw-c-press", 0);
+  }
+#if 0
   for_avijk(c,i,j,k)
-    c[i][j][k] = 1.0-c[i][j][k];
+    c[i][j][k] = 1. - c[i][j][k];
+#endif
 
   c.bnd_update();
   c.exchange_all();
-  boil::plot->plot(uvw,c,press, "uvw-c-press", 0);
-
-  } // restart
 
   /*----------------+
   |  linear solver  |
@@ -205,8 +270,12 @@ main(int argc, char * argv[]) {
   Pressure pr(p, f, uvw, time, solver, &mixed);
 
   AC multigrid( &pr );
-  multigrid.min_cycles(4);  // 4
-  multigrid.max_cycles(8); // 8
+  if(mSimple>1) {
+    multigrid.min_cycles(4);  // 4
+    multigrid.max_cycles(8); // 8
+  } else {
+    multigrid.min_cycles(6);  // 6
+  }
   multigrid.stop_if_diverging(true);
 
 #ifdef USE_VOF
@@ -214,10 +283,6 @@ main(int argc, char * argv[]) {
   conc.set_curv_method(0);  // height function
   //conc.set_curv_method(1);  // smoothed VOF
   conc.ancillary();
-#if 0
-  if(Nsmooth>0)
-    conc.smooth(c,sc,Nsmooth);
-#endif
 #else
   CIPCSL2 conc  (c, g, kappa, uvw, time, solver);
   conc.set_itsharpen(8);

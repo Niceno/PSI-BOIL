@@ -1,7 +1,7 @@
 #include "vof.h"
 
 /******************************************************************************/
-void VOF::fs_bnd_nosubgrid() {
+void VOF::fs_bnd_nosubgrid(const Scalar & scp) {
 /***************************************************************************//**
 *  \brief Corrects fs at boundaries. No subgrid interfaces are considered.
 *         IMPORTANT: does not work when immersed boundaries do not correspond
@@ -15,14 +15,14 @@ void VOF::fs_bnd_nosubgrid() {
   //real tol_wall = 0.5e-2; 
   /* consistent tol_wall with update_at_walls: ie for clr */
 
-  for( int b=0; b<phi.bc().count(); b++ ) {
+  for( int b=0; b<scp.bc().count(); b++ ) {
 
-    if( phi.bc().type_decomp(b) ) continue;
+    if( scp.bc().type_decomp(b) ) continue;
 
     /* special treatment at walls */
-    if( phi.bc().type(b) == BndType::wall() ) {
+    if( scp.bc().type(b) == BndType::wall() ) {
 
-      Dir d = phi.bc().direction(b);
+      Dir d = scp.bc().direction(b);
       if(d != Dir::undefined()) {
         Comp mcomp;
         int of(0), ofx(0), ofy(0), ofz(0);
@@ -84,7 +84,7 @@ void VOF::fs_bnd_nosubgrid() {
         }
 #endif
        
-        for_vijk( phi.bc().at(b), i,j,k ) { 
+        for_vijk( scp.bc().at(b), i,j,k ) { 
           /* at first, the fs value is reset */
           if(mcomp==Comp::i()) {
             fs[mcomp][i+of][j][k] = boil::unreal;
@@ -108,8 +108,8 @@ void VOF::fs_bnd_nosubgrid() {
     dom->ibody().ijk(cc,&i,&j,&k);
          
     /* erroneous interfaces */
-    real phiphi = phi[i][j][k];
-    bool errint = (phiphi<tol_wall||phiphi-1.0>-tol_wall);
+    real scpscp = scp[i][j][k];
+    bool errint = (scpscp<tol_wall||scpscp-1.0>-tol_wall);
     if(errint) {
       if(dom->ibody().off(i-1,j,k)) {
         mcomp = Comp::i();
@@ -177,7 +177,7 @@ void VOF::fs_bnd_nosubgrid() {
       bool flagm = (0.0+tolf <= fsval && fsval <= 0.5    );
       fs[mcomp][i][j][k  ] = boil::unreal;
       
-      //boil::oout<<"VOF-fs_bnd "<<i<<" "<<j<<" "<<k<<" | "<<phi.zn(k)<<" "<<fsval<<" "<<phi.dzc(k)<<" "<<fs[mcomp][i][j][k  ]<<boil::endl;
+      //boil::oout<<"VOF-fs_bnd "<<i<<" "<<j<<" "<<k<<" | "<<scp.zn(k)<<" "<<fsval<<" "<<scp.dzc(k)<<" "<<fs[mcomp][i][j][k  ]<<boil::endl;
     }
 
     /* top */

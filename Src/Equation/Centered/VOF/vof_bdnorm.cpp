@@ -1,7 +1,7 @@
 #include "vof.h"
 
 /******************************************************************************/
-void VOF::bdnorm() {
+void VOF::bdnorm(Scalar & scp) {
 /***************************************************************************//**
 *  \brief iteration routine to obtain
           normal vector for cells adjacent to a wall or an immersed boundary
@@ -12,13 +12,14 @@ void VOF::bdnorm() {
   for(int iter(0); iter<niter; ++iter) {
 
     /* calculate alpha in cells */
-    extract_alpha();
+    //extract_alpha(scp);
+    extract_alpha_near_bnd(scp);
 
     /* prerequisite for marching cubes */
-    update_at_walls();
+    update_at_walls(scp);
    
     /* calculate new normal vector near walls */
-    extend_norm(phi);
+    extend_norm(scp);
 
   }
 

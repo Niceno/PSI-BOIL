@@ -1,7 +1,7 @@
 #include "vof.h"
 
 /******************************************************************************/
-void VOF::fs_bnd() {
+void VOF::fs_bnd(const Scalar & scp) {
 /***************************************************************************//**
 *  \brief Corrects fs at boundaries.
 *         scalar_exchange(_all) should take account of periodic condition.
@@ -16,14 +16,14 @@ void VOF::fs_bnd() {
   //real tol_wall = 0.5e-2; 
   /* consistent tol_wall with update_at_walls: ie for clr */
 
-  for( int b=0; b<phi.bc().count(); b++ ) {
+  for( int b=0; b<scp.bc().count(); b++ ) {
 
-    if( phi.bc().type_decomp(b) ) continue;
+    if( scp.bc().type_decomp(b) ) continue;
 
     /* special treatment at walls */
-    if( phi.bc().type(b) == BndType::wall() ) {
+    if( scp.bc().type(b) == BndType::wall() ) {
 
-      Dir d = phi.bc().direction(b);
+      Dir d = scp.bc().direction(b);
       if(d != Dir::undefined()) {
         Comp mcomp;
         int of(0), ofx(0), ofy(0), ofz(0);
@@ -85,7 +85,7 @@ void VOF::fs_bnd() {
         }
 #endif
        
-        for_vijk( phi.bc().at(b), i,j,k ) { 
+        for_vijk( scp.bc().at(b), i,j,k ) { 
           /* at first, the fs value is reset */
           if(mcomp==Comp::i()) {
             fs[mcomp][i+of][j][k] = boil::unreal;
@@ -103,17 +103,17 @@ void VOF::fs_bnd() {
           bool flagp = (0.5     <= fsval && fsval <= 1.0-tolf);
          
           /* erroneous interfaces */
-          real phiphi = phi[ii][jj][kk];
-          bool errint = (phiphi<tol_wall||phiphi-1.0>-tol_wall);
+          real scpscp = scp[ii][jj][kk];
+          bool errint = (scpscp<tol_wall||scpscp-1.0>-tol_wall);
 
           /* interface exists in the dir we are interested in */
           if(((flagm && of)||(flagp && !of))&&!errint) { 
             if(mcomp==Comp::i()) {
-              fs[mcomp][i+of][j][k] = phi.xn(ii) + phi.dxc(ii) * fsval;
+              fs[mcomp][i+of][j][k] = scp.xn(ii) + scp.dxc(ii) * fsval;
             } else if(mcomp==Comp::j()) {
-              fs[mcomp][i][j+of][k] = phi.yn(jj) + phi.dyc(jj) * fsval;   
+              fs[mcomp][i][j+of][k] = scp.yn(jj) + scp.dyc(jj) * fsval;   
             } else {
-              fs[mcomp][i][j][k+of] = phi.zn(kk) + phi.dzc(kk) * fsval;
+              fs[mcomp][i][j][k+of] = scp.zn(kk) + scp.dzc(kk) * fsval;
             }
           }
         }
@@ -131,8 +131,8 @@ void VOF::fs_bnd() {
     dom->ibody().ijk(cc,&i,&j,&k);
          
     /* erroneous interfaces */
-    real phiphi = phi[i][j][k];
-    bool errint = (phiphi<tol_wall||phiphi-1.0>-tol_wall);
+    real scpscp = scp[i][j][k];
+    bool errint = (scpscp<tol_wall||scpscp-1.0>-tol_wall);
     if(errint) {
       if(dom->ibody().off(i-1,j,k)) {
         mcomp = Comp::i();
@@ -167,7 +167,7 @@ void VOF::fs_bnd() {
       real fsval = fs_val(mcomp,i,j,k);
       bool flagm = (0.0+tolf <= fsval && fsval <= 0.5    );
       if(flagm)
-        fs[mcomp][i  ][j][k] = phi.xn(i) + phi.dxc(i) * fsval;
+        fs[mcomp][i  ][j][k] = scp.xn(i) + scp.dxc(i) * fsval;
       else
         fs[mcomp][i  ][j][k] = boil::unreal;
     }
@@ -178,7 +178,7 @@ void VOF::fs_bnd() {
       real fsval = fs_val(mcomp,i,j,k);
       bool flagp = (0.5     <= fsval && fsval <= 1.0-tolf);
       if(flagp)
-        fs[mcomp][i+1][j][k] = phi.xn(i) + phi.dxc(i) * fsval;
+        fs[mcomp][i+1][j][k] = scp.xn(i) + scp.dxc(i) * fsval;
       else
         fs[mcomp][i+1][j][k] = boil::unreal;
     }
@@ -189,7 +189,7 @@ void VOF::fs_bnd() {
       real fsval = fs_val(mcomp,i,j,k);
       bool flagm = (0.0+tolf <= fsval && fsval <= 0.5    );
       if(flagm)
-        fs[mcomp][i][j  ][k] = phi.yn(j) + phi.dyc(j) * fsval;
+        fs[mcomp][i][j  ][k] = scp.yn(j) + scp.dyc(j) * fsval;
       else
         fs[mcomp][i][j  ][k] = boil::unreal;
     }
@@ -200,7 +200,7 @@ void VOF::fs_bnd() {
       real fsval = fs_val(mcomp,i,j,k);
       bool flagp = (0.5     <= fsval && fsval <= 1.0-tolf);
       if(flagp)
-        fs[mcomp][i][j+1][k] = phi.yn(j) + phi.dyc(j) * fsval;
+        fs[mcomp][i][j+1][k] = scp.yn(j) + scp.dyc(j) * fsval;
       else
         fs[mcomp][i][j+1][k] = boil::unreal;
     }
@@ -211,11 +211,11 @@ void VOF::fs_bnd() {
       real fsval = fs_val(mcomp,i,j,k);
       bool flagm = (0.0+tolf <= fsval && fsval <= 0.5    );
       if(flagm)
-        fs[mcomp][i][j][k  ] = phi.zn(k) + phi.dzc(k) * fsval;
+        fs[mcomp][i][j][k  ] = scp.zn(k) + scp.dzc(k) * fsval;
       else
         fs[mcomp][i][j][k  ] = boil::unreal;
       
-      //boil::oout<<"VOF-fs_bnd "<<i<<" "<<j<<" "<<k<<" | "<<phi.zn(k)<<" "<<fsval<<" "<<phi.dzc(k)<<" "<<fs[mcomp][i][j][k  ]<<boil::endl;
+      //boil::oout<<"VOF-fs_bnd "<<i<<" "<<j<<" "<<k<<" | "<<scp.zn(k)<<" "<<fsval<<" "<<scp.dzc(k)<<" "<<fs[mcomp][i][j][k  ]<<boil::endl;
     }
 
     /* top */
@@ -224,7 +224,7 @@ void VOF::fs_bnd() {
       real fsval = fs_val(mcomp,i,j,k);
       bool flagp = (0.5     <= fsval && fsval <= 1.0-tolf);
       if(flagp)
-        fs[mcomp][i][j][k+1] = phi.zn(k) + phi.dzc(k) * fsval;
+        fs[mcomp][i][j][k+1] = scp.zn(k) + scp.dzc(k) * fsval;
       else
         fs[mcomp][i][j][k+1] = boil::unreal;
     }

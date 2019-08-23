@@ -31,6 +31,7 @@ class VOF : public Centered {
     void advance(Scalar & sca, const bool anci = true);
     void curvature();
     void ancillary(); /* calcs ancillary params such as adens w/o advance */
+    void ancillary(Scalar & scp);
     void tension(Vector * vec, const Matter matt);
     void tension(Vector * vec, const Matter matt, const Scalar & scp);
     void totalvol();
@@ -118,13 +119,14 @@ class VOF : public Centered {
     void advance_y(Scalar & sca);
     void advance_z(Scalar & sca);
     void bdcurv();
-    void cal_fs3();
-    void cal_fs_interp();
+    void cal_fs3(const Scalar & scp);
+    void cal_fs_interp(const Scalar & scp);
     void curv_HF();
     void curv_smooth();
-    void extract_alpha();
-    void fs_bnd();
-    void fs_bnd_nosubgrid();
+    void extract_alpha(Scalar & scp);
+    void extract_alpha_near_bnd(const Scalar & scp);
+    void fs_bnd(const Scalar & scp);
+    void fs_bnd_nosubgrid(const Scalar & scp);
     void standardized_norm_vect();
     void gradphi(const Scalar & g);
     void gradphic(const Scalar & g);
@@ -152,7 +154,7 @@ class VOF : public Centered {
                     const int i, const int j, const int k,
                     const Scalar & sca);
 
-    void bdnorm();
+    void bdnorm(Scalar & scp);
     void extend_norm(const Scalar & g);
 
     void normalize(real & r1, real & r2, real & r3);
@@ -165,7 +167,7 @@ class VOF : public Centered {
              , real r[] );
     void smooth(const Scalar & sca, Scalar & scb, const int itnum);
     void true_norm_vect();
-    void update_at_walls();
+    void update_at_walls(Scalar & scp);
     void wall_norm(const Scalar & sca);
     real kappa_ave(const real r1, const real r2);
     real kappa_ave(const real r1, const real r2, const int i1, const int i2);
@@ -189,7 +191,7 @@ class VOF : public Centered {
     void insert_bc_flag(ScalarInt & g, const bool b);
 
     void cal_adens();
-    void cal_bndclr();
+    void cal_bndclr(const Scalar & scp);
 
     void set_adens(const Scalar & newadens) {
       for_aijk(i,j,k)
@@ -198,7 +200,8 @@ class VOF : public Centered {
 
     real extrapolate_v(const int i, const int j, const int k,
                        const int ofx, const int ofy, const int ofz,
-                       const real xp, const real yp, const real zp);
+                       const real xp, const real yp, const real zp,
+                       const Scalar & scp);
 
     void norm_cc_imin(const Scalar &g, const int i,const int j, const int k);
     void norm_cc_imax(const Scalar &g, const int i,const int j, const int k);

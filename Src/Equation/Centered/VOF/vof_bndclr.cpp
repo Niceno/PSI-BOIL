@@ -3,7 +3,7 @@
 /******************************************************************************/
 /* calculate volume fraction in staggered cells */
 /******************************************************************************/
-void VOF::cal_bndclr() {
+void VOF::cal_bndclr(const Scalar & scp) {
   int ofx(0),ofy(0),ofz(0);
   for_m(m) {
     if       (m==Comp::i()) {
@@ -26,28 +26,28 @@ void VOF::cal_bndclr() {
       int jj = j+ofy;
       int kk = k+ofz;
 
-      real phip = phi[i ][j ][k ];
-      real phim = phi[ii][jj][kk];     
+      real scpp = scp[i ][j ][k ];
+      real scpm = scp[ii][jj][kk];     
      
-      bool liqp = phip-1.>-boil::pico;
-      bool gasp = phip<boil::pico;
-      bool liqm = phim-1.>-boil::pico;
-      bool gasm = phim<boil::pico;
+      bool liqp = scpp-1.>-boil::pico;
+      bool gasp = scpp<boil::pico;
+      bool liqm = scpm-1.>-boil::pico;
+      bool gasm = scpm<boil::pico;
 
-      real stagphip, stagphim;
+      real stagscpp, stagscpm;
 
       /* degenerate cases */
       if( (liqp|gasp) & (liqm|gasm) ) {
-        (*bndclr)[m][i][j][k] = 0.5 * (phip + phim);
+        (*bndclr)[m][i][j][k] = 0.5 * (scpp + scpm);
         continue;
       }
 
       if(liqp||gasp) {
-        stagphip = phip*0.5*dV(i,j,k); /* this only works for cart. grid...*/
+        stagscpp = scpp*0.5*dV(i,j,k); /* this only works for cart. grid...*/
       } else {
         /* we are looking in the negative direction */
         real g = -0.5;
-        real c = phip;
+        real c = scpp;
 
         real vn1 = -nx[i][j][k];
         real vn2 = -ny[i][j][k];
@@ -83,14 +83,14 @@ void VOF::cal_bndclr() {
         (*alig_vm) *= absg;
 
         /* here we use absg to avoid negative sign */
-        stagphip = calc_v(alpha*qa, vm1*qa, vm2*qa, vm3*qa)*absg*dV(i,j,k);
+        stagscpp = calc_v(alpha*qa, vm1*qa, vm2*qa, vm3*qa)*absg*dV(i,j,k);
       }
 
       if(liqm||gasm) {
-        stagphim = phim*0.5*dV(ii,jj,kk);
+        stagscpm = scpm*0.5*dV(ii,jj,kk);
       } else {
         real g = 0.5;
-        real c = phim;
+        real c = scpm;
 
         real vn1 = -nx[ii][jj][kk];
         real vn2 = -ny[ii][jj][kk];
@@ -124,16 +124,16 @@ void VOF::cal_bndclr() {
         if((*alig_vn)>0.0) alpha -= ra;
         (*alig_vm) *= g;
 
-        stagphim = calc_v(alpha*qa, vm1*qa, vm2*qa, vm3*qa)*g*dV(ii,jj,kk);
+        stagscpm = calc_v(alpha*qa, vm1*qa, vm2*qa, vm3*qa)*g*dV(ii,jj,kk);
       }
 
 #if 0
       if(j==i-1&&m==Comp::i())
-      boil::oout<<"VOF::bdclr "<<i<<" "<<stagphip<<" "<<stagphim<<" "<<(*bndclr).dV(m,i,j,k)<<boil::endl;
+      boil::oout<<"VOF::bdclr "<<i<<" "<<stagscpp<<" "<<stagscpm<<" "<<(*bndclr).dV(m,i,j,k)<<boil::endl;
 #endif
 
     
-      (*bndclr)[m][i][j][k] = (stagphip+stagphim)/(*bndclr).dV(m,i,j,k);
+      (*bndclr)[m][i][j][k] = (stagscpp+stagscpm)/(*bndclr).dV(m,i,j,k);
     } /* for_wvmijk */
   } /* for_m */
 }

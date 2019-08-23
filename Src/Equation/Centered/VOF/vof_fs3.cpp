@@ -1,7 +1,7 @@
 #include "vof.h"
 
 /******************************************************************************/
-void VOF::cal_fs3() {
+void VOF::cal_fs3(const Scalar & scp) {
 /***************************************************************************//**
  \brief Calculate free-surface position between cell centers
     if there is no interface in the cell, unreal=yotta (=1e+24) is stored.
@@ -35,15 +35,15 @@ void VOF::cal_fs3() {
       continue;
   
     /* degenerate cases */
-    real clrw = phi[i-1][j][k];
-    real clre = phi[i  ][j][k];
+    real clrw = scp[i-1][j][k];
+    real clre = scp[i  ][j][k];
 
     if((clrw-phisurf)*(clre-phisurf)>0.0) 
       continue;
   
     if(  (clrw<boil::pico&&clre-1.0>-boil::pico)
        ||(clrw-1.0>-boil::pico&&clre<boil::pico)) {
-      fs[m][i][j][k] = phi.xn(i);
+      fs[m][i][j][k] = scp.xn(i);
       continue;
     }
 
@@ -60,11 +60,11 @@ void VOF::cal_fs3() {
     bool flage = (0.0-tolf <= fsxe && fsxe <= 0.5    );
 
     if     ( flagw && !flage) { /* west is real and east is not */
-      fs[m][i][j][k] = phi.xn(i-1) + phi.dxc(i-1) * fsxw;
+      fs[m][i][j][k] = scp.xn(i-1) + scp.dxc(i-1) * fsxw;
       continue;
     }
     else if(!flagw &&  flage) { /* east is real and west is not */
-      fs[m][i][j][k] = phi.xn(i) + phi.dxc(i) * fsxe;
+      fs[m][i][j][k] = scp.xn(i) + scp.dxc(i) * fsxe;
       continue;
     }
     else if( flagw &&  flage) { /* both are real */
@@ -72,16 +72,16 @@ void VOF::cal_fs3() {
       /* calculate distance between the two candidate positions */
       real fsx_diff = fsxe + 1.0 - fsxw;
       if(fabs(fsx_diff)<tolf) { /* they are close to each other */
-        fs[m][i][j][k] = phi.xn(i);
+        fs[m][i][j][k] = scp.xn(i);
       } else {  /* choose the "more real" value */
         fs[m][i][j][k] = (1.0-fsxw>fsxe) ? 
-                         phi.xn(i-1) + phi.dxc(i-1) * fsxw
-                       : phi.xn(i  ) + phi.dxc(i  ) * fsxe;
+                         scp.xn(i-1) + scp.dxc(i-1) * fsxw
+                       : scp.xn(i  ) + scp.dxc(i  ) * fsxe;
       }
       continue;
     }
 
-    fs[m][i][j][k] = phi.xn(i);
+    fs[m][i][j][k] = scp.xn(i);
   } 
   
   /******************************************
@@ -99,15 +99,15 @@ void VOF::cal_fs3() {
       continue;
                
     /* degenerate cases */
-    real clrs = phi[i][j-1][k];
-    real clrn = phi[i][j  ][k];
+    real clrs = scp[i][j-1][k];
+    real clrn = scp[i][j  ][k];
 
     if((clrs-phisurf)*(clrn-phisurf)>0.0) 
       continue;
     
     if(  (clrs<boil::pico&&clrn-1.0>-boil::pico)
        ||(clrs-1.0>-boil::pico&&clrn<boil::pico)) {
-      fs[m][i][j][k] = phi.yn(j);
+      fs[m][i][j][k] = scp.yn(j);
       continue;
     }
 
@@ -124,11 +124,11 @@ void VOF::cal_fs3() {
     bool flagn = (0.0-tolf <= fsyn && fsyn <= 0.5+tolf);
    
     if     ( flags && !flagn) { /* south is real and north is not */
-      fs[m][i][j][k] = phi.yn(j-1) + phi.dyc(j-1) * fsys;
+      fs[m][i][j][k] = scp.yn(j-1) + scp.dyc(j-1) * fsys;
       continue;
     }
     else if(!flags &&  flagn) { /* north is real and south is not */
-      fs[m][i][j][k] = phi.yn(j) + phi.dyc(j) * fsyn;
+      fs[m][i][j][k] = scp.yn(j) + scp.dyc(j) * fsyn;
       continue;
     }
     else if( flags &&  flagn) { /* both are real */
@@ -136,15 +136,15 @@ void VOF::cal_fs3() {
       /* calculate distance between the two candidate positions */
       real fsy_diff = fsyn + 1.0 - fsys;
       if(fabs(fsy_diff)<tolf) { /* they are close to each other */
-        fs[m][i][j][k] = phi.yn(j);
+        fs[m][i][j][k] = scp.yn(j);
       } else {  /* choose the "more real" value */
         fs[m][i][j][k] = (1.0-fsys>fsyn) ? 
-                         phi.yn(j-1) + phi.dyc(j-1) * fsys
-                       : phi.yn(j  ) + phi.dyc(j  ) * fsyn;
+                         scp.yn(j-1) + scp.dyc(j-1) * fsys
+                       : scp.yn(j  ) + scp.dyc(j  ) * fsyn;
       }
       continue;
     }
-    fs[m][i][j][k] = phi.yn(j);
+    fs[m][i][j][k] = scp.yn(j);
   } 
   
   /******************************************
@@ -162,15 +162,15 @@ void VOF::cal_fs3() {
       continue;
                
     /* degenerate cases */
-    real clrb = phi[i][j][k-1];
-    real clrt = phi[i][j][k  ];
+    real clrb = scp[i][j][k-1];
+    real clrt = scp[i][j][k  ];
 
     if((clrb-phisurf)*(clrt-phisurf)>0.0) 
       continue;
     
     if(  (clrb<boil::pico&&clrt-1.0>-boil::pico)
        ||(clrb-1.0>-boil::pico&&clrt<boil::pico)) {
-      fs[m][i][j][k] = phi.zn(k);
+      fs[m][i][j][k] = scp.zn(k);
       continue;
     }
 
@@ -189,11 +189,11 @@ void VOF::cal_fs3() {
     //if(i==46&&j==50&&k==76) boil::oout<<"VOF::cal_FS3 "<<fszb<<" "<<fszt<<boil::endl;
   
     if     ( flagb && !flagt) { /* south is real and north is not */
-      fs[m][i][j][k] = phi.zn(k-1) + phi.dzc(k-1) * fszb;
+      fs[m][i][j][k] = scp.zn(k-1) + scp.dzc(k-1) * fszb;
       continue;
     }
     else if(!flagb &&  flagt) { /* north is real and south is not */
-      fs[m][i][j][k] = phi.zn(k) + phi.dzc(k) * fszt;
+      fs[m][i][j][k] = scp.zn(k) + scp.dzc(k) * fszt;
       continue;
     }
     else if( flagb &&  flagt) { /* both are real */
@@ -201,25 +201,25 @@ void VOF::cal_fs3() {
       /* calculate distance between the two candidate positions */
       real fsz_diff = fszt + 1.0 - fszb;
       if(fabs(fsz_diff)<tolf) { /* they are close to each other */
-        fs[m][i][j][k] = phi.zn(k);
+        fs[m][i][j][k] = scp.zn(k);
       } else {  /* choose the "more real" value */
         fs[m][i][j][k] = (1.0-fszb>fszt) ? 
-                         phi.zn(k-1) + phi.dzc(k-1) * fszb
-                       : phi.zn(k  ) + phi.dzc(k  ) * fszt;
+                         scp.zn(k-1) + scp.dzc(k-1) * fszb
+                       : scp.zn(k  ) + scp.dzc(k  ) * fszt;
       }
       continue;
     }
-    fs[m][i][j][k] = phi.zn(k);
+    fs[m][i][j][k] = scp.zn(k);
   } 
 
   /* correct at boundaries */
   if(use_subgrid)
-    fs_bnd();
+    fs_bnd(scp);
   else
-    fs_bnd_nosubgrid();
+    fs_bnd_nosubgrid(scp);
   //fs.exchange_all();
 
-  //boil::plot->plot(fs,phi, "fs-clr", 0);
+  //boil::plot->plot(fs,scp, "fs-clr", 0);
  
   return;
 }

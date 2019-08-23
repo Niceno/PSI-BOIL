@@ -26,7 +26,7 @@ const real LZ =   LX/real(NX)*real(NZ);
 #endif
 
 #ifdef USE_VOF
-const int mSimple = 4;
+const int mSimple = 1;
 #else
 const int mSimple = 1;
 #endif
@@ -67,7 +67,7 @@ main(int argc, char * argv[]) {
   /*---------+
   |  domain  |
   +---------*/
-  Domain d(gx, gy, gz);
+  Domain d(gx, gz, gy);
 
   /*------------------+
   |  define unknowns  |
@@ -85,32 +85,32 @@ main(int argc, char * argv[]) {
 #ifdef SYM
     uvw.bc(m).add( BndCnd( Dir::imin(), BndType::symmetry() ) );
     uvw.bc(m).add( BndCnd( Dir::imax(), BndType::outlet() ) );
-    uvw.bc(m).add( BndCnd( Dir::jmin(), BndType::symmetry() ) );
-    uvw.bc(m).add( BndCnd( Dir::jmax(), BndType::outlet() ) );
+    uvw.bc(m).add( BndCnd( Dir::kmin(), BndType::symmetry() ) );
+    uvw.bc(m).add( BndCnd( Dir::kmax(), BndType::outlet() ) );
 #else
     uvw.bc(m).add( BndCnd( Dir::imin(), BndType::outlet() ) );
     uvw.bc(m).add( BndCnd( Dir::imax(), BndType::outlet() ) );
-    uvw.bc(m).add( BndCnd( Dir::jmin(), BndType::outlet() ) );
-    uvw.bc(m).add( BndCnd( Dir::jmax(), BndType::outlet() ) );
+    uvw.bc(m).add( BndCnd( Dir::kmin(), BndType::outlet() ) );
+    uvw.bc(m).add( BndCnd( Dir::kmax(), BndType::outlet() ) );
 #endif
-    uvw.bc(m).add( BndCnd( Dir::kmin(), BndType::periodic() ) );
-    uvw.bc(m).add( BndCnd( Dir::kmax(), BndType::periodic() ) );
+    uvw.bc(m).add( BndCnd( Dir::jmin(), BndType::periodic() ) );
+    uvw.bc(m).add( BndCnd( Dir::jmax(), BndType::periodic() ) );
     uvw_old(m)=uvw(m).shape();
   }
 
 #ifdef SYM
   c.bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
   c.bc().add( BndCnd( Dir::imax(), BndType::outlet() ) );
-  c.bc().add( BndCnd( Dir::jmin(), BndType::symmetry() ) );
-  c.bc().add( BndCnd( Dir::jmax(), BndType::outlet() ) );
+  c.bc().add( BndCnd( Dir::kmin(), BndType::symmetry() ) );
+  c.bc().add( BndCnd( Dir::kmax(), BndType::outlet() ) );
 #else
   c.bc().add( BndCnd( Dir::imin(), BndType::outlet() ) );
   c.bc().add( BndCnd( Dir::imax(), BndType::outlet() ) );
-  c.bc().add( BndCnd( Dir::jmin(), BndType::outlet() ) );
-  c.bc().add( BndCnd( Dir::jmax(), BndType::outlet() ) );
+  c.bc().add( BndCnd( Dir::kmin(), BndType::outlet() ) );
+  c.bc().add( BndCnd( Dir::kmax(), BndType::outlet() ) );
 #endif
-  c.bc().add( BndCnd( Dir::kmin(), BndType::periodic() ) );
-  c.bc().add( BndCnd( Dir::kmax(), BndType::periodic() ) );
+  c.bc().add( BndCnd( Dir::jmin(), BndType::periodic() ) );
+  c.bc().add( BndCnd( Dir::jmax(), BndType::periodic() ) );
 
   press=c.shape();
   p=c.shape();
@@ -325,7 +325,7 @@ main(int argc, char * argv[]) {
     }
   }
 #else
-  setup_circle_xy(c,radius,xcent,ycent);
+  setup_circle_xz(c,radius,xcent,ycent);
 #endif
 #if 1
   for_avijk(c,i,j,k)
