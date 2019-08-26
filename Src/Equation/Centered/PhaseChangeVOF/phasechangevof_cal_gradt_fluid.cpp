@@ -2,19 +2,12 @@
 using namespace std;
 
 /******************************************************************************/
-void PhaseChangeVOF::cal_gradt(const Scalar * diff_eddy) {
+void PhaseChangeVOF::cal_gradt_fluid(const Scalar * diff_eddy) {
 /***************************************************************************//**
 *  \brief calculate gradient of temperature
 *         txl,tyl,tzl: gradient of liquid tempereture in x,y,z-direction
 *         txv,tyv,tzv: gradient of vapor  tempereture in x,y,z-direction
 *******************************************************************************/
-
-  /* used by gradt_ib and gradt8 */
-  /* -> increased precision near cell centre */
-  /* achieved by switching to upwind/downwind differencing */
-  /* it is also possible to use purely upw/dwnw through the upwind_flag */
-  /* this is however not recommended <- lower precision */
-  calculate_node_temperature();
 
   for_vijk(tpr,i,j,k){
 
@@ -137,20 +130,6 @@ void PhaseChangeVOF::cal_gradt(const Scalar * diff_eddy) {
     if(kk==2)tzv[i][j][k]=tzl[i][j][k]=0.0;
 #endif
   }
-
-  gradt_ib(diff_eddy);
-  
-#if 0  /* replaced by elaborate subgrid treatment */
-  /* correct at walls */
-  insert_bc_gradt(diff_eddy);
-#endif
-
-  txl.exchange_all();
-  tyl.exchange_all();
-  tzl.exchange_all();
-  txv.exchange_all();
-  tyv.exchange_all();
-  tzv.exchange_all();
 
   return;
 }

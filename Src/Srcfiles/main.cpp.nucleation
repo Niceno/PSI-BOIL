@@ -206,7 +206,7 @@ main(int argc, char ** argv) {
   /*-------------------+
   |  time-integration  |
   +-------------------*/
-  const int  ndt = 1000;//305;//700000;
+  const int  ndt = 700000;
   const real tint = 1.0e-3;
   const int  nint2= 10000;
   const real dxmin = d.dxyz_min();
@@ -645,9 +645,9 @@ main(int argc, char ** argv) {
     /*--------------+
     |  output data  |
     +--------------*/
-    //if((time.current_time()) / (tint) >= real(iint) ) {
+    if((time.current_time()) / (tint) >= real(iint) ) {
     //if(true ) {
-    if(time.current_step()>time.total_steps()-3) {
+    //if(time.current_step()>time.total_steps()-3) {
       iint++;// = int(time.current_time() / tint);
       tpr.exchange_all();
       boil::plot->plot(uvw,c,tpr,press,mdot,(*(conc.topo.adens))

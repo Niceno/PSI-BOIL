@@ -1,18 +1,20 @@
 noinst_LIBRARIES = libPhaseChangeVOF.a
 libPhaseChangeVOF_a_SOURCES = phasechangevof.h                           \
                               phasechangevof.cpp                         \
-                              phasechangevof_cal_gradt.cpp               \
+                              phasechangevof_cal_gradt_fluid.cpp         \
+                              phasechangevof_cal_gradt_ib.cpp            \
                               phasechangevof_cal_massflux.cpp            \
+                              phasechangevof_correct_gradt_at_ib.cpp     \
                               phasechangevof_extrapolate.cpp             \
                               phasechangevof_grad_2nd.cpp                \
                               phasechangevof_gradt.cpp                   \
                               phasechangevof_gradt_gen.cpp               \
-                              phasechangevof_gradt_ib.cpp                \
                               phasechangevof_gradt8.cpp                  \
                               phasechangevof_gradt9.cpp                  \
 			      phasechangevof_finalize.cpp                \
                               phasechangevof_initialize.cpp              \
                               phasechangevof_insert_bc_ext.cpp           \
+                              phasechangevof_insert_bc_gradt_at_walls.cpp\
                               phasechangevof_interface.cpp               \
                               phasechangevof_int_distance.cpp            \
                               phasechangevof_lambda.cpp                  \

@@ -2,9 +2,11 @@
 using namespace std;
 
 /******************************************************************************/
-void PhaseChangeVOF::insert_bc_gradt(const Scalar * diff_eddy) {
+void PhaseChangeVOF::insert_bc_gradt_at_walls(const Scalar * diff_eddy) {
 /***************************************************************************//**
-*  \brief correct gradient of temperature near walls
+*  \brief correct gradient of temperature at walls
+*         N.B. fluid values are also updated but will be overwritten during
+*         extrapolation
 *******************************************************************************/
   for(int b = 0; b < clr.bc().count(); b++) {
 
@@ -64,24 +66,30 @@ void PhaseChangeVOF::insert_bc_gradt(const Scalar * diff_eddy) {
               dist = clr.dxc(ii)/2.0 - dist;
               if(clr[ii][jj][kk]>=clrsurf) {
                 txv[ii][jj][kk] = (tw-ti)/dist * real(dir);
+                txv[i ][j ][k ] = (tw-ti)/dist * real(dir);
               } else {
                 txl[ii][jj][kk] = (tw-ti)/dist * real(dir);
+                txl[i ][j ][k ] = (tw-ti)/dist * real(dir);
               }
             } else if(mcomp==Comp::j()) {             
               dist = distance_y(ii,jj,kk,dir,ti);
               dist = clr.dyc(jj)/2.0 - dist;
               if(clr[ii][jj][kk]>=clrsurf) {
                 tyv[ii][jj][kk] = (tw-ti)/dist * real(dir);
+                tyv[i ][j ][k ] = (tw-ti)/dist * real(dir);
               } else {
                 tyl[ii][jj][kk] = (tw-ti)/dist * real(dir);
+                tyl[i ][j ][k ] = (tw-ti)/dist * real(dir);
               }
             } else {
               dist = distance_z(ii,jj,kk,dir,ti);
               dist = clr.dzc(kk)/2.0 - dist;
               if(clr[ii][jj][kk]>=clrsurf) {
                 tzv[ii][jj][kk] = (tw-ti)/dist * real(dir);
+                tzv[i ][j ][k ] = (tw-ti)/dist * real(dir);
               } else {
                 tzl[ii][jj][kk] = (tw-ti)/dist * real(dir);
+                tzl[i ][j ][k ] = (tw-ti)/dist * real(dir);
               }
             }
           }
@@ -90,4 +98,6 @@ void PhaseChangeVOF::insert_bc_gradt(const Scalar * diff_eddy) {
       } /* dir not undefined */
     } /* is wall? */
   } /* loop over bcs */
+
+  return;
 }

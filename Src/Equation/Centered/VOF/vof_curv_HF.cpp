@@ -112,12 +112,22 @@ void VOF::curv_HF() {
         /* check stencil size */
         int imin=-3;
         int imax=3;  // normal stencil size 7 (=3+1+3)
-        if (iminc) imin=max(-3,si()-i);  // limit stencil size for cut-stencil
-        if (imaxc) imax=min( 3,ei()-i);
-        if (dom->ibody().off(i-1,j,k)) { imin=-1; }  // use wall adjacent phi
-        else if(dom->ibody().off(i-2,j,k)) { imin=-2; } // in solid
-        if (dom->ibody().off(i+1,j,k)) { imax=1; }
-        else if(dom->ibody().off(i+2,j,k)) { imax=2; }
+
+        int imin_bnd = imin - 1; /* uses update at walls */
+        int imax_bnd = imax + 1;
+
+        if (iminc&&!iminw) imin=max(-3,si()-i);  // limit stencil size for cut-stencil
+        if (imaxc&&!imaxw) imax=min( 3,ei()-i);
+        if(iminw) { imin = max(-3,si()-i-1); imin_bnd = imin; }
+        if(imaxw) { imax = min(+3,ei()-i+1); imax_bnd = imax; }
+
+        if (dom->ibody().off(i-1,j,k)) { imin=-1; imin_bnd = imin; }  // use wall adjacent phi
+        else if(dom->ibody().off(i-2,j,k)) { imin=-2; imin_bnd = imin; } // in solid
+        else if(dom->ibody().off(i-3,j,k)) { imin=-3; imin_bnd = imin; }
+
+        if (dom->ibody().off(i+1,j,k)) { imax=1; imax_bnd = imax; }
+        else if(dom->ibody().off(i+2,j,k)) { imax=2; imax_bnd = imax; }
+        else if(dom->ibody().off(i+3,j,k)) { imax=3; imax_bnd = imax; }
 
         /* Calculate Eq. (2) in J.Lopez et al. */
         // Warning! if nxc is low accuracy (wrong sign), this algorithm
@@ -167,15 +177,23 @@ void VOF::curv_HF() {
 
         // calculate height
         for (int ii=imin; ii<=imax; ii++) {
-          hmm += stmp[i+ii][j-1][k-1]*phi.dxc(i+ii);
-          hcm += stmp[i+ii][j  ][k-1]*phi.dxc(i+ii);
-          hpm += stmp[i+ii][j+1][k-1]*phi.dxc(i+ii);
-          hmc += stmp[i+ii][j-1][k  ]*phi.dxc(i+ii);
-          hcc += stmp[i+ii][j  ][k  ]*phi.dxc(i+ii);
-          hpc += stmp[i+ii][j+1][k  ]*phi.dxc(i+ii);
-          hmp += stmp[i+ii][j-1][k+1]*phi.dxc(i+ii);
-          hcp += stmp[i+ii][j  ][k+1]*phi.dxc(i+ii); 
-          hpp += stmp[i+ii][j+1][k+1]*phi.dxc(i+ii);
+          real deltax = phi.dxc(i+ii);
+          /* increment by one for update at walls usage */
+          if(ii=imin_bnd) deltax = phi.dxc(i+imin_bnd+1);
+          if(ii=imax_bnd) deltax = phi.dxc(i+imax_bnd-1);
+          /* Warning: does not work properly if immerse body
+           * does not span the whole plane */
+          /* At the same time, update_at_walls fails then as well */
+
+          hmm += stmp[i+ii][j-1][k-1]*deltax;
+          hcm += stmp[i+ii][j  ][k-1]*deltax;
+          hpm += stmp[i+ii][j+1][k-1]*deltax;
+          hmc += stmp[i+ii][j-1][k  ]*deltax;
+          hcc += stmp[i+ii][j  ][k  ]*deltax;
+          hpc += stmp[i+ii][j+1][k  ]*deltax;
+          hmp += stmp[i+ii][j-1][k+1]*deltax;
+          hcp += stmp[i+ii][j  ][k+1]*deltax; 
+          hpp += stmp[i+ii][j+1][k+1]*deltax;
           hc  += stmp[i+ii][j  ][k  ];
         }
 
@@ -224,12 +242,22 @@ void VOF::curv_HF() {
         /* check stencil size */
         int jmin=-3;
         int jmax=3;  // normal stencil size 7 (=3+1+3)
-        if (jminc) jmin=max(-3,sj()-j);  // limit stencil size for cut-stencil
-        if (jmaxc) jmax=min( 3,ej()-j);
-        if (dom->ibody().off(i,j-1,k)) { jmin=-1; }
-        else if(dom->ibody().off(i,j-2,k)) { jmin=-2; }
-        if (dom->ibody().off(i,j+1,k)) { jmax=1; }
-        else if(dom->ibody().off(i,j+2,k)) { jmax=2; }
+        
+        int jmin_bnd = jmin - 1; /* uses update at walls */
+        int jmax_bnd = jmax + 1;
+
+        if (jminc&&!jminw) jmin=max(-3,sj()-j);  // limit stencil size for cut-stencil
+        if (jmaxc&&!jmaxw) jmax=min( 3,ej()-j);
+        if(jminw) { jmin = max(-3,sj()-j-1); jmin_bnd = jmin; }
+        if(jmaxw) { jmax = min(+3,ej()-j+1); jmax_bnd = jmax; }
+
+        if (dom->ibody().off(i,j-1,k)) { jmin=-1; jmin_bnd = jmin; }
+        else if(dom->ibody().off(i,j-2,k)) { jmin=-2; jmin_bnd = jmin; }
+        else if(dom->ibody().off(i,j-3,k)) { jmin=-3; jmin_bnd = jmin; }
+
+        if (dom->ibody().off(i,j+1,k)) { jmax=1; jmax_bnd = jmax; }
+        else if(dom->ibody().off(i,j+2,k)) { jmax=2; jmax_bnd = jmax; }
+        else if(dom->ibody().off(i,j+3,k)) { jmax=3; jmax_bnd = jmax; }
 
         /* Calculate Eq. (2) in J.Lopez et al. */
 #ifdef LOPEZ
@@ -278,15 +306,23 @@ void VOF::curv_HF() {
 
         // calculate height
         for (int jj=jmin; jj<=jmax; jj++) {
-          hmm += stmp[i-1][j+jj][k-1]*phi.dyc(j+jj);
-          hcm += stmp[i  ][j+jj][k-1]*phi.dyc(j+jj);
-          hpm += stmp[i+1][j+jj][k-1]*phi.dyc(j+jj);
-          hmc += stmp[i-1][j+jj][k  ]*phi.dyc(j+jj);
-          hcc += stmp[i  ][j+jj][k  ]*phi.dyc(j+jj);
-          hpc += stmp[i+1][j+jj][k  ]*phi.dyc(j+jj);
-          hmp += stmp[i-1][j+jj][k+1]*phi.dyc(j+jj);
-          hcp += stmp[i  ][j+jj][k+1]*phi.dyc(j+jj);
-          hpp += stmp[i+1][j+jj][k+1]*phi.dyc(j+jj);
+          real deltay = phi.dyc(j+jj);
+          /* increment by one for update at walls usage */
+          if(jj=jmin_bnd) deltay = phi.dyc(j+jmin_bnd+1);
+          if(jj=jmax_bnd) deltay = phi.dyc(j+jmax_bnd-1);
+          /* Warning: does not work properly if immerse body
+           * does not span the whole plane */
+          /* At the same time, update_at_walls fails then as well */
+
+          hmm += stmp[i-1][j+jj][k-1]*deltay;
+          hcm += stmp[i  ][j+jj][k-1]*deltay;
+          hpm += stmp[i+1][j+jj][k-1]*deltay;
+          hmc += stmp[i-1][j+jj][k  ]*deltay;
+          hcc += stmp[i  ][j+jj][k  ]*deltay;
+          hpc += stmp[i+1][j+jj][k  ]*deltay;
+          hmp += stmp[i-1][j+jj][k+1]*deltay;
+          hcp += stmp[i  ][j+jj][k+1]*deltay;
+          hpp += stmp[i+1][j+jj][k+1]*deltay;
           hc  += stmp[i  ][j+jj][k  ];
         }
 
@@ -335,13 +371,22 @@ void VOF::curv_HF() {
         /* check stencil size */
         int kmin=-3;
         int kmax=3;  // normal stencil size 7 (=3+1+3)
-        if (kminc) kmin=max(-3,sk()-k);  // limit stencil size for cut-stencil
-        if (kmaxc) kmax=min( 3,ek()-k);
 
-        if (dom->ibody().off(i,j,k-1)) { kmin=-1; }
-        else if(dom->ibody().off(i,j,k-2)) { kmin=-2; }
-        if (dom->ibody().off(i,j,k+1)) { kmax=1; }
-        else if(dom->ibody().off(i,j,k+2)) { kmax=2; }
+        int kmin_bnd = kmin - 1; /* uses update at walls */
+        int kmax_bnd = kmax + 1;
+
+        if (kminc&&!kminw) kmin=max(-3,sk()-k);  // limit stencil size for cut-stencil
+        if (kmaxc&&!kmaxw) kmax=min( 3,ek()-k);
+        if(kminw) { kmin = max(-3,sk()-k-1); kmin_bnd = kmin; }
+        if(kmaxw) { kmax = min(+3,ek()-k+1); kmax_bnd = kmax; }
+
+        if (dom->ibody().off(i,j,k-1)) { kmin=-1; kmin_bnd = kmin; }
+        else if(dom->ibody().off(i,j,k-2)) { kmin=-2; kmin_bnd = kmin; }
+        else if(dom->ibody().off(i,j,k-3)) { kmin=-3; kmin_bnd = kmin; }
+
+        if (dom->ibody().off(i,j,k+1)) { kmax=1; kmax_bnd = kmax; }
+        else if(dom->ibody().off(i,j,k+2)) { kmax=2; kmax_bnd = kmax; }
+        else if(dom->ibody().off(i,j,k+3)) { kmax=3; kmax_bnd = kmax; }
 
         /* Calculate Eq. (2) in J.Lopez et al. */
 #ifdef LOPEZ
@@ -389,15 +434,23 @@ void VOF::curv_HF() {
 
         // calculate height
         for (int kk=kmin; kk<=kmax; kk++) {    
-          hmm += stmp[i-1][j-1][k+kk]*phi.dzc(k+kk);
-          hcm += stmp[i  ][j-1][k+kk]*phi.dzc(k+kk);
-          hpm += stmp[i+1][j-1][k+kk]*phi.dzc(k+kk);
-          hmc += stmp[i-1][j  ][k+kk]*phi.dzc(k+kk);
-          hcc += stmp[i  ][j  ][k+kk]*phi.dzc(k+kk);
-          hpc += stmp[i+1][j  ][k+kk]*phi.dzc(k+kk);
-          hmp += stmp[i-1][j+1][k+kk]*phi.dzc(k+kk); 
-          hcp += stmp[i  ][j+1][k+kk]*phi.dzc(k+kk);
-          hpp += stmp[i+1][j+1][k+kk]*phi.dzc(k+kk);
+          real deltaz = phi.dzc(k+kk);
+          /* increment by one for update at walls usage */
+          if(kk=kmin_bnd) deltaz = phi.dzc(k+kmin_bnd+1);
+          if(kk=kmax_bnd) deltaz = phi.dzc(k+kmax_bnd-1);
+          /* Warning: does not work properly if immerse body
+           * does not span the whole plane */
+          /* At the same time, update_at_walls fails then as well */
+
+          hmm += stmp[i-1][j-1][k+kk]*deltaz;
+          hcm += stmp[i  ][j-1][k+kk]*deltaz;
+          hpm += stmp[i+1][j-1][k+kk]*deltaz;
+          hmc += stmp[i-1][j  ][k+kk]*deltaz;
+          hcc += stmp[i  ][j  ][k+kk]*deltaz;
+          hpc += stmp[i+1][j  ][k+kk]*deltaz;
+          hmp += stmp[i-1][j+1][k+kk]*deltaz; 
+          hcp += stmp[i  ][j+1][k+kk]*deltaz;
+          hpp += stmp[i+1][j+1][k+kk]*deltaz;
           hc  += stmp[i  ][j  ][k+kk];
         }
 

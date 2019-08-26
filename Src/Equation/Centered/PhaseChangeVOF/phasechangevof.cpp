@@ -58,6 +58,24 @@ PhaseChangeVOF::PhaseChangeVOF(const Scalar & MDOT,
   iflag   = MDOT.shape();
   for_m(m) bndtpr(m) = U(m).shape(); /* a mistake? */
 
+  for( int b=0; b<phi.bc().count(); b++ ) {
+    if(    phi.bc().type(b) == BndType::dirichlet()
+        || phi.bc().type(b) == BndType::inlet()
+        || phi.bc().type(b) == BndType::insert()
+        || phi.bc().type(b) == BndType::convective()
+       ) {
+       txv.bc().type(b) = BndType::neumann();
+       tyv.bc().type(b) = BndType::neumann();
+       tzv.bc().type(b) = BndType::neumann();
+       txl.bc().type(b) = BndType::neumann();
+       tyl.bc().type(b) = BndType::neumann();
+       tzl.bc().type(b) = BndType::neumann();
+
+       boil::oout << "Adjusting b.c.s for temperature gradients at " << b
+                  << boil::endl;
+    }
+  }
+
   /* set arguments */
   latent = LAT;
   rhol = fluid()->rho(1);

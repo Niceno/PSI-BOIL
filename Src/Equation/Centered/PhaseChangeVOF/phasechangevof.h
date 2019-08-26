@@ -72,9 +72,12 @@ class PhaseChangeVOF : public Centered {
     void mdot_cut();
 #endif
     void mdot();
-    void cal_gradt(const Scalar * diff_eddy = NULL);
+
+    void cal_gradt_fluid(const Scalar * diff_eddy = NULL);
+    void cal_gradt_ib(const Scalar * diff_eddy = NULL);
+    void correct_gradt_at_ib(const Scalar * diff_eddy = NULL);
+    void insert_bc_gradt_at_walls(const Scalar * diff_eddy = NULL);
     void gradt(const Scalar * diff_eddy = NULL);
-    void gradt_ib(const Scalar * diff_eddy = NULL);
 
     //void ext_gradt(Scalar & sca, const int iext, const Comp mcomp);
     void extrapolate(Scalar & sca, const int iext);
@@ -86,7 +89,6 @@ class PhaseChangeVOF : public Centered {
     void subgrid_gradt();
     void subgrid_setflag();
 
-    //void insert_bc_gradt(const Scalar * diff_eddy = NULL);
     void calculate_node_temperature(const Scalar * diff_eddy = NULL);
 
     real grad_2nd(const real tm0, const real tm1, const real tm2,

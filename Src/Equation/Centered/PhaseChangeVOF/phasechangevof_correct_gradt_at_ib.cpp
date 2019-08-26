@@ -3,7 +3,7 @@ using namespace std;
 
 static real grad3(real ww, real dm, real dp, real tm, real tc, real tp, real epsl);
 /******************************************************************************/
-void PhaseChangeVOF::gradt_ib(const Scalar * diff_eddy) {
+void PhaseChangeVOF::correct_gradt_at_ib(const Scalar * diff_eddy) {
 /***************************************************************************//**
 *  \brief calculate gradient of temperature near immersed bodies
 *******************************************************************************/
@@ -48,7 +48,8 @@ void PhaseChangeVOF::gradt_ib(const Scalar * diff_eddy) {
 
       /* interface in east */
       real clre = clr[i+1][j][k];
-      if((clrc-clrsurf)*(clre-clrsurf)<=0.0){
+      //if((clrc-clrsurf)*(clre-clrsurf)<=0.0){
+      if(Interface(+1,m,i,j,k)) {
         real ww = 1.0/dx_e;
         dx_e = distance_x(i,j,k,+1,t_e);
         ww *= dx_e;
@@ -90,7 +91,8 @@ void PhaseChangeVOF::gradt_ib(const Scalar * diff_eddy) {
 
       /* interface in west */
       real clrw = clr[i-1][j][k];
-      if((clrw-clrsurf)*(clrc-clrsurf)<=0.0){
+      //if((clrw-clrsurf)*(clrc-clrsurf)<=0.0){
+      if(Interface(-1,m,i,j,k)) {
         real ww = 1.0/dx_w;
         dx_w = distance_x(i,j,k,-1,t_w);
         ww *= dx_w;
@@ -139,7 +141,8 @@ void PhaseChangeVOF::gradt_ib(const Scalar * diff_eddy) {
 
       /* interface in north */
       real clrn = clr[i][j+1][k];
-      if((clrc-clrsurf)*(clrn-clrsurf)<=0.0){
+      //if((clrc-clrsurf)*(clrn-clrsurf)<=0.0){
+      if(Interface(+1,m,i,j,k)) {
         real ww = 1.0/dy_n;
         dy_n = distance_y(i,j,k,+1,t_n);
         ww *= dy_n;
@@ -181,7 +184,8 @@ void PhaseChangeVOF::gradt_ib(const Scalar * diff_eddy) {
 
       /* interface in south */
       real clrs = clr[i][j-1][k];
-      if((clrs-clrsurf)*(clrc-clrsurf)<=0.0){
+      //if((clrs-clrsurf)*(clrc-clrsurf)<=0.0){
+      if(Interface(-1,m,i,j,k)) {
         real ww = 1.0/dy_s;
         dy_s = distance_y(i,j,k,-1,t_s);
         ww *= dy_s;
@@ -230,21 +234,12 @@ void PhaseChangeVOF::gradt_ib(const Scalar * diff_eddy) {
 
       /* interface in top */
       real clrt = clr[i][j][k+1];
-      if((clrc-clrsurf)*(clrt-clrsurf)<=0.0){
+      //if((clrc-clrsurf)*(clrt-clrsurf)<=0.0){
+      if(Interface(+1,m,i,j,k)) {
         real ww = 1.0/dz_t;
         dz_t = distance_z(i,j,k,+1,t_t);
         ww *= dz_t;
 	dtdz = grad3(ww, dz_b, dz_t, t_b, t_c, t_t, epsl);
-#if 0 /* obsolete code = does the same as grad3 */
-        if (ww>epsl) {
-          real a = dz_b;
-          real b = dz_t;
-          dtdz = b*b*(t_c - t_b) +a*a*(t_t - t_c);
-          dtdz /= (a*b*(a+b));
-        } else {
-          dtdz = (t_t - t_b)/(dz_b + dz_t);
-        }
-#endif
       }
 
       /* update grad */
@@ -282,7 +277,8 @@ void PhaseChangeVOF::gradt_ib(const Scalar * diff_eddy) {
 
       /* interface in bottom */
       real clrb = clr[i][j][k-1];
-      if((clrb-clrsurf)*(clrc-clrsurf)<=0.0){
+      //if((clrb-clrsurf)*(clrc-clrsurf)<=0.0){
+      if(Interface(-1,m,i,j,k)) {
         real ww = 1.0/dz_b;
         dz_b = distance_z(i,j,k,-1,t_b);
         ww *= dz_b;
@@ -298,6 +294,7 @@ void PhaseChangeVOF::gradt_ib(const Scalar * diff_eddy) {
     }
   }
 
+#if 0
   if(dom->ibody().nccells() > 0) {
     for_ijk(i,j,k) {
       if(dom->ibody().off(i,j,k)) {
@@ -310,6 +307,7 @@ void PhaseChangeVOF::gradt_ib(const Scalar * diff_eddy) {
       }
     }
   }
+#endif
 
   return;
 }
