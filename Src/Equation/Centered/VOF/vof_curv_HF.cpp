@@ -179,8 +179,8 @@ void VOF::curv_HF() {
         for (int ii=imin; ii<=imax; ii++) {
           real deltax = phi.dxc(i+ii);
           /* increment by one for update at walls usage */
-          if(ii=imin_bnd) deltax = phi.dxc(i+imin_bnd+1);
-          if(ii=imax_bnd) deltax = phi.dxc(i+imax_bnd-1);
+          if(ii==imin_bnd) deltax = phi.dxc(i+imin_bnd+1);
+          if(ii==imax_bnd) deltax = phi.dxc(i+imax_bnd-1);
           /* Warning: does not work properly if immerse body
            * does not span the whole plane */
           /* At the same time, update_at_walls fails then as well */
@@ -308,8 +308,8 @@ void VOF::curv_HF() {
         for (int jj=jmin; jj<=jmax; jj++) {
           real deltay = phi.dyc(j+jj);
           /* increment by one for update at walls usage */
-          if(jj=jmin_bnd) deltay = phi.dyc(j+jmin_bnd+1);
-          if(jj=jmax_bnd) deltay = phi.dyc(j+jmax_bnd-1);
+          if(jj==jmin_bnd) deltay = phi.dyc(j+jmin_bnd+1);
+          if(jj==jmax_bnd) deltay = phi.dyc(j+jmax_bnd-1);
           /* Warning: does not work properly if immerse body
            * does not span the whole plane */
           /* At the same time, update_at_walls fails then as well */
@@ -436,8 +436,8 @@ void VOF::curv_HF() {
         for (int kk=kmin; kk<=kmax; kk++) {    
           real deltaz = phi.dzc(k+kk);
           /* increment by one for update at walls usage */
-          if(kk=kmin_bnd) deltaz = phi.dzc(k+kmin_bnd+1);
-          if(kk=kmax_bnd) deltaz = phi.dzc(k+kmax_bnd-1);
+          if(kk==kmin_bnd) deltaz = phi.dzc(k+kmin_bnd+1);
+          if(kk==kmax_bnd) deltaz = phi.dzc(k+kmax_bnd-1);
           /* Warning: does not work properly if immerse body
            * does not span the whole plane */
           /* At the same time, update_at_walls fails then as well */

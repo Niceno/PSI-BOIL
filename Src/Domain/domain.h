@@ -111,7 +111,33 @@ class Domain {
     bool  period(const int i) const {return per[i];}
     bool  is_dummy(const int i) const {return dummy[i];}
     //bool  cutoff(const int i, const int j) const {return ctf[i][j];}
-    bool  bnd_symmetry(const Dir d) const;
+    //bool bnd_symmetry(const Dir d) const;
+    bool bnd_symmetry(const Dir d) const {
+      int axis(0), dir(0);
+
+      if       (d==Dir::imin()) {
+        axis = 0;
+        dir  = 0;
+      } else if(d==Dir::imax()) {
+        axis = 0;
+        dir  = 1;
+      } else if(d==Dir::jmin()) {
+        axis = 1;
+        dir  = 0;
+      } else if(d==Dir::jmax()) {
+        axis = 1;
+        dir  = 1;
+      } else if(d==Dir::kmin()) {
+        axis = 2;
+        dir  = 0;
+      } else if(d==Dir::kmax()) {
+        axis = 2;
+        dir  = 1;
+      }
+
+      return ctf[axis][dir];
+    }
+
     const Domain * coarser() const {return crsr;}
     
     const Body & ibody() const {return * body;}
