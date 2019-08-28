@@ -26,6 +26,19 @@ void PhaseChangeVOF::cal_gradt_ib(const Scalar * diff_eddy) {
 
   }
 
+#if 0
+  int ii = 4, jj = 4, kk = 7;
+  real factl = solid()->lambda(ii,jj,kk)/lambdal;
+  real factv = solid()->lambda(ii,jj,kk)/lambdav;
+  boil::oout<<txl[ii][jj][kk]<<" "<<tyl[ii][jj][kk]<<" "<<tzl[ii][jj][kk]<<boil::endl;
+  kk-=1;
+  boil::oout<<txl[ii][jj][kk]<<" "<<tyl[ii][jj][kk]<<" "<<tzl[ii][jj][kk]<<boil::endl;
+  boil::oout<<txl[ii][jj][kk]/factl<<" "<<tyl[ii][jj][kk]/factl<<" "<<tzl[ii][jj][kk]/factl<<boil::endl;
+  boil::oout<<tpr[ii][jj][kk]<<" "<<tpr[ii][jj][kk+1]<<boil::endl;
+  boil::oout<<bndtpr[Comp::w()][ii][jj][kk]<<" "<<bndtpr[Comp::w()][ii][jj][kk+1]<<boil::endl;
+  boil::oout<<"---------------"<<boil::endl;
+#endif
+
   /* near interfaces */
   for(int cc=0; cc<dom->ibody().nccells(); cc++){
     int i,j,k;
@@ -125,8 +138,8 @@ void PhaseChangeVOF::cal_gradt_ib(const Scalar * diff_eddy) {
 
       real factl = lam_s/lambdal;
       real factv = lam_s/lambdav;
-      txl[i][j-1][k] = factl * (tmp_w-tmp_s)/len_s;
-      txv[i][j-1][k] = factv * (tmp_w-tmp_s)/len_s;
+      tyl[i][j-1][k] = factl * (tmp_w-tmp_s)/len_s;
+      tyv[i][j-1][k] = factv * (tmp_w-tmp_s)/len_s;
     }
 
     /* north is in wall */
@@ -155,8 +168,8 @@ void PhaseChangeVOF::cal_gradt_ib(const Scalar * diff_eddy) {
 
       real factl = lam_s/lambdal;
       real factv = lam_s/lambdav;
-      txl[i][j+1][k] = factl * (tmp_s-tmp_w)/len_s;
-      txv[i][j+1][k] = factv * (tmp_s-tmp_w)/len_s;
+      tyl[i][j+1][k] = factl * (tmp_s-tmp_w)/len_s;
+      tyv[i][j+1][k] = factv * (tmp_s-tmp_w)/len_s;
     }
 
     /* z direction */
@@ -188,8 +201,8 @@ void PhaseChangeVOF::cal_gradt_ib(const Scalar * diff_eddy) {
 
       real factl = lam_s/lambdal;
       real factv = lam_s/lambdav;
-      txl[i][j][k-1] = factl * (tmp_w-tmp_s)/len_s;
-      txv[i][j][k-1] = factv * (tmp_w-tmp_s)/len_s;
+      tzl[i][j][k-1] = factl * (tmp_w-tmp_s)/len_s;
+      tzv[i][j][k-1] = factv * (tmp_w-tmp_s)/len_s;
     }
 
     /* top is in wall */
@@ -218,10 +231,23 @@ void PhaseChangeVOF::cal_gradt_ib(const Scalar * diff_eddy) {
 
       real factl = lam_s/lambdal;
       real factv = lam_s/lambdav;
-      txl[i][j][k+1] = factl * (tmp_w-tmp_s)/len_s;
-      txv[i][j][k+1] = factv * (tmp_w-tmp_s)/len_s;
+      tzl[i][j][k+1] = factl * (tmp_w-tmp_s)/len_s;
+      tzv[i][j][k+1] = factv * (tmp_w-tmp_s)/len_s;
     }
   } /* ib cells */
+
+#if 0
+  ii = 4; jj = 4; kk = 7;
+  factl = solid()->lambda(ii,jj,kk)/lambdal;
+  factv = solid()->lambda(ii,jj,kk)/lambdav;
+  boil::oout<<txl[ii][jj][kk]<<" "<<tyl[ii][jj][kk]<<" "<<tzl[ii][jj][kk]<<boil::endl;
+  kk-=1;
+  boil::oout<<txl[ii][jj][kk]<<" "<<tyl[ii][jj][kk]<<" "<<tzl[ii][jj][kk]<<boil::endl;
+  boil::oout<<txl[ii][jj][kk]/factl<<" "<<tyl[ii][jj][kk]/factl<<" "<<tzl[ii][jj][kk]/factl<<boil::endl;
+  boil::oout<<tpr[ii][jj][kk]<<" "<<tpr[ii][jj][kk+1]<<boil::endl;
+  boil::oout<<bndtpr[Comp::w()][ii][jj][kk]<<" "<<bndtpr[Comp::w()][ii][jj][kk+1]<<boil::endl;
+  exit(0);
+#endif
     
   return;
 }
