@@ -248,6 +248,7 @@ class CIPCSL2 : public Centered {
     real beta(const real a1, const real a2, const bool b);
 
     void cal_fs();
+    void fs_bnd_nosubgrid(const Scalar & scp);
     real extrapolate_c(const Scalar & sca, const int i, const int j, const int k,
                        const int ofx, const int ofy, const int ofz,
                        const real rat);

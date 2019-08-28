@@ -3,7 +3,9 @@
 #include <string>
 #include <cstring>
 #include "update_step.cpp"
-#define USE_VOF
+//#define USE_VOF
+#define USE_PC
+#define USE_ENTH
 
 #define _GNU_SOURCE 1
 #include <fenv.h>
@@ -234,6 +236,7 @@ main(int argc, char ** argv) {
   conc.set_globalSharpen();
 #else
   VOF conc  (c,  g, kappa, uvw, time, solver);
+  conc.set_use_subgrid(true);
 #endif
   conc.set_cangle(0.0);
 
@@ -261,7 +264,7 @@ main(int argc, char ** argv) {
   nucl.set_seed_period(0.001);
 
   /* phase change */
-#if 1
+#ifdef USE_PC
   PhaseChangeVOF pc(mdot, mflx, tpr, q, c, g, f, uvw, conc.topo,
                     tsat, time, &mixed, latent, &nickel);
 #else
@@ -325,6 +328,9 @@ main(int argc, char ** argv) {
       boil::oout<<"Restart: Deny replant for this step.\n";
     }
     conc.init();
+#ifndef USE_VOF
+    conc.ancillary();
+#endif
   } else {
     boil::oout << "######################" << boil::endl;
     boil::oout << "#                    #" << boil::endl;
@@ -363,12 +369,15 @@ main(int argc, char ** argv) {
     tpr.bnd_update();
     tpr.exchange_all();
     conc.init();
+#ifndef USE_VOF
+    conc.ancillary();
+#endif
     boil::plot->plot(uvw,c,tpr,press,mdot,(*(conc.topo.adens))
                     ,"uvw-c-tpr-press-mdot-adens",0);
   }
   input.close();
 
-#if 1
+#ifdef USE_ENTH
   EnthalpyTIF enthFD(tpr, q, c, uvw, time, solver2, &mixed, tsat,
                      &nickel, conc.topo.fs, conc.topo.adens);
 #else
@@ -520,7 +529,11 @@ main(int argc, char ** argv) {
     /*---------------------------+
     |  solve transport equation  |
     +---------------------------*/
+#ifdef USE_VOF
     conc.advance(false); /* no ancillary -> done after nucleation */
+#else
+    conc.advance(); /* no ancillary -> done after nucleation */
+#endif
 
     /*---------------------------+
     |  replant seed or cut neck  |
