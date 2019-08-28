@@ -36,25 +36,29 @@ void PhaseChangeVOF::cal_gradt_ib(const Scalar * diff_eddy) {
     /* x direction */
     Comp m = Comp::u();
 
-    /* west is in wall & there is interface in west */
-    if(dom->ibody().off(i-1,j,k)&&Interface(-1,m,i,j,k)) {
+    /* west is in wall */
+    if(dom->ibody().off(i-1,j,k)) {
       real len_s = 0.5*phi.dxc(i-1);
       real lam_s = solid()->lambda(i-1,j,k);
       real tmp_s = tpr[i-1][j][k];
 
-      real tmp_f;
-      real len_f = 0.5*phi.dxc(i)-distance_x(i,j,k,-1,tmp_f);
-      real lam_f;
-      /* note the inversion */
-      if(clrc<clrsurf) {
-        lam_f=lambdal;
-        if(diff_eddy) lam_f += (*diff_eddy)[i][j][k]*cpl/rhol/turbP;
+      real tmp_w;
+      if(!Interface(-1,m,i,j,k)) {
+        tmp_w = bndtpr[m][i][j][k];
       } else {
-        lam_f=lambdav;
-        if(diff_eddy) lam_f += (*diff_eddy)[i][j][k]*cpv/rhov/turbP;
+        real tmp_f;
+        real len_f = 0.5*phi.dxc(i)-distance_x(i,j,k,-1,tmp_f);
+        real lam_f;
+        /* note the inversion */
+        if(clrc<clrsurf) {
+          lam_f=lambdal;
+          if(diff_eddy) lam_f += (*diff_eddy)[i][j][k]*cpl/rhol/turbP;
+        } else {
+          lam_f=lambdav;
+          if(diff_eddy) lam_f += (*diff_eddy)[i][j][k]*cpv/rhov/turbP;
+        }
+        tmp_w = temperature_node(len_s, lam_s, tmp_s, len_f, lam_f, tmp_f);
       }
-
-      real tmp_w = temperature_node(len_s, lam_s, tmp_s, len_f, lam_f, tmp_f);
 
       real factl = lam_s/lambdal;
       real factv = lam_s/lambdav;
@@ -62,25 +66,29 @@ void PhaseChangeVOF::cal_gradt_ib(const Scalar * diff_eddy) {
       txv[i-1][j][k] = factv * (tmp_w-tmp_s)/len_s;
     }
 
-    /* east is in wall & there is interface in east */
-    if(dom->ibody().off(i+1,j,k)&&Interface(+1,m,i,j,k)) {
+    /* east is in wall */
+    if(dom->ibody().off(i+1,j,k)) {
       real len_s = 0.5*phi.dxc(i+1);
       real lam_s = solid()->lambda(i+1,j,k);
       real tmp_s = tpr[i+1][j][k];
 
-      real tmp_f;
-      real len_f = 0.5*phi.dxc(i)-distance_x(i,j,k,+1,tmp_f);
-      real lam_f;
-      /* note the inversion */
-      if(clrc<clrsurf) {
-        lam_f=lambdal;
-        if(diff_eddy) lam_f += (*diff_eddy)[i][j][k]*cpl/rhol/turbP;
-      } else {
-        lam_f=lambdav;
-        if(diff_eddy) lam_f += (*diff_eddy)[i][j][k]*cpv/rhov/turbP;
-      } 
-
-      real tmp_w = temperature_node(len_s, lam_s, tmp_s, len_f, lam_f, tmp_f);
+      real tmp_w;
+      if(!Interface(+1,m,i,j,k)) {
+        tmp_w = bndtpr[m][i+1][j][k];
+      } else {      
+        real tmp_f;
+        real len_f = 0.5*phi.dxc(i)-distance_x(i,j,k,+1,tmp_f);
+        real lam_f;
+        /* note the inversion */
+        if(clrc<clrsurf) {
+          lam_f=lambdal;
+          if(diff_eddy) lam_f += (*diff_eddy)[i][j][k]*cpl/rhol/turbP;
+        } else {
+          lam_f=lambdav;
+          if(diff_eddy) lam_f += (*diff_eddy)[i][j][k]*cpv/rhov/turbP;
+        } 
+        tmp_w = temperature_node(len_s, lam_s, tmp_s, len_f, lam_f, tmp_f);
+      }
 
       real factl = lam_s/lambdal;
       real factv = lam_s/lambdav;
@@ -91,25 +99,29 @@ void PhaseChangeVOF::cal_gradt_ib(const Scalar * diff_eddy) {
     /* y direction */
     m = Comp::v();
  
-    /* south is in wall & there is interface in south */
-    if(dom->ibody().off(i,j-1,k)&&Interface(-1,m,i,j,k)) {
+    /* south is in wall */
+    if(dom->ibody().off(i,j-1,k)) {
       real len_s = 0.5*phi.dyc(j-1);
       real lam_s = solid()->lambda(i,j-1,k);
       real tmp_s = tpr[i][j-1][k];
 
-      real tmp_f;
-      real len_f = 0.5*phi.dyc(j)-distance_y(i,j,k,-1,tmp_f);
-      real lam_f;
-      /* note the inversion */
-      if(clrc<clrsurf) {
-        lam_f=lambdal;
-        if(diff_eddy) lam_f += (*diff_eddy)[i][j][k]*cpl/rhol/turbP;
+      real tmp_w;
+      if(!Interface(-1,m,i,j,k)) {
+        tmp_w = bndtpr[m][i][j][k];
       } else {
-        lam_f=lambdav;
-        if(diff_eddy) lam_f += (*diff_eddy)[i][j][k]*cpv/rhov/turbP;
+        real tmp_f;
+        real len_f = 0.5*phi.dyc(j)-distance_y(i,j,k,-1,tmp_f);
+        real lam_f;
+        /* note the inversion */
+        if(clrc<clrsurf) {
+          lam_f=lambdal;
+          if(diff_eddy) lam_f += (*diff_eddy)[i][j][k]*cpl/rhol/turbP;
+        } else {
+          lam_f=lambdav;
+          if(diff_eddy) lam_f += (*diff_eddy)[i][j][k]*cpv/rhov/turbP;
+        }
+        tmp_w = temperature_node(len_s, lam_s, tmp_s, len_f, lam_f, tmp_f);
       }
-
-      real tmp_w = temperature_node(len_s, lam_s, tmp_s, len_f, lam_f, tmp_f);
 
       real factl = lam_s/lambdal;
       real factv = lam_s/lambdav;
@@ -117,25 +129,29 @@ void PhaseChangeVOF::cal_gradt_ib(const Scalar * diff_eddy) {
       txv[i][j-1][k] = factv * (tmp_w-tmp_s)/len_s;
     }
 
-    /* north is in wall & there is interface in north */
-    if(dom->ibody().off(i,j+1,k)&&Interface(+1,m,i,j,k)) {
+    /* north is in wall */
+    if(dom->ibody().off(i,j+1,k)) {
       real len_s = 0.5*phi.dyc(j+1);
       real lam_s = solid()->lambda(i,j+1,k);
       real tmp_s = tpr[i][j+1][k];
 
-      real tmp_f;
-      real len_f = 0.5*phi.dyc(j)-distance_y(i,j,k,+1,tmp_f);
-      real lam_f;
-      /* note the inversion */
-      if(clrc<clrsurf) {
-        lam_f=lambdal;
-        if(diff_eddy) lam_f += (*diff_eddy)[i][j][k]*cpl/rhol/turbP;
+      real tmp_w;
+      if(!Interface(+1,m,i,j,k)) {
+        tmp_w = bndtpr[m][i][j+1][k];
       } else {
-        lam_f=lambdav;
-        if(diff_eddy) lam_f += (*diff_eddy)[i][j][k]*cpv/rhov/turbP;
+        real tmp_f;
+        real len_f = 0.5*phi.dyc(j)-distance_y(i,j,k,+1,tmp_f);
+        real lam_f;
+        /* note the inversion */
+        if(clrc<clrsurf) {
+          lam_f=lambdal;
+          if(diff_eddy) lam_f += (*diff_eddy)[i][j][k]*cpl/rhol/turbP;
+        } else {
+          lam_f=lambdav;
+          if(diff_eddy) lam_f += (*diff_eddy)[i][j][k]*cpv/rhov/turbP;
+        }
+        tmp_w = temperature_node(len_s, lam_s, tmp_s, len_f, lam_f, tmp_f);
       }
-
-      real tmp_w = temperature_node(len_s, lam_s, tmp_s, len_f, lam_f, tmp_f);
 
       real factl = lam_s/lambdal;
       real factv = lam_s/lambdav;
@@ -146,25 +162,29 @@ void PhaseChangeVOF::cal_gradt_ib(const Scalar * diff_eddy) {
     /* z direction */
     m = Comp::w();
 
-    /* bottom is in wall & there is interface in bottom */
-    if(dom->ibody().off(i,j,k-1)&&Interface(-1,m,i,j,k)) {
+    /* bottom is in wall */
+    if(dom->ibody().off(i,j,k-1)) {
       real len_s = 0.5*phi.dzc(k-1);
       real lam_s = solid()->lambda(i,j,k-1);
       real tmp_s = tpr[i][j][k-1];
 
-      real tmp_f;
-      real len_f = 0.5*phi.dzc(k)-distance_z(i,j,k,-1,tmp_f);
-      real lam_f;
-      /* note the inversion */
-      if(clrc<clrsurf) {
-        lam_f=lambdal;
-        if(diff_eddy) lam_f += (*diff_eddy)[i][j][k]*cpl/rhol/turbP;
+      real tmp_w;
+      if(!Interface(-1,m,i,j,k)) {
+        tmp_w = bndtpr[m][i][j][k];
       } else {
-        lam_f=lambdav;
-        if(diff_eddy) lam_f += (*diff_eddy)[i][j][k]*cpv/rhov/turbP;
+        real tmp_f;
+        real len_f = 0.5*phi.dzc(k)-distance_z(i,j,k,-1,tmp_f);
+        real lam_f;
+        /* note the inversion */
+        if(clrc<clrsurf) {
+          lam_f=lambdal;
+          if(diff_eddy) lam_f += (*diff_eddy)[i][j][k]*cpl/rhol/turbP;
+        } else {
+          lam_f=lambdav;
+          if(diff_eddy) lam_f += (*diff_eddy)[i][j][k]*cpv/rhov/turbP;
+        }
+        tmp_w = temperature_node(len_s, lam_s, tmp_s, len_f, lam_f, tmp_f);
       }
-
-      real tmp_w = temperature_node(len_s, lam_s, tmp_s, len_f, lam_f, tmp_f);
 
       real factl = lam_s/lambdal;
       real factv = lam_s/lambdav;
@@ -172,25 +192,29 @@ void PhaseChangeVOF::cal_gradt_ib(const Scalar * diff_eddy) {
       txv[i][j][k-1] = factv * (tmp_w-tmp_s)/len_s;
     }
 
-    /* top is in wall & there is interface in top */
-    if(dom->ibody().off(i,j,k+1)&&Interface(+1,m,i,j,k)) {
+    /* top is in wall */
+    if(dom->ibody().off(i,j,k+1)) {
       real len_s = 0.5*phi.dzc(k+1);
       real lam_s = solid()->lambda(i,j,k+1);
       real tmp_s = tpr[i][j][k+1];
 
-      real tmp_f;
-      real len_f = 0.5*phi.dzc(k)-distance_z(i,j,k,+1,tmp_f);
-      real lam_f;
-      /* note the inversion */
-      if(clrc<clrsurf) {
-        lam_f=lambdal;
-        if(diff_eddy) lam_f += (*diff_eddy)[i][j][k]*cpl/rhol/turbP;
+      real tmp_w;
+      if(!Interface(+1,m,i,j,k)) {
+        tmp_w = bndtpr[m][i][j][k+1];
       } else {
-        lam_f=lambdav;
-        if(diff_eddy) lam_f += (*diff_eddy)[i][j][k]*cpv/rhov/turbP;
+        real tmp_f;
+        real len_f = 0.5*phi.dzc(k)-distance_z(i,j,k,+1,tmp_f);
+        real lam_f;
+        /* note the inversion */
+        if(clrc<clrsurf) {
+          lam_f=lambdal;
+          if(diff_eddy) lam_f += (*diff_eddy)[i][j][k]*cpl/rhol/turbP;
+        } else {
+          lam_f=lambdav;
+          if(diff_eddy) lam_f += (*diff_eddy)[i][j][k]*cpv/rhov/turbP;
+        }
+        tmp_w = temperature_node(len_s, lam_s, tmp_s, len_f, lam_f, tmp_f);
       }
-
-      real tmp_w = temperature_node(len_s, lam_s, tmp_s, len_f, lam_f, tmp_f);
 
       real factl = lam_s/lambdal;
       real factv = lam_s/lambdav;
