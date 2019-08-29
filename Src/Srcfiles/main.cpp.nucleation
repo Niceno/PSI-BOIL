@@ -3,9 +3,10 @@
 #include <string>
 #include <cstring>
 #include "update_step.cpp"
-//#define USE_VOF
+#define USE_VOF
 #define USE_PC
 #define USE_ENTH
+#define VARIABLE
 
 #define _GNU_SOURCE 1
 #include <fenv.h>
@@ -186,6 +187,7 @@ main(int argc, char ** argv) {
   const real latent=1865.02*1000.0;
   const real twall = tsat0 + 2.694;
   const real qflux=12.2*1000.0;     // heater power [W/m2]
+  const real tsat0_K = 217.24+273.15;//0.0;
 #endif
 
   nickel.rho    (8908.0);
@@ -236,6 +238,7 @@ main(int argc, char ** argv) {
   conc.set_globalSharpen();
 #else
   VOF conc  (c,  g, kappa, uvw, time, solver);
+  //conc.set_use_subgrid(false);
   conc.set_use_subgrid(true);
 #endif
   conc.set_cangle(0.0);
@@ -252,7 +255,17 @@ main(int argc, char ** argv) {
   multigrid.max_cycles(10);
 
   /* enthalpy equation */
+#ifndef VARIABLE
   TIF tsat(tsat0);
+#else
+  const real Mv = 18.015e-3;
+  const real pi = atan(1.0) * 4.0;
+  const real R  = 8.3144621;
+  const real resist = pow(tsat0_K,1.5)/2.0/vapor.rho()->value()/latent/sqrt(Mv/(2.0*pi*R));
+  boil::oout<<"Mass transfer resistance: "<<resist<<boil::endl;
+  TIF tsat(tsat0, latent, resist, &mixed, conc.adens, mflx);
+  tsat.set_weak_limiting(tsat0,twall);
+#endif
 
   /* nucleation site */
   real rseed = 2.0*dxmin;
@@ -313,6 +326,9 @@ main(int argc, char ** argv) {
     c. load("c", ts);
 #endif
     tpr.  load("tpr", ts);
+#ifdef VARIABLE
+    (tsat.tif).load("tif",ts);
+#endif
     nucl. load("nucl", ts);
     dmicro.load("dmicro", ts);
     time.first_step(ts);
@@ -368,6 +384,12 @@ main(int argc, char ** argv) {
     }
     tpr.bnd_update();
     tpr.exchange_all();
+#ifdef VARIABLE
+   for_avijk(c,i,j,k) {
+     (tsat.tif)[i][j][k] = tpr[i][j][k];
+   }
+   //tsat.set_ur(0.01);
+#endif
     conc.init();
 #ifndef USE_VOF
     conc.ancillary();
@@ -425,6 +447,18 @@ main(int argc, char ** argv) {
         }
       }
     }
+
+#ifdef VARIABLE
+    real maxtif(0.);
+    real mintif(100000.);
+    for_vijk(tpr,i,j,k) {
+      if(tsat.tif[i][j][k]>maxtif) maxtif = tsat.tif[i][j][k];
+      if(tsat.tif[i][j][k]<mintif) mintif = tsat.tif[i][j][k];
+    }
+    boil::cart.max_real(&maxtif);
+    boil::cart.min_real(&maxtif);
+    boil::oout<<"MaxMinTif: "<<time.current_time()<<" " <<maxtif<<" "<<mintif<<boil::endl;
+#endif
 
     /*---------------+
     |  phase change  |
@@ -697,6 +731,9 @@ main(int argc, char ** argv) {
       c.save("c",  time.current_step());
 #endif
       tpr  .save("tpr",   time.current_step());
+#ifdef VARIABLE
+      (tsat.tif).save("tif",   time.current_step());
+#endif
       nucl .save("nucl",   time.current_step());
       dmicro.save("dmicro",time.current_step());
       if( boil::cart.iam()==0) {
@@ -726,6 +763,9 @@ main(int argc, char ** argv) {
       c.save("c",  time.current_step());
 #endif
       tpr  .save("tpr",   time.current_step());
+#ifdef VARIABLE
+      (tsat.tif).save("tif",   time.current_step());
+#endif
       nucl .save("nucl",   time.current_step());
       dmicro.save("dmicro",time.current_step());
       std::fstream output;
@@ -748,7 +788,11 @@ main(int argc, char ** argv) {
       c.rm("c", ts);
 #endif
       tpr  .rm("tpr", ts);
+#ifdef VARIABLE
+      (tsat.tif).rm("tif",ts);
+#endif
       nucl .rm("nucl", ts);
+      dmicro .rm("dmicro", ts);
       exit(0); 
     }
   }
