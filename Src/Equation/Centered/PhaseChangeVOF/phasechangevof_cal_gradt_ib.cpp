@@ -55,6 +55,11 @@ void PhaseChangeVOF::cal_gradt_ib(const Scalar * diff_eddy) {
       real lam_s = solid()->lambda(i-1,j,k);
       real tmp_s = tpr[i-1][j][k];
 
+      if(boil::realistic(bndtpr[m][i-1][j][k])) {
+        tmp_s = bndtpr[m][i-1][j][k];
+        len_s *= 2.0;
+      }
+
       real tmp_w;
       if(!Interface(-1,m,i,j,k)) {
         tmp_w = bndtpr[m][i][j][k];
@@ -84,6 +89,11 @@ void PhaseChangeVOF::cal_gradt_ib(const Scalar * diff_eddy) {
       real len_s = 0.5*phi.dxc(i+1);
       real lam_s = solid()->lambda(i+1,j,k);
       real tmp_s = tpr[i+1][j][k];
+
+      if(boil::realistic(bndtpr[m][i+2][j][k])) {
+        tmp_s = bndtpr[m][i+2][j][k];
+        len_s *= 2.0;
+      }
 
       real tmp_w;
       if(!Interface(+1,m,i,j,k)) {
@@ -118,6 +128,11 @@ void PhaseChangeVOF::cal_gradt_ib(const Scalar * diff_eddy) {
       real lam_s = solid()->lambda(i,j-1,k);
       real tmp_s = tpr[i][j-1][k];
 
+      if(boil::realistic(bndtpr[m][i][j-1][k])) {
+        tmp_s = bndtpr[m][i][j-1][k];
+        len_s *= 2.0;
+      }
+
       real tmp_w;
       if(!Interface(-1,m,i,j,k)) {
         tmp_w = bndtpr[m][i][j][k];
@@ -147,6 +162,11 @@ void PhaseChangeVOF::cal_gradt_ib(const Scalar * diff_eddy) {
       real len_s = 0.5*phi.dyc(j+1);
       real lam_s = solid()->lambda(i,j+1,k);
       real tmp_s = tpr[i][j+1][k];
+
+      if(boil::realistic(bndtpr[m][i][j+2][k])) {
+        tmp_s = bndtpr[m][i][j+2][k];
+        len_s *= 2.0;
+      }
 
       real tmp_w;
       if(!Interface(+1,m,i,j,k)) {
@@ -181,6 +201,11 @@ void PhaseChangeVOF::cal_gradt_ib(const Scalar * diff_eddy) {
       real lam_s = solid()->lambda(i,j,k-1);
       real tmp_s = tpr[i][j][k-1];
 
+      if(boil::realistic(bndtpr[m][i][j][k-1])) {
+        tmp_s = bndtpr[m][i][j][k-1];
+        len_s *= 2.0;
+      }
+
       real tmp_w;
       if(!Interface(-1,m,i,j,k)) {
         tmp_w = bndtpr[m][i][j][k];
@@ -210,6 +235,11 @@ void PhaseChangeVOF::cal_gradt_ib(const Scalar * diff_eddy) {
       real len_s = 0.5*phi.dzc(k+1);
       real lam_s = solid()->lambda(i,j,k+1);
       real tmp_s = tpr[i][j][k+1];
+
+      if(boil::realistic(bndtpr[m][i][j][k+2])) {
+        tmp_s = bndtpr[m][i][j][k+2];
+        len_s *= 2.0;
+      }
 
       real tmp_w;
       if(!Interface(+1,m,i,j,k)) {
