@@ -4,6 +4,9 @@
 
 /******************************************************************************/
 void Momentum::scale_outlet_velocity(const real ubo, const real ratio) {
+  
+  if(time->current_step()==1)
+    boil::oout<<"Spherical outlet is used for this calculation."<<boil::endl;
 
 #ifdef TWODXY
   #ifdef SYM
