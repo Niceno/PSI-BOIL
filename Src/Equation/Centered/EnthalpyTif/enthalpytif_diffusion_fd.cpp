@@ -253,7 +253,7 @@ void EnthalpyTIF::diffusion_fd(const Scalar * diff_eddy) {
         real am, ac, ap;
         real tm, tc, tp;
         real aflagm, aflagp;
-        real area;
+        real aream, areap;
 
         onm=dom->ibody().on (i-ii,j-jj,k-kk);
         onc=dom->ibody().on (i   ,j   ,k   );
@@ -270,7 +270,8 @@ void EnthalpyTIF::diffusion_fd(const Scalar * diff_eddy) {
 	if(m==Comp::i()){
           dxm=phi.dxw(i);
           dxp=phi.dxe(i);
-          area = dSx(i,j,k);
+          aream = dSx(Sign::neg(),i,j,k);
+          areap = dSx(Sign::pos(),i,j,k);
           fdm=dom->ibody().fdxw(i,j,k);
           fdp=dom->ibody().fdxe(i,j,k);
           fdms=dom->ibody().fdxe(i-1,j,k);
@@ -278,7 +279,8 @@ void EnthalpyTIF::diffusion_fd(const Scalar * diff_eddy) {
         } else if(m==Comp::j()){
           dxm=phi.dys(j);
           dxp=phi.dyn(j);
-          area = dSy(i,j,k);
+          aream = dSy(Sign::neg(),i,j,k);
+          areap = dSy(Sign::pos(),i,j,k);
           fdm=dom->ibody().fdys(i,j,k);
           fdp=dom->ibody().fdyn(i,j,k);
           fdms=dom->ibody().fdyn(i,j-1,k);
@@ -286,7 +288,8 @@ void EnthalpyTIF::diffusion_fd(const Scalar * diff_eddy) {
         } else {
           dxm=phi.dzb(k);
           dxp=phi.dzt(k);
-          area = dSz(i,j,k);
+          aream = dSz(Sign::neg(),i,j,k);
+          areap = dSz(Sign::pos(),i,j,k);
           fdm=dom->ibody().fdzb(i,j,k);
           fdp=dom->ibody().fdzt(i,j,k);
           fdms=dom->ibody().fdzt(i,j,k-1);
@@ -304,7 +307,7 @@ void EnthalpyTIF::diffusion_fd(const Scalar * diff_eddy) {
         diff_matrix(am, ac, ap
                   , tm, tc, tp
                   , aflagm, aflagp
-                  , vol, area
+                  , vol, aream, areap
                   , onm, onc, onp, ofm, ofc, ofp
                   , lsm, lsc, lsp
                   , clm, clc, clp

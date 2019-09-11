@@ -88,12 +88,24 @@ Vector::Vector(const Vector * v) : aliav(true), vec(v->vec) {
     pnt_dyn[~m] = v->pnt_dyn[~m]; 
     pnt_dzb[~m] = v->pnt_dzb[~m];
     pnt_dzt[~m] = v->pnt_dzt[~m];
+
+    pnt_dSx[~m] = v->pnt_dSx[~m];
+    pnt_dSy[~m] = v->pnt_dSy[~m];
+    pnt_dSz[~m] = v->pnt_dSz[~m];
+
+    pnt_dSx_dir[~m] = v->pnt_dSx_dir[~m];
+    pnt_dSy_dir[~m] = v->pnt_dSy_dir[~m];
+    pnt_dSz_dir[~m] = v->pnt_dSz_dir[~m];
+
+    pnt_dV[~m] = v->pnt_dV[~m];
   }
 
   dom    = v->dom;
 
   for_m(m)
     vec[m].bndcnd = v->vec[m].bndcnd;
+
+  return;
 }	
 
 /******************************************************************************/
@@ -223,6 +235,38 @@ void Vector::coordinate() {
   pnt_dzt[1] = &Vector::dzt_nrm;
   pnt_dzt[2] = &Vector::dzt_staggered;
 	
+  /* dS */
+  pnt_dSx[0] = &Vector::dSx_xstaggered;
+  pnt_dSx[1] = &Vector::dSx_ystaggered;
+  pnt_dSx[2] = &Vector::dSx_zstaggered;
+
+  pnt_dSy[0] = &Vector::dSy_xstaggered;
+  pnt_dSy[1] = &Vector::dSy_ystaggered;
+  pnt_dSy[2] = &Vector::dSy_zstaggered;
+
+  pnt_dSz[0] = &Vector::dSz_xstaggered;
+  pnt_dSz[1] = &Vector::dSz_ystaggered;
+  pnt_dSz[2] = &Vector::dSz_zstaggered;
+
+  /* dS dir */
+  pnt_dSx_dir[0] = &Vector::dSx_dir_xstaggered;
+  pnt_dSx_dir[1] = &Vector::dSx_dir_ystaggered;
+  pnt_dSx_dir[2] = &Vector::dSx_dir_zstaggered;
+
+  pnt_dSy_dir[0] = &Vector::dSy_dir_xstaggered;
+  pnt_dSy_dir[1] = &Vector::dSy_dir_ystaggered;
+  pnt_dSy_dir[2] = &Vector::dSy_dir_zstaggered;
+
+  pnt_dSz_dir[0] = &Vector::dSz_dir_xstaggered;
+  pnt_dSz_dir[1] = &Vector::dSz_dir_ystaggered;
+  pnt_dSz_dir[2] = &Vector::dSz_dir_zstaggered;
+
+  /* dV */
+  pnt_dV[0] = &Vector::dV_xstaggered;
+  pnt_dV[1] = &Vector::dV_xstaggered;
+  pnt_dV[2] = &Vector::dV_xstaggered;
+
+  return;
 }	
 
 /******************************************************************************/

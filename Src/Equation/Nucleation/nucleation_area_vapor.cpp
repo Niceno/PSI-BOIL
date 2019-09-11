@@ -36,7 +36,11 @@ real Nucleation::area_vapor(const int i
                 +(*clr)[i3][j3-1][k3  ]+(*clr)[i3  ][j3  ][k3  ]);
     clr4 = 0.25*((*clr)[i4][j4-1][k4-1]+(*clr)[i4  ][j4  ][k4-1]
                 +(*clr)[i4][j4-1][k4  ]+(*clr)[i4  ][j4  ][k4  ]);
-    area=clr->dSx(i,j,k);
+
+    if(d == Dir::imin())
+      area=clr->dSx(Sign::neg(),i,j,k);
+    else
+      area=clr->dSx(Sign::pos(),i,j,k);
 
   } else if (d == Dir::jmin() || d == Dir::jmax()) {
 
@@ -51,7 +55,11 @@ real Nucleation::area_vapor(const int i
                 +(*clr)[i3-1][j3][k3  ]+(*clr)[i3  ][j3][k3  ]);
     clr4 = 0.25*((*clr)[i4-1][j4][k4-1]+(*clr)[i4  ][j4][k4-1]
                 +(*clr)[i4-1][j4][k4  ]+(*clr)[i4  ][j4][k4  ]);
-    area=clr->dSy(i,j,k);
+
+    if(d == Dir::jmin())
+      area=clr->dSy(Sign::neg(),i,j,k);
+    else
+      area=clr->dSy(Sign::pos(),i,j,k);
 
   } else if (d == Dir::kmin() || d == Dir::kmax()) {
 
@@ -66,7 +74,11 @@ real Nucleation::area_vapor(const int i
                 +(*clr)[i3-1][j3  ][k3]+(*clr)[i3  ][j3  ][k3]);
     clr4 = 0.25*((*clr)[i4-1][j4-1][k4]+(*clr)[i4  ][j4-1][k4]
                 +(*clr)[i4-1][j4  ][k4]+(*clr)[i4  ][j4  ][k4]);
-    area=clr->dSz(i,j,k);
+
+    if(d == Dir::kmin())
+      area=clr->dSz(Sign::neg(),i,j,k);
+    else
+      area=clr->dSz(Sign::pos(),i,j,k);
 
   }
 

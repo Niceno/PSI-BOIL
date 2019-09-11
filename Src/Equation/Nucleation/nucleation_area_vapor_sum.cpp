@@ -7,7 +7,7 @@ real Nucleation::area_vapor_sum( Range<real> xr
                                , Range<real> zr ) {
 /***************************************************************************//**
 *  \brief calculate vapor area on wall
-*           assumption: wall is flat
+*           assumption: wall is flat, in the negative z-direction
 *******************************************************************************/
 
   bool bib=true;  // true: with IB,  false: without IB
@@ -26,7 +26,7 @@ real Nucleation::area_vapor_sum( Range<real> xr
         if ((*clr).zc(k)>zr.last() ) continue;
 
         c  = max(min((*clr)[i][j][k],1.0),0.0);
-        ds = clr->dSz(i,j,k);
+        ds = clr->dSz(Sign::neg(),i,j,k);
         area += (1.0-c) * ds;
 	//std::cout<<i<<" "<<j<<" "<<k<<" "<<c<<" "<<ds<<" "
         //<<(*clr).zc(k)<<" "<<zr.first()<<" "<<zr.last()<<"\n";

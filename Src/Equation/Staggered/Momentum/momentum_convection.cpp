@@ -71,8 +71,8 @@ void Momentum::convection(Vector * conv) {
     { 
     const Comp d = Comp::u(); /* transport by u */
 
-    real a_w = dSx(m,i,j,k); 
-    real a_e = dSx(m,i,j,k); 
+    real a_w = dSx(m,Sign::neg(),i,j,k); 
+    real a_e = dSx(m,Sign::pos(),i,j,k); 
     if( dom->ibody().cut(m,i,j,k) ) {
       a_w *= dom->ibody().fSw(m,i,j,k);
       a_e *= dom->ibody().fSe(m,i,j,k);
@@ -111,8 +111,8 @@ void Momentum::convection(Vector * conv) {
     { /* v */
     const Comp d = Comp::v(); /* transport by v */
 
-    real a_s = dSy(m,i,j,k); 
-    real a_n = dSy(m,i,j,k); 
+    real a_s = dSy(m,Sign::neg(),i,j,k); 
+    real a_n = dSy(m,Sign::pos(),i,j,k); 
     if( dom->ibody().cut(m,i,j,k) ) {
       a_s *= dom->ibody().fSs(m,i,j,k);
       a_n *= dom->ibody().fSn(m,i,j,k);
@@ -148,8 +148,8 @@ void Momentum::convection(Vector * conv) {
     { 
     const Comp d = Comp::w(); /* transport by w */
 
-    real a_b = dSz(m,i,j,k); 
-    real a_t = dSz(m,i,j,k); 
+    real a_b = dSz(m,Sign::neg(),i,j,k); 
+    real a_t = dSz(m,Sign::pos(),i,j,k); 
     if( dom->ibody().cut(m,i,j,k) ) {
       a_b *= dom->ibody().fSb(m,i,j,k);
       a_t *= dom->ibody().fSt(m,i,j,k);
@@ -197,8 +197,8 @@ void Momentum::convection(Vector * conv) {
     { 
     const Comp d = Comp::v(); /* transport by v */
 
-    real a_s = dSy(m,i,j,k); 
-    real a_n = dSy(m,i,j,k); 
+    real a_s = dSy(m,Sign::neg(),i,j,k); 
+    real a_n = dSy(m,Sign::pos(),i,j,k); 
     if( dom->ibody().cut(m,i,j,k) ) {
       a_s *= dom->ibody().fSs(m,i,j,k);
       a_n *= dom->ibody().fSn(m,i,j,k);
@@ -237,8 +237,8 @@ void Momentum::convection(Vector * conv) {
     { 
     const Comp d = Comp::u(); /* transport by u */
 
-    real a_w = dSx(m,i,j,k); 
-    real a_e = dSx(m,i,j,k); 
+    real a_w = dSx(m,Sign::neg(),i,j,k); 
+    real a_e = dSx(m,Sign::pos(),i,j,k); 
     if( dom->ibody().cut(m,i,j,k) ) {
       a_w *= dom->ibody().fSw(m,i,j,k);
       a_e *= dom->ibody().fSe(m,i,j,k);
@@ -274,8 +274,8 @@ void Momentum::convection(Vector * conv) {
     { 
     const Comp d = Comp::w(); /* transport by w */
 
-    real a_b = dSz(m,i,j,k); 
-    real a_t = dSz(m,i,j,k); 
+    real a_b = dSz(m,Sign::neg(),i,j,k); 
+    real a_t = dSz(m,Sign::pos(),i,j,k); 
     if( dom->ibody().cut(m,i,j,k) ) {
       a_b *= dom->ibody().fSb(m,i,j,k);
       a_t *= dom->ibody().fSt(m,i,j,k);
@@ -323,8 +323,8 @@ void Momentum::convection(Vector * conv) {
     { 
     const Comp d = Comp::w(); /* transport by w */
 
-    real a_b = dSz(m,i,j,k); 
-    real a_t = dSz(m,i,j,k); 
+    real a_b = dSz(m,Sign::neg(),i,j,k); 
+    real a_t = dSz(m,Sign::pos(),i,j,k); 
     if( dom->ibody().cut(m,i,j,k) ) {
       a_b *= dom->ibody().fSb(m,i,j,k);
       a_t *= dom->ibody().fSt(m,i,j,k);
@@ -363,8 +363,8 @@ void Momentum::convection(Vector * conv) {
     { 
     const Comp d = Comp::u(); /* transport by u */
 
-    real a_w = dSx(m,i,j,k); 
-    real a_e = dSx(m,i,j,k); 
+    real a_w = dSx(m,Sign::neg(),i,j,k); 
+    real a_e = dSx(m,Sign::pos(),i,j,k); 
     if( dom->ibody().cut(m,i,j,k) ) {
       a_w *= dom->ibody().fSw(m,i,j,k);
       a_e *= dom->ibody().fSe(m,i,j,k);
@@ -400,8 +400,8 @@ void Momentum::convection(Vector * conv) {
     { 
     const Comp d = Comp::v(); /* transport by v */
 
-    real a_s = dSy(m,i,j,k); 
-    real a_n = dSy(m,i,j,k); 
+    real a_s = dSy(m,Sign::neg(),i,j,k); 
+    real a_n = dSy(m,Sign::pos(),i,j,k); 
     if( dom->ibody().cut(m,i,j,k) ) {
       a_s *= dom->ibody().fSs(m,i,j,k);
       a_n *= dom->ibody().fSn(m,i,j,k);
@@ -436,57 +436,57 @@ void Momentum::convection(Vector * conv) {
   /* u.div(uvw) */
   m=Comp::u();
   for_mijk(m,i,j,k) {
-    real divuc= - u.domain()->dSx(i  ,j,k)*u[Comp::u()][i]  [j]  [k]
-                + u.domain()->dSx(i  ,j,k)*u[Comp::u()][i+1][j]  [k]
-                - u.domain()->dSy(i  ,j,k)*u[Comp::v()][i]  [j]  [k]
-                + u.domain()->dSy(i  ,j,k)*u[Comp::v()][i]  [j+1][k]
-                - u.domain()->dSz(i  ,j,k)*u[Comp::w()][i]  [j]  [k]
-                + u.domain()->dSz(i  ,j,k)*u[Comp::w()][i]  [j]  [k+1];
-    real divum= - u.domain()->dSx(i-1,j,k)*u[Comp::u()][i-1][j]  [k]
-                + u.domain()->dSx(i-1,j,k)*u[Comp::u()][i]  [j]  [k]
-                - u.domain()->dSy(i-1,j,k)*u[Comp::v()][i-1][j]  [k]
-                + u.domain()->dSy(i-1,j,k)*u[Comp::v()][i-1][j+1][k]
-                - u.domain()->dSz(i-1,j,k)*u[Comp::w()][i-1][j]  [k]
-                + u.domain()->dSz(i-1,j,k)*u[Comp::w()][i-1][j]  [k+1];
+    real divuc= - u.domain()->dSx(Sign::neg(),i  ,j,k)*u[Comp::u()][i]  [j]  [k]
+                + u.domain()->dSx(Sign::pos(),i  ,j,k)*u[Comp::u()][i+1][j]  [k]
+                - u.domain()->dSy(Sign::neg(),i  ,j,k)*u[Comp::v()][i]  [j]  [k]
+                + u.domain()->dSy(Sign::pos(),i  ,j,k)*u[Comp::v()][i]  [j+1][k]
+                - u.domain()->dSz(Sign::neg(),i  ,j,k)*u[Comp::w()][i]  [j]  [k]
+                + u.domain()->dSz(Sign::pos(),i  ,j,k)*u[Comp::w()][i]  [j]  [k+1];
+    real divum= - u.domain()->dSx(Sign::neg(),i-1,j,k)*u[Comp::u()][i-1][j]  [k]
+                + u.domain()->dSx(Sign::pos(),i-1,j,k)*u[Comp::u()][i]  [j]  [k]
+                - u.domain()->dSy(Sign::neg(),i-1,j,k)*u[Comp::v()][i-1][j]  [k]
+                + u.domain()->dSy(Sign::pos(),i-1,j,k)*u[Comp::v()][i-1][j+1][k]
+                - u.domain()->dSz(Sign::neg(),i-1,j,k)*u[Comp::w()][i-1][j]  [k]
+                + u.domain()->dSz(Sign::pos(),i-1,j,k)*u[Comp::w()][i-1][j]  [k+1];
     (*conv)[m][i][j][k] += u[m][i][j][k] * 0.5 * (divuc+divum);
   }
   /* v.div(uvw) */
   m=Comp::v();
   for_mijk(m,i,j,k) {
-    real divuc= - u.domain()->dSx(i,j  ,k)*u[Comp::u()][i]  [j]  [k]
-                + u.domain()->dSx(i,j  ,k)*u[Comp::u()][i+1][j]  [k]
-                - u.domain()->dSy(i,j  ,k)*u[Comp::v()][i]  [j]  [k]
-                + u.domain()->dSy(i,j  ,k)*u[Comp::v()][i]  [j+1][k]
-                - u.domain()->dSz(i,j  ,k)*u[Comp::w()][i]  [j]  [k]
-                + u.domain()->dSz(i,j  ,k)*u[Comp::w()][i]  [j]  [k+1];
-    real divum= - u.domain()->dSx(i,j-1,k)*u[Comp::u()][i]  [j-1][k]
-                + u.domain()->dSx(i,j-1,k)*u[Comp::u()][i+1][j-1][k]
-                - u.domain()->dSy(i,j-1,k)*u[Comp::v()][i]  [j-1][k]
-                + u.domain()->dSy(i,j-1,k)*u[Comp::v()][i]  [j  ][k]
-                - u.domain()->dSz(i,j-1,k)*u[Comp::w()][i]  [j-1][k]
-                + u.domain()->dSz(i,j-1,k)*u[Comp::w()][i]  [j-1][k+1];
+    real divuc= - u.domain()->dSx(Sign::neg(),i,j  ,k)*u[Comp::u()][i]  [j]  [k]
+                + u.domain()->dSx(Sign::pos(),i,j  ,k)*u[Comp::u()][i+1][j]  [k]
+                - u.domain()->dSy(Sign::neg(),i,j  ,k)*u[Comp::v()][i]  [j]  [k]
+                + u.domain()->dSy(Sign::pos(),i,j  ,k)*u[Comp::v()][i]  [j+1][k]
+                - u.domain()->dSz(Sign::neg(),i,j  ,k)*u[Comp::w()][i]  [j]  [k]
+                + u.domain()->dSz(Sign::pos(),i,j  ,k)*u[Comp::w()][i]  [j]  [k+1];
+    real divum= - u.domain()->dSx(Sign::neg(),i,j-1,k)*u[Comp::u()][i]  [j-1][k]
+                + u.domain()->dSx(Sign::pos(),i,j-1,k)*u[Comp::u()][i+1][j-1][k]
+                - u.domain()->dSy(Sign::neg(),i,j-1,k)*u[Comp::v()][i]  [j-1][k]
+                + u.domain()->dSy(Sign::pos(),i,j-1,k)*u[Comp::v()][i]  [j  ][k]
+                - u.domain()->dSz(Sign::neg(),i,j-1,k)*u[Comp::w()][i]  [j-1][k]
+                + u.domain()->dSz(Sign::pos(),i,j-1,k)*u[Comp::w()][i]  [j-1][k+1];
     (*conv)[m][i][j][k] += u[m][i][j][k] * 0.5 * (divuc+divum);
   }
   /* w.div(uvw) */
   m=Comp::w();
   for_mijk(m,i,j,k) {
-    real divuc= - u.domain()->dSx(i,j,k  )*u[Comp::u()][i]  [j]  [k]
-                + u.domain()->dSx(i,j,k  )*u[Comp::u()][i+1][j]  [k]
-                - u.domain()->dSy(i,j,k  )*u[Comp::v()][i]  [j]  [k]
-                + u.domain()->dSy(i,j,k  )*u[Comp::v()][i]  [j+1][k]
-                - u.domain()->dSz(i,j,k  )*u[Comp::w()][i]  [j]  [k]
-                + u.domain()->dSz(i,j,k  )*u[Comp::w()][i]  [j]  [k+1];
-    real divum= - u.domain()->dSx(i,j,k-1)*u[Comp::u()][i]  [j]  [k-1]
-                + u.domain()->dSx(i,j,k-1)*u[Comp::u()][i+1][j]  [k-1]
-                - u.domain()->dSy(i,j,k-1)*u[Comp::v()][i]  [j]  [k-1]
-                + u.domain()->dSy(i,j,k-1)*u[Comp::v()][i]  [j+1][k-1]
-                - u.domain()->dSz(i,j,k-1)*u[Comp::w()][i]  [j]  [k-1]
-                + u.domain()->dSz(i,j,k-1)*u[Comp::w()][i]  [j]  [k];
+    real divuc= - u.domain()->dSx(Sign::neg(),i,j,k  )*u[Comp::u()][i]  [j]  [k]
+                + u.domain()->dSx(Sign::pos(),i,j,k  )*u[Comp::u()][i+1][j]  [k]
+                - u.domain()->dSy(Sign::neg(),i,j,k  )*u[Comp::v()][i]  [j]  [k]
+                + u.domain()->dSy(Sign::pos(),i,j,k  )*u[Comp::v()][i]  [j+1][k]
+                - u.domain()->dSz(Sign::neg(),i,j,k  )*u[Comp::w()][i]  [j]  [k]
+                + u.domain()->dSz(Sign::pos(),i,j,k  )*u[Comp::w()][i]  [j]  [k+1];
+    real divum= - u.domain()->dSx(Sign::neg(),i,j,k-1)*u[Comp::u()][i]  [j]  [k-1]
+                + u.domain()->dSx(Sign::pos(),i,j,k-1)*u[Comp::u()][i+1][j]  [k-1]
+                - u.domain()->dSy(Sign::neg(),i,j,k-1)*u[Comp::v()][i]  [j]  [k-1]
+                + u.domain()->dSy(Sign::pos(),i,j,k-1)*u[Comp::v()][i]  [j+1][k-1]
+                - u.domain()->dSz(Sign::neg(),i,j,k-1)*u[Comp::w()][i]  [j]  [k-1]
+                + u.domain()->dSz(Sign::pos(),i,j,k-1)*u[Comp::w()][i]  [j]  [k];
     (*conv)[m][i][j][k] += u[m][i][j][k] * 0.5 * (divuc+divum);
   }
   #endif
 
-  /* God help me, pleae */
+  /* God help me, please */
   for_m(m)
     for_mijk(m,i,j,k) (*conv)[m][i][j][k] *= fluid()->rho(m,i,j,k);
   

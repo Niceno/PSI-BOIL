@@ -152,11 +152,18 @@ class Centered : public Equation {
     /* needed for discretization.
        avoid dxc, dyc and dzc here, use dSx, dSy, dSz and dV instead. */
     real dSx(const int i, const int j, const int k) const 
-     {return phi.dSx(i,j,k);}
+      {return phi.dSx(i,j,k);}
     real dSy(const int i, const int j, const int k) const 
-     {return phi.dSy(i,j,k);}
+      {return phi.dSy(i,j,k);}
     real dSz(const int i, const int j, const int k) const 
-     {return phi.dSz(i,j,k);}
+      {return phi.dSz(i,j,k);}
+
+    real dSx(const Sign sig, const int i, const int j, const int k) const
+      {return phi.dSx(sig,i,j,k);}
+    real dSy(const Sign sig, const int i, const int j, const int k) const
+      {return phi.dSy(sig,i,j,k);}
+    real dSz(const Sign sig, const int i, const int j, const int k) const
+      {return phi.dSz(sig,i,j,k);}
 
     void create_system_innertial(const Property * f_prop,  
                                  const Property * s_prop = NULL);

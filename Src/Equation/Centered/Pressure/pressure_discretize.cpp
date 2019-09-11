@@ -13,7 +13,7 @@ void Pressure::discretize() {
   boil::timer.start("pressure discretize");
 
   Comp m;
-  real a_x, a_y, a_z;
+  real a_w, a_e, a_s, a_n, a_b, a_t;
   real rhom, rhop;
 
   /*----------------------------+
@@ -26,9 +26,10 @@ void Pressure::discretize() {
     /* linear */
     rhom = fluid()->rho(m,i,  j,k);
     rhop = fluid()->rho(m,i+1,j,k);
-    a_x = dSx(i,j,k);
-    A.w[i][j][k] = a_x / dxw(i) / rhom;
-    A.e[i][j][k] = a_x / dxe(i) / rhop;
+    a_w = dSx(Sign::neg(),i,j,k);
+    a_e = dSx(Sign::pos(),i,j,k);
+    A.w[i][j][k] = a_w / dxw(i) / rhom;
+    A.e[i][j][k] = a_e / dxe(i) / rhop;
   }
 
   /* coefficients in j direction (s and n) */
@@ -37,9 +38,10 @@ void Pressure::discretize() {
     /* linear */
     rhom = fluid()->rho(m,i,j,  k);
     rhop = fluid()->rho(m,i,j+1,k);
-    a_y = dSy(i,j,k);
-    A.s[i][j][k] = a_y / dys(j) / rhom;
-    A.n[i][j][k] = a_y / dyn(j) / rhop;
+    a_s = dSy(Sign::neg(),i,j,k);
+    a_n = dSy(Sign::pos(),i,j,k);
+    A.s[i][j][k] = a_s / dys(j) / rhom;
+    A.n[i][j][k] = a_n / dyn(j) / rhop;
   }
 
   /* coefficients in k direction (b and t) */
@@ -48,9 +50,10 @@ void Pressure::discretize() {
     /* linear */
     rhom = fluid()->rho(m,i,j,k);
     rhop = fluid()->rho(m,i,j,k+1);
-    a_z = dSz(i,j,k);
-    A.b[i][j][k] = a_z / dzb(k) / rhom;
-    A.t[i][j][k] = a_z / dzt(k) / rhop;
+    a_b = dSz(Sign::neg(),i,j,k);
+    a_t = dSz(Sign::pos(),i,j,k);
+    A.b[i][j][k] = a_b / dzb(k) / rhom;
+    A.t[i][j][k] = a_t / dzt(k) / rhop;
   }
 
   Centered::create_system_bnd();

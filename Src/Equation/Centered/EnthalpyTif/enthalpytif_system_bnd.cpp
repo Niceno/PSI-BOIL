@@ -24,7 +24,7 @@ void EnthalpyTIF::create_system_bnd() {
 
       if( d == Dir::imin() ) 
         for_vjk(phi.bc().at(b),j,k) 
-         {//fbnd[si()][j][k] += phi.bc().value(b) * dSx(si(),j,k);
+         {//fbnd[si()][j][k] += phi.bc().value(b) * dSx(Sign::neg(),si(),j,k);
           if(!fs||!Interface(-1,Comp::i(),si(),j,k)) {
             A.c[si()][j][k] -= A.w[si()][j][k];
             A.w[si()][j][k]  = 0.0;
@@ -33,7 +33,7 @@ void EnthalpyTIF::create_system_bnd() {
 
       if( d == Dir::imax() ) 
         for_vjk(phi.bc().at(b),j,k)
-         {//fbnd[ei()][j][k] += phi.bc().value(b) * dSx(ei(),j,k);
+         {//fbnd[ei()][j][k] += phi.bc().value(b) * dSx(Sign::pos(),ei(),j,k);
           if(!fs||!Interface(+1,Comp::i(),ei(),j,k)) {
             A.c[ei()][j][k] -= A.e[ei()][j][k];
             A.e[ei()][j][k]  = 0.0;
@@ -42,7 +42,7 @@ void EnthalpyTIF::create_system_bnd() {
 
       if( d == Dir::jmin() ) 
         for_vik(phi.bc().at(b),i,k)
-         {//fbnd[i][sj()][k] += phi.bc().value(b) * dSy(i,sj(),k);
+         {//fbnd[i][sj()][k] += phi.bc().value(b) * dSy(Sign::neg(),i,sj(),k);
           if(!fs||!Interface(-1,Comp::j(),i,sj(),k)) {
             A.c[i][sj()][k] -= A.s[i][sj()][k];
             A.s[i][sj()][k]  = 0.0;
@@ -51,7 +51,7 @@ void EnthalpyTIF::create_system_bnd() {
 
       if( d == Dir::jmax() ) 
         for_vik(phi.bc().at(b),i,k)
-         {//fbnd[i][ej()][k] += phi.bc().value(b) * dSy(i,ej(),k);
+         {//fbnd[i][ej()][k] += phi.bc().value(b) * dSy(Sign::pos(),i,ej(),k);
           if(!fs||!Interface(+1,Comp::j(),i,ej(),k)) {
             A.c[i][ej()][k] -= A.n[i][ej()][k];
             A.n[i][ej()][k]  = 0.0;
@@ -60,7 +60,7 @@ void EnthalpyTIF::create_system_bnd() {
 
       if( d == Dir::kmin() ) 
         for_vij(phi.bc().at(b),i,j)
-         {//fbnd[i][j][sk()] += phi.bc().value(b) * dSz(i,j,sk());
+         {//fbnd[i][j][sk()] += phi.bc().value(b) * dSz(Sign::neg(),i,j,sk());
           if(!fs||!Interface(-1,Comp::k(),i,j,sk())) {
             A.c[i][j][sk()] -= A.b[i][j][sk()];
             A.b[i][j][sk()]  = 0.0;
@@ -69,7 +69,7 @@ void EnthalpyTIF::create_system_bnd() {
 
       if( d == Dir::kmax() ) 
         for_vij(phi.bc().at(b),i,j)
-         {//fbnd[i][j][ek()] += phi.bc().value(b) * dSz(i,j,ek());
+         {//fbnd[i][j][ek()] += phi.bc().value(b) * dSz(Sign::pos(),i,j,ek());
           if(!fs||!Interface(+1,Comp::k(),i,j,ek())) {
             A.c[i][j][ek()] -= A.t[i][j][ek()];
             A.t[i][j][ek()]  = 0.0;

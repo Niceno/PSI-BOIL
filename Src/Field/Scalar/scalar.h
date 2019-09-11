@@ -13,6 +13,7 @@
 #include "../../Global/global_minmax.h"
 #include "../../Global/global_name_file.h"
 #include "../../LookUpTable/lookuptable.h"  
+#include "../../Ravioli/sign.h"
 
 #include "scalar_acc.h"
 #include "scalar_aliases.h"
@@ -111,6 +112,13 @@ class Scalar {
      {return dom->dSy(i,j,k);}
     real dSz(const int i, const int j, const int k) const 
      {return dom->dSz(i,j,k);}
+
+    real dSx(const Sign sig, const int i, const int j, const int k) const 
+     {return dom->dSx(sig,i,j,k);}
+    real dSy(const Sign sig, const int i, const int j, const int k) const 
+     {return dom->dSy(sig,i,j,k);}
+    real dSz(const Sign sig, const int i, const int j, const int k) const 
+     {return dom->dSz(sig,i,j,k);}
 
     /* cell volume */
     real dV(const int i, const int j, const int k) const 

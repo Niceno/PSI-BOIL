@@ -43,7 +43,7 @@ void Nucleation::plant () {
             (*clr)[i][j][k]=std::min((*clr)[i][j][k],cseed);
             vol_seed += clr->dV(i,j,k) * (1.0-cseed);
             if (clr->domain()->ibody().off(i,j,k-1)) {
-              area_base += clr->dSz(i,j,k) * (1.0-cseed);
+              area_base += clr->dSz(Sign::neg(),i,j,k) * (1.0-cseed);
               kadj=k;
             }
           }

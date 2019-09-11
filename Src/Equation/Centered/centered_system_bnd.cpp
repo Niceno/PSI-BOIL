@@ -24,37 +24,37 @@ void Centered::create_system_bnd(const Property * f_prop) {
 
       if( d == Dir::imin() ) 
         for_vjk(phi.bc().at(b),j,k) 
-         {fbnd[si()][j][k] += phi.bc().value(b) * dSx(si(),j,k);
+         {fbnd[si()][j][k] += phi.bc().value(b) * dSx(Sign::neg(),si(),j,k);
           A.c[si()][j][k] -= A.w[si()][j][k];
           A.w[si()][j][k]  = 0.0;}
 
       if( d == Dir::imax() ) 
         for_vjk(phi.bc().at(b),j,k)
-         {fbnd[ei()][j][k] += phi.bc().value(b) * dSx(ei(),j,k);
+         {fbnd[ei()][j][k] += phi.bc().value(b) * dSx(Sign::pos(),ei(),j,k);
           A.c[ei()][j][k] -= A.e[ei()][j][k];
           A.e[ei()][j][k]  = 0.0;}
 
       if( d == Dir::jmin() ) 
         for_vik(phi.bc().at(b),i,k)
-         {fbnd[i][sj()][k] += phi.bc().value(b) * dSy(i,sj(),k);
+         {fbnd[i][sj()][k] += phi.bc().value(b) * dSy(Sign::neg(),i,sj(),k);
           A.c[i][sj()][k] -= A.s[i][sj()][k];
           A.s[i][sj()][k]  = 0.0;}
 
       if( d == Dir::jmax() ) 
         for_vik(phi.bc().at(b),i,k)
-         {fbnd[i][ej()][k] += phi.bc().value(b) * dSy(i,ej(),k);
+         {fbnd[i][ej()][k] += phi.bc().value(b) * dSy(Sign::pos(),i,ej(),k);
           A.c[i][ej()][k] -= A.n[i][ej()][k];
           A.n[i][ej()][k]  = 0.0;}
 
       if( d == Dir::kmin() ) 
         for_vij(phi.bc().at(b),i,j)
-         {fbnd[i][j][sk()] += phi.bc().value(b) * dSz(i,j,sk());
+         {fbnd[i][j][sk()] += phi.bc().value(b) * dSz(Sign::neg(),i,j,sk());
           A.c[i][j][sk()] -= A.b[i][j][sk()];
           A.b[i][j][sk()]  = 0.0;}
 
       if( d == Dir::kmax() ) 
         for_vij(phi.bc().at(b),i,j)
-         {fbnd[i][j][ek()] += phi.bc().value(b) * dSz(i,j,ek());
+         {fbnd[i][j][ek()] += phi.bc().value(b) * dSz(Sign::pos(),i,j,ek());
           A.c[i][j][ek()] -= A.t[i][j][ek()];
           A.t[i][j][ek()]  = 0.0;}
 
@@ -257,7 +257,7 @@ void Centered::create_system_bnd(const Property * f_prop) {
          {const real value  = phi.bc().value(b, Comp::inf());
           const real coeff  = phi.bc().value(b, Comp::coefficient());
           const real lambda = f_prop -> value(si(),j,k);
-          const real area   = dSx(si(),j,k);
+          const real area   = dSx(Sign::neg(),si(),j,k);
           const real delta  = dxw(si());
           const real factor = (lambda/delta)/(coeff+lambda/delta)*coeff*area;
           fbnd[si()][j][k] += value * factor;
@@ -271,7 +271,7 @@ void Centered::create_system_bnd(const Property * f_prop) {
          {const real value  = phi.bc().value(b, Comp::inf());
           const real coeff  = phi.bc().value(b, Comp::coefficient());
           const real lambda = f_prop -> value(si(),j,k);
-          const real area   = dSx(ei(),j,k);
+          const real area   = dSx(Sign::pos(),ei(),j,k);
           const real delta  = dxe(ei());
           const real factor = (lambda/delta)/(coeff+lambda/delta)*coeff*area;
           fbnd[ei()][j][k] += value * factor;
@@ -285,7 +285,7 @@ void Centered::create_system_bnd(const Property * f_prop) {
          {const real value  = phi.bc().value(b, Comp::inf());
           const real coeff  = phi.bc().value(b, Comp::coefficient());
           const real lambda = f_prop -> value(i,sj(),k);
-          const real area   = dSy(i,sj(),k);
+          const real area   = dSy(Sign::neg(),i,sj(),k);
           const real delta  = dys(sj());
           const real factor = (lambda/delta)/(coeff+lambda/delta)*coeff*area;
           fbnd[i][sj()][k] += value * factor;
@@ -299,7 +299,7 @@ void Centered::create_system_bnd(const Property * f_prop) {
          {const real value  = phi.bc().value(b, Comp::inf());
           const real coeff  = phi.bc().value(b, Comp::coefficient());
           const real lambda = f_prop -> value(i,ej(),k);
-          const real area   = dSy(i,ej(),k);
+          const real area   = dSy(Sign::pos(),i,ej(),k);
           const real delta  = dyn(ej());
           const real factor = (lambda/delta)/(coeff+lambda/delta)*coeff*area;
           fbnd[i][ej()][k] += value * factor;
@@ -313,7 +313,7 @@ void Centered::create_system_bnd(const Property * f_prop) {
          {const real value  = phi.bc().value(b, Comp::inf());
           const real coeff  = phi.bc().value(b, Comp::coefficient());
           const real lambda = f_prop -> value(i,j,sk());
-          const real area   = dSz(i,j,sk());
+          const real area   = dSz(Sign::neg(),i,j,sk());
           const real delta  = dzb(sk());
           const real factor = (lambda/delta)/(coeff+lambda/delta)*coeff*area;
           fbnd[i][j][sk()] += value * factor;
@@ -327,7 +327,7 @@ void Centered::create_system_bnd(const Property * f_prop) {
          {const real value  = phi.bc().value(b, Comp::inf());
           const real coeff  = phi.bc().value(b, Comp::coefficient());
           const real lambda = f_prop -> value(i,j,ek());
-          const real area   = dSz(i,j,ek());
+          const real area   = dSz(Sign::pos(),i,j,ek());
           const real delta  = dzt(ek());
           const real factor = (lambda/delta)/(coeff+lambda/delta)*coeff*area;
           fbnd[i][j][ek()] += value * factor;

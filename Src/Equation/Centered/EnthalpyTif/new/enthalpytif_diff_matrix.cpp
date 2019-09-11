@@ -1,7 +1,7 @@
 #include "enthalpytif.h"
 using namespace std;
 
-#define USE_FDM
+//#define USE_FDM
 
 /***************************************************************************//**
 *  \brief Creates diffusive part of the system matrix \f$ [A] \f$.
@@ -9,7 +9,7 @@ using namespace std;
 void EnthalpyTIF::diff_matrix(real & am, real & ac, real & ap
                 , real & tm, real & tc, real & tp
                 , real & aflagm, real & aflagp
-                , const real vol, const real aream, const real areap
+                , const real vol, const real area
                 , const bool onm, const bool onc, const bool onp
                 , const bool ofm, const bool ofc, const bool ofp
                 , const real lsm, const real lsc, const real lsp
@@ -78,8 +78,8 @@ void EnthalpyTIF::diff_matrix(real & am, real & ac, real & ap
       ap = lc * vol * 2.0 / (dxp*(dxm+dxp));
 #else
       /* FVM */
-      am = 0.5 * (lc + lm) * aream / dxm;
-      ap = 0.5 * (lc + lp) * areap / dxp;
+      am = 0.5 * (lc + lm) * area / dxm;
+      ap = 0.5 * (lc + lp) * area / dxp;
       ac = am + ap;
 #endif
 #if 0
@@ -121,8 +121,8 @@ void EnthalpyTIF::diff_matrix(real & am, real & ac, real & ap
       ap = lc*vol*2.0/(dxp*(dxm+dxp));
 #else
       /* FVM */
-      am = lc * aream / dxm * fdm*lm/((1.0-fdm)*lc+fdm*lm);
-      ap = 0.5 * (lc + lp) * areap / dxp;
+      am = lc * area / dxm * fdm*lm/((1.0-fdm)*lc+fdm*lm);
+      ap = 0.5 * (lc + lp) * area / dxp;
       ac = am + ap;
 #endif
 #if 0
@@ -164,8 +164,8 @@ void EnthalpyTIF::diff_matrix(real & am, real & ac, real & ap
       ap = lc*vol*2.0/(dxp*(dxm+dxp))*fdp*lp/((1.0-fdp)*lc+fdp*lp);
 #else
       /* FVM */
-      am = 0.5 * (lc + lm) * aream / dxm;
-      ap = lc * areap / dxp * fdp*lp/((1.0-fdp)*lc+fdp*lp);
+      am = 0.5 * (lc + lm) * area / dxm;
+      ap = lc * area / dxp * fdp*lp/((1.0-fdp)*lc+fdp*lp);
       ac = am + ap;
 #endif
 #if 0
@@ -240,8 +240,8 @@ void EnthalpyTIF::diff_matrix(real & am, real & ac, real & ap
         ap = lc * vol * 2.0 / (dxp*(dxm+dxp));
       } else { 
         /* FVM */
-        am = 0.5 * (lc + lm) * aream / dxm;
-        ap = 0.5 * (lc + lp) * areap / dxp;
+        am = 0.5 * (lc + lm) * area / dxm;
+        ap = 0.5 * (lc + lp) * area / dxp;
         ac = am + ap;
       }
 #endif
@@ -301,8 +301,8 @@ void EnthalpyTIF::diff_matrix(real & am, real & ac, real & ap
           ap = lc*vol*2.0/(dxp*(dxm+dxp));
         } else {
           /* FVM */
-          am = lc * aream / dxm * fdm * lm / (fdm*lm+(1.0-fdm)*lc);
-          ap = 0.5 * (lc + lp) * areap / dxp;
+          am = lc * area / dxm * fdm * lm / (fdm*lm+(1.0-fdm)*lc);
+          ap = 0.5 * (lc + lp) * area / dxp;
           ac = am + ap;
         }
 #endif
@@ -363,8 +363,8 @@ void EnthalpyTIF::diff_matrix(real & am, real & ac, real & ap
           ap = lc*vol*2.0/(dxp*(dxm+dxp))*fdp*lp/((1.0-fdp)*lc+fdp*lp);
         } else {
           /* FVM */
-          am = 0.5 * (lc + lm) * aream / dxm;
-          ap = lc * areap / dxp * fdp * lp / (fdp*lp+(1.0-fdp)*lc);
+          am = 0.5 * (lc + lm) * area / dxm;
+          ap = lc * area / dxp * fdp * lp / (fdp*lp+(1.0-fdp)*lc);
           ac = am + ap;
         }
 #endif

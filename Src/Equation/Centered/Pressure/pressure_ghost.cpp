@@ -28,7 +28,7 @@ void Pressure::ghost(const Scalar & c, const Scalar & kappa) {
         //std::cout<<"ghost:w";
         Comp m =  Comp::u();
         real rho = fluid()->rho(m,i,j,k);
-        real s   = dSx(i,j,k);
+        real s   = dSx(Sign::neg(),i,j,k);
         real dd  = dxw(i);
         int iphase = 1;
         if (cc<cint) iphase = -1;
@@ -40,7 +40,7 @@ void Pressure::ghost(const Scalar & c, const Scalar & kappa) {
       if ((cc-cint)*(ce-cint)<0.0) {
         Comp m =  Comp::u();
         real rho = fluid()->rho(m,i+1,j,k);
-        real s   = dSx(i+1,j,k);
+        real s   = dSx(Sign::neg(),i+1,j,k);
         real dd  = dxe(i);
         int iphase = 1;
         if (cc<cint) iphase = -1;
@@ -52,7 +52,7 @@ void Pressure::ghost(const Scalar & c, const Scalar & kappa) {
       if ((cc-cint)*(cs-cint)<0.0) {
         Comp m =  Comp::v();
         real rho = fluid()->rho(m,i,j,k);
-        real s   = dSy(i,j,k);
+        real s   = dSy(Sign::neg(),i,j,k);
         real dd  = dys(j);
         int iphase = 1;
         if (cc<cint) iphase = -1;
@@ -64,7 +64,7 @@ void Pressure::ghost(const Scalar & c, const Scalar & kappa) {
       if ((cc-cint)*(cn-cint)<0.0) {
         Comp m =  Comp::v();
         real rho = fluid()->rho(m,i,j+1,k);
-        real s   = dSy(i,j+1,k);
+        real s   = dSy(Sign::neg(),i,j+1,k);
         real dd  = dys(j);
         int iphase = 1;
         if (cc<cint) iphase = -1;
@@ -76,7 +76,7 @@ void Pressure::ghost(const Scalar & c, const Scalar & kappa) {
       if ((cc-cint)*(cb-cint)<0.0) {
         Comp m =  Comp::w();
         real rho = fluid()->rho(m,i,j,k);
-        real s   = dSz(i,j,k);
+        real s   = dSz(Sign::neg(),i,j,k);
         real dd  = dzb(k);
         int iphase = 1;
         if (cc<cint) iphase = -1;
@@ -88,7 +88,7 @@ void Pressure::ghost(const Scalar & c, const Scalar & kappa) {
       if ((cc-cint)*(ct-cint)<0.0) {
         Comp m =  Comp::w();
         real rho = fluid()->rho(m,i,j,k+1);
-        real s   = dSz(i,j,k+1);
+        real s   = dSz(Sign::neg(),i,j,k+1);
         real dd  = dzt(k);
         int iphase = 1;
         if (cc<cint) iphase = -1;
@@ -115,7 +115,7 @@ void Pressure::ghost(const Scalar & c, const Scalar & kappa) {
         //std::cout<<"ghost:w";
         Comp m =  Comp::u();
         real rho = fluid()->rho(m,i,j,k);
-        real s   = dSx(i,j,k);
+        real s   = dSx(Sign::neg(),i,j,k);
         real dd  = dxw(i);
         int iphase = 1;
         if (cc<cint) iphase = -1;
@@ -127,7 +127,7 @@ void Pressure::ghost(const Scalar & c, const Scalar & kappa) {
       if ((cc-cint)*(ce-cint)<0.0) {
         Comp m =  Comp::u();
         real rho = fluid()->rho(m,i+1,j,k);
-        real s   = dSx(i+1,j,k);
+        real s   = dSx(Sign::neg(),i+1,j,k);
         real dd  = dxe(i);
         int iphase = 1;
         if (cc<cint) iphase = -1;
@@ -139,7 +139,7 @@ void Pressure::ghost(const Scalar & c, const Scalar & kappa) {
       if ((cc-cint)*(cs-cint)<0.0) {
         Comp m =  Comp::v();
         real rho = fluid()->rho(m,i,j,k);
-        real s   = dSy(i,j,k);
+        real s   = dSy(Sign::neg(),i,j,k);
         real dd  = dys(j);
         int iphase = 1;
         if (cc<cint) iphase = -1;
@@ -151,7 +151,7 @@ void Pressure::ghost(const Scalar & c, const Scalar & kappa) {
       if ((cc-cint)*(cn-cint)<0.0) {
         Comp m =  Comp::v();
         real rho = fluid()->rho(m,i,j+1,k);
-        real s   = dSy(i,j+1,k);
+        real s   = dSy(Sign::neg(),i,j+1,k);
         real dd  = dys(j);
         int iphase = 1;
         if (cc<cint) iphase = -1;
@@ -163,7 +163,7 @@ void Pressure::ghost(const Scalar & c, const Scalar & kappa) {
       if ((cc-cint)*(cb-cint)<0.0) {
         Comp m =  Comp::w();
         real rho = fluid()->rho(m,i,j,k);
-        real s   = dSz(i,j,k);
+        real s   = dSz(Sign::neg(),i,j,k);
         real dd  = dzb(k);
         int iphase = 1;
         if (cc<cint) iphase = -1;
@@ -175,7 +175,7 @@ void Pressure::ghost(const Scalar & c, const Scalar & kappa) {
       if ((cc-cint)*(ct-cint)<0.0) {
         Comp m =  Comp::w();
         real rho = fluid()->rho(m,i,j,k+1);
-        real s   = dSz(i,j,k+1);
+        real s   = dSz(Sign::neg(),i,j,k+1);
         real dd  = dzt(k);
         int iphase = 1;
         if (cc<cint) iphase = -1;

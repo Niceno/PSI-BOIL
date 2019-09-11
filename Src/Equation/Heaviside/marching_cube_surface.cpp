@@ -2,8 +2,8 @@
 #include <iostream>
 
 /* interface to call marching_cube_surfval using cell coordinates,
-   direction and orientation, dir < 0 - negative direction and vice versa */
-real MarchingCube::surface(const int dir, const Comp & mcomp,
+   direction and orientation, sig is neg() - negative direction and vice versa */
+real MarchingCube::surface(const Sign sig, const Comp & mcomp,
                            const int i, const int j, const int k) {
   CELLFACE face;
   int isum(0);
@@ -11,8 +11,8 @@ real MarchingCube::surface(const int dir, const Comp & mcomp,
 
   if (mcomp == Comp::i()) {
     int ii = i;
-    surf = (*clr).dSx(i,j,k);
-    if (dir < 0) { ii -= 1; }
+    surf = (*clr).dSx(sig,i,j,k);
+    if (sig == Sign::neg()) { ii -= 1; }
     for (int m = 0; m != 4; m++) {
       int jj, kk;
       if(m==0)      {jj=j-1; kk=k  ;}
@@ -40,8 +40,8 @@ real MarchingCube::surface(const int dir, const Comp & mcomp,
 
   else if (mcomp == Comp::j()) {
     int jj = j;
-    surf = (*clr).dSy(i,j,k);
-    if (dir < 0) { jj -= 1; }
+    surf = (*clr).dSy(sig,i,j,k);
+    if (sig == Sign::neg()) { jj -= 1; }
     for (int m = 0; m != 4; m++) {
       int ii, kk;
       if(m==0)      {ii=i-1; kk=k  ;}       
@@ -68,8 +68,8 @@ real MarchingCube::surface(const int dir, const Comp & mcomp,
 
   else if (mcomp == Comp::k()) {
     int kk = k;
-    surf = (*clr).dSz(i,j,k);
-    if (dir < 0) { kk -= 1; }
+    surf = (*clr).dSz(sig,i,j,k);
+    if (sig == Sign::neg()) { kk -= 1; }
     for (int m = 0; m != 4; m++) {
       int ii, jj;
       if(m==0)      {ii=i-1; jj=j  ;}      

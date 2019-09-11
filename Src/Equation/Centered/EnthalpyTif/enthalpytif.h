@@ -146,7 +146,7 @@ class EnthalpyTIF : public Centered {
     void diff_matrix(real & am, real & ac, real & ap
                 , real & tm, real & tc, real & tp
                 , real & aflagm, real & aflagp
-                , const real vol, const real area
+                , const real vol, const real aream, const real areap
                 , const bool onm, const bool onc, const bool onp
                 , const bool ofm, const bool ofc, const bool ofp
                 , const real lsm, const real lsc, const real lsp

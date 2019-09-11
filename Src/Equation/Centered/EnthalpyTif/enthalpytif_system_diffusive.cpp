@@ -269,7 +269,7 @@ void EnthalpyTIF::create_system_diffusive(const Scalar * diff_eddy) {
       diff_matrix(am, ac, ap
                 , tm, tc, tp
                 , aflagm, aflagp
-                , vol, dSx(i,j,k)
+                , vol, dSx(Sign::neg(),i,j,k), dSx(Sign::pos(),i,j,k)
                 , onm, onc, onp, ofm, ofc, ofp
                 , lsm, lsc, lsp
                 , clm, clc, clp
@@ -313,7 +313,7 @@ void EnthalpyTIF::create_system_diffusive(const Scalar * diff_eddy) {
       diff_matrix(am, ac, ap
                 , tm, tc, tp
                 , aflagm, aflagp
-                , vol, dSy(i,j,k)
+                , vol, dSy(Sign::neg(),i,j,k), dSy(Sign::pos(),i,j,k)
                 , onm, onc, onp, ofm, ofc, ofp
                 , lsm, lsc, lsp
                 , clm, clc, clp
@@ -357,7 +357,7 @@ void EnthalpyTIF::create_system_diffusive(const Scalar * diff_eddy) {
       diff_matrix(am, ac, ap
                 , tm, tc, tp
                 , aflagm, aflagp
-                , vol, dSz(i,j,k)
+                , vol, dSz(Sign::neg(),i,j,k), dSy(Sign::pos(),i,j,k)
                 , onm, onc, onp, ofm, ofc, ofp
                 , lsm, lsc, lsp
                 , clm, clc, clp

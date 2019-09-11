@@ -15,6 +15,7 @@ void VOF::advance_y(Scalar & scp) {
 
     /* flux */
     real f;
+    Sign sig = Sign::neg();
 
     // upwind j-index
     int jup = j-1;
@@ -24,17 +25,17 @@ void VOF::advance_y(Scalar & scp) {
 
     if (scp[i][jup][k]<boil::pico) {
 
-      f = scp[i][jup][k] * dSy(i,j,k) * ((*u)[m][i][j][k]) * dt;
+      f = scp[i][jup][k] * dSy(sig,i,j,k) * ((*u)[m][i][j][k]) * dt;
 
     } else if(scp[i][jup][k]>1.0-boil::pico) {
 
-      f = scp[i][jup][k] * dSy(i,j,k) * ((*u)[m][i][j][k]) * dt;
+      f = scp[i][jup][k] * dSy(sig,i,j,k) * ((*u)[m][i][j][k]) * dt;
 
     } else {
 
       if (scp.dyc(jup)==0.0) {
 
-        f = scp[i][jup][k] * dSy(i,j,k) * ((*u)[m][i][j][k]) * dt;
+        f = scp[i][jup][k] * dSy(sig,i,j,k) * ((*u)[m][i][j][k]) * dt;
 
       } else {
 

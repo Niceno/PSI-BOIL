@@ -24,12 +24,12 @@ real Pressure::update_rhs() {
 
   for_ijk(i,j,k) {
 
-    real a_w = dSx(i,j,k) * time->dti(); 
-    real a_e = dSx(i,j,k) * time->dti(); 
-    real a_s = dSy(i,j,k) * time->dti(); 
-    real a_n = dSy(i,j,k) * time->dti(); 
-    real a_b = dSz(i,j,k) * time->dti(); 
-    real a_t = dSz(i,j,k) * time->dti(); 
+    real a_w = dSx(Sign::neg(),i,j,k) * time->dti(); 
+    real a_e = dSx(Sign::pos(),i,j,k) * time->dti(); 
+    real a_s = dSy(Sign::neg(),i,j,k) * time->dti(); 
+    real a_n = dSy(Sign::pos(),i,j,k) * time->dti(); 
+    real a_b = dSz(Sign::neg(),i,j,k) * time->dti(); 
+    real a_t = dSz(Sign::pos(),i,j,k) * time->dti(); 
 
     if(dom->ibody().nccells() > 0) 
       if( dom->ibody().on_p(i,j,k) ) {

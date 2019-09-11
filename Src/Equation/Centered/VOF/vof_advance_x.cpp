@@ -15,6 +15,7 @@ void VOF::advance_x(Scalar & scp) {
 
     /* flux */
     real f;
+    Sign sig = Sign::neg();
 
     // upwind i-index
     int iup = i-1;
@@ -24,17 +25,17 @@ void VOF::advance_x(Scalar & scp) {
 
     if (scp[iup][j][k] < boil::pico) {
 
-      f = scp[iup][j][k] * dSx(i,j,k) * ((*u)[m][i][j][k]) * dt;
+      f = scp[iup][j][k] * dSx(sig,i,j,k) * ((*u)[m][i][j][k]) * dt;
 
     } else if(scp[iup][j][k]>1.0-boil::pico) {
 
-      f = scp[iup][j][k] * dSx(i,j,k) * ((*u)[m][i][j][k]) * dt;
+      f = scp[iup][j][k] * dSx(sig,i,j,k) * ((*u)[m][i][j][k]) * dt;
 
     } else {
 
       if (scp.dxc(iup)==0.0 ) {
 
-        f = scp[iup][j][k] * dSx(i,j,k) * ((*u)[m][i][j][k]) * dt;
+        f = scp[iup][j][k] * dSx(sig,i,j,k) * ((*u)[m][i][j][k]) * dt;
 
       } else {
 

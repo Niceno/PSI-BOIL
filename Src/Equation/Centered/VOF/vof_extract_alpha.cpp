@@ -22,6 +22,8 @@ void VOF::extract_alpha(Scalar & scp) {
                                 nx[i][j][k],ny[i][j][k],nz[i][j][k]);
   }
 
+  nalpha.exchange_all();
+
   return;
 }
 

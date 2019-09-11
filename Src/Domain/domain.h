@@ -15,6 +15,7 @@
 #include "../Ravioli/bndgrid.h"
 #include "../Ravioli/dir.h"
 #include "../Ravioli/comp.h"
+#include "../Ravioli/sign.h"
 #include "../Ravioli/decompose.h"
 #include "../Global/global_swap.h"
 
@@ -91,22 +92,50 @@ class Domain {
     real global_max_y() const {return grid_y_original->x_max();}
     real global_max_z() const {return grid_z_original->x_max();}
 
-    /* carefull: these return global logical coordinates */
+    /* careful: these return global logical coordinates */
     int I(const real x) const;
     int J(const real y) const;
     int K(const real z) const;
 
     /* cell surfaces */
-    real dSx(const int i, const int j, const int k) const 
-     {return dyc(j) * dzc(k);}
-    real dSy(const int i, const int j, const int k) const
-     {return dxc(i) * dzc(k);}
-    real dSz(const int i, const int j, const int k) const
-     {return dxc(i) * dyc(j);}
+    virtual real dSx(const int i, const int j, const int k) const; 
+    virtual real dSy(const int i, const int j, const int k) const;
+    virtual real dSz(const int i, const int j, const int k) const;
+
+    virtual real dSx_xstag(const int i, const int j, const int k) const;
+    virtual real dSx_ystag(const int i, const int j, const int k) const;
+    virtual real dSx_zstag(const int i, const int j, const int k) const;
+
+    virtual real dSy_xstag(const int i, const int j, const int k) const;
+    virtual real dSy_ystag(const int i, const int j, const int k) const;
+    virtual real dSy_zstag(const int i, const int j, const int k) const;
+
+    virtual real dSz_xstag(const int i, const int j, const int k) const;
+    virtual real dSz_ystag(const int i, const int j, const int k) const;
+    virtual real dSz_zstag(const int i, const int j, const int k) const;
+
+    virtual real dSx(const Sign sig, const int i, const int j, const int k) const; 
+    virtual real dSy(const Sign sig, const int i, const int j, const int k) const;
+    virtual real dSz(const Sign sig, const int i, const int j, const int k) const;
+
+    virtual real dSx_xstag(const Sign sig, const int i, const int j, const int k) const;
+    virtual real dSx_ystag(const Sign sig, const int i, const int j, const int k) const;
+    virtual real dSx_zstag(const Sign sig, const int i, const int j, const int k) const;
+
+    virtual real dSy_xstag(const Sign sig, const int i, const int j, const int k) const;
+    virtual real dSy_ystag(const Sign sig, const int i, const int j, const int k) const;
+    virtual real dSy_zstag(const Sign sig, const int i, const int j, const int k) const;
+
+    virtual real dSz_xstag(const Sign sig, const int i, const int j, const int k) const;
+    virtual real dSz_ystag(const Sign sig, const int i, const int j, const int k) const;
+    virtual real dSz_zstag(const Sign sig, const int i, const int j, const int k) const;
 
     /* cell volume */
-    real dV(const int i, const int j, const int k) const 
-     {return dxc(i) * dyc(j) * dzc(k);}
+    virtual real dV(const int i, const int j, const int k) const; 
+
+    virtual real dV_xstag(const int i, const int j, const int k) const;
+    virtual real dV_ystag(const int i, const int j, const int k) const;
+    virtual real dV_zstag(const int i, const int j, const int k) const;
 
     bool  period(const int i) const {return per[i];}
     bool  is_dummy(const int i) const {return dummy[i];}

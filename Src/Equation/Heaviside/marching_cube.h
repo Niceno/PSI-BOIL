@@ -19,7 +19,7 @@ class MarchingCube {
 
     real volume(const int i, const int j, const int k);
     real area(const int i, const int j, const int k);
-    real surface(const int dir, const Comp & mcomp,
+    real surface(const Sign sig, const Comp & mcomp,
                  const int i, const int j, const int k);
  
     real area(const real p1, const real p2, const real p3,
@@ -66,7 +66,7 @@ class MarchingCube {
     real clrsurf;
     
     real surfval(CELLFACE grid, real isolevel);
-    FACEVAL faceval(const int dir, const Comp & mcomp,
+    FACEVAL faceval(const Sign sig, const Comp & mcomp,
                     const int i, const int j, const int k);
 
     XY VertexInterp2D(real isolevel, XY p1, XY p2, real valp1, real valp2);

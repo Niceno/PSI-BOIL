@@ -29,19 +29,20 @@ real EnthalpyTIF::hflux_wall(const Scalar & val, const Dir din
 
           int iof=0, jof=0, kof=0;
       	  int of(0);
-	        Comp mcomp;
+	  Comp mcomp;
+          Sign sig;
 
-          if(d == Dir::imin()) { iof++; mcomp = Comp::i(); of = -1; }
-	        if(d == Dir::imax()) { iof--; mcomp = Comp::i(); of = +1; }
-          if(d == Dir::jmin()) { jof++; mcomp = Comp::j(); of = -1; }
-	        if(d == Dir::jmax()) { jof--; mcomp = Comp::j(); of = +1; }
-          if(d == Dir::kmin()) { kof++; mcomp = Comp::k(); of = -1; }
-	        if(d == Dir::kmax()) { kof--; mcomp = Comp::k(); of = +1; }
+          if(d == Dir::imin()) { iof++; mcomp = Comp::i(); of = -1; sig = Sign::neg(); }
+          if(d == Dir::imax()) { iof--; mcomp = Comp::i(); of = +1; sig = Sign::pos(); }
+          if(d == Dir::jmin()) { jof++; mcomp = Comp::j(); of = -1; sig = Sign::neg(); }
+          if(d == Dir::jmax()) { jof--; mcomp = Comp::j(); of = +1; sig = Sign::pos(); } 
+          if(d == Dir::kmin()) { kof++; mcomp = Comp::k(); of = -1; sig = Sign::neg(); }
+          if(d == Dir::kmax()) { kof--; mcomp = Comp::k(); of = +1; sig = Sign::pos(); }
     
           for_vijk(phi.bc().at(b),i,j,k){
-            real area = fabs(iof)*val.dSx(i,j,k)
-                      + fabs(jof)*val.dSy(i,j,k)
-                      + fabs(kof)*val.dSz(i,j,k);
+            real area = fabs(iof)*val.dSx(sig,i,j,k)
+                      + fabs(jof)*val.dSy(sig,i,j,k)
+                      + fabs(kof)*val.dSz(sig,i,j,k);
             areaw += area;
             if(!fs||!Interface(of,mcomp,i+iof,j+jof,k+kof)) {
               real lc=lambdav;

@@ -8,7 +8,7 @@ void Momentum::create_system(const Scalar * mu_eddy) {
 
   real mu, rho;
   real mu_w, mu_e, mu_s, mu_n, mu_b, mu_t;
-  real a_x, a_y, a_z;
+  real a_w, a_e, a_s, a_n, a_b, a_t;
 
   /*------------------------------+
   |  coefficient due to innertia  |
@@ -69,20 +69,22 @@ void Momentum::create_system(const Scalar * mu_eddy) {
     /*----------------------------------------+ 
     |  coefficients in i direction (w and e)  |
     +----------------------------------------*/
-    a_x  = dSx(m,i,j,k); // dyc(m,j) * dzc(m,k);
+    a_w  = dSx(m,Sign::neg(),i,j,k);
+    a_e  = dSx(m,Sign::pos(),i,j,k);
     if( !mu_eddy )
      {mu_w = fluid()->mu(i-1,j,k);
       mu_e = fluid()->mu(i  ,j,k);}
     else
      {mu_w = fluid()->mu(i-1,j,k) + (*mu_eddy)[i-1][j][k];
       mu_e = fluid()->mu(i  ,j,k) + (*mu_eddy)[i]  [j][k];}
-    A[~m]->w[i][j][k] = tsc * mu_w * a_x / dxw(m,i);
-    A[~m]->e[i][j][k] = tsc * mu_e * a_x / dxe(m,i);
+    A[~m]->w[i][j][k] = tsc * mu_w * a_w / dxw(m,i);
+    A[~m]->e[i][j][k] = tsc * mu_e * a_e / dxe(m,i);
     
     /*----------------------------------------+ 
     |  coefficients in j direction (s and n)  |
     +----------------------------------------*/
-    a_y  = dSy(m,i,j,k); //dxc(m,i) * dzc(m,k);
+    a_s  = dSy(m,Sign::neg(),i,j,k);
+    a_n  = dSy(m,Sign::pos(),i,j,k);
     if( !mu_eddy )
      {mu_s = 0.25 * (mu_w + mu_e)
            + 0.25 * (fluid()->mu(i-1,j-1,k) 
@@ -97,13 +99,14 @@ void Momentum::create_system(const Scalar * mu_eddy) {
       mu_n = 0.25 * (mu_w + mu_e)
            + 0.25 * (fluid()->mu(i-1,j+1,k) + (*mu_eddy)[i-1][j+1][k]
                    + fluid()->mu(i  ,j+1,k) + (*mu_eddy)[i]  [j+1][k]);}
-    A[~m]->s[i][j][k] = tsc * mu_s * a_y / dys(m,j);
-    A[~m]->n[i][j][k] = tsc * mu_n * a_y / dyn(m,j);
+    A[~m]->s[i][j][k] = tsc * mu_s * a_s / dys(m,j);
+    A[~m]->n[i][j][k] = tsc * mu_n * a_n / dyn(m,j);
     
     /*----------------------------------------+ 
     |  coefficients in k direction (b and t)  |
     +----------------------------------------*/
-    a_z  = dSz(m,i,j,k); //dyc(m,j) * dxc(m,i);
+    a_b  = dSz(m,Sign::neg(),i,j,k);
+    a_t  = dSz(m,Sign::pos(),i,j,k);
     if( !mu_eddy )
      {mu_b = 0.25 * (mu_w + mu_e)
            + 0.25 * (fluid()->mu(i-1,j,k-1) 
@@ -118,8 +121,8 @@ void Momentum::create_system(const Scalar * mu_eddy) {
       mu_t = 0.25 * (mu_w + mu_e)
            + 0.25 * (fluid()->mu(i-1,j,k+1) + (*mu_eddy)[i-1][j][k+1]
                    + fluid()->mu(i  ,j,k+1) + (*mu_eddy)[i]  [j][k+1]);}
-    A[~m]->b[i][j][k] = tsc * mu_b * a_z / dzb(m,k);
-    A[~m]->t[i][j][k] = tsc * mu_t * a_z / dzt(m,k);
+    A[~m]->b[i][j][k] = tsc * mu_b * a_b / dzb(m,k);
+    A[~m]->t[i][j][k] = tsc * mu_t * a_t / dzt(m,k);
     
   }
 
@@ -133,20 +136,22 @@ void Momentum::create_system(const Scalar * mu_eddy) {
     /*----------------------------------------+ 
     |  coefficients in j direction (s and n)  |
     +----------------------------------------*/
-    a_y  = dSy(m,i,j,k); //dxc(m,i) * dzc(m,k);
+    a_s  = dSy(m,Sign::neg(),i,j,k);
+    a_n  = dSy(m,Sign::pos(),i,j,k);
     if( !mu_eddy )
      {mu_s = fluid()->mu(i,j-1,k);
       mu_n = fluid()->mu(i,j  ,k);}
     else
      {mu_s = fluid()->mu(i,j-1,k) + (*mu_eddy)[i][j-1][k];
       mu_n = fluid()->mu(i,j  ,k) + (*mu_eddy)[i][j]  [k];}
-    A[~m]->s[i][j][k] = tsc * mu_s * a_y / dys(m,j);
-    A[~m]->n[i][j][k] = tsc * mu_n * a_y / dyn(m,j);
+    A[~m]->s[i][j][k] = tsc * mu_s * a_s / dys(m,j);
+    A[~m]->n[i][j][k] = tsc * mu_n * a_n / dyn(m,j);
     
     /*----------------------------------------+ 
     |  coefficients in i direction (w and e)  |
     +----------------------------------------*/
-    a_x  = dSx(m,i,j,k); //dyc(m,j) * dzc(m,k);
+    a_w  = dSx(m,Sign::neg(),i,j,k);
+    a_e  = dSx(m,Sign::pos(),i,j,k);
     if( !mu_eddy )
      {mu_w = 0.25 * (mu_s + mu_n)
            + 0.25 * (fluid()->mu(i-1,j-1,k) 
@@ -161,13 +166,14 @@ void Momentum::create_system(const Scalar * mu_eddy) {
       mu_e = 0.25 * (mu_s + mu_n)
            + 0.25 * (fluid()->mu(i+1,j-1,k) + (*mu_eddy)[i+1][j-1][k] 
                    + fluid()->mu(i+1,j  ,k) + (*mu_eddy)[i+1][j]  [k]);}
-    A[~m]->w[i][j][k] = tsc * mu_w * a_x / dxw(m,i);
-    A[~m]->e[i][j][k] = tsc * mu_e * a_x / dxe(m,i);
+    A[~m]->w[i][j][k] = tsc * mu_w * a_w / dxw(m,i);
+    A[~m]->e[i][j][k] = tsc * mu_e * a_e / dxe(m,i);
     
     /*----------------------------------------+ 
     |  coefficients in k direction (b and t)  |
     +----------------------------------------*/
-    a_z  = dSz(m,i,j,k); //dyc(m,j) * dxc(m,i);
+    a_b  = dSz(m,Sign::neg(),i,j,k);
+    a_t  = dSz(m,Sign::pos(),i,j,k);
     if( !mu_eddy )
      {mu_b = 0.25 * (mu_s + mu_n)
            + 0.25 * (fluid()->mu(i,j-1,k-1) 
@@ -182,8 +188,8 @@ void Momentum::create_system(const Scalar * mu_eddy) {
       mu_t = 0.25 * (mu_s + mu_n)
            + 0.25 * (fluid()->mu(i,j-1,k+1) + (*mu_eddy)[i][j-1][k+1] 
                    + fluid()->mu(i,j  ,k+1) + (*mu_eddy)[i][j]  [k+1]);}
-    A[~m]->b[i][j][k] = tsc * mu_b * a_z / dzb(m,k);
-    A[~m]->t[i][j][k] = tsc * mu_t * a_z / dzt(m,k);
+    A[~m]->b[i][j][k] = tsc * mu_b * a_b / dzb(m,k);
+    A[~m]->t[i][j][k] = tsc * mu_t * a_t / dzt(m,k);
     
   }
 
@@ -197,20 +203,22 @@ void Momentum::create_system(const Scalar * mu_eddy) {
     /*----------------------------------------+ 
     |  coefficients in k direction (b and t)  |
     +----------------------------------------*/
-    a_z  = dSz(m,i,j,k); //dyc(m,j) * dxc(m,i);
+    a_b  = dSz(m,Sign::neg(),i,j,k);
+    a_t  = dSz(m,Sign::pos(),i,j,k);
     if( !mu_eddy )
      {mu_b = fluid()->mu(i,j,k-1);
       mu_t = fluid()->mu(i,j,k  );}
     else
      {mu_b = fluid()->mu(i,j,k-1) + (*mu_eddy)[i][j][k-1];
       mu_t = fluid()->mu(i,j,k  ) + (*mu_eddy)[i][j][k]  ;}
-    A[~m]->b[i][j][k] = tsc * mu_b * a_z / dzb(m,k);
-    A[~m]->t[i][j][k] = tsc * mu_t * a_z / dzt(m,k);
+    A[~m]->b[i][j][k] = tsc * mu_b * a_b / dzb(m,k);
+    A[~m]->t[i][j][k] = tsc * mu_t * a_t / dzt(m,k);
     
     /*----------------------------------------+ 
     |  coefficients in i direction (w and e)  |
     +----------------------------------------*/
-    a_x  = dSx(m,i,j,k); //dyc(m,j) * dzc(m,k);
+    a_w  = dSx(m,Sign::neg(),i,j,k);
+    a_e  = dSx(m,Sign::pos(),i,j,k);
     if( !mu_eddy )
      {mu_w = 0.25 * (mu_b + mu_t)
            + 0.25 * (fluid()->mu(i-1,j,k-1) 
@@ -225,13 +233,14 @@ void Momentum::create_system(const Scalar * mu_eddy) {
       mu_e = 0.25 * (mu_b + mu_t)
            + 0.25 * (fluid()->mu(i+1,j,k-1)+ (*mu_eddy)[i+1][j][k-1] 
                    + fluid()->mu(i+1,j,k  )+ (*mu_eddy)[i+1][j][k]  );}
-    A[~m]->w[i][j][k] = tsc * mu_w * a_x / dxw(m,i);
-    A[~m]->e[i][j][k] = tsc * mu_e * a_x / dxe(m,i);
+    A[~m]->w[i][j][k] = tsc * mu_w * a_w / dxw(m,i);
+    A[~m]->e[i][j][k] = tsc * mu_e * a_e / dxe(m,i);
     
     /*----------------------------------------+ 
     |  coefficients in j direction (s and n)  |
     +----------------------------------------*/
-    a_y  = dSy(m,i,j,k); //dxc(m,i) * dzc(m,k);
+    a_s  = dSy(m,Sign::neg(),i,j,k);
+    a_n  = dSy(m,Sign::pos(),i,j,k);
     if( !mu_eddy )
      {mu_s = 0.25 * (mu_b + mu_t)
            + 0.25 * (fluid()->mu(i,j-1,k-1) 
@@ -246,8 +255,8 @@ void Momentum::create_system(const Scalar * mu_eddy) {
       mu_n = 0.25 * (mu_b + mu_t)
            + 0.25 * (fluid()->mu(i,j+1,k-1)+ (*mu_eddy)[i][j+1][k-1] 
                    + fluid()->mu(i,j+1,k  )+ (*mu_eddy)[i][j+1][k]  );}
-    A[~m]->s[i][j][k] = tsc * mu_s * a_y / dys(m,j);
-    A[~m]->n[i][j][k] = tsc * mu_n * a_y / dyn(m,j);
+    A[~m]->s[i][j][k] = tsc * mu_s * a_s / dys(m,j);
+    A[~m]->n[i][j][k] = tsc * mu_n * a_n / dyn(m,j);
     
   }
 

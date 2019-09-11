@@ -59,11 +59,18 @@ class Staggered : public Equation {
 
     /* staggered cell-face areas needed for discretization */
     real dSx(const Comp & m, const int i, const int j, const int k) const
-     {return u.dSx(m,i,j,k);}
+      {return u.dSx(m,i,j,k);}
     real dSy(const Comp & m, const int i, const int j, const int k) const
-     {return u.dSy(m,i,j,k);}
+      {return u.dSy(m,i,j,k);}
     real dSz(const Comp & m, const int i, const int j, const int k) const
-     {return u.dSz(m,i,j,k);}
+      {return u.dSz(m,i,j,k);}
+
+    real dSx(const Comp & m, const Sign sig, const int i, const int j, const int k) const
+      {return u.dSx(m,sig,i,j,k);}
+    real dSy(const Comp & m, const Sign sig, const int i, const int j, const int k) const
+      {return u.dSy(m,sig,i,j,k);}
+    real dSz(const Comp & m, const Sign sig, const int i, const int j, const int k) const
+      {return u.dSz(m,sig,i,j,k);}
 
     Vector u, fold, fnew, fext; 
     Vector    cold, cnew, gradp;
