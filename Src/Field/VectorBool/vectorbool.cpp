@@ -223,8 +223,8 @@ void VectorBool::coordinate() {
 
   /* dV */
   pnt_dV[0] = &VectorBool::dV_xstaggered;
-  pnt_dV[1] = &VectorBool::dV_xstaggered;
-  pnt_dV[2] = &VectorBool::dV_xstaggered;
+  pnt_dV[1] = &VectorBool::dV_ystaggered;
+  pnt_dV[2] = &VectorBool::dV_zstaggered;
 
   return;
 }	
