@@ -737,6 +737,7 @@ void PlotTEC::plot_tec_body(const Body & bod, std::vector<int> & vars) {
     assert( bod.nnodes(c) >= 3 );
     int i,j,k;
     bod.ijk(c,&i,&j,&k);
+    nat += bod.nnodes(c)-3;
   } 
 
   /*----------------------+
@@ -765,6 +766,12 @@ void PlotTEC::plot_tec_body(const Body & bod, std::vector<int> & vars) {
   for(int c=0; c<bod.nccells(); c++) {
     int i,j,k;
     bod.ijk(c,&i,&j,&k);
+    //if(box.contains(i,j,k) || !boxed)
+      for(int i=0; i<bod.nnodes(c); i++) {
+        out << bod[c].xn(i) << " "
+            << bod[c].yn(i) << " "
+            << bod[c].zn(i) << std::endl;
+    }
   }
 
   /*--------+
@@ -774,6 +781,13 @@ void PlotTEC::plot_tec_body(const Body & bod, std::vector<int> & vars) {
   for(int c=0; c<bod.nccells(); c++) {
     int i,j,k;
     bod.ijk(c,&i,&j,&k);
+    //if(box.contains(i,j,k) || !boxed) {
+      int nn = bod.nnodes(c);
+                out << n+1 << " " << n+2 << " " << n+3 << boil::endl;
+      if(nn>3)  out << n+1 << " " << n+3 << " " << n+4 << boil::endl;
+      if(nn>4)  out << n+1 << " " << n+4 << " " << n+5 << boil::endl;
+      if(nn>5)  out << n+1 << " " << n+5 << " " << n+6 << boil::endl;
+      n+=nn;
   }
 }
 
