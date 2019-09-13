@@ -16,8 +16,7 @@ void Momentum::grad(Scalar & frc) {
 #if 0
     gradp[m][i][j][k] = (frc[i-1][j][k]-frc[i][j][k]) * dSx(m,i,j,k); 
 #else
-    gradp[m][i][j][k] = frc[i-1][j][k]*dSx(m,Sign::neg(),i,j,k)
-                      - frc[i  ][j][k]*dSx(m,Sign::pos(),i,j,k); 
+    gradp[m][i][j][k] = (frc[i-1][j][k]-frc[i][j][k])*dV(m,i,j,k)/u.dxc(m,i); 
 #endif
   }
   
@@ -26,8 +25,7 @@ void Momentum::grad(Scalar & frc) {
 #if 0
     gradp[m][i][j][k] = (frc[i][j-1][k]-frc[i][j][k]) * dSy(m,i,j,k); 
 #else
-    gradp[m][i][j][k] = frc[i][j-1][k]*dSy(m,Sign::neg(),i,j,k)
-                      - frc[i][j  ][k]*dSy(m,Sign::pos(),i,j,k); 
+    gradp[m][i][j][k] = (frc[i][j-1][k]-frc[i][j][k])*dV(m,i,j,k)/u.dyc(m,j); 
 #endif
   }
   
@@ -36,8 +34,7 @@ void Momentum::grad(Scalar & frc) {
 #if 0
     gradp[m][i][j][k] = (frc[i][j][k-1]-frc[i][j][k]) * dSz(m,i,j,k);
 #else
-    gradp[m][i][j][k] = frc[i][j][k-1]*dSz(m,Sign::neg(),i,j,k)
-                      - frc[i][j][k  ]*dSz(m,Sign::pos(),i,j,k); 
+    gradp[m][i][j][k] = (frc[i][j][k-1]-frc[i][j][k])*dV(m,i,j,k)/u.dzc(m,k); 
 #endif
   }
 

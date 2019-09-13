@@ -27,15 +27,20 @@
 class Domain {
   public:
     Domain(const Grid1D & ogx, const Grid1D & ogy, const Grid1D & ogz,
-           const std::string n="domain", const Decompose dec=Decompose::xyz());
+           const std::string n="domain", const Decompose dec=Decompose::xyz(),
+           const bool print_statistics = true);
 
     Domain(const Grid1D & ogx, const Grid1D & ogy, const Grid1D & ogz,
            Body * b, /* it will change, that is why it is pointer */ 
-           const std::string n="domain", const Decompose dec=Decompose::xyz());
+           const std::string n="domain", const Decompose dec=Decompose::xyz(),
+           const bool print_statistics = true);
 
     ~Domain(){}
 
     int  level() const {return lev;}
+
+    virtual bool is_axisymmetric() const { return false; }
+    virtual bool is_cartesian() const { return true; }
 
     /* local number of cells */
     int  ni()    const {return grid_x_local->ncell_b();}
@@ -46,7 +51,6 @@ class Domain {
     int  gi() const {return grid_x_original->ncell_b();}
     int  gj() const {return grid_y_original->ncell_b();}
     int  gk() const {return grid_z_original->ncell_b();}
-
 
     /*  global extents of the domain */
     const Range<int> & cxg() const {return cr_x;}
@@ -207,15 +211,17 @@ class Domain {
     int coord(const Comp & i)  const {return coords[~i];}
     int dim(const Comp & i)    const {return dims[~i];}
 
-    /* computes and prints grid statistics */
-    void statistics(Body * b = NULL);
+    /* computes and prints grid statistics
+     * -> virtual so that it gets called from the proper constructor */
+    virtual void statistics(Body * b = NULL);
 
     real dxyz_min() const {return min_dxyz;}
     real dxyz_max() const {return max_dxyz;}
     real dV_min()   const {return min_dV;}
     real dV_max()   const {return max_dV;}
 
-  private:
+  //private:
+  protected:
     Domain(const Grid1D * ogx, const Grid1D * ogy, const Grid1D * ogz,
            const Grid1D * lgx, const Grid1D * lgy, const Grid1D * lgz,
            int * dms, int * crds, int * nghbrs,

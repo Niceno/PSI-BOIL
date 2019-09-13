@@ -108,5 +108,9 @@ void VOF::extend_norm(const Scalar & val) {
     }
   }
 
+  nx.exchange_all();
+  ny.exchange_all();
+  nz.exchange_all();
+
   return;
 }

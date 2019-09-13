@@ -13,6 +13,7 @@ libVector_a_SOURCES = vector_browsing.h      \
                       vector_grad.cpp        \
                       vector_ijk.cpp         \
                       vector_load.cpp        \
+                      vector_outflow.cpp     \
                       vector_randomize.cpp   \
                       vector_rm.cpp          \
                       vector_save.cpp        \

@@ -29,16 +29,18 @@ void Momentum::new_time_step(Vector & vec) {
     }
   }
 
+#if 1
   /*------------+
   |        n-1  |
   |  f -= H     |
   |             |
   +------------*/
   if (conv_ts.Nm2()!=0.0)  {
-    for_m(m) 
+    for_m(m) { 
       for_mijk(m,i,j,k) { /* conv_ts.Nm2() = -0.5 for adams-bashforth */
         fold[m][i][j][k] += conv_ts.Nm2() * cold[m][i][j][k]; 
       }
+    }
   }
 
   /*------------+
@@ -50,10 +52,12 @@ void Momentum::new_time_step(Vector & vec) {
   if (conv_ts.Nm1()==0.0 && conv_ts.Nm2()==0.0) {
   } else {
     convection(&cold);
-    for_m(m)
+    for_m(m) {
       for_mijk(m,i,j,k) /*conv_ts.Nm1()=1.5*/
         fold[m][i][j][k] += conv_ts.Nm1() * cold[m][i][j][k];
+    }
   }
+#endif
     
   /*------------+ 
   |       1  n  |
@@ -61,5 +65,6 @@ void Momentum::new_time_step(Vector & vec) {
   |       2     |
   +------------*/
   /* a condition like: if(diff_ts != backward_euler()) would be good */
-  diffusion();
+  if(diff_ts.Nm1() != 0.0);
+    diffusion();
 }

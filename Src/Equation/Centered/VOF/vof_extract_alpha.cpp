@@ -141,6 +141,8 @@ void VOF::extract_alpha_near_bnd(const Scalar & scp) {
     }
   }
 
+  nalpha.exchange_all();
+
   return;
 }
 

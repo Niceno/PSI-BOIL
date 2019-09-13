@@ -6,6 +6,7 @@
 #include "../Ravioli/decompose.h"
 #include "../Ravioli/column.h"
 #include "../Ravioli/buffers.h"
+#include "../Domain/Axisymmetric/axisymmetric.h"
 #include "../Equation/Centered/Enthalpy/enthalpy.h"
 #include "../Equation/Centered/EnthalpyFD/enthalpyfd.h"
 #include "../Equation/Centered/EnthalpyTif/enthalpytif.h"

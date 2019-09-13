@@ -263,8 +263,8 @@ void Vector::coordinate() {
 
   /* dV */
   pnt_dV[0] = &Vector::dV_xstaggered;
-  pnt_dV[1] = &Vector::dV_xstaggered;
-  pnt_dV[2] = &Vector::dV_xstaggered;
+  pnt_dV[1] = &Vector::dV_ystaggered;
+  pnt_dV[2] = &Vector::dV_zstaggered;
 
   return;
 }	

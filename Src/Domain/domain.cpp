@@ -4,8 +4,29 @@
 
 /******************************************************************************/
 Domain::Domain(const Grid1D & ogx, const Grid1D & ogy, const Grid1D & ogz,
+               const std::string n, const Decompose dec,
+               const bool print_statistics) :
+/*---------------------------------------------------------------+
+|  this constructor creates a domain globally on all processors  |
++---------------------------------------------------------------*/
+  lev(0), 
+  cr_x(0,0), cr_y(0,0), cr_z(0,0),
+  grid_x_original(&ogx), grid_y_original(&ogy), grid_z_original(&ogz),
+  name(n) {
+
+  body = new Empty();
+
+  setup(dec);
+
+  if(print_statistics)
+    statistics();
+}
+
+/******************************************************************************/
+Domain::Domain(const Grid1D & ogx, const Grid1D & ogy, const Grid1D & ogz,
                Body * stl_body,  
-               const std::string n, const Decompose dec) :
+               const std::string n, const Decompose dec,
+               const bool print_statistics) :
 /*---------------------------------------------------------------+
 |  this constructor creates a domain globally on all processors  |
 +---------------------------------------------------------------*/
@@ -20,25 +41,8 @@ Domain::Domain(const Grid1D & ogx, const Grid1D & ogy, const Grid1D & ogz,
 
   body->cut(*this);
 
-  statistics(body);
-}
-
-/******************************************************************************/
-Domain::Domain(const Grid1D & ogx, const Grid1D & ogy, const Grid1D & ogz,
-               const std::string n, const Decompose dec) :
-/*---------------------------------------------------------------+
-|  this constructor creates a domain globally on all processors  |
-+---------------------------------------------------------------*/
-  lev(0), 
-  cr_x(0,0), cr_y(0,0), cr_z(0,0),
-  grid_x_original(&ogx), grid_y_original(&ogy), grid_z_original(&ogz),
-  name(n) {
-
-  body = new Empty();
-
-  setup(dec);
-
-  statistics();
+  if(print_statistics)
+    statistics(body);
 }
 
 /******************************************************************************/

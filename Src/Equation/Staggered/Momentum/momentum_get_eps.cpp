@@ -52,6 +52,13 @@ void Momentum::get_eps(Scalar * eps) {
 |                                                                              |
 +-----------------------------------------------------------------------------*/
 
+  if(!(domain()->is_cartesian())) {
+    boil::oout<<"Momentum::get_eps: "
+              <<"Underdevelopment for non-Cartesian geometry. Exiting."
+              <<boil::endl;
+    exit(0);
+  }
+
   u.exchange();
   
   for_vijk((*eps),i,j,k) {

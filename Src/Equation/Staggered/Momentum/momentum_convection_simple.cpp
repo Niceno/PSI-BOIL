@@ -249,7 +249,7 @@ void Momentum::convection(Vector * conv) {
     (*conv)[Comp::w()][i][j]  [k] += a_s * vmf*wm - a_n * vpf*wp;
     }
 
-  /* God help me, pleae */
+  /* God help me, please */
   for_mijk(Comp::u(),i,j,k) {
     real rho = fluid()->rho(Comp::u(),i,j,k);
     (*conv)[Comp::u()][i][j][k] *= rho;

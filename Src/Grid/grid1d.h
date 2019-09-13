@@ -48,7 +48,7 @@ class Grid1D {
            const BndGrid & coN = BndGrid::undefined());
 
     /* constructor to create a dummy grid (for lower dim simulations) */
-    Grid1D(const real dx);
+    explicit Grid1D(const real dx);
 
     /* constructor which creates a coarser grid */
     Grid1D(const Grid1D & grid, const Step & step = Step(1));
@@ -59,13 +59,11 @@ class Grid1D {
            const Step       & step = Step(1));
     ~Grid1D();
 
-    /* are these used? */
     const Periodic periodic1() const {return period1;}
     const Periodic periodicN() const {return periodN;}
 
-    /* are these used? */
-    const BndGrid cutoff1() const {return ctf1;}
-    const BndGrid cutoffN() const {return ctfN;}
+    const BndGrid bndgrid1() const {return ctf1;}
+    const BndGrid bndgridN() const {return ctfN;}
 
     /* number of cells and nodes */
     int ncell()   const {return nc_in;}

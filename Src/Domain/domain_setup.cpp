@@ -20,12 +20,12 @@ void Domain::setup(const Decompose & dec) {
   per[1] = grid_y_original->periodic1();
   per[2] = grid_z_original->periodic1();
 
-  ctf[0][0] = ( per[0]==0 && grid_x_original->cutoff1() == BndGrid::symmetry() );
-  ctf[0][1] = ( per[0]==0 && grid_x_original->cutoffN() == BndGrid::symmetry() );
-  ctf[1][0] = ( per[1]==0 && grid_y_original->cutoff1() == BndGrid::symmetry() );
-  ctf[1][1] = ( per[1]==0 && grid_y_original->cutoffN() == BndGrid::symmetry() );
-  ctf[2][0] = ( per[2]==0 && grid_z_original->cutoff1() == BndGrid::symmetry() );
-  ctf[2][1] = ( per[2]==0 && grid_z_original->cutoffN() == BndGrid::symmetry() );
+  ctf[0][0] = ( per[0]==0 && grid_x_original->bndgrid1() == BndGrid::symmetry() );
+  ctf[0][1] = ( per[0]==0 && grid_x_original->bndgridN() == BndGrid::symmetry() );
+  ctf[1][0] = ( per[1]==0 && grid_y_original->bndgrid1() == BndGrid::symmetry() );
+  ctf[1][1] = ( per[1]==0 && grid_y_original->bndgridN() == BndGrid::symmetry() );
+  ctf[2][0] = ( per[2]==0 && grid_z_original->bndgrid1() == BndGrid::symmetry() );
+  ctf[2][1] = ( per[2]==0 && grid_z_original->bndgridN() == BndGrid::symmetry() );
 
   dummy[0] = grid_x_original->is_dummy();
   dummy[1] = grid_y_original->is_dummy();

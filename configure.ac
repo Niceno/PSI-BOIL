@@ -10,6 +10,7 @@ AC_PROG_INSTALL
 AC_PROG_RANLIB
 AC_OUTPUT(Makefile                                     \
           Src/Domain/Makefile                          \
+          Src/Domain/Axisymmetric/Makefile             \
           Src/Global/Makefile                          \
           Src/Field/Scalar/Makefile                    \
           Src/Field/Vector/Makefile                    \

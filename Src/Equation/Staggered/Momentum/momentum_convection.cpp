@@ -436,6 +436,10 @@ void Momentum::convection(Vector * conv) {
   /* u.div(uvw) */
   m=Comp::u();
   for_mijk(m,i,j,k) {
+#if 1
+    real divuc = u.outflow(i  ,j,k);
+    real divum = u.outflow(i-1,j,k);
+#else
     real divuc= - u.domain()->dSx(Sign::neg(),i  ,j,k)*u[Comp::u()][i]  [j]  [k]
                 + u.domain()->dSx(Sign::pos(),i  ,j,k)*u[Comp::u()][i+1][j]  [k]
                 - u.domain()->dSy(Sign::neg(),i  ,j,k)*u[Comp::v()][i]  [j]  [k]
@@ -448,11 +452,16 @@ void Momentum::convection(Vector * conv) {
                 + u.domain()->dSy(Sign::pos(),i-1,j,k)*u[Comp::v()][i-1][j+1][k]
                 - u.domain()->dSz(Sign::neg(),i-1,j,k)*u[Comp::w()][i-1][j]  [k]
                 + u.domain()->dSz(Sign::pos(),i-1,j,k)*u[Comp::w()][i-1][j]  [k+1];
+#endif
     (*conv)[m][i][j][k] += u[m][i][j][k] * 0.5 * (divuc+divum);
   }
   /* v.div(uvw) */
   m=Comp::v();
   for_mijk(m,i,j,k) {
+#if 1
+    real divuc = u.outflow(i,j  ,k);
+    real divum = u.outflow(i,j-1,k);
+#else
     real divuc= - u.domain()->dSx(Sign::neg(),i,j  ,k)*u[Comp::u()][i]  [j]  [k]
                 + u.domain()->dSx(Sign::pos(),i,j  ,k)*u[Comp::u()][i+1][j]  [k]
                 - u.domain()->dSy(Sign::neg(),i,j  ,k)*u[Comp::v()][i]  [j]  [k]
@@ -465,11 +474,16 @@ void Momentum::convection(Vector * conv) {
                 + u.domain()->dSy(Sign::pos(),i,j-1,k)*u[Comp::v()][i]  [j  ][k]
                 - u.domain()->dSz(Sign::neg(),i,j-1,k)*u[Comp::w()][i]  [j-1][k]
                 + u.domain()->dSz(Sign::pos(),i,j-1,k)*u[Comp::w()][i]  [j-1][k+1];
+#endif
     (*conv)[m][i][j][k] += u[m][i][j][k] * 0.5 * (divuc+divum);
   }
   /* w.div(uvw) */
   m=Comp::w();
   for_mijk(m,i,j,k) {
+#if 1
+    real divuc = u.outflow(i,j,k  );
+    real divum = u.outflow(i,j,k-1);
+#else
     real divuc= - u.domain()->dSx(Sign::neg(),i,j,k  )*u[Comp::u()][i]  [j]  [k]
                 + u.domain()->dSx(Sign::pos(),i,j,k  )*u[Comp::u()][i+1][j]  [k]
                 - u.domain()->dSy(Sign::neg(),i,j,k  )*u[Comp::v()][i]  [j]  [k]
@@ -482,6 +496,7 @@ void Momentum::convection(Vector * conv) {
                 + u.domain()->dSy(Sign::pos(),i,j,k-1)*u[Comp::v()][i]  [j+1][k-1]
                 - u.domain()->dSz(Sign::neg(),i,j,k-1)*u[Comp::w()][i]  [j]  [k-1]
                 + u.domain()->dSz(Sign::pos(),i,j,k-1)*u[Comp::w()][i]  [j]  [k];
+#endif
     (*conv)[m][i][j][k] += u[m][i][j][k] * 0.5 * (divuc+divum);
   }
   #endif

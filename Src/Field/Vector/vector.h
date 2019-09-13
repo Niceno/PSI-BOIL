@@ -189,7 +189,10 @@ class Vector {
               real *, real *, real *,
               real *, real *, real *) const;
 
-    /* shear and it's magnitude */
+    /* outflow from a scalar cell = integral divergence */
+    real outflow(const int i, const int j, const int k) const;
+
+    /* shear and its magnitude */
     void shear(const int i, const int j, const int k,
                real *, real *, real *,
                real *, real *, real *,

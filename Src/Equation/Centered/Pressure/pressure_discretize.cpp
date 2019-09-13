@@ -6,7 +6,7 @@
 *  neighbouring coefficients depend on the inverse of physical property
 *  (density), a specialized function is written here. 
 *
-*  The only thing usefull from the parrent is handling of boundary conditions.
+*  The only thing useful from the parent is handling of boundary conditions.
 *******************************************************************************/
 void Pressure::discretize() {
 

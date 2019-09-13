@@ -152,7 +152,7 @@ void BndCnd::add(BndCnd bc) {
     if( bc.dir == Dir::kmax() && dom->period(2) ) fail = true;
   }
   if( fail ) {
-    boil::oout << "Fatal: trying to define non-periodic b.c. " 
+    boil::oout << "Fatal: trying to define real non-periodic b.c. " 
                << "to a periodic domain. Exiting!" << boil::endl;
     exit(0);
   }
