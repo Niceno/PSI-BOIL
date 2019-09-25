@@ -70,12 +70,12 @@ void VOF::norm_young(real & nx_val, real & ny_val, real & nz_val,
 
     /* check boundary condition */
     jflag=1;
-    if (iii  ==si() && iminp==false) jflag=0;
-    if (iii-1==ei() && imaxp==false) jflag=0;
-    if (jjj  ==sj() && jminp==false) jflag=0;
-    if (jjj-1==ej() && jmaxp==false) jflag=0;
-    if (kkk  ==sk() && kminp==false) jflag=0;
-    if (kkk-1==ek() && kmaxp==false) jflag=0;
+    if (iii  ==si() && iminc==true) jflag=0;
+    if (iii-1==ei() && imaxc==true) jflag=0;
+    if (jjj  ==sj() && jminc==true) jflag=0;
+    if (jjj-1==ej() && jmaxc==true) jflag=0;
+    if (kkk  ==sk() && kminc==true) jflag=0;
+    if (kkk-1==ek() && kmaxc==true) jflag=0;
 
     sum_jflag += jflag;
 
