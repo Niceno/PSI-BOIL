@@ -12,7 +12,7 @@ void VOF::norm_cc(const Scalar & sca) {
   for_ijk(i,j,k) {
     real nxx, nyy, nzz;
     Comp mcomp;
-    norm_cc(nxx, nyy, nzz, mcomp, i,j,k, sca);
+    norm_cc_kernel(nxx, nyy, nzz, mcomp, i,j,k, sca);
 
     nx[i][j][k] = nxx;
     ny[i][j][k] = nyy;
@@ -46,10 +46,10 @@ void VOF::norm_cc(const Scalar & sca) {
   return;
 }
 
-void VOF::norm_cc(real & nx_val, real & ny_val, real & nz_val,
-                  Comp & mcomp,
-                  const int i, const int j, const int k,
-                  const Scalar & sca) {
+void VOF::norm_cc_kernel(real & nx_val, real & ny_val, real & nz_val,
+                         Comp & mcomp,
+                         const int i, const int j, const int k,
+                         const Scalar & sca) {
 
   real nxX, nyX, nzX;
   nxX = copysign(1.0,+(sca[i+1][j][k]-sca[i-1][j][k]));
@@ -72,6 +72,39 @@ void VOF::norm_cc(real & nx_val, real & ny_val, real & nz_val,
               - (sca[i][j-1][k-1]+sca[i][j-1][k]+sca[i][j-1][k+1])); 
   nzZ = copysign(1.0,+(sca[i][j][k+1]-sca[i][j][k-1]));
 
+  select_norm_cc(nx_val, ny_val, nz_val,
+                 nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ,
+                 &mcomp);
+
+  return;
+}
+
+void VOF::norm_cc_kernel(real & nx_val, real & ny_val, real & nz_val,
+                         const int i, const int j, const int k,
+                         const Scalar & sca) {
+
+  real nxX, nyX, nzX;
+  nxX = copysign(1.0,+(sca[i+1][j][k]-sca[i-1][j][k]));
+  nyX = 0.5 * ( (sca[i+1][j+1][k]+sca[i][j+1][k]+sca[i-1][j+1][k])
+              - (sca[i+1][j-1][k]+sca[i][j-1][k]+sca[i-1][j-1][k])); 
+  nzX = 0.5 * ( (sca[i+1][j][k+1]+sca[i][j][k+1]+sca[i-1][j][k+1])
+              - (sca[i+1][j][k-1]+sca[i][j][k-1]+sca[i-1][j][k-1])); 
+
+  real nxY, nyY, nzY;
+  nxY = 0.5 * ( (sca[i+1][j-1][k]+sca[i+1][j][k]+sca[i+1][j+1][k])
+              - (sca[i-1][j-1][k]+sca[i-1][j][k]+sca[i-1][j+1][k])); 
+  nyY = copysign(1.0,+(sca[i][j+1][k]-sca[i][j-1][k]));
+  nzY = 0.5 * ( (sca[i][j-1][k+1]+sca[i][j][k+1]+sca[i][j+1][k+1])
+              - (sca[i][j-1][k-1]+sca[i][j][k-1]+sca[i][j+1][k-1]));
+
+  real nxZ, nyZ, nzZ;
+  nxZ = 0.5 * ( (sca[i+1][j][k-1]+sca[i+1][j][k]+sca[i+1][j][k+1])
+              - (sca[i-1][j][k-1]+sca[i-1][j][k]+sca[i-1][j][k+1])); 
+  nyZ = 0.5 * ( (sca[i][j+1][k-1]+sca[i][j+1][k]+sca[i][j+1][k+1])
+              - (sca[i][j-1][k-1]+sca[i][j-1][k]+sca[i][j-1][k+1])); 
+  nzZ = copysign(1.0,+(sca[i][j][k+1]-sca[i][j][k-1]));
+
+  Comp * mcomp;
   select_norm_cc(nx_val, ny_val, nz_val,
                  nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ,
                  mcomp);

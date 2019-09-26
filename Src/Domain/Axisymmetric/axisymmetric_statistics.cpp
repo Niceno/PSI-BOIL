@@ -72,8 +72,8 @@ void Axisymmetric::statistics(Body * body) {
   }
   boil::oout << "+-------------------------";
   boil::oout << "--------------------------+" << boil::endl;
-  sprintf(b, "| resolution; nx, ny, nz = %6d, %6d, %6d.  |", 
-             gnx, gny, gnz);
+  sprintf(b, "| Resolution: nx, nz = %6d, %6d.              |", 
+             gnx, gnz);
   boil::oout << b << boil::endl;
   boil::oout << "+-------------------------";
   boil::oout << "+-------------------------+" << boil::endl;

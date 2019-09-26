@@ -4,7 +4,7 @@
 #include "global_constants.h"
 
 namespace boil {
- inline bool realistic(const real val) { return val<boil::zetta; }
+ inline bool realistic(const real val) { return fabs(val)<boil::zetta; }
 }
 
 #endif

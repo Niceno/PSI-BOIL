@@ -16,7 +16,7 @@ void VOF::norm_young(const Scalar & sca) {
 
   for_ijk(i,j,k) {
     real nxx, nyy, nzz;
-    norm_young(nxx, nyy, nzz, i,j,k, sca);
+    norm_young_kernel(nxx, nyy, nzz, i,j,k, sca);
 
     nx[i][j][k] = nxx;
     ny[i][j][k] = nyy;
@@ -37,9 +37,9 @@ void VOF::norm_young(const Scalar & sca) {
 }
 
 
-void VOF::norm_young(real & nx_val, real & ny_val, real & nz_val,
-                     const int i, const int j, const int k,
-                     const Scalar & sca) {
+void VOF::norm_young_kernel(real & nx_val, real & ny_val, real & nz_val,
+                            const int i, const int j, const int k,
+                            const Scalar & sca) {
 
   int jflag, sum_jflag=0;
   real nxave=0.0, nyave=0.0, nzave=0.0;
@@ -70,12 +70,12 @@ void VOF::norm_young(real & nx_val, real & ny_val, real & nz_val,
 
     /* check boundary condition */
     jflag=1;
-    if (iii  ==si() && iminp==false) jflag=0;
-    if (iii-1==ei() && imaxp==false) jflag=0;
-    if (jjj  ==sj() && jminp==false) jflag=0;
-    if (jjj-1==ej() && jmaxp==false) jflag=0;
-    if (kkk  ==sk() && kminp==false) jflag=0;
-    if (kkk-1==ek() && kmaxp==false) jflag=0;
+    if (iii  ==si() && iminc==true) jflag=0;
+    if (iii-1==ei() && imaxc==true) jflag=0;
+    if (jjj  ==sj() && jminc==true) jflag=0;
+    if (jjj-1==ej() && jmaxc==true) jflag=0;
+    if (kkk  ==sk() && kminc==true) jflag=0;
+    if (kkk-1==ek() && kmaxc==true) jflag=0;
 
     sum_jflag += jflag;
 

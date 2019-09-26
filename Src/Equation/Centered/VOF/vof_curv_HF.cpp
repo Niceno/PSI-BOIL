@@ -25,21 +25,33 @@ void VOF::curv_HF() {
 
   /* calculate normal vector */
   // Normal vector is used for (i) dirMax and (ii) Eq. (2) in J.Lopez et al.
-#if 1
-  norm_young(phi);  // Young's method is good for low resolution
-  true_norm_vect();
+  if(norm_method_curvature != norm_method_advance) {
+    if       (norm_method_curvature==NormMethod::Mixed()) {
+      norm_mixed(phi);
+    } else if(norm_method_curvature==NormMethod::Young()) {
+      norm_young(phi);
+    } else if(norm_method_curvature==NormMethod::CC()) {
+      norm_cc(phi);
+    } else if(norm_method_curvature==NormMethod::ElviraXZ()) {
+      norm_elvira(phi);
+    } else if(norm_method_curvature==NormMethod::ElviraXY()) {
+      norm_elvira(phi);
+    } else if(norm_method_curvature==NormMethod::ElviraYZ()) {
+      norm_elvira(phi);
+    } else {
+      /* default */
+      boil::aout<<"VOF::curvHF: Normal vector calculation method not set properly!"
+                <<" Exiting."<<boil::endl;
+      exit(0);
+    }
+    true_norm_vect();
+  }
+
   for_aijk(i,j,k) {
     nx[i][j][k] = mx[i][j][k];
     ny[i][j][k] = my[i][j][k];
     nz[i][j][k] = mz[i][j][k];
   }
-#else
-  for_aijk(i,j,k) {
-    nx[i][j][k] = mx[i][j][k];
-    ny[i][j][k] = my[i][j][k];
-    nz[i][j][k] = mz[i][j][k];
-  }
-#endif
 
   /* define iflag */
   iflag=0;

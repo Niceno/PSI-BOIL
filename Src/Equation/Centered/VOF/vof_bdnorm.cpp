@@ -19,7 +19,7 @@ void VOF::bdnorm(Scalar & scp) {
     update_at_walls(scp);
    
     /* calculate new normal vector near walls */
-    extend_norm(scp);
+    normal_vector_near_bnd(scp);
 
   }
 

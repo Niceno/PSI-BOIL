@@ -1,0 +1,307 @@
+#include "Include/psi-boil.h"
+#include "setup_circle.cpp"
+#include "test_reconstruction.cpp"
+#include <fstream>
+//#define USE_BNDCLR
+//#define USE_CARTESIAN
+
+/* computed parameters */
+const int NX = 50;
+const int NZ = 2*NX;
+
+/* domain dimensions (given by problem) */
+//const real LX =   1.0;
+const real LX =   4.0e-3;
+const real LZ =   LX;
+const real DX =   0.5*LX/real(NX);
+
+const int mSimple = 1;
+
+const bool inverted = true;
+const real radius = LX/4.0;
+const real xcent = 0.0;
+const real ycent = 0.0;
+const real zcent = 0.0;
+
+/******************************************************************************/
+main(int argc, char * argv[]) {
+
+  if(argc==1){
+    boil::oout<<"An argument is required!"<<"\n";
+    boil::oout<<"./Boil wmin (wmin::wall time in minute)"<<"\n";
+    exit(0);
+  }
+  int wmin=atoi(argv[1]);
+  boil::oout<<"wmin= "<<wmin<<"\n";
+
+  boil::timer.start();
+
+  /*--------------------------------+
+  |  choose the output file format  |
+  +--------------------------------*/
+  boil::plot = new PlotTEC();
+  //boil::plot = new PlotTEC(AsNodes::no(), Buffers::yes());
+
+  /*----------+
+  |  grid(s)  |
+  +----------*/
+  Grid1D gx( Range<real>(0.0,0.5*LX), NX, Periodic::no(),
+             BndGrid::symmetry(), BndGrid::wall() );
+  Grid1D gz( Range<real>(-0.5*LZ,0.5*LZ), NZ, Periodic::yes() );
+
+  /*---------+
+  |  domain  |
+  +---------*/
+#ifdef USE_CARTESIAN
+  Grid1D gy(DX);
+  Domain d(gx,gy,gz);
+#else
+  Axisymmetric d(gx,gz,DX);
+#endif
+
+  /*------------------+
+  |  define unknowns  |
+  +------------------*/
+  Vector uvw(d), uvw_old(d); // vel
+  Vector xyz(d); // body force
+  Scalar c  (d), g  (d), kappa(d), cold(d); // concentration
+  Scalar press  (d), p(d), f  (d);
+
+#ifdef USE_BNDCLR
+  Vector bndclr(d), bndclrold(d);
+#endif
+
+  /*-----------------------------+ 
+  |  insert boundary conditions  |
+  +-----------------------------*/
+  for_m(m) {
+    uvw.bc(m).add( BndCnd( Dir::imin(), BndType::symmetry() ) );
+    uvw.bc(m).add( BndCnd( Dir::imax(), BndType::outlet() ) );
+    uvw.bc(m).add( BndCnd( Dir::kmin(), BndType::periodic() ) );
+    uvw.bc(m).add( BndCnd( Dir::kmax(), BndType::periodic() ) );
+    uvw.bc(m).add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
+    uvw.bc(m).add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
+    uvw_old(m)=uvw(m).shape();
+#ifdef USE_BNDCLR
+    bndclr(m)    = uvw(m).shape();
+    bndclrold(m) = uvw(m).shape();
+#endif
+  }
+
+  c.bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
+  c.bc().add( BndCnd( Dir::imax(), BndType::outlet() ) );
+  c.bc().add( BndCnd( Dir::kmin(), BndType::periodic() ) );
+  c.bc().add( BndCnd( Dir::kmax(), BndType::periodic() ) );
+  c.bc().add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
+  c.bc().add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
+
+  g=c.shape();
+  press=c.shape();
+  p=c.shape();
+  kappa=c.shape();
+  cold=c.shape();
+
+  Matter air(d), water(d);
+#if 0
+  air  .mu    (1.0000e-3);
+  air  .rho   (1.0000e+0);
+  water.mu    (1.0000e-3);
+  water.rho   (1.0000e+0);
+
+#ifdef USE_BNDCLR
+  Matter mixed(water, air, &c, &bndclr);
+#else
+  Matter mixed(water, air, &c);
+#endif
+  mixed.sigma (0.01);
+#else
+  air  .mu    (1.0000e-5);
+  air  .rho   (1.2500e+0);
+  water.mu    (1.0000e-3);
+  water.rho   (1.0000e+3);
+
+#ifdef USE_BNDCLR
+  Matter mixed(water, air, &c, &bndclr);
+#else
+  Matter mixed(water, air, &c);
+#endif
+  mixed.sigma (0.07);
+#endif
+
+  /*-------------------+
+  |  time-integration  |
+  +-------------------*/
+  const int  ndt = 400;
+  const int nint = 100;
+  const real dt  = 0.25 * LZ / real(NZ);
+  Times time(ndt, dt);
+
+  /*-------------------+
+  |  check if restart  |
+  +-------------------*/
+  std::fstream input;
+  int irun = 0;
+  if(boil::cart.iam()==0){
+    input.open("run.txt", std::ios::in);
+    if( !input.fail() ) {
+      input >> irun;
+      std::cout<<"read irun.  irun= "<<irun<<"\n";
+    }
+    input.close();
+  }
+  boil::cart.sum_int(&irun);
+  if (irun==1){
+    boil::oout<<"exit job due to irun=1"<<"\n";
+    exit(0);
+  }
+
+  if(boil::cart.iam()==0){
+    std::fstream output;
+    output.open("run.txt", std::ios::out);
+    output << 1 << boil::endl;
+    output.close();
+  }
+
+  input.open("time.txt", std::ios::in);
+  bool restart = false;
+
+  if( !input.fail() ) {
+    restart=true;
+  }
+
+  if( restart ) {
+    int ts;
+    real t,dtf;
+    input >> ts;
+    input >> t;
+    input >> dtf;
+    time.first_step(ts);
+    time.current_time(t);
+    time.set_dt(dtf);
+    uvw   .load("uvw", ts);
+    press .load("press", ts);
+    c     .load("c", ts);
+  } else {
+
+  /*--------------------+
+  |  initial condition  |
+  +--------------------*/
+  for_m(m)
+    for_avmijk(uvw,m,i,j,k)
+      uvw[m][i][j][k]=0.0;
+
+  Comp m=Comp::w();
+  for_vmijk(uvw,m,i,j,k)
+    uvw[m][i][j][k]=1.0;
+  uvw.exchange();
+
+
+  cold = 0.0;
+
+#if 1
+  setup_circle_xz(cold,radius,xcent,ycent);
+  if(inverted) {
+    for_avijk(cold,i,j,k)
+      cold[i][j][k] = 1. - cold[i][j][k];
+  }
+#else 
+  for_avijk(cold,i,j,k) {
+    if(fabs(cold.zc(k))<radius) {
+      cold[i][j][k] = 1.0;
+    }
+  }
+#endif
+
+  cold.bnd_update();
+  cold.exchange_all();
+
+  } // restart
+
+  /*----------------+
+  |  linear solver  |
+  +----------------*/
+  Krylov * solver = new CG(d, Prec::ic2());
+  //Krylov * solver = new CG(d, Prec::di());
+  Momentum ns( uvw, xyz, time, solver, &mixed);
+  ns.convection_set(TimeScheme::backward_euler()); //ns.convection is mandatory
+  ns.diffusion_set(TimeScheme::backward_euler());
+  Pressure pr(p, f, uvw, time, solver, &mixed);
+
+  AC multigrid( &pr );
+  if(mSimple>1) {
+    multigrid.min_cycles(4);  // 4
+    multigrid.max_cycles(8); // 8
+  } else {
+    multigrid.min_cycles(6);  // 6
+  }
+  multigrid.stop_if_diverging(true);
+
+
+#ifdef USE_CARTESIAN
+  #ifdef USE_BNDCLR
+  VOF conc(c, g, kappa, uvw, time, solver, &bndclr);
+  #else
+  VOF conc(c, g, kappa, uvw, time, solver);
+  #endif
+  for_avijk(c,i,j,k) {
+    c[i][j][k] = cold[i][j][k];
+  }
+#else
+  #ifdef USE_BNDCLR
+  VOFaxisym conc(c, g, kappa, uvw, time, solver, &bndclr);
+  #else
+  VOFaxisym conc(c, g, kappa, uvw, time, solver);
+  #endif
+  //conc.set_reconstruction_parameters(1e-5,conc.get_reconstruction_maxiter());
+  conc.color_to_vf(cold,c);
+#endif
+  conc.set_curv_method(0);  // height function
+  //conc.set_curv_method(1);  // smoothed VOF
+
+  conc.ancillary();
+  conc.totalvol();
+
+  c.bnd_update();
+  c.exchange_all();
+
+#ifndef USE_CARTESIAN
+  conc.reconstruct_geometry();
+  conc.test_reconstruction(conc.color(),c);
+  boil::plot->plot(uvw,c,cold,conc.color(), "uvw-phi-c-c2", 0);
+#else
+  boil::plot->plot(uvw,c,cold,cold, "uvw-phi-c-c2", 0);
+#endif
+
+  std::vector<real> nl1, nli, kl1, kli;
+  std::vector<NormMethod> nmv;
+
+  NormMethod nm = NormMethod::ElviraXZ();
+  nmv.push_back(nm);
+  conc.set_normal_vector_method_all(nm);
+  conc.ancillary();
+  //conc.curvature();
+#ifndef USE_CARTESIAN
+  test_reconstruction_circle_xz(conc,conc.color(),cold,kappa,inverted,radius,nm,nl1, nli, kl1, kli);
+#else
+  test_reconstruction_circle_xz(conc,c,cold,kappa,inverted,radius,nm,nl1, nli, kl1, kli);
+#endif
+
+  for(int i(0); i<nl1.size(); ++i) {
+    boil::oout<<nmv[i]<<" "<<nl1[i]<<" "<<nli[i]<<" "<<kl1[i]<<" "<<kli[i]<<boil::endl;
+  }
+
+  for(time.start(); time.end(); time.increase()) {
+   
+    conc.advance();
+    conc.totalvol();
+
+    if(time.current_step() % nint == 0) {
+      boil::plot->plot(uvw, c, "uvw-c",  time.current_step());
+    }
+  }
+
+  boil::oout << "finished" << boil::endl;
+
+  boil::timer.stop();
+  boil::timer.report();
+}	

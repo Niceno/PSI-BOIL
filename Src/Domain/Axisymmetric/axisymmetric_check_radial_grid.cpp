@@ -12,14 +12,16 @@ void Axisymmetric::check_radial_grid(const Grid1D & gx) {
               <<"the radial grid. Exiting."<<boil::endl;
     exit(0);
   } else if(beg==0.0) {
-    if(gx.bndgrid1() != BndGrid::wall()) {
-       boil::oout<<"Radial grid with zero origin can only have wall "
-                 <<"extrapolation at the origin. Exiting."<<boil::endl;
+    //if(gx.bndgrid1() != BndGrid::wall()) {
+    if(gx.bndgrid1() != BndGrid::symmetry()) {
+       boil::oout<<"Radial grid with zero origin can only have "
+                 //<<"a wall extrapolation at the origin. Exiting."<<boil::endl;
+                 <<"a symmetry 'plane' the origin. Exiting."<<boil::endl;
        exit(0);
     }
   } else {
     if(gx.bndgrid1() == BndGrid::symmetry()) {
-      boil::oout<<"Radial grid  with non-zero origin cannot be symmetric "
+      boil::oout<<"Radial grid with non-zero origin cannot be symmetric "
                 <<"at the origin. Exiting."<<boil::endl;
       exit(0);
     }

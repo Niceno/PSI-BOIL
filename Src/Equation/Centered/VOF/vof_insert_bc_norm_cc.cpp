@@ -130,9 +130,9 @@ void VOF::insert_bc_norm_cc(const Scalar & val) {
                   -(val[i][j  ][k-1]+val[i][j  ][k]+val[i][j  ][k+1]));
       nzZ = copysign(1.0,+(val[i][j][k+1]-val[i][j][k-1]));
 
-      Comp mcomp; 
+      Comp mcomp = Comp::undefined(); 
   select_norm_cc(nx[i][j][k],ny[i][j][k],nz[i][j][k],
-                 nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ, mcomp);
+                 nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ, &mcomp);
     }
   }
 
@@ -161,9 +161,9 @@ void VOF::insert_bc_norm_cc(const Scalar & val) {
                   -(val[i][j-1][k-1]+val[i][j-1][k]+val[i][j-1][k+1]));
       nzZ = copysign(1.0,+(val[i][j][k+1]-val[i][j][k-1]));
 
-      Comp mcomp; 
+      Comp mcomp = Comp::undefined(); 
   select_norm_cc(nx[i][j][k],ny[i][j][k],nz[i][j][k],
-                 nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ, mcomp);
+                 nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ, &mcomp);
     }
   }
 
@@ -192,9 +192,9 @@ void VOF::insert_bc_norm_cc(const Scalar & val) {
                   -(val[i][j-1][k]+val[i][j-1][k+1]));
       nzZ = copysign(1.0,+(val[i][j][k+1]-val[i][j][k]));
 
-      Comp mcomp; 
+      Comp mcomp = Comp::undefined(); 
   select_norm_cc(nx[i][j][k],ny[i][j][k],nz[i][j][k],
-                 nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ, mcomp);
+                 nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ, &mcomp);
     }
   }
 
@@ -223,9 +223,9 @@ void VOF::insert_bc_norm_cc(const Scalar & val) {
                   -(val[i][j-1][k-1]+val[i][j-1][k]));
       nzZ = copysign(1.0,+(val[i][j][k]-val[i][j][k-1]));
 
-      Comp mcomp; 
+      Comp mcomp = Comp::undefined(); 
   select_norm_cc(nx[i][j][k],ny[i][j][k],nz[i][j][k],
-                 nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ, mcomp);
+                 nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ, &mcomp);
     }
   }
 
@@ -254,9 +254,9 @@ void VOF::insert_bc_norm_cc(const Scalar & val) {
                   -(val[i][j  ][k-1]+val[i][j  ][k]+val[i][j  ][k+1]));
       nzZ = copysign(1.0,+(val[i][j][k+1]-val[i][j][k-1]));
 
-      Comp mcomp; 
+      Comp mcomp = Comp::undefined(); 
   select_norm_cc(nx[i][j][k],ny[i][j][k],nz[i][j][k],
-                 nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ, mcomp);
+                 nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ, &mcomp);
     }
   }
 
@@ -285,9 +285,9 @@ void VOF::insert_bc_norm_cc(const Scalar & val) {
                   -(val[i][j-1][k-1]+val[i][j-1][k]+val[i][j-1][k+1]));
       nzZ = copysign(1.0,+(val[i][j][k+1]-val[i][j][k-1]));
 
-      Comp mcomp; 
+      Comp mcomp = Comp::undefined(); 
   select_norm_cc(nx[i][j][k],ny[i][j][k],nz[i][j][k],
-                 nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ, mcomp);
+                 nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ, &mcomp);
     }
   }
 
@@ -316,9 +316,9 @@ void VOF::insert_bc_norm_cc(const Scalar & val) {
                   -(val[i][j-1][k]+val[i][j-1][k+1]));
       nzZ = copysign(1.0,+(val[i][j][k+1]-val[i][j][k]));
 
-      Comp mcomp; 
+      Comp mcomp = Comp::undefined(); 
   select_norm_cc(nx[i][j][k],ny[i][j][k],nz[i][j][k],
-                 nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ, mcomp);
+                 nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ, &mcomp);
     }
   }
 
@@ -347,9 +347,9 @@ void VOF::insert_bc_norm_cc(const Scalar & val) {
                   -(val[i][j-1][k-1]+val[i][j-1][k]));
       nzZ = copysign(1.0,+(val[i][j][k]-val[i][j][k-1]));
 
-      Comp mcomp; 
+      Comp mcomp = Comp::undefined(); 
   select_norm_cc(nx[i][j][k],ny[i][j][k],nz[i][j][k],
-                 nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ, mcomp);
+                 nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ, &mcomp);
     }
   }
 
@@ -378,9 +378,9 @@ void VOF::insert_bc_norm_cc(const Scalar & val) {
                   -(val[i][j  ][k]+val[i][j  ][k+1]));
       nzZ = copysign(1.0,+(val[i][j][k+1]-val[i][j][k]));
 
-      Comp mcomp; 
+      Comp mcomp = Comp::undefined(); 
   select_norm_cc(nx[i][j][k],ny[i][j][k],nz[i][j][k],
-                 nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ, mcomp);
+                 nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ, &mcomp);
     }
   }
 
@@ -409,9 +409,9 @@ void VOF::insert_bc_norm_cc(const Scalar & val) {
                   -(val[i][j  ][k-1]+val[i][j  ][k]));
       nzZ = copysign(1.0,+(val[i][j][k]-val[i][j][k-1]));
 
-      Comp mcomp; 
+      Comp mcomp = Comp::undefined(); 
   select_norm_cc(nx[i][j][k],ny[i][j][k],nz[i][j][k],
-                 nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ, mcomp);
+                 nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ, &mcomp);
     }
   }
 
@@ -440,9 +440,9 @@ void VOF::insert_bc_norm_cc(const Scalar & val) {
                   -(val[i][j-1][k]+val[i][j-1][k+1]));
       nzZ = copysign(1.0,+(val[i][j][k+1]-val[i][j][k]));
 
-      Comp mcomp; 
+      Comp mcomp = Comp::undefined(); 
   select_norm_cc(nx[i][j][k],ny[i][j][k],nz[i][j][k],
-                 nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ, mcomp);
+                 nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ, &mcomp);
     }
   }
 
@@ -471,9 +471,9 @@ void VOF::insert_bc_norm_cc(const Scalar & val) {
                   -(val[i][j-1][k-1]+val[i][j-1][k]));
       nzZ = copysign(1.0,+(val[i][j][k]-val[i][j][k-1]));
 
-      Comp mcomp; 
+      Comp mcomp = Comp::undefined(); 
   select_norm_cc(nx[i][j][k],ny[i][j][k],nz[i][j][k],
-                 nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ, mcomp);
+                 nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ, &mcomp);
     }
   }
 
@@ -503,9 +503,9 @@ void VOF::insert_bc_norm_cc(const Scalar & val) {
                 -(val[i][j  ][k]+val[i][j  ][k+1]));
     nzZ = copysign(1.0,+(val[i][j][k+1]-val[i][j][k]));
 
-    Comp mcomp; 
+    Comp mcomp = Comp::undefined(); 
   select_norm_cc(nx[i][j][k],ny[i][j][k],nz[i][j][k],
-                 nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ, mcomp);
+                 nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ, &mcomp);
   }
 
   /* corner i-max & j-min & k-max */
@@ -534,9 +534,9 @@ void VOF::insert_bc_norm_cc(const Scalar & val) {
                   -(val[i][j  ][k-1]+val[i][j  ][k]));
       nzZ = copysign(1.0,+(val[i][j][k]-val[i][j][k-1]));
 
-      Comp mcomp; 
+      Comp mcomp = Comp::undefined(); 
   select_norm_cc(nx[i][j][k],ny[i][j][k],nz[i][j][k],
-                 nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ, mcomp);
+                 nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ, &mcomp);
   }
 
   /* corner i-min & j-min & k-min */
@@ -565,9 +565,9 @@ void VOF::insert_bc_norm_cc(const Scalar & val) {
                 -(val[i][j  ][k]+val[i][j  ][k+1]));
     nzZ = copysign(1.0,+(val[i][j][k+1]-val[i][j][k]));
 
-    Comp mcomp; 
+    Comp mcomp = Comp::undefined(); 
   select_norm_cc(nx[i][j][k],ny[i][j][k],nz[i][j][k],
-                 nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ, mcomp);
+                 nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ, &mcomp);
   }
 
   /* corner i-min & j-min & k-max */
@@ -596,9 +596,9 @@ void VOF::insert_bc_norm_cc(const Scalar & val) {
                 -(val[i][j  ][k-1]+val[i][j  ][k]));
     nzZ = copysign(1.0,+(val[i][j][k]-val[i][j][k-1]));
 
-    Comp mcomp; 
+    Comp mcomp = Comp::undefined(); 
   select_norm_cc(nx[i][j][k],ny[i][j][k],nz[i][j][k],
-                 nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ, mcomp);
+                 nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ, &mcomp);
   }
 
   /* corner i-min & j-max & k-min */
@@ -627,9 +627,9 @@ void VOF::insert_bc_norm_cc(const Scalar & val) {
                 -(val[i][j-1][k]+val[i][j-1][k+1]));
     nzZ = copysign(1.0,+(val[i][j][k+1]-val[i][j][k]));
 
-    Comp mcomp; 
+    Comp mcomp = Comp::undefined(); 
   select_norm_cc(nx[i][j][k],ny[i][j][k],nz[i][j][k],
-                 nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ, mcomp);
+                 nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ, &mcomp);
   }
 
   /* corner i-min & j-max & k-max */
@@ -658,9 +658,9 @@ void VOF::insert_bc_norm_cc(const Scalar & val) {
                 -(val[i][j-1][k-1]+val[i][j-1][k]));
     nzZ = copysign(1.0,+(val[i][j][k]-val[i][j][k-1]));
 
-    Comp mcomp; 
+    Comp mcomp = Comp::undefined(); 
   select_norm_cc(nx[i][j][k],ny[i][j][k],nz[i][j][k],
-                 nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ, mcomp);
+                 nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ, &mcomp);
   }
 
   /* corner i-max & j-min & k-min */
@@ -689,9 +689,9 @@ void VOF::insert_bc_norm_cc(const Scalar & val) {
                 -(val[i][j  ][k]+val[i][j  ][k+1]));
     nzZ = copysign(1.0,+(val[i][j][k+1]-val[i][j][k]));
 
-    Comp mcomp; 
+    Comp mcomp = Comp::undefined(); 
   select_norm_cc(nx[i][j][k],ny[i][j][k],nz[i][j][k],
-                 nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ, mcomp);
+                 nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ, &mcomp);
   }
 
   /* corner i-max & j-min & k-max */
@@ -720,9 +720,9 @@ void VOF::insert_bc_norm_cc(const Scalar & val) {
                 -(val[i][j  ][k-1]+val[i][j  ][k]));
     nzZ = copysign(1.0,+(val[i][j][k]-val[i][j][k-1]));
 
-    Comp mcomp; 
+    Comp mcomp = Comp::undefined(); 
   select_norm_cc(nx[i][j][k],ny[i][j][k],nz[i][j][k],
-                 nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ, mcomp);
+                 nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ, &mcomp);
   }
 
   /* corner i-max & j-max & k-min */
@@ -751,9 +751,9 @@ void VOF::insert_bc_norm_cc(const Scalar & val) {
                 -(val[i][j-1][k]+val[i][j-1][k+1]));
     nzZ = copysign(1.0,+(val[i][j][k+1]-val[i][j][k]));
 
-    Comp mcomp; 
+    Comp mcomp = Comp::undefined(); 
   select_norm_cc(nx[i][j][k],ny[i][j][k],nz[i][j][k],
-                 nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ, mcomp);
+                 nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ, &mcomp);
   }
 
   /* corner i-max & j-max & k-max */
@@ -782,9 +782,9 @@ void VOF::insert_bc_norm_cc(const Scalar & val) {
                 -(val[i][j-1][k-1]+val[i][j-1][k]));
     nzZ = copysign(1.0,+(val[i][j][k+1]-val[i][j][k-1]));
 
-    Comp mcomp; 
+    Comp mcomp = Comp::undefined(); 
   select_norm_cc(nx[i][j][k],ny[i][j][k],nz[i][j][k],
-                 nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ, mcomp);
+                 nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ, &mcomp);
   }
 }
 
@@ -811,9 +811,9 @@ void VOF::norm_cc_imin(const Scalar & val,
               -(val[i][j-1][k-1]+val[i][j-1][k]+val[i][j-1][k+1]));
   nzZ = copysign(1.0,+(val[i][j][k+1]-val[i][j][k-1]));
 
-  Comp mcomp; 
+  Comp mcomp = Comp::undefined(); 
   select_norm_cc(nx[i][j][k],ny[i][j][k],nz[i][j][k],
-                 nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ, mcomp);
+                 nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ, &mcomp);
 }
 
 /******************************************************************************/
@@ -838,9 +838,9 @@ void VOF::norm_cc_imax(const Scalar & val,
               -(val[i][j-1][k-1]+val[i][j-1][k]+val[i][j-1][k+1]));
   nzZ = copysign(1.0,+(val[i][j][k+1]-val[i][j][k-1]));
 
-  Comp mcomp; 
+  Comp mcomp = Comp::undefined(); 
   select_norm_cc(nx[i][j][k],ny[i][j][k],nz[i][j][k],
-                 nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ, mcomp);
+                 nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ, &mcomp);
 }
 
 /******************************************************************************/
@@ -865,9 +865,9 @@ void VOF::norm_cc_jmin(const Scalar & val,
               -(val[i][j  ][k-1]+val[i][j  ][k]+val[i][j  ][k+1]));
   nzZ = copysign(1.0,+(val[i][j][k+1]-val[i][j][k-1]));
 
-  Comp mcomp; 
+  Comp mcomp = Comp::undefined(); 
   select_norm_cc(nx[i][j][k],ny[i][j][k],nz[i][j][k],
-                 nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ, mcomp);
+                 nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ, &mcomp);
 }
 
 /******************************************************************************/
@@ -892,9 +892,9 @@ void VOF::norm_cc_jmax(const Scalar & val,
               -(val[i][j-1][k-1]+val[i][j-1][k]+val[i][j-1][k+1]));
   nzZ = copysign(1.0,+(val[i][j][k+1]-val[i][j][k-1]));
 
-  Comp mcomp; 
+  Comp mcomp = Comp::undefined(); 
   select_norm_cc(nx[i][j][k],ny[i][j][k],nz[i][j][k],
-                 nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ, mcomp);
+                 nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ, &mcomp);
 }
 
 /******************************************************************************/
@@ -919,9 +919,9 @@ void VOF::norm_cc_kmin(const Scalar & val,
               -(val[i][j-1][k]+val[i][j-1][k+1]));
   nzZ = copysign(1.0,+(val[i][j][k+1]-val[i][j][k]));
 
-  Comp mcomp; 
+  Comp mcomp = Comp::undefined(); 
   select_norm_cc(nx[i][j][k],ny[i][j][k],nz[i][j][k],
-                 nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ, mcomp);
+                 nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ, &mcomp);
 }
 
 /******************************************************************************/
@@ -947,7 +947,7 @@ void VOF::norm_cc_kmax(const Scalar & val,
               -(val[i][j-1][k-1]+val[i][j-1][k]));
   nzZ = copysign(1.0,+(val[i][j][k]-val[i][j][k-1]));
 
-  Comp mcomp; 
+  Comp mcomp = Comp::undefined(); 
   select_norm_cc(nx[i][j][k],ny[i][j][k],nz[i][j][k],
-                 nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ, mcomp);
+                 nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ, &mcomp);
 }

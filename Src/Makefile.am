@@ -15,6 +15,7 @@ SUBDIRS = Equation/Staggered/Momentum      \
           Equation/Centered/PhaseChangeVOF \
           Equation/Centered/CIPCSL2        \
           Equation/Centered/VOF            \
+          Equation/Centered/VOF/VOFaxisym  \
           Equation/Centered/Distance       \
           Equation/Centered                \
           Equation/Dispersed               \
@@ -64,6 +65,7 @@ LDADD = Equation/Staggered/Momentum/libMomentum.a            \
         Equation/Centered/PhaseChangeVOF/libPhaseChangeVOF.a \
         Equation/Centered/CIPCSL2/libCipcsl2.a               \
         Equation/Centered/VOF/libVof.a                       \
+        Equation/Centered/VOF/VOFaxisym/libVOFaxisym.a       \
         Equation/Centered/Distance/libDistance.a             \
         Equation/Centered/libCentered.a                      \
         Equation/Dispersed/libDispersed.a                    \

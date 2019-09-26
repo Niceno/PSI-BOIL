@@ -17,7 +17,7 @@ void VOF::advance_z(Scalar & scp) {
     real f;
     Sign sig = Sign::neg();
 
-    // upwind j-index
+    // upwind k-index
     int kup = k-1;
     if((*u)[m][i][j][k]<0.0) kup = k;             
 

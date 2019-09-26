@@ -19,15 +19,22 @@ void VOF::ancillary(Scalar & scp) {
   /*-------------------------------+
   |  normal vector at cell center  |
   +-------------------------------*/
-#if 1
-  #if 1
-  norm_mixed(scp);
-  #else
-  norm_cc(scp);
-  #endif
-#else
-  norm_elvira(scp);
-#endif
+  if       (norm_method_advance==NormMethod::Mixed()) {
+    norm_mixed(scp);
+  } else if(norm_method_advance==NormMethod::Young()) {
+    norm_young(scp);
+  } else if(norm_method_advance==NormMethod::CC()) {
+    norm_cc(scp);
+  } else if(norm_method_advance==NormMethod::ElviraXZ()) {
+    norm_elvira(scp);
+  } else if(norm_method_advance==NormMethod::ElviraXY()) {
+    norm_elvira(scp);
+  } else if(norm_method_advance==NormMethod::ElviraYZ()) {
+    norm_elvira(scp);
+  } else {
+    /* default */
+    norm_mixed(scp);
+  }
 
   /* iterate boundary normal vector */
   bdnorm(scp);

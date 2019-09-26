@@ -17,8 +17,8 @@ libVof_a_SOURCES =      vof.h                         \
                         vof_curvature.cpp             \
                         vof_curv_HF.cpp               \
                         vof_curv_smooth.cpp           \
-                        vof_extend_norm.cpp           \
                         vof_extract_alpha.cpp         \
+                        vof_forward.cpp               \
                         vof_front_minmax.cpp          \
                         vof_fs_bnd.cpp                \
                         vof_fs_bnd_nosubgrid.cpp      \
@@ -34,6 +34,7 @@ libVof_a_SOURCES =      vof.h                         \
                         vof_insert_bc_norm.cpp        \
                         vof_insert_bc_norm_cc.cpp     \
                         vof_normalize.cpp             \
+                        vof_normal_vector_near_bnd.cpp\
                         vof_norm_cc.cpp               \
                         vof_norm_elvira.cpp           \
                         vof_norm_mixed.cpp            \

@@ -4,6 +4,7 @@
 #define USE_VOF
 //#define AVEJ
 #define SYM
+//#define USE_BNDCLR
 
 /* computed parameters */
 const int gLevel = 4;
@@ -77,6 +78,9 @@ main(int argc, char * argv[]) {
   Scalar c  (d), g  (d), kappa(d), cold(d); // concentration
   Scalar press  (d), p(d), f  (d);
 
+#ifdef USE_BNDCLR
+  Vector bndclr(d), bndclrold(d);
+#endif
 
   /*-----------------------------+ 
   |  insert boundary conditions  |
@@ -96,6 +100,10 @@ main(int argc, char * argv[]) {
     uvw.bc(m).add( BndCnd( Dir::jmin(), BndType::periodic() ) );
     uvw.bc(m).add( BndCnd( Dir::jmax(), BndType::periodic() ) );
     uvw_old(m)=uvw(m).shape();
+#ifdef USE_BNDCLR
+    bndclr(m)    = uvw(m).shape();
+    bndclrold(m) = uvw(m).shape();
+#endif
   }
 
 #ifdef SYM
@@ -124,7 +132,11 @@ main(int argc, char * argv[]) {
   water.mu    (1.0000e-3);
   water.rho   (1.0000e+0);
 
+#ifdef USE_BNDCLR
+  Matter mixed(water, air, &c, &bndclr);
+#else
   Matter mixed(water, air, &c);
+#endif
   mixed.sigma (0.01);
 #else
   air  .mu    (1.0000e-5);
@@ -132,7 +144,11 @@ main(int argc, char * argv[]) {
   water.mu    (1.0000e-3);
   water.rho   (1.0000e+3);
 
+#ifdef USE_BNDCLR
+  Matter mixed(water, air, &c, &bndclr);
+#else
   Matter mixed(water, air, &c);
+#endif
   mixed.sigma (0.07);
 #endif
 
@@ -358,7 +374,11 @@ main(int argc, char * argv[]) {
   multigrid.stop_if_diverging(true);
 
 #ifdef USE_VOF
+  #ifdef USE_BNDCLR
+  VOF conc  (c, g, kappa, uvw, time, solver, &bndclr);
+  #else
   VOF conc  (c, g, kappa, uvw, time, solver);
+  #endif
   conc.set_curv_method(0);  // height function
   //conc.set_curv_method(1);  // smoothed VOF
   conc.ancillary();
@@ -377,6 +397,10 @@ main(int argc, char * argv[]) {
       uvw_old(m) = uvw(m);
     // store color function
     cold = c;
+#ifdef USE_BNDCLR
+    for_m(m)
+      bndclrold(m) = bndclr(m);
+#endif
 
     /* inner loop */
     for(int mloop=0; mloop<mSimple; mloop++) {

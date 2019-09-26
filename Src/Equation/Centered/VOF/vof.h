@@ -10,6 +10,49 @@
 
 #define IB
 
+////////////////////////////
+//                        //
+//  Normal vector method  //
+//                        //
+////////////////////////////
+/* this is a ravioli class for normal vector method selection */
+class NormMethod {
+  public:
+    NormMethod() {val=-1;}
+
+    static const NormMethod undefined() {return NormMethod(-1);}
+    static const NormMethod Young()     {return NormMethod( 1);}
+    static const NormMethod Mixed()     {return NormMethod( 2);}
+    static const NormMethod CC()        {return NormMethod( 3);}
+    static const NormMethod ElviraXZ()  {return NormMethod( 4);}
+    static const NormMethod ElviraXY()  {return NormMethod( 5);}
+    static const NormMethod ElviraYZ()  {return NormMethod( 6);}
+
+    //! Prints the components name.
+    friend std::ostream & operator << (std::ostream & ost, const NormMethod & com) {
+      switch(com.val) {
+        case(-1): ost << "undefined"; break;
+        case( 1): ost << "Young"; break;
+        case( 2): ost << "Mixed"; break;
+        case( 3): ost << "CC"; break;
+        case( 4): ost << "ElviraXZ"; break;
+        case( 5): ost << "ElviraXY"; break;
+        case( 6): ost << "ElviraYZ"; break;
+      }
+
+      return ost;
+    }
+
+    bool operator == (const NormMethod & o) const {return val == o.val;}
+    bool operator != (const NormMethod & o) const {return val != o.val;}
+
+  private:
+    int val;
+
+    /* avoid implicit conversions of integer to Comp */
+    explicit NormMethod(const int m) {val = m;}
+};
+
 ///////////
 //       //
 //  VOF  //
@@ -27,11 +70,10 @@ class VOF : public Centered {
     ~VOF();
 
     void new_time_step(){};
-    void advance(const bool anci = true);
-    void advance(Scalar & sca, const bool anci = true);
+    virtual void advance(const bool anci = true);
+    virtual void advance(Scalar & sca, const bool anci = true);
     void curvature();
-    void ancillary(); /* calcs ancillary params such as adens w/o advance */
-    void ancillary(Scalar & scp);
+    virtual void ancillary(); /* calcs ancillary params such as adens w/o advance */
     void tension(Vector * vec, const Matter matt);
     void tension(Vector * vec, const Matter matt, const Scalar & scp);
     void totalvol();
@@ -105,6 +147,56 @@ class VOF : public Centered {
     void set_minval(real r) {minclr=r;}
     void set_maxval(real r) {maxclr=r;}
 
+    /* setter for normal vector method */
+    void set_normal_vector_method_advance(const NormMethod nm) {
+      norm_method_advance = nm;
+      boil::oout<<"Normal vector method for advance: "<<nm<<boil::endl;
+      if(nm==NormMethod::ElviraYZ()) {
+        mcomp_for_elvira = Comp::i();
+      } else if(nm==NormMethod::ElviraXZ()) {
+        mcomp_for_elvira = Comp::j();
+      } else if(nm==NormMethod::ElviraXY()) {
+        mcomp_for_elvira = Comp::k();
+      } else {
+        mcomp_for_elvira = Comp::undefined();
+      }
+    }
+    void set_normal_vector_method_curvature(const NormMethod nm) {
+      norm_method_curvature = nm;
+      boil::oout<<"Normal vector method for curvature: "<<nm<<boil::endl;
+      if(nm==NormMethod::ElviraYZ()) {
+        mcomp_for_elvira = Comp::i();
+      } else if(nm==NormMethod::ElviraXZ()) {
+        mcomp_for_elvira = Comp::j();
+      } else if(nm==NormMethod::ElviraXY()) {
+        mcomp_for_elvira = Comp::k();
+      } else {
+        mcomp_for_elvira = Comp::undefined();
+      }
+    }
+    void set_normal_vector_method_all(const NormMethod nm) {
+      norm_method_advance = nm;
+      norm_method_curvature = nm;
+      boil::oout<<"Normal vector method: "<<nm<<boil::endl;
+      if(nm==NormMethod::ElviraYZ()) {
+        mcomp_for_elvira = Comp::i();
+      } else if(nm==NormMethod::ElviraXZ()) {
+        mcomp_for_elvira = Comp::j();
+      } else if(nm==NormMethod::ElviraXY()) {
+        mcomp_for_elvira = Comp::k();
+      } else {
+        mcomp_for_elvira = Comp::undefined();
+      }
+    }
+
+    /* getter for normal vector method */
+    NormMethod get_normal_vector_method_advance() {
+      return norm_method_advance;
+    }
+    NormMethod get_normal_vector_method_curvature() {
+      return norm_method_curvature;
+    }
+
     Vector fs;
     Vector * bndclr;
     Topology  topo;
@@ -114,16 +206,18 @@ class VOF : public Centered {
     Scalar adens;
     Scalar mx,my,mz;/* normal to interface, in real space */
 
+    void forward(Scalar & scp);
   protected:
-    void advance_x(Scalar & sca);
-    void advance_y(Scalar & sca);
-    void advance_z(Scalar & sca);
+    virtual void ancillary(Scalar & scp);
+    virtual void advance_x(Scalar & sca);
+    virtual void advance_y(Scalar & sca);
+    virtual void advance_z(Scalar & sca);
     void bdcurv();
     void cal_fs3(const Scalar & scp);
     void cal_fs_interp(const Scalar & scp);
     void curv_HF();
     void curv_smooth();
-    void extract_alpha(Scalar & scp);
+    void extract_alpha(const Scalar & scp);
     void extract_alpha_near_bnd(const Scalar & scp);
     void fs_bnd(const Scalar & scp);
     void fs_bnd_nosubgrid(const Scalar & scp);
@@ -141,21 +235,24 @@ class VOF : public Centered {
            , const real & n4, const real & n5, const real & n6
            , real r[]);
 
+
     void norm_cc(const Scalar & g);
-    void norm_cc(real & nx_val, real & ny_val, real & nz_val, Comp & mcomp,
-                 const int i, const int j, const int z, const Scalar & sca);
+    void norm_cc_kernel(real & nx_val, real & ny_val, real & nz_val, Comp & mcomp,
+                        const int i, const int j, const int k, const Scalar & sca);
+    void norm_cc_kernel(real & nx_val, real & ny_val, real & nz_val,
+                        const int i, const int j, const int k, const Scalar & sca);
 
     void norm_young(const Scalar & g);
-    void norm_young(real & nx_val, real & ny_val, real & nz_val,
-                    const int i, const int j, const int z, const Scalar & sca);
+    void norm_young_kernel(real & nx_val, real & ny_val, real & nz_val,
+                           const int i, const int j, const int k, const Scalar & sca);
 
     void norm_mixed(const Scalar & g);
-    void norm_mixed(real & nx_val, real & ny_val, real & nz_val,
-                    const int i, const int j, const int k,
-                    const Scalar & sca);
-
+    void norm_mixed_kernel(real & nx_val, real & ny_val, real & nz_val,
+                           const int i, const int j, const int k,
+                           const Scalar & sca);
+  
     void bdnorm(Scalar & scp);
-    void extend_norm(const Scalar & g);
+    void normal_vector_near_bnd(const Scalar & g);
 
     void normalize(real & r1, real & r2, real & r3);
     void normalize_l1(real & nx_l1, real & ny_l1, real & nz_l1,
@@ -172,15 +269,16 @@ class VOF : public Centered {
     real kappa_ave(const real r1, const real r2);
     real kappa_ave(const real r1, const real r2, const int i1, const int i2);
 
-    real calc_v(real r1, real r2, real r3, real r4);
-    real calc_alpha(const real r1, const real r2, const real r3, const real r4);
-    real calc_flux(const real g, real c, const real nx, const real ny, const real nz);
+    /* at the moment, these are NOT overwritten in the derived class */
+    virtual real calc_v(real r1, real r2, real r3, real r4);
+    virtual real calc_alpha(const real r1, const real r2, const real r3, const real r4);
+    virtual real calc_flux(const real g, real c, const real nx, const real ny, const real nz);
 
     void select_norm_cc(real & nx_val, real & ny_val, real & nz_val,
                         real & NxX, real & NyX, real & NzX,
                         real & NxY, real & NyY, real & NzY,
                         real & NxZ, real & NyZ, real & NzZ,
-                        Comp & mcomp);
+                        Comp * mcomp);
     void select_norm_myc(real & nx_val, real & ny_val, real & nz_val,
                          const real & nx_cc, const real & ny_cc, const real & nz_cc,
                          const real & nx_young, const real & ny_young, const real & nz_young,
@@ -212,13 +310,17 @@ class VOF : public Centered {
     void vf_limiter();   
 
     /* elvira functions */
-    void norm_elvira(Scalar & sca);
-    void norm_elvira(int i,int j,int k,
-                     real valcc,real valmc,real valpc,real valcm,
-                     real valcp,real valmm,real valpm,real valmp,real valpp);
+    void norm_elvira(const Scalar & sca);
+    void norm_elvira_kernel(real & nx_val, real & ny_val, real & nz_val,
+                            const int i, const int j, const int k,
+                            const Scalar & sca);
+    void norm_elvira_kernel_full(real & nx_val, real & ny_val, real & nz_val,
+                                 const Comp & m, const int i, const int j, const int k,
+                                 real valcc,real valmc,real valpc,real valcm,
+                                 real valcp,real valmm,real valpm,real valmp,real valpp);
     void normalize_elvira(const real m, const real sig, 
-                          real & nnx, real & nny, real & nnz);
-    real elvira_l2(const real alp,const real nnx,const real nny,const real nnz,
+                          real & nn1, real & nn2, real & nn3);
+    real elvira_l2(const real alp,const real nn1,const real nn2,const real nn3,
                    const real valcc,const real valmc,const real valpc,
                    const real valcm,const real valcp,const real valmm,
                    const real valpm,const real valmp,const real valpp);
@@ -251,6 +353,8 @@ class VOF : public Centered {
     real minclr, maxclr;
 
     Heaviside heavi;
+    NormMethod norm_method_advance, norm_method_curvature;
+    Comp mcomp_for_elvira;
 
     int nlayer;
     int curv_method;

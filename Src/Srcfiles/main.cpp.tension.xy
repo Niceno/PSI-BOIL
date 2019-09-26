@@ -4,9 +4,10 @@
 #define USE_VOF
 //#define AVEJ
 #define SYM
+//#define USE_BNDCLR
 
 /* computed parameters */
-const int gLevel = 4;
+const int gLevel = 8;
 #ifdef SYM
 const int NX = 16*gLevel;
 #else
@@ -26,7 +27,7 @@ const real LZ =   LX/real(NX)*real(NZ);
 #endif
 
 #ifdef USE_VOF
-const int mSimple = 1;
+const int mSimple = 4;
 #else
 const int mSimple = 1;
 #endif
@@ -77,6 +78,9 @@ main(int argc, char * argv[]) {
   Scalar c  (d), g  (d), kappa(d), cold(d); // concentration
   Scalar press  (d), p(d), f  (d);
 
+#ifdef USE_BNDCLR
+  Vector bndclr(d), bndclrold(d);
+#endif
 
   /*-----------------------------+ 
   |  insert boundary conditions  |
@@ -96,6 +100,10 @@ main(int argc, char * argv[]) {
     uvw.bc(m).add( BndCnd( Dir::kmin(), BndType::periodic() ) );
     uvw.bc(m).add( BndCnd( Dir::kmax(), BndType::periodic() ) );
     uvw_old(m)=uvw(m).shape();
+#ifdef USE_BNDCLR
+    bndclr(m)    = uvw(m).shape();
+    bndclrold(m) = uvw(m).shape();
+#endif
   }
 
 #ifdef SYM
@@ -124,7 +132,11 @@ main(int argc, char * argv[]) {
   water.mu    (1.0000e-3);
   water.rho   (1.0000e+0);
 
+#ifdef USE_BNDCLR
+  Matter mixed(water, air, &c, &bndclr);
+#else
   Matter mixed(water, air, &c);
+#endif
   mixed.sigma (0.01);
 #else
   air  .mu    (1.0000e-5);
@@ -132,7 +144,11 @@ main(int argc, char * argv[]) {
   water.mu    (1.0000e-3);
   water.rho   (1.0000e+3);
 
+#ifdef USE_BNDCLR
+  Matter mixed(water, air, &c, &bndclr);
+#else
   Matter mixed(water, air, &c);
+#endif
   mixed.sigma (0.07);
 #endif
 
@@ -214,119 +230,7 @@ main(int argc, char * argv[]) {
   const real zcent = 0.0;
 
   const real radius = LX/4.0;
-#if 0
-  // set theoretical value of single droplet for color function
-  for_vijk(c,i,j,k){
-    int inm,inp,jnm,jnp;
-    if (c.xc(i)>0.0 && c.yc(j)>0.0) {
-      inm=i; inp=i+1; jnm=j; jnp=j+1;
-    } else if (c.xc(i)>0.0 && c.yc(j)<0.0) {
-      inm=i; inp=i+1; jnm=j+1; jnp=j; 
-    } else if (c.xc(i)<0.0 && c.yc(j)>0.0) {
-      inm=i+1; inp=i; jnm=j; jnp=j+1;
-    } else {
-      inm=i+1; inp=i; jnm=j+1; jnp=j;
-    }
-
-    // check vertex
-    int imm=0, imp=0, ipm=0, ipp=0;
-
-    real dtmp = sqrt(pow(c.xn(inm)-xcent,2.0) + pow(c.yn(jnm)-ycent,2.0));
-    if (dtmp<=radius) imm=1;
-
-    dtmp = sqrt(pow(c.xn(inm)-xcent,2.0) + pow(c.yn(jnp)-ycent,2.0));
-    if (dtmp<=radius) imp=1;
-
-    dtmp = sqrt(pow(c.xn(inp)-xcent,2.0) + pow(c.yn(jnm)-ycent,2.0));
-    if (dtmp<=radius) ipm=1;
-
-    dtmp = sqrt(pow(c.xn(inp)-xcent,2.0) + pow(c.yn(jnp)-ycent,2.0));
-    if (dtmp<=radius) ipp=1;
-
-    if (imm+imp+ipm+ipp==4) {
-
-      // full of liquid
-      c[i][j][k] = 1.0;
-
-    } else if(imm+imp+ipm+ipp==0){
-
-      // full of gas
-      c[i][j][k] = 0.0;
-
-    } else if(imm+imp+ipm+ipp==1) {
-
-      // one vertex is in liquid
-      real theta1 = asin(fabs(c.yn(jnm))/radius);
-      real theta2 = acos(fabs(c.xn(inm))/radius);
-
-      if (approx(theta2-theta1,0.0)) {
-
-        //exception
-        c[i][j][k]=0.0;
-
-      } else {
-
-        real area = radius*radius*(theta2-theta1)*0.5;
-        real a = fabs(c.yn(jnm))/(radius*cos(theta1));
-        real yy = a*fabs(c.xn(inm));
-        area = area - (radius*sin(theta2)-yy)*fabs(c.xn(inm))*0.5
-                    - (fabs(c.yn(jnm))-yy)
-                     *(radius*cos(theta1)-fabs(c.xn(inm)))*0.5;
-        c[i][j][k] = area/(fabs(c.dxc(inm))*fabs(c.dyc(jnm)));
-        //std::cout<<area<<"\n";
-        
-      }
-
-    } else if (imm+imp+ipm+ipp==3) {
-
-      // one vertex is in gas
-      real theta1 = acos(fabs(c.xn(inp))/radius);
-      real theta2 = asin(fabs(c.yn(jnp))/radius);
-
-      real area = (fabs(c.xn(inp))-radius*cos(theta2))*fabs(c.yn(jnp))*0.5
-                + (fabs(c.yn(jnp))-radius*sin(theta1))*fabs(c.xn(inp))*0.5;
-      area -= radius*radius*(theta2-theta1)*0.5;
-      area = c.dxc(i)*c.dyc(j)-area;
-      c[i][j][k] = area/(c.dxc(i)*c.dyc(j));
-      //std::cout<<c[i][j][k]<<"\n";
-
-    } else if (imm+imp+ipm+ipp==2) {
-
-      // two vertices are in gas
-      if (ipm==1) {
-        // imm and ipm are in liquid
-        real theta1 = acos(fabs(c.xn(inp))/radius);
-        real theta2 = acos(fabs(c.xn(inm))/radius);
-
-        real area = radius*radius*(theta2-theta1)*0.5;
-        real a1 = radius*sin(theta1)/fabs(c.xn(inp));
-        area += (fabs(c.xn(inp))-fabs(c.yn(jnm))/a1)
-               *(radius*sin(theta1)-fabs(c.yn(jnm)))*0.5;
-        area -= (fabs(c.yn(jnm))/a1-fabs(c.xn(inm)))*fabs(c.yn(jnm))*0.5;
-        area -= (radius*sin(theta2)-fabs(c.yn(jnm)))*fabs(c.xn(inm))*0.5;
-        c[i][j][k] = area/(c.dxc(i)*c.dyc(j));
-        //std::cout<<c[i][j][k]<<"\n";
-      } else if (imp==1) {
-        // imm and imp are in liquid
-        real theta1 = asin(fabs(c.yn(jnm))/radius);
-        real theta2 = asin(fabs(c.yn(jnp))/radius);
-
-        real area = radius*radius*(theta2-theta1)*0.5;
-        real a2 = fabs(c.yn(jnp))/(radius*cos(theta2));
-        area += (radius*cos(theta2)-fabs(c.xn(inm)))
-               *(fabs(c.yn(jnp))-a2*fabs(c.xn(inm)))*0.5;
-        area -= (a2*fabs(c.xn(inm))-fabs(c.yn(jnm)))*fabs(c.xn(inm))*0.5;
-        area -= (radius*cos(theta1)-fabs(c.xn(inm)))*fabs(c.yn(jnm))*0.5;
-        c[i][j][k] = area/(c.dxc(i)*c.dyc(j));
-      } else {
-        std::cout<<"Error!!!\n";
-        exit(0);
-      }
-    }
-  }
-#else
   setup_circle_xy(c,radius,xcent,ycent);
-#endif
 #if 1
   for_avijk(c,i,j,k)
     c[i][j][k] = 1. - c[i][j][k];
@@ -358,7 +262,11 @@ main(int argc, char * argv[]) {
   multigrid.stop_if_diverging(true);
 
 #ifdef USE_VOF
+  #ifdef USE_BNDCLR
+  VOF conc  (c, g, kappa, uvw, time, solver, &bndclr);
+  #else
   VOF conc  (c, g, kappa, uvw, time, solver);
+  #endif
   conc.set_curv_method(0);  // height function
   //conc.set_curv_method(1);  // smoothed VOF
   conc.ancillary();
@@ -377,6 +285,10 @@ main(int argc, char * argv[]) {
       uvw_old(m) = uvw(m);
     // store color function
     cold = c;
+#ifdef USE_BNDCLR
+    for_m(m)
+      bndclrold(m) = bndclr(m);
+#endif
 
     /* inner loop */
     for(int mloop=0; mloop<mSimple; mloop++) {

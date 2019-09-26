@@ -84,7 +84,7 @@ void Domain::statistics(Body * body) {
   }
   boil::oout << "+-------------------------";
   boil::oout << "--------------------------+" << boil::endl;
-  sprintf(b, "| resolution; nx, ny, nz = %6d, %6d, %6d.  |", 
+  sprintf(b, "| Resolution: nx, ny, nz = %6d, %6d, %6d.  |", 
              gnx, gny, gnz);
   boil::oout << b << boil::endl;
   boil::oout << "+-------------------------";

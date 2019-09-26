@@ -28,7 +28,10 @@ VOF::VOF(const Scalar & PHI,
   iflagx(*PHI.domain() ),
   adens(*PHI.domain() ),
   heavi(&phi, NULL, &adens),
-  topo(&mx,&my,&mz,&adens,&fs)
+  topo(&mx,&my,&mz,&adens,&fs),
+  norm_method_advance(NormMethod::Mixed()),
+  norm_method_curvature(NormMethod::Young()),
+  mcomp_for_elvira(Comp::undefined()) /* undefined for 3D */
 
 /*------------------------------------------------------+
 |  this constructor is called only at the finest level  |
@@ -77,7 +80,7 @@ VOF::VOF(const Scalar & PHI,
 
   assert(PHI.domain() == F.domain());
 
-/* set parameters */
+  /* set parameters */
   //dxmin=std::min(phi.dxc(3),std::min(phi.dyc(3),phi.dzc(3)));
   dxmin = dom->dxyz_min();
   boil::cart.min_real(&dxmin);

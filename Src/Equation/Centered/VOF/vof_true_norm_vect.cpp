@@ -9,29 +9,29 @@ void VOF::true_norm_vect() {
 
   /* cell centered base, second order */
   for_aijk(i,j,k) {
-    real mmx = nx[i][j][k];
-    real mmy = ny[i][j][k];
-    real mmz = nz[i][j][k];
+    real nnx = nx[i][j][k];
+    real nny = ny[i][j][k];
+    real nnz = nz[i][j][k];
 
     real dnx = nx.dxc(i);
     real dny = nx.dyc(j);
     real dnz = nx.dzc(k);
-    real nnx, nny, nnz;
+    real mmx, mmy, mmz;
     if(dnx==0.0||dny==0.0||dnz==0.0) {
-      nnx = mmx;
-      nny = mmy;
-      nnz = mmz;
+      mmx = nnx;
+      mmy = nny;
+      mmz = nnz;
     } else {
-      nnx = mmx/nx.dxc(i);
-      nny = mmy/nx.dyc(j);
-      nnz = mmz/nx.dzc(k);
+      mmx = nnx/nx.dxc(i);
+      mmy = nny/nx.dyc(j);
+      mmz = nnz/nx.dzc(k);
     }
 
-    normalize(nnx,nny,nnz);
+    normalize(mmx,mmy,mmz);
  
-    mx[i][j][k] = nnx;
-    my[i][j][k] = nny;
-    mz[i][j][k] = nnz;
+    mx[i][j][k] = mmx;
+    my[i][j][k] = mmy;
+    mz[i][j][k] = mmz;
 
   }
 

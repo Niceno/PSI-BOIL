@@ -5,7 +5,7 @@ void VOF::select_norm_cc(real & nx_val, real & ny_val, real & nz_val,
                          real & nxX, real & nyX, real & nzX,
                          real & nxY, real & nyY, real & nzY,
                          real & nxZ, real & nyZ, real & nzZ,
-                         Comp & mcomp) {
+                         Comp * mcomp) {
 /***************************************************************************//**
 *  \brief Select normal vector according to CC criterion
 *  in E.Aulisa,JCP,225(2007),2301-2319
@@ -52,24 +52,24 @@ void VOF::select_norm_cc(real & nx_val, real & ny_val, real & nz_val,
       nx_val=nxZ;
       ny_val=nyZ;
       nz_val=nzZ;
-      mcomp = Comp::k();
+      *mcomp = Comp::k();
     } else {
       nx_val=nxY;
       ny_val=nyY;
       nz_val=nzY;
-      mcomp = Comp::j();
+      *mcomp = Comp::j();
     }
   } else {
     if (fabs(nxX_l1)<fabs(nzZ_l1)) {
       nx_val=nxZ;
       ny_val=nyZ;
       nz_val=nzZ;
-      mcomp = Comp::k();
+      *mcomp = Comp::k();
     } else {
       nx_val=nxX;
       ny_val=nyX;
       nz_val=nzX;
-      mcomp = Comp::i();
+      *mcomp = Comp::i();
     }
   }
 #endif
