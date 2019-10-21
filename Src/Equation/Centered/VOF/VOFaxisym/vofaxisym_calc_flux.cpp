@@ -3,28 +3,40 @@
 real VOFaxisym::calc_flux_axisymmetric(const real gg,
                                        const int i, const int j, const int k,
                                        const Comp & mcomp) {
+  /* no advection */
+  if(gg==0.0) {
+    return 0.0;
+  }
 
   /* cell dimensions and cut values */
 #if 1
   real g, ratio; /* cut-cell-fraction in linear and volumetric terms, resp */
-  real eta0; /* left edge of the cut-cell */
+  real absg; /* and in abs value */
+  real eta0; /* one of the edges of the cut-cell */
+  real eta00; /* left edge of the cut-cell, must be identified and rescaled */
   real eta1 = phi.xn(i)/phi.dxc(i); /* left */
   real eta2 = phi.xn(i+1)/phi.dxc(i); /* right */
   if       (mcomp == Comp::w()) {
     g = gg;
+    absg = fabs(g);
     ratio = g;
     eta0 = eta1;
+    eta00 = eta0;
   } else if(mcomp == Comp::u()) {
     real etaf;
     /* in the Cartesian limit etaf->inf, g & ratio become gg */
-    if(g>0.0) {
+    if(gg>0.0) {
       etaf = eta2;
       g =  etaf - sqrt(etaf*etaf-2.*etaf*gg);
+      absg = fabs(g);
       eta0 = etaf-g;
+      eta00 = eta0/absg;
     } else {
       etaf = eta1;
       g =  etaf - sqrt(etaf*etaf-2.*etaf*gg);
+      absg = fabs(g);
       eta0 = etaf-g;
+      eta00 = etaf/absg;
     }
     ratio = (etaf*etaf-eta0*eta0)/(eta2*eta2-eta1*eta1);
   } else {
@@ -33,12 +45,6 @@ real VOFaxisym::calc_flux_axisymmetric(const real gg,
     exit(0);
   }
 #endif
-  real absg = fabs(g);
-
-  /* no advection */
-  if(g==0.0) {
-    return 0.0;
-  }
 
   /* n points to the liquid */
   real vnx = -nx[i][j][k];
@@ -89,7 +95,8 @@ real VOFaxisym::calc_flux_axisymmetric(const real gg,
      - the ratio factor then scales the transported volume back to the org wedge 
      - it also imposes the correct sign */
   real Kdummy;
-  real f = calc_v_axisymmetric(vnx*qa,alpha*qa,eta0,Kdummy) * gg;
+  real f = calc_v_axisymmetric(vnx*qa,alpha*qa,eta00,Kdummy) * ratio;
+  //boil::oout<<i<<" "<<k<<" | "<<vnx*qa<<" "<<(vmx+vmz)*qa<<" "<<alpha*qa<<" | "<<eta00<<" "<<ratio<<" "<<f<<boil::endl;
 
   return f;
 }

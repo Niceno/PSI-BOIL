@@ -53,22 +53,23 @@ void VOFaxisym::reconstruct_geometry(const Scalar & scp) {
 
   /* set c0 = phi */
   for_avijk(clr,i,j,k) {
-    clr[i][j][k] = scp[i][j][k];
+    clr[i][j][k] = std::max(0.0,std::min(1.0,scp[i][j][k]));
   }
 
+  #if 1
   /* iteration procedure */
   do {
     norm_axisymmetric(clr);
     backward_axisymmetric(phi,nalpha);
     forward(axistmp);
-#if 0
+    #if 0
     /* calculate Linf error norm of reconstruction in c-space */
     linferr = linf_scalar_error(axistmp,clr);
-#else
+    #else
     color_to_vf(axistmp,axistmp2);
     /* calculate Linf error norm of reconstruction in phi-space */
     linferr = linf_scalar_error(axistmp2,phi);
-#endif
+    #endif
 
     iter++;
     boil::oout<<"VOFaxisym::reconstruct_geometry: "<<time->current_time()
@@ -77,15 +78,18 @@ void VOFaxisym::reconstruct_geometry(const Scalar & scp) {
     for_avijk(clr,i,j,k) {
       clr[i][j][k] = axistmp[i][j][k];
     }
-  #if 1
+    #if 1
   } while(linferr>reconstruction_tolerance&&iter<reconstruction_maxiter);
-  #else
+    #else
   } while(false);
+    #endif
+  #else
+  norm_axisymmetric(clr);
+  extract_alpha(clr);
   #endif
-
 #endif
 
-  if(iter<=reconstruction_maxiter) {
+  if(iter<reconstruction_maxiter) {
     boil::oout<<"VOFaxisym::reconstruct_geometry converged after "
               <<iter<<" iterations! "
               <<"Final error: "<<linferr<<boil::endl;
@@ -93,6 +97,8 @@ void VOFaxisym::reconstruct_geometry(const Scalar & scp) {
     boil::oout<<"VOFaxisym::reconstruct_geometry did not converge after "
               <<iter<<" iterations! "
               <<"Final error: "<<linferr<<boil::endl;
+    //boil::plot->plot(phi,clr,nx,nz,nalpha,"phi-clr-nx-nz-nalp", time->current_step());
+    //exit(0);
   }
 
   return;

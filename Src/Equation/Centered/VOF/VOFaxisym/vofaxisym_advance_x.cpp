@@ -22,28 +22,35 @@ void VOFaxisym::advance_x(Scalar & scp) {
     if((*u)[m][i][j][k]<0.0) iup = i;             
 
     real dt = time->dt();
+    real refval = clr[iup][j][k];
 
-    if (scp[iup][j][k] < boil::pico) {
+    if (refval < boil::pico) {
 
-      f = scp[iup][j][k] * dSx(sig,i,j,k) * ((*u)[m][i][j][k]) * dt;
+      f = refval * dSx(sig,i,j,k) * ((*u)[m][i][j][k]) * dt;
 
-    } else if(scp[iup][j][k]>1.0-boil::pico) {
+    } else if(refval>1.0-boil::pico) {
 
-      f = scp[iup][j][k] * dSx(sig,i,j,k) * ((*u)[m][i][j][k]) * dt;
+      f = refval * dSx(sig,i,j,k) * ((*u)[m][i][j][k]) * dt;
 
-    } else {
+    } else { 
 
       if (scp.dxc(iup)==0.0 ) {
 
-        /* could be imprecise in fringe cases:
-           it should actually be clr*dS*u*dt */
-        f = scp[iup][j][k] * dSx(sig,i,j,k) * ((*u)[m][i][j][k]) * dt;
+        f = refval * dSx(sig,i,j,k) * ((*u)[m][i][j][k]) * dt;
 
-      } else {
+      } else { 
 
         /* calculate g: CFL upwind */
         real g = ((*u)[m][i][j][k])*dt/scp.dxc(iup);
+#if 1
         f = dV(iup,j,k)*calc_flux_axisymmetric(g,iup,j,k,Comp::u());
+#else
+        real scpup = scp[iup][j][k];
+        f = dV(iup,j,k)*calc_flux(g,scpup,nx[iup][j][k],
+                                          ny[iup][j][k],
+                                          nz[iup][j][k]);
+#endif
+
       }
     }
 

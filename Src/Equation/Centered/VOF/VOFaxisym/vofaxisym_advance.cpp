@@ -29,11 +29,9 @@ void VOFaxisym::advance(Scalar & scp, const bool anci) {
     stmp[i][j][k] = scp[i][j][k] * dV(i,j,k);
   }
 
-#if 0
   /* advance in x-direction */
   if(ifull)
     advance_x(scp);
-#endif
 
   /* advance in z-direction */
   if(kfull)
