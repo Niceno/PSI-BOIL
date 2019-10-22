@@ -37,7 +37,7 @@ class VOFaxisym : public VOF {
        set_normal_vector_method_all(NormMethod::ElviraXZ());
 
        reconstruction_tolerance = 1e-4;
-       reconstruction_maxiter = 20;
+       reconstruction_maxiter = 7;
     }
 
     ~VOFaxisym() {};

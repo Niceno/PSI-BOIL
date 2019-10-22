@@ -65,8 +65,21 @@ void VOF::advance(Scalar & scp, const bool anci) {
       phi[i][j][k] = std::min(1.0,std::max(0.0,phi_tmp));
     }
   } else {
+    int ierr=0;
     for_ijk(i,j,k){
       phi[i][j][k] = stmp[i][j][k] / dV(i,j,k);
+      if (phi[i][j][k]<-1.0||phi[i][j][k]>2.0) {
+        boil::aout<<"Error!!! Too small or too large phi in vof_advance. phi= "
+                  <<phi[i][j][k]<<"\n";
+        boil::aout<<"proc= "<<boil::cart.iam()
+                  <<" (i,j,k)= "<<i<<" "<<j<<" "<<k<<"\n";
+        boil::aout<<"(x,y,z)= "<<phi.xc(i)<<" "<<phi.yc(j)<<" "<<phi.zc(k)<<"\n";
+        ierr=1;
+      }
+    }
+    boil::cart.sum_int(&ierr);
+    if (ierr>=1) {
+      exit(0);
     }
   }
 

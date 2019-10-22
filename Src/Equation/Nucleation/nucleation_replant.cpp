@@ -23,7 +23,7 @@ void Nucleation::replant () {
     real clr_seed = clr_site(ns);  // color function at seed point
 
     bool bheight = false;          // bheight=true, if zplant is satisfied.
-    if(sites[ns].zplant()<0.0) {   // crued code
+    if(sites[ns].zplant()<0.0) {   // crude code
       bheight = true;
     } else {
       real zft=zftmin( Range<real>(sites[ns].x()-dxmin,sites[ns].x()+dxmin)
@@ -108,23 +108,52 @@ void Nucleation::replant () {
       /* set color function */
       real vol_seed=0.0;   // volome of seed
       real area_base=0.0;  // area of bubble-base
-      int kadj=0;          // k at adjasent to wall
+      int kadj=0;          // k adjacent to wall
       for(int i=sites[ns].is(); i<=sites[ns].ie(); i++) {
         for(int j=sites[ns].js(); j<=sites[ns].je(); j++) {
           for(int k=sites[ns].ks(); k<=sites[ns].ke(); k++) {
             if (i<clr->si() || clr->ei()<i ||
                 j<clr->sj() || clr->ej()<j) continue;
             if( clr->domain()->ibody().on(i,j,k) ) {
-              real adist = sqrt( pow(clr->xc(i)-sites[ns].x(),2.0)
-                               + pow(clr->yc(j)-sites[ns].y(),2.0)
-                               + pow(clr->zc(k)-sites[ns].z(),2.0))
+              real xcent=sites[ns].x();
+              real ycent=sites[ns].y();
+              real zcent=sites[ns].z();
+              real adist = sqrt( pow(clr->xc(i)-xcent,2.0)
+                               + pow(clr->yc(j)-ycent,2.0)
+                               + pow(clr->zc(k)-zcent,2.0))
                          - rseed;
               real cseed = 1.0;
               if(adist<-eps){
                 cseed=0.0;
               }else if(adist<eps){
+#if 0
                 cseed= 0.5 + adist/(2.0*eps) 
                      + 1.0/(2.0*boil::pi)*sin(boil::pi*adist/eps);
+#else
+                real mm=8;
+                real x0=clr->xn(i);
+                real y0=clr->yn(j);
+                real z0=clr->zn(k);
+                real ddx=clr->dxc(i)/real(mm);
+                real ddy=clr->dyc(j)/real(mm);
+                real ddz=clr->dzc(k)/real(mm);
+                int itmp=0;
+                for (int ii=0; ii<mm; ii++){
+                  for (int jj=0; jj<mm; jj++){
+                    for (int kk=0; kk<mm; kk++){
+                      real xxc=x0+0.5*ddx+real(ii)*ddx;
+                      real yyc=y0+0.5*ddy+real(jj)*ddy;
+                      real zzc=z0+0.5*ddz+real(kk)*ddz;
+                      real dist=sqrt(pow(xxc-xcent,2.0)
+                                    +pow(yyc-ycent,2.0)+pow(zzc-zcent,2.0));
+                      if (dist>rseed){
+                        itmp=itmp+1;
+                      }
+                    }
+                  }
+                }
+                cseed=real(itmp)/real(mm*mm*mm);
+#endif
               }
               (*clr)[i][j][k]=std::min((*clr)[i][j][k],cseed);
               vol_seed += clr->dV(i,j,k) * (1.0-cseed);
@@ -139,7 +168,7 @@ void Nucleation::replant () {
         }
       }
 
-#if 1
+#if 0
       /* set heat sink */
       if(sites[ns].seed_prev()==false) {
         for(int i=sites[ns].is(); i<=sites[ns].ie(); i++) {

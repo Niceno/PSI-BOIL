@@ -472,6 +472,7 @@ void VOF::update_at_walls(Scalar & scp) {
     }
   }
 
+  scp.bnd_update_nowall();
   scp.exchange_all();
   nx.exchange_all();
   ny.exchange_all();

@@ -150,7 +150,7 @@ void PhaseChangeVOF::extrapolate(Scalar & sca, const int iext) {
   
     if(errnorm<tol_ext) {
       converged = true;
-      boil::oout<<"PC-VOF::ext_grad converged after "<<mstep<<" steps, final rel. error: "<<errnorm<<"\n";
+      //boil::oout<<"PC-VOF::ext_grad converged after "<<mstep<<" steps, final rel. error: "<<errnorm<<"\n";
       break;
     }
 

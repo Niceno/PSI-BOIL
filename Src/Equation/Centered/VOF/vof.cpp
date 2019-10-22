@@ -94,6 +94,7 @@ VOF::VOF(const Scalar & PHI,
   cangle=90.0/180.0*boil::pi;
   limit_color=false;
   use_subgrid=false;
+  use_HF_wall=false;
 
   discretize();
 
