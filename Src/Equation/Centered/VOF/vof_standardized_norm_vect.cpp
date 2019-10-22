@@ -1,7 +1,10 @@
 #include "vof.h"
 
 /******************************************************************************/
-void VOF::standardized_norm_vect() {
+void VOF::standardized_norm_vect(const Scalar & mx,
+                                 const Scalar & my,
+                                 const Scalar & mz,
+                                 Scalar & nx, Scalar & ny, Scalar & nz) {
 /***************************************************************************//**
 *  \brief Calculate normal vector at cell center.
 *         Results: nx, ny, nz -- standardized normal vector 

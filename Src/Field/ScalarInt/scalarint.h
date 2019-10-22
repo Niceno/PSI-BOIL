@@ -166,6 +166,8 @@ class ScalarInt {
     const Domain * domain() const {return dom;}
     
     void bnd_update();
+    void bnd_update_nowall();
+    void bnd_update_symmetry();
 
     void bnd_extract( const Dir d, int *** cp ) const;
     void bnd_insert ( const Dir d, int **  cp );

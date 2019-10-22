@@ -9,31 +9,25 @@ void VOF::norm_cc(const Scalar & sca) {
 *         Results: nx, ny, nz
 *******************************************************************************/
 
+  real dummy; /* dummy from alpha calculations */
+
   for_ijk(i,j,k) {
     real nxx, nyy, nzz;
     Comp mcomp;
-    norm_cc_kernel(nxx, nyy, nzz, mcomp, i,j,k, sca);
+    norm_cc_kernel(nxx, nyy, nzz, dummy, mcomp, i,j,k, sca);
 
     nx[i][j][k] = nxx;
     ny[i][j][k] = nyy;
     nz[i][j][k] = nzz;
   }
 
-  /* normal vector at adjacent cells next to wall, symmetric and IB */
-  //insert_bc_gradphic(sca); 
-
   /* normal vector on boundary plane */
+  norm_cc_near_bnd(sca);
 #if 1
   nx.bnd_update();
   ny.bnd_update();
   nz.bnd_update();
 #endif
-  insert_bc_norm_cc(sca);
-
-  /* normalize */
-  //for_avijk(sca,i,j,k) {
-  //  normalize(nx[i][j][k],ny[i][j][k],nz[i][j][k]);
-  //}
 
   nx.exchange_all();
   ny.exchange_all();
@@ -47,6 +41,7 @@ void VOF::norm_cc(const Scalar & sca) {
 }
 
 void VOF::norm_cc_kernel(real & nx_val, real & ny_val, real & nz_val,
+                         real & dummy, /* unused */
                          Comp & mcomp,
                          const int i, const int j, const int k,
                          const Scalar & sca) {
@@ -80,6 +75,7 @@ void VOF::norm_cc_kernel(real & nx_val, real & ny_val, real & nz_val,
 }
 
 void VOF::norm_cc_kernel(real & nx_val, real & ny_val, real & nz_val,
+                         real & dummy, /* unused */
                          const int i, const int j, const int k,
                          const Scalar & sca) {
 

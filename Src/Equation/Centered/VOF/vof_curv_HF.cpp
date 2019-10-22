@@ -20,53 +20,34 @@ void VOF::curv_HF() {
   /*-----------------------------------------------------------+
   |  Step 1: calculate normal vector                           |
   |  Step 2: define iflag=1                                    |
-  |  Step 3: calculate curvature if (iflag==1 & 3<=height<=4)  |
-  |  Step 4: extrapolate curvatuer to two layers               |
-  |  Step 5: calculate curvature at wall                       |
+  |  Step 3: calculate curvature if (iflag==1 & 3<height<=4)   |
+  |  Step 4: calculate curvature at wall                       |
+  |  Step 5: extrapolate curvature to five layers              |
   +-----------------------------------------------------------*/
 
   /* calculate normal vector */
-  // Normal vector is used for (i) dirMax and (ii) Eq. (2) in J.Lopez et al.
+  /* Normal vector is used for (i) mMax and (ii) Eq. (2) in J.Lopez et al. */
   if(norm_method_curvature != norm_method_advance) {
-    if       (norm_method_curvature==NormMethod::Mixed()) {
-      norm_mixed(phi);
-    } else if(norm_method_curvature==NormMethod::Young()) {
-      norm_young(phi);
-    } else if(norm_method_curvature==NormMethod::CC()) {
-      norm_cc(phi);
-    } else if(norm_method_curvature==NormMethod::ElviraXZ()) {
-      norm_elvira(phi);
-    } else if(norm_method_curvature==NormMethod::ElviraXY()) {
-      norm_elvira(phi);
-    } else if(norm_method_curvature==NormMethod::ElviraYZ()) {
-      norm_elvira(phi);
-    } else {
-      /* default */
-      boil::aout<<"VOF::curvHF: Normal vector calculation method not set properly!"
-                <<" Exiting."<<boil::endl;
-      exit(0);
-    }
-    true_norm_vect();
+    norm(phi,norm_method_curvature,false); /* alpha is not extracted */
   }
 
-  for_aijk(i,j,k) {
-    nx[i][j][k] = mx[i][j][k];
-    ny[i][j][k] = my[i][j][k];
-    nz[i][j][k] = mz[i][j][k];
-  }
+  /* nx, ny, nz themselves are changed */
+  /* mx, my, mz remain unchanged */
+  true_norm_vect(nx,ny,nz,nx,ny,nz); 
 
   /* define iflag */
   iflag=0;
   for_ijk(i,j,k) {
     if(dom->ibody().on(i,j,k)) {
-      if((phi[i-1][j][k]-0.5)*(phi[i][j][k]-0.5)<=0.0){ iflag[i][j][k]=1;}
-      if((phi[i+1][j][k]-0.5)*(phi[i][j][k]-0.5)<=0.0){ iflag[i][j][k]=1;}
-      if((phi[i][j-1][k]-0.5)*(phi[i][j][k]-0.5)<=0.0){ iflag[i][j][k]=1;}
-      if((phi[i][j+1][k]-0.5)*(phi[i][j][k]-0.5)<=0.0){ iflag[i][j][k]=1;}
-      if((phi[i][j][k-1]-0.5)*(phi[i][j][k]-0.5)<=0.0){ iflag[i][j][k]=1;}
-      if((phi[i][j][k+1]-0.5)*(phi[i][j][k]-0.5)<=0.0){ iflag[i][j][k]=1;}
+      if((phi[i-1][j][k]-phisurf)*(phi[i][j][k]-phisurf)<=0.0){ iflag[i][j][k]=1;}
+      if((phi[i+1][j][k]-phisurf)*(phi[i][j][k]-phisurf)<=0.0){ iflag[i][j][k]=1;}
+      if((phi[i][j-1][k]-phisurf)*(phi[i][j][k]-phisurf)<=0.0){ iflag[i][j][k]=1;}
+      if((phi[i][j+1][k]-phisurf)*(phi[i][j][k]-phisurf)<=0.0){ iflag[i][j][k]=1;}
+      if((phi[i][j][k-1]-phisurf)*(phi[i][j][k]-phisurf)<=0.0){ iflag[i][j][k]=1;}
+      if((phi[i][j][k+1]-phisurf)*(phi[i][j][k]-phisurf)<=0.0){ iflag[i][j][k]=1;}
     }
   }
+  iflag.bnd_update_symmetry(); /* copy on symmetry plane */
   iflag.exchange();
   //boil::plot->plot(phi,nx,ny,nz, "c-nx-ny-nz", time->current_step());
 
@@ -86,26 +67,26 @@ void VOF::curv_HF() {
     if (iflag[i][j][k]==1) {
 
       /* select direction of stencil-7 */
-      int dirMax=0;
+      Comp mMax;
       real abs_nx = fabs(nx[i][j][k]);
       real abs_ny = fabs(ny[i][j][k]);
       real abs_nz = fabs(nz[i][j][k]);
       real max_abs_n;
- 
+
       if (abs_nx<abs_ny) {
         if (abs_ny<abs_nz) {
-          dirMax=3;
+          mMax = Comp::k();
           max_abs_n = abs_nz;
         } else {
-          dirMax=2;
+          mMax = Comp::j();
           max_abs_n = abs_ny;
         }
       } else {
         if (abs_nx<abs_nz) {
-          dirMax=3;
+          mMax = Comp::k();
           max_abs_n = abs_nz;
         } else {
-          dirMax=1;
+          mMax = Comp::i();
           max_abs_n = abs_nx;
         }
       }
@@ -116,10 +97,10 @@ void VOF::curv_HF() {
       real hc_limit = 0.0;
       real hc = 0.0;
 
-      if (dirMax==1) {
+      if (mMax==Comp::i()) {
         if(!ifull) {
           boil::oout<<"Curv_HF: Pseudo direction selected at "<<i<<" "<<j<<" "
-                    <<k<<" with dirMax="<<dirMax<<" ; exiting."<<boil::endl;
+                    <<k<<" with mMax="<<mMax<<" ; exiting."<<boil::endl;
           exit(0);
         }
 
@@ -258,10 +239,10 @@ void VOF::curv_HF() {
           stmp[i+ii][j+jj][k+kk] = min(1.0,max(0.0,phi[i+ii][j+jj][k+kk]));
         }}}
 
-      } else if (dirMax==2) {
+      } else if (mMax==Comp::j()) {
         if(!jfull) {
           boil::oout<<"Curv_HF: Pseudo direction selected at "<<i<<" "<<j<<" "
-                    <<k<<" with dirMax="<<dirMax<<" ; exiting."<<boil::endl;
+                    <<k<<" with mMax="<<mMax<<" ; exiting."<<boil::endl;
           exit(0);
         }
 
@@ -399,10 +380,10 @@ void VOF::curv_HF() {
           stmp[i+ii][j+jj][k+kk] = min(1.0,max(0.0,phi[i+ii][j+jj][k+kk]));
         }}}
 
-      } else if (dirMax==3) {
+      } else if (mMax==Comp::k()) {
         if(!kfull) {
           boil::oout<<"Curv_HF: Pseudo direction selected at "<<i<<" "<<j<<" "
-                    <<k<<" with dirMax="<<dirMax<<" ; exiting."<<boil::endl;
+                    <<k<<" with mMax="<<mMax<<" ; exiting."<<boil::endl;
           exit(0);
         }
 
@@ -542,13 +523,15 @@ void VOF::curv_HF() {
       }
     }
   }
+  kappa.bnd_update_symmetry(); /* copy on symmetry plane */
+  iflag.bnd_update_symmetry(); /* copy on symmetry plane */
   kappa.exchange();
   iflag.exchange();
 
 #if 1
   // extrapolate kappa
   stmp = kappa;
-  iflagx = iflag;
+  jflag = iflag;
 
   //for(int iloop=1; iloop<2; iloop++) {
   //for(int iloop=1; iloop<3; iloop++) {
@@ -567,14 +550,16 @@ void VOF::curv_HF() {
                            + real(min(1,iflag[i][j][k-1])) * kappa[i][j][k-1]
                            + real(min(1,iflag[i][j][k+1])) * kappa[i][j][k+1])
                            /real(inb);
-            iflagx[i][j][k] = 2;  // iflag=2 for extrapolated
+            jflag[i][j][k] = 2;  // iflag=2 for extrapolated
         }
       }
     }
+    stmp.bnd_update_symmetry(); /* copy on symmetry plane */
+    jflag.bnd_update_symmetry(); /* copy on symmetry plane */
     stmp.exchange();
-    iflagx.exchange();
+    jflag.exchange();
     kappa = stmp;
-    iflag = iflagx;
+    iflag = jflag;
   }
 #endif
 

@@ -32,10 +32,11 @@ libVof_a_SOURCES =      vof.h                         \
                         vof_insert_bc_gradphi.cpp     \
                         vof_insert_bc_gradphic.cpp    \
                         vof_insert_bc_norm.cpp        \
-                        vof_insert_bc_norm_cc.cpp     \
+                        vof_norm.cpp                  \
                         vof_normalize.cpp             \
                         vof_normal_vector_near_bnd.cpp\
                         vof_norm_cc.cpp               \
+                        vof_norm_cc_near_bnd.cpp      \
                         vof_norm_elvira.cpp           \
                         vof_norm_mixed.cpp            \
                         vof_norm_young.cpp            \

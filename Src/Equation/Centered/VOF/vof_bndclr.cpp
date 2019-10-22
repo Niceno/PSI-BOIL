@@ -62,7 +62,7 @@ void VOF::cal_bndclr(const Scalar & scp) {
         vm1 *= qa;
         vm2 *= qa;
         vm3 *= qa;
-        real alpha = calc_alpha(c, vm1, vm2, vm3);
+        real alpha = qa*nalpha[i][j][k];
 
         real * alig_vm;
         real * alig_vn;
@@ -104,7 +104,8 @@ void VOF::cal_bndclr(const Scalar & scp) {
         vm1 *= qa;
         vm2 *= qa;
         vm3 *= qa;
-        real alpha = calc_alpha(c, vm1, vm2, vm3);
+        //real alpha = calc_alpha(c, vm1, vm2, vm3);
+        real alpha = qa*nalpha[ii][jj][kk];
 
         real * alig_vm;
         real * alig_vn;

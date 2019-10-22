@@ -4,7 +4,7 @@
    Comp::j() == XZ-plane and 1 = x, 2 = z, 3 = y. 
    Comp::k() == XY-plane and 1 = x, 2 = y, 3 = z. 
    The 3-direction is not-considered and is identically zero. */
-void VOF::norm_elvira(const Scalar & sca) {
+void VOF::norm_elvira(const Scalar & sca, const bool extalp) {
 /***************************************************************************//**
 *  \brief Calculate normal vector at interface
 *  Elvira method: Pilliod and Puckett, LBNL-40744 (1997), 2D
@@ -13,18 +13,32 @@ void VOF::norm_elvira(const Scalar & sca) {
 
   assert(mcomp_for_elvira != Comp::undefined());
 
+  Scalar * nalpha_ptr = &nalpha;
+  /* in case of no extract_alpha, nalp results are discarded */
+  if(!extalp)
+    nalpha_ptr = &stmp;
+
   /* 2D algorithm */
   for_ijk(i,j,k) {
-    norm_elvira_kernel(nx[i][j][k],ny[i][j][k],nz[i][j][k], i,j,k, sca);
+    norm_elvira_kernel(nx[i][j][k],ny[i][j][k],nz[i][j][k],
+                       (*nalpha_ptr)[i][j][k],
+                       i,j,k, sca);
     if(dom->ibody().off(i,j,k)) {
-      nalpha[i][j][k] = ((sca[i][j][k]>=phisurf)-(sca[i][j][k]<phisurf))*boil::unreal;
+      (*nalpha_ptr)[i][j][k] = ((sca[i][j][k]>=phisurf)-(sca[i][j][k]<phisurf))*boil::unreal;
     }
   }
 
   /* missing boundary conditions */
-  insert_bc_norm_cc(sca);
-  /* nalpha exchange inside extract alpha */
-  extract_alpha_near_bnd(sca);
+  norm_cc_near_bnd(sca);
+#if 1
+  nx.bnd_update();
+  ny.bnd_update();
+  nz.bnd_update();
+#endif
+
+  /* nalpha bnd update and exchange inside extract alpha */
+  if(extalp)
+    extract_alpha_near_bnd(sca);
 
   nx.exchange_all();
   ny.exchange_all();
@@ -37,6 +51,7 @@ void VOF::norm_elvira(const Scalar & sca) {
 }
 
 void VOF::norm_elvira_kernel(real & nx_val, real & ny_val, real & nz_val,
+                             real & nalpha_val,
                              const int i, const int j, const int k,
                              const Scalar & sca) {
   real valcc,valmc,valpc,valcm,valcp,valmm,valpm,valmp,valpp;
@@ -87,19 +102,21 @@ void VOF::norm_elvira_kernel(real & nx_val, real & ny_val, real & nz_val,
      ||(valcc-phisurf)*(valpm-phisurf)<=0.0
      ||(valcc-phisurf)*(valmp-phisurf)<=0.0
      ||(valcc-phisurf)*(valpp-phisurf)<=0.0) {
-    norm_elvira_kernel_full(nx_val, ny_val, nz_val, mcomp_for_elvira,
+    norm_elvira_kernel_full(nx_val, ny_val, nz_val, nalpha_val, 
+                            mcomp_for_elvira,
                             i,j,k,valcc,valmc,valpc,valcm,valcp,
                                         valmm,valpm,valmp,valpp);
   /* otherwise, standard method is used */
   } else {
-    norm_mixed_kernel(nx[i][j][k], ny[i][j][k], nz[i][j][k], i,j,k, sca);
+    norm_mixed_kernel(nx_val, ny_val, nz_val, nalpha_val, i,j,k, sca);
     real scpval = sca[i][j][k];
     if(scpval==0.5) scpval += boil::pico;
-    nalpha[i][j][k] = alpha_val(scpval,
-                                nx[i][j][k],ny[i][j][k],nz[i][j][k]);
+    nalpha_val = alpha_val(scpval,
+                           nx_val,ny_val,nz_val);
   }
 #else
-  norm_elvira_kernel_full(nx_val, ny_val, nz_val, mcomp_for_elvira,
+  norm_elvira_kernel_full(nx_val, ny_val, nz_val, *nalpha_val,
+                          mcomp_for_elvira,
                           i,j,k,valcc,valmc,valpc,valcm,valcp,
                                       valmm,valpm,valmp,valpp);
 #endif
@@ -112,6 +129,7 @@ void VOF::norm_elvira_kernel(real & nx_val, real & ny_val, real & nz_val,
    Comp::k() == XY-plane and 1 = x, 2 = y, 3 = z. 
    The 3-direction is not-considered and is identically zero. */
 void VOF::norm_elvira_kernel_full(real & nx_val, real & ny_val, real & nz_val,
+                                  real & nalpha_val,
                                   const Comp & m, const int i, const int j, const int k,
                                   real valcc,real valmc,real valpc,real valcm,
                                   real valcp,real valmm,real valpm,real valmp,real valpp) {
@@ -262,10 +280,10 @@ void VOF::norm_elvira_kernel_full(real & nx_val, real & ny_val, real & nz_val,
   /* nalpha is also assigned */
 #if 0
   real denom = fabs(n1s[min_err_idx])+fabs(n2s[min_err_idx])+fabs(n3s[min_err_idx]);
-  nalpha[i][j][k] = denom*alps[min_err_idx]; 
+  nalpha_val = denom*alps[min_err_idx]; 
   boil::oout<<i<<" "<<j<<" "<<k<<" | "<<alps[min_err_idx]<<" "<<alpha_val(valcc,nx_val,nz_val,ny_val)<<boil::endl;
 #else
-  nalpha[i][j][k] = alps[min_err_idx];
+  nalpha_val = alps[min_err_idx];
 #endif
 
 #if 0

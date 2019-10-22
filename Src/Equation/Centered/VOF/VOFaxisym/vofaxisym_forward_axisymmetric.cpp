@@ -34,6 +34,7 @@ void VOFaxisym::forward_axisymmetric(const Scalar & color,
 
   axip.bnd_update();
   axip.exchange_all();
+  Kp.bnd_update();
   Kp.exchange_all();
 
   return;

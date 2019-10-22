@@ -53,6 +53,7 @@ void VOFaxisym::advance_z(Scalar & scp) {
         f = dV(i,j,kup)*calc_flux(g,scpup,nz[i][j][kup],
                                           ny[i][j][kup],
                                           nx[i][j][kup]);
+                                          nalpha[i][j][kup]);
 #endif
       }
     }

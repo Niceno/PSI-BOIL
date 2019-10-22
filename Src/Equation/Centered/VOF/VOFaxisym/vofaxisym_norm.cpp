@@ -1,32 +1,32 @@
 #include "vofaxisym.h"
 
 /******************************************************************************/
-void VOFaxisym::norm_axisymmetric(const Scalar & color) {
+void VOFaxisym::norm(const Scalar & color, const NormMethod & nm,
+                     const bool extalp) {
 /***************************************************************************//**
  \brief Calculate the normal vector and line constant, given color
     output: nx, ny, nz, nalpha
 *******************************************************************************/
 
-  /* firstly, alpha and nx,ny,nz must be calculated */
-  if        (norm_method_advance==NormMethod::ElviraXZ()) {
+  if       (nm==NormMethod::ElviraXZ()) {
     /* elvira encapsulates nalpha calculations */
-    norm_elvira(color);
-  } else if(norm_method_advance==NormMethod::Mixed()) {
+    norm_elvira(color,extalp);
+  } else if(nm==NormMethod::Mixed()) {
     norm_mixed(color);
-    extract_alpha(color);
-  } else if(norm_method_advance==NormMethod::Young()) {
+    if(extalp) extract_alpha(color);
+  } else if(nm==NormMethod::Young()) {
     norm_young(color);
-    extract_alpha(color);
-  } else if(norm_method_advance==NormMethod::CC()) {
+    if(extalp) extract_alpha(color);
+  } else if(nm==NormMethod::CC()) {
     norm_cc(color);
-    extract_alpha(color);
+    if(extalp) extract_alpha(color);
   } else {
-    boil::aout<<"VOFaxisym::reconstruct_geom: Normal vector calculation method "
+    boil::oout<<"VOFaxisym::norm_axisymmetric: Normal vector calculation method "
               <<"not set properly! Exiting."<<boil::endl;
     exit(0);
   }
 
-  //extract_alpha(color);
+  //if(extalp) extract_alpha(color);
 
   return;
 }

@@ -9,9 +9,10 @@ libVOFaxisym_a_SOURCES = vofaxisym.h                        \
                          vofaxisym_calc_flux.cpp            \
                          vofaxisym_calc_v.cpp               \
                          vofaxisym_color_to_vf.cpp          \
+                         vofaxisym_curv_HF.cpp              \
                          vofaxisym_forward_axisymmetric.cpp \
                          vofaxisym_linf_scalar_error.cpp    \
-                         vofaxisym_norm_axisymmetric.cpp    \
+                         vofaxisym_norm.cpp                 \
                          vofaxisym_reconstruct_geometry.cpp \
                          vofaxisym_test_reconstruction.cpp  \
                          vofaxisym_vf_to_color.cpp          \

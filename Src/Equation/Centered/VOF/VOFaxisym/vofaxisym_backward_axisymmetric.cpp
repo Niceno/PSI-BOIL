@@ -26,6 +26,7 @@ void VOFaxisym::backward_axisymmetric(const Scalar & vf, Scalar & alp) {
     }
   }
 
+  alp.bnd_update();
   alp.exchange_all();
 
   return;

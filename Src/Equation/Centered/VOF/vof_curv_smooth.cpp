@@ -55,7 +55,7 @@ void VOF::curv_smooth() {
     }
   }
   stmp = kappa;
-  iflagx = iflag;
+  jflag = iflag;
 
   //for(int iloop=1; iloop<2; iloop++) {
   for(int iloop=1; iloop<3; iloop++) {
@@ -72,14 +72,14 @@ void VOF::curv_smooth() {
                            + real(iflag[i][j][k-1]) * kappa[i][j][k-1]
                            + real(iflag[i][j][k+1]) * kappa[i][j][k+1])
                            /real(inb);
-            iflagx[i][j][k] = 1;
+            jflag[i][j][k] = 1;
         }
       }
     }
     stmp.exchange();
-    iflagx.exchange();
+    jflag.exchange();
     kappa = stmp;
-    iflag = iflagx;
+    iflag = jflag;
   }
 
 

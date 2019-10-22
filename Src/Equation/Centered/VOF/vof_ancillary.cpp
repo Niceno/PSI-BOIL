@@ -19,34 +19,16 @@ void VOF::ancillary(Scalar & scp) {
   /*-------------------------------+
   |  normal vector at cell center  |
   +-------------------------------*/
-  if       (norm_method_advance==NormMethod::Mixed()) {
-    norm_mixed(scp);
-  } else if(norm_method_advance==NormMethod::Young()) {
-    norm_young(scp);
-  } else if(norm_method_advance==NormMethod::CC()) {
-    norm_cc(scp);
-  } else if(norm_method_advance==NormMethod::ElviraXZ()) {
-    norm_elvira(scp);
-  } else if(norm_method_advance==NormMethod::ElviraXY()) {
-    norm_elvira(scp);
-  } else if(norm_method_advance==NormMethod::ElviraYZ()) {
-    norm_elvira(scp);
-  } else {
-    /* default */
-    norm_mixed(scp);
-  }
+  norm(scp,norm_method_advance,true); /* alpha is extracted */
 
   /* iterate boundary normal vector */
   bdnorm(scp);
-
-  /* calculate alpha in cells */
-  extract_alpha(scp);
 
   /* prerequisite for marching cubes */
   update_at_walls(scp);
 
   /* calculate the real-space normal vector */
-  true_norm_vect(); 
+  true_norm_vect(nx,ny,nz,mx,my,mz); 
 
   /*  calculate free surface position */
 #if 1

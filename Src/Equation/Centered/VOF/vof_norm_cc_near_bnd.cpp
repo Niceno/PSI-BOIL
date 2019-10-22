@@ -1,7 +1,7 @@
 #include "vof.h"
 
 /******************************************************************************/
-void VOF::insert_bc_norm_cc(const Scalar & val) {
+void VOF::norm_cc_near_bnd(const Scalar & val) {
 /***************************************************************************//**
 *  \brief normal vector for cells adjacent to a wall or an immersed boundary
 *******************************************************************************/

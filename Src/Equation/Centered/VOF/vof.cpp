@@ -25,7 +25,7 @@ VOF::VOF(const Scalar & PHI,
   stmp( *PHI.domain() ),
   fs( *U.domain() ),
   iflag(*PHI.domain() ),
-  iflagx(*PHI.domain() ),
+  jflag(*PHI.domain() ),
   adens(*PHI.domain() ),
   heavi(&phi, NULL, &adens),
   topo(&mx,&my,&mz,&adens,&fs),
@@ -37,17 +37,17 @@ VOF::VOF(const Scalar & PHI,
 |  this constructor is called only at the finest level  |
 +------------------------------------------------------*/
 { 
-  nx        = phi.shape();
-  ny        = phi.shape();
-  nz        = phi.shape();
-  mx        = phi.shape();
-  my        = phi.shape();
-  mz        = phi.shape();
-  nalpha    = phi.shape();
-  stmp      = phi.shape();
-  iflag     = phi.shape();
-  iflagx    = phi.shape();
-  adens     = phi.shape();
+  nx     = phi.shape();
+  ny     = phi.shape();
+  nz     = phi.shape();
+  mx     = phi.shape();
+  my     = phi.shape();
+  mz    = phi.shape();
+  nalpha = phi.shape();
+  stmp   = phi.shape();
+  iflag  = phi.shape();
+  jflag  = phi.shape();
+  adens  = phi.shape();
 
   for( int b=0; b<phi.bc().count(); b++ ) {
     if(    phi.bc().type(b) == BndType::dirichlet()
@@ -94,7 +94,7 @@ VOF::VOF(const Scalar & PHI,
   cangle=90.0/180.0*boil::pi;
   limit_color=false;
   use_subgrid=false;
-  use_HF_wall=false;
+  use_HF_wall=true;
 
   discretize();
 
@@ -116,6 +116,12 @@ VOF::VOF(const Scalar & PHI,
     if (phi.bc().type(d,BndType::periodic())) {
       iminp=true;
       iminc=false;
+    } else if (phi.bc().type(d,BndType::wall())) {
+      iminw=true;
+    } else if (phi.bc().type(d,BndType::pseudo())) {
+      iminp=true;
+      iminc=false;
+      ifull = false;
     }
     if (dom->bnd_symmetry(d)) iminc=false;
   }

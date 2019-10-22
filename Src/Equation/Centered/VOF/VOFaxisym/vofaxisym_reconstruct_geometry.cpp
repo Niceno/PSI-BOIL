@@ -59,7 +59,8 @@ void VOFaxisym::reconstruct_geometry(const Scalar & scp) {
   #if 1
   /* iteration procedure */
   do {
-    norm_axisymmetric(clr);
+    /* true = extract alpha */
+    norm(clr,norm_method_advance,true);
     backward_axisymmetric(phi,nalpha);
     forward(axistmp);
     #if 0
@@ -84,8 +85,8 @@ void VOFaxisym::reconstruct_geometry(const Scalar & scp) {
   } while(false);
     #endif
   #else
-  norm_axisymmetric(clr);
-  extract_alpha(clr);
+  /* true = extract alpha */
+  norm(clr,norm_method_advance,true);
   #endif
 #endif
 

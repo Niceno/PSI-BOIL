@@ -7,6 +7,13 @@ void VOF::gradphic(const Scalar & sca) {
 *         Resluts: nx, ny, nz
 *******************************************************************************/
 
+  if( !(phi.domain()->is_cartesian()) ) {
+     boil::oout<<"Error: possible underdevelopment for VOF::gradphic on an "
+               <<" axisymmetric domain! Perform verification before continuing."
+               <<boil::endl;
+     exit(0);
+  }
+
   sca.exchange_all();  // necessary for corner
 
   /* cell centered base */

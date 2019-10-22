@@ -16,6 +16,11 @@ void VOF::bdcurv() {
 *  \brief Calculate curvature on wall boundary condition.
 *******************************************************************************/
 
+  boil::oout<<"VOF::bdcurv: obsolete code. Use height-functions instead. "
+            <<"Exiting."
+            <<boil::endl;
+  exit(0);
+
   /* calculate normal vector at vertex */
   gradphi(phi);
 
@@ -126,7 +131,7 @@ void VOF::bdcurv() {
   +--------*/
   if(phi.bc().type(Dir::imin(), BndType::wall())) {
     stmp = kappa;
-    iflagx = iflag;
+    jflag = iflag;
     int i=si();
     for(int iloop=1; iloop<=mloop; iloop++) {
       if(phi.bc().type_here(Dir::imin(), BndType::wall())) {
@@ -141,15 +146,15 @@ void VOF::bdcurv() {
                              + real(min(1,iflag[i][j][k-1])) * kappa[i][j][k-1]
                              + real(min(1,iflag[i][j][k+1])) * kappa[i][j][k+1])
                              /real(inb);
-              iflagx[i][j][k] = 2;  // iflag=2 for extrapolated
+              jflag[i][j][k] = 2;  // iflag=2 for extrapolated
           }
         }
       }
       }
       stmp.exchange();
-      iflagx.exchange();
+      jflag.exchange();
       kappa = stmp;
-      iflag = iflagx;
+      iflag = jflag;
     }
   }
 
@@ -158,7 +163,7 @@ void VOF::bdcurv() {
   +--------*/
   if(phi.bc().type(Dir::imax(), BndType::wall())) {
     stmp = kappa;
-    iflagx = iflag;
+    jflag = iflag;
     int i=ei();
     for(int iloop=1; iloop<=mloop; iloop++) {
       if(phi.bc().type_here(Dir::imax(), BndType::wall())) {
@@ -173,15 +178,15 @@ void VOF::bdcurv() {
                              + real(min(1,iflag[i][j][k-1])) * kappa[i][j][k-1]
                              + real(min(1,iflag[i][j][k+1])) * kappa[i][j][k+1])
                              /real(inb);
-              iflagx[i][j][k] = 2;  // iflag=2 for extrapolated
+              jflag[i][j][k] = 2;  // iflag=2 for extrapolated
           }
         }
       }
       }
       stmp.exchange();
-      iflagx.exchange();
+      jflag.exchange();
       kappa = stmp;
-      iflag = iflagx;
+      iflag = jflag;
     }
   }
 
@@ -190,7 +195,7 @@ void VOF::bdcurv() {
   +--------*/
   if(phi.bc().type(Dir::jmin(), BndType::wall())) {
     stmp = kappa;
-    iflagx = iflag;
+    jflag = iflag;
     int j=sj();
     for(int iloop=1; iloop<=mloop; iloop++) {
       if(phi.bc().type_here(Dir::jmin(), BndType::wall())) {
@@ -205,15 +210,15 @@ void VOF::bdcurv() {
                              + real(min(1,iflag[i][j][k-1])) * kappa[i][j][k-1]
                              + real(min(1,iflag[i][j][k+1])) * kappa[i][j][k+1])
                              /real(inb);
-              iflagx[i][j][k] = 2;  // iflag=2 for extrapolated
+              jflag[i][j][k] = 2;  // iflag=2 for extrapolated
           }
         }
       }
       }
       stmp.exchange();
-      iflagx.exchange();
+      jflag.exchange();
       kappa = stmp;
-      iflag = iflagx;
+      iflag = jflag;
     }
   }
 
@@ -222,7 +227,7 @@ void VOF::bdcurv() {
   +--------*/
   if(phi.bc().type(Dir::jmax(), BndType::wall())) {
     stmp = kappa;
-    iflagx = iflag;
+    jflag = iflag;
     int j=ej();
     for(int iloop=1; iloop<=mloop; iloop++) {
       if(phi.bc().type_here(Dir::jmax(), BndType::wall())) {
@@ -237,15 +242,15 @@ void VOF::bdcurv() {
                              + real(min(1,iflag[i][j][k-1])) * kappa[i][j][k-1]
                              + real(min(1,iflag[i][j][k+1])) * kappa[i][j][k+1])
                              /real(inb);
-              iflagx[i][j][k] = 2;  // iflag=2 for extrapolated
+              jflag[i][j][k] = 2;  // iflag=2 for extrapolated
           }
         }
       }
       }
       stmp.exchange();
-      iflagx.exchange();
+      jflag.exchange();
       kappa = stmp;
-      iflag = iflagx;
+      iflag = jflag;
     }
   }
 
@@ -254,7 +259,7 @@ void VOF::bdcurv() {
   +--------*/
   if(phi.bc().type(Dir::kmin(), BndType::wall())) {
     stmp = kappa;
-    iflagx = iflag;
+    jflag = iflag;
     int k=sk();
     for(int iloop=1; iloop<=mloop; iloop++) {
       if(phi.bc().type_here(Dir::kmin(), BndType::wall())) {
@@ -269,15 +274,15 @@ void VOF::bdcurv() {
                              + real(min(1,iflag[i][j-1][k])) * kappa[i][j-1][k]
                              + real(min(1,iflag[i][j+1][k])) * kappa[i][j+1][k])
                              /real(inb);
-              iflagx[i][j][k] = 2;  // iflag=2 for extrapolated
+              jflag[i][j][k] = 2;  // iflag=2 for extrapolated
           }
         }
       }
       }
       stmp.exchange();
-      iflagx.exchange();
+      jflag.exchange();
       kappa = stmp;
-      iflag = iflagx;
+      iflag = jflag;
     }
   }
 
@@ -286,7 +291,7 @@ void VOF::bdcurv() {
   +--------*/
   if(phi.bc().type(Dir::kmax(), BndType::wall())) {
     stmp = kappa;
-    iflagx = iflag;
+    jflag = iflag;
     int k=ek();
     for(int iloop=1; iloop<=mloop; iloop++) {
       if(phi.bc().type_here(Dir::kmax(), BndType::wall())) {
@@ -301,15 +306,15 @@ void VOF::bdcurv() {
                              + real(min(1,iflag[i][j-1][k])) * kappa[i][j-1][k]
                              + real(min(1,iflag[i][j+1][k])) * kappa[i][j+1][k])
                              /real(inb);
-              iflagx[i][j][k] = 2;  // iflag=2 for extrapolated
+              jflag[i][j][k] = 2;  // iflag=2 for extrapolated
           }
         }
       }
       }
       stmp.exchange();
-      iflagx.exchange();
+      jflag.exchange();
       kappa = stmp;
-      iflag = iflagx;
+      iflag = jflag;
     }
   }
 
@@ -318,7 +323,7 @@ void VOF::bdcurv() {
   +--------------------*/
   if(dom->ibody().ncall() >= 1) {
     stmp = kappa;
-    iflagx = iflag;
+    jflag = iflag;
     for(int iloop=1; iloop<=mloop; iloop++) {
       for(int cc=0; cc<dom->ibody().nccells(); cc++){
         int i,j,k;
@@ -358,14 +363,14 @@ void VOF::bdcurv() {
                           +kcal*(real(min(1,iflag[i][j][k-1]))*kappa[i][j][k-1]
                                +real(min(1,iflag[i][j][k+1]))*kappa[i][j][k+1]))
                           /real(inb);
-            iflagx[i][j][k] = 2;  // iflag=2 for extrapolation
+            jflag[i][j][k] = 2;  // iflag=2 for extrapolation
           }
         }
       }
       stmp.exchange();
-      iflagx.exchange();
+      jflag.exchange();
       kappa = stmp;
-      iflag = iflagx;
+      iflag = jflag;
     }
   }
 

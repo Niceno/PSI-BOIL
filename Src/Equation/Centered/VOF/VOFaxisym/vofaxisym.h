@@ -72,7 +72,8 @@ class VOFaxisym : public VOF {
   protected:
     void forward_axisymmetric(const Scalar & color, Scalar & axip, Scalar & Kp);
     void backward_axisymmetric(const Scalar & vf, Scalar & alp);
-    void norm_axisymmetric(const Scalar & color);
+    virtual void norm(const Scalar & color, const NormMethod & nm,
+                      const bool extalp = true);
 
     virtual void advance_x(Scalar & sca);
     virtual void advance_y(Scalar & sca) {};
@@ -82,7 +83,7 @@ class VOFaxisym : public VOF {
     void reconstruct_geometry(const Scalar & scp);
     real linf_scalar_error(const Scalar & sca, const Scalar & scb);
 
-    //virtual real calc_v(real alpha, real vma, real vmb, real vmc);
+    //virtual real calc_v(const real alpha, const real vma, const real vmb, const real vmc);
     real calc_v_axisymmetric(real nnx, real alp, real eta0, real & Kp);
     
     //virtual real calc_alpha(const real r1, const real r2,
@@ -92,6 +93,14 @@ class VOFaxisym : public VOF {
     real calc_flux_axisymmetric(const real g,
                                 const int i, const int j, const int k,
                                 const Comp & mcomp);
+    
+    virtual void curv_HF();
+    void curv_HF_kernel_axisymmetric(arr & stencil, const arr & gridstencil,
+                                     const int imin, const int imax,
+                                     const real dm, const real dc, const real dp,
+                                     const real max_n, const bool truedir,
+                                     real & kap, int & flag);
+
 
     real xi_small_pos_triangle(real alpha, real mmx, real mmz);
     real xi_small_pos_trapezoid(real alpha, real mmx, real mmz);

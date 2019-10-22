@@ -1,7 +1,10 @@
 #include "vof.h"
 
 /******************************************************************************/
-void VOF::true_norm_vect() {
+void VOF::true_norm_vect(const Scalar & nx, 
+                         const Scalar & ny,
+                         const Scalar & nz,
+                         Scalar & mx, Scalar & my, Scalar & mz) {
 /***************************************************************************//**
 *  \brief Calculate normal vector at cell center.
 *         Results: mx, my, mz -- true normal vector 

@@ -21,23 +21,7 @@ void VOF::advance(Scalar & scp, const bool anci) {
   /*-------------------------------+
   |  normal vector at cell center  |
   +-------------------------------*/
-  if       (norm_method_advance==NormMethod::Mixed()) {
-    norm_mixed(scp);
-  } else if(norm_method_advance==NormMethod::Young()) {
-    norm_young(scp);
-  } else if(norm_method_advance==NormMethod::CC()) {
-    norm_cc(scp);
-  } else if(norm_method_advance==NormMethod::ElviraXZ()) {
-    norm_elvira(scp);
-  } else if(norm_method_advance==NormMethod::ElviraXY()) {
-    norm_elvira(scp);
-  } else if(norm_method_advance==NormMethod::ElviraYZ()) {
-    norm_elvira(scp);
-  } else {
-    boil::aout<<"VOF::advance: Normal vector calculation method not set properly!"
-              <<" Exiting."<<boil::endl;
-    exit(0);
-  }
+  norm(scp,norm_method_advance,true); /* alpha is extracted */
 
   /* iterate boundary normal vector */
   bdnorm(scp);

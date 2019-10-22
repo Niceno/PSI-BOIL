@@ -194,6 +194,7 @@ class Scalar {
 
     void bnd_update();
     void bnd_update_nowall();
+    void bnd_update_symmetry();
     void bnd_grad_update(const Comp &);
 
     void bnd_extract( const Dir d, real *** cp ) const;

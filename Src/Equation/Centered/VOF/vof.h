@@ -10,6 +10,8 @@
 
 #define IB
 
+using arr = std::vector< std::vector<real> >;
+
 ////////////////////////////
 //                        //
 //  Normal vector method  //
@@ -226,13 +228,16 @@ class VOF : public Centered {
     void bdcurv();
     void cal_fs3(const Scalar & scp);
     void cal_fs_interp(const Scalar & scp);
-    void curv_HF();
+    virtual void curv_HF();
     void curv_smooth();
     void extract_alpha(const Scalar & scp);
     void extract_alpha_near_bnd(const Scalar & scp);
     void fs_bnd(const Scalar & scp);
     void fs_bnd_nosubgrid(const Scalar & scp);
-    void standardized_norm_vect();
+    void standardized_norm_vect(const Scalar & mx,
+                                const Scalar & my,
+                                const Scalar & mz,
+                                Scalar & nx, Scalar & ny, Scalar & nz);
     void gradphi(const Scalar & g);
     void gradphic(const Scalar & g);
     void ib_norm(const Scalar & g);
@@ -240,25 +245,35 @@ class VOF : public Centered {
     void insert_bc(const Scalar & g);
     void insert_bc_gradphic(const Scalar & g);
     void insert_bc_gradphi(const Scalar & g);
-    void insert_bc_norm_cc(const Scalar & g);
     void insert_bc_norm();
     void nib(const real & n1, const real & n2, const real & n3
            , const real & n4, const real & n5, const real & n6
            , real r[]);
 
+    virtual void norm(const Scalar & color, const NormMethod & nm,
+                      const bool extalp);
 
     void norm_cc(const Scalar & g);
-    void norm_cc_kernel(real & nx_val, real & ny_val, real & nz_val, Comp & mcomp,
-                        const int i, const int j, const int k, const Scalar & sca);
     void norm_cc_kernel(real & nx_val, real & ny_val, real & nz_val,
-                        const int i, const int j, const int k, const Scalar & sca);
+                        real & nalpha_val,
+                        Comp & mcomp,
+                        const int i, const int j, const int k, 
+                        const Scalar & sca);
+    void norm_cc_kernel(real & nx_val, real & ny_val, real & nz_val, 
+                        real & nalpha_val,
+                        const int i, const int j, const int k, 
+                        const Scalar & sca);
+    void norm_cc_near_bnd(const Scalar & g);
 
     void norm_young(const Scalar & g);
-    void norm_young_kernel(real & nx_val, real & ny_val, real & nz_val,
-                           const int i, const int j, const int k, const Scalar & sca);
+    void norm_young_kernel(real & nx_val, real & ny_val, real & nz_val, 
+                           real & nalpha_val,
+                           const int i, const int j, const int k,
+                           const Scalar & sca);
 
     void norm_mixed(const Scalar & g);
-    void norm_mixed_kernel(real & nx_val, real & ny_val, real & nz_val,
+    void norm_mixed_kernel(real & nx_val, real & ny_val, real & nz_val, 
+                           real & nalpha_val,
                            const int i, const int j, const int k,
                            const Scalar & sca);
   
@@ -274,16 +289,22 @@ class VOF : public Centered {
              , const int & i1, const int & i2, const int &i3
              , real r[] );
     void smooth(const Scalar & sca, Scalar & scb, const int itnum);
-    void true_norm_vect();
+    void true_norm_vect(const Scalar & nx,
+                        const Scalar & ny,
+                        const Scalar & nz,
+                        Scalar & mx, Scalar & my, Scalar & mz);
+
     void update_at_walls(Scalar & scp);
     void wall_norm(const Scalar & sca);
     real kappa_ave(const real r1, const real r2);
     real kappa_ave(const real r1, const real r2, const int i1, const int i2);
 
     /* at the moment, these are NOT overwritten in the derived class */
-    virtual real calc_v(real r1, real r2, real r3, real r4);
+    virtual real calc_v(const real r1, const real r2, const real r3, const real r4);
     virtual real calc_alpha(const real r1, const real r2, const real r3, const real r4);
-    virtual real calc_flux(const real g, real c, const real nx, const real ny, const real nz);
+    virtual real calc_flux(const real g, real c,
+                           const real nx, const real ny, const real nz,
+                           const real nalpha);
 
     void select_norm_cc(real & nx_val, real & ny_val, real & nz_val,
                         real & NxX, real & NyX, real & NzX,
@@ -321,11 +342,13 @@ class VOF : public Centered {
     void vf_limiter();   
 
     /* elvira functions */
-    void norm_elvira(const Scalar & sca);
+    void norm_elvira(const Scalar & sca, const bool extalp);
     void norm_elvira_kernel(real & nx_val, real & ny_val, real & nz_val,
+                            real & nalpha_val,
                             const int i, const int j, const int k,
                             const Scalar & sca);
     void norm_elvira_kernel_full(real & nx_val, real & ny_val, real & nz_val,
+                                 real & nalpha_val,
                                  const Comp & m, const int i, const int j, const int k,
                                  real valcc,real valmc,real valpc,real valcm,
                                  real valcp,real valmm,real valpm,real valmp,real valpp);
@@ -346,7 +369,7 @@ class VOF : public Centered {
 
     Scalar kappa;        /* curvature */
     Scalar stmp;
-    ScalarInt iflag,iflagx;
+    ScalarInt iflag,jflag;
 
     Matter jelly;   /* virtual fluid for level set transport */
     real xminft,xmaxft,yminft,ymaxft,zminft,zmaxft; /* xyz min&max of front */

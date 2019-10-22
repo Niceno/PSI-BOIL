@@ -6,8 +6,11 @@ void VOF::normal_vector_near_bnd(const Scalar & val) {
 *  \brief normal vector for cells adjacent to a wall or an immersed boundary
 *         obtained using extrapolated volume fractions
 *******************************************************************************/
+  
+  /* in this case, no extraction of alpha is performed */
+  Scalar * nalpha_ptr = &stmp;
 
-  void(VOF::*norm_kernel) (real &, real &, real &,
+  void(VOF::*norm_kernel) (real &, real &, real &, real &,
                            const int, const int, const int,
                            const Scalar &);
 #if 1
@@ -52,42 +55,56 @@ void VOF::normal_vector_near_bnd(const Scalar & val) {
           for_vijk( val.bc().at(b), i,j,k ){
             int ii=i+1;
             //norm_kernel(nx[ii][j][k], ny[ii][j][k], nz[ii][j][k], ii,j ,k , val);
-            (this->*norm_kernel)(nx[ii][j][k], ny[ii][j][k], nz[ii][j][k], ii,j ,k , val);
+            (this->*norm_kernel)(nx[ii][j][k], ny[ii][j][k], nz[ii][j][k], 
+                                 (*nalpha_ptr)[ii][j][k],
+                                 ii,j ,k , val);
           }
         }
         if(d == Dir::imax()){
           for_vijk( val.bc().at(b), i,j,k ){
             int ii=i-1;
             //norm_kernel(nx[ii][j][k], ny[ii][j][k], nz[ii][j][k], ii,j ,k , val);
-            (this->*norm_kernel)(nx[ii][j][k], ny[ii][j][k], nz[ii][j][k], ii,j ,k , val);
+            (this->*norm_kernel)(nx[ii][j][k], ny[ii][j][k], nz[ii][j][k],
+                                 (*nalpha_ptr)[ii][j][k],
+                                 ii,j ,k , val);
           }
         }
         if(d == Dir::jmin()){
           for_vijk( val.bc().at(b), i,j,k ){
             int jj=j+1;
             //norm_kernel(nx[i][jj][k], ny[i][jj][k], nz[i][jj][k], i ,jj,k , val);
-            (this->*norm_kernel)(nx[i][jj][k], ny[i][jj][k], nz[i][jj][k], i ,jj,k , val);
+            (this->*norm_kernel)(nx[i][jj][k], ny[i][jj][k], nz[i][jj][k],
+                                 (*nalpha_ptr)[i][jj][k],
+                                 i ,jj,k , val);
           }
         }
         if(d == Dir::jmax()){
           for_vijk( val.bc().at(b), i,j,k ){
             int jj=j-1;
             //norm_kernel(nx[i][jj][k], ny[i][jj][k], nz[i][jj][k], i ,jj,k , val);
-            (this->*norm_kernel)(nx[i][jj][k], ny[i][jj][k], nz[i][jj][k], i ,jj,k , val);
+            (this->*norm_kernel)(nx[i][jj][k], ny[i][jj][k], nz[i][jj][k],
+                                 (*nalpha_ptr)[i][jj][k],
+                                 
+                                 i ,jj,k , val);
           }
         }
         if(d == Dir::kmin()){
           for_vijk( val.bc().at(b), i,j,k ){
             int kk=k+1;
             //norm_kernel(nx[i][j][kk], ny[i][j][kk], nz[i][j][kk], i ,j ,kk, val);
-            (this->*norm_kernel)(nx[i][j][kk], ny[i][j][kk], nz[i][j][kk], i ,j ,kk, val);
+            (this->*norm_kernel)(nx[i][j][kk], ny[i][j][kk], nz[i][j][kk],
+                                 (*nalpha_ptr)[i][j][kk],
+                                 
+                                 i ,j ,kk, val);
           }
         }
         if(d == Dir::kmax()){
           for_vijk( val.bc().at(b), i,j,k ){
             int kk=k-1;
             //norm_kernel(nx[i][j][kk], ny[i][j][kk], nz[i][j][kk], i ,j ,kk, val);
-            (this->*norm_kernel)(nx[i][j][kk], ny[i][j][kk], nz[i][j][kk], i ,j ,kk, val);
+            (this->*norm_kernel)(nx[i][j][kk], ny[i][j][kk], nz[i][j][kk],
+                                 (*nalpha_ptr)[i][j][kk],
+                                 i ,j ,kk, val);
           }
         }
       }
@@ -106,39 +123,57 @@ void VOF::normal_vector_near_bnd(const Scalar & val) {
     // west is in solid domain
     if (dom->ibody().off(i-1,j,k)) {
       //norm_kernel(nx[i][j][k], ny[i][j][k], nz[i][j][k], i,j,k, val);
-      (this->*norm_kernel)(nx[i][j][k], ny[i][j][k], nz[i][j][k], i,j,k, val);
+      (this->*norm_kernel)(nx[i][j][k], ny[i][j][k], nz[i][j][k],
+                           (*nalpha_ptr)[i][j][k],
+                           i,j,k, val);
     }
 
     // east
     if (dom->ibody().off(i+1,j,k)) {
       //norm_kernel(nx[i][j][k], ny[i][j][k], nz[i][j][k], i,j,k, val);
-      (this->*norm_kernel)(nx[i][j][k], ny[i][j][k], nz[i][j][k], i,j,k, val);
+      (this->*norm_kernel)(nx[i][j][k], ny[i][j][k], nz[i][j][k],
+                           (*nalpha_ptr)[i][j][k],
+                           i,j,k, val);
     }
 
     // south
     if (dom->ibody().off(i,j-1,k)) {
       //norm_kernel(nx[i][j][k], ny[i][j][k], nz[i][j][k], i,j,k, val);
-      (this->*norm_kernel)(nx[i][j][k], ny[i][j][k], nz[i][j][k], i,j,k, val);
+      (this->*norm_kernel)(nx[i][j][k], ny[i][j][k], nz[i][j][k],
+                           (*nalpha_ptr)[i][j][k],
+                           i,j,k, val);
     }
 
     // north
     if (dom->ibody().off(i,j+1,k)) {
       //norm_kernel(nx[i][j][k], ny[i][j][k], nz[i][j][k], i,j,k, val);
-      (this->*norm_kernel)(nx[i][j][k], ny[i][j][k], nz[i][j][k], i,j,k, val);
+      (this->*norm_kernel)(nx[i][j][k], ny[i][j][k], nz[i][j][k],
+                           (*nalpha_ptr)[i][j][k],
+                           i,j,k, val);
     }
 
     // bottom
     if (dom->ibody().off(i,j,k-1)) {
       //norm_kernel(nx[i][j][k], ny[i][j][k], nz[i][j][k], i,j,k, val);
-      (this->*norm_kernel)(nx[i][j][k], ny[i][j][k], nz[i][j][k], i,j,k, val);
+      (this->*norm_kernel)(nx[i][j][k], ny[i][j][k], nz[i][j][k],
+                           (*nalpha_ptr)[i][j][k],
+                           i,j,k, val);
     }
 
     // top
     if (dom->ibody().off(i,j,k+1)) {
       //norm_kernel(nx[i][j][k], ny[i][j][k], nz[i][j][k], i,j,k, val);
-      (this->*norm_kernel)(nx[i][j][k], ny[i][j][k], nz[i][j][k], i,j,k, val);
+      (this->*norm_kernel)(nx[i][j][k], ny[i][j][k], nz[i][j][k],
+                           (*nalpha_ptr)[i][j][k],
+                           i,j,k, val);
     }
   }
+
+#if 1
+  nx.bnd_update();
+  ny.bnd_update();
+  nz.bnd_update();
+#endif
 
   nx.exchange_all();
   ny.exchange_all();

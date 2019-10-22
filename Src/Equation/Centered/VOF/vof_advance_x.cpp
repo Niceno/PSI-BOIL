@@ -44,7 +44,8 @@ void VOF::advance_x(Scalar & scp) {
         real scpup = scp[iup][j][k];
         f = dV(iup,j,k)*calc_flux(g,scpup,nx[iup][j][k],
                                           ny[iup][j][k],
-                                          nz[iup][j][k]);
+                                          nz[iup][j][k],
+                                          nalpha[iup][j][k]);
       }
     }
 

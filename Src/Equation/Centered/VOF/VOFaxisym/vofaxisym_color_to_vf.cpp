@@ -9,7 +9,8 @@ void VOFaxisym::color_to_vf(const Scalar & color, Scalar & vf) {
             Ktmp = correction coefficient K = vf/c
 *******************************************************************************/
 
-  norm_axisymmetric(color);
+  /* true = extract alpha */
+  norm(color,norm_method_advance,true);
 
   /* secondly, the forward problem is solved, Ktmp is overwritten */
   forward_axisymmetric(color,vf,Ktmp);

@@ -1,6 +1,8 @@
 #include "vof.h"
 
-real VOF::calc_flux(const real g, real c, const real nx, const real ny, const real nz) {
+real VOF::calc_flux(const real g, real c, 
+                    const real nx, const real ny, const real nz,
+                    const real nalpha) {
 
   /* no advection */
   if(g==0.0) {
@@ -24,8 +26,10 @@ real VOF::calc_flux(const real g, real c, const real nx, const real ny, const re
   vm2 *= qa;
   vm3 *= qa;
   
-  /* normalized alpha value in the cell */
-  real alpha = calc_alpha(c, vm1, vm2, vm3);
+  /* normalized alpha value in the cell
+   * even if nalpha is not realistic, the checks at the beginning
+   * of calc_v should handle it */
+  real alpha = qa*nalpha;
       
   /* this number serves two purposes:
      - alpha offset due to origin shift

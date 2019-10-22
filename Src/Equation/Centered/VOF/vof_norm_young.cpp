@@ -13,10 +13,12 @@ void VOF::norm_young(const Scalar & sca) {
   nx=0.0;
   ny=0.0;
   nz=0.0;
+  
+  real dummy; /* dummy from alpha calculations */
 
   for_ijk(i,j,k) {
     real nxx, nyy, nzz;
-    norm_young_kernel(nxx, nyy, nzz, i,j,k, sca);
+    norm_young_kernel(nxx, nyy, nzz, dummy, i,j,k, sca);
 
     nx[i][j][k] = nxx;
     ny[i][j][k] = nyy;
@@ -38,6 +40,7 @@ void VOF::norm_young(const Scalar & sca) {
 
 
 void VOF::norm_young_kernel(real & nx_val, real & ny_val, real & nz_val,
+                            real & dummy, /* unused */
                             const int i, const int j, const int k,
                             const Scalar & sca) {
 
