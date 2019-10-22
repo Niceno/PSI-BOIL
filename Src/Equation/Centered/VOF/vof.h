@@ -96,7 +96,18 @@ class VOF : public Centered {
       boil::oout<<"set_use_subgrid= "<<b<<"\n";
     }
     /* getter for use_subgrid */
-    bool get_use_subgrid() { return(use_subgrid);};    
+    bool get_use_subgrid() { return(use_subgrid);};
+
+    /* setter for use_HF_wall */
+    bool set_use_HF_wall(const bool b) {
+      use_HF_wall=b;
+      if (use_HF_wall) {
+        boil::oout<<"VOF: Height function is used for wall adhesion force.\n";
+      }
+      return b;
+    }
+    /* getter for use_subgrid */
+    bool get_use_HF_wall() { return(use_HF_wall);};
 
     /* min and max of color function in fluid domain */
     real minval() {return minclr;}
@@ -246,8 +257,7 @@ class VOF : public Centered {
     bool iminw, imaxw, jminw, jmaxw, kminw, kmaxw; // true = wall
     bool iminc, imaxc, jminc, jmaxc, kminc, kmaxc; // true = cut-stencil
     bool ifull, jfull, kfull; // true = not a dummy direction
-    bool limit_color;
-    bool use_subgrid;
+    bool limit_color, use_subgrid, use_HF_wall;
     real minclr, maxclr;
 
     Heaviside heavi;

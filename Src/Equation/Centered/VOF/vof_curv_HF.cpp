@@ -6,7 +6,7 @@ using namespace std;
 void VOF::curv_HF() {
 /***************************************************************************//**
 *  \brief Calculate curvature using height function.
-*     7x3x3 stencil
+*     7 x 3 x 3 stencil
 *     J.Lopez et al., Comput. Methods Appl. Mech. Engrg. 198 (2009) 2555-2564
 *
 *     modification: selection of cells where curvature is calculated is 
@@ -14,7 +14,9 @@ void VOF::curv_HF() {
 *
 *     output: kappa
 *******************************************************************************/
-  const real theta_crit = 0.8;
+  // special parameters
+  const real theta_crit = 0.8;  // Eq. (6) in Lopez's paper
+
   /*-----------------------------------------------------------+
   |  Step 1: calculate normal vector                           |
   |  Step 2: define iflag=1                                    |
@@ -197,28 +199,40 @@ void VOF::curv_HF() {
           hc  += stmp[i+ii][j  ][k  ];
         }
 
-        if (hc_limit<=hc && hc<=(hc_limit+1.0)) {
+        //if (hc_limit<=hc && hc<=(hc_limit+1.0)) {
+        if (hc_limit<hc && hc<=(hc_limit+1.0)) {
           real theta = acos(max_abs_n);
           real g = 0.0;
           if (theta < theta_crit) {   // Eq.6 Lopez (2009) Comp Methods Appl
             g = 0.2;
           }
+
+          real dzzb = phi.dzb(k);
+          real dzzc = phi.dzc(k);
+          real dzzt = phi.dzt(k);
+          if(dom->ibody().off(i,j,k-1)) dzzb = phi.dzc(k);
+          if(dom->ibody().off(i,j,k+1)) dzzt = phi.dzc(k);
+          real dyys = dys(j);
+          real dyyc = phi.dyc(j);
+          real dyyn = dyn(j);
+          if(dom->ibody().off(i,j-1,k)) dyys = phi.dyc(j);
+          if(dom->ibody().off(i,j+1,k)) dyyn = phi.dyc(j);
 #if 0
-          real hy  = jfull*(hpc-hmc)/(dys(j)+dyn(j));
-          real hz  = kfull*(hcp-hcm)/(dzb(k)+dzt(k));
-          real hyy = jfull*(hpc-2.0*hcc+hmc)/(phi.dyc(j)*phi.dyc(j));
-          real hzz = kfull*(hcp-2.0*hcc+hcm)/(phi.dzc(k)*phi.dzc(k));
+          real hy  = jfull*(hpc-hmc)/(dyys+dyyn);
+          real hz  = kfull*(hcp-hcm)/(dzzb+dzzt);
+          real hyy = jfull*(hpc-2.0*hcc+hmc)/(dyyc*dyyc));
+          real hzz = kfull*(hcp-2.0*hcc+hcm)/(dzzc*dzzc));
 #else
           real hy  = jfull*(g*(hpp-hmp)+(hpc-hmc)+g*(hpm-hmm))
-                    / ((dys(j)+dyn(j))*(1.0+2.0*g));
+                    / ((dyys+dyyn)*(1.0+2.0*g));
           real hz  = kfull*(g*(hpp-hpm)+(hcp-hcm)+g*(hmp-hmm))
-                    / ((dzb(k)+dzt(k))*(1.0+2.0*g));
+                    / ((dzzb+dzzt)*(1.0+2.0*g));
           real hyy = jfull*(g*(hpp-2.0*hcp+hmp)+(hpc-2.0*hcc+hmc)+g*(hpm-2.0*hcm+hmm))
-                    / ((phi.dyc(j)*phi.dyc(j))*(1.0+2.0*g));
+                    / ((dyyc*dyyc)*(1.0+2.0*g));
           real hzz = kfull*(g*(hpp-2.0*hpc+hpm)+(hcp-2.0*hcc+hcm)+g*(hmp-2.0*hmc+hmm))
-                    / ((phi.dzc(k)*phi.dzc(k))*(1.0+2.0*g));
+                    / ((dzzc*dzzc)*(1.0+2.0*g));
 #endif
-          real hyz = jfull*kfull*(hpp-hpm-hmp+hmm)/(4.0*phi.dyc(j)*phi.dzc(k));
+          real hyz = jfull*kfull*(hpp-hpm-hmp+hmm)/(4.0*dyyc*dzzc);
           kappa[i][j][k] = -1.0
                          * (hyy + hzz + hyy*hz*hz + hzz*hy*hy - 2.0*hyz*hy*hz)
                          / pow(1.0 + hy*hy + hz*hz, 1.5);
@@ -326,28 +340,40 @@ void VOF::curv_HF() {
           hc  += stmp[i  ][j+jj][k  ];
         }
 
-        if (hc_limit<=hc && hc<=(hc_limit+1.0)) {
+        //if (hc_limit<=hc && hc<=(hc_limit+1.0)) {
+        if (hc_limit<hc && hc<=(hc_limit+1.0)) {
           real theta = acos(max_abs_n);
           real g = 0.0;
           if (theta < theta_crit) {   // Eq.6 Lopez (2009) Comp Methods Appl
             g = 0.2;
           }
+
+          real dzzb = phi.dzb(k);
+          real dzzc = phi.dzc(k);
+          real dzzt = phi.dzt(k);
+          if(dom->ibody().off(i,j,k-1)) dzzb = phi.dzc(k);
+          if(dom->ibody().off(i,j,k+1)) dzzt = phi.dzc(k);
+          real dxxw = dxw(i);
+          real dxxc = phi.dxc(i);
+          real dxxe = dxe(i);
+          if(dom->ibody().off(i-1,j,k)) dxxw = phi.dxc(i);
+          if(dom->ibody().off(i+1,j,k)) dxxe = phi.dxc(i);
 #if 0
-          real hx  = ifull*(hpc-hmc)/(dxw(i)+dxe(i));
-          real hz  = kfull*(hcp-hcm)/(dzb(k)+dzt(k));
-          real hxx = ifull*(hpc-2.0*hcc+hmc)/(phi.dxc(i)*phi.dxc(i));
-          real hzz = kfull*(hcp-2.0*hcc+hcm)/(phi.dzc(k)*phi.dzc(k));
+          real hx  = ifull*(hpc-hmc)/(dxxw+dxxe);
+          real hz  = kfull*(hcp-hcm)/(dzzb+dzzt);
+          real hxx = ifull*(hpc-2.0*hcc+hmc)/(dxxc*dxxc);
+          real hzz = kfull*(hcp-2.0*hcc+hcm)/(dzzc*dzzc);
 #else
           real hx  = ifull*(g*(hpp-hmp)+(hpc-hmc)+g*(hpm-hmm))
-                    / ((dxw(i)+dxe(i))*(1.0+2.0*g));
+                    / ((dxxw+dxxe)*(1.0+2.0*g));
           real hz  = kfull*(g*(hpp-hpm)+(hcp-hcm)+g*(hmp-hmm))
-                    / ((dzb(k)+dzt(k))*(1.0+2.0*g));
+                    / ((dzzb+dzzt)*(1.0+2.0*g));
           real hxx = ifull*(g*(hpp-2.0*hcp+hmp)+(hpc-2.0*hcc+hmc)+g*(hpm-2.0*hcm+hmm))
-                    / ((phi.dxc(i)*phi.dxc(i))*(1.0+2.0*g));
+                    / ((dxxc*dxxc)*(1.0+2.0*g));
           real hzz = kfull*(g*(hpp-2.0*hpc+hpm)+(hcp-2.0*hcc+hcm)+g*(hmp-2.0*hmc+hmm))
-                    / ((phi.dzc(k)*phi.dzc(k))*(1.0+2.0*g));
+                    / ((dzzc*dzzc)*(1.0+2.0*g));
 #endif
-          real hxz = ifull*kfull*(hpp-hpm-hmp+hmm) / (4.0*phi.dxc(i)*phi.dzc(k));
+          real hxz = ifull*kfull*(hpp-hpm-hmp+hmm) / (4.0*dxxc*dzzc);
           kappa[i][j][k] = -1.0
                          * (hxx + hzz + hxx*hz*hz + hzz*hx*hx - 2.0*hxz*hx*hz)
                          / pow(1.0 + hx*hx + hz*hz, 1.5);
@@ -454,28 +480,40 @@ void VOF::curv_HF() {
           hc  += stmp[i  ][j  ][k+kk];
         }
 
-        if (hc_limit<=hc && hc<=(hc_limit+1.0)) {
+        //if (hc_limit<=hc && hc<=(hc_limit+1.0)) {
+        if (hc_limit<hc && hc<=(hc_limit+1.0)) {
           real theta = acos(max_abs_n);
           real g = 0.0;
           if (theta < theta_crit) {   // Eq.6 Lopez (2009) Comp Methods Appl
             g = 0.2;
           }
+
+          real dyys = dys(j);
+          real dyyc = phi.dyc(j);
+          real dyyn = dyn(j);
+          if(dom->ibody().off(i,j-1,k)) dyys = phi.dyc(j);
+          if(dom->ibody().off(i,j+1,k)) dyyn = phi.dyc(j);
+          real dxxw = dxw(i);
+          real dxxc = phi.dxc(i);
+          real dxxe = dxe(i);
+          if(dom->ibody().off(i-1,j,k)) dxxw = phi.dxc(i);
+          if(dom->ibody().off(i+1,j,k)) dxxe = phi.dxc(i);
 #if 0
-          real hx  = ifull*(hpc-hmc)/(dxw(i)+dxe(i));
-          real hy  = jfull*(hcp-hcm)/(dys(j)+dyn(j));
-          real hxx = ifull*(hpc-2.0*hcc+hmc)/(phi.dxc(i)*phi.dxc(i));
-          real hyy = jfull*(hcp-2.0*hcc+hcm)/(phi.dyc(j)*phi.dyc(j));
+          real hx  = ifull*(hpc-hmc)/(dxxw+dxxe);
+          real hy  = jfull*(hcp-hcm)/(dyys+dyyn);
+          real hxx = ifull*(hpc-2.0*hcc+hmc)/(dxxc*dxxc);
+          real hyy = jfull*(hcp-2.0*hcc+hcm)/(dyyc*dyyc);
 #else
           real hx  = ifull*(g*(hpp-hmp)+(hpc-hmc)+g*(hpm-hmm))
-                    / ((dxw(i)+dxe(i))*(1.0+2.0*g));
+                    / ((dxxw+dxxe)*(1.0+2.0*g));
           real hy  = jfull*(g*(hpp-hpm)+(hcp-hcm)+g*(hmp-hmm))
-                    / ((dys(j)+dyn(j))*(1.0+2.0*g));
+                    / ((dyys+dyyn)*(1.0+2.0*g));
           real hxx = ifull*(g*(hpp-2.0*hcp+hmp)+(hpc-2.0*hcc+hmc)+g*(hpm-2.0*hcm+hmm))
-                    / ((phi.dxc(i)*phi.dxc(i))*(1.0+2.0*g));
+                    / ((dxxc*dxxc)*(1.0+2.0*g));
           real hyy = jfull*(g*(hpp-2.0*hpc+hpm)+(hcp-2.0*hcc+hcm)+g*(hmp-2.0*hmc+hmm))
-                    / ((phi.dyc(j)*phi.dyc(j))*(1.0+2.0*g));
+                    / ((dyyc*dyyc)*(1.0+2.0*g));
 #endif
-          real hxy = ifull*jfull*(hpp-hpm-hmp+hmm) / (4.0*phi.dxc(i)*phi.dyc(j));
+          real hxy = ifull*jfull*(hpp-hpm-hmp+hmm) / (4.0*dxxc*dyyc);
           kappa[i][j][k] = -1.0
                          * (hxx + hyy + hxx*hy*hy + hyy*hx*hx - 2.0*hxy*hx*hy)
                          / pow(1.0 + hx*hx + hy*hy, 1.5);
@@ -528,7 +566,9 @@ void VOF::curv_HF() {
   }
 #endif
 
-  bdcurv();
+  if(!use_HF_wall) {
+    bdcurv();
+  }
 
 #if 0
   if(time->current_step()==1) {

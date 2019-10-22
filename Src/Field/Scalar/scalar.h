@@ -193,6 +193,7 @@ class Scalar {
                    real * nx, real * ny, real * nz) const;
 
     void bnd_update();
+    void bnd_update_nowall();
     void bnd_grad_update(const Comp &);
 
     void bnd_extract( const Dir d, real *** cp ) const;
