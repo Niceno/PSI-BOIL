@@ -10,7 +10,7 @@
 
 #define IB
 
-using arr = std::vector< std::vector<real> >;
+using arr3D = std::vector< std::vector< std::vector<real> > >;
 
 ////////////////////////////
 //                        //
@@ -56,7 +56,7 @@ class NormMethod {
 };
 
 ///////////
-//       //
+///       //
 //  VOF  //
 //       //
 ///////////
@@ -228,7 +228,6 @@ class VOF : public Centered {
     void bdcurv();
     void cal_fs3(const Scalar & scp);
     void cal_fs_interp(const Scalar & scp);
-    virtual void curv_HF();
     void curv_smooth();
     void extract_alpha(const Scalar & scp);
     void extract_alpha_near_bnd(const Scalar & scp);
@@ -249,6 +248,16 @@ class VOF : public Centered {
     void nib(const real & n1, const real & n2, const real & n3
            , const real & n4, const real & n5, const real & n6
            , real r[]);
+    
+    virtual void curv_HF();
+    void curv_HF_kernel(arr3D & stencil, const arr3D & gridstencil,
+                        const int imin, const int imax,
+                        const real d1m, const real d1c, const real d1p,
+                        const real d2m, const real d2c, const real d2p,
+                        const real max_n,
+                        const bool truedir1, const bool truedir2,
+                        real & kap, int & flag);
+                        //const int i, const int j, const int k);
 
     virtual void norm(const Scalar & color, const NormMethod & nm,
                       const bool extalp);

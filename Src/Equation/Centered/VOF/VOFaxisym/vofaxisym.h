@@ -5,6 +5,8 @@
 
 #define IB
 
+using arr2D = std::vector< std::vector<real> >;
+
 ///////////
 //       //
 //  VOF  //
@@ -95,12 +97,26 @@ class VOFaxisym : public VOF {
                                 const Comp & mcomp);
     
     virtual void curv_HF();
-    void curv_HF_kernel_axisymmetric(arr & stencil, const arr & gridstencil,
-                                     const int imin, const int imax,
-                                     const real dm, const real dc, const real dp,
-                                     const real max_n, const bool truedir,
-                                     real & kap, int & flag);
 
+    void fill_stencil_x(arr2D & stencil, arr2D & gridstencil,
+                        int & min, int & max,
+                        const int i, const int j, const int k);
+    void fill_stencil_z(arr2D & stencil, arr2D & gridstencil,
+                        int & min, int & max,
+                        const int i, const int j, const int k);
+
+    void calculate_heights(arr2D & stencil, const arr2D & gridstencil,
+                           const int imin, const int imax,
+                           const real max_n, real & mult,
+                           real & hm, real & hc, real & hp, real & nhc);
+
+    void calculate_curvature_HF_axisymmetric(
+                            const real hm, const real hc, const real hp,
+                            const real dm, const real dc, const real dp,
+                            const bool truedir, const real mult,
+                            const Comp mcomp, const real xcent,
+                            real & kap,
+                            const int i, const int j, const int k);
 
     real xi_small_pos_triangle(real alpha, real mmx, real mmz);
     real xi_small_pos_trapezoid(real alpha, real mmx, real mmz);
