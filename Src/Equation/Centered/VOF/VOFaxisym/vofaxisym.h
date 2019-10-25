@@ -110,7 +110,13 @@ class VOFaxisym : public VOF {
                            const real max_n, real & mult,
                            real & hm, real & hc, real & hp, real & nhc);
 
-    void calculate_curvature_HF_axisymmetric(
+    void calculate_curvature_HF_cartesian(
+                            const real hm, const real hc, const real hp,
+                            const real dm, const real dc, const real dp,
+                            const bool truedir, const real mult,
+                            real & kap,
+                            const int i, const int j, const int k);
+    void calculate_curvature_HF_cylindrical(
                             const real hm, const real hc, const real hp,
                             const real dm, const real dc, const real dp,
                             const bool truedir, const real mult,

@@ -2,10 +2,12 @@
 #include "setup_circle.cpp"
 #include "test_reconstruction.cpp"
 #include <fstream>
+#include <iostream>
 #define SYM
 //#define USE_BNDCLR
 //#define USE_CARTESIAN
 
+#if 0
 /* computed parameters */
 const int gLevel = 2;
 const int NX = 16*gLevel;
@@ -28,19 +30,47 @@ const real radius = LX/4.0;
 const real xcent = 0.0;
 const real ycent = 0.0;
 const real zcent = 0.0;
+#endif
 
 /******************************************************************************/
 int main(int argc, char * argv[]) {
 
-  if(argc==1){
-    boil::oout<<"An argument is required!"<<"\n";
-    boil::oout<<"./Boil wmin (wmin::wall time in minute)"<<"\n";
+  boil::timer.start();
+
+  if(argc<=2){
+    boil::oout<<"Two command line arguments required!"<<"\n";
+    boil::oout<<"./Boil gridlevel radius-mult"<<boil::endl;
     exit(0);
   }
-  int wmin=atoi(argv[1]);
-  boil::oout<<"wmin= "<<wmin<<"\n";
 
-  boil::timer.start();
+  const int gLevel = atoi(argv[1]);
+  boil::oout<<"gLevel= "<<gLevel<<"\n";
+
+  const real radmult = atof(argv[2]);
+  boil::oout<<"radmult= "<<radmult<<"\n";
+
+  /* computed parameters */
+  const int NX = 16*gLevel;
+#ifdef SYM
+  const int NZ = NX;
+#else
+  const int NZ = 2*NX;
+#endif
+
+  /* domain dimensions (given by problem) */
+  const real LX =   4.0e-3;
+  const real LZ =   LX;
+  const real DX =   0.5*LX/real(NX);
+
+  const int mSimple = 1;
+
+  const bool inverted = true;
+  const bool partial = true;
+
+  const real radius = radmult*0.5*LX;
+  const real xcent = 0.0;
+  const real ycent = 0.0;
+  const real zcent = 0.0;
 
   /*--------------------------------+
   |  choose the output file format  |
@@ -166,52 +196,28 @@ int main(int argc, char * argv[]) {
   boil::oout<<"sk= "<<c.sk()<<" ei= "<<c.ek()<<"\n";
 #endif
 
-  /*-------------------+
-  |  check if restart  |
-  +-------------------*/
-  std::fstream input;
-  int irun = 0;
-  if(boil::cart.iam()==0){
-    input.open("run.txt", std::ios::in);
-    if( !input.fail() ) {
-      input >> irun;
-      std::cout<<"read irun.  irun= "<<irun<<"\n";
-    }
-    input.close();
-  }
-  boil::cart.sum_int(&irun);
-  if (irun==1){
-    boil::oout<<"exit job due to irun=1"<<"\n";
-    exit(0);
-  }
+  /*----------------+
+  |  linear solver  |
+  +----------------*/
+  Krylov * solver = new CG(d, Prec::ic2());
+  //Krylov * solver = new CG(d, Prec::di());
 
-  if(boil::cart.iam()==0){
-    std::fstream output;
-    output.open("run.txt", std::ios::out);
-    output << 1 << boil::endl;
-    output.close();
-  }
-
-  input.open("time.txt", std::ios::in);
-  bool restart = false;
-
-  if( !input.fail() ) {
-    restart=true;
-  }
-
-  if( restart ) {
-    int ts;
-    real t,dtf;
-    input >> ts;
-    input >> t;
-    input >> dtf;
-    time.first_step(ts);
-    time.current_time(t);
-    time.set_dt(dtf);
-    uvw   .load("uvw", ts);
-    press .load("press", ts);
-    c     .load("c", ts);
-  } else {
+#ifdef USE_CARTESIAN
+  #ifdef USE_BNDCLR
+  VOF conc(c, g, kappa, uvw, time, solver, &bndclr);
+  #else
+  VOF conc(c, g, kappa, uvw, time, solver);
+  #endif
+#else
+  #ifdef USE_BNDCLR
+  VOFaxisym conc(c, g, kappa, uvw, time, solver, &bndclr);
+  #else
+  VOFaxisym conc(c, g, kappa, uvw, time, solver);
+  #endif
+  //conc.set_reconstruction_parameters(1e-5,conc.get_reconstruction_maxiter());
+#endif
+  conc.set_curv_method(0);  // height function
+  //conc.set_curv_method(1);  // smoothed VOF
 
   /*--------------------+
   |  initial condition  |
@@ -231,13 +237,6 @@ int main(int argc, char * argv[]) {
   cold.bnd_update();
   cold.exchange_all();
 
-  } // restart
-
-  /*----------------+
-  |  linear solver  |
-  +----------------*/
-  Krylov * solver = new CG(d, Prec::ic2());
-  //Krylov * solver = new CG(d, Prec::di());
   Momentum ns( uvw, xyz, time, solver, &mixed);
   ns.convection_set(TimeScheme::backward_euler()); //ns.convection is mandatory
   ns.diffusion_set(TimeScheme::backward_euler());
@@ -254,27 +253,14 @@ int main(int argc, char * argv[]) {
 
 
 #ifdef USE_CARTESIAN
-  #ifdef USE_BNDCLR
-  VOF conc(c, g, kappa, uvw, time, solver, &bndclr);
-  #else
-  VOF conc(c, g, kappa, uvw, time, solver);
-  #endif
-  for_avijk(c,i,j,k) {
+  for_avijk(cold,i,j,k) {
     c[i][j][k] = cold[i][j][k];
   }
 #else
-  #ifdef USE_BNDCLR
-  VOFaxisym conc(c, g, kappa, uvw, time, solver, &bndclr);
-  #else
-  VOFaxisym conc(c, g, kappa, uvw, time, solver);
-  #endif
-  //conc.set_reconstruction_parameters(1e-5,conc.get_reconstruction_maxiter());
   conc.color_to_vf(cold,c);
   conc.reconstruct_geometry();
   conc.test_reconstruction(conc.color(),c);
 #endif
-  conc.set_curv_method(0);  // height function
-  //conc.set_curv_method(1);  // smoothed VOF
 
   conc.ancillary();
   conc.totalvol();
@@ -297,14 +283,18 @@ int main(int argc, char * argv[]) {
   conc.curvature();
 #ifndef USE_CARTESIAN
   //test_reconstruction_circle_xz(conc,conc.color(),cold,kappa,inverted,0.5*radius,nm,nl1, nli, kl1, kli);
-  test_reconstruction_sphere(conc,conc.color(),cold,kappa,inverted,radius,nm,nl1,nli,kl1,kli);
+  test_reconstruction_sphere(partial,conc,conc.color(),cold,kappa,inverted,radius,nm,nl1,nli,kl1,kli);
 #else
   test_reconstruction_circle_xz(conc,c,cold,kappa,inverted,radius,nm,nl1, nli, kl1, kli);
 #endif
 
+  std::ofstream output;
+  output.open( "results_sphere.txt", std::ios::out | std::ios::app );
   for(int i(0); i<nl1.size(); ++i) {
-    boil::oout<<nmv[i]<<" "<<nl1[i]<<" "<<nli[i]<<" "<<kl1[i]<<" "<<kli[i]<<boil::endl;
+    boil::oout<<radmult<<" "<<gLevel<<" | "<<nmv[i]<<" "<<nl1[i]<<" "<<nli[i]<<" "<<kl1[i]<<" "<<kli[i]<<boil::endl;
+    output<<radmult<<" "<<gLevel<<" | "<<nmv[i]<<" "<<nl1[i]<<" "<<nli[i]<<" "<<kl1[i]<<" "<<kli[i]<<boil::endl;
   }
+  output.close();
 
 #ifndef USE_CARTESIAN
   boil::plot->plot(c,conc.color(),kappa, "uvw-phi-c-kappa", 0);

@@ -51,7 +51,7 @@ int main(int argc, char * argv[]) {
 
   boil::timer.start();
 
-  if(argc==2){
+  if(argc<=2){
     boil::oout<<"Two command line arguments required!"<<"\n";
     boil::oout<<"./Boil gridlevel angleofrepose"<<boil::endl;
     exit(0);
@@ -79,14 +79,14 @@ int main(int argc, char * argv[]) {
 
   const int mSimple = 1;
 
-  const bool inverted = false;//true;
+  const bool inverted = true;//false;
 
-  const real angle = 90.-atoi(argv[2]);
+  const real angle = atof(argv[2]);
   boil::oout<<"angle= "<<angle<<"\n";
 
-  real mmx = 1.;
+  real mmz = 1./sqrt((1.+pow(tan(angle*boil::pi/180.),2.)));
+  real mmx = sqrt(1.-mmz*mmz);
   real mmy = 0.;
-  real mmz = tan(angle*boil::pi/180.);
   
   real r1 = 0.5*LX-DX;
   real r2 = (0.5*LZ-DZ)/tan(boil::pi/180.*(90.-angle));
@@ -333,16 +333,16 @@ int main(int argc, char * argv[]) {
   conc.ancillary();
   conc.curvature();
 #ifndef USE_CARTESIAN
-  test_reconstruction_cone(conc,conc.color(),cold,kappa,inverted,nnx,nnz,nalp,nm,nl1,nli,kl1,kli);
+  test_reconstruction_cone(NX,NZ,conc,conc.color(),cold,kappa,inverted,nnx,nnz,nalp,nm,nl1,nli,kl1,kli);
 #else
   test_reconstruction_triangle_xz(conc,c,cold,kappa,inverted,nnx,nnz,nm,nl1,nli,kl1,kli);
 #endif
 
   std::ofstream output;
-  output.open( "results.txt", std::ios::out | std::ios::app );
+  output.open( "results_cone.txt", std::ios::out | std::ios::app );
   for(int i(0); i<nl1.size(); ++i) {
-    boil::oout<<90.-angle<<" "<<gLevel<<" | "<<nmv[i]<<" "<<nl1[i]<<" "<<nli[i]<<" "<<kl1[i]<<" "<<kli[i]<<boil::endl;
-    output<<90.-angle<<" "<<gLevel<<" | "<<nmv[i]<<" "<<nl1[i]<<" "<<nli[i]<<" "<<kl1[i]<<" "<<kli[i]<<boil::endl;
+    boil::oout<<angle<<" "<<gLevel<<" | "<<nmv[i]<<" "<<nl1[i]<<" "<<nli[i]<<" "<<kl1[i]<<" "<<kli[i]<<boil::endl;
+    output<<angle<<" "<<gLevel<<" | "<<nmv[i]<<" "<<nl1[i]<<" "<<nli[i]<<" "<<kl1[i]<<" "<<kli[i]<<boil::endl;
   }
   output.close();
 

@@ -1,5 +1,7 @@
 #include "vofaxisym.h"
 #define LOPEZ_COLORING
+//#define ONLY_CART
+#define ONLY_CYL
 
 /* parameters */
 static const int mof(3); /* symmetric stencil is constructed */
@@ -11,6 +13,8 @@ static const int minor(nof*2+1);
 static const real blending_angle = 40./180.*boil::pi;
 static const real n0square = 1.-1./(1.+tan(blending_angle)*tan(blending_angle));
 static const real n0 = sqrt(n0square);
+
+static const real overshoot(0.03);
 
 static const int iterloop(1); /* 2019.07.09 */
 
@@ -129,11 +133,21 @@ void VOFaxisym::curv_HF() {
           /* radius of cylindrical revolution, adjusted for height */
           real xcent_adj = clr.xc(i) + (nhc+imin-0.5)*gridstencilx[nof][mof];
 
-          calculate_curvature_HF_axisymmetric(hm,hc,hp,
-                                              clr.dzb(k),clr.dzc(k),clr.dzt(k),
-                                              kfull,mult,mMax,xcent_adj,
-                                              kappa[i][j][k],
-                                              i,j,k);
+          real kap_cyl,kap_cart;
+          calculate_curvature_HF_cylindrical(hm,hc,hp,
+                                             clr.dzb(k),clr.dzc(k),clr.dzt(k),
+                                             kfull,mult,mMax,xcent_adj,
+                                             kap_cyl,i,j,k);
+          calculate_curvature_HF_cartesian(hm,hc,hp,
+                                           clr.dzb(k),clr.dzc(k),clr.dzt(k),
+                                           kfull,mult,kap_cart,i,j,k);
+#ifdef ONLY_CART
+          kappa[i][j][k] = kap_cart;
+#elif defined ONLY_CYL
+          kappa[i][j][k] = kap_cyl;
+#else
+          kappa[i][j][k] = kap_cyl+kap_cart;
+#endif
         } else {
           iflag[i][j][k] = 0;
         }
@@ -161,11 +175,21 @@ void VOFaxisym::curv_HF() {
           /* radius of cylindrical revolution */
           real xcent = clr.xc(i);
 
-          calculate_curvature_HF_axisymmetric(hm,hc,hp,
-                                              clr.dxw(i),clr.dxc(i),clr.dxe(i),
-                                              ifull,mult,mMax,xcent,
-                                              kappa[i][j][k],
-                                              i,j,k);
+          real kap_cyl,kap_cart;
+          calculate_curvature_HF_cylindrical(hm,hc,hp,
+                                             clr.dxw(i),clr.dxc(i),clr.dxe(i),
+                                             ifull,mult,mMax,xcent,
+                                             kap_cyl,i,j,k);
+          calculate_curvature_HF_cartesian(hm,hc,hp,
+                                           clr.dxw(i),clr.dxc(i),clr.dxe(i),
+                                           ifull,mult,kap_cart,i,j,k);
+#ifdef ONLY_CART
+          kappa[i][j][k] = kap_cart;
+#elif defined ONLY_CYL
+          kappa[i][j][k] = kap_cyl;
+#else
+          kappa[i][j][k] = kap_cyl+kap_cart;
+#endif
         } else {
           iflag[i][j][k] = 0;
         }
@@ -175,6 +199,12 @@ void VOFaxisym::curv_HF() {
           boil::oout<<"Curv_HF: Pseudo direction selected at "<<i<<" "<<j<<" "
                     <<k<<" while blending; exiting."<<boil::endl;
           exit(0);
+        }
+
+        if(abs_nx<abs_nz) {
+          mMax = Comp::k();
+        } else {
+          mMax = Comp::i();
         }
 
         /* fill stencils */
@@ -195,47 +225,68 @@ void VOFaxisym::curv_HF() {
         calculate_heights(stencilz,gridstencilz,kmin,imax,nnz,
                           mult_z,hm_z,hc_z,hp_z,nhc_z);
 
+        /* slight overshoot can be tolerated if at least one dir ok */
         bool flag_x = -imin<nhc_x && nhc_x<=(-imin+1.0);
         bool flag_z = -kmin<nhc_z && nhc_z<=(-kmin+1.0);
-#if 0
+        bool flag_x_ov = (-imin-overshoot)<nhc_x && nhc_x<=(-imin+1.0+overshoot);
+        bool flag_z_ov = (-kmin-overshoot)<nhc_z && nhc_z<=(-kmin+1.0+overshoot);
+#if 1
         bool flag = flag_x & flag_z;
-        boil::oout<<nhc_x<<" "<<nhc_z<<" | "<<nhc_x+imin<<" "<<nhc_z+kmin<<" | "
+        boil::oout<<i<<" "<<k<<" | "<<nhc_x<<" "<<nhc_z<<" | "<<nhc_x+imin+overshoot<<" "<<nhc_z+kmin+overshoot<<" "<<overshoot<<" | "
                   <<flag_x<<" "<<flag_z<<" "<<flag
                   <<boil::endl;
 #endif
-
-        real kap_x(0.0), kap_z(0.0);
         if(!flag_x&&!flag_z) {
           iflag[i][j][k] = 0;
         } else {
+
+          real kap_x_cyl(0.0), kap_z_cyl(0.0), kap_cart(0.0);
+
+          /* Cartesian curvature is not blended */
+          if(abs_nx<abs_nz) {
+            calculate_curvature_HF_cartesian(hm_z,hc_z,hp_z,
+                                             clr.dxw(i),clr.dxc(i),clr.dxe(i),
+                                             ifull,mult_z,kap_cart,i,j,k);
+          } else {
+            calculate_curvature_HF_cartesian(hm_x,hc_x,hp_x,
+                                             clr.dzb(k),clr.dzc(k),clr.dzt(k),
+                                             kfull,mult_x,kap_cart,i,j,k);
+          }
+
           /* blending factor for z-component */
-          real bfactor = ( flag_x& flag_z)*(abs_nz*abs_nz - n0square)/(1.-2.*n0square)
-                       + ( flag_x&!flag_z)*0.0
-                       + (!flag_x& flag_z)*1.0;
-          if(flag_x) {
+          real bfactor = ( flag_x_ov& flag_z_ov)*(abs_nz*abs_nz - n0square)/(1.-2.*n0square)
+                       + ( flag_x_ov&!flag_z_ov)*0.0
+                       + (!flag_x_ov& flag_z_ov)*1.0;
+          if(flag_x_ov) {
             /* radius of cylindrical revolution, adjusted for height */
             real xcent_x = clr.xc(i) + (nhc_x+imin-0.5)*gridstencilx[nof][mof];
 
-            calculate_curvature_HF_axisymmetric(hm_x,hc_x,hp_x,
-                                                clr.dzb(k),clr.dzc(k),clr.dzt(k),
-                                                kfull,mult_x,Comp::i(),xcent_x,
-                                                kap_x,
-                                                i,j,k);
-            kap_x *= 1.0-bfactor;
+            calculate_curvature_HF_cylindrical(hm_x,hc_x,hp_x,
+                                               clr.dzb(k),clr.dzc(k),clr.dzt(k),
+                                               kfull,mult_x,Comp::i(),xcent_x,
+                                               kap_x_cyl,i,j,k);
+            kap_x_cyl *= 1.0-bfactor;
           }
-          if(flag_z) {
+          if(flag_z_ov) {
             /* radius of cylindrical revolution */
             real xcent_z = clr.xc(i);
 
-            calculate_curvature_HF_axisymmetric(hm_z,hc_z,hp_z,
-                                                clr.dxw(i),clr.dxc(i),clr.dxe(i),
-                                                ifull,mult_z,Comp::k(),xcent_z,
-                                                kap_z,
-                                                i,j,k);
-            kap_z *= bfactor;
+            calculate_curvature_HF_cylindrical(hm_z,hc_z,hp_z,
+                                               clr.dxw(i),clr.dxc(i),clr.dxe(i),
+                                               ifull,mult_z,Comp::k(),xcent_z,
+                                               kap_z_cyl,i,j,k);
+            kap_z_cyl *= bfactor;
           }
 
-          kappa[i][j][k] = kap_x + kap_z;
+#ifdef ONLY_CART
+          kappa[i][j][k] = kap_cart;
+#elif defined ONLY_CYL
+          kappa[i][j][k] = kap_x_cyl+kap_z_cyl;
+#else
+          kappa[i][j][k] = kap_x_cyl+kap_z_cyl+kap_cart;
+#endif
+
+          //boil::oout<<"blending: "<<i<<" "<<k<<" | "<<kap_cart<<" "<<kap_x_cyl<<" "<<kap_z_cyl<<" | "<<kap_x_cyl+kap_z_cyl<<" "<<kappa[i][j][k]<<boil::endl;
         }
       } /* blending */
 
@@ -451,7 +502,27 @@ void VOFaxisym::calculate_heights(arr2D & stencil, const arr2D & gridstencil,
 /*-----------------------+
 |  curvature calculation |
 +-----------------------*/
-void VOFaxisym::calculate_curvature_HF_axisymmetric(
+void VOFaxisym::calculate_curvature_HF_cartesian(
+                               const real hm, const real hc, const real hp,
+                               const real dm, const real dc, const real dp,
+                               const bool truedir, const real mult,
+                               real & kap,
+                               const int i, const int j, const int k) {
+
+/* Note: Lopez Eq. (6) correction is not used in 2D */
+  real h_1c = truedir*(hp-hm)/(dm+dp);
+  real h_1u = truedir*(hp-hc)/dp;
+  real h_1d = truedir*(hc-hm)/dm;
+  real h_11 = truedir*2.*(dp*hm+dm*hp-(dp+dm)*hc)/dp/dm/(dp+dm);
+
+  /* Cartesian contribution */
+  /* under this convention, bubbles have negative curvature */
+  kap = -mult*h_11/pow(1.+h_1c*h_1c,1.5);
+
+  return;
+}
+
+void VOFaxisym::calculate_curvature_HF_cylindrical(
                                const real hm, const real hc, const real hp,
                                const real dm, const real dc, const real dp,
                                const bool truedir, const real mult,
@@ -465,35 +536,32 @@ void VOFaxisym::calculate_curvature_HF_axisymmetric(
   real h_1d = truedir*(hc-hm)/dm;
   real h_11 = truedir*2.*(dp*hm+dm*hp-(dp+dm)*hc)/dp/dm/(dp+dm);
 
-  /* Cartesian contribution */
-  real kappa_cart = 0.0;//h_11/pow(1.+h_1c*h_1c,1.5);
-
   /* cylindrical contribution -> depends on stencil orientation */
-  real kappa_cyl;
+  kap = 0.0;
   if(mcomp==Comp::k()) {
 #if 0
-    kappa_cyl  = 1.0/xcent*h_1c/sqrt(1.+h_1c*h_1c);
+    kap  = 1.0/xcent*h_1c/sqrt(1.+h_1c*h_1c);
 #else
-    kappa_cyl  = h_1u/sqrt(1.+h_1u*h_1u);
-    kappa_cyl += h_1d/sqrt(1.+h_1d*h_1d);
+    kap  = h_1u/sqrt(1.+h_1u*h_1u);
+    kap += h_1d/sqrt(1.+h_1d*h_1d);
 
-    kappa_cyl /= 2.*xcent;
+    kap /= 2.*xcent;
 #endif
   } else {
 #if 1
-    kappa_cyl = -1./xcent * 1./sqrt(1.+h_1c*h_1c);
+    kap = -1./xcent * 1./sqrt(1.+h_1c*h_1c);
 #else /* this cannot reproduce zero curvature at inflexion */
-    kappa_cyl  = -1./sqrt(1.+h_1u*h_1u);
-    kappa_cyl += -1./sqrt(1.+h_1d*h_1d);
+    kap  = -1./sqrt(1.+h_1u*h_1u);
+    kap += -1./sqrt(1.+h_1d*h_1d);
 
-    kappa_cyl /= 2.*xcent;
+    kap /= 2.*xcent;
 #endif
   }
 
   /* under this convention, bubbles have negative curvature */
-  kap = -mult*(kappa_cart + kappa_cyl);
+  kap *= -mult;
 
-  boil::oout<<i<<" "<<k<<" | "<<h_1d<<" "<<h_1c<<" "<<h_1u<<" "<<h_11<<" | "<<mcomp<<" | "<<kappa_cart<<" "<<kappa_cyl<<" "<<kap<<boil::endl;
+  boil::oout<<i<<" "<<k<<" | "<<h_1d<<" "<<h_1c<<" "<<h_1u<<" "<<h_11<<" | "<<mcomp<<" | "<<" "<<kap<<boil::endl;
 
   return;
 } 
