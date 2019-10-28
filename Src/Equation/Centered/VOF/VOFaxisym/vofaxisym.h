@@ -39,7 +39,7 @@ class VOFaxisym : public VOF {
        set_normal_vector_method_all(NormMethod::ElviraXZ());
 
        reconstruction_tolerance = 1e-4;
-       reconstruction_maxiter = 7;
+       reconstruction_maxiter = 5;
     }
 
     ~VOFaxisym() {};
@@ -98,6 +98,7 @@ class VOFaxisym : public VOF {
     
     virtual void curv_HF();
 
+#if 1
     void fill_stencil_x(arr2D & stencil, arr2D & gridstencil,
                         int & min, int & max,
                         const int i, const int j, const int k);
@@ -110,19 +111,24 @@ class VOFaxisym : public VOF {
                            const real max_n, real & mult,
                            real & hm, real & hc, real & hp, real & nhc);
 
-    void calculate_curvature_HF_cartesian(
-                            const real hm, const real hc, const real hp,
-                            const real dm, const real dc, const real dp,
-                            const bool truedir, const real mult,
-                            real & kap,
-                            const int i, const int j, const int k);
-    void calculate_curvature_HF_cylindrical(
-                            const real hm, const real hc, const real hp,
-                            const real dm, const real dc, const real dp,
-                            const bool truedir, const real mult,
-                            const Comp mcomp, const real xcent,
-                            real & kap,
-                            const int i, const int j, const int k);
+    void calculate_curvature_HF_axisymmetric(
+                               const real hm, const real hc, const real hp,
+                               const real dm, const real dc, const real dp,
+                               const bool truedir, const real mult,
+                               const Comp mcomp, const real xcent,
+                               real & kap_cart, real & kap_cyl,
+                               const int i, const int j, const int k);
+#else
+    void curv_HF_kernel_axisymmetric(
+                               arr2D & stencil, const arr2D & gridstencil,
+                               const int imin, const int imax,
+                               const real dm, const real dc, const real dp,
+                               const real max_n, const bool truedir,
+                               const Comp mcomp, const real xcent,
+                               real & kap, int & flag,
+                               const int i, const int j, const int k
+                                    );
+#endif
 
     real xi_small_pos_triangle(real alpha, real mmx, real mmz);
     real xi_small_pos_trapezoid(real alpha, real mmx, real mmz);

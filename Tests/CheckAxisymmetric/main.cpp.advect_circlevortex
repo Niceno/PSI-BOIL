@@ -3,11 +3,12 @@
 #include "test_reconstruction.cpp"
 #include "l2_scalar_error.cpp"
 #include <fstream>
+#include <iostream>
 //#define USE_BNDCLR
-#define USE_CARTESIAN
+//#define USE_CARTESIAN
 //#define USE_CONTINUOUS
-//#define USE_INVERTED
 
+#if 0
 const int level = 2;
 
 /* computed parameters */
@@ -15,7 +16,6 @@ const int NX = 100*level;
 const int NZ = NX;
 
 /* domain dimensions (given by problem) */
-//const real LX =   1.0;
 const real LX = 1.0;
 const real LZ = LX;
 const real DX = LX/real(NX);
@@ -24,20 +24,39 @@ const int mSimple = 1;
 
 const bool inverted = true;
 const real A = 1.0;
-const real LA = A*LX;
+#endif
 
 /******************************************************************************/
-main(int argc, char * argv[]) {
-
-  if(argc==1){
-    boil::oout<<"An argument is required!"<<"\n";
-    boil::oout<<"./Boil wmin (wmin::wall time in minute)"<<"\n";
-    exit(0);
-  }
-  int wmin=atoi(argv[1]);
-  boil::oout<<"wmin= "<<wmin<<"\n";
+int main(int argc, char * argv[]) {
 
   boil::timer.start();
+
+  if(argc<3){
+    boil::oout<<"Three arguments (gridlevel, cfl, inversion) required!"<<"\n";
+    boil::oout<<"./Boil gridlevel cfl-max inversion"<<"\n";
+    exit(0);
+  }
+  const int level = atoi(argv[1]);
+  boil::oout<<"glevel= "<<level<<"\n";
+
+  const real cfl_max = atof(argv[2]);
+  boil::oout<<"cfl-max= "<<cfl_max<<"\n";
+
+  const bool inverted = atoi(argv[3]);
+  boil::oout<<"inversion= "<<inverted<<"\n";
+
+  /* computed parameters */
+  const int NX = 100*level;
+  const int NZ = NX;
+
+  /* domain dimensions (given by problem) */
+  const real LX = 1.0;
+  const real LZ = LX;
+  const real DX = LX/real(NX);
+
+  const int mSimple = 1;
+
+  const real A = 1.0;
 
   /*--------------------------------+
   |  choose the output file format  |
@@ -135,67 +154,16 @@ main(int argc, char * argv[]) {
   /*-------------------+
   |  time-integration  |
   +-------------------*/
-  const real cfl_max = 0.2;
 #ifdef USE_CARTESIAN
   const real vel_max = A;
 #else
   const real vel_max = 2.*A;
 #endif
   const real dt  = cfl_max*DX/vel_max;
-  const int  ndt = 7000*level;
-  const int nint = 100*level;
-  Times time(ndt, dt);
+  const int  ndt = int(300000*level/int(100*cfl_max));
+  const int nint = ndt/20;
+  Times time(ndt,dt);
 
-  /*-------------------+
-  |  check if restart  |
-  +-------------------*/
-  std::fstream input;
-  int irun = 0;
-  if(boil::cart.iam()==0){
-    input.open("run.txt", std::ios::in);
-    if( !input.fail() ) {
-      input >> irun;
-      std::cout<<"read irun.  irun= "<<irun<<"\n";
-    }
-    input.close();
-  }
-  boil::cart.sum_int(&irun);
-  if (irun==1){
-    boil::oout<<"exit job due to irun=1"<<"\n";
-    exit(0);
-  }
-
-  if(boil::cart.iam()==0){
-    std::fstream output;
-    output.open("run.txt", std::ios::out);
-    output << 1 << boil::endl;
-    output.close();
-  }
-
-  input.open("time.txt", std::ios::in);
-  bool restart = false;
-
-  if( !input.fail() ) {
-    restart=true;
-  }
-
-  if( restart ) {
-    int ts;
-    real t,dtf;
-    input >> ts;
-    input >> t;
-    input >> dtf;
-    time.first_step(ts);
-    time.current_time(t);
-    time.set_dt(dtf);
-    uvw   .load("uvw", ts);
-    press .load("press", ts);
-    c     .load("c", ts);
-  } else {
-
-  /*--------------------+
-  |  initial condition  |
-  +--------------------*/
   real a = boil::pi/LX;
   Comp m=Comp::u();
   for_avmijk(uvw,m,i,j,k) {
@@ -236,7 +204,7 @@ main(int argc, char * argv[]) {
   cold = 0.0;
 
 #if 1
-  setup_circle_xz(cold,0.1,0.3,0.3);
+  setup_circle_xz(cold,0.2,0.4,0.4);
   cold.bnd_update();
   cold.exchange_all();
 #else 
@@ -245,13 +213,10 @@ main(int argc, char * argv[]) {
   cold.exchange_all();
 #endif
 
-#ifdef USE_INVERTED
-  for_avijk(cold,i,j,k) {
-    cold[i][j][k] = 1.0 - cold[i][j][k];
-  }
-#endif
-
-  } // restart
+  if(inverted)
+    for_avijk(cold,i,j,k) {
+      cold[i][j][k] = 1.0 - cold[i][j][k];
+    }
 
   /*----------------+
   |  linear solver  |
@@ -404,24 +369,23 @@ main(int argc, char * argv[]) {
   cmax_l2 = sqrt(cmax_l2);
   cmin_l2 = sqrt(cmin_l2);
 
-#ifndef USE_INVERTED
-  boil::oout<<"Errors over time: "
-#else
-  boil::oout<<"Errors over time (inverted): "
-#endif
-            <<level<<" | "<<cmax_l2<<" "<<cmin_l2<<" | "
+  boil::oout<<"Errors over time: ";
+  boil::oout<<level<<" "<<inverted<<" | "<<cmax_l2<<" "<<cmin_l2<<" | "
             <<fabs(cmax_linf_linf-1.)<<" "<<fabs(cmin_linf_linf)<<boil::endl;
 
-  real toterr = l2_scalar_error(cold2,c);
-  toterr /= real(level);
-  toterr = sqrt(toterr);
+  real toterr = li_scalar_error(cold2,c);
+  real toterr2 = l2_scalar_error(cold2,c);
 
-#ifndef USE_INVERTED
-  boil::oout<<"Total error normalised by grid level: "
-#else
-  boil::oout<<"Total error normalised by grid level (inverted): "
-#endif
-            <<level<<" "<<toterr<<boil::endl;
+  boil::oout<<"Linf/2 error: ";
+  boil::oout<<level<<" "<<inverted<<" "<<toterr<<" "<<toterr2<<boil::endl;
+
+  std::ofstream output;
+  output.open( "results_circlevortex.txt", std::ios::out | std::ios::app );
+  if(!boil::cart.iam()) {
+    output<<level<<" "<<cfl_max<<" "<<inverted<<" | "<<cmax_l2<<" "<<cmin_l2<<" | "
+          <<fabs(cmax_linf_linf-1.)<<" "<<fabs(cmin_linf_linf)<<" | "<<toterr<<" "<<toterr2<<boil::endl;
+  }
+
 
   boil::oout << "finished" << boil::endl;
 

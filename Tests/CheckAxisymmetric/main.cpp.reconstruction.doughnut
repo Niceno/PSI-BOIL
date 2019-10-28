@@ -287,13 +287,14 @@ int main(int argc, char * argv[]) {
   conc.set_normal_vector_method_all(nm);
   conc.ancillary();
   conc.curvature();
-#ifndef USE_CARTESIAN
+#if 0
+  #ifndef USE_CARTESIAN
   test_reconstruction_doughnut(partial_major,partial_minor, conc, c, conc.color(),
                                kappa,inverted,xcent,radius,
                                xcent,zcent,nm,nl1,nli,kl1,kli);
-#else
+  #else
   test_reconstruction_circle_xz(conc,c,cold,kappa,inverted,radius,xcent,zcent,nm,nl1, nli, kl1, kli);
-#endif
+  #endif
 
   std::ofstream output;
   output.open( "results_doughnut.txt", std::ios::out | std::ios::app );
@@ -302,6 +303,41 @@ int main(int argc, char * argv[]) {
     output<<roffset<<" "<<gLevel<<" | "<<nmv[i]<<" "<<nl1[i]<<" "<<nli[i]<<" "<<kl1[i]<<" "<<kli[i]<<boil::endl;
   }
   output.close();
+#else
+  /* curvature */
+  real k1(0.0), k2(0.0), k3(0.0), k4(0.0);
+  int knt(0);
+  for_vijk(kappa,i,j,k) {
+    real kap = kappa[i][j][k];
+    if(boil::realistic(kap)) {
+      knt++;
+      k1 += kap;
+      k2 += kap*kap;
+      k3 += kap*kap*kap;
+      k4 += kap*kap*kap*kap;
+    }
+  }
+  boil::cart.sum_real(&k1);
+  boil::cart.sum_real(&k2);
+  boil::cart.sum_real(&k3);
+  boil::cart.sum_real(&k4);
+  boil::cart.sum_int(&knt);
+
+  if(knt>0) {
+    real mean = k1/knt;
+    real stdev = sqrt(k2/real(knt)-mean*mean);
+    real skew = (k3/real(knt) -3.*mean*stdev*stdev - pow(mean,3.))/pow(stdev,3.);
+    real kurtos = (k4/real(knt) - 4.*mean*k3/real(knt) + 6.*pow(mean,2.)*k2/real(knt)-3.*pow(mean,4.))/pow(stdev,4.);
+    
+    std::ofstream output;
+    output.open( "results_doughnut.txt", std::ios::out | std::ios::app );
+    for(int i(0); i<nmv.size(); ++i) {
+      boil::oout<<roffset<<" "<<gLevel<<" | "<<nmv[i]<<" "<<mean<<" "<<stdev<<" "<<skew<<" "<<kurtos<<boil::endl;
+      output<<roffset<<" "<<gLevel<<" | "<<nmv[i]<<" "<<mean<<" "<<stdev<<" "<<skew<<" "<<kurtos<<boil::endl;
+    }
+    output.close();
+  }
+#endif
 
 #ifndef USE_CARTESIAN
   boil::plot->plot(c,conc.color(),kappa, "uvw-phi-c-kappa", 0);

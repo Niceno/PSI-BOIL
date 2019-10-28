@@ -283,7 +283,7 @@ int main(int argc, char * argv[]) {
   conc.curvature();
 #ifndef USE_CARTESIAN
   //test_reconstruction_circle_xz(conc,conc.color(),cold,kappa,inverted,0.5*radius,nm,nl1, nli, kl1, kli);
-  test_reconstruction_sphere(partial,conc,conc.color(),cold,kappa,inverted,radius,nm,nl1,nli,kl1,kli);
+  test_reconstruction_sphere(partial,conc,conc.color(),cold,kappa,inverted,radius,0.,0.,0.,nm,nl1,nli,kl1,kli);
 #else
   test_reconstruction_circle_xz(conc,c,cold,kappa,inverted,radius,nm,nl1, nli, kl1, kli);
 #endif

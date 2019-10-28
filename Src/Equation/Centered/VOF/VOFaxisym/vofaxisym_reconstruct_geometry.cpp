@@ -69,12 +69,14 @@ void VOFaxisym::reconstruct_geometry(const Scalar & scp) {
     #else
     color_to_vf(axistmp,axistmp2);
     /* calculate Linf error norm of reconstruction in phi-space */
-    linferr = linf_scalar_error(axistmp2,phi);
+    linferr = linf_scalar_error(axistmp2,scp);
     #endif
 
     iter++;
     boil::oout<<"VOFaxisym::reconstruct_geometry: "<<time->current_time()
               <<" "<<iter<<" "<<linferr<<boil::endl;
+              //" | "<<" "<<imax<<" "<<kmax<<" "
+              //<<" | "<<axistmp[imax][jmax][kmax]<<" "<<scp[imax][jmax][kmax]<<" "<<nalpha[imax][jmax][kmax]/(fabs(nx[imax][jmax][kmax])+fabs(nz[imax][jmax][kmax])+boil::atto)<<" "<<nx[imax][jmax][kmax]<<" "<<ny[imax][jmax][kmax]<<" "<<nz[imax][jmax][kmax]<<" "<<elvibool<<boil::endl;
 
     for_avijk(clr,i,j,k) {
       clr[i][j][k] = axistmp[i][j][k];
@@ -84,6 +86,7 @@ void VOFaxisym::reconstruct_geometry(const Scalar & scp) {
     #else
   } while(false);
     #endif
+    norm(clr,norm_method_advance,true);
   #else
   /* true = extract alpha */
   norm(clr,norm_method_advance,true);
@@ -93,11 +96,11 @@ void VOFaxisym::reconstruct_geometry(const Scalar & scp) {
   if(iter<reconstruction_maxiter) {
     boil::oout<<"VOFaxisym::reconstruct_geometry converged after "
               <<iter<<" iterations! "
-              <<"Final error: "<<linferr<<boil::endl;
+              <<"Final error: "<<time->current_time()<<" "<<linferr<<boil::endl;
   } else {
     boil::oout<<"VOFaxisym::reconstruct_geometry did not converge after "
               <<iter<<" iterations! "
-              <<"Final error: "<<linferr<<boil::endl;
+              <<"Final error: "<<time->current_time()<<" "<<linferr<<boil::endl;
     //boil::plot->plot(phi,clr,nx,nz,nalpha,"phi-clr-nx-nz-nalp", time->current_step());
     //exit(0);
   }
