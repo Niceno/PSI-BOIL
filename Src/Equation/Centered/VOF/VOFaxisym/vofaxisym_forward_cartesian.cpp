@@ -1,9 +1,9 @@
-#include "vof.h"
+#include "vofaxisym.h"
 
 /******************************************************************************/
-void VOF::forward(Scalar & scp) {
+void VOFaxisym::forward_cartesian(Scalar & scp) {
 /***************************************************************************//**
- \brief Solve the forward problem, i.e. calculate phi(alp,n)
+ \brief Solve the forward Cartesian problem, i.e. calculate phi(alp,n)
     prerequisites: nx, nalpha
     output: tentative phi = scp
 *******************************************************************************/
@@ -13,6 +13,7 @@ void VOF::forward(Scalar & scp) {
     real nny  = -ny[i][j][k];
     real nnz  = -nz[i][j][k];
     real nsum = fabs(nnx)+fabs(nny)+fabs(nnz);
+    real n2sum = nnx*nnx+nny*nny+nnz*nnz;
     real nalp = nalpha[i][j][k];
     if       (!boil::realistic(nalp)) {
       if(nalp>0.0) {
@@ -20,7 +21,7 @@ void VOF::forward(Scalar & scp) {
       } else {
         scp[i][j][k] = 0.0;
       }
-    } else if(dom->ibody().off(i,j,k)|| nsum <boil::pico) {
+    } else if(dom->ibody().off(i,j,k)|| n2sum <0.5) {
       scp[i][j][k] = -1.0;
     } else {
       /* normalization */

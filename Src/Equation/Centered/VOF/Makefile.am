@@ -18,7 +18,6 @@ libVof_a_SOURCES =      vof.h                         \
                         vof_curv_HF.cpp               \
                         vof_curv_smooth.cpp           \
                         vof_extract_alpha.cpp         \
-                        vof_forward.cpp               \
                         vof_front_minmax.cpp          \
                         vof_fs_bnd.cpp                \
                         vof_fs_bnd_nosubgrid.cpp      \

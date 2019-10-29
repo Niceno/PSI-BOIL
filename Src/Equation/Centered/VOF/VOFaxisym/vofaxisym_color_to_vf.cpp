@@ -1,7 +1,7 @@
 #include "vofaxisym.h"
 
 /******************************************************************************/
-void VOFaxisym::color_to_vf(const Scalar & color, Scalar & vf) {
+void VOFaxisym::color_to_vf(const Scalar & color, Scalar & vf, const bool extalp) {
 /***************************************************************************//**
  \brief Solve the forward axisymmetric problem, i.e. calculate phi(alp,n,x),
     assuming the knowledge of Cartesian color
@@ -10,7 +10,7 @@ void VOFaxisym::color_to_vf(const Scalar & color, Scalar & vf) {
 *******************************************************************************/
 
   /* true = extract alpha */
-  norm(color,norm_method_advance,true);
+  norm(color,norm_method_advance,extalp);
 
   /* secondly, the forward problem is solved, Ktmp is overwritten */
   forward_axisymmetric(color,vf,Ktmp);

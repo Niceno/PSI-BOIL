@@ -6,8 +6,9 @@ real VOFaxisym::test_reconstruction(const Scalar & color, const Scalar & vf) {
  \brief Calculate the error of reconstruction by solving the forward problem
 *******************************************************************************/
 
-  /* Ktmp, nx, ny, nz, nalpha are internally overwritten in this function! */
-  color_to_vf(color,axistmp);
+  /* Ktmp, nx, ny, nz, (nalpha) are internally overwritten in this function! */
+  color_to_vf(color,axistmp,false);
+  /* false = do not extract alpha -> nalpha is not overwritten */
 
   /* calculate Linf error norm of reconstruction in phi-space */
   real linferr = linf_scalar_error(axistmp,vf);

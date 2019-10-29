@@ -53,15 +53,19 @@ void VOF::norm_mixed_kernel(real & nx_val, real & ny_val, real & nz_val,
   norm_young_kernel(nxx_young, nyy_young, nzz_young, dummy, i,j,k, sca);
 
   /* selection according to Aulisa (9) */
-  real nxx, nyy, nzz;
-  select_norm_myc(nxx,nyy,nzz, 
-                  nxx_cc,nyy_cc,nzz_cc,
-                  nxx_young,nyy_young,nzz_young,
-                  mcomp);
+  bool nyoung = nxx_young*nxx_young+nyy_young*nyy_young+nzz_young*nzz_young < 0.5;
+  bool ncc    = nxx_cc*nxx_cc+nyy_cc*nyy_cc+nzz_cc*nzz_cc < 0.5;
+  if (nyoung || ncc) {
+    nx_val = real(!ncc)*nxx_cc+real(!nyoung)*nxx_young;
+    ny_val = real(!ncc)*nyy_cc+real(!nyoung)*nyy_young;
+    nz_val = real(!ncc)*nzz_cc+real(!nyoung)*nzz_young;
+  } else {
+    select_norm_myc(nx_val,ny_val,nz_val, 
+                    nxx_cc,nyy_cc,nzz_cc,
+                    nxx_young,nyy_young,nzz_young,
+                    mcomp);
+  }
 
-  nx_val = nxx;
-  ny_val = nyy;
-  nz_val = nzz;
 
   return;
 }

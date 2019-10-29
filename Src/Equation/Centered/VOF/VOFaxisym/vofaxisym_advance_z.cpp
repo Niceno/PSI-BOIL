@@ -27,8 +27,9 @@ void VOFaxisym::advance_z(Scalar & scp) {
 #else
     real refval = phi[i][j][kup];
 #endif
+    real n2sum = nx[i][j][kup]*nx[i][j][kup]+nz[i][j][kup]*nz[i][j][kup];
 
-    if (refval < boil::pico) {
+    if (refval < boil::pico || n2sum<0.5) {
 
       f = refval * dSz(sig,i,j,k) * ((*u)[m][i][j][k]) * dt;
 
@@ -52,7 +53,7 @@ void VOFaxisym::advance_z(Scalar & scp) {
         real scpup = scp[i][j][kup];
         f = dV(i,j,kup)*calc_flux(g,scpup,nz[i][j][kup],
                                           ny[i][j][kup],
-                                          nx[i][j][kup]);
+                                          nx[i][j][kup],
                                           nalpha[i][j][kup]);
 #endif
       }

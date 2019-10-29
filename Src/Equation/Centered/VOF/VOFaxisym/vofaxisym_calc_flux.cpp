@@ -30,11 +30,17 @@ real VOFaxisym::calc_flux_axisymmetric(const real gg,
       g =  etaf - sqrt(etaf*etaf-2.*etaf*gg);
       absg = fabs(g);
       eta0 = etaf-g;
+      if(!(absg>0.0)) {
+        return 0.0;
+      }
       eta00 = eta0/absg;
     } else {
       etaf = eta1;
       g =  etaf - sqrt(etaf*etaf-2.*etaf*gg);
       absg = fabs(g);
+      if(!(absg>0.0)) {
+        return 0.0;
+      }
       eta0 = etaf-g;
       eta00 = etaf/absg;
     }

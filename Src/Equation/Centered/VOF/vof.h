@@ -219,7 +219,7 @@ class VOF : public Centered {
     Scalar adens;
     Scalar mx,my,mz;/* normal to interface, in real space */
 
-    void forward(Scalar & scp);
+    //void forward(Scalar & scp); /* undefined reference? */
   protected:
     virtual void ancillary(Scalar & scp);
     virtual void advance_x(Scalar & sca);
@@ -401,6 +401,8 @@ class VOF : public Centered {
     int nlayer;
     int curv_method;
     real cangle;
+
+    inline real signum(const real a, const real b) { return a*((b>0.)-(b<0.)); }
 };	
 #endif
 

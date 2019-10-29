@@ -1,7 +1,7 @@
 #include "vofaxisym.h"
 #define LOPEZ_COLORING
 //#define ONLY_CART
-#define ONLY_CYL
+//#define ONLY_CYL
 //#define BLEND_CART
 
 /* parameters */
@@ -15,7 +15,7 @@ static const real blending_angle = 37./180.*boil::pi;
 static const real n0square = 1.-1./(1.+tan(blending_angle)*tan(blending_angle));
 static const real n0 = sqrt(n0square);
 
-static const int iterloop(1); /* 2019.07.09 */
+static const int iterloop(5); /* 2019.07.09 */
 static const real overshoot(0.5);
 
 /******************************************************************************/

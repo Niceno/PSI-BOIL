@@ -112,7 +112,7 @@ void VOF::norm_cc_near_bnd(const Scalar & val) {
     int j=sj();
     for_k(k){
       real nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ;
-      nxX = copysign(1.0,+(val[i+1][j][k]-val[i][j][k]));
+      nxX = signum(1.0,+(val[i+1][j][k]-val[i][j][k]));
       nyX = 1.0 * ((val[i+1][j+1][k]+val[i][j+1][k])
                   -(val[i+1][j  ][k]+val[i][j  ][k]));
       nzX = 0.5 * ((val[i+1][j][k+1]+val[i][j][k+1])
@@ -120,7 +120,7 @@ void VOF::norm_cc_near_bnd(const Scalar & val) {
 
       nxY = 1.0 * ((val[i+1][j][k]+val[i+1][j+1][k])
                   -(val[i  ][j][k]+val[i  ][j+1][k]));
-      nyY = copysign(1.0,+(val[i][j+1][k]-val[i][j][k]));
+      nyY = signum(1.0,+(val[i][j+1][k]-val[i][j][k]));
       nzY = 0.5 * ((val[i][j][k+1]+val[i][j+1][k+1])
                  - (val[i][j][k-1]+val[i][j+1][k-1]));
 
@@ -128,7 +128,7 @@ void VOF::norm_cc_near_bnd(const Scalar & val) {
                   -(val[i  ][j][k-1]+val[i  ][j][k]+val[i  ][j][k+1]));
       nyZ = 1.0 * ((val[i][j+1][k-1]+val[i][j+1][k]+val[i][j+1][k+1])
                   -(val[i][j  ][k-1]+val[i][j  ][k]+val[i][j  ][k+1]));
-      nzZ = copysign(1.0,+(val[i][j][k+1]-val[i][j][k-1]));
+      nzZ = signum(1.0,+(val[i][j][k+1]-val[i][j][k-1]));
 
       Comp mcomp = Comp::undefined(); 
   select_norm_cc(nx[i][j][k],ny[i][j][k],nz[i][j][k],
@@ -143,7 +143,7 @@ void VOF::norm_cc_near_bnd(const Scalar & val) {
     int j=ej();
     for_k(k) {
       real nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ;
-      nxX = copysign(1.0,+(val[i+1][j][k]-val[i][j][k]));
+      nxX = signum(1.0,+(val[i+1][j][k]-val[i][j][k]));
       nyX = 1.0 * ((val[i+1][j  ][k]+val[i][j  ][k])
                   -(val[i+1][j-1][k]+val[i][j-1][k]));
       nzX = 0.5 * ((val[i+1][j][k+1]+val[i][j][k+1])
@@ -151,7 +151,7 @@ void VOF::norm_cc_near_bnd(const Scalar & val) {
 
       nxY = 1.0 * ((val[i+1][j-1][k]+val[i+1][j][k])
                   -(val[i  ][j-1][k]+val[i  ][j][k]));
-      nyY = copysign(1.0,+(val[i][j][k]-val[i][j-1][k]));
+      nyY = signum(1.0,+(val[i][j][k]-val[i][j-1][k]));
       nzY = 0.5 * ((val[i][j-1][k+1]+val[i][j][k+1])
                  - (val[i][j-1][k-1]+val[i][j][k-1]));
 
@@ -159,7 +159,7 @@ void VOF::norm_cc_near_bnd(const Scalar & val) {
                   -(val[i  ][j][k-1]+val[i  ][j][k]+val[i  ][j][k+1]));
       nyZ = 1.0 * ((val[i][j  ][k-1]+val[i][j  ][k]+val[i][j  ][k+1])
                   -(val[i][j-1][k-1]+val[i][j-1][k]+val[i][j-1][k+1]));
-      nzZ = copysign(1.0,+(val[i][j][k+1]-val[i][j][k-1]));
+      nzZ = signum(1.0,+(val[i][j][k+1]-val[i][j][k-1]));
 
       Comp mcomp = Comp::undefined(); 
   select_norm_cc(nx[i][j][k],ny[i][j][k],nz[i][j][k],
@@ -174,7 +174,7 @@ void VOF::norm_cc_near_bnd(const Scalar & val) {
     int k=sk();
     for_j(j) {
       real nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ;
-      nxX = copysign(1.0,+(val[i+1][j][k]-val[i][j][k]));
+      nxX = signum(1.0,+(val[i+1][j][k]-val[i][j][k]));
       nyX = 0.5 * ((val[i+1][j+1][k]+val[i][j+1][k])
                   -(val[i+1][j-1][k]+val[i][j-1][k]));
       nzX = 1.0 * ((val[i+1][j][k+1]+val[i][j][k+1])
@@ -182,7 +182,7 @@ void VOF::norm_cc_near_bnd(const Scalar & val) {
 
       nxY = 1.0 * ((val[i+1][j-1][k]+val[i+1][j][k]+val[i+1][j+1][k])
                   -(val[i  ][j-1][k]+val[i  ][j][k]+val[i  ][j+1][k]));
-      nyY = copysign(1.0,+(val[i][j+1][k]-val[i][j-1][k]));
+      nyY = signum(1.0,+(val[i][j+1][k]-val[i][j-1][k]));
       nzY = 1.0 * ((val[i][j-1][k+1]+val[i][j][k+1]+val[i][j+1][k+1])
                  - (val[i][j-1][k  ]+val[i][j][k  ]+val[i][j+1][k  ]));
 
@@ -190,7 +190,7 @@ void VOF::norm_cc_near_bnd(const Scalar & val) {
                   -(val[i  ][j][k]+val[i  ][j][k+1]));
       nyZ = 0.5 * ((val[i][j+1][k]+val[i][j+1][k+1])
                   -(val[i][j-1][k]+val[i][j-1][k+1]));
-      nzZ = copysign(1.0,+(val[i][j][k+1]-val[i][j][k]));
+      nzZ = signum(1.0,+(val[i][j][k+1]-val[i][j][k]));
 
       Comp mcomp = Comp::undefined(); 
   select_norm_cc(nx[i][j][k],ny[i][j][k],nz[i][j][k],
@@ -205,7 +205,7 @@ void VOF::norm_cc_near_bnd(const Scalar & val) {
     int k=ek();
     for_j(j) {
       real nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ;
-      nxX = copysign(1.0,+(val[i+1][j][k]-val[i][j][k]));
+      nxX = signum(1.0,+(val[i+1][j][k]-val[i][j][k]));
       nyX = 0.5 * ((val[i+1][j+1][k]+val[i][j+1][k])
                   -(val[i+1][j-1][k]+val[i][j-1][k]));
       nzX = 1.0 * ((val[i+1][j][k  ]+val[i][j][k  ])
@@ -213,7 +213,7 @@ void VOF::norm_cc_near_bnd(const Scalar & val) {
 
       nxY = 1.0 * ((val[i+1][j-1][k]+val[i+1][j][k]+val[i+1][j+1][k])
                   -(val[i  ][j-1][k]+val[i  ][j][k]+val[i  ][j+1][k]));
-      nyY = copysign(1.0,+(val[i][j+1][k]-val[i][j-1][k]));
+      nyY = signum(1.0,+(val[i][j+1][k]-val[i][j-1][k]));
       nzY = 1.0 * ((val[i][j-1][k  ]+val[i][j][k  ]+val[i][j+1][k  ])
                  - (val[i][j-1][k-1]+val[i][j][k-1]+val[i][j+1][k-1]));
 
@@ -221,7 +221,7 @@ void VOF::norm_cc_near_bnd(const Scalar & val) {
                   -(val[i  ][j][k-1]+val[i  ][j][k]));
       nyZ = 0.5 * ((val[i][j+1][k-1]+val[i][j+1][k])
                   -(val[i][j-1][k-1]+val[i][j-1][k]));
-      nzZ = copysign(1.0,+(val[i][j][k]-val[i][j][k-1]));
+      nzZ = signum(1.0,+(val[i][j][k]-val[i][j][k-1]));
 
       Comp mcomp = Comp::undefined(); 
   select_norm_cc(nx[i][j][k],ny[i][j][k],nz[i][j][k],
@@ -236,7 +236,7 @@ void VOF::norm_cc_near_bnd(const Scalar & val) {
     int j=sj();
     for_k(k) {
       real nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ;
-      nxX = copysign(1.0,+(val[i][j][k]-val[i-1][j][k]));
+      nxX = signum(1.0,+(val[i][j][k]-val[i-1][j][k]));
       nyX = 1.0 * ((val[i][j+1][k]+val[i-1][j+1][k])
                   -(val[i][j  ][k]+val[i-1][j  ][k]));
       nzX = 0.5 * ((val[i][j][k+1]+val[i-1][j][k+1])
@@ -244,7 +244,7 @@ void VOF::norm_cc_near_bnd(const Scalar & val) {
 
       nxY = 1.0 * ((val[i  ][j][k]+val[i  ][j+1][k])
                   -(val[i-1][j][k]+val[i-1][j+1][k]));
-      nyY = copysign(1.0,+(val[i][j+1][k]-val[i][j][k]));
+      nyY = signum(1.0,+(val[i][j+1][k]-val[i][j][k]));
       nzY = 0.5 * ((val[i][j][k+1]+val[i][j+1][k+1])
                   -(val[i][j][k-1]+val[i][j+1][k-1]));
 
@@ -252,7 +252,7 @@ void VOF::norm_cc_near_bnd(const Scalar & val) {
                   -(val[i-1][j][k-1]+val[i-1][j][k]+val[i-1][j][k+1]));
       nyZ = 1.0 * ((val[i][j+1][k-1]+val[i][j+1][k]+val[i][j+1][k+1])
                   -(val[i][j  ][k-1]+val[i][j  ][k]+val[i][j  ][k+1]));
-      nzZ = copysign(1.0,+(val[i][j][k+1]-val[i][j][k-1]));
+      nzZ = signum(1.0,+(val[i][j][k+1]-val[i][j][k-1]));
 
       Comp mcomp = Comp::undefined(); 
   select_norm_cc(nx[i][j][k],ny[i][j][k],nz[i][j][k],
@@ -267,7 +267,7 @@ void VOF::norm_cc_near_bnd(const Scalar & val) {
     int j=ej();
     for_k(k) {
       real nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ;
-      nxX = copysign(1.0,+(val[i][j][k]-val[i-1][j][k]));
+      nxX = signum(1.0,+(val[i][j][k]-val[i-1][j][k]));
       nyX = 1.0 * ((val[i][j  ][k]+val[i-1][j  ][k])
                   -(val[i][j-1][k]+val[i-1][j-1][k]));
       nzX = 0.5 * ((val[i][j][k+1]+val[i-1][j][k+1])
@@ -275,7 +275,7 @@ void VOF::norm_cc_near_bnd(const Scalar & val) {
 
       nxY = 1.0 * ((val[i  ][j-1][k]+val[i  ][j][k])
                  - (val[i-1][j-1][k]+val[i-1][j][k]));
-      nyY = copysign(1.0,+(val[i][j][k]-val[i][j-1][k]));
+      nyY = signum(1.0,+(val[i][j][k]-val[i][j-1][k]));
       nzY = 0.5 * ((val[i][j-1][k+1]+val[i][j][k+1])
                  - (val[i][j-1][k-1]+val[i][j][k-1]));
 
@@ -283,7 +283,7 @@ void VOF::norm_cc_near_bnd(const Scalar & val) {
                   -(val[i-1][j][k-1]+val[i-1][j][k]+val[i-1][j][k+1]));
       nyZ = 1.0 * ((val[i][j  ][k-1]+val[i][j  ][k]+val[i][j  ][k+1])
                   -(val[i][j-1][k-1]+val[i][j-1][k]+val[i][j-1][k+1]));
-      nzZ = copysign(1.0,+(val[i][j][k+1]-val[i][j][k-1]));
+      nzZ = signum(1.0,+(val[i][j][k+1]-val[i][j][k-1]));
 
       Comp mcomp = Comp::undefined(); 
   select_norm_cc(nx[i][j][k],ny[i][j][k],nz[i][j][k],
@@ -298,7 +298,7 @@ void VOF::norm_cc_near_bnd(const Scalar & val) {
     int k=sk();
     for_j(j) {
       real nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ;
-      nxX = copysign(1.0,+(val[i][j][k]-val[i-1][j][k]));
+      nxX = signum(1.0,+(val[i][j][k]-val[i-1][j][k]));
       nyX = 0.5 * ((val[i][j+1][k]+val[i-1][j+1][k])
                   -(val[i][j-1][k]+val[i-1][j-1][k]));
       nzX = 1.0 * ((val[i][j][k+1]+val[i-1][j][k+1])
@@ -306,7 +306,7 @@ void VOF::norm_cc_near_bnd(const Scalar & val) {
 
       nxY = 1.0 * ((val[i  ][j-1][k]+val[i  ][j][k]+val[i  ][j+1][k])
                  - (val[i-1][j-1][k]+val[i-1][j][k]+val[i-1][j+1][k]));
-      nyY = copysign(1.0,+(val[i][j+1][k]-val[i][j-1][k]));
+      nyY = signum(1.0,+(val[i][j+1][k]-val[i][j-1][k]));
       nzY = 1.0 * ((val[i][j-1][k+1]+val[i][j][k+1]+val[i][j+1][k+1])
                  - (val[i][j-1][k  ]+val[i][j][k  ]+val[i][j+1][k  ]));
 
@@ -314,7 +314,7 @@ void VOF::norm_cc_near_bnd(const Scalar & val) {
                   -(val[i-1][j][k]+val[i-1][j][k+1]));
       nyZ = 0.5 * ((val[i][j+1][k]+val[i][j+1][k+1])
                   -(val[i][j-1][k]+val[i][j-1][k+1]));
-      nzZ = copysign(1.0,+(val[i][j][k+1]-val[i][j][k]));
+      nzZ = signum(1.0,+(val[i][j][k+1]-val[i][j][k]));
 
       Comp mcomp = Comp::undefined(); 
   select_norm_cc(nx[i][j][k],ny[i][j][k],nz[i][j][k],
@@ -329,7 +329,7 @@ void VOF::norm_cc_near_bnd(const Scalar & val) {
     int k=ek();
     for_j(j) {
       real nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ;
-      nxX = copysign(1.0,+(val[i][j][k]-val[i-1][j][k]));
+      nxX = signum(1.0,+(val[i][j][k]-val[i-1][j][k]));
       nyX = 0.5 * ((val[i][j+1][k]+val[i-1][j+1][k])
                   -(val[i][j-1][k]+val[i-1][j-1][k]));
       nzX = 1.0 * ((val[i][j][k  ]+val[i-1][j][k  ])
@@ -337,7 +337,7 @@ void VOF::norm_cc_near_bnd(const Scalar & val) {
 
       nxY = 1.0 * ((val[i  ][j-1][k]+val[i  ][j][k]+val[i  ][j+1][k])
                  - (val[i-1][j-1][k]+val[i-1][j][k]+val[i-1][j+1][k]));
-      nyY = copysign(1.0,+(val[i][j+1][k]-val[i][j-1][k]));
+      nyY = signum(1.0,+(val[i][j+1][k]-val[i][j-1][k]));
       nzY = 1.0 * ((val[i][j-1][k  ]+val[i][j][k  ]+val[i][j+1][k  ])
                  - (val[i][j-1][k-1]+val[i][j][k-1]+val[i][j+1][k-1]));
 
@@ -345,7 +345,7 @@ void VOF::norm_cc_near_bnd(const Scalar & val) {
                   -(val[i-1][j][k-1]+val[i-1][j][k]));
       nyZ = 0.5 * ((val[i][j+1][k-1]+val[i][j+1][k])
                   -(val[i][j-1][k-1]+val[i][j-1][k]));
-      nzZ = copysign(1.0,+(val[i][j][k]-val[i][j][k-1]));
+      nzZ = signum(1.0,+(val[i][j][k]-val[i][j][k-1]));
 
       Comp mcomp = Comp::undefined(); 
   select_norm_cc(nx[i][j][k],ny[i][j][k],nz[i][j][k],
@@ -360,7 +360,7 @@ void VOF::norm_cc_near_bnd(const Scalar & val) {
     int k=sk();
     for_i(i) {
       real nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ;
-      nxX = copysign(1.0,+(val[i+1][j][k]-val[i-1][j][k]));
+      nxX = signum(1.0,+(val[i+1][j][k]-val[i-1][j][k]));
       nyX = 1.0 * ((val[i+1][j+1][k]+val[i][j+1][k]+val[i-1][j+1][k])
                   -(val[i+1][j  ][k]+val[i][j  ][k]+val[i-1][j  ][k]));
       nzX = 1.0 * ((val[i+1][j][k+1]+val[i][j][k+1]+val[i-1][j][k+1])
@@ -368,7 +368,7 @@ void VOF::norm_cc_near_bnd(const Scalar & val) {
 
       nxY = 0.5 * ((val[i+1][j][k]+val[i+1][j+1][k])
                   -(val[i-1][j][k]+val[i-1][j+1][k]));
-      nyY = copysign(1.0,+(val[i][j+1][k]-val[i][j][k]));
+      nyY = signum(1.0,+(val[i][j+1][k]-val[i][j][k]));
       nzY = 1.0 * ((val[i][j][k+1]+val[i][j+1][k+1])
                   -(val[i][j][k  ]+val[i][j+1][k  ]));
 
@@ -376,7 +376,7 @@ void VOF::norm_cc_near_bnd(const Scalar & val) {
                   -(val[i-1][j][k]+val[i-1][j][k+1]));
       nyZ = 1.0 * ((val[i][j+1][k]+val[i][j+1][k+1])
                   -(val[i][j  ][k]+val[i][j  ][k+1]));
-      nzZ = copysign(1.0,+(val[i][j][k+1]-val[i][j][k]));
+      nzZ = signum(1.0,+(val[i][j][k+1]-val[i][j][k]));
 
       Comp mcomp = Comp::undefined(); 
   select_norm_cc(nx[i][j][k],ny[i][j][k],nz[i][j][k],
@@ -391,7 +391,7 @@ void VOF::norm_cc_near_bnd(const Scalar & val) {
     int k=ek();
     for_i(i) {
       real nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ;
-      nxX = copysign(1.0,+(val[i+1][j][k]-val[i-1][j][k]));
+      nxX = signum(1.0,+(val[i+1][j][k]-val[i-1][j][k]));
       nyX = 1.0 * ((val[i+1][j+1][k]+val[i][j+1][k]+val[i-1][j+1][k])
                   -(val[i+1][j  ][k]+val[i][j  ][k]+val[i-1][j  ][k]));
       nzX = 1.0 * ((val[i+1][j][k  ]+val[i][j][k  ]+val[i-1][j][k  ])
@@ -399,7 +399,7 @@ void VOF::norm_cc_near_bnd(const Scalar & val) {
 
       nxY = 0.5 * ((val[i+1][j][k]+val[i+1][j+1][k])
                   -(val[i-1][j][k]+val[i-1][j+1][k]));
-      nyY = copysign(1.0,+(val[i][j+1][k]-val[i][j][k]));
+      nyY = signum(1.0,+(val[i][j+1][k]-val[i][j][k]));
       nzY = 1.0 * ((val[i][j][k  ]+val[i][j+1][k  ])
                   -(val[i][j][k-1]+val[i][j+1][k-1]));
 
@@ -407,7 +407,7 @@ void VOF::norm_cc_near_bnd(const Scalar & val) {
                   -(val[i-1][j][k-1]+val[i-1][j][k]));
       nyZ = 1.0 * ((val[i][j+1][k-1]+val[i][j+1][k])
                   -(val[i][j  ][k-1]+val[i][j  ][k]));
-      nzZ = copysign(1.0,+(val[i][j][k]-val[i][j][k-1]));
+      nzZ = signum(1.0,+(val[i][j][k]-val[i][j][k-1]));
 
       Comp mcomp = Comp::undefined(); 
   select_norm_cc(nx[i][j][k],ny[i][j][k],nz[i][j][k],
@@ -422,7 +422,7 @@ void VOF::norm_cc_near_bnd(const Scalar & val) {
     int k=sk();
     for_i(i) {
       real nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ;
-      nxX = copysign(1.0,+(val[i+1][j][k]-val[i-1][j][k]));
+      nxX = signum(1.0,+(val[i+1][j][k]-val[i-1][j][k]));
       nyX = 1.0 * ((val[i+1][j  ][k]+val[i][j  ][k]+val[i-1][j  ][k])
                   -(val[i+1][j-1][k]+val[i][j-1][k]+val[i-1][j-1][k]));
       nzX = 1.0 * ((val[i+1][j][k+1]+val[i][j][k+1]+val[i-1][j][k+1])
@@ -430,7 +430,7 @@ void VOF::norm_cc_near_bnd(const Scalar & val) {
 
       nxY = 0.5 * ((val[i+1][j-1][k]+val[i+1][j][k])
                   -(val[i-1][j-1][k]+val[i-1][j][k]));
-      nyY = copysign(1.0,+(val[i][j][k]-val[i][j-1][k]));
+      nyY = signum(1.0,+(val[i][j][k]-val[i][j-1][k]));
       nzY = 1.0 * ((val[i][j-1][k+1]+val[i][j][k+1])
                   -(val[i][j-1][k  ]+val[i][j][k  ]));
 
@@ -438,7 +438,7 @@ void VOF::norm_cc_near_bnd(const Scalar & val) {
                   -(val[i-1][j][k]+val[i-1][j][k+1]));
       nyZ = 1.0 * ((val[i][j  ][k]+val[i][j  ][k+1])
                   -(val[i][j-1][k]+val[i][j-1][k+1]));
-      nzZ = copysign(1.0,+(val[i][j][k+1]-val[i][j][k]));
+      nzZ = signum(1.0,+(val[i][j][k+1]-val[i][j][k]));
 
       Comp mcomp = Comp::undefined(); 
   select_norm_cc(nx[i][j][k],ny[i][j][k],nz[i][j][k],
@@ -453,7 +453,7 @@ void VOF::norm_cc_near_bnd(const Scalar & val) {
     int k=ek();
     for_i(i) {
       real nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ;
-      nxX = copysign(1.0,+(val[i+1][j][k]-val[i-1][j][k]));
+      nxX = signum(1.0,+(val[i+1][j][k]-val[i-1][j][k]));
       nyX = 1.0 * ((val[i+1][j  ][k]+val[i][j  ][k]+val[i-1][j  ][k])
                   -(val[i+1][j-1][k]+val[i][j-1][k]+val[i-1][j-1][k]));
       nzX = 1.0 * ((val[i+1][j][k  ]+val[i][j][k  ]+val[i-1][j][k  ])
@@ -461,7 +461,7 @@ void VOF::norm_cc_near_bnd(const Scalar & val) {
 
       nxY = 0.5 * ((val[i+1][j-1][k]+val[i+1][j][k])
                   -(val[i-1][j-1][k]+val[i-1][j][k]));
-      nyY = copysign(1.0,+(val[i][j][k]-val[i][j-1][k]));
+      nyY = signum(1.0,+(val[i][j][k]-val[i][j-1][k]));
       nzY = 1.0 * ((val[i][j-1][k  ]+val[i][j][k  ])
                   -(val[i][j-1][k-1]+val[i][j][k-1]));
 
@@ -469,7 +469,7 @@ void VOF::norm_cc_near_bnd(const Scalar & val) {
                   -(val[i-1][j][k-1]+val[i-1][j][k]));
       nyZ = 1.0 * ((val[i][j  ][k-1]+val[i][j  ][k])
                   -(val[i][j-1][k-1]+val[i][j-1][k]));
-      nzZ = copysign(1.0,+(val[i][j][k]-val[i][j][k-1]));
+      nzZ = signum(1.0,+(val[i][j][k]-val[i][j][k-1]));
 
       Comp mcomp = Comp::undefined(); 
   select_norm_cc(nx[i][j][k],ny[i][j][k],nz[i][j][k],
@@ -485,7 +485,7 @@ void VOF::norm_cc_near_bnd(const Scalar & val) {
     int j=sj();
     int k=sk();
     real nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ;
-    nxX = copysign(1.0,+(val[i][j][k]-val[i-1][j][k]));
+    nxX = signum(1.0,+(val[i][j][k]-val[i-1][j][k]));
     nyX = 1.0 * ((val[i][j+1][k]+val[i-1][j+1][k])
                 -(val[i][j  ][k]+val[i-1][j  ][k]));
     nzX = 1.0 * ((val[i][j][k+1]+val[i-1][j][k+1])
@@ -493,7 +493,7 @@ void VOF::norm_cc_near_bnd(const Scalar & val) {
 
     nxY = 1.0 * ((val[i  ][j][k]+val[i  ][j+1][k])
                 -(val[i-1][j][k]+val[i-1][j+1][k]));
-    nyY = copysign(1.0,+(val[i][j+1][k]-val[i][j][k]));
+    nyY = signum(1.0,+(val[i][j+1][k]-val[i][j][k]));
     nzY = 1.0 * ((val[i][j][k+1]+val[i][j+1][k+1])
                 -(val[i][j][k  ]+val[i][j+1][k  ]));
 
@@ -501,7 +501,7 @@ void VOF::norm_cc_near_bnd(const Scalar & val) {
                 -(val[i-1][j][k]+val[i-1][j][k+1]));
     nyZ = 1.0 * ((val[i][j+1][k]+val[i][j+1][k+1])
                 -(val[i][j  ][k]+val[i][j  ][k+1]));
-    nzZ = copysign(1.0,+(val[i][j][k+1]-val[i][j][k]));
+    nzZ = signum(1.0,+(val[i][j][k+1]-val[i][j][k]));
 
     Comp mcomp = Comp::undefined(); 
   select_norm_cc(nx[i][j][k],ny[i][j][k],nz[i][j][k],
@@ -516,7 +516,7 @@ void VOF::norm_cc_near_bnd(const Scalar & val) {
     int j=sj();
     int k=ek();
       real nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ;
-      nxX = copysign(1.0,+(val[i][j][k]-val[i-1][j][k]));
+      nxX = signum(1.0,+(val[i][j][k]-val[i-1][j][k]));
       nyX = 1.0 * ((val[i][j+1][k]+val[i-1][j+1][k])
                   -(val[i][j  ][k]+val[i-1][j  ][k]));
       nzX = 1.0 * ((val[i][j][k  ]+val[i-1][j][k  ])
@@ -524,7 +524,7 @@ void VOF::norm_cc_near_bnd(const Scalar & val) {
 
       nxY = 1.0 * ((val[i  ][j][k]+val[i  ][j+1][k])
                   -(val[i-1][j][k]+val[i-1][j+1][k]));
-      nyY = copysign(1.0,+(val[i][j+1][k]-val[i][j][k]));
+      nyY = signum(1.0,+(val[i][j+1][k]-val[i][j][k]));
       nzY = 1.0 * ((val[i][j][k  ]+val[i][j+1][k  ])
                   -(val[i][j][k-1]+val[i][j+1][k-1]));
 
@@ -532,7 +532,7 @@ void VOF::norm_cc_near_bnd(const Scalar & val) {
                   -(val[i-1][j][k-1]+val[i-1][j][k]));
       nyZ = 1.0 * ((val[i][j+1][k-1]+val[i][j+1][k])
                   -(val[i][j  ][k-1]+val[i][j  ][k]));
-      nzZ = copysign(1.0,+(val[i][j][k]-val[i][j][k-1]));
+      nzZ = signum(1.0,+(val[i][j][k]-val[i][j][k-1]));
 
       Comp mcomp = Comp::undefined(); 
   select_norm_cc(nx[i][j][k],ny[i][j][k],nz[i][j][k],
@@ -547,7 +547,7 @@ void VOF::norm_cc_near_bnd(const Scalar & val) {
     int j=sj();
     int k=sk();
     real nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ;
-    nxX = copysign(1.0,+(val[i+1][j][k]-val[i][j][k]));
+    nxX = signum(1.0,+(val[i+1][j][k]-val[i][j][k]));
     nyX = 1.0 * ((val[i+1][j+1][k]+val[i][j+1][k])
                 -(val[i+1][j  ][k]+val[i][j  ][k]));
     nzX = 1.0 * ((val[i+1][j][k+1]+val[i][j][k+1])
@@ -555,7 +555,7 @@ void VOF::norm_cc_near_bnd(const Scalar & val) {
 
     nxY = 1.0 * ((val[i+1][j][k]+val[i+1][j+1][k])
                 -(val[i  ][j][k]+val[i  ][j+1][k]));
-    nyY = copysign(1.0,+(val[i][j+1][k]-val[i][j][k]));
+    nyY = signum(1.0,+(val[i][j+1][k]-val[i][j][k]));
     nzY = 1.0 * ((val[i][j][k+1]+val[i][j+1][k+1])
                - (val[i][j][k  ]+val[i][j+1][k  ]));
 
@@ -563,7 +563,7 @@ void VOF::norm_cc_near_bnd(const Scalar & val) {
                 -(val[i  ][j][k]+val[i  ][j][k+1]));
     nyZ = 1.0 * ((val[i][j+1][k]+val[i][j+1][k+1])
                 -(val[i][j  ][k]+val[i][j  ][k+1]));
-    nzZ = copysign(1.0,+(val[i][j][k+1]-val[i][j][k]));
+    nzZ = signum(1.0,+(val[i][j][k+1]-val[i][j][k]));
 
     Comp mcomp = Comp::undefined(); 
   select_norm_cc(nx[i][j][k],ny[i][j][k],nz[i][j][k],
@@ -578,7 +578,7 @@ void VOF::norm_cc_near_bnd(const Scalar & val) {
     int j=sj();
     int k=ek();
     real nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ;
-    nxX = copysign(1.0,+(val[i+1][j][k]-val[i][j][k]));
+    nxX = signum(1.0,+(val[i+1][j][k]-val[i][j][k]));
     nyX = 1.0 * ((val[i+1][j+1][k]+val[i][j+1][k])
                 -(val[i+1][j  ][k]+val[i][j  ][k]));
     nzX = 1.0 * ((val[i+1][j][k  ]+val[i][j][k  ])
@@ -586,7 +586,7 @@ void VOF::norm_cc_near_bnd(const Scalar & val) {
 
     nxY = 1.0 * ((val[i+1][j][k]+val[i+1][j+1][k])
                 -(val[i  ][j][k]+val[i  ][j+1][k]));
-    nyY = copysign(1.0,+(val[i][j+1][k]-val[i][j][k]));
+    nyY = signum(1.0,+(val[i][j+1][k]-val[i][j][k]));
     nzY = 1.0 * ((val[i][j][k  ]+val[i][j+1][k  ])
                - (val[i][j][k-1]+val[i][j+1][k-1]));
 
@@ -594,7 +594,7 @@ void VOF::norm_cc_near_bnd(const Scalar & val) {
                 -(val[i  ][j][k-1]+val[i  ][j][k]));
     nyZ = 1.0 * ((val[i][j+1][k-1]+val[i][j+1][k])
                 -(val[i][j  ][k-1]+val[i][j  ][k]));
-    nzZ = copysign(1.0,+(val[i][j][k]-val[i][j][k-1]));
+    nzZ = signum(1.0,+(val[i][j][k]-val[i][j][k-1]));
 
     Comp mcomp = Comp::undefined(); 
   select_norm_cc(nx[i][j][k],ny[i][j][k],nz[i][j][k],
@@ -609,7 +609,7 @@ void VOF::norm_cc_near_bnd(const Scalar & val) {
     int j=ej();
     int k=sk();
     real nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ;
-    nxX = copysign(1.0,+(val[i+1][j][k]-val[i][j][k]));
+    nxX = signum(1.0,+(val[i+1][j][k]-val[i][j][k]));
     nyX = 1.0 * ((val[i+1][j  ][k]+val[i][j  ][k])
                 -(val[i+1][j-1][k]+val[i][j-1][k]));
     nzX = 1.0 * ((val[i+1][j][k+1]+val[i][j][k+1])
@@ -617,7 +617,7 @@ void VOF::norm_cc_near_bnd(const Scalar & val) {
 
     nxY = 1.0 * ((val[i+1][j-1][k]+val[i+1][j][k])
                 -(val[i  ][j-1][k]+val[i  ][j][k]));
-    nyY = copysign(1.0,+(val[i][j][k]-val[i][j-1][k]));
+    nyY = signum(1.0,+(val[i][j][k]-val[i][j-1][k]));
     nzY = 1.0 * ((val[i][j-1][k+1]+val[i][j][k+1])
                - (val[i][j-1][k  ]+val[i][j][k  ]));
 
@@ -625,7 +625,7 @@ void VOF::norm_cc_near_bnd(const Scalar & val) {
                 -(val[i  ][j][k]+val[i  ][j][k+1]));
     nyZ = 1.0 * ((val[i][j  ][k]+val[i][j  ][k+1])
                 -(val[i][j-1][k]+val[i][j-1][k+1]));
-    nzZ = copysign(1.0,+(val[i][j][k+1]-val[i][j][k]));
+    nzZ = signum(1.0,+(val[i][j][k+1]-val[i][j][k]));
 
     Comp mcomp = Comp::undefined(); 
   select_norm_cc(nx[i][j][k],ny[i][j][k],nz[i][j][k],
@@ -640,7 +640,7 @@ void VOF::norm_cc_near_bnd(const Scalar & val) {
     int j=ej();
     int k=ek();
     real nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ;
-    nxX = copysign(1.0,+(val[i+1][j][k]-val[i][j][k]));
+    nxX = signum(1.0,+(val[i+1][j][k]-val[i][j][k]));
     nyX = 1.0 * ((val[i+1][j  ][k]+val[i][j  ][k])
                 -(val[i+1][j-1][k]+val[i][j-1][k]));
     nzX = 1.0 * ((val[i+1][j][k  ]+val[i][j][k  ])
@@ -648,7 +648,7 @@ void VOF::norm_cc_near_bnd(const Scalar & val) {
 
     nxY = 1.0 * ((val[i+1][j-1][k]+val[i+1][j][k])
                 -(val[i  ][j-1][k]+val[i  ][j][k]));
-    nyY = copysign(1.0,+(val[i][j][k]-val[i][j-1][k]));
+    nyY = signum(1.0,+(val[i][j][k]-val[i][j-1][k]));
     nzY = 1.0 * ((val[i][j-1][k  ]+val[i][j][k  ])
                - (val[i][j-1][k-1]+val[i][j][k-1]));
 
@@ -656,7 +656,7 @@ void VOF::norm_cc_near_bnd(const Scalar & val) {
                 -(val[i  ][j][k-1]+val[i  ][j][k]));
     nyZ = 1.0 * ((val[i][j  ][k-1]+val[i][j  ][k])
                 -(val[i][j-1][k-1]+val[i][j-1][k]));
-    nzZ = copysign(1.0,+(val[i][j][k]-val[i][j][k-1]));
+    nzZ = signum(1.0,+(val[i][j][k]-val[i][j][k-1]));
 
     Comp mcomp = Comp::undefined(); 
   select_norm_cc(nx[i][j][k],ny[i][j][k],nz[i][j][k],
@@ -671,7 +671,7 @@ void VOF::norm_cc_near_bnd(const Scalar & val) {
     int j=sj();
     int k=sk();
     real nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ;
-    nxX = copysign(1.0,+(val[i][j][k]-val[i-1][j][k]));
+    nxX = signum(1.0,+(val[i][j][k]-val[i-1][j][k]));
     nyX = 1.0 * ((val[i][j+1][k]+val[i-1][j+1][k])
                 -(val[i][j  ][k]+val[i-1][j  ][k]));
     nzX = 1.0 * ((val[i][j][k+1]+val[i-1][j][k+1])
@@ -679,7 +679,7 @@ void VOF::norm_cc_near_bnd(const Scalar & val) {
 
     nxY = 1.0 * ((val[i  ][j][k]+val[i  ][j+1][k])
                 -(val[i-1][j][k]+val[i-1][j+1][k]));
-    nyY = copysign(1.0,+(val[i][j+1][k]-val[i][j][k]));
+    nyY = signum(1.0,+(val[i][j+1][k]-val[i][j][k]));
     nzY = 1.0 * ((val[i][j][k+1]+val[i][j+1][k+1])
                 -(val[i][j][k  ]+val[i][j+1][k  ]));
 
@@ -687,7 +687,7 @@ void VOF::norm_cc_near_bnd(const Scalar & val) {
                 -(val[i-1][j][k]+val[i-1][j][k+1]));
     nyZ = 1.0 * ((val[i][j+1][k]+val[i][j+1][k+1])
                 -(val[i][j  ][k]+val[i][j  ][k+1]));
-    nzZ = copysign(1.0,+(val[i][j][k+1]-val[i][j][k]));
+    nzZ = signum(1.0,+(val[i][j][k+1]-val[i][j][k]));
 
     Comp mcomp = Comp::undefined(); 
   select_norm_cc(nx[i][j][k],ny[i][j][k],nz[i][j][k],
@@ -702,7 +702,7 @@ void VOF::norm_cc_near_bnd(const Scalar & val) {
     int j=sj();
     int k=ek();
     real nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ;
-    nxX = copysign(1.0,+(val[i][j][k]-val[i-1][j][k]));
+    nxX = signum(1.0,+(val[i][j][k]-val[i-1][j][k]));
     nyX = 1.0 * ((val[i][j+1][k]+val[i-1][j+1][k])
                 -(val[i][j  ][k]+val[i-1][j  ][k]));
     nzX = 1.0 * ((val[i][j][k  ]+val[i-1][j][k  ])
@@ -710,7 +710,7 @@ void VOF::norm_cc_near_bnd(const Scalar & val) {
 
     nxY = 1.0 * ((val[i  ][j][k]+val[i  ][j+1][k])
                 -(val[i-1][j][k]+val[i-1][j+1][k]));
-    nyY = copysign(1.0,+(val[i][j+1][k]-val[i][j][k]));
+    nyY = signum(1.0,+(val[i][j+1][k]-val[i][j][k]));
     nzY = 1.0 * ((val[i][j][k  ]+val[i][j+1][k  ])
                 -(val[i][j][k-1]+val[i][j+1][k-1]));
 
@@ -718,7 +718,7 @@ void VOF::norm_cc_near_bnd(const Scalar & val) {
                 -(val[i-1][j][k-1]+val[i-1][j][k]));
     nyZ = 1.0 * ((val[i][j+1][k-1]+val[i][j+1][k])
                 -(val[i][j  ][k-1]+val[i][j  ][k]));
-    nzZ = copysign(1.0,+(val[i][j][k]-val[i][j][k-1]));
+    nzZ = signum(1.0,+(val[i][j][k]-val[i][j][k-1]));
 
     Comp mcomp = Comp::undefined(); 
   select_norm_cc(nx[i][j][k],ny[i][j][k],nz[i][j][k],
@@ -733,7 +733,7 @@ void VOF::norm_cc_near_bnd(const Scalar & val) {
     int j=ej();
     int k=sk();
     real nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ;
-    nxX = copysign(1.0,+(val[i][j][k]-val[i-1][j][k]));
+    nxX = signum(1.0,+(val[i][j][k]-val[i-1][j][k]));
     nyX = 1.0 * ((val[i][j  ][k]+val[i-1][j  ][k])
                 -(val[i][j-1][k]+val[i-1][j-1][k]));
     nzX = 1.0 * ((val[i][j][k+1]+val[i-1][j][k+1])
@@ -741,7 +741,7 @@ void VOF::norm_cc_near_bnd(const Scalar & val) {
 
     nxY = 1.0 * ((val[i  ][j-1][k]+val[i  ][j][k])
                - (val[i-1][j-1][k]+val[i-1][j][k]));
-    nyY = copysign(1.0,+(val[i][j][k]-val[i][j-1][k]));
+    nyY = signum(1.0,+(val[i][j][k]-val[i][j-1][k]));
     nzY = 1.0 * ((val[i][j-1][k+1]+val[i][j][k+1])
                - (val[i][j-1][k  ]+val[i][j][k  ]));
 
@@ -749,7 +749,7 @@ void VOF::norm_cc_near_bnd(const Scalar & val) {
                 -(val[i-1][j][k]+val[i-1][j][k+1]));
     nyZ = 1.0 * ((val[i][j  ][k]+val[i][j  ][k+1])
                 -(val[i][j-1][k]+val[i][j-1][k+1]));
-    nzZ = copysign(1.0,+(val[i][j][k+1]-val[i][j][k]));
+    nzZ = signum(1.0,+(val[i][j][k+1]-val[i][j][k]));
 
     Comp mcomp = Comp::undefined(); 
   select_norm_cc(nx[i][j][k],ny[i][j][k],nz[i][j][k],
@@ -764,7 +764,7 @@ void VOF::norm_cc_near_bnd(const Scalar & val) {
     int j=ej();
     int k=ek();
     real nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ;
-    nxX = copysign(1.0,+(val[i][j][k]-val[i-1][j][k]));
+    nxX = signum(1.0,+(val[i][j][k]-val[i-1][j][k]));
     nyX = 1.0 * ((val[i][j  ][k]+val[i-1][j  ][k])
                 -(val[i][j-1][k]+val[i-1][j-1][k]));
     nzX = 1.0 * ((val[i][j][k  ]+val[i-1][j][k  ])
@@ -772,7 +772,7 @@ void VOF::norm_cc_near_bnd(const Scalar & val) {
 
     nxY = 1.0 * ((val[i  ][j-1][k]+val[i  ][j][k])
                - (val[i-1][j-1][k]+val[i-1][j][k]));
-    nyY = copysign(1.0,+(val[i][j][k]-val[i][j-1][k]));
+    nyY = signum(1.0,+(val[i][j][k]-val[i][j-1][k]));
     nzY = 1.0 * ((val[i][j-1][k  ]+val[i][j][k  ])
                - (val[i][j-1][k-1]+val[i][j][k-1]));
 
@@ -780,7 +780,7 @@ void VOF::norm_cc_near_bnd(const Scalar & val) {
                 -(val[i-1][j][k-1]+val[i-1][j][k]));
     nyZ = 1.0 * ((val[i][j  ][k-1]+val[i][j  ][k])
                 -(val[i][j-1][k-1]+val[i][j-1][k]));
-    nzZ = copysign(1.0,+(val[i][j][k+1]-val[i][j][k-1]));
+    nzZ = signum(1.0,+(val[i][j][k+1]-val[i][j][k-1]));
 
     Comp mcomp = Comp::undefined(); 
   select_norm_cc(nx[i][j][k],ny[i][j][k],nz[i][j][k],
@@ -793,7 +793,7 @@ void VOF::norm_cc_near_bnd(const Scalar & val) {
 void VOF::norm_cc_imin(const Scalar & val,
                        const int i,const int j, const int k) {
   real nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ;
-  nxX = copysign(1.0,+(val[i+1][j][k]-val[i][j][k]));
+  nxX = signum(1.0,+(val[i+1][j][k]-val[i][j][k]));
   nyX = 0.5 * ((val[i+1][j+1][k]+val[i][j+1][k])
               -(val[i+1][j-1][k]+val[i][j-1][k]));
   nzX = 0.5 * ((val[i+1][j][k+1]+val[i][j][k+1])
@@ -801,7 +801,7 @@ void VOF::norm_cc_imin(const Scalar & val,
 
   nxY = 1.0 * ((val[i+1][j-1][k]+val[i+1][j][k]+val[i+1][j+1][k])
               -(val[i  ][j-1][k]+val[i  ][j][k]+val[i  ][j+1][k]));
-  nyY = copysign(1.0,+(val[i][j+1][k]-val[i][j-1][k]));
+  nyY = signum(1.0,+(val[i][j+1][k]-val[i][j-1][k]));
   nzY = 0.5 * ((val[i][j-1][k+1]+val[i][j][k+1]+val[i][j+1][k+1])
              - (val[i][j-1][k-1]+val[i][j][k-1]+val[i][j+1][k-1]));
 
@@ -809,7 +809,7 @@ void VOF::norm_cc_imin(const Scalar & val,
               -(val[i  ][j][k-1]+val[i  ][j][k]+val[i  ][j][k+1]));
   nyZ = 0.5 * ((val[i][j+1][k-1]+val[i][j+1][k]+val[i][j+1][k+1])
               -(val[i][j-1][k-1]+val[i][j-1][k]+val[i][j-1][k+1]));
-  nzZ = copysign(1.0,+(val[i][j][k+1]-val[i][j][k-1]));
+  nzZ = signum(1.0,+(val[i][j][k+1]-val[i][j][k-1]));
 
   Comp mcomp = Comp::undefined(); 
   select_norm_cc(nx[i][j][k],ny[i][j][k],nz[i][j][k],
@@ -820,7 +820,7 @@ void VOF::norm_cc_imin(const Scalar & val,
 void VOF::norm_cc_imax(const Scalar & val,
                        const int i,const int j, const int k) {
   real nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ;
-  nxX = copysign(1.0,+(val[i][j][k]-val[i-1][j][k]));
+  nxX = signum(1.0,+(val[i][j][k]-val[i-1][j][k]));
   nyX = 0.5 * ((val[i][j+1][k]+val[i-1][j+1][k])
               -(val[i][j-1][k]+val[i-1][j-1][k]));
   nzX = 0.5 * ((val[i][j][k+1]+val[i-1][j][k+1])
@@ -828,7 +828,7 @@ void VOF::norm_cc_imax(const Scalar & val,
 
   nxY = 1.0 * ((val[i  ][j-1][k]+val[i  ][j][k]+val[i  ][j+1][k])
              - (val[i-1][j-1][k]+val[i-1][j][k]+val[i-1][j+1][k]));
-  nyY = copysign(1.0,+(val[i][j+1][k]-val[i][j-1][k]));
+  nyY = signum(1.0,+(val[i][j+1][k]-val[i][j-1][k]));
   nzY = 0.5 * ((val[i][j-1][k+1]+val[i][j][k+1]+val[i][j+1][k+1])
              - (val[i][j-1][k-1]+val[i][j][k-1]+val[i][j+1][k-1]));
 
@@ -836,7 +836,7 @@ void VOF::norm_cc_imax(const Scalar & val,
               -(val[i-1][j][k-1]+val[i-1][j][k]+val[i-1][j][k+1]));
   nyZ = 0.5 * ((val[i][j+1][k-1]+val[i][j+1][k]+val[i][j+1][k+1])
               -(val[i][j-1][k-1]+val[i][j-1][k]+val[i][j-1][k+1]));
-  nzZ = copysign(1.0,+(val[i][j][k+1]-val[i][j][k-1]));
+  nzZ = signum(1.0,+(val[i][j][k+1]-val[i][j][k-1]));
 
   Comp mcomp = Comp::undefined(); 
   select_norm_cc(nx[i][j][k],ny[i][j][k],nz[i][j][k],
@@ -847,7 +847,7 @@ void VOF::norm_cc_imax(const Scalar & val,
 void VOF::norm_cc_jmin(const Scalar & val,
                        const int i,const int j, const int k) {
   real nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ;
-  nxX = copysign(1.0,+(val[i+1][j][k]-val[i-1][j][k]));
+  nxX = signum(1.0,+(val[i+1][j][k]-val[i-1][j][k]));
   nyX = 1.0 * ((val[i+1][j+1][k]+val[i][j+1][k]+val[i-1][j+1][k])
               -(val[i+1][j  ][k]+val[i][j  ][k]+val[i-1][j  ][k]));
   nzX = 0.5 * ((val[i+1][j][k+1]+val[i][j][k+1]+val[i-1][j][k+1])
@@ -855,7 +855,7 @@ void VOF::norm_cc_jmin(const Scalar & val,
 
   nxY = 0.5 * ((val[i+1][j][k]+val[i+1][j+1][k])
               -(val[i-1][j][k]+val[i-1][j+1][k]));
-  nyY = copysign(1.0,+(val[i][j+1][k]-val[i][j][k]));
+  nyY = signum(1.0,+(val[i][j+1][k]-val[i][j][k]));
   nzY = 0.5 * ((val[i][j][k+1]+val[i][j+1][k+1])
               -(val[i][j][k-1]+val[i][j+1][k-1]));
 
@@ -863,7 +863,7 @@ void VOF::norm_cc_jmin(const Scalar & val,
               -(val[i-1][j][k-1]+val[i-1][j][k]+val[i-1][j][k+1]));
   nyZ = 1.0 * ((val[i][j+1][k-1]+val[i][j+1][k]+val[i][j+1][k+1])
               -(val[i][j  ][k-1]+val[i][j  ][k]+val[i][j  ][k+1]));
-  nzZ = copysign(1.0,+(val[i][j][k+1]-val[i][j][k-1]));
+  nzZ = signum(1.0,+(val[i][j][k+1]-val[i][j][k-1]));
 
   Comp mcomp = Comp::undefined(); 
   select_norm_cc(nx[i][j][k],ny[i][j][k],nz[i][j][k],
@@ -874,7 +874,7 @@ void VOF::norm_cc_jmin(const Scalar & val,
 void VOF::norm_cc_jmax(const Scalar & val,
                        const int i,const int j, const int k) {
   real nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ;
-  nxX = copysign(1.0,+(val[i+1][j][k]-val[i-1][j][k]));
+  nxX = signum(1.0,+(val[i+1][j][k]-val[i-1][j][k]));
   nyX = 1.0 * ((val[i+1][j  ][k]+val[i][j  ][k]+val[i-1][j  ][k])
               -(val[i+1][j-1][k]+val[i][j-1][k]+val[i-1][j-1][k]));
   nzX = 0.5 * ((val[i+1][j][k+1]+val[i][j][k+1]+val[i-1][j][k+1])
@@ -882,7 +882,7 @@ void VOF::norm_cc_jmax(const Scalar & val,
 
   nxY = 0.5 * ((val[i+1][j-1][k]+val[i+1][j][k])
               -(val[i-1][j-1][k]+val[i-1][j][k]));
-  nyY = copysign(1.0,+(val[i][j][k]-val[i][j-1][k]));
+  nyY = signum(1.0,+(val[i][j][k]-val[i][j-1][k]));
   nzY = 0.5 * ((val[i][j-1][k+1]+val[i][j][k+1])
               -(val[i][j-1][k-1]+val[i][j][k-1]));
 
@@ -890,7 +890,7 @@ void VOF::norm_cc_jmax(const Scalar & val,
               -(val[i-1][j][k-1]+val[i-1][j][k]+val[i-1][j][k+1]));
   nyZ = 1.0 * ((val[i][j  ][k-1]+val[i][j  ][k]+val[i][j  ][k+1])
               -(val[i][j-1][k-1]+val[i][j-1][k]+val[i][j-1][k+1]));
-  nzZ = copysign(1.0,+(val[i][j][k+1]-val[i][j][k-1]));
+  nzZ = signum(1.0,+(val[i][j][k+1]-val[i][j][k-1]));
 
   Comp mcomp = Comp::undefined(); 
   select_norm_cc(nx[i][j][k],ny[i][j][k],nz[i][j][k],
@@ -901,7 +901,7 @@ void VOF::norm_cc_jmax(const Scalar & val,
 void VOF::norm_cc_kmin(const Scalar & val,
                        const int i,const int j, const int k) {
   real nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ;
-  nxX = copysign(1.0,+(val[i+1][j][k]-val[i-1][j][k]));
+  nxX = signum(1.0,+(val[i+1][j][k]-val[i-1][j][k]));
   nyX = 0.5 * ((val[i+1][j+1][k]+val[i][j+1][k]+val[i-1][j+1][k])
               -(val[i+1][j-1][k]+val[i][j-1][k]+val[i-1][j-1][k]));
   nzX = 1.0 * ((val[i+1][j][k+1]+val[i][j][k+1]+val[i-1][j][k+1])
@@ -909,7 +909,7 @@ void VOF::norm_cc_kmin(const Scalar & val,
 
   nxY = 0.5 * ((val[i+1][j-1][k]+val[i+1][j][k]+val[i+1][j+1][k])
               -(val[i-1][j-1][k]+val[i-1][j][k]+val[i-1][j+1][k]));
-  nyY = copysign(1.0,+(val[i][j+1][k]-val[i][j-1][k]));
+  nyY = signum(1.0,+(val[i][j+1][k]-val[i][j-1][k]));
   nzY = 1.0 * ((val[i][j-1][k+1]+val[i][j][k+1]+val[i][j+1][k+1])
               -(val[i][j-1][k  ]+val[i][j][k  ]+val[i][j+1][k  ]));
 
@@ -917,7 +917,7 @@ void VOF::norm_cc_kmin(const Scalar & val,
               -(val[i-1][j][k]+val[i-1][j][k+1]));
   nyZ = 0.5 * ((val[i][j+1][k]+val[i][j+1][k+1])
               -(val[i][j-1][k]+val[i][j-1][k+1]));
-  nzZ = copysign(1.0,+(val[i][j][k+1]-val[i][j][k]));
+  nzZ = signum(1.0,+(val[i][j][k+1]-val[i][j][k]));
 
   Comp mcomp = Comp::undefined(); 
   select_norm_cc(nx[i][j][k],ny[i][j][k],nz[i][j][k],
@@ -929,7 +929,7 @@ void VOF::norm_cc_kmax(const Scalar & val,
                        const int i,const int j, const int k) {
 
   real nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ;
-  nxX = copysign(1.0,+(val[i+1][j][k]-val[i-1][j][k]));
+  nxX = signum(1.0,+(val[i+1][j][k]-val[i-1][j][k]));
   nyX = 0.5 * ((val[i+1][j+1][k]+val[i][j+1][k]+val[i-1][j+1][k])
               -(val[i+1][j-1][k]+val[i][j-1][k]+val[i-1][j-1][k]));
   nzX = 1.0 * ((val[i+1][j][k  ]+val[i][j][k  ]+val[i-1][j][k  ])
@@ -937,7 +937,7 @@ void VOF::norm_cc_kmax(const Scalar & val,
 
   nxY = 0.5 * ((val[i+1][j-1][k]+val[i+1][j][k]+val[i+1][j+1][k])
               -(val[i-1][j-1][k]+val[i-1][j][k]+val[i-1][j+1][k]));
-  nyY = copysign(1.0,+(val[i][j+1][k]-val[i][j-1][k]));
+  nyY = signum(1.0,+(val[i][j+1][k]-val[i][j-1][k]));
   nzY = 1.0 * ((val[i][j-1][k  ]+val[i][j][k  ]+val[i][j+1][k  ])
               -(val[i][j-1][k-1]+val[i][j][k-1]+val[i][j+1][k-1]));
 
@@ -945,7 +945,7 @@ void VOF::norm_cc_kmax(const Scalar & val,
               -(val[i-1][j][k-1]+val[i-1][j][k]));
   nyZ = 0.5 * ((val[i][j+1][k-1]+val[i][j+1][k])
               -(val[i][j-1][k-1]+val[i][j-1][k]));
-  nzZ = copysign(1.0,+(val[i][j][k]-val[i][j][k-1]));
+  nzZ = signum(1.0,+(val[i][j][k]-val[i][j][k-1]));
 
   Comp mcomp = Comp::undefined(); 
   select_norm_cc(nx[i][j][k],ny[i][j][k],nz[i][j][k],

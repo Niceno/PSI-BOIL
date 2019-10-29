@@ -1,15 +1,19 @@
 #include "vof.h"
 #include <iomanip>
 
-/******************************************************************************/
 void VOF::tension(Vector * vec, const Matter matt) {
+  tension(vec,matt,phi);
+}
+
+/******************************************************************************/
+void VOF::tension(Vector * vec, const Matter matt, const Scalar & scp) {
 /***************************************************************************//**
 *  \brief Calculate surface tension
 *         Algorithm
 *           1st step: calculate curvature
 *           2nd step: calculate body force
 *         Variables
-*           color function          : phi
+*           color function          : scp
 *           curvature               : kappa
 *           body force              : vec
 *******************************************************************************/
@@ -35,7 +39,7 @@ void VOF::tension(Vector * vec, const Matter matt) {
           (*vec)[m][i][j][k] += matt.sigma(m,i,j,k)
                 * kappa_ave(kappa[i-1][j][k],kappa[i][j][k])
                 //* kappa_ave(kappa[i-1][j][k],kappa[i][j][k],iflag[i-1][j][k],iflag[i][j][k])
-                * (phi[i][j][k] - phi[i-1][j][k])/vec->dxc(m,i)
+                * (scp[i][j][k] - scp[i-1][j][k])/vec->dxc(m,i)
                 * vec->dV(m,i,j,k);
         }
       }
@@ -47,7 +51,7 @@ void VOF::tension(Vector * vec, const Matter matt) {
           (*vec)[m][i][j][k] += matt.sigma(m,i,j,k)
                 * kappa_ave(kappa[i][j-1][k],kappa[i][j][k])
                 //* kappa_ave(kappa[i][j-1][k],kappa[i][j][k],iflag[i][j-1][k],iflag[i][j][k])
-                * (phi[i][j][k] - phi[i][j-1][k])/vec->dyc(m,j)
+                * (scp[i][j][k] - scp[i][j-1][k])/vec->dyc(m,j)
                 * vec->dV(m,i,j,k);
         }
       }
@@ -59,7 +63,7 @@ void VOF::tension(Vector * vec, const Matter matt) {
           (*vec)[m][i][j][k] += matt.sigma(m,i,j,k)
                 * kappa_ave(kappa[i][j][k-1],kappa[i][j][k])
                 //* kappa_ave(kappa[i][j][k-1],kappa[i][j][k],iflag[i][j][k-1],iflag[i][j][k])
-                * (phi[i][j][k] - phi[i][j][k-1])/vec->dzc(m,k)
+                * (scp[i][j][k] - scp[i][j][k-1])/vec->dzc(m,k)
                 * vec->dV(m,i,j,k);
         }
       }

@@ -47,9 +47,9 @@ class VOFaxisym : public VOF {
     virtual void advance(const bool anci = true);
     virtual void advance(Scalar & sca, const bool anci = true);
 
-    virtual void ancillary() {};
+    virtual void ancillary();
     void reconstruct_geometry();
-    void color_to_vf(const Scalar & color, Scalar & vf);
+    void color_to_vf(const Scalar & color, Scalar & vf,const bool extalp = true);
     void vf_to_color(const Scalar & vf, Scalar & color);
 
     //real calc_alpha_axisymmetric(const real nnx, const real v, const real eta0);
@@ -72,6 +72,7 @@ class VOFaxisym : public VOF {
     real test_reconstruction(const Scalar & color, const Scalar & vf);
 
   protected:
+    void forward_cartesian(Scalar & scp);
     void forward_axisymmetric(const Scalar & color, Scalar & axip, Scalar & Kp);
     void backward_axisymmetric(const Scalar & vf, Scalar & alp);
     virtual void norm(const Scalar & color, const NormMethod & nm,
@@ -81,9 +82,11 @@ class VOFaxisym : public VOF {
     virtual void advance_y(Scalar & sca) {};
     virtual void advance_z(Scalar & sca);
 
-    virtual void ancillary(Scalar & scp) {};
+    virtual void ancillary(Scalar & scp);
     void reconstruct_geometry(const Scalar & scp);
-    real linf_scalar_error(const Scalar & sca, const Scalar & scb);
+    real linf_scalar_error(const Scalar & sca, const Scalar & scb
+                          // ,int & i, int & j, int & k, bool & ebool
+                           );
 
     //virtual real calc_v(const real alpha, const real vma, const real vmb, const real vmc);
     real calc_v_axisymmetric(real nnx, real alp, real eta0, real & Kp);

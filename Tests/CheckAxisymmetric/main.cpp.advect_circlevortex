@@ -1,12 +1,21 @@
 #include "Include/psi-boil.h"
 #include "setup_circle.cpp"
-#include "test_reconstruction.cpp"
 #include "l2_scalar_error.cpp"
 #include <fstream>
 #include <iostream>
+#include <fenv.h>
 //#define USE_BNDCLR
 //#define USE_CARTESIAN
 //#define USE_CONTINUOUS
+
+#define _GNU_SOURCE 1
+#if 1
+static void __attribute__ ((constructor)) trapfpe(void)
+{
+  /* Enable some exceptions. At startup all exceptions are masked. */
+  feenableexcept(FE_INVALID|FE_DIVBYZERO|FE_OVERFLOW);
+}
+#endif
 
 #if 0
 const int level = 2;

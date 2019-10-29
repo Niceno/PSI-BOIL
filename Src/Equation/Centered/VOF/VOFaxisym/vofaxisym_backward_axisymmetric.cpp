@@ -13,10 +13,11 @@ void VOFaxisym::backward_axisymmetric(const Scalar & vf, Scalar & alp) {
     real nnx  = -nx[i][j][k];
     real nnz  = -nz[i][j][k];
     real nsum = fabs(nnx)+fabs(nnz);
+    real n2sum = nnx*nnx+nnz*nnz;
     real v = vf[i][j][k];
     real deltax = vf.dxc(i);
-    if(  dom->ibody().off(i,j,k)|| nsum <boil::pico
-       ||deltax==0.0) {
+    if(  dom->ibody().off(i,j,k)
+       ||n2sum<0.9 || deltax==0.0) {
       alp[i][j][k] = ((v>=phisurf)-(v<phisurf))*boil::unreal;
     } else {
       /* normalization */

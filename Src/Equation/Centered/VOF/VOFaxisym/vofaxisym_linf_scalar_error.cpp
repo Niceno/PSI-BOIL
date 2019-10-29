@@ -1,7 +1,9 @@
 #include "vofaxisym.h"
 
 /******************************************************************************/
-real VOFaxisym::linf_scalar_error(const Scalar & sca, const Scalar & scb) {
+real VOFaxisym::linf_scalar_error(const Scalar & sca, const Scalar & scb
+                                  //,int & imax, int & jmax, int & kmax, bool & ebool
+                                  ) {
 /***************************************************************************//**
  \brief Calculate the Linf difference between two scalar fields.
     output: Linf
@@ -35,6 +37,12 @@ real VOFaxisym::linf_scalar_error(const Scalar & sca, const Scalar & scb) {
                      -std::max(0.0,std::min(1.0,scb[i][j][k])));
     if(sdiff>linferr) {
       linferr = sdiff;
+#if 0
+      imax = i;
+      jmax = j;
+      kmax = k;
+      ebool = elvibool;
+#endif
     }
   }
   boil::cart.max_real(&linferr);
