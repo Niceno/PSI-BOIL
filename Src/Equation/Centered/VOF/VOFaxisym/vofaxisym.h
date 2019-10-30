@@ -49,7 +49,8 @@ class VOFaxisym : public VOF {
 
     virtual void ancillary();
     void reconstruct_geometry();
-    void color_to_vf(const Scalar & color, Scalar & vf,const bool extalp = true);
+    void color_to_vf(Scalar & color, Scalar & vf,
+                     const bool extalp=true,const bool bdn=true);
     void vf_to_color(const Scalar & vf, Scalar & color);
 
     //real calc_alpha_axisymmetric(const real nnx, const real v, const real eta0);
@@ -71,8 +72,8 @@ class VOFaxisym : public VOF {
 
     real test_reconstruction(const Scalar & color, const Scalar & vf);
 
-  protected:
     void forward_cartesian(Scalar & scp);
+  protected:
     void forward_axisymmetric(const Scalar & color, Scalar & axip, Scalar & Kp);
     void backward_axisymmetric(const Scalar & vf, Scalar & alp);
     virtual void norm(const Scalar & color, const NormMethod & nm,

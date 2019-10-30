@@ -17,38 +17,7 @@ void VOFaxisym::reconstruct_geometry(const Scalar & scp) {
 
   real linferr(boil::unreal);
   int iter(0);
-#if 0
-  /* simplified iteration */
 
-  /* set K0 = 1.0 */
-  for_avijk(Ktmp,i,j,k) {
-    Ktmp[i][j][k] = 1.0;
-  }
-
-  /* iteration procedure */
-  do {
-    /* set c = phi/K */
-    for_vijk(clr,i,j,k) {
-      clr[i][j][k] = scp[i][j][k]/Ktmp[i][j][k];
-    }
-    clr.bnd_update();
-    clr.exchange_all();
-
-    /* Ktmp is internally overwritten in this function! */
-    color_to_vf(clr,axistmp);
-
-    /* calculate Linf error norm of reconstruction in phi-space */
-    linferr = linf_scalar_error(axistmp,scp);
-
-    iter++;
-    boil::oout<<"VOFaxisym::reconstruct_geometry: "<<time->current_time()
-              <<" "<<iter<<" "<<linferr<<boil::endl;
-  #if 1
-  } while(linferr>reconstruction_tolerance&&iter<reconstruction_maxiter);
-  #else
-  } while(false);
-  #endif
-#else
   /* direct iteration */
 
   /* set c0 = phi */
@@ -56,29 +25,29 @@ void VOFaxisym::reconstruct_geometry(const Scalar & scp) {
     clr[i][j][k] = std::max(0.0,std::min(1.0,scp[i][j][k]));
   }
 
-  #if 1
+  /* true = extract alpha */
+  norm(clr,norm_method_advance,true);
+
+  /* iterate boundary normal vector */
+  bdnorm(clr);
+
+#if 1
   /* iteration procedure */
   do {
-    /* true = extract alpha */
-    norm(clr,norm_method_advance,true);
     backward_axisymmetric(phi,nalpha);
     forward_cartesian(axistmp);
-    #if 0
-    /* calculate Linf error norm of reconstruction in c-space */
-    linferr = linf_scalar_error(axistmp,clr);
-    #else
-    color_to_vf(axistmp,axistmp2,true);
+    /* color to vf contains calculations of normal vector and update at walls */
+    color_to_vf(axistmp,axistmp2,true,true);
     /* calculate Linf error norm of reconstruction in phi-space */
-      #if 0
+  #if 0
     int imax,jmax,kmax;
     bool elvibool;
-      #endif
+  #endif
     linferr = linf_scalar_error(axistmp2,scp);
                                 //,imax,jmax,kmax,elvibool);
-    #endif
 
     iter++;
-    #if 0
+  #if 0
     boil::oout<<"VOFaxisym::reconstruct_geometry: "<<time->current_time()
               <<" "<<iter<<" "<<linferr
               <<" | "<<" "<<imax<<" "<<kmax<<" "
@@ -86,20 +55,15 @@ void VOFaxisym::reconstruct_geometry(const Scalar & scp) {
               <<boil::endl;
     boil::plot->plot(scp,axistmp,nx,nz,nalpha,"phi-clr-nx-nz-nalp", time->current_step());
     if(time->current_step()==1)exit(0);
-    #endif
+  #endif
 
     for_avijk(clr,i,j,k) {
       clr[i][j][k] = axistmp[i][j][k];
     }
-    #if 1
+  #if 1
   } while(linferr>reconstruction_tolerance&&iter<reconstruction_maxiter);
-    #else
-  } while(false);
-    #endif
-    norm(clr,norm_method_advance,true);
   #else
-  /* true = extract alpha */
-  norm(clr,norm_method_advance,true);
+  } while(false);
   #endif
 #endif
 

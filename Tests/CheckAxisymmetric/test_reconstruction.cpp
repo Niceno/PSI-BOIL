@@ -2,6 +2,7 @@ static const real blending_angle = 40./180.*boil::pi;
 static const real n0square = 1.-1./(1.+tan(blending_angle)*tan(blending_angle));
 static const real n0 = sqrt(n0square);
 
+#if 0
 /*****************************************************************************/
 void test_reconstruction_circle_xz(VOF & conc, Scalar & c, Scalar & ctest,
                                    Scalar & kappa, bool inverted, real radius,
@@ -194,10 +195,11 @@ void test_reconstruction_triangle_xz(VOF & conc, Scalar & c, Scalar & ctest,
 
   return;
 }
+#endif
 
 /*****************************************************************************/
 void test_reconstruction_sphere(bool partial,
-                                VOF & conc, Scalar & c, Scalar & ctest,
+                                VOFaxisym & conc, Scalar & c, Scalar & ctest,
                                 Scalar & kappa, bool inverted, real radius,
                                 real xcent, real ycent, real zcent,
                                 NormMethod & nm,
@@ -206,7 +208,7 @@ void test_reconstruction_sphere(bool partial,
                                 std::vector<real> & kl1,
                                 std::vector<real> & kli) {
 
-  conc.forward(ctest);
+  conc.forward_cartesian(ctest);
 
   real err_n_l1(0.0),  err_n_linf(0.0);
   real err_c_l1(0.0),  err_c_linf(0.0);
@@ -323,7 +325,7 @@ void test_reconstruction_sphere(bool partial,
 
 /*****************************************************************************/
 void test_reconstruction_cone(const int NX, const int NZ,
-                              VOF & conc, Scalar & c, Scalar & ctest,
+                              VOFaxisym & conc, Scalar & c, Scalar & ctest,
                               Scalar & kappa, bool inverted,
                               real mx, real mz, real nalp,
                               NormMethod & nm,
@@ -332,7 +334,7 @@ void test_reconstruction_cone(const int NX, const int NZ,
                               std::vector<real> & kl1,
                               std::vector<real> & kli) {
 
-  conc.forward(ctest);
+  conc.forward_cartesian(ctest);
 
   real err_n_l1(0.0),  err_n_linf(0.0);
   real err_c_l1(0.0),  err_c_linf(0.0);
@@ -454,7 +456,7 @@ void test_reconstruction_cone(const int NX, const int NZ,
 
 /*****************************************************************************/
 void test_reconstruction_doughnut(bool partial_major, bool partial_minor,
-                                 VOF & conc, Scalar & c, Scalar & ctest,
+                                 VOFaxisym & conc, Scalar & c, Scalar & ctest,
                                  Scalar & kappa, bool inverted, 
                                  real radius_major, real radius_minor,
                                  real xcent, real zcent,
@@ -464,7 +466,7 @@ void test_reconstruction_doughnut(bool partial_major, bool partial_minor,
                                  std::vector<real> & kl1,
                                  std::vector<real> & kli) {
 
-  conc.forward(ctest);
+  conc.forward_cartesian(ctest);
 
   real err_n_l1(0.0),  err_n_linf(0.0);
   real err_c_l1(0.0),  err_c_linf(0.0);
