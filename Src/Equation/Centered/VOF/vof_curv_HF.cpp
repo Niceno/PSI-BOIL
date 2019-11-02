@@ -5,9 +5,9 @@
 /* parameters */
 static const int mof(3); /* symmetric stencil is constructed */
 static const int nof(1);
-static const int major(mof*2+1);
-static const int minor(nof*2+1);
-/* warning: if stencil size is changed in the minor direction,
+static const int majorext(mof*2+1);
+static const int minorext(nof*2+1);
+/* warning: if stencil size is changed in the minorext direction,
    the kernel must be properly adjusted! */
 
 static const int iterloop(5); /* 2019.07.09 */
@@ -17,7 +17,7 @@ static const real theta_crit = 0.8; /* Eq. (6) in Lopez's paper */
 void VOF::curv_HF() {
 /***************************************************************************//**
 *  \brief Calculate curvature using height function in 2D axisymmetric.
-*     major x minor x minor stencil
+*     majorext x minorext x minorext stencil
 *     J.Lopez et al., Comput. Methods Appl. Mech. Engrg. 198 (2009) 2555-2564
 *
 *     modification: selection of cells where curvature is calculated is 
@@ -36,18 +36,18 @@ void VOF::curv_HF() {
 
   /* prepare stencils: one for heights, one for dx */
   arr3D stencil, gridstencil;
-  stencil.resize(minor);
-  gridstencil.resize(minor);
+  stencil.resize(minorext);
+  gridstencil.resize(minorext);
   for(auto & t : stencil) {
-    t.resize(minor);
+    t.resize(minorext);
     for(auto & s : t) {
-      s.resize(major);
+      s.resize(majorext);
     }
   }
   for(auto & t : gridstencil) {
-    t.resize(minor);
+    t.resize(minorext);
     for(auto & g : t) {
-      g.resize(major);
+      g.resize(majorext);
     }
   }
 
@@ -95,7 +95,7 @@ void VOF::curv_HF() {
     /* calculate curvature only when iflag=1 */
     if(iflag[i][j][k]==1) {
 
-      /* select dominant (=major) direction of stencil */
+      /* select dominant (=majorext) direction of stencil */
       Comp mMax;
       /* n points to the liquid */
       real nnx = -nx[i][j][k];
@@ -352,11 +352,11 @@ void VOF::curv_HF() {
    - stencil of color values
    - stencil of grid spacings in the dominant direction
    - starting and ending indices in the dominant direction
-   - grid spacings in the first minor direction
-   - grid spacings in the second minor direction
+   - grid spacings in the first minorext direction
+   - grid spacings in the second minorext direction
    - normal vector component in the dominant direction, pointing to gas
-   - bool indicator if first minor direction is a non-pseudo direction
-   - bool indicator if second minor direction is a non-pseudo direction
+   - bool indicator if first minorext direction is a non-pseudo direction
+   - bool indicator if second minorext direction is a non-pseudo direction
    
    outputs:
    - kappa value (if computed)
