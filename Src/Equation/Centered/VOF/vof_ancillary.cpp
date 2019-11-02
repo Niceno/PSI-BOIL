@@ -31,12 +31,13 @@ void VOF::ancillary(Scalar & scp) {
   true_norm_vect(nx,ny,nz,mx,my,mz); 
 
   /*  calculate free surface position */
-#if 1
-  cal_fs3(scp);
-#else
-  cal_fs_interp(scp);
-  if(!use_subgrid) fs_bnd_nosubgrid(scp);
-#endif
+  if(!use_interp) {
+    cal_fs3(scp);
+  } else {
+    cal_fs_interp(scp);
+    if(!use_subgrid) 
+      fs_bnd_nosubgrid(scp);
+  }
 
   /* calculate area -> due to the Heaviside bindings, phi is used, not scp */
   cal_adens();

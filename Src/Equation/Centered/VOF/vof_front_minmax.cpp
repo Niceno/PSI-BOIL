@@ -119,8 +119,10 @@ void VOF::front_minmax(Range<real> xr,
    boil::cart.max_real(&zmaxft);
 
    std::cout.setf(std::ios_base::scientific);
-   boil::oout << "front_minmax:time,xmax= " << time->current_time() 
-              << " " << xmaxft << " " << zmaxft << boil::endl;
+   boil::oout<<"x-min-front= "<<time->current_time()<<" "
+              <<xminft<<" "<<xmaxft<<" "
+              <<yminft<<" "<<ymaxft<<" "
+              <<zminft<<" "<<zmaxft<<"\n";
    std::cout.unsetf(std::ios_base::floatfield);
 }
 

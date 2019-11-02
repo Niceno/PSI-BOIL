@@ -191,14 +191,17 @@ int main(int argc, char * argv[]) {
   |  time-integration  |
   +-------------------*/
   real dxmin = d.dxyz_min();
-  const real dt = dtmult * pow(std::min(air.rho()->value(),water.rho()->value())*pow(dxmin,3.0)
-                           /(2.0*3.1415*mixed.sigma()->value()),0.5);
+  const real wvel = 0.501318/5.;
+  const real dt = cfl_max*dxmin/wvel;
+
+  //const real dt = dtmult * pow(std::min(air.rho()->value(),water.rho()->value())*pow(dxmin,3.0)
+  //                         /(2.0*3.1415*mixed.sigma()->value()),0.5);
   const real tend = std::max(tsig,tmu);
-  const real wvel = dxmin/dt * cfl_max;
   const int ndt = tend/dt;
   const int nint = ndt/10;
   Times time(ndt, dt); 
 
+  boil::oout<<"times= "<<dt<<" "<<ndt<<" "<<tend<<boil::endl;
   boil::oout<<"wvel= "<<wvel<<" "<<wvel/usig<<boil::endl;
 	
   //exit(0);

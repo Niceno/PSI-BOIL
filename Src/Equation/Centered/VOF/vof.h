@@ -142,6 +142,14 @@ class VOF : public Centered {
     /* getter for use_subgrid */
     bool get_use_subgrid() { return(use_subgrid);};
 
+    /* setter for use_interp */
+    void set_use_interp(const bool b) {
+      use_interp=b;
+      boil::oout<<"set_use_interp= "<<b<<"\n";
+    }
+    /* getter for use_interp */
+    bool get_use_interp() { return(use_interp);};
+
     /* setter for use_HF_wall */
     bool set_use_HF_wall(const bool b) {
       use_HF_wall=b;
@@ -391,7 +399,7 @@ class VOF : public Centered {
     bool iminw, imaxw, jminw, jmaxw, kminw, kmaxw; // true = wall
     bool iminc, imaxc, jminc, jmaxc, kminc, kmaxc; // true = cut-stencil
     bool ifull, jfull, kfull; // true = not a dummy direction
-    bool limit_color, use_subgrid, use_HF_wall;
+    bool limit_color, use_subgrid, use_interp, use_HF_wall;
     real minclr, maxclr;
 
     Heaviside heavi;
