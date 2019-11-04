@@ -24,7 +24,7 @@ int main(int argc, char * argv[]) {
 
   if(argc<=9){
     boil::oout<<"Nine command line arguments required!"<<"\n";
-    boil::oout<<"./Boil La rhorat murat gridlevel radius-mult dt-mult cfl inverted msimple"<<boil::endl;
+    boil::oout<<"./Boil La rhorat murat gridlevel radius-mult dt-mult usig-mult inverted msimple"<<boil::endl;
     exit(0);
   }
 
@@ -46,8 +46,8 @@ int main(int argc, char * argv[]) {
   const real dtmult = atof(argv[6]);
   boil::oout<<"dtmult= "<<dtmult<<"\n";
 
-  const real cfl_max = atof(argv[7]);
-  boil::oout<<"cfl_max= "<<cfl_max<<"\n";
+  const real usigmult = atof(argv[7]);
+  boil::oout<<"usigmult= "<<usigmult<<"\n";
 
   const bool inverted = atoi(argv[8]);
   boil::oout<<"inverted= "<<inverted<<"\n";
@@ -191,18 +191,15 @@ int main(int argc, char * argv[]) {
   |  time-integration  |
   +-------------------*/
   real dxmin = d.dxyz_min();
-  const real wvel = 0.501318/5.;
-  const real dt = cfl_max*dxmin/wvel;
-
-  //const real dt = dtmult * pow(std::min(air.rho()->value(),water.rho()->value())*pow(dxmin,3.0)
-  //                         /(2.0*3.1415*mixed.sigma()->value()),0.5);
-  const real tend = std::max(tsig,tmu);
+  const real dt = dtmult * pow(std::min(air.rho()->value(),water.rho()->value())*pow(dxmin,3.0)
+                           /(2.0*3.1415*mixed.sigma()->value()),0.5);
+  const real tend = 10.*std::max(tsig,tmu);
+  const real wvel = usig*usigmult;
   const int ndt = tend/dt;
   const int nint = ndt/10;
   Times time(ndt, dt); 
 
-  boil::oout<<"times= "<<dt<<" "<<ndt<<" "<<tend<<boil::endl;
-  boil::oout<<"wvel= "<<wvel<<" "<<wvel/usig<<boil::endl;
+  boil::oout<<"wvel= "<<wvel<<" "<<wvel/usig<<" "<<wvel/dxmin*dt<<boil::endl;
 	
   //exit(0);
 #if 1
