@@ -15,7 +15,8 @@ void VOFaxisym::vf_to_color(const Scalar & vf, Scalar & color) {
   backward_axisymmetric(vf,nalpha);
 
   /* secondly, color is calculated with the forward Cartesian problem */
-  forward_cartesian(color);
+  //forward_cartesian(color);
+  forward(color);
 
   return;
 }

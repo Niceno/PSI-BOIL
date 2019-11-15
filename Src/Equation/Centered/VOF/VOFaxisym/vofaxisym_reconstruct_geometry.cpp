@@ -35,7 +35,8 @@ void VOFaxisym::reconstruct_geometry(const Scalar & scp) {
   /* iteration procedure */
   do {
     backward_axisymmetric(phi,nalpha);
-    forward_cartesian(axistmp);
+    //forward_cartesian(axistmp);
+    forward(axistmp);
     /* color to vf contains calculations of normal vector and update at walls */
     color_to_vf(axistmp,axistmp2,true,true);
     /* calculate Linf error norm of reconstruction in phi-space */

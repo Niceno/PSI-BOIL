@@ -8,7 +8,9 @@
 #include <fstream>
 #include <iostream>
 #include <fenv.h>
+#define INVERTED
 #define _GNU_SOURCE 1
+//#define MOVING_FRAME
 #if 1
 static void __attribute__ ((constructor)) trapfpe(void)
 {
@@ -38,11 +40,18 @@ int main(int argc, char * argv[]) {
   const int gLevel = atoi(argv[3]);
   boil::oout<<"gLevel= "<<gLevel<<"\n";
 
+  real wvel = atof(argv[4]);
+  boil::oout<<"wvel= "<<wvel<<"\n";
+
   const real radius = .5*diameter;
-  const int NcellsPerRadius = 10*gLevel;
-  const int NXmult = 20;
+  const int NcellsPerRadius = 11*gLevel;
+  const int NXmult = 10;
   const int NX = NXmult*NcellsPerRadius;
-  const int NZ = 32*NcellsPerRadius;
+#ifdef MOVING_FRAME
+  const int NZ = 20*NcellsPerRadius;
+#else
+  const int NZ = 40*NcellsPerRadius;
+#endif
 
   const real LX = real(NXmult)*radius;
   const real DX = LX/real(NX);
@@ -59,7 +68,16 @@ int main(int argc, char * argv[]) {
   const real mug = 18.5e-6;
 
   const real xcent = 0.0;
-  const real zcent = diameter;
+  const real zcent = 0.0;
+
+  const real whadryb = 2.*(rhol-rhog)*gravity*radius*radius/3./mul*(mul+mug)/(2.*mul+3.*mug);
+  const real Rehadryb = whadryb*rhol*diameter/mul;
+  boil::oout<<"Hadamard-Rybczynski= "<<whadryb<<" "<<Rehadryb<<boil::endl;
+
+  const real dtmult = 1.;
+  const real underrelax = 5e-3;
+  const int ndt = 400000*gLevel;
+  boil::oout<<"tparams= "<<dtmult<<" "<<ndt<<" "<<underrelax<<boil::endl;
 
   /*--------------------------------+
   |  choose the output file format  |
@@ -71,8 +89,13 @@ int main(int argc, char * argv[]) {
   +----------*/
   Grid1D gx( Range<real>(0.0,LX), NX, Periodic::no(),
              BndGrid::symmetry(), BndGrid::wall() );
-  Grid1D gz( Range<real>(0.0,LZ), NZ, Periodic::no(),
+#ifdef MOVING_FRAME
+  Grid1D gz( Range<real>(-LZ/2.,LZ/2.), NZ, Periodic::no(),
              BndGrid::wall(), BndGrid::wall() );
+#else
+  Grid1D gz( Range<real>(-2.*diameter,LZ-2.*diameter), NZ, Periodic::no(),
+             BndGrid::wall(), BndGrid::wall() );
+#endif
 
   /*---------+
   |  domain  |
@@ -106,40 +129,64 @@ int main(int argc, char * argv[]) {
   +-----------------------------*/
   for_m(m) {
     uvw.bc(m).add( BndCnd( Dir::imin(), BndType::symmetry() ) );
-    uvw.bc(m).add( BndCnd( Dir::imax(), BndType::wall() ) );
+    uvw.bc(m).add( BndCnd( Dir::imax(), BndType::outlet() ) );
+#ifdef MOVING_FRAME
+    uvw.bc(m).add( BndCnd( Dir::kmin(), BndType::outlet() ) );
+    uvw.bc(m).add( BndCnd( Dir::kmax(), BndType::inlet(), 0., 0., -wvel ) );
+#else
     uvw.bc(m).add( BndCnd( Dir::kmin(), BndType::wall() ) );
     uvw.bc(m).add( BndCnd( Dir::kmax(), BndType::outlet() ) );
+#endif
     uvw.bc(m).add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
     uvw.bc(m).add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
   }
 
+  p.bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
+  p.bc().add( BndCnd( Dir::imax(), BndType::outlet() ) );
+  p.bc().add( BndCnd( Dir::kmin(), BndType::outlet() ) );
+  p.bc().add( BndCnd( Dir::kmax(), BndType::neumann() ) );
+  p.bc().add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
+  p.bc().add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
+
   c.bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
-  c.bc().add( BndCnd( Dir::imax(), BndType::wall() ) );
+  c.bc().add( BndCnd( Dir::imax(), BndType::outlet() ) );
+#ifdef MOVING_FRAME
+  c.bc().add( BndCnd( Dir::kmin(), BndType::outlet() ) );
+  #ifndef INVERTED
+  c.bc().add( BndCnd( Dir::kmax(), BndType::dirichlet(),1.0 ) );
+  #else
+  c.bc().add( BndCnd( Dir::kmax(), BndType::dirichlet(),0.0 ) );
+  #endif
+#else
   c.bc().add( BndCnd( Dir::kmin(), BndType::wall() ) );
   c.bc().add( BndCnd( Dir::kmax(), BndType::outlet() ) );
+#endif
   c.bc().add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
   c.bc().add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
 
-  g=c.shape();
-  press=c.shape();
-  p=c.shape();
-  kappa=c.shape();
+  g=p.shape();
+  press=p.shape();
+  p=p.shape();
+  kappa=p.shape();
   cold=c.shape();
 
+#ifndef INVERTED
   Matter mixed(liquid, air, & c);
+#else
+  Matter mixed(air, liquid, & c);
+#endif
   mixed.sigma(sigma);
 
   /*------------+
   |  time step  |
   +------------*/
   const real dxmin = d.dxyz_min();
-  const real dt  = 10.0 * pow(air.rho()->value()*pow(dxmin,3.0)
+  const real dt  = dtmult * pow(air.rho()->value()*pow(dxmin,3.0)
                         /(2.0*3.1415*mixed.sigma()->value()),0.5);
   boil::oout<<"dt= "<<dt<<"\n";
-  const int ndt = 100000*gLevel;
   Times time(ndt, dt);
-  const real tint = 0.1;
-  const int nint= 24000;
+  const real tint = 5000*dt*gLevel;
+  const int nint= 25000*gLevel;
   const real cfl_limit=0.25;
 
   /*-----------------+
@@ -149,7 +196,8 @@ int main(int argc, char * argv[]) {
   Pressure pr(p, f, uvw, time, solver, &mixed);
   AC multigrid( &pr );
 
-  multigrid.min_cycles(6);  // 6
+  multigrid.min_cycles(5);  
+  multigrid.max_cycles(10);
   multigrid.stop_if_diverging(true);
 
   VOFaxisym conc(c, g, kappa, uvw, time, solver);
@@ -207,8 +255,10 @@ int main(int argc, char * argv[]) {
     +--------------------*/
 
     setup_circle_xz(cold,radius,xcent,zcent);
+#ifndef INVERTED
     for_avijk(cold,i,j,k)
       cold[i][j][k] = 1. - cold[i][j][k];
+#endif
 
     cold.bnd_update();
     cold.exchange_all();
@@ -216,6 +266,11 @@ int main(int argc, char * argv[]) {
     conc.color_to_vf(cold,c);
     conc.reconstruct_geometry();
     conc.totalvol();
+
+    Comp mm = Comp::w();
+    for_vmijk(uvw,mm,i,j,k) 
+      uvw[mm][i][j][k] = 0.0; 
+    uvw.exchange_all();
 
     boil::plot->plot(uvw,c,press,kappa, "uvw-c-press-kappa",0);
     conc.front_minmax();
@@ -232,14 +287,46 @@ int main(int argc, char * argv[]) {
 
   for(time.start(); time.end(); time.increase()) {
 
+    /* calculate bubble velocity */
+    real vol(0.), wv(0.);
+    Comp m = Comp::w();
+    for_vijk(c,i,j,k) {
+#ifndef INVERTED
+      real vf = 1.-c[i][j][k];
+#else
+      real vf = c[i][j][k];
+#endif
+      vf *= cold.dV(i,j,k);
+      vol += vf;
+      wv += vf*0.5*(uvw[m][i][j][k+1]+uvw[m][i][j][k]);
+    }
+    boil::cart.sum_real(&vol);
+    boil::cart.sum_real(&wv);
+    wv /= vol;
+
+    boil::oout <<"Relative-vel= "<<time.current_time()<<" "<< wv << " "<< wvel<< boil::endl;
+#ifdef MOVING_FRAME
+    wvel += underrelax*wv;
+    for_m(m) {
+      uvw.bc(m).modify( BndCnd( Dir::kmax(), BndType::inlet(), 0., 0., -wvel ) );
+    }
+    for_vmijk(uvw,m,i,j,k)
+      uvw[m][i][j][k] -= underrelax*wv; 
+    uvw.exchange_all();
+#endif
+
     /* body force */
     for_m(m)
       for_avmijk(xyz,m,i,j,k)
         xyz[m][i][j][k]=0.0;
  
-    Comp m = Comp::w();
     for_vmijk(xyz,m,i,j,k) {
+      /* gravity */
       xyz[m][i][j][k] = -gravity*xyz.dV(m,i,j,k)*mixed.rho(m,i,j,k);
+      /* non-inertial forces */
+#ifdef MOVING_FRAME
+      xyz[m][i][j][k] += underrelax*wv*xyz.dV(m,i,j,k)*mixed.rho(m,i,j,k)*time.dti();
+#endif
     }
     xyz.exchange();
 
@@ -261,29 +348,27 @@ int main(int argc, char * argv[]) {
     press += p;    // p_n+1 = p_n + dp
     press.exchange();
 
+#if 1
     /* advance */
-    conc.new_time_step();
     conc.advance();
     conc.totalvol();
     conc.front_minmax();
-
-    real vol(0.), wvel(0.);
-    for_vijk(c,i,j,k) {
-      real vf = (1.-c[i][j][k])*cold.dV(i,j,k);
-      vol += vf;
-      wvel += vf*0.5*(uvw[m][i][j][k+1]+uvw[m][i][j][k]);
-    }
-    boil::cart.sum_real(&vol);
-    boil::cart.sum_real(&wvel);
-    wvel /= vol;
-    real Re = wvel*diameter/mul;
-    boil::oout<<"wvel= "<<time.current_time()<<" "<<wvel<<" "<<Re<<boil::endl; 
+#endif
+#ifdef MOVING_FRAME
+    real Re = wvel*rhol*diameter/mul;
+    boil::oout<<"wvel= "<<time.current_time()<<" "<<wvel<<" "<<Re<<" "<<wvel/whadryb<<boil::endl; 
+#else
+    real Re = wv*rhol*diameter/mul;
+    boil::oout<<"wvel= "<<time.current_time()<<" "<<wv<<" "<<Re<<" "<<wv/whadryb<<boil::endl; 
+#endif
 
     /* dt control */
     time.control_dt(ns.cfl_max(), cfl_limit, dt);
 
     if((time.current_time()) / (tint) >= real(iint) ) {
+    //if(true) {
       iint = int(time.current_time() / tint);
+      //iint++;
       boil::plot->plot(uvw,c,press,kappa, "uvw-c-press-kappa",iint);
 
       // subtract gravity just for visualization

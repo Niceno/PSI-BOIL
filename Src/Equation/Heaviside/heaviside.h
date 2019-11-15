@@ -36,7 +36,7 @@ class Heaviside {
       {  return mc.area(p1,p2,p3,p4,p5,p6,p7,p8,
             i, j, k); }
 #endif
-    const real operator() (const int i, const int j, const int k) {
+    real operator() (const int i, const int j, const int k) const {
       return (*phi)[i][j][k];
     }
 

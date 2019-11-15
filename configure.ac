@@ -9,6 +9,7 @@ AC_PROG_CXX
 AC_PROG_INSTALL
 AC_PROG_RANLIB
 AC_OUTPUT(Makefile                                     \
+          Src/Custom/Makefile                          \
           Src/Domain/Makefile                          \
           Src/Domain/Axisymmetric/Makefile             \
           Src/Global/Makefile                          \

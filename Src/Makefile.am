@@ -32,6 +32,7 @@ SUBDIRS = Equation/Staggered/Momentum      \
           Plot                             \
           Plot/TEC                         \
           Plot/VTK                         \
+          Custom                           \
           Domain                           \
           Domain/Axisymmetric              \
           Body                             \
@@ -82,6 +83,7 @@ LDADD = Equation/Staggered/Momentum/libMomentum.a            \
         Plot/libPlot.a                                       \
         Plot/TEC/libPlotTEC.a                                \
         Plot/VTK/libPlotVTK.a                                \
+        Custom/libCustom.a                                   \
         Domain/libDomain.a                                   \
         Domain/Axisymmetric/libAxisymmetric.a                \
         Body/libBody.a                                       \

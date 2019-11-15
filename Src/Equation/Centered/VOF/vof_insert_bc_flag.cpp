@@ -58,7 +58,7 @@ void VOF::insert_bc_flag(ScalarInt & val, const bool adj) {
         for(int j=jst; j<=jed; j++){
         for(int k=kst; k<=ked; k++){
           val[i][j][k]=val[i+iof][j+jof][k+kof];
-          //do not use extrapolation. it causes trouble in bdcurv!
+          //do not use extrapolation. it causes trouble in bdcurv_divnorm!
         } } }
 
       }

@@ -1,7 +1,7 @@
 #include "vof.h"
 
 /******************************************************************************/
-void VOF::normal_vector_near_bnd(const Scalar & val) {
+void VOF::normal_vector_near_bnd(const Scalar & val,const NormMethod & nm) {
 /***************************************************************************//**
 *  \brief normal vector for cells adjacent to a wall or an immersed boundary
 *         obtained using extrapolated volume fractions
@@ -14,17 +14,17 @@ void VOF::normal_vector_near_bnd(const Scalar & val) {
                            const int, const int, const int,
                            const Scalar &);
 #if 1
-  if       (norm_method_advance==NormMethod::Mixed()) {
+  if       (nm==NormMethod::Mixed()) {
     norm_kernel = &VOF::norm_mixed_kernel;
-  } else if(norm_method_advance==NormMethod::Young()) {
+  } else if(nm==NormMethod::Young()) {
     norm_kernel = &VOF::norm_young_kernel;
-  } else if(norm_method_advance==NormMethod::CC()) {
+  } else if(nm==NormMethod::CC()) {
     norm_kernel = &VOF::norm_cc_kernel;
-  } else if(norm_method_advance==NormMethod::ElviraXZ()) {
+  } else if(nm==NormMethod::ElviraXZ()) {
     norm_kernel = &VOF::norm_elvira_kernel;
-  } else if(norm_method_advance==NormMethod::ElviraXY()) {
+  } else if(nm==NormMethod::ElviraXY()) {
     norm_kernel = &VOF::norm_elvira_kernel;
-  } else if(norm_method_advance==NormMethod::ElviraYZ()) {
+  } else if(nm==NormMethod::ElviraYZ()) {
     norm_kernel = &VOF::norm_elvira_kernel;
   } else {
     /* default */

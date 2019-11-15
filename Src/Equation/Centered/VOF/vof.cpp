@@ -31,7 +31,8 @@ VOF::VOF(const Scalar & PHI,
   topo(&mx,&my,&mz,&adens,&fs),
   norm_method_advance(NormMethod::Mixed()),
   norm_method_curvature(NormMethod::Young()),
-  mcomp_for_elvira(Comp::undefined()) /* undefined for 3D */
+  mcomp_for_elvira(Comp::undefined()), /* undefined for 3D */
+  wall_curv_method(WallCurvMethod::DivNorm())
 
 /*------------------------------------------------------+
 |  this constructor is called only at the finest level  |
@@ -92,10 +93,10 @@ VOF::VOF(const Scalar & PHI,
   tol_wall = 0.01; /* tolerance 0.99 \approx 1.0 near walls */
   curv_method = 0;
   cangle=90.0/180.0*boil::pi;
+  mult_wall = 1.;
   limit_color=false;
   use_subgrid=false;
   use_interp=false;
-  use_HF_wall=true;
 
   discretize();
 

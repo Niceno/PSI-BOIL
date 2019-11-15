@@ -12,51 +12,10 @@
 
 using arr3D = std::vector< std::vector< std::vector<real> > >;
 
-////////////////////////////
-//                        //
-//  Normal vector method  //
-//                        //
-////////////////////////////
-/* this is a ravioli class for normal vector method selection */
-class NormMethod {
-  public:
-    NormMethod() {val=-1;}
-
-    static const NormMethod undefined() {return NormMethod(-1);}
-    static const NormMethod Young()     {return NormMethod( 1);}
-    static const NormMethod Mixed()     {return NormMethod( 2);}
-    static const NormMethod CC()        {return NormMethod( 3);}
-    static const NormMethod ElviraXZ()  {return NormMethod( 4);}
-    static const NormMethod ElviraXY()  {return NormMethod( 5);}
-    static const NormMethod ElviraYZ()  {return NormMethod( 6);}
-
-    //! Prints the components name.
-    friend std::ostream & operator << (std::ostream & ost, const NormMethod & com) {
-      switch(com.val) {
-        case(-1): ost << "undefined"; break;
-        case( 1): ost << "Young"; break;
-        case( 2): ost << "Mixed"; break;
-        case( 3): ost << "CC"; break;
-        case( 4): ost << "ElviraXZ"; break;
-        case( 5): ost << "ElviraXY"; break;
-        case( 6): ost << "ElviraYZ"; break;
-      }
-
-      return ost;
-    }
-
-    bool operator == (const NormMethod & o) const {return val == o.val;}
-    bool operator != (const NormMethod & o) const {return val != o.val;}
-
-  private:
-    int val;
-
-    /* avoid implicit conversions of integer to Comp */
-    explicit NormMethod(const int m) {val = m;}
-};
+#include "vof_ravioli.h"
 
 ///////////
-///       //
+///      //
 //  VOF  //
 //       //
 ///////////
@@ -72,6 +31,7 @@ class VOF : public Centered {
     ~VOF();
 
     void new_time_step(){};
+    void forward(Scalar & scp);
     virtual void advance(const bool anci = true);
     virtual void advance(Scalar & sca, const bool anci = true);
     void curvature();
@@ -150,17 +110,6 @@ class VOF : public Centered {
     /* getter for use_interp */
     bool get_use_interp() { return(use_interp);};
 
-    /* setter for use_HF_wall */
-    bool set_use_HF_wall(const bool b) {
-      use_HF_wall=b;
-      if (use_HF_wall) {
-        boil::oout<<"VOF: Height function is used for wall adhesion force.\n";
-      }
-      return b;
-    }
-    /* getter for use_subgrid */
-    bool get_use_HF_wall() { return(use_HF_wall);};
-
     /* min and max of color function in fluid domain */
     real minval() {return minclr;}
     real maxval() {return maxclr;}
@@ -218,6 +167,35 @@ class VOF : public Centered {
       return norm_method_curvature;
     }
 
+    /* setter for near-wall curvature method */
+    void set_wall_curv_method(const WallCurvMethod wcm,
+                              const Sign sig = Sign::undefined(),
+                              const real cangle = -1.) {
+      wall_curv_method = wcm;
+      boil::oout<<"Wall curvature method: "<<wcm<<boil::endl;
+      if(wcm==WallCurvMethod::HFmixedXZ()) {
+        if       (sig==Sign::pos()) {
+          mult_wall =  1;
+        } else if(sig==Sign::neg()) {
+          mult_wall = -1;
+        } else {
+          boil::oout<<"Phase at the origin must be specified! "
+                    <<"Sign-neg: phi(orig)<0.5 and vice versa. "
+                    <<"Exiting."
+                    <<boil::endl;
+          exit(0);
+        }
+
+        if(cangle>0.) {
+          detachment_model.set_detachment_params(cangle);
+        }
+      }
+      return;
+    }
+
+    /* getter for near-wall curvature method */
+    WallCurvMethod get_wall_curv_method() { return wall_curv_method;};
+
     Vector fs;
     Vector * bndclr;
     Topology  topo;
@@ -226,14 +204,26 @@ class VOF : public Centered {
     Scalar nx,ny,nz;/* normal to interface */
     Scalar adens;
     Scalar mx,my,mz;/* normal to interface, in real space */
-
-    //void forward(Scalar & scp); /* undefined reference? */
   protected:
     virtual void ancillary(Scalar & scp);
     virtual void advance_x(Scalar & sca);
     virtual void advance_y(Scalar & sca);
     virtual void advance_z(Scalar & sca);
-    void bdcurv();
+
+    void insert_bc_curv_divnorm();
+    void insert_bc_curv_HFmixed(const Scalar & scp,
+                                const Comp ctangential, const Comp cnormal,
+                                const Sign sig);
+    virtual real wall_curv_HFmixed_kernel(const real hc, const real hp,
+                                          const real dc, const real dp,
+                                          const real mult,
+                                          const real cang);
+    virtual real wall_curv_HFmixed_kernel(const real hm, const real hc, const real hp,
+                                          const real dm, const real dc, const real dp,
+                                          const real mult);
+    
+    void flood(Scalar & scp,const real mult);
+
     void cal_fs3(const Scalar & scp);
     void cal_fs_interp(const Scalar & scp);
     void curv_smooth();
@@ -295,7 +285,7 @@ class VOF : public Centered {
                            const Scalar & sca);
   
     void bdnorm(Scalar & scp);
-    void normal_vector_near_bnd(const Scalar & g);
+    void normal_vector_near_bnd(const Scalar & g, const NormMethod & nm);
 
     void normalize(real & r1, real & r2, real & r3);
     void normalize_l1(real & nx_l1, real & ny_l1, real & nz_l1,
@@ -399,16 +389,19 @@ class VOF : public Centered {
     bool iminw, imaxw, jminw, jmaxw, kminw, kmaxw; // true = wall
     bool iminc, imaxc, jminc, jmaxc, kminc, kmaxc; // true = cut-stencil
     bool ifull, jfull, kfull; // true = not a dummy direction
-    bool limit_color, use_subgrid, use_interp, use_HF_wall;
+    bool limit_color, use_subgrid, use_interp;
     real minclr, maxclr;
 
     Heaviside heavi;
     NormMethod norm_method_advance, norm_method_curvature;
     Comp mcomp_for_elvira;
+    DetachmentModel detachment_model;
+    WallCurvMethod wall_curv_method;
 
     int nlayer;
     int curv_method;
     real cangle;
+    real mult_wall;
 
     inline real signum(const real a, const real b) { return a*((b>0.)-(b<0.)); }
 };	

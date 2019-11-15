@@ -23,6 +23,8 @@ void VOF::curv_HF() {
 *     modification: selection of cells where curvature is calculated is 
 *                   modified from Lopez et al.
 *
+*     in this method, normal vector and bnd values of color are destroyed!
+*
 *     output: kappa
 *******************************************************************************/
 
@@ -56,6 +58,15 @@ void VOF::curv_HF() {
     norm(phi,norm_method_curvature,false); /* alpha is not extracted */
   }
 
+  /* detachment treatment = flooding of walls */
+  if(detachment_model.initialized()&&detachment_model.detached()) {
+    /* this is the only implemented instance atm */
+    assert(wall_curv_method==WallCurvMethod::HFmixedXZ());
+
+    flood(phi,-mult_wall);
+    normal_vector_near_bnd(phi,norm_method_curvature);
+  }
+
   /* nx, ny, nz themselves are changed */
   /* mx, my, mz remain unchanged */
   true_norm_vect(nx,ny,nz,nx,ny,nz);
@@ -64,6 +75,7 @@ void VOF::curv_HF() {
   iflag=0;
   for_ijk(i,j,k) {
     if(dom->ibody().on(i,j,k)) {
+#if 0 /* no longer necessary! */
       /* exclude near-wall cells: treated specially */
       if(   (i==si() && iminw) || (i==ei() && imaxw)
          || (j==sj() && jminw) || (j==ej() && jmaxw)
@@ -71,15 +83,22 @@ void VOF::curv_HF() {
          || dom->ibody().off(i-1,j,k) || dom->ibody().off(i+1,j,k)
          || dom->ibody().off(i,j-1,k) || dom->ibody().off(i,j+1,k)
          || dom->ibody().off(i,j,k-1) || dom->ibody().off(i,j,k+1)
+         || (i==si()+1 && iminw) || (i==ei()-1 && imaxw)
+         || (j==sj()+1 && jminw) || (j==ej()-1 && jmaxw)
+         || (k==sk()+1 && kminw) || (k==ek()-1 && kmaxw)
+         || dom->ibody().off(i-2,j,k) || dom->ibody().off(i+2,j,k)
+         || dom->ibody().off(i,j-2,k) || dom->ibody().off(i,j+2,k)
+         || dom->ibody().off(i,j,k-2) || dom->ibody().off(i,j,k+2)
         ) {
       } else {
+#endif
         if((phi[i-1][j][k]-phisurf)*(phi[i][j][k]-phisurf)<=0.0){ iflag[i][j][k]=1;}
         if((phi[i+1][j][k]-phisurf)*(phi[i][j][k]-phisurf)<=0.0){ iflag[i][j][k]=1;}
         if((phi[i][j-1][k]-phisurf)*(phi[i][j][k]-phisurf)<=0.0){ iflag[i][j][k]=1;}
         if((phi[i][j+1][k]-phisurf)*(phi[i][j][k]-phisurf)<=0.0){ iflag[i][j][k]=1;}
         if((phi[i][j][k-1]-phisurf)*(phi[i][j][k]-phisurf)<=0.0){ iflag[i][j][k]=1;}
         if((phi[i][j][k+1]-phisurf)*(phi[i][j][k]-phisurf)<=0.0){ iflag[i][j][k]=1;}
-      }
+      //}
     }
   }
   iflag.bnd_update_symmetry(); /* copy on symmetry plane */
@@ -291,11 +310,17 @@ void VOF::curv_HF() {
   iflag.exchange();
 
   /* near-wall calculations */
-  if(!use_HF_wall) {
-    bdcurv();
+  if       (wall_curv_method==WallCurvMethod::DivNorm()) {
+    insert_bc_curv_divnorm();
+  } else if(wall_curv_method==WallCurvMethod::HFmixedXZ()) {
+    insert_bc_curv_HFmixed(phi,Comp::i(),Comp::k(),Sign::neg());
   } else {
-
+    /* default */
+    boil::oout<<"VOF::curvHF: Wall curvature calculation method not set properly!"
+              <<" Exiting."<<boil::endl;
+    exit(0);
   }
+
 
   /* extrapolate kappa */
   stmp  = kappa;

@@ -15,7 +15,7 @@ void VOF::bdnorm(Scalar & scp) {
     update_at_walls(scp);
    
     /* calculate new normal vector near walls */
-    normal_vector_near_bnd(scp);
+    normal_vector_near_bnd(scp,norm_method_advance);
 
     /* calculate alpha in cells */
     //extract_alpha(scp);

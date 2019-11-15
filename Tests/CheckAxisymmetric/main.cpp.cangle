@@ -1,0 +1,457 @@
+#include "Include/psi-boil.h"
+#include "setup_circle.cpp"
+#include "test_reconstruction.cpp"
+#include "droplet_parameters.cpp"
+#include <fstream>
+#include <iostream>
+#include <fenv.h>
+#define SYM
+//#define USE_CARTESIAN
+#define _GNU_SOURCE 1
+#if 1
+static void __attribute__ ((constructor)) trapfpe(void)
+{
+  /* Enable some exceptions. At startup all exceptions are masked. */
+  feenableexcept(FE_INVALID|FE_DIVBYZERO|FE_OVERFLOW);
+}
+#endif
+
+
+/******************************************************************************/
+int main(int argc, char * argv[]) {
+
+  boil::timer.start();
+
+  if(argc<=9){
+    boil::oout<<"Nine command line arguments required!"<<"\n";
+    boil::oout<<"./Boil wmin La rhorat murat gridlevel cangle dt-mult inverted msimple"<<boil::endl;
+    exit(0);
+  }
+
+  const int wmin=atoi(argv[1]);
+  boil::oout<<"wmin= "<<wmin<<"\n";
+
+  const real La = atof(argv[2]);
+  boil::oout<<"La= "<<La<<"\n";
+
+  const real rhorat = atof(argv[3]);
+  boil::oout<<"rhorat= "<<rhorat<<boil::endl;
+
+  const real murat = atof(argv[4]);
+  boil::oout<<"murat= "<<murat<<boil::endl;
+
+  const int gLevel = atoi(argv[5]);
+  boil::oout<<"gLevel= "<<gLevel<<"\n";
+
+  real cangle = atof(argv[6]);
+  boil::oout<<"cangle= "<<cangle<<"\n";
+
+  const real dtmult = atof(argv[7]);
+  boil::oout<<"dtmult= "<<dtmult<<"\n";
+
+  const bool inverted = atoi(argv[8]);
+  boil::oout<<"inverted= "<<inverted<<"\n";
+
+  const int mSimple = atoi(argv[9]);
+  boil::oout<<"mSimple= "<<mSimple<<"\n";
+
+  const real R0 = 1.;
+  real radius, zcent, chord;
+  const real xcent = 0.0;
+
+#ifdef USE_CARTESIAN
+  droplet_parameters_2D(cangle,boil::pi*R0*R0,radius,zcent,chord);
+#else
+  droplet_parameters_3D(cangle,4./3.*boil::pi*R0*R0*R0,radius,zcent,chord);
+#endif
+  boil::oout<<"dropparams= "<<radius<<" "<<zcent<<" "<<chord<<boil::endl;
+
+  /* computed parameters */
+#ifdef SYM
+  const int xmult = 1;
+#else
+  const int xmult = 2;
+#endif
+  const int NcellsPerRadius = 16*gLevel;
+  const int NXmult = 2;
+  const int NZmult = 2;
+  
+  /* domain dimensions (given by problem) */
+  const real DZ = radius/real(NcellsPerRadius);
+  real LZ = real(NZmult)*(zcent+radius);
+  const int NZ = int(LZ/DZ);
+  LZ = real(NZ)*DZ;
+  real LX = real(NXmult) * ( (zcent>0) ? radius : 0.5*chord );
+  const int NX = int(xmult*LX/DZ);
+  LX = real(NX)*DZ/real(xmult);
+  const int NY = 1;
+
+
+  /*--------------------------------+
+  |  choose the output file format  |
+  +--------------------------------*/
+  boil::plot = new PlotTEC();
+
+  /*----------+
+  |  grid(s)  |
+  +----------*/
+#ifdef SYM
+  Grid1D gx( Range<real>(0.0,LX), NX, Periodic::no(),
+             BndGrid::symmetry(), BndGrid::wall() );
+#else
+  Grid1D gx( Range<real>(-LX,LX), NX, Periodic::no() );
+#endif
+  Grid1D gz( Range<real>(0.0,LZ), NZ, Periodic::no() );
+  /*---------+
+  |  domain  |
+  +---------*/
+#ifdef USE_CARTESIAN
+  Grid1D gy(DZ);
+  Domain d(gx,gy,gz);
+#else
+  Axisymmetric d(gx,gz,DZ);
+#endif
+
+  /*------------------+
+  |  define unknowns  |
+  +------------------*/
+  Vector uvw(d), uvw_old(d); // vel
+  Vector xyz(d); // body force
+  Scalar c  (d), g  (d), kappa(d), cold(d),ctest(d); // concentration
+  Scalar press  (d), p(d), f  (d);
+
+  /*-----------------------------+ 
+  |  insert boundary conditions  |
+  +-----------------------------*/
+  for_m(m) {
+#ifdef SYM
+    uvw.bc(m).add( BndCnd( Dir::imin(), BndType::symmetry() ) );
+    uvw.bc(m).add( BndCnd( Dir::imax(), BndType::outlet() ) );
+#else
+    uvw.bc(m).add( BndCnd( Dir::imin(), BndType::outlet() ) );
+    uvw.bc(m).add( BndCnd( Dir::imax(), BndType::outlet() ) );
+#endif
+    uvw.bc(m).add( BndCnd( Dir::kmin(), BndType::wall() ) );
+    uvw.bc(m).add( BndCnd( Dir::kmax(), BndType::outlet() ) );
+    uvw.bc(m).add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
+    uvw.bc(m).add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
+    uvw_old(m)=uvw(m).shape();
+  }
+
+#ifdef SYM
+  c.bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
+  c.bc().add( BndCnd( Dir::imax(), BndType::outlet() ) );
+#else
+  c.bc().add( BndCnd( Dir::imin(), BndType::outlet() ) );
+  c.bc().add( BndCnd( Dir::imax(), BndType::outlet() ) );
+#endif
+  c.bc().add( BndCnd( Dir::kmin(), BndType::wall() ) );
+  c.bc().add( BndCnd( Dir::kmax(), BndType::outlet() ) );
+  c.bc().add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
+  c.bc().add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
+
+  press=c.shape();
+  p=c.shape();
+  kappa=c.shape();
+  cold=c.shape();
+  ctest=c.shape();
+
+  Matter air(d), water(d);
+  air  .mu    (1.0000e-5);
+  air  .rho   (1.0000e+0);
+  water.mu    (air.mu()->value()*murat);
+  water.rho   (air.rho()->value()*rhorat);
+
+  const real rhoinside = inverted ? air.rho()->value() : water.rho()->value();
+  const real muinside = inverted ? air.mu()->value() : water.mu()->value();
+
+  const real tmu = rhoinside/muinside*radius*radius*4.;
+  boil::oout<<"tmu.scale= "<<tmu<<boil::endl;
+
+  const real sig = muinside*muinside/rhoinside*La/(2.*radius);
+  boil::oout<<"sigma= "<<sig<<boil::endl;
+
+  Matter mixed(water, air, &c);
+  mixed.sigma(sig);
+
+  const real usig = sqrt(mixed.sigma()->value()/(2.*radius*rhoinside));
+  boil::oout<<"vel.scale= "<<usig<<boil::endl;
+
+  const real tsig = sqrt(rhoinside*pow(2.*radius,3.)/mixed.sigma()->value());
+  boil::oout<<"tsig.scale= "<<tsig<<boil::endl;
+
+  /*-------------------+
+  |  time-integration  |
+  +-------------------*/
+  real dxmin = d.dxyz_min();
+  const real dt = dtmult * pow(std::min(air.rho()->value(),water.rho()->value())*pow(dxmin,3.0)
+                           /(2.0*3.1415*mixed.sigma()->value()),0.5);
+  const real tend = std::max(tsig,tmu);
+  const int ndt = tend/dt;
+  const int nint = ndt/10;
+  boil::oout<<"times= "<<dt<<" "<<tend<<" "<<ndt<<boil::endl;
+  Times time(ndt, dt); 
+	
+  /*--------------------+
+  |  initial condition  |
+  +--------------------*/
+  for_m(m)
+    for_avmijk(uvw,m,i,j,k)
+      uvw[m][i][j][k]=0.0;
+
+  cold = 0.0;
+
+  setup_circle_xz(cold,radius,xcent,zcent);
+  if(inverted) {
+    for_avijk(cold,i,j,k)
+      cold[i][j][k] = 1. - cold[i][j][k];
+    cangle = 180.-cangle;
+  }
+
+  cold.bnd_update();
+  cold.exchange_all();
+
+  /*----------------+
+  |  linear solver  |
+  +----------------*/
+  Krylov * solver = new CG(d, Prec::ic2());
+  //Krylov * solver = new CG(d, Prec::di());
+  Momentum ns( uvw, xyz, time, solver, &mixed);
+  ns.convection_set(TimeScheme::backward_euler()); //ns.convection is mandatory
+  ns.diffusion_set(TimeScheme::backward_euler());
+  Pressure pr(p, f, uvw, time, solver, &mixed);
+
+  AC multigrid( &pr );
+  if(mSimple>1) {
+    multigrid.min_cycles(4);  // 4
+    multigrid.max_cycles(8); // 8
+  } else {
+    multigrid.min_cycles(6);  // 6
+  }
+  multigrid.stop_if_diverging(true);
+
+#ifdef USE_CARTESIAN
+  VOF conc(c, g, kappa, uvw, time, solver);
+#else
+  VOFaxisym conc(c, g, kappa, uvw, time, solver);
+#endif
+
+#ifdef USE_CARTESIAN
+  for_avijk(cold,i,j,k) {
+    c[i][j][k] = cold[i][j][k];
+    ctest[i][j][k] = cold[i][j][k];
+  }
+#else
+  conc.color_to_vf(cold,c);
+  conc.color_to_vf(cold,ctest);
+  conc.reconstruct_geometry();
+  conc.test_reconstruction(conc.color(),c);
+#endif
+  conc.totalvol();
+
+  conc.set_curv_method(0);  // height function
+  conc.set_cangle(cangle);
+  conc.set_normal_vector_method_all(NormMethod::ElviraXZ());
+  if(!inverted)
+    conc.set_wall_curv_method(WallCurvMethod::HFmixedXZ(),Sign::pos());
+  else
+    conc.set_wall_curv_method(WallCurvMethod::HFmixedXZ(),Sign::neg());
+
+  conc.ancillary();
+  conc.curvature();
+
+  boil::plot->plot(uvw,c,press,kappa, "uvw-c-press-kappa", 0);
+
+  /* curvature */
+  int cnt(0);
+  real kap(0.);
+  for_vijk(c,i,j,k) {
+    if(boil::realistic(kappa[i][j][k])&&k==c.sk()) {
+      cnt++;
+      kap += kappa[i][j][k];
+    }
+  }
+  boil::cart.sum_real(&kap);
+  boil::cart.sum_int(&cnt);
+  if(cnt>0)
+    kap /= real(cnt);
+  real radref = radius;
+  if(inverted) radref = -radius;
+  boil::oout<<"CL-kappaerr= "<<cangle<<" "<<gLevel<<" "<<kap<<" "
+#ifdef USE_CARTESIAN
+                             <<1./radref<<" "<<kap*radref/1.-1.
+#else
+                             <<2./radref<<" "<<kap*radref/2.-1.
+#endif
+                             <<boil::endl;
+
+  std::vector<real> nl1, nli, kl1, kli;
+  NormMethod nmv = NormMethod::ElviraXZ();
+#ifdef USE_CARTESIAN
+  test_reconstruction_circle_xz(conc,c,ctest,
+                                kappa,inverted,radius,
+                                xcent,zcent,
+                                nmv,
+                                nl1,
+                                nli,
+                                kl1,
+                                kli);
+#else
+  test_reconstruction_sphere(false,
+                             conc,c,ctest,
+                             kappa,inverted,radius,
+                             xcent,0.0,zcent,
+                             nmv,
+                             nl1,
+                             nli,
+                             kl1,
+                             kli);
+#endif
+
+
+#if 1
+  for(time.start(); time.end(); time.increase()) {
+
+    // store velocity
+    for_m(m)
+      uvw_old(m) = uvw(m);
+    // store color function
+    cold = c;
+
+    /* inner loop */
+    for(int mloop=0; mloop<mSimple; mloop++) {
+
+      //reset body force
+      for_m(m)
+        for_avmijk(xyz,m,i,j,k)
+          xyz[m][i][j][k]=0.0;
+
+      /* surface tension */
+#ifdef USE_CARTESIAN
+      conc.tension(&xyz, mixed);
+#else
+      conc.tension(&xyz, mixed,conc.color());
+      //conc.tension(&xyz, mixed);
+#endif
+
+      /* essential for moving front */
+      ns.discretize();
+      pr.discretize();
+      pr.coarsen();
+
+      /* momentum */
+      ns.new_time_step(uvw_old);
+      ns.convection();
+      ns.grad(press);
+      ns.solve(ResRat(1e-8));
+
+      p=0.0;
+      if (multigrid.vcycle(ResRat(1e-6))) OMS(converged);
+
+      ns.project(p);
+      press += p;
+      press.exchange();
+
+      ns.cfl_max();
+
+      conc.advance(cold);
+      conc.totalvol();
+
+    }
+    /* post process */
+    //velocity
+    real umax=0.0, vmax=0.0, wmax=0.0;
+    real usum=0.0, vsum=0.0, wsum=0.0;
+    int icount=0;
+    for_vijk(c,i,j,k) {
+      real utmp=fabs(0.5*(uvw[Comp::u()][i][j][k]+uvw[Comp::u()][i+1][j][k]))/usig;
+      real vtmp=fabs(0.5*(uvw[Comp::v()][i][j][k]+uvw[Comp::v()][i][j+1][k]))/usig;
+      real wtmp=fabs(0.5*(uvw[Comp::w()][i][j][k]+uvw[Comp::w()][i][j][k+1]))/usig;
+      if (umax<utmp) umax=utmp;
+      if (vmax<vtmp) vmax=vtmp;
+      if (wmax<wtmp) wmax=wtmp;
+      usum += utmp;
+      vsum += vtmp;
+      wsum += wtmp;
+      icount++;
+    }
+    boil::cart.max_real(&umax);
+    boil::cart.max_real(&vmax);
+    boil::cart.max_real(&wmax);
+    boil::cart.sum_real(&usum);
+    boil::cart.sum_real(&vsum);
+    boil::cart.sum_real(&wsum);
+    boil::cart.sum_int(&icount);
+    usum /= real(icount);
+    vsum /= real(icount);
+    wsum /= real(icount);
+    boil::oout<<"velocity= "<<time.current_time()<<" "
+                <<umax<<" "<<vmax<<" "<<wmax<<" "
+                <<usum<<" "<<vsum<<" "<<wsum<<"\n";
+
+    /* curvature */
+    real err_k_l1(0.0),  err_k_linf(0.0);
+    int knt(0);
+    for_vijk(c,i,j,k) {
+      real kap = kappa[i][j][k];
+      if(boil::realistic(kap)) {
+        knt++;
+#ifdef USE_CARTESIAN
+        real kappa_real = 1./radius;
+#else
+        real kappa_real = 2./radius;
+#endif
+        if(inverted)
+          kappa_real = -kappa_real;
+        real err = fabs(kap-kappa_real)/fabs(kappa_real);
+        if(err>err_k_linf) {
+          err_k_linf = err;
+        }
+        err_k_l1 += err;
+      }
+    }
+    boil::cart.max_real(&err_k_linf);
+    boil::cart.sum_real(&err_k_l1);
+
+    if(knt>0) {
+      err_k_l1 /= real(knt);
+    }
+
+    boil::oout<<"Errkappa= "<<time.current_time()<<" "<<err_k_linf<<" "<<err_k_l1<<boil::endl;
+
+    if(time.current_step() % nint == 0 || time.current_step()==1 ) {
+      boil::plot->plot(uvw, c, press,"uvw-c-press",  time.current_step());
+      boil::plot->plot(xyz, c, kappa,"xyz-c-kappa",  time.current_step());
+    }
+
+  }
+#endif
+
+  nl1.clear(); nli.clear(); kl1.clear(); kli.clear();
+#ifdef USE_CARTESIAN
+  test_reconstruction_circle_xz(conc,c,ctest,
+                             kappa,inverted,radius,
+                             xcent,zcent,
+                             nmv,
+                             nl1,
+                             nli,
+                             kl1,
+                             kli);
+#else
+  test_reconstruction_sphere(false,
+                             conc,c,ctest,
+                             kappa,inverted,radius,
+                             xcent,0.0,zcent,
+                             nmv,
+                             nl1,
+                             nli,
+                             kl1,
+                             kli);
+#endif
+
+  boil::oout << "finished" << boil::endl;
+
+  boil::timer.stop();
+  boil::timer.report();
+
+}	

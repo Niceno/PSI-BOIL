@@ -37,9 +37,11 @@ class VOFaxisym : public VOF {
        Ktmp = phi.shape();
 
        set_normal_vector_method_all(NormMethod::ElviraXZ());
+       set_wall_curv_method(WallCurvMethod::HFmixedXZ(),Sign::pos());
 
        reconstruction_tolerance = 1e-4;
        reconstruction_maxiter = 5;
+
     }
 
     ~VOFaxisym() {};
@@ -72,7 +74,7 @@ class VOFaxisym : public VOF {
 
     real test_reconstruction(const Scalar & color, const Scalar & vf);
 
-    void forward_cartesian(Scalar & scp);
+    //void forward_cartesian(Scalar & scp);
   protected:
     void forward_axisymmetric(const Scalar & color, Scalar & axip, Scalar & Kp);
     void backward_axisymmetric(const Scalar & vf, Scalar & alp);
@@ -88,6 +90,14 @@ class VOFaxisym : public VOF {
     real linf_scalar_error(const Scalar & sca, const Scalar & scb
                           // ,int & i, int & j, int & k, bool & ebool
                            );
+    
+    virtual real wall_curv_HFmixed_kernel(const real hc, const real hp,
+                                          const real dc, const real dp,
+                                          const real mult,
+                                          const real cang);
+    virtual real wall_curv_HFmixed_kernel(const real hm, const real hc, const real hp,
+                                          const real dm, const real dc, const real dp,
+                                          const real mult);
 
     //virtual real calc_v(const real alpha, const real vma, const real vmb, const real vmc);
     real calc_v_axisymmetric(real nnx, real alp, real eta0, real & Kp);

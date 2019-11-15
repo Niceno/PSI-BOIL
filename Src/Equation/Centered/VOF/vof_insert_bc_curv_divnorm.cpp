@@ -11,12 +11,12 @@ real divnorm(const Scalar & nx, const Scalar & ny,const Scalar & nz
             ,const int & i, const int & j, const int & k);
 
 /******************************************************************************/
-void VOF::bdcurv() {
+void VOF::insert_bc_curv_divnorm() {
 /***************************************************************************//**
 *  \brief Calculate curvature on wall boundary condition.
 *******************************************************************************/
 
-  boil::oout<<"VOF::bdcurv: obsolete code. Use height-functions instead. "
+  boil::oout<<"VOF::insert_bc_curv_divnorm: obsolete code. Use height-functions instead. "
             <<"Exiting."
             <<boil::endl;
   exit(0);

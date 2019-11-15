@@ -30,6 +30,8 @@ void VOFaxisym::curv_HF() {
 *
 *     modification: adapted for a 2D axisymmetric grid
 *
+*     in this method, normal vector and bnd values of color are destroyed!
+*
 *     output: kappa
 *******************************************************************************/
 
@@ -58,6 +60,15 @@ void VOFaxisym::curv_HF() {
     norm(clr,norm_method_curvature,false); /* alpha is not extracted */
   }
 
+  /* detachment treatment = flooding of walls */
+  if(detachment_model.initialized()&&detachment_model.detached()) {
+    /* this is the only implemented instance atm */
+    assert(wall_curv_method==WallCurvMethod::HFmixedXZ());
+
+    flood(phi,-mult_wall);
+    normal_vector_near_bnd(phi,norm_method_curvature);
+  }
+
   /* nx, ny, nz themselves are changed */
   /* mx, my, mz remain unchanged */
   true_norm_vect(nx,ny,nz,nx,ny,nz);
@@ -66,6 +77,7 @@ void VOFaxisym::curv_HF() {
   iflag=0;
   for_ijk(i,j,k) {
     if(dom->ibody().on(i,j,k)) {
+#if 0 /* no longer necessary! */
       /* exclude near-wall cells: treated specially */
       if(   (i==si() && iminw) || (i==ei() && imaxw)
          || (k==sk() && kminw) || (k==ek() && kmaxw)
@@ -73,11 +85,12 @@ void VOFaxisym::curv_HF() {
          || dom->ibody().off(i,j,k-1) || dom->ibody().off(i,j,k+1)
         ) {
       } else {
+#endif
         if((clr[i-1][j][k]-phisurf)*(clr[i][j][k]-phisurf)<=0.0){ iflag[i][j][k]=1;}
         if((clr[i+1][j][k]-phisurf)*(clr[i][j][k]-phisurf)<=0.0){ iflag[i][j][k]=1;}
         if((clr[i][j][k-1]-phisurf)*(clr[i][j][k]-phisurf)<=0.0){ iflag[i][j][k]=1;}
         if((clr[i][j][k+1]-phisurf)*(clr[i][j][k]-phisurf)<=0.0){ iflag[i][j][k]=1;}
-      }
+      //}
     }
   }
   iflag.bnd_update_symmetry(); /* copy on symmetry plane */
@@ -278,13 +291,18 @@ void VOFaxisym::curv_HF() {
   iflag.exchange();
 
   /* near-wall calculations */
-  if(!use_HF_wall) {
+  if       (wall_curv_method==WallCurvMethod::DivNorm()) {
     boil::oout<<"VOFaxisym::curv_HF: Obsolete, underdeveloped code. Exiting."
               <<boil::endl;
     exit(0);
     //bdcurv();
+  } else if(wall_curv_method==WallCurvMethod::HFmixedXZ()) {
+    insert_bc_curv_HFmixed(clr,Comp::i(),Comp::k(),Sign::neg());
   } else {
-
+    /* default */
+    boil::oout<<"VOF::curvHF: Wall curvature calculation method not set properly!"
+              <<" Exiting."<<boil::endl;
+    exit(0);
   }
 
   /* extrapolate kappa */
