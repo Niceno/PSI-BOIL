@@ -63,7 +63,7 @@ void VOFaxisym::curv_HF() {
   /* detachment treatment = flooding of walls */
   if(detachment_model.initialized()&&detachment_model.detached()) {
     /* this is the only implemented instance atm */
-    assert(wall_curv_method==WallCurvMethod::HFmixedXZ());
+    assert(wall_curv_method==CurvMethod::HFmixedXZ());
 
     flood(phi,-mult_wall);
     normal_vector_near_bnd(phi,norm_method_curvature);
@@ -291,12 +291,12 @@ void VOFaxisym::curv_HF() {
   iflag.exchange();
 
   /* near-wall calculations */
-  if       (wall_curv_method==WallCurvMethod::DivNorm()) {
+  if       (wall_curv_method==CurvMethod::DivNorm()) {
     boil::oout<<"VOFaxisym::curv_HF: Obsolete, underdeveloped code. Exiting."
               <<boil::endl;
     exit(0);
     //bdcurv();
-  } else if(wall_curv_method==WallCurvMethod::HFmixedXZ()) {
+  } else if(wall_curv_method==CurvMethod::HFmixedXZ()) {
     insert_bc_curv_HFmixed(clr,Comp::i(),Comp::k(),Sign::neg());
   } else {
     /* default */

@@ -47,75 +47,74 @@ class VOF : public Centered {
     void init(){ ancillary(); };
 
     // getter for front_minmax
-    real get_xminft() { return(xminft);};
-    real get_xmaxft() { return(xmaxft);};
-    real get_yminft() { return(yminft);};
-    real get_ymaxft() { return(ymaxft);};
-    real get_zminft() { return(zminft);};
-    real get_zmaxft() { return(zmaxft);};
+    inline real get_xminft() { return(xminft);};
+    inline real get_xmaxft() { return(xmaxft);};
+    inline real get_yminft() { return(yminft);};
+    inline real get_ymaxft() { return(ymaxft);};
+    inline real get_zminft() { return(zminft);};
+    inline real get_zmaxft() { return(zmaxft);};
 
     // getter and setter for wall value tolerance
-    real get_tol_wall() { return tol_wall; }
-    void set_tol_wall(real tolnew) {
+    inline real get_tol_wall() { return tol_wall; }
+    inline void set_tol_wall(real tolnew) {
       tol_wall = tolnew;
       boil::oout<<"VOF: New wall value tolerance: "<<tol_wall<<boil::endl;
       return;
     }
 
-    // getter and setter for curv_method
-    int get_curv_method() {return curv_method;}
-    void set_curv_method(int i) {
-      curv_method=i;
-      if(i==0){
+    // getter and setter for bulk_curv_method
+    inline CurvMethod get_curv_method() {return bulk_curv_method;}
+    void set_curv_method(const CurvMethod cm) {
+      bulk_curv_method=cm;
+      if(cm==CurvMethod::HF()){
         boil::oout<<"VOF: height function is used for curvature calculation.\n";
-      } else if(i==1){
+      } else if(cm==CurvMethod::DivNorm()){
         boil::oout<<"VOF: smoothed VOF is used for curvature calculation.\n";
       } else {
-        boil::oout<<"method should be 0 or 1.\n";
-        boil::oout<<"0 for height function.\n";
-        boil::oout<<"1 for smoothed VOF.\n";
+        boil::oout<<"Curv method should be HF or DivNorm.\n";
+        boil::oout<<"Exiting."<<boil::endl;
         exit(0);
       }
     }
 
     /* setter for cangle */
-    void set_cangle(const real r) {
-      cangle=r/180.0*acos(-1.0);
+    inline void set_cangle(const real r) {
+      cangle=r/180.0*boil::pi;
       boil::oout<<"set_cangle: cangle= "<<r<<"\n";
     }
     /* getter for cangle */
-    real get_cangle() { return(cangle/acos(-1.0)*180.0);};
+    inline real get_cangle() { return(cangle/boil::pi*180.0);};
 
     /* setter for limit_color */
-    void set_limit_color(const bool b) {
+    inline void set_limit_color(const bool b) {
       limit_color=b;
       boil::oout<<"set_limit_color= "<<b<<"\n";
     }
     /* getter for limit_color */
-    bool get_limit_color() { return(limit_color);};
+    inline bool get_limit_color() { return(limit_color);};
 
     /* setter for use_subgrid */
-    void set_use_subgrid(const bool b) {
+    inline void set_use_subgrid(const bool b) {
       use_subgrid=b;
       boil::oout<<"set_use_subgrid= "<<b<<"\n";
     }
     /* getter for use_subgrid */
-    bool get_use_subgrid() { return(use_subgrid);};
+    inline bool get_use_subgrid() { return(use_subgrid);};
 
     /* setter for use_interp */
-    void set_use_interp(const bool b) {
+    inline void set_use_interp(const bool b) {
       use_interp=b;
       boil::oout<<"set_use_interp= "<<b<<"\n";
     }
     /* getter for use_interp */
-    bool get_use_interp() { return(use_interp);};
+    inline bool get_use_interp() { return(use_interp);};
 
     /* min and max of color function in fluid domain */
-    real minval() {return minclr;}
-    real maxval() {return maxclr;}
+    inline real minval() {return minclr;}
+    inline real maxval() {return maxclr;}
     void color_minmax();
-    void set_minval(real r) {minclr=r;}
-    void set_maxval(real r) {maxclr=r;}
+    inline void set_minval(real r) {minclr=r;}
+    inline void set_maxval(real r) {maxclr=r;}
 
     /* setter for normal vector method */
     void set_normal_vector_method_advance(const NormMethod nm) {
@@ -160,20 +159,20 @@ class VOF : public Centered {
     }
 
     /* getter for normal vector method */
-    NormMethod get_normal_vector_method_advance() {
+    inline NormMethod get_normal_vector_method_advance() {
       return norm_method_advance;
     }
-    NormMethod get_normal_vector_method_curvature() {
+    inline NormMethod get_normal_vector_method_curvature() {
       return norm_method_curvature;
     }
 
     /* setter for near-wall curvature method */
-    void set_wall_curv_method(const WallCurvMethod wcm,
+    void set_wall_curv_method(const CurvMethod wcm,
                               const Sign sig = Sign::undefined(),
                               const real cangle = -1.) {
       wall_curv_method = wcm;
       boil::oout<<"Wall curvature method: "<<wcm<<boil::endl;
-      if(wcm==WallCurvMethod::HFmixedXZ()) {
+      if(wcm==CurvMethod::HFmixedXZ()) {
         if       (sig==Sign::pos()) {
           mult_wall =  1;
         } else if(sig==Sign::neg()) {
@@ -194,11 +193,11 @@ class VOF : public Centered {
     }
 
     /* getter for near-wall curvature method */
-    WallCurvMethod get_wall_curv_method() { return wall_curv_method;};
+    inline CurvMethod get_wall_curv_method() { return wall_curv_method;};
 
     Vector fs;
     Vector * bndclr;
-    Topology  topo;
+    Topology topo;
 
     Scalar nalpha;
     Scalar nx,ny,nz;/* normal to interface */
@@ -396,10 +395,9 @@ class VOF : public Centered {
     NormMethod norm_method_advance, norm_method_curvature;
     Comp mcomp_for_elvira;
     DetachmentModel detachment_model;
-    WallCurvMethod wall_curv_method;
+    CurvMethod bulk_curv_method, wall_curv_method;
 
     int nlayer;
-    int curv_method;
     real cangle;
     real mult_wall;
 

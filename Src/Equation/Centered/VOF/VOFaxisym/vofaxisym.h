@@ -37,7 +37,7 @@ class VOFaxisym : public VOF {
        Ktmp = phi.shape();
 
        set_normal_vector_method_all(NormMethod::ElviraXZ());
-       set_wall_curv_method(WallCurvMethod::HFmixedXZ(),Sign::pos());
+       set_wall_curv_method(CurvMethod::HFmixedXZ(),Sign::pos());
 
        reconstruction_tolerance = 1e-4;
        reconstruction_maxiter = 5;
@@ -69,8 +69,8 @@ class VOFaxisym : public VOF {
       return;
     }
     /* getter for reconstruction */
-    real get_reconstruction_tolerance() { return(reconstruction_tolerance);}
-    int get_reconstruction_maxiter() { return(reconstruction_maxiter);}
+    inline real get_reconstruction_tolerance() { return(reconstruction_tolerance);}
+    inline int get_reconstruction_maxiter() { return(reconstruction_maxiter);}
 
     real test_reconstruction(const Scalar & color, const Scalar & vf);
 

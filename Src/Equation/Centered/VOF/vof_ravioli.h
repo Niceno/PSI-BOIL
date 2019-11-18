@@ -41,40 +41,42 @@ class NormMethod {
     explicit NormMethod(const int m) {val = m;}
 };
 
-///////////////////////
-//                   //
-//  WallCurv method  //
-//                   //
-///////////////////////
-/* this is a ravioli class for wall curvature method selection */
-class WallCurvMethod {
+///////////////////
+//               //
+//  Curv method  //
+//               //
+///////////////////
+/* this is a ravioli class for curvature method selection */
+class CurvMethod {
   public:
-    WallCurvMethod() {val=-1;}
+    CurvMethod() {val=-1;}
 
-    static const WallCurvMethod undefined() {return WallCurvMethod(-1);}
-    static const WallCurvMethod DivNorm()   {return WallCurvMethod( 1);}
+    static const CurvMethod undefined() {return CurvMethod(-1);}
+    static const CurvMethod DivNorm()   {return CurvMethod( 1);}
+    static const CurvMethod HF()        {return CurvMethod( 2);}
     /* 2D method, X = wall tangent, Z = wall normal dir */
-    static const WallCurvMethod HFmixedXZ()  {return WallCurvMethod( 2);}
+    static const CurvMethod HFmixedXZ() {return CurvMethod( 3);}
 
     //! Prints the components name.
-    friend std::ostream & operator << (std::ostream & ost, const WallCurvMethod & com) {
+    friend std::ostream & operator << (std::ostream & ost, const CurvMethod & com) {
       switch(com.val) {
         case(-1): ost << "undefined"; break;
         case( 1): ost << "DivNorm"; break;
-        case( 2): ost << "HFmixedXZ"; break;
+        case( 2): ost << "HF"; break;
+        case( 3): ost << "HFmixedXZ"; break;
       }
 
       return ost;
     }
 
-    bool operator == (const WallCurvMethod & o) const {return val == o.val;}
-    bool operator != (const WallCurvMethod & o) const {return val != o.val;}
+    bool operator == (const CurvMethod & o) const {return val == o.val;}
+    bool operator != (const CurvMethod & o) const {return val != o.val;}
 
   private:
     int val;
 
-    /* avoid implicit conversions of integer to WallCurv */
-    explicit WallCurvMethod(const int m) {val = m;}
+    /* avoid implicit conversions of integer to Curv */
+    explicit CurvMethod(const int m) {val = m;}
 };
 
 ////////////////////////
@@ -128,7 +130,7 @@ class DetachmentModel {
       etacrit = 0.5*cos(cval*boil::pi/180.)/sin(cval*boil::pi/180.);
 
       boil::oout<<"VOF: detachment model invoked with critical height= "
-                 <<etacrit
+                 <<etacrit<<" (angle "<<cval<<")"
                  <<boil::endl;
 
     }
