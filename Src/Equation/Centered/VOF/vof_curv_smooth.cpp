@@ -12,12 +12,12 @@ void VOF::curv_smooth() {
 
   gradphic(stmp);
   
-  set_iflag();
+  set_flag();
 
   /* div.norm */
   for_ijk(i,j,k) {
-    if(abs(iflag[i][j][k])>nlayer-3){
-    //if(abs(iflag[i][j][k])!=0){
+    if(abs(tempflag[i][j][k])>nlayer-3){
+    //if(abs(tempflag[i][j][k])!=0){
       kappa[i][j][k]=boil::unreal;
     } else {
       real nw = nx[i-1][j][k];
@@ -48,38 +48,38 @@ void VOF::curv_smooth() {
 #if 0
   //extrapolate kappa
   for_aijk(i,j,k) {
-    if(iflag[i][j][k]==0) {
-      iflag[i][j][k]=1;
+    if(tempflag[i][j][k]==0) {
+      tempflag[i][j][k]=1;
     } else {
-      iflag[i][j][k]=0;
+      tempflag[i][j][k]=0;
     }
   }
   stmp = kappa;
-  jflag = iflag;
+  tempflag2 = tempflag;
 
   //for(int iloop=1; iloop<2; iloop++) {
   for(int iloop=1; iloop<3; iloop++) {
     for_ijk(i,j,k) {
-      if(iflag[i][j][k]==0) {
-        int inb =  iflag[i-1][j][k] + iflag[i+1][j][k]
-                 + iflag[i][j-1][k] + iflag[i][j+1][k]
-                 + iflag[i][j][k-1] + iflag[i][j][k+1];
+      if(tempflag[i][j][k]==0) {
+        int inb =  tempflag[i-1][j][k] + tempflag[i+1][j][k]
+                 + tempflag[i][j-1][k] + tempflag[i][j+1][k]
+                 + tempflag[i][j][k-1] + tempflag[i][j][k+1];
         if (inb >= 1) {
-            stmp[i][j][k] = (real(iflag[i-1][j][k]) * kappa[i-1][j][k]
-                           + real(iflag[i+1][j][k]) * kappa[i+1][j][k]
-                           + real(iflag[i][j-1][k]) * kappa[i][j-1][k]
-                           + real(iflag[i][j+1][k]) * kappa[i][j+1][k]
-                           + real(iflag[i][j][k-1]) * kappa[i][j][k-1]
-                           + real(iflag[i][j][k+1]) * kappa[i][j][k+1])
+            stmp[i][j][k] = (real(tempflag[i-1][j][k]) * kappa[i-1][j][k]
+                           + real(tempflag[i+1][j][k]) * kappa[i+1][j][k]
+                           + real(tempflag[i][j-1][k]) * kappa[i][j-1][k]
+                           + real(tempflag[i][j+1][k]) * kappa[i][j+1][k]
+                           + real(tempflag[i][j][k-1]) * kappa[i][j][k-1]
+                           + real(tempflag[i][j][k+1]) * kappa[i][j][k+1])
                            /real(inb);
-            jflag[i][j][k] = 1;
+            tempflag2[i][j][k] = 1;
         }
       }
     }
     stmp.exchange();
-    jflag.exchange();
+    tempflag2.exchange();
     kappa = stmp;
-    iflag = jflag;
+    tempflag = tempflag2;
   }
 
 
@@ -125,7 +125,7 @@ void VOF::curv_smooth() {
 #if 0
   boil::plot->plot(clr,sca,kappa, "clr-sca-kappa_afterInter",
                      time->current_step());
-  boil::plot->plot(clr,iflag, "clr-iflag", time->current_step());
+  boil::plot->plot(clr,tempflag, "clr-tempflag", time->current_step());
 #endif
 
   /* extpolate curvature from interface cells to others */
@@ -141,10 +141,10 @@ void VOF::curv_smooth() {
 
 #if 0
   for_aijk(i,j,k) {
-    stmp[i][j][k]=real(iflag[i][j][k]);
+    stmp[i][j][k]=real(tempflag[i][j][k]);
   }
   if(time->current_step() == 1) {
-    boil::plot->plot(phi,kappa,stmp, "phi-kappa-iflag", time->current_step());
+    boil::plot->plot(phi,kappa,stmp, "phi-kappa-tempflag", time->current_step());
   }
   exit(0);
 #endif

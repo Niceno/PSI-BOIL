@@ -23,6 +23,7 @@ CIPCSL2::CIPCSL2(const Scalar & PHI,
   stmp  ( *PHI.domain() ),
   iflag ( *PHI.domain() ),
   wflag ( *PHI.domain() ),
+  intflag( *PHI.domain() ),
   scheme( PHI ),
   fn    ( *PHI.domain() ),
   dist  ( *PHI.domain() ),
@@ -32,7 +33,7 @@ CIPCSL2::CIPCSL2(const Scalar & PHI,
   adens ( *PHI.domain() ),
   kappa ( &K ),
   heavi(&phi, NULL, &adens),
-  topo(&nx,&ny,&nz,&adens,&fs)
+  topo(&nx,&ny,&nz,&adens,&fs,&intflag)
 
 /*------------------------------------------------------+
 |  this constructor is called only at the finest level  |
@@ -47,6 +48,7 @@ CIPCSL2::CIPCSL2(const Scalar & PHI,
   stmp    = phi.shape();
   iflag   = phi.shape();
   wflag   = phi.shape();
+  intflag = phi.shape();
   fn      = phi.shape();
   dist    = phi.shape();
   alp     = phi.shape();

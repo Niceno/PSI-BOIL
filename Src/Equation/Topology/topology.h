@@ -11,16 +11,17 @@
 //  Topology  //
 //            //
 ////////////////
-/* A class for safe argument passing to phase change */
+/* A class for safe argument passing from interface tracking to other classes */
 class Topology {
   public:
     Topology(Scalar * NX, Scalar * NY, Scalar * NZ, 
-             Scalar * ADENS, Vector * FS) :
+             Scalar * ADENS, Vector * FS, ScalarInt * IFLAG) :
         nx(NX),
         ny(NY),
         nz(NZ),
         fs(FS),
-        adens(ADENS) { }
+        adens(ADENS),
+        iflag(IFLAG) { }
     ~Topology() {};
 
     Scalar * nx;
@@ -28,5 +29,6 @@ class Topology {
     Scalar * nz;
     Scalar * adens;
     Vector * fs;
+    ScalarInt * iflag;
 };
 #endif

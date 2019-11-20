@@ -38,15 +38,12 @@ void EnthalpyFD::new_time_step(const Scalar * diff_eddy) {
     for_aijk(i,j,k){
       clrold[i][j][k] = (*clr)[i][j][k];
     }
-    if(fs) {
-      for_m(m)
-        for_avmijk(fsold,m,i,j,k)
-          fsold[m][i][j][k] = (*fs)[m][i][j][k];
+    for_aijk(i,j,k){
+      iflagold[i][j][k] = iflag[i][j][k];
     }
-    if(adens) 
-      for_aijk(i,j,k){
-        adensold[i][j][k] = (*adens)[i][j][k];
-      }
+    for_m(m)
+      for_avmijk(fsold,m,i,j,k)
+        fsold[m][i][j][k] = fs[m][i][j][k];
     store_clrold = true;
   }
 
@@ -134,15 +131,12 @@ void EnthalpyFD::new_time_step(const Scalar * diff_eddy) {
   for_aijk(i,j,k){
     clrold[i][j][k] = (*clr)[i][j][k];
   }
-  if(fs) {
-    for_m(m)
-      for_avmijk(fsold,m,i,j,k)
-        fsold[m][i][j][k] = (*fs)[m][i][j][k];
+  for_aijk(i,j,k){
+    iflagold[i][j][k] = iflag[i][j][k];
   }
-  if(adens) {
-    for_aijk(i,j,k)
-      adensold[i][j][k] = (*adens)[i][j][k];
-  }
+  for_m(m)
+    for_avmijk(fsold,m,i,j,k)
+      fsold[m][i][j][k] = fs[m][i][j][k];
 
   /*---------------------------------------+
   |  fold = fold + D                       |

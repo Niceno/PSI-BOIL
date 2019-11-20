@@ -44,7 +44,7 @@ real EnthalpyFD::hflux_wall(const Scalar & val, const Dir din
                       + fabs(jof)*val.dSy(sig,i,j,k)
                       + fabs(kof)*val.dSz(sig,i,j,k);
             areaw += area;
-            if(!fs||!Interface(of,mcomp,i+iof,j+jof,k+kof)) {
+            if(!Interface(of,mcomp,i+iof,j+jof,k+kof)) {
               real lc=lambdav;
               real cp_mass = cpv/rhov;
               if((*clr)[i+iof][j+jof][k+kof]>=clrsurf){

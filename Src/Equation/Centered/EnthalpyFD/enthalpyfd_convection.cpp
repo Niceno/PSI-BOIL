@@ -55,10 +55,7 @@ void EnthalpyFD::convection(Scalar * conv) {
     }
   }
 
-  //boil::plot->plot(*clr, phi, iflag,"clr-phi-iflag", time->current_step());
-
-  /* set flag */
-  setflag();
+  //boil::plot->plot(*clr, phi, iflagold,"clr-phi-iflag", time->current_step());
 
   /*-----------------------+
   |  finite volume method  |
@@ -173,7 +170,7 @@ void EnthalpyFD::convection(Scalar * conv) {
   +---------------------------*/
   for_ijk(i,j,k) {
 
-    if(iflag[i][j][k]==0){
+    if(fabs(iflagold[i][j][k])<3){
 
       real umf, upf, vmf, vpf, wmf, wpf, uc, vc, wc;
       real dtdxm, dtdxp, dtdym, dtdyp, dtdzm, dtdzp;
@@ -202,13 +199,7 @@ void EnthalpyFD::convection(Scalar * conv) {
       //if((clrc-clrsurf)*(clrw-clrsurf)<0.0){
       if(Interface_old(-1,Comp::i(),i,j,k)) {
         real dxm, ts;
-        if(!fs) {
-          dxm = max(epsl,(clrsurf-clrc)/(clrw-clrc));
-          ts = Tint_old(-1,Comp::i(),dxm,i,j,k);
-          dxm = dxm * dxw(i);
-        } else {
-          dxm = max(epsl*dxw(i),distance_x(i,j,k,-1,ts,true));
-        }
+        dxm = max(epsl*dxw(i),distance_x(i,j,k,-1,ts,true));
         dtdxm = (phi[i][j][k]-ts)/dxm;
 #ifndef VERSION_STABLE
         umf = upf;
@@ -226,13 +217,7 @@ void EnthalpyFD::convection(Scalar * conv) {
       //if((clrc-clrsurf)*(clre-clrsurf)<0.0){
       if(Interface_old(+1,Comp::i(),i,j,k)) {
         real dxp, ts;
-        if(!fs) {
-          dxp = max(epsl,(clrsurf-clrc)/(clre-clrc));
-          ts = Tint_old(+1,Comp::i(),dxp,i,j,k);
-          dxp = dxp * dxe(i);
-        } else {
-          dxp = max(epsl*dxe(i),distance_x(i,j,k,+1,ts,true));
-        }
+        dxp = max(epsl*dxe(i),distance_x(i,j,k,+1,ts,true));
         dtdxp = (ts-phi[i][j][k])/dxp;
 #ifndef VERSION_STABLE
         upf = umf;
@@ -250,13 +235,7 @@ void EnthalpyFD::convection(Scalar * conv) {
       //if((clrc-clrsurf)*(clrs-clrsurf)<0.0){
       if(Interface_old(-1,Comp::j(),i,j,k)) {
         real dym, ts;
-        if(!fs) {
-          dym = max(epsl,(clrsurf-clrc)/(clrs-clrc));
-          ts = Tint_old(-1,Comp::j(),dym,i,j,k);
-          dym = dym * dys(j);
-        } else {
-          dym = max(epsl*dys(j),distance_y(i,j,k,-1,ts,true));
-        }
+        dym = max(epsl*dys(j),distance_y(i,j,k,-1,ts,true));
         dtdym = (phi[i][j][k]-ts)/dym;
 #ifndef VERSION_STABLE
         vmf = vpf;
@@ -274,13 +253,7 @@ void EnthalpyFD::convection(Scalar * conv) {
       //if((clrc-clrsurf)*(clrn-clrsurf)<0.0){
       if(Interface_old(+1,Comp::j(),i,j,k)) {
         real dyp, ts;
-        if(!fs) {
-          dyp = max(epsl,(clrsurf-clrc)/(clrn-clrc));
-          ts = Tint_old(+1,Comp::j(),dyp,i,j,k);
-          dyp = dyp * dyn(j);
-        } else {
-          dyp = max(epsl*dyn(j),distance_y(i,j,k,+1,ts,true));
-        }
+        dyp = max(epsl*dyn(j),distance_y(i,j,k,+1,ts,true));
         dtdyp = (ts-phi[i][j][k])/dyp;
 #ifndef VERSION_STABLE
         vpf = vmf;
@@ -298,13 +271,7 @@ void EnthalpyFD::convection(Scalar * conv) {
       //if((clrc-clrsurf)*(clrb-clrsurf)<0.0){
       if(Interface_old(-1,Comp::k(),i,j,k)) {
         real dzm, ts;
-        if(!fs) {
-          dzm = max(epsl,(clrsurf-clrc)/(clrb-clrc));
-          ts = Tint_old(-1,Comp::k(),dzm,i,j,k);
-          dzm = dzm * dzb(k);
-        } else {
-          dzm = max(epsl*dzb(k),distance_z(i,j,k,-1,ts,true));
-        }
+        dzm = max(epsl*dzb(k),distance_z(i,j,k,-1,ts,true));
         dtdzm = (phi[i][j][k]-ts)/dzm;
 #ifndef VERSION_STABLE
         wmf = wpf;
@@ -322,13 +289,7 @@ void EnthalpyFD::convection(Scalar * conv) {
       //if((clrc-clrsurf)*(clrt-clrsurf)<0.0){
       if(Interface_old(+1,Comp::k(),i,j,k)) {
         real dzp, ts;
-        if(!fs) {
-          dzp = max(epsl,(clrsurf-clrc)/(clrt-clrc));
-          ts = Tint_old(+1,Comp::k(),dzp,i,j,k);
-          dzp = dzp * dzt(k);
-        } else {
-          dzp = max(epsl*dzt(k),distance_z(i,j,k,+1,ts,true));
-        }
+        dzp = max(epsl*dzt(k),distance_z(i,j,k,+1,ts,true));
         dtdzp = (ts-phi[i][j][k])/dzp;
 #ifndef VERSION_STABLE
         wpf = wmf;

@@ -21,6 +21,9 @@ void CIPCSL2::ancillary() {
   /* calculate area */
   cal_adens();
 
+  /* flag the interface */
+  interfacial_flagging(phi);
+
   boil::timer.stop("cipcsl2 ancillary");
 
   return;

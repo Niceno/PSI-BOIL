@@ -255,6 +255,11 @@ class CIPCSL2 : public Centered {
     void cal_adens();
     void update_at_walls(Scalar & sca);
 
+    void interfacial_flagging(Scalar & scp);
+    bool Interface(const Sign dir, const Comp m,
+                   const int i, const int j, const int k);
+    bool Interface(const int i, const int j, const int k);
+
     Scalar clr, sclr;            /* color function, smeared color function */
 
     /* ancillary */
@@ -267,7 +272,7 @@ class CIPCSL2 : public Centered {
     Scalar kappa;          /* curvature function */
     Scalar alp;            /* coefficient for local sharpening */
     Scalar fn, atmp, stmp; /* temporary */
-    ScalarInt iflag, wflag;
+    ScalarInt iflag, wflag, intflag;
     Scheme scheme;
     Matter jelly;   /* virtual fluid for level set transport */
     real xminft,xmaxft,yminft,ymaxft,zminft,zmaxft; /* xyz min&max of front */

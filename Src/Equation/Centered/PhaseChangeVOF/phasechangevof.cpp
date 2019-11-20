@@ -29,33 +29,34 @@ PhaseChangeVOF::PhaseChangeVOF(const Scalar & MDOT,
   nz(topo.nz),
   fs(topo.fs),
   adens(topo.adens),
-  bndtpr ( *U   .domain() ),
-  txv    ( *MDOT.domain()),
-  tyv    ( *MDOT.domain()),
-  tzv    ( *MDOT.domain()),
-  txl    ( *MDOT.domain()),
-  tyl    ( *MDOT.domain()),
-  tzl    ( *MDOT.domain()),
-  tnl    ( *MDOT.domain()),
-  tnv    ( *MDOT.domain()),
-  stmp   ( *MDOT.domain()),
-  stmp2  ( *MDOT.domain()),
-  delta  ( *MDOT.domain()),
-  iflag  ( *MDOT.domain()),
+  iflag(topo.iflag),
+  bndtpr  ( *U   .domain() ),
+  txv     ( *MDOT.domain()),
+  tyv     ( *MDOT.domain()),
+  tzv     ( *MDOT.domain()),
+  txl     ( *MDOT.domain()),
+  tyl     ( *MDOT.domain()),
+  tzl     ( *MDOT.domain()),
+  tnl     ( *MDOT.domain()),
+  tnv     ( *MDOT.domain()),
+  stmp    ( *MDOT.domain()),
+  stmp2   ( *MDOT.domain()),
+  delta   ( *MDOT.domain()),
+  tempflag( *MDOT.domain()),
   tifmodel(TIFMODEL)
 {
-  txv     = MDOT.shape();
-  tyv     = MDOT.shape();
-  tzv     = MDOT.shape();
-  txl     = MDOT.shape();
-  tyl     = MDOT.shape();
-  tzl     = MDOT.shape();
-  tnl     = MDOT.shape();
-  tnv     = MDOT.shape();
-  stmp    = MDOT.shape();
-  stmp2   = MDOT.shape();
-  delta   = MDOT.shape();
-  iflag   = MDOT.shape();
+  txv      = MDOT.shape();
+  tyv      = MDOT.shape();
+  tzv      = MDOT.shape();
+  txl      = MDOT.shape();
+  tyl      = MDOT.shape();
+  tzl      = MDOT.shape();
+  tnl      = MDOT.shape();
+  tnv      = MDOT.shape();
+  stmp     = MDOT.shape();
+  stmp2    = MDOT.shape();
+  delta    = MDOT.shape();
+  tempflag = MDOT.shape();
   for_m(m) bndtpr(m) = U(m).shape(); /* a mistake? */
 
   for( int b=0; b<phi.bc().count(); b++ ) {

@@ -11,16 +11,16 @@ void PhaseChangeVOF::subgrid_setflag() {
 *******************************************************************************/
   for_vijk(clr,i,j,k) {
     if(clr[i][j][k]>=clrsurf){
-      iflag[i][j][k]=3;
+      tempflag[i][j][k]=3;
     } else {
-      iflag[i][j][k]=-3;
+      tempflag[i][j][k]=-3;
     }
   }
 
 #ifdef IB
   for_ijk(i,j,k) {
     if(dom->ibody().off(i,j,k))
-      iflag[i][j][k]=-1001;
+      tempflag[i][j][k]=-1001;
   }
 #endif
 
@@ -73,9 +73,9 @@ void PhaseChangeVOF::subgrid_setflag() {
           /* is there an interface between cell centre and wall? */
           if(Interface(dir,mcomp,ii,jj,kk)) {
             if(clr[ii][jj][kk]>=clrsurf) {
-              iflag[ii][jj][kk] = +1;
+              tempflag[ii][jj][kk] = +1;
             } else {
-              iflag[ii][jj][kk] = -1;
+              tempflag[ii][jj][kk] = -1;
             }
           }
         }
@@ -101,17 +101,17 @@ void PhaseChangeVOF::subgrid_setflag() {
        ||(dom->ibody().off(i,j,k+1)&&Interface(+1,Comp::k(),i,j,k))) {
 
       if(clr[i][j][k]>=clrsurf) {
-        iflag[i][j][k] = +1;
+        tempflag[i][j][k] = +1;
       } else {
-        iflag[i][j][k] = -1;
+        tempflag[i][j][k] = -1;
       }
     }
   }
 #endif
 
-  iflag.exchange_all();
+  tempflag.exchange_all();
 
-  //boil::plot->plot(clr,iflag, "ib+setflag+clr-dflag", time->current_step());
+  //boil::plot->plot(clr,tempflag, "ib+setflag+clr-dflag", time->current_step());
   //boil::plot->plot(clr,nx,ny,nz, "clr-nx-ny-nz", time->current_step());
   //exit(0);
 

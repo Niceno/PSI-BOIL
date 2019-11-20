@@ -25,10 +25,11 @@ VOF::VOF(const Scalar & PHI,
   stmp( *PHI.domain() ),
   fs( *U.domain() ),
   iflag(*PHI.domain() ),
-  jflag(*PHI.domain() ),
+  tempflag(*PHI.domain() ),
+  tempflag2(*PHI.domain() ),
   adens(*PHI.domain() ),
   heavi(&phi, NULL, &adens),
-  topo(&mx,&my,&mz,&adens,&fs),
+  topo(&mx,&my,&mz,&adens,&fs,&iflag),
   norm_method_advance(NormMethod::Mixed()),
   norm_method_curvature(NormMethod::Young()),
   mcomp_for_elvira(Comp::undefined()), /* undefined for 3D */
@@ -48,7 +49,8 @@ VOF::VOF(const Scalar & PHI,
   nalpha = phi.shape();
   stmp   = phi.shape();
   iflag  = phi.shape();
-  jflag  = phi.shape();
+  tempflag  = phi.shape();
+  tempflag2  = phi.shape();
   adens  = phi.shape();
 
   for( int b=0; b<phi.bc().count(); b++ ) {

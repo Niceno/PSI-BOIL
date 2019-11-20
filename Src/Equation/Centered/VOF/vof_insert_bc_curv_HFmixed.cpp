@@ -63,20 +63,20 @@ void VOF::insert_bc_curv_HFmixed(const Scalar & scp,
         if(dom->ibody().off(i,j,k-1) || (k==sk() && kminw)) {
           if( (scp.xn(i  )<h0) && (h0<scp.xn(i+1)) ) {
             kappa[i][j][k] = kappa_wall;
-            iflag[i][j][k] = 1;
+            tempflag[i][j][k] = 1;
 #if 0
           } else {
             kappa[i][j][k] = kappa_wall;
-            iflag[i][j][k] = 2;
+            tempflag[i][j][k] = 2;
 #endif
           }
           if( (scp.xn(i  )<h1) && (h1<scp.xn(i+1)) ) {
             kappa[i][j][k+1] = kappa_above;
-            iflag[i][j][k+1] = 1;
+            tempflag[i][j][k+1] = 1;
 #if 0
           } else {
             kappa[i][j][k+1] = kappa_above;
-            iflag[i][j][k+1] = 2;
+            tempflag[i][j][k+1] = 2;
 #endif
           }
         } /* next to wall */
@@ -90,7 +90,7 @@ void VOF::insert_bc_curv_HFmixed(const Scalar & scp,
     detachment_model.test_detachment(h0/dzzc0);
 
   kappa.exchange();
-  iflag.exchange();
+  tempflag.exchange();
 
   return;
 

@@ -18,7 +18,7 @@ real Tout=110;
 real Tsat=100;
 
 /******************************************************************************/
-main(int argc, char * argv[]) {
+int main(int argc, char * argv[]) {
 
   boil::timer.start();
 
@@ -229,8 +229,8 @@ main(int argc, char * argv[]) {
   conc.totalvol();
 
   TIF tsat(Tsat);
-  EnthalpyFD enthVOF(tpr, q, c, uvw, time, solver, &mixed, tsat,
-                      NULL, conc.topo.fs, conc.topo.adens);
+  EnthalpyFD enthVOF(tpr, q, c, uvw, time, solver, &mixed,
+                     conc.topo,tsat);
   enthVOF.convection_set(TimeScheme::forward_euler());
   enthVOF.diffusion_set(TimeScheme::backward_euler());
   PhaseChangeVOF pc(mdot, mflx, tpr, q, c, g , f , uvw, conc.topo,

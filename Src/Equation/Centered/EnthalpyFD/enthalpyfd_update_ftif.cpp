@@ -42,13 +42,7 @@ void EnthalpyFD::update_ftif(const real TS0, const real TSm, const bool nst,
         xm=phi.dxw(i);
         pm=phi[i-1][j][k];
       } else {
-        if(!fs) {
-          real frac = std::max((clrsurf-clrc)/(clrw-clrc),epsl);
-          xm=frac*phi.dxw(i);
-          pm=Tint(-1,Comp::i(),frac,i,j,k);
-        } else {
-          xm = std::max(epsl*phi.dxw(i),distance_x(i,j,k,-1,pm));
-        }
+        xm = std::max(epsl*phi.dxw(i),distance_x(i,j,k,-1,pm));
         aflagm=1.0;
       }
       //if((clrc-clrsurf)*(clre-clrsurf)>=0){
@@ -56,13 +50,7 @@ void EnthalpyFD::update_ftif(const real TS0, const real TSm, const bool nst,
         xp=phi.dxe(i);
         pp=phi[i+1][j][k];
       } else {
-        if(!fs) {
-          real frac = std::max((clrsurf-clrc)/(clre-clrc),epsl);
-          xp=frac*phi.dxe(i);
-          pp=Tint(+1,Comp::i(),frac,i,j,k);
-        } else {
-          xp = std::max(epsl*phi.dxe(i),distance_x(i,j,k,+1,pp));
-        }
+        xp = std::max(epsl*phi.dxe(i),distance_x(i,j,k,+1,pp));
         aflagp=1.0;
       }
       real cxm = coef_x_m(xm,xp,phi.xc(i));
@@ -101,13 +89,7 @@ void EnthalpyFD::update_ftif(const real TS0, const real TSm, const bool nst,
         ym=phi.dys(j);
         pm=phi[i][j-1][k];
       } else {
-        if(!fs) {
-          real frac = std::max((clrsurf-clrc)/(clrs-clrc),epsl);
-          ym=frac*phi.dys(j);
-          pm=Tint(-1,Comp::j(),frac,i,j,k);
-        } else {
-          ym = std::max(epsl*phi.dys(j),distance_y(i,j,k,-1,pm));
-        }
+        ym = std::max(epsl*phi.dys(j),distance_y(i,j,k,-1,pm));
         aflagm=1.0;
       }
       //if((clrc-clrsurf)*(clrn-clrsurf)>=0){
@@ -115,13 +97,7 @@ void EnthalpyFD::update_ftif(const real TS0, const real TSm, const bool nst,
         yp=phi.dyn(j);
         pp=phi[i][j+1][k];
       } else {
-        if(!fs) {
-          real frac = std::max((clrsurf-clrc)/(clrn-clrc),epsl);
-          yp=frac*phi.dyn(j);
-          pp=Tint(+1,Comp::j(),frac,i,j,k);
-        } else {
-          yp = std::max(epsl*phi.dyn(j),distance_y(i,j,k,+1,pp));
-        }
+        yp = std::max(epsl*phi.dyn(j),distance_y(i,j,k,+1,pp));
         aflagp=1.0;
       }
       real cym = coef_y_m(ym,yp,phi.yc(j));
@@ -159,13 +135,7 @@ void EnthalpyFD::update_ftif(const real TS0, const real TSm, const bool nst,
         zm=phi.dzb(k);
         pm=phi[i][j][k-1];
       } else {
-        if(!fs) {
-          real frac = std::max((clrsurf-clrc)/(clrb-clrc),epsl);
-          zm=frac*phi.dzb(k);
-          pm=Tint(-1,Comp::k(),frac,i,j,k);
-        } else {
-          zm = std::max(epsl*phi.dzb(k),distance_z(i,j,k,-1,pm));
-        }
+        zm = std::max(epsl*phi.dzb(k),distance_z(i,j,k,-1,pm));
         aflagm=1.0;
       }
       //if((clrc-clrsurf)*(clrt-clrsurf)>=0){
@@ -173,13 +143,7 @@ void EnthalpyFD::update_ftif(const real TS0, const real TSm, const bool nst,
         zp=phi.dzt(k);
         pp=phi[i][j][k+1];
       } else {
-        if(!fs) {
-          real frac = std::max((clrsurf-clrc)/(clrt-clrc),epsl);
-          zp=frac*phi.dzt(k);
-          pp=Tint(+1,Comp::k(),frac,i,j,k);
-        } else {
-          zp = std::max(epsl*phi.dzt(k),distance_z(i,j,k,+1,pp));
-        }
+        zp = std::max(epsl*phi.dzt(k),distance_z(i,j,k,+1,pp));
         aflagp=1.0;
       }
       real czm = coef_z_m(zm,zp,phi.zc(k));
@@ -214,7 +178,7 @@ void EnthalpyFD::update_ftif(const real TS0, const real TSm, const bool nst,
 
         bool onm, onc, onp, ofm, ofc, ofp; // on & off
         real lsm, lsc, lsp; // lambda
-        real clm, clc, clp; // color function
+        int clm, clc, clp; // topology flag
         real dxm, dxp, fdm, fdp, fdms, fdps;
         real edm, edc, edp; // eddy viscosity
         real pm, pc, pp;
@@ -234,9 +198,9 @@ void EnthalpyFD::update_ftif(const real TS0, const real TSm, const bool nst,
         lsm=solid()->lambda (i-ii,j-jj,k-kk);
         lsc=solid()->lambda (i   ,j   ,k   );
         lsp=solid()->lambda (i+ii,j+jj,k+kk);
-        clm=(*clr)[i-ii][j-jj][k-kk];
-        clc=(*clr)[i   ][j   ][k   ];
-        clp=(*clr)[i+ii][j+jj][k+kk];
+        clm=iflag[i-ii][j-jj][k-kk];
+        clc=iflag[i   ][j   ][k   ];
+        clp=iflag[i+ii][j+jj][k+kk];
 	if(m==Comp::i()){
           dxm=phi.dxw(i);
           dxp=phi.dxe(i);

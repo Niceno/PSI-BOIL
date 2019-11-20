@@ -1,0 +1,282 @@
+#include "Include/psi-boil.h"
+#include <iomanip>
+#include <string>
+#include <cstring>
+
+#define _GNU_SOURCE 1
+#include <fenv.h>
+static void __attribute__ ((constructor)) trapfpe(void)
+{
+  /* Enable some exceptions. At startup all exceptions are masked. */
+  feenableexcept(FE_INVALID|FE_DIVBYZERO|FE_OVERFLOW);
+}
+
+/* domain dimensions */
+const int gLevel = 4;  //grid level=2,3,4
+#if 0
+/* small domain */
+const real LX1 =  0.1*0.001;
+const real LX2 =  0.15 *0.001;
+#elif 1
+/* large domain */
+const real LX1 =  0.3*0.001;
+const real LX2 =  0.45*0.001;
+#endif
+
+const int NX1  = 25*gLevel;
+const int NX2  =  7*gLevel;
+const real dxuni = LX1/real(NX1);
+const int NZ0  = 2*gLevel;  // solid
+const int NZ1  = 64*gLevel;
+const real LZ1  = LX1+LX2;
+const real DZ = LZ1/real(NZ1);
+//const real LZ0 = -real(NZ0)*DZ;
+const real LZ0 = -8.0e-6;
+
+const real zgamma = 0.05*gLevel*DZ;//7.*LZ1/13.;
+
+/* parameter for boundary or initial condition */
+const real tsat0 = -3.;
+const real tout = 0.;
+
+int main(int argc, char ** argv) {
+
+  boil::timer.start();
+
+  if(argc==1){
+    boil::oout<<"One command line argument is required!"<<"\n";
+    boil::oout<<"./Boil wmin (wmin::wall time in minute)"<<"\n";
+
+    exit(0);
+  }
+  int wmin=atoi(argv[1]);
+  boil::oout<<"wmin= "<<wmin<<"\n";
+
+  /*--------------------------------+
+  |  choose the output file format  |
+  +--------------------------------*/
+  boil::plot = new PlotTEC();
+
+  /*----------+
+  |  grid(s)  |
+  +----------*/
+#if 0
+  Grid1D gx1( Range<real>(0.0,LX1), NX1, Periodic::no() );
+  Grid1D gx2( Range<real>(LX1,LX2),
+              Range<real>(dxuni,3.0*dxuni),
+              NX2, Periodic::no() );
+  Grid1D gx ( gx1, gx2, Periodic::no(), BndGrid::symmetry(), BndGrid::wall());
+#else
+  const real LX = LX1+LX2;
+  const real NX = NX1+NX2;
+  Grid1D gx( Range<real>(0.0,LX), NX, Periodic::no(),
+             BndGrid::symmetry(), BndGrid::wall());
+#endif
+  Grid1D gz0( Range<real>(LZ0, 0.0), NZ0, Periodic::no() );
+  Grid1D gz1( Range<real>(0.0, LZ1), NZ1, Periodic::no() );
+  Grid1D gz ( gz0, gz1, Periodic::no());
+
+  /*---------+
+  |  domain  |
+  +---------*/
+#if 0
+  Grid1D gy( Range<real>(0.0,3.*dxuni),3, Periodic::yes() );
+#else
+  Grid1D gy(0.5*dxuni);
+#endif
+  Body floor("floor.stl");
+#if 0
+  Domain d(gx, gy, gz, & floor);
+#elif 1
+  Axisymmetric d(gx, gz, 0.5*dxuni, & floor);
+#else
+  Domain d(gx, gy, gz);
+#endif
+
+  /*------------------+
+  |  define unknowns  |
+  +------------------*/
+  Vector uvw(d), xyz(d);           // vel
+  Scalar p  (d), f  (d), press(d); // pressure
+  Scalar c  (d), g  (d), kappa(d); // concentration
+  Scalar tpr(d), q  (d);           // temperature
+  Scalar mdot(d), mflx(d);         // phase-change rate
+  Scalar dmicro(d);                // micro-layer film thickness
+  Scalar mu_t(d);                  // eddy viscosity
+  Scalar cold(d);
+
+  /*-----------------------------+ 
+  |  insert boundary conditions  |
+  +-----------------------------*/
+  for_m(m) {
+    uvw.bc(m).add( BndCnd( Dir::imin(), BndType::symmetry() ) );
+    uvw.bc(m).add( BndCnd( Dir::imax(), BndType::wall() ) );
+    //uvw.bc(m).add( BndCnd( Dir::jmin(), BndType::periodic() ) );
+    //uvw.bc(m).add( BndCnd( Dir::jmax(), BndType::periodic() ) );
+    uvw.bc(m).add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
+    uvw.bc(m).add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
+    uvw.bc(m).add( BndCnd( Dir::kmin(), BndType::wall() ) );
+    uvw.bc(m).add( BndCnd( Dir::kmax(), BndType::outlet() ) );
+  }
+
+  c.bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
+  c.bc().add( BndCnd( Dir::imax(), BndType::neumann() ) );
+  c.bc().add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
+  c.bc().add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
+  c.bc().add( BndCnd( Dir::kmin(), BndType::neumann() ) );
+  c.bc().add( BndCnd( Dir::kmax(), BndType::neumann() ) );
+
+  /* copy b.c. from c */
+  p = c.shape();
+  press = p.shape();
+  f = p.shape();
+  mdot = p.shape();
+  mflx = p.shape();
+  q = p.shape();
+  mu_t = p.shape();
+  kappa = p.shape();
+  cold = c.shape();
+
+  g = c.shape();
+  dmicro = c.shape();
+
+  tpr.bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
+  tpr.bc().add( BndCnd( Dir::imax(), BndType::neumann() ) );
+  tpr.bc().add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
+  tpr.bc().add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
+  tpr.bc().add( BndCnd( Dir::kmin(), BndType::neumann() ) );
+  tpr.bc().add( BndCnd( Dir::kmax(), BndType::dirichlet(),tout) );
+
+  /*----------------------+
+  |  physical properties  |
+  +----------------------*/
+  Matter vapor(d), liquid(d), nickel(d);
+  vapor  .rho   (0.01);
+  vapor  .cp    (1.0);  // J/m3
+  vapor  .lambda(0.04);
+  liquid.rho   (4.0);
+  liquid.cp    (3.0);   // J/m3
+  liquid.lambda(0.6);
+  const real qflux=1000.;     // heater power [W/m2]
+
+#if 1
+  nickel.rho    (2.0);
+  nickel.cp     (5.0);
+  nickel.lambda (1.2);
+#else
+  nickel.rho   (4.0);
+  nickel.cp    (3.0);   // J/m3
+  nickel.lambda(0.6);
+#endif
+
+  Matter mixed(liquid, vapor, &c);
+  mixed.sigma(0.024);
+
+  /* heater power */
+  real q0=qflux/fabs(LZ0);  // [W/m3]
+  boil::oout<<"#q0= "<<q0<<" qflux= "<<qflux<<"\n";
+
+  /*-------------------+
+  |  time-integration  |
+  +-------------------*/
+  const int ndt = 700;
+  const real dt = dxuni;
+  Times time(ndt,dt);
+  time.print_time(false);
+
+  /*-----------------+
+  |  define solvers  |
+  +-----------------*/
+  Krylov * solver = new BiCGS(d, Prec::di());
+  //Krylov * solver = new BiCGS(d, Prec::ic2());
+
+  /* color function */
+  VOFaxisym conc  (c,  g, kappa, uvw, time, solver);
+  //conc.set_use_subgrid(false);
+  conc.set_use_subgrid(true);
+
+  /*--------------------+
+  |  initial condition  |
+  +--------------------*/
+  for_vijk(c,i,j,k) {
+    if(c.zn(k)<zgamma&&c.zn(k+1)<=zgamma&&d.ibody().on(i,j,k)) {
+      cold[i][j][k] = 1.0;
+    } else if(c.zn(k)<=zgamma&&c.zn(k+1)>=zgamma) {
+      cold[i][j][k] = (zgamma-c.zn(k))/(c.zn(k+1)-c.zn(k));
+    } else {
+      cold[i][j][k] = 0.0;
+    }
+  }
+  cold.bnd_update();
+  cold.exchange_all();
+  conc.color_to_vf(cold,c);
+  conc.reconstruct_geometry();
+  conc.test_reconstruction(conc.color(),c);
+  conc.ancillary();
+
+  /* enthalpy equation */
+#if 1
+  boil::oout<<c.dzc(boil::BW+NZ0)<<" "<<c.dzc(boil::BW+NZ0-1)<<" "<<0.5*c.dzc(boil::BW+NZ0-1)/c.dzt(boil::BW+NZ0-1)<<boil::endl;
+  TIF tsat(tsat0);
+
+  EnthalpyFDaxisym enthFD(tpr, q, conc.color(), uvw, time, solver, &mixed,conc.topo,tsat,&nickel);
+#else
+  Enthalpy enthFD(tpr,q,uvw,time,solver,&mixed,&nickel);
+  enthFD.convection_set(TimeScheme::forward_euler());
+  enthFD.diffusion_set(TimeScheme::backward_euler());
+#endif
+
+  tpr = tsat0;
+  q=0.0;
+  for_vk(tpr,k){
+    if((tpr.zc(k)<0.0)){
+      for_vij(tpr,i,j){
+        q[i][j][k]=q0*tpr.dV(i,j,k);
+      }
+    }
+  }
+
+  boil::plot->plot(tpr,q,c,conc.color(), "tpr-q-c-clr");
+  /*------------+
+  |  time loop  |
+  +------------*/
+  for(time.start(); time.end(); time.increase()) {
+    /*---------------------------+
+    |  solve transport equation  |
+    +---------------------------*/
+    boil::oout<<time.current_step()<<" "<<time.current_time()<<boil::endl;
+    enthFD.discretize();
+    enthFD.new_time_step();
+    enthFD.solve(ResRat(1e-20),"enth");
+  }
+
+  boil::plot->plot(tpr,q,c,conc.color(), "tpr-q-c-clr");
+
+  for_vk(tpr,k) {
+    int j = boil::BW;
+    int i = boil::BW+5;
+
+    real pos = tpr.zc(k);
+    real tprref;
+#if 1
+    real T0 = tsat0-q0*LZ0*zgamma/liquid.lambda()->value();
+    if(pos<0.)
+      tprref = q0/2./nickel.lambda()->value() *(2.*LZ0*pos-pos*pos) + T0;
+    else if(pos<zgamma)
+      tprref = T0 + (tsat0-T0)/zgamma*pos;
+#else
+    real T0 = tsat0;
+    if(pos<zgamma)
+      tprref = q0/2./nickel.lambda()->value() *(2.*LZ0*pos-2.*LZ0*zgamma-pos*pos+zgamma*zgamma) + T0;
+#endif
+    else
+      tprref = tsat0 + (tout-tsat0)*(pos-zgamma)/(LZ1-zgamma);
+    boil::oout<<pos<<" "<<conc.color()[i][j][k]<<" "<<(*conc.topo.iflag)[i][j][k]<<" "<<tpr[i][j][k]<<" "
+              <<tprref<<boil::endl;
+  }
+
+  boil::oout << "finished" << boil::endl;
+  boil::timer.stop();
+  boil::timer.report();
+
+}

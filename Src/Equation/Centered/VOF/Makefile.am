@@ -35,6 +35,7 @@ libVof_a_SOURCES =      vof.h                           \
                         vof_insert_bc_gradphi.cpp       \
                         vof_insert_bc_gradphic.cpp      \
                         vof_insert_bc_norm.cpp          \
+                        vof_interfacial_flagging.cpp    \
                         vof_norm.cpp                    \
                         vof_normalize.cpp               \
                         vof_normal_vector_near_bnd.cpp  \
@@ -44,7 +45,7 @@ libVof_a_SOURCES =      vof.h                           \
                         vof_norm_mixed.cpp              \
                         vof_norm_young.cpp              \
                         vof_select_norm.cpp             \
-                        vof_set_iflag.cpp               \
+                        vof_set_flag.cpp                \
                         vof_smooth.cpp                  \
                         vof_standardized_norm_vect.cpp  \
                         vof_tension.cpp                 \

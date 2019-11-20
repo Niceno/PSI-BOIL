@@ -23,11 +23,7 @@ class PhaseChangeVOF : public Centered {
                    const Scalar & clrs,
                    const Scalar & vs,
                    const Vector & u, 
-#if 1
                    Topology & topo,
-#else
-                   const VOF & vof,
-#endif
                    const TIF & tifmodel,
                    Times & t,
                    Matter * flu,
@@ -83,8 +79,6 @@ class PhaseChangeVOF : public Centered {
     void extrapolate(Scalar & sca, const int iext);
     void insert_bc_ext(const Comp mcomp);
 
-    void setflag();
-
     void subgrid();
     void subgrid_gradt();
     void subgrid_setflag();
@@ -133,7 +127,7 @@ class PhaseChangeVOF : public Centered {
 
     bool upwind_flag;
 
-    ScalarInt iflag;
+    ScalarInt tempflag,iflag;
     Scalar txv, tyv, tzv;
     Scalar txl, tyl, tzl;
     Scalar tnv, tnl;

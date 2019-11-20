@@ -9,6 +9,7 @@
 #include "../../../Timer/timer.h"
 #include "../../../Global/global_realistic.h"
 #include "../../Tifmodel/tif.h"
+#include "../../Topology/topology.h"
 
 /***************************************************************************//**
 *  \brief Discretizes and solves enthalpy conservaion equation.
@@ -45,13 +46,9 @@ class EnthalpyFD : public Centered {
         \param sm  - Krylov subspace solver. It acts as a solver, or as a
                      smoother for AC multirid.
         \param flu - Holds all fluid properties (\f$\rho, C_p, \lambda\f$),
-        \param sol - holds all solid properties (\f$\rho, C_p, \lambda\f$).
-        \param sol - holds all solid properties (\f$\rho, C_p, \lambda\f$).
+        \param topo - properties of the free surface (from ITM).
         \param tifmodel - interfacial temperature model.
-        \param latent - latent heat of evaporation.
-        \param mresis - interfacial mass transfer resistance.
-        \param fs - free surface position from VOF.
-        \param adens - interfacial area density.
+        \param sol - holds all solid properties (\f$\rho, C_p, \lambda\f$).
     */
 
     /* Most general constructor */
@@ -62,10 +59,9 @@ class EnthalpyFD : public Centered {
                 Times & t,
                 Krylov * sm,
                 Matter * flu,
+                Topology & topo,
                 TIF & tifmodel,
-                Matter * sol = NULL,
-                const Vector * fs = NULL,
-                const Scalar * adens = NULL);
+                Matter * sol = NULL);
 
     ~EnthalpyFD();
 
@@ -129,7 +125,6 @@ class EnthalpyFD : public Centered {
                * 0.5 * (phi.dzb(k)+phi.dzt(k));
       return vol;
     };
-    void setflag();
     void diff_matrix(real & am, real & ac, real & ap
                 , real & tm, real & tc, real & tp
                 , real & aflagm, real & aflagp
@@ -138,7 +133,7 @@ class EnthalpyFD : public Centered {
                 , const bool onm, const bool onc, const bool onp
                 , const bool ofm, const bool ofc, const bool ofp
                 , const real lsm, const real lsc, const real lsp
-                , const real clm, const real clc, const real clp
+                , const int clm, const int clc, const int clp
                 , real dxm, real dxp
                 , real fdm, real fdp, real fdms, real fdps
                 , real pm, real pc, real pp
@@ -150,15 +145,11 @@ class EnthalpyFD : public Centered {
     bool store_clrold;
     Scalar clrold;
     Scalar ftif,ftifold; /* tbd */
-    ScalarInt iflag;
+    ScalarInt iflag,iflagold;
     real turbP; /* turbulent Prandtl number */
     bool laminar;
 
-    const Scalar * adens;
-    Scalar adensold;
-
-    const Vector * fs;
-    Vector fsold;
+    Vector fs,fsold;
 
     TIF & tifmodel;  
 

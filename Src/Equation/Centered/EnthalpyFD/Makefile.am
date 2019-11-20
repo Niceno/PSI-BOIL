@@ -15,7 +15,6 @@ libEnthalpyFD_a_SOURCES = enthalpyfd.h                    \
                           enthalpyfd_hflux_wall_ib.cpp    \
                           enthalpyfd_int_distance.cpp     \
                           enthalpyfd_interface.cpp        \
-                          enthalpyfd_setflag.cpp          \
                           enthalpyfd_solve.cpp            \
                           enthalpyfd_solve_sor.cpp        \
                           enthalpyfd_tint_val.cpp         \

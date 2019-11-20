@@ -37,8 +37,8 @@ void VOFaxisym::curv_HF() {
 
   /*-----------------------------------------------------------------+
   |  Step 1: calculate normal vector                                 |
-  |  Step 2: define iflag=1                                          |
-  |  Step 3: calculate curvature if (iflag==1 & mof<height<=mof+1)   |
+  |  Step 2: define flag=1                                           |
+  |  Step 3: calculate curvature if (flag==1 & mof<height<=mof+1)    |
   |  Step 4: calculate curvature near wall                           |
   |  Step 5: extrapolate curvature to iterloop layers                |
   +-----------------------------------------------------------------*/
@@ -73,8 +73,8 @@ void VOFaxisym::curv_HF() {
   /* mx, my, mz remain unchanged */
   true_norm_vect(nx,ny,nz,nx,ny,nz);
 
-  /* define iflag */
-  iflag=0;
+  /* define tempflag */
+  tempflag=0;
   for_ijk(i,j,k) {
     if(dom->ibody().on(i,j,k)) {
 #if 0 /* no longer necessary! */
@@ -86,15 +86,15 @@ void VOFaxisym::curv_HF() {
         ) {
       } else {
 #endif
-        if((clr[i-1][j][k]-phisurf)*(clr[i][j][k]-phisurf)<=0.0){ iflag[i][j][k]=1;}
-        if((clr[i+1][j][k]-phisurf)*(clr[i][j][k]-phisurf)<=0.0){ iflag[i][j][k]=1;}
-        if((clr[i][j][k-1]-phisurf)*(clr[i][j][k]-phisurf)<=0.0){ iflag[i][j][k]=1;}
-        if((clr[i][j][k+1]-phisurf)*(clr[i][j][k]-phisurf)<=0.0){ iflag[i][j][k]=1;}
+        if((clr[i-1][j][k]-phisurf)*(clr[i][j][k]-phisurf)<=0.0){ tempflag[i][j][k]=1;}
+        if((clr[i+1][j][k]-phisurf)*(clr[i][j][k]-phisurf)<=0.0){ tempflag[i][j][k]=1;}
+        if((clr[i][j][k-1]-phisurf)*(clr[i][j][k]-phisurf)<=0.0){ tempflag[i][j][k]=1;}
+        if((clr[i][j][k+1]-phisurf)*(clr[i][j][k]-phisurf)<=0.0){ tempflag[i][j][k]=1;}
       //}
     }
   }
-  iflag.bnd_update_symmetry(); /* copy on symmetry plane */
-  iflag.exchange();
+  tempflag.bnd_update_symmetry(); /* copy on symmetry plane */
+  tempflag.exchange();
 
   /*------------------------+
   |  curvature calculation  |
@@ -103,8 +103,8 @@ void VOFaxisym::curv_HF() {
 
   for_ijk(i,j,k) {
 
-    /* calculate curvature only when iflag=1 */
-    if(iflag[i][j][k]==1) {
+    /* calculate curvature only when tempflag=1 */
+    if(tempflag[i][j][k]==1) {
 
       /* select dominant (=majorext) direction of stencil */
       Comp mMax = Comp::undefined();
@@ -154,7 +154,7 @@ void VOFaxisym::curv_HF() {
                                               i,j,k);
           kappa[i][j][k] = kap_cart + kap_cyl;
         } else {
-          iflag[i][j][k] = 0;
+          tempflag[i][j][k] = 0;
         }
 
       } else if(mMax==Comp::k()) {
@@ -188,7 +188,7 @@ void VOFaxisym::curv_HF() {
                                               i,j,k);
           kappa[i][j][k] = kap_cart + kap_cyl;
         } else {
-          iflag[i][j][k] = 0;
+          tempflag[i][j][k] = 0;
         }
 
       } else { /* blending */
@@ -230,7 +230,7 @@ void VOFaxisym::curv_HF() {
         real kap_x_cart(0.0), kap_z_cart(0.0);
         
         if(!flag_x&&!flag_z) {
-          iflag[i][j][k] = 0;
+          tempflag[i][j][k] = 0;
         } else {
           /* blending factor for z-component */
           real bfactor = ( flag_x_adj& flag_z_adj)*(abs_nz*abs_nz - n0square)/(1.-2.*n0square)
@@ -282,13 +282,13 @@ void VOFaxisym::curv_HF() {
 
       //boil::oout<<i<<" "<<k<<" "<<mMax<<" "<<kappa[i][j][k]<<boil::endl;
 
-    } /* iflag = 1 */
+    } /* tempflag = 1 */
   } /* for ijk */
 
   kappa.bnd_update_symmetry(); /* copy on symmetry plane */
-  iflag.bnd_update_symmetry(); /* copy on symmetry plane */
+  tempflag.bnd_update_symmetry(); /* copy on symmetry plane */
   kappa.exchange();
-  iflag.exchange();
+  tempflag.exchange();
 
   /* near-wall calculations */
   if       (wall_curv_method==CurvMethod::DivNorm()) {
@@ -307,42 +307,42 @@ void VOFaxisym::curv_HF() {
 
   /* extrapolate kappa */
   stmp  = kappa;
-  jflag = iflag;
+  tempflag2 = tempflag;
   
   for(int iloop=1; iloop<iterloop; iloop++) { 
     for_ijk(i,j,k) {
       if(dom->ibody().off(i,j,k)) continue;
-      if(iflag[i][j][k]==0) {
-        /* at this point, the near-wall iflag must be properly 0 or 1 */
-        int inb = std::min(1,iflag[i-1][j][k]) + std::min(1,iflag[i+1][j][k])
-                + std::min(1,iflag[i][j][k-1]) + std::min(1,iflag[i][j][k+1]);
+      if(tempflag[i][j][k]==0) {
+        /* at this point, the near-wall tempflag must be properly 0 or 1 */
+        int inb = std::min(1,tempflag[i-1][j][k]) + std::min(1,tempflag[i+1][j][k])
+                + std::min(1,tempflag[i][j][k-1]) + std::min(1,tempflag[i][j][k+1]);
         if(inb >= 1) {
-          stmp[i][j][k] = (real(std::min(1,iflag[i-1][j][k])) * kappa[i-1][j][k]
-                        +  real(std::min(1,iflag[i+1][j][k])) * kappa[i+1][j][k]
-                        +  real(std::min(1,iflag[i][j][k-1])) * kappa[i][j][k-1]
-                        +  real(std::min(1,iflag[i][j][k+1])) * kappa[i][j][k+1])
+          stmp[i][j][k] = (real(std::min(1,tempflag[i-1][j][k])) * kappa[i-1][j][k]
+                        +  real(std::min(1,tempflag[i+1][j][k])) * kappa[i+1][j][k]
+                        +  real(std::min(1,tempflag[i][j][k-1])) * kappa[i][j][k-1]
+                        +  real(std::min(1,tempflag[i][j][k+1])) * kappa[i][j][k+1])
                         /real(inb);
-          jflag[i][j][k] = 2;  /* iflag=2 for extrapolated */
+          tempflag2[i][j][k] = 2;  /* tempflag=2 for extrapolated */
         }
       }
     }
     stmp.bnd_update_symmetry(); /* copy on symmetry plane */
-    jflag.bnd_update_symmetry(); /* copy on symmetry plane */
+    tempflag2.bnd_update_symmetry(); /* copy on symmetry plane */
     stmp.exchange();
-    jflag.exchange();
+    tempflag2.exchange();
     kappa = stmp;
-    iflag = jflag;
+    tempflag = tempflag2;
   }
 
 #if 0
   //if(time->current_step()==1) {
   //if(time->current_step()%100==0) {
-  /* visualize iflag */
+  /* visualize tempflag */
   boil::plot->plot(clr,nx,ny,nz, "clr-nx-ny-nz", time->current_step());
   for_ijk(i,j,k){
-    stmp[i][j][k]=iflag[i][j][k];
+    stmp[i][j][k]=tempflag[i][j][k];
   }
-  boil::plot->plot(clr,kappa,stmp, "clr-kappa-iflag", time->current_step());
+  boil::plot->plot(clr,kappa,stmp, "clr-kappa-tempflag", time->current_step());
   exit(0);
   //}
 #endif

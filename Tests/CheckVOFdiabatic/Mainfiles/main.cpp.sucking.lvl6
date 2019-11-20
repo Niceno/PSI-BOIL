@@ -18,7 +18,7 @@ const real tout=378.15;
 const real twall=373.15;
 
 /******************************************************************************/
-main(int argc, char * argv[]) {
+int main(int argc, char * argv[]) {
 
   // Journal of Computational Physics, 249, 127-161
   // Sucking problem
@@ -224,8 +224,8 @@ main(int argc, char * argv[]) {
   EnthalpyFD enthFD(tpr, q, c, uvw, time, solver, &mixed ,tsat);
 #else
   TIF Tsat(tsat);
-  EnthalpyFD enthFD(tpr, q, c, uvw, time, solver, &mixed, Tsat,
-                     NULL, conc.topo.fs, conc.topo.adens);
+  EnthalpyFD enthFD(tpr, q, c, uvw, time, solver, &mixed, 
+                     conc.topo,Tsat);
 #endif
   enthFD.convection_set(TimeScheme::forward_euler());
   enthFD.diffusion_set(TimeScheme::backward_euler());

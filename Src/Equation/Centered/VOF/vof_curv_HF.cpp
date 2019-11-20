@@ -30,8 +30,8 @@ void VOF::curv_HF() {
 
   /*-----------------------------------------------------------------+
   |  Step 1: calculate normal vector                                 |
-  |  Step 2: define iflag=1                                          |
-  |  Step 3: calculate curvature if (iflag==1 & mof<height<=mof+1)   |
+  |  Step 2: define flag=1                                           |
+  |  Step 3: calculate curvature if (flag==1 & mof<height<=mof+1)    |
   |  Step 4: calculate curvature near wall                           |
   |  Step 5: extrapolate curvature to iterloop layers                |
   +-----------------------------------------------------------------*/
@@ -71,8 +71,8 @@ void VOF::curv_HF() {
   /* mx, my, mz remain unchanged */
   true_norm_vect(nx,ny,nz,nx,ny,nz);
 
-  /* define iflag */
-  iflag=0;
+  /* define tempflag */
+  tempflag=0;
   for_ijk(i,j,k) {
     if(dom->ibody().on(i,j,k)) {
 #if 0 /* no longer necessary! */
@@ -92,17 +92,17 @@ void VOF::curv_HF() {
         ) {
       } else {
 #endif
-        if((phi[i-1][j][k]-phisurf)*(phi[i][j][k]-phisurf)<=0.0){ iflag[i][j][k]=1;}
-        if((phi[i+1][j][k]-phisurf)*(phi[i][j][k]-phisurf)<=0.0){ iflag[i][j][k]=1;}
-        if((phi[i][j-1][k]-phisurf)*(phi[i][j][k]-phisurf)<=0.0){ iflag[i][j][k]=1;}
-        if((phi[i][j+1][k]-phisurf)*(phi[i][j][k]-phisurf)<=0.0){ iflag[i][j][k]=1;}
-        if((phi[i][j][k-1]-phisurf)*(phi[i][j][k]-phisurf)<=0.0){ iflag[i][j][k]=1;}
-        if((phi[i][j][k+1]-phisurf)*(phi[i][j][k]-phisurf)<=0.0){ iflag[i][j][k]=1;}
+        if((phi[i-1][j][k]-phisurf)*(phi[i][j][k]-phisurf)<=0.0){ tempflag[i][j][k]=1;}
+        if((phi[i+1][j][k]-phisurf)*(phi[i][j][k]-phisurf)<=0.0){ tempflag[i][j][k]=1;}
+        if((phi[i][j-1][k]-phisurf)*(phi[i][j][k]-phisurf)<=0.0){ tempflag[i][j][k]=1;}
+        if((phi[i][j+1][k]-phisurf)*(phi[i][j][k]-phisurf)<=0.0){ tempflag[i][j][k]=1;}
+        if((phi[i][j][k-1]-phisurf)*(phi[i][j][k]-phisurf)<=0.0){ tempflag[i][j][k]=1;}
+        if((phi[i][j][k+1]-phisurf)*(phi[i][j][k]-phisurf)<=0.0){ tempflag[i][j][k]=1;}
       //}
     }
   }
-  iflag.bnd_update_symmetry(); /* copy on symmetry plane */
-  iflag.exchange();
+  tempflag.bnd_update_symmetry(); /* copy on symmetry plane */
+  tempflag.exchange();
 
   /*------------------------+
   |  curvature calculation  |
@@ -111,8 +111,8 @@ void VOF::curv_HF() {
 
   for_ijk(i,j,k) {
 
-    /* calculate curvature only when iflag=1 */
-    if(iflag[i][j][k]==1) {
+    /* calculate curvature only when tempflag=1 */
+    if(tempflag[i][j][k]==1) {
 
       /* select dominant (=majorext) direction of stencil */
       Comp mMax;
@@ -192,7 +192,7 @@ void VOF::curv_HF() {
                        phi.dys(j),phi.dyc(j),phi.dyn(j),
                        phi.dzb(k),phi.dzc(k),phi.dzt(k),
                        max_n,jfull,kfull,
-                       kappa[i][j][k],iflag[i][j][k]);
+                       kappa[i][j][k],tempflag[i][j][k]);
                        //i,j,k);
 
       } else if(mMax==Comp::j()) {
@@ -244,7 +244,7 @@ void VOF::curv_HF() {
                        phi.dxw(i),phi.dxc(i),phi.dxe(i),
                        phi.dzb(k),phi.dzc(k),phi.dzt(k),
                        max_n,ifull,kfull,
-                       kappa[i][j][k],iflag[i][j][k]);
+                       kappa[i][j][k],tempflag[i][j][k]);
                        //i,j,k);
 
       } else { 
@@ -296,18 +296,18 @@ void VOF::curv_HF() {
                        phi.dxw(i),phi.dxc(i),phi.dxe(i),
                        phi.dys(j),phi.dyc(j),phi.dyn(j),
                        max_n,ifull,jfull,
-                       kappa[i][j][k],iflag[i][j][k]);
+                       kappa[i][j][k],tempflag[i][j][k]);
                        //i,j,k);
 
       }
 
-    } /* iflag = 1 */
+    } /* tempflag = 1 */
   } /* for ijk */
 
   kappa.bnd_update_symmetry(); /* copy on symmetry plane */
-  iflag.bnd_update_symmetry(); /* copy on symmetry plane */
+  tempflag.bnd_update_symmetry(); /* copy on symmetry plane */
   kappa.exchange();
-  iflag.exchange();
+  tempflag.exchange();
 
   /* near-wall calculations */
   if       (wall_curv_method==CurvMethod::DivNorm()) {
@@ -324,45 +324,45 @@ void VOF::curv_HF() {
 
   /* extrapolate kappa */
   stmp  = kappa;
-  jflag = iflag;
+  tempflag2 = tempflag;
   
   for(int iloop=1; iloop<iterloop; iloop++) { /* 2019.07.09 */
     for_ijk(i,j,k) {
       if(dom->ibody().off(i,j,k)) continue;
-      if(iflag[i][j][k]==0) {
-        /* at this point, the near-wall iflag must be properly 0 or 1 */
-        int inb = std::min(1,iflag[i-1][j][k]) + std::min(1,iflag[i+1][j][k])
-                + std::min(1,iflag[i][j-1][k]) + std::min(1,iflag[i][j+1][k])
-                + std::min(1,iflag[i][j][k-1]) + std::min(1,iflag[i][j][k+1]);
+      if(tempflag[i][j][k]==0) {
+        /* at this point, the near-wall tempflag must be properly 0 or 1 */
+        int inb = std::min(1,tempflag[i-1][j][k]) + std::min(1,tempflag[i+1][j][k])
+                + std::min(1,tempflag[i][j-1][k]) + std::min(1,tempflag[i][j+1][k])
+                + std::min(1,tempflag[i][j][k-1]) + std::min(1,tempflag[i][j][k+1]);
         if(inb >= 1) {
-          stmp[i][j][k] = (real(std::min(1,iflag[i-1][j][k])) * kappa[i-1][j][k]
-                        +  real(std::min(1,iflag[i+1][j][k])) * kappa[i+1][j][k]
-                        +  real(std::min(1,iflag[i][j-1][k])) * kappa[i][j-1][k]
-                        +  real(std::min(1,iflag[i][j+1][k])) * kappa[i][j+1][k]
-                        +  real(std::min(1,iflag[i][j][k-1])) * kappa[i][j][k-1]
-                        +  real(std::min(1,iflag[i][j][k+1])) * kappa[i][j][k+1])
+          stmp[i][j][k] = (real(std::min(1,tempflag[i-1][j][k])) * kappa[i-1][j][k]
+                        +  real(std::min(1,tempflag[i+1][j][k])) * kappa[i+1][j][k]
+                        +  real(std::min(1,tempflag[i][j-1][k])) * kappa[i][j-1][k]
+                        +  real(std::min(1,tempflag[i][j+1][k])) * kappa[i][j+1][k]
+                        +  real(std::min(1,tempflag[i][j][k-1])) * kappa[i][j][k-1]
+                        +  real(std::min(1,tempflag[i][j][k+1])) * kappa[i][j][k+1])
                         /real(inb);
-          jflag[i][j][k] = 2;  /* iflag=2 for extrapolated */
+          tempflag2[i][j][k] = 2;  /* tempflag=2 for extrapolated */
         }
       }
     }
     stmp.bnd_update_symmetry(); /* copy on symmetry plane */
-    jflag.bnd_update_symmetry(); /* copy on symmetry plane */
+    tempflag2.bnd_update_symmetry(); /* copy on symmetry plane */
     stmp.exchange();
-    jflag.exchange();
+    tempflag2.exchange();
     kappa = stmp;
-    iflag = jflag;
+    tempflag = tempflag2;
   }
   
 #if 0
   if(time->current_step()==1) {
   //if(time->current_step()%100==0) {
-  /* visualize iflag */
+  /* visualize tempflag */
   boil::plot->plot(phi,nx,ny,nz, "clr-nx-ny-nz", time->current_step());
   for_ijk(i,j,k){
-    stmp[i][j][k]=iflag[i][j][k];
+    stmp[i][j][k]=tempflag[i][j][k];
   }
-  boil::plot->plot(phi,kappa,stmp, "clr-kappa-iflag", time->current_step());
+  boil::plot->plot(phi,kappa,stmp, "clr-kappa-tempflag", time->current_step());
   exit(0);
   } 
 #endif
@@ -385,7 +385,7 @@ void VOF::curv_HF() {
    
    outputs:
    - kappa value (if computed)
-   - iflag value (if kappa not computed)
+   - tempflag value (if kappa not computed)
 */
 void VOF::curv_HF_kernel(arr3D & stencil, const arr3D & gridstencil,
                          const int imin, const int imax,

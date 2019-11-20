@@ -37,15 +37,15 @@ void VOF::insert_bc_curv_divnorm() {
   /*---------------------------------------------+
   |  calculate curvature. curvature=-div(norm)   |
   +---------------------------------------------*/
-  // iflag=1 at "3 <= height-function <=4", which is set in curv_HF.
+  // tempflag=1 at "3 <= height-function <=4", which is set in curv_HF.
   if(phi.bc().type_here(Dir::imin(), BndType::wall())) {
     int i=si();
     for_vjk(kappa,j,k) {
-      if (iflag[i][j][k]==1) {
+      if (tempflag[i][j][k]==1) {
         kappa[i][j][k]=divnorm(nx,ny,nz,i,j,k);
         kappa[i-1][j][k]=kappa[i][j][k];
       } else {
-        iflag[i][j][k]=0;
+        tempflag[i][j][k]=0;
       }
     }
   }
@@ -53,11 +53,11 @@ void VOF::insert_bc_curv_divnorm() {
   if(phi.bc().type_here(Dir::imax(), BndType::wall())) {
     int i=ei();
     for_vjk(kappa,j,k) {
-      if (iflag[i][j][k]==1) {
+      if (tempflag[i][j][k]==1) {
         kappa[i][j][k]=divnorm(nx,ny,nz,i,j,k);
         kappa[i+1][j][k]=kappa[i][j][k];
       } else {
-        iflag[i][j][k]=0;
+        tempflag[i][j][k]=0;
       }
     }
   }
@@ -65,11 +65,11 @@ void VOF::insert_bc_curv_divnorm() {
   if(phi.bc().type_here(Dir::jmin(), BndType::wall())) {
     int j=sj();
     for_vik(kappa,i,k) {
-      if (iflag[i][j][k]==1) {
+      if (tempflag[i][j][k]==1) {
         kappa[i][j][k]=divnorm(nx,ny,nz,i,j,k);
         kappa[i][j-1][k]=kappa[i][j][k];
       } else {
-        iflag[i][j][k]=0;
+        tempflag[i][j][k]=0;
       }
     }
   }
@@ -77,11 +77,11 @@ void VOF::insert_bc_curv_divnorm() {
   if(phi.bc().type_here(Dir::jmax(), BndType::wall())) {
     int j=ej();
     for_vik(kappa,i,k) {
-      if (iflag[i][j][k]==1) {
+      if (tempflag[i][j][k]==1) {
         kappa[i][j][k]=divnorm(nx,ny,nz,i,j,k);
         kappa[i][j+1][k]=kappa[i][j][k];
       } else {
-        iflag[i][j][k]=0;
+        tempflag[i][j][k]=0;
       }
     }
   }
@@ -89,11 +89,11 @@ void VOF::insert_bc_curv_divnorm() {
   if(phi.bc().type_here(Dir::kmin(), BndType::wall())) {
     int k=sk();
     for_vij(kappa,i,j) {
-      if (iflag[i][j][k]==1) {
+      if (tempflag[i][j][k]==1) {
         kappa[i][j][k]=divnorm(nx,ny,nz,i,j,k);
         kappa[i][j][k-1]=kappa[i][j][k];
       } else {
-        iflag[i][j][k]=0;
+        tempflag[i][j][k]=0;
       }
     }
   }
@@ -101,11 +101,11 @@ void VOF::insert_bc_curv_divnorm() {
   if(phi.bc().type_here(Dir::kmax(), BndType::wall())) {
     int k=ek();
     for_vij(kappa,i,j) {
-      if (iflag[i][j][k]==1) {
+      if (tempflag[i][j][k]==1) {
         kappa[i][j][k]=divnorm(nx,ny,nz,i,j,k);
         kappa[i][j][k+1]=kappa[i][j][k];
       } else {
-        iflag[i][j][k]=0;
+        tempflag[i][j][k]=0;
       }
     }
   }
@@ -113,14 +113,14 @@ void VOF::insert_bc_curv_divnorm() {
   for(int cc=0; cc<dom->ibody().nccells(); cc++){
     int i,j,k;
     dom->ibody().ijk(cc,&i,&j,&k);
-    if (iflag[i][j][k]==1) {
+    if (tempflag[i][j][k]==1) {
       kappa[i][j][k] = divnorm(nx,ny,nz,i,j,k);
     } else {
-        iflag[i][j][k]=0;
+        tempflag[i][j][k]=0;
     }
   }
 
-  iflag.exchange();
+  tempflag.exchange();
   kappa.exchange();
 
   /*---------------------------------+
@@ -133,30 +133,30 @@ void VOF::insert_bc_curv_divnorm() {
   +--------*/
   if(phi.bc().type(Dir::imin(), BndType::wall())) {
     stmp = kappa;
-    jflag = iflag;
+    tempflag2 = tempflag;
     int i=si();
     for(int iloop=1; iloop<=mloop; iloop++) {
       if(phi.bc().type_here(Dir::imin(), BndType::wall())) {
       for_vjk(kappa,j,k) {
         if(dom->ibody().off(i,j,k)) continue;
-        if (iflag[i][j][k]==0) {
-          int inb =  min(1,iflag[i][j-1][k]) + min(1,iflag[i][j+1][k])
-                   + min(1,iflag[i][j][k-1]) + min(1,iflag[i][j][k+1]);
+        if (tempflag[i][j][k]==0) {
+          int inb =  min(1,tempflag[i][j-1][k]) + min(1,tempflag[i][j+1][k])
+                   + min(1,tempflag[i][j][k-1]) + min(1,tempflag[i][j][k+1]);
           if (inb >= 1) {
-              stmp[i][j][k] = (real(min(1,iflag[i][j-1][k])) * kappa[i][j-1][k]
-                             + real(min(1,iflag[i][j+1][k])) * kappa[i][j+1][k]
-                             + real(min(1,iflag[i][j][k-1])) * kappa[i][j][k-1]
-                             + real(min(1,iflag[i][j][k+1])) * kappa[i][j][k+1])
+              stmp[i][j][k] = (real(min(1,tempflag[i][j-1][k])) * kappa[i][j-1][k]
+                             + real(min(1,tempflag[i][j+1][k])) * kappa[i][j+1][k]
+                             + real(min(1,tempflag[i][j][k-1])) * kappa[i][j][k-1]
+                             + real(min(1,tempflag[i][j][k+1])) * kappa[i][j][k+1])
                              /real(inb);
-              jflag[i][j][k] = 2;  // iflag=2 for extrapolated
+              tempflag2[i][j][k] = 2;  // tempflag=2 for extrapolated
           }
         }
       }
       }
       stmp.exchange();
-      jflag.exchange();
+      tempflag2.exchange();
       kappa = stmp;
-      iflag = jflag;
+      tempflag = tempflag2;
     }
   }
 
@@ -165,30 +165,30 @@ void VOF::insert_bc_curv_divnorm() {
   +--------*/
   if(phi.bc().type(Dir::imax(), BndType::wall())) {
     stmp = kappa;
-    jflag = iflag;
+    tempflag2 = tempflag;
     int i=ei();
     for(int iloop=1; iloop<=mloop; iloop++) {
       if(phi.bc().type_here(Dir::imax(), BndType::wall())) {
       for_vjk(kappa,j,k) {
         if(dom->ibody().off(i,j,k)) continue;
-        if (iflag[i][j][k]==0) {
-          int inb =  min(1,iflag[i][j-1][k]) + min(1,iflag[i][j+1][k])
-                   + min(1,iflag[i][j][k-1]) + min(1,iflag[i][j][k+1]);
+        if (tempflag[i][j][k]==0) {
+          int inb =  min(1,tempflag[i][j-1][k]) + min(1,tempflag[i][j+1][k])
+                   + min(1,tempflag[i][j][k-1]) + min(1,tempflag[i][j][k+1]);
           if (inb >= 1) {
-              stmp[i][j][k] = (real(min(1,iflag[i][j-1][k])) * kappa[i][j-1][k]
-                             + real(min(1,iflag[i][j+1][k])) * kappa[i][j+1][k]
-                             + real(min(1,iflag[i][j][k-1])) * kappa[i][j][k-1]
-                             + real(min(1,iflag[i][j][k+1])) * kappa[i][j][k+1])
+              stmp[i][j][k] = (real(min(1,tempflag[i][j-1][k])) * kappa[i][j-1][k]
+                             + real(min(1,tempflag[i][j+1][k])) * kappa[i][j+1][k]
+                             + real(min(1,tempflag[i][j][k-1])) * kappa[i][j][k-1]
+                             + real(min(1,tempflag[i][j][k+1])) * kappa[i][j][k+1])
                              /real(inb);
-              jflag[i][j][k] = 2;  // iflag=2 for extrapolated
+              tempflag2[i][j][k] = 2;  // tempflag=2 for extrapolated
           }
         }
       }
       }
       stmp.exchange();
-      jflag.exchange();
+      tempflag2.exchange();
       kappa = stmp;
-      iflag = jflag;
+      tempflag = tempflag2;
     }
   }
 
@@ -197,30 +197,30 @@ void VOF::insert_bc_curv_divnorm() {
   +--------*/
   if(phi.bc().type(Dir::jmin(), BndType::wall())) {
     stmp = kappa;
-    jflag = iflag;
+    tempflag2 = tempflag;
     int j=sj();
     for(int iloop=1; iloop<=mloop; iloop++) {
       if(phi.bc().type_here(Dir::jmin(), BndType::wall())) {
       for_vik(kappa,i,k) {
         if(dom->ibody().off(i,j,k)) continue;
-        if (iflag[i][j][k]==0) {
-          int inb =  min(1,iflag[i-1][j][k]) + min(1,iflag[i+1][j][k])
-                   + min(1,iflag[i][j][k-1]) + min(1,iflag[i][j][k+1]);
+        if (tempflag[i][j][k]==0) {
+          int inb =  min(1,tempflag[i-1][j][k]) + min(1,tempflag[i+1][j][k])
+                   + min(1,tempflag[i][j][k-1]) + min(1,tempflag[i][j][k+1]);
           if (inb >= 1) {
-              stmp[i][j][k] = (real(min(1,iflag[i-1][j][k])) * kappa[i-1][j][k]
-                             + real(min(1,iflag[i+1][j][k])) * kappa[i+1][j][k]
-                             + real(min(1,iflag[i][j][k-1])) * kappa[i][j][k-1]
-                             + real(min(1,iflag[i][j][k+1])) * kappa[i][j][k+1])
+              stmp[i][j][k] = (real(min(1,tempflag[i-1][j][k])) * kappa[i-1][j][k]
+                             + real(min(1,tempflag[i+1][j][k])) * kappa[i+1][j][k]
+                             + real(min(1,tempflag[i][j][k-1])) * kappa[i][j][k-1]
+                             + real(min(1,tempflag[i][j][k+1])) * kappa[i][j][k+1])
                              /real(inb);
-              jflag[i][j][k] = 2;  // iflag=2 for extrapolated
+              tempflag2[i][j][k] = 2;  // tempflag=2 for extrapolated
           }
         }
       }
       }
       stmp.exchange();
-      jflag.exchange();
+      tempflag2.exchange();
       kappa = stmp;
-      iflag = jflag;
+      tempflag = tempflag2;
     }
   }
 
@@ -229,30 +229,30 @@ void VOF::insert_bc_curv_divnorm() {
   +--------*/
   if(phi.bc().type(Dir::jmax(), BndType::wall())) {
     stmp = kappa;
-    jflag = iflag;
+    tempflag2 = tempflag;
     int j=ej();
     for(int iloop=1; iloop<=mloop; iloop++) {
       if(phi.bc().type_here(Dir::jmax(), BndType::wall())) {
       for_vik(kappa,i,k) {
         if(dom->ibody().off(i,j,k)) continue;
-        if (iflag[i][j][k]==0) {
-          int inb =  min(1,iflag[i-1][j][k]) + min(1,iflag[i+1][j][k])
-                   + min(1,iflag[i][j][k-1]) + min(1,iflag[i][j][k+1]);
+        if (tempflag[i][j][k]==0) {
+          int inb =  min(1,tempflag[i-1][j][k]) + min(1,tempflag[i+1][j][k])
+                   + min(1,tempflag[i][j][k-1]) + min(1,tempflag[i][j][k+1]);
           if (inb >= 1) {
-              stmp[i][j][k] = (real(min(1,iflag[i-1][j][k])) * kappa[i-1][j][k]
-                             + real(min(1,iflag[i+1][j][k])) * kappa[i+1][j][k]
-                             + real(min(1,iflag[i][j][k-1])) * kappa[i][j][k-1]
-                             + real(min(1,iflag[i][j][k+1])) * kappa[i][j][k+1])
+              stmp[i][j][k] = (real(min(1,tempflag[i-1][j][k])) * kappa[i-1][j][k]
+                             + real(min(1,tempflag[i+1][j][k])) * kappa[i+1][j][k]
+                             + real(min(1,tempflag[i][j][k-1])) * kappa[i][j][k-1]
+                             + real(min(1,tempflag[i][j][k+1])) * kappa[i][j][k+1])
                              /real(inb);
-              jflag[i][j][k] = 2;  // iflag=2 for extrapolated
+              tempflag2[i][j][k] = 2;  // tempflag=2 for extrapolated
           }
         }
       }
       }
       stmp.exchange();
-      jflag.exchange();
+      tempflag2.exchange();
       kappa = stmp;
-      iflag = jflag;
+      tempflag = tempflag2;
     }
   }
 
@@ -261,30 +261,30 @@ void VOF::insert_bc_curv_divnorm() {
   +--------*/
   if(phi.bc().type(Dir::kmin(), BndType::wall())) {
     stmp = kappa;
-    jflag = iflag;
+    tempflag2 = tempflag;
     int k=sk();
     for(int iloop=1; iloop<=mloop; iloop++) {
       if(phi.bc().type_here(Dir::kmin(), BndType::wall())) {
       for_vij(kappa,i,j) {
         if(dom->ibody().off(i,j,k)) continue;
-        if (iflag[i][j][k]==0) {
-          int inb =  min(1,iflag[i-1][j][k]) + min(1,iflag[i+1][j][k])
-                   + min(1,iflag[i][j-1][k]) + min(1,iflag[i][j+1][k]);
+        if (tempflag[i][j][k]==0) {
+          int inb =  min(1,tempflag[i-1][j][k]) + min(1,tempflag[i+1][j][k])
+                   + min(1,tempflag[i][j-1][k]) + min(1,tempflag[i][j+1][k]);
           if (inb >= 1) {
-              stmp[i][j][k] = (real(min(1,iflag[i-1][j][k])) * kappa[i-1][j][k]
-                             + real(min(1,iflag[i+1][j][k])) * kappa[i+1][j][k]
-                             + real(min(1,iflag[i][j-1][k])) * kappa[i][j-1][k]
-                             + real(min(1,iflag[i][j+1][k])) * kappa[i][j+1][k])
+              stmp[i][j][k] = (real(min(1,tempflag[i-1][j][k])) * kappa[i-1][j][k]
+                             + real(min(1,tempflag[i+1][j][k])) * kappa[i+1][j][k]
+                             + real(min(1,tempflag[i][j-1][k])) * kappa[i][j-1][k]
+                             + real(min(1,tempflag[i][j+1][k])) * kappa[i][j+1][k])
                              /real(inb);
-              jflag[i][j][k] = 2;  // iflag=2 for extrapolated
+              tempflag2[i][j][k] = 2;  // tempflag=2 for extrapolated
           }
         }
       }
       }
       stmp.exchange();
-      jflag.exchange();
+      tempflag2.exchange();
       kappa = stmp;
-      iflag = jflag;
+      tempflag = tempflag2;
     }
   }
 
@@ -293,30 +293,30 @@ void VOF::insert_bc_curv_divnorm() {
   +--------*/
   if(phi.bc().type(Dir::kmax(), BndType::wall())) {
     stmp = kappa;
-    jflag = iflag;
+    tempflag2 = tempflag;
     int k=ek();
     for(int iloop=1; iloop<=mloop; iloop++) {
       if(phi.bc().type_here(Dir::kmax(), BndType::wall())) {
       for_vij(kappa,i,j) {
         if(dom->ibody().off(i,j,k)) continue;
-        if (iflag[i][j][k]==0) {
-          int inb =  min(1,iflag[i-1][j][k]) + min(1,iflag[i+1][j][k])
-                   + min(1,iflag[i][j-1][k]) + min(1,iflag[i][j+1][k]);
+        if (tempflag[i][j][k]==0) {
+          int inb =  min(1,tempflag[i-1][j][k]) + min(1,tempflag[i+1][j][k])
+                   + min(1,tempflag[i][j-1][k]) + min(1,tempflag[i][j+1][k]);
           if (inb >= 1) {
-              stmp[i][j][k] = (real(min(1,iflag[i-1][j][k])) * kappa[i-1][j][k]
-                             + real(min(1,iflag[i+1][j][k])) * kappa[i+1][j][k]
-                             + real(min(1,iflag[i][j-1][k])) * kappa[i][j-1][k]
-                             + real(min(1,iflag[i][j+1][k])) * kappa[i][j+1][k])
+              stmp[i][j][k] = (real(min(1,tempflag[i-1][j][k])) * kappa[i-1][j][k]
+                             + real(min(1,tempflag[i+1][j][k])) * kappa[i+1][j][k]
+                             + real(min(1,tempflag[i][j-1][k])) * kappa[i][j-1][k]
+                             + real(min(1,tempflag[i][j+1][k])) * kappa[i][j+1][k])
                              /real(inb);
-              jflag[i][j][k] = 2;  // iflag=2 for extrapolated
+              tempflag2[i][j][k] = 2;  // tempflag=2 for extrapolated
           }
         }
       }
       }
       stmp.exchange();
-      jflag.exchange();
+      tempflag2.exchange();
       kappa = stmp;
-      iflag = jflag;
+      tempflag = tempflag2;
     }
   }
 
@@ -325,7 +325,7 @@ void VOF::insert_bc_curv_divnorm() {
   +--------------------*/
   if(dom->ibody().ncall() >= 1) {
     stmp = kappa;
-    jflag = iflag;
+    tempflag2 = tempflag;
     for(int iloop=1; iloop<=mloop; iloop++) {
       for(int cc=0; cc<dom->ibody().nccells(); cc++){
         int i,j,k;
@@ -333,7 +333,7 @@ void VOF::insert_bc_curv_divnorm() {
     /*--------------------------------------+
     |  Note:  (i, j, k) is in fluid domain  |
     +--------------------------------------*/
-        if (iflag[i][j][k]==0) {  // to be extrapolated
+        if (tempflag[i][j][k]==0) {  // to be extrapolated
           /* set direction */    // crude code!!!
           real ux=fabs(dom->ibody().nwx(i,j,k));
           real uy=fabs(dom->ibody().nwy(i,j,k));
@@ -354,25 +354,25 @@ void VOF::insert_bc_curv_divnorm() {
           else if(dirMax==1) { jcal=0; }
           else               { kcal=0; }
 
-          int inb = ical*( min(1,iflag[i-1][j][k]) + min(1,iflag[i+1][j][k]))
-                  + jcal*( min(1,iflag[i][j-1][k]) + min(1,iflag[i][j+1][k]))
-                  + kcal*( min(1,iflag[i][j][k-1]) + min(1,iflag[i][j][k+1]));
+          int inb = ical*( min(1,tempflag[i-1][j][k]) + min(1,tempflag[i+1][j][k]))
+                  + jcal*( min(1,tempflag[i][j-1][k]) + min(1,tempflag[i][j+1][k]))
+                  + kcal*( min(1,tempflag[i][j][k-1]) + min(1,tempflag[i][j][k+1]));
           if (inb >= 1) {
-            stmp[i][j][k]=(ical*(real(min(1,iflag[i-1][j][k]))*kappa[i-1][j][k]
-                                +real(min(1,iflag[i+1][j][k]))*kappa[i+1][j][k])
-                          +jcal*(real(min(1,iflag[i][j-1][k]))*kappa[i][j-1][k]
-                                +real(min(1,iflag[i][j+1][k]))*kappa[i][j+1][k])
-                          +kcal*(real(min(1,iflag[i][j][k-1]))*kappa[i][j][k-1]
-                               +real(min(1,iflag[i][j][k+1]))*kappa[i][j][k+1]))
+            stmp[i][j][k]=(ical*(real(min(1,tempflag[i-1][j][k]))*kappa[i-1][j][k]
+                                +real(min(1,tempflag[i+1][j][k]))*kappa[i+1][j][k])
+                          +jcal*(real(min(1,tempflag[i][j-1][k]))*kappa[i][j-1][k]
+                                +real(min(1,tempflag[i][j+1][k]))*kappa[i][j+1][k])
+                          +kcal*(real(min(1,tempflag[i][j][k-1]))*kappa[i][j][k-1]
+                               +real(min(1,tempflag[i][j][k+1]))*kappa[i][j][k+1]))
                           /real(inb);
-            jflag[i][j][k] = 2;  // iflag=2 for extrapolation
+            tempflag2[i][j][k] = 2;  // tempflag=2 for extrapolation
           }
         }
       }
       stmp.exchange();
-      jflag.exchange();
+      tempflag2.exchange();
       kappa = stmp;
-      iflag = jflag;
+      tempflag = tempflag2;
     }
   }
 

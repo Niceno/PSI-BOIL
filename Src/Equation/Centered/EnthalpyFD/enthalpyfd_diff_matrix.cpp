@@ -3,7 +3,7 @@ using namespace std;
 
 //#define DEBUG
 //#define USE_FDM_SOLID
-#define USE_FDM_FLUID
+//#define USE_FDM_FLUID
 
 /***************************************************************************//**
 *  \brief Creates diffusive part of the system matrix \f$ [A] \f$.
@@ -16,7 +16,7 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
                 , const bool onm, const bool onc, const bool onp
                 , const bool ofm, const bool ofc, const bool ofp
                 , const real lsm, const real lsc, const real lsp
-                , const real clm, const real clc, const real clp
+                , const int clm, const int clc, const int clp
                 , real dxm, real dxp
                 , real fdm, real fdp, real fdms, real fdps
                 , real pm, real pc, real pp
@@ -35,7 +35,7 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
   +--------------------*/
   // minus
   if(onm){
-    if(clm>=clrsurf){
+    if(clm>0){
       lm = lambdal + edm*cpl/rhol/turbP;
     } else {
       lm = lambdav + edm*cpv/rhov/turbP;
@@ -46,7 +46,7 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
 
   // center
   if(onc){
-    if(clc>=clrsurf){
+    if(clc>0){
       lc = lambdal + edc*cpl/rhol/turbP;
     } else {
       lc = lambdav + edc*cpv/rhov/turbP;
@@ -59,7 +59,7 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
 
   // plus
   if(onp){
-    if(clp>=clrsurf){
+    if(clp>0){
       lp = lambdal + edp*cpl/rhol/turbP;
     } else {
       lp = lambdav + edp*cpv/rhov/turbP;
@@ -94,7 +94,7 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
 #endif
     } else if(onm && ofp){
       /* f-s-s */
-      if(fs&&Interface(-1,m,i,j,k)) {
+      if(Interface(-1,m,i,j,k)) {
         /* removed from system matrix */
         aflagm = 0.0;
         /* dxm,fdm are corrected to account for interface position */
@@ -111,7 +111,7 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
         /* dxm is corrected */
         dxm = dxm * fdm;
         /* lambdaf is inverted */
-        if(clm>=clrsurf){
+        if(clm>0) {
           lm = lambdav + edm*cpv/rhov/turbP;
         } else {
           lm = lambdal + edm*cpl/rhol/turbP;
@@ -137,7 +137,7 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
 #endif
     } else if(ofm && onp){
       /* s-s-f */
-      if(fs&&Interface(+1,m,i,j,k)) {
+      if(Interface(+1,m,i,j,k)) {
         /* removed from system matrix */
         aflagp = 0.0;
         /* dxp,fdp are corrected to account for interface position */
@@ -154,7 +154,7 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
         /* dxp is corrected */
         dxp = dxp * fdp;
         /* lambdaf is inverted */
-        if(clp>=clrsurf){
+        if(clp>0){
           lp = lambdav + edp*cpv/rhov/turbP;
         } else {
           lp = lambdal + edp*cpl/rhol/turbP;
@@ -195,43 +195,32 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
 
     if(onm && onp){
       /* f-f-f */
-      //if((clm-clrsurf)*(clc-clrsurf)>=0){
       if(!Interface(-1,m,i,j,k)){
         dxm=dxm;
       } else {
-        if(!fs) {
-          real frac = std::max((clrsurf-clc)/(clm-clc),epsl);
-          dxm=frac*dxm;
-          tm = Tint(-1,m,frac,i,j,k);
-        } else {
-          if(m==Comp::i())
-            dxm = std::max(epsl*dxm,distance_x(i,j,k,-1,tm));
-          else if(m==Comp::j())
-            dxm = std::max(epsl*dxm,distance_y(i,j,k,-1,tm));
-          else
-            dxm = std::max(epsl*dxm,distance_z(i,j,k,-1,tm));
-        }
+        if(m==Comp::i())
+          dxm = std::max(epsl*dxm,distance_x(i,j,k,-1,tm));
+        else if(m==Comp::j())
+          dxm = std::max(epsl*dxm,distance_y(i,j,k,-1,tm));
+        else
+          dxm = std::max(epsl*dxm,distance_z(i,j,k,-1,tm));
         aflagm=0.0;
+#ifdef DEBUG
+	std::cout<<"aflagm=0.0: " <<i<<" "<<j<<" "<<k<<" "<<clc<<"\n";
+#endif
       }
-      //if((clc-clrsurf)*(clp-clrsurf)>=0){
       if(!Interface(+1,m,i,j,k)){
         dxp=dxp;
       } else {
-        if(!fs) {
-          real frac = std::max((clrsurf-clc)/(clp-clc),epsl);
-          dxp=frac*dxp;
-          tp = Tint(+1,m,frac,i,j,k);
-        } else {
-          if(m==Comp::i())
-            dxp = std::max(epsl*dxp,distance_x(i,j,k,+1,tp));
-          else if(m==Comp::j())
-            dxp = std::max(epsl*dxp,distance_y(i,j,k,+1,tp));
-          else
-            dxp = std::max(epsl*dxp,distance_z(i,j,k,+1,tp));
-        }
+        if(m==Comp::i())
+          dxp = std::max(epsl*dxp,distance_x(i,j,k,+1,tp));
+        else if(m==Comp::j())
+          dxp = std::max(epsl*dxp,distance_y(i,j,k,+1,tp));
+        else
+          dxp = std::max(epsl*dxp,distance_z(i,j,k,+1,tp));
         aflagp=0.0;
 #ifdef DEBUG
-	std::cout<<"aflagp=0.0: " <<i<<" "<<j<<" "<<k<<"\n";
+	std::cout<<"aflagp=0.0: " <<i<<" "<<j<<" "<<k<<" "<<clc<<"\n";
 #endif
       }
 #ifdef USE_FDM_FLUID /* now, finite difference is applied always, as in system_diffusive */
@@ -240,7 +229,8 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
       ac = lc * vol * ((this->*coef_m)(dxm,dxp,x0)+(this->*coef_p)(dxm,dxp,x0));
       ap = lc * vol * (this->*coef_p)(dxm,dxp,x0);
 #else
-      if(aflagm==0.0 || aflagp==0.0) {
+      //if(aflagm==0.0 || aflagp==0.0) {
+      if(fabs(clc)<3) {
         /* FDM */
         am = lc * vol * (this->*coef_m)(dxm,dxp,x0);
         ac = lc * vol * ((this->*coef_m)(dxm,dxp,x0)+(this->*coef_p)(dxm,dxp,x0));
@@ -257,25 +247,18 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
 #endif
     } else if(ofm && onp){ 
       /* s-f-f */
-      //if((clc-clrsurf)*(clp-clrsurf)>=0){
       if(!Interface(+1,m,i,j,k)){
         dxp=dxp;
       } else {
-        if(!fs) {
-          real frac = std::max((clrsurf-clc)/(clp-clc),epsl);
-          dxp=frac*dxp;
-          tp = Tint(+1,m,frac,i,j,k);
-        } else {
-          if(m==Comp::i())
-            dxp = std::max(epsl*dxp,distance_x(i,j,k,+1,tp));
-          else if(m==Comp::j())
-            dxp = std::max(epsl*dxp,distance_y(i,j,k,+1,tp));
-          else
-            dxp = std::max(epsl*dxp,distance_z(i,j,k,+1,tp));
-        }
+        if(m==Comp::i())
+          dxp = std::max(epsl*dxp,distance_x(i,j,k,+1,tp));
+        else if(m==Comp::j())
+          dxp = std::max(epsl*dxp,distance_y(i,j,k,+1,tp));
+        else
+          dxp = std::max(epsl*dxp,distance_z(i,j,k,+1,tp));
         aflagp=0.0;
       }
-      if(fs&&Interface(-1,m,i,j,k)) {
+      if(Interface(-1,m,i,j,k)) {
         /* removed from system matrix */
         aflagm = 0.0;
         /* dxm is corrected to account for interface position */
@@ -300,7 +283,8 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
            - lc*vol*(this->*coef_m)(dxm,dxp,x0)*(1.0-fdm)*lc/(fdm*lm+(1.0-fdm)*lc);
         ap = lc*vol*(this->*coef_p)(dxm,dxp,x0);
 #else
-        if(aflagp==0.0) {
+        //if(aflagp==0.0) {
+        if(fabs(clc)<3) {
           /* FDM */
           am = lc*vol*(this->*coef_m)(dxm,dxp,x0)*fdm*lm/(fdm*lm+(1.0-fdm)*lc);
           ac = lc*vol*((this->*coef_m)(dxm,dxp,x0)+(this->*coef_p)(dxm,dxp,x0))
@@ -319,25 +303,18 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
 #endif
     } else if(onm && ofp){
       /* f-f-s */
-      //if((clm-clrsurf)*(clc-clrsurf)>=0){
       if(!Interface(-1,m,i,j,k)){
         dxm=dxm;
       } else {
-        if(!fs) {
-          real frac = std::max((clrsurf-clc)/(clm-clc),epsl);
-          dxm=frac*dxm;
-          tm = Tint(-1,m,frac,i,j,k);
-        } else {
-          if(m==Comp::i())
-            dxm = std::max(epsl*dxm,distance_x(i,j,k,-1,tm));
-          else if(m==Comp::j())
-            dxm = std::max(epsl*dxm,distance_y(i,j,k,-1,tm));
-          else
-            dxm = std::max(epsl*dxm,distance_z(i,j,k,-1,tm));
-        }
+        if(m==Comp::i())
+          dxm = std::max(epsl*dxm,distance_x(i,j,k,-1,tm));
+        else if(m==Comp::j())
+          dxm = std::max(epsl*dxm,distance_y(i,j,k,-1,tm));
+        else
+          dxm = std::max(epsl*dxm,distance_z(i,j,k,-1,tm));
         aflagm=0.0;
       }
-      if(fs&&Interface(+1,m,i,j,k)) {
+      if(Interface(+1,m,i,j,k)) {
         /* removed from system matrix */
         aflagp = 0.0;
         /* dxp is corrected to account for interface position */
@@ -362,7 +339,8 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
            - lc*vol*(this->*coef_p)(dxm,dxp,x0)*(1.0-fdp)*lc/((1.0-fdp)*lc+fdp*lp);
         ap = lc*vol*(this->*coef_p)(dxm,dxp,x0)*fdp*lp/((1.0-fdp)*lc+fdp*lp);
 #else
-        if(aflagm==0.0) {
+        //if(aflagm==0.0) {
+        if(fabs(clc)<3) {
           /* FVM */
           am = lc*vol*(this->*coef_m)(dxm,dxp,x0);
           ac = lc*vol*((this->*coef_m)(dxm,dxp,x0)+(this->*coef_p)(dxm,dxp,x0))

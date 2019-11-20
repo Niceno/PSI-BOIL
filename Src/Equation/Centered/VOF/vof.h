@@ -209,6 +209,11 @@ class VOF : public Centered {
     virtual void advance_y(Scalar & sca);
     virtual void advance_z(Scalar & sca);
 
+    void interfacial_flagging(Scalar & scp);
+    bool Interface(const Sign dir, const Comp m,
+                   const int i, const int j, const int k);
+    bool Interface(const int i, const int j, const int k);
+
     void insert_bc_curv_divnorm();
     void insert_bc_curv_HFmixed(const Scalar & scp,
                                 const Comp ctangential, const Comp cnormal,
@@ -323,7 +328,7 @@ class VOF : public Centered {
                          const Comp & mcomp);
 
 
-    void set_iflag();
+    void set_flag();
     void insert_bc_flag(ScalarInt & g, const bool b);
 
     void cal_adens();
@@ -375,7 +380,7 @@ class VOF : public Centered {
 
     Scalar kappa;        /* curvature */
     Scalar stmp;
-    ScalarInt iflag,jflag;
+    ScalarInt iflag,tempflag,tempflag2;
 
     Matter jelly;   /* virtual fluid for level set transport */
     real xminft,xmaxft,yminft,ymaxft,zminft,zmaxft; /* xyz min&max of front */

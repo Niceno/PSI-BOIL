@@ -54,16 +54,21 @@ int main(int argc, char ** argv) {
   Vector uvwsol(d), uvwdiff(d);
 
   Scalar test(d);
+  Scalar c(d), cold(d), g(d), kappa(d); // color
 
   /*----------------------+
   |  physical properties  |
   +----------------------*/
-  Matter liquid(d);
+  Matter liquid(d),gas(d);
 
   liquid.mu(1.0);
   liquid.rho(1.0);
   liquid.cp(Cp);
   liquid.lambda(2.0);
+
+  gas.lambda(0.1);
+  gas.rho(0.01);
+  gas.cp(0.01*8.5);
   
   const real alpha = liquid.lambda()->value()/liquid.cp()->value();
 
@@ -120,6 +125,13 @@ int main(int argc, char ** argv) {
   press = p.shape();
   f = p.shape();
   q = p.shape();
+  c = q.shape();
+  cold = q.shape();
+  g = c.shape();
+  kappa = c.shape();
+
+  Matter mixed(liquid,gas, &c);
+  mixed.sigma(0.1);
 
   /*-------------------+
   |  time-integration  |
@@ -140,6 +152,8 @@ int main(int argc, char ** argv) {
   +-----------------*/
   Krylov * solver = new CG(d, Prec::ic2());
 
+  VOFaxisym conc(c, g, kappa, uvw, time, solver);
+
   Momentum ns( uvw, xyz, time, solver, &liquid);
   ns.diffusion_set (TimeScheme::backward_euler());
   ns.convection_set(ConvScheme::upwind());
@@ -149,12 +163,27 @@ int main(int argc, char ** argv) {
   multigrid.stop_if_diverging(true);
   multigrid.min_cycles(6);
 
-  Enthalpy enth(tpr,q,uvw,time,solver,&liquid);
+  TIF Tsat(1000.);
+  EnthalpyFDaxisym enth(tpr, q, conc.color(), uvw, time, solver, &mixed, Tsat,
+                  NULL, conc.topo.fs, conc.topo.adens);
   enth.diffusion_set(TimeScheme::backward_euler());
 
   /*--------------------+
   |  initial condition  |
   +--------------------*/
+  /*--------------------+
+  |  initial condition  |
+  +--------------------*/
+  for_vijk(c,i,j,k) {
+    cold[i][j][k] = 1.0;
+  }
+  cold.bnd_update();
+  cold.exchange_all();
+  conc.color_to_vf(cold,c);
+  conc.reconstruct_geometry();
+  conc.test_reconstruction(conc.color(),c);
+  conc.ancillary();
+
   tpr = 20.0;
 
   for_avijk(tprsol,i,j,k) {

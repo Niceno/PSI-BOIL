@@ -55,7 +55,7 @@ void PhaseChangeVOF::subgrid_gradt() {
           int kk = k+ofz;
 
           /* is there an interface between cell centre and wall? */
-          if( (iflag[ii][jj][kk]==3) || (iflag[ii][jj][kk]==-3) ) continue;
+          if( (tempflag[ii][jj][kk]==3) || (tempflag[ii][jj][kk]==-3) ) continue;
 
           /* is there an interface between cell centre and wall? */
           if(Interface(dir,mcomp,ii,jj,kk)) {
@@ -114,7 +114,7 @@ void PhaseChangeVOF::subgrid_gradt() {
     /* cell[i][j][k] is wall adjacent cell in fluid domain */
     dom->ibody().ijk(cc,&i,&j,&k);
 
-    if( (iflag[i][j][k]==3) || (iflag[i][j][k]==-3) ) continue;
+    if( (tempflag[i][j][k]==3) || (tempflag[i][j][k]==-3) ) continue;
 
     real clrc = clr[i][j][k];
 
@@ -313,11 +313,11 @@ void PhaseChangeVOF::subgrid_gradt() {
 #if 0 /* a simple 1D version is being used */
   /* normal component of gradient is calculated */
   for_vijk(clr,i,j,k) {
-    if        (iflag[i][j][k]== 1) { /* subgrid cell with liquid majority */
+    if        (tempflag[i][j][k]== 1) { /* subgrid cell with liquid majority */
       tnv[i][j][k] = txv[i][j][k]*nx[i][j][k]
                    + tyv[i][j][k]*ny[i][j][k]
                    + tzv[i][j][k]*nz[i][j][k];
-    } else if (iflag[i][j][k]==-1) { /* subgrid cell with vapour majority */
+    } else if (tempflag[i][j][k]==-1) { /* subgrid cell with vapour majority */
       tnl[i][j][k] = txl[i][j][k]*nx[i][j][k]
                    + tyl[i][j][k]*ny[i][j][k]
                    + tzl[i][j][k]*nz[i][j][k];

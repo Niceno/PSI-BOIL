@@ -17,11 +17,10 @@ class EnthalpyFDaxisym : public EnthalpyFD {
                      Times & t,
                      Krylov * sm,
                      Matter * flu,
+                     Topology & topo,
                      TIF & tifmodel,
-                     Matter * sol = NULL,
-                     const Vector * fs = NULL,
-                     const Scalar * adens = NULL) :
-    EnthalpyFD(phi,f,clr,u,t,sm,flu,tifmodel,sol,fs,adens) {
+                     Matter * sol = NULL) :
+    EnthalpyFD(phi,f,clr,u,t,sm,flu,topo,tifmodel,sol) {
 
       if(phi.domain()->is_cartesian()) {
            boil::oout<<"Warning: Initializing axisymmetric EnthalpyFD on a Cartesian "

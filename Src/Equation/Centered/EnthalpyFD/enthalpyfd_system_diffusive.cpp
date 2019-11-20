@@ -38,24 +38,16 @@ void EnthalpyFD::create_system_diffusive(const Scalar * diff_eddy) {
       if(!Interface(-1,Comp::i(),i,j,k)){
         xm=phi.dxw(i);
       } else {
-        if(!fs) {
-          xm=std::max((clrsurf-clrc)/(clrw-clrc),epsl)*phi.dxw(i);
-        } else {
-          real ts;
-          xm = std::max(epsl*phi.dxw(i),distance_x(i,j,k,-1,ts));
-        }        
+        real ts;
+        xm = std::max(epsl*phi.dxw(i),distance_x(i,j,k,-1,ts));
         aflagm=0.0;
       }
       //if((clrc-clrsurf)*(clre-clrsurf)>=0){
       if(!Interface(+1,Comp::i(),i,j,k)){
         xp=phi.dxe(i);
       } else {
-        if(!fs) {
-          xp=std::max((clrsurf-clrc)/(clre-clrc),epsl)*phi.dxe(i);
-        } else {
-          real ts;
-          xp = std::max(epsl*phi.dxe(i),distance_x(i,j,k,+1,ts));
-        }
+        real ts;
+        xp = std::max(epsl*phi.dxe(i),distance_x(i,j,k,+1,ts));
         aflagp=0.0;
       }
       real cxm = coef_x_m(xm,xp,phi.xc(i));
@@ -89,24 +81,16 @@ void EnthalpyFD::create_system_diffusive(const Scalar * diff_eddy) {
       if(!Interface(-1,Comp::j(),i,j,k)){
         ym=phi.dys(j);
       } else {
-        if(!fs) {
-          ym=std::max((clrsurf-clrc)/(clrs-clrc),epsl)*phi.dys(j);
-        } else {
-          real ts;
-          ym = std::max(epsl*phi.dys(j),distance_y(i,j,k,-1,ts));
-        }
+        real ts;
+        ym = std::max(epsl*phi.dys(j),distance_y(i,j,k,-1,ts));
         aflagm=0.0;
       }
       //if((clrc-clrsurf)*(clrn-clrsurf)>=0){
       if(!Interface(+1,Comp::j(),i,j,k)){
         yp=phi.dyn(j);
       } else {
-        if(!fs) {
-          yp=std::max((clrsurf-clrc)/(clrn-clrc),epsl)*phi.dyn(j);
-        } else {
-          real ts;
-          yp = std::max(epsl*phi.dyn(j),distance_y(i,j,k,+1,ts));
-        }
+        real ts;
+        yp = std::max(epsl*phi.dyn(j),distance_y(i,j,k,+1,ts));
         aflagp=0.0;
       }
       real cym = coef_y_m(ym,yp,phi.yc(j));
@@ -140,24 +124,16 @@ void EnthalpyFD::create_system_diffusive(const Scalar * diff_eddy) {
       if(!Interface(-1,Comp::k(),i,j,k)){
         zm=phi.dzb(k);
       } else {
-        if(!fs) {
-          zm=std::max((clrsurf-clrc)/(clrb-clrc),epsl)*phi.dzb(k);
-        } else {
-          real ts;
-          zm = std::max(epsl*phi.dzb(k),distance_z(i,j,k,-1,ts));
-        }
+        real ts;
+        zm = std::max(epsl*phi.dzb(k),distance_z(i,j,k,-1,ts));
         aflagm=0.0;
       }
       //if((clrc-clrsurf)*(clrt-clrsurf)>=0){
       if(!Interface(+1,Comp::k(),i,j,k)){
         zp=phi.dzt(k);
       } else {
-        if(!fs) {
-          zp=std::max((clrsurf-clrc)/(clrt-clrc),epsl)*phi.dzt(k);
-        } else {
-          real ts;
-          zp = std::max(epsl*phi.dzt(k),distance_z(i,j,k,+1,ts));
-        }
+        real ts;
+        zp = std::max(epsl*phi.dzt(k),distance_z(i,j,k,+1,ts));
         aflagp=0.0;
       }
       real czm = coef_z_m(zm,zp,phi.zc(k));
@@ -238,7 +214,7 @@ void EnthalpyFD::create_system_diffusive(const Scalar * diff_eddy) {
 
       bool onm, onc, onp, ofm, ofc, ofp; // on & off
       real lsm, lsc, lsp; // lambda
-      real clm, clc, clp; // color function
+      int clm, clc, clp; // topology flag
       real dxm, dxp, fdm, fdp, fdms, fdps;
       real pm, pc, pp;    // temperature-input
       real edm, edc, edp; // eddy viscosity
@@ -258,9 +234,9 @@ void EnthalpyFD::create_system_diffusive(const Scalar * diff_eddy) {
       lsm=solid()->lambda(i-1,j,k);
       lsc=solid()->lambda(i  ,j,k);
       lsp=solid()->lambda(i+1,j,k);
-      clm=(*clr)[i-1][j][k];
-      clc=(*clr)[i  ][j][k];
-      clp=(*clr)[i+1][j][k];
+      clm=iflag[i-1][j][k];
+      clc=iflag[i  ][j][k];
+      clp=iflag[i+1][j][k];
       dxm=phi.dxw(i);
       dxp=phi.dxe(i);
       pos0=phi.xc(i);
@@ -306,9 +282,9 @@ void EnthalpyFD::create_system_diffusive(const Scalar * diff_eddy) {
       lsm=solid()->lambda(i,j-1,k);
       lsc=solid()->lambda(i,j  ,k);
       lsp=solid()->lambda(i,j+1,k);
-      clm=(*clr)[i][j-1][k];
-      clc=(*clr)[i][j  ][k];
-      clp=(*clr)[i][j+1][k];
+      clm=iflag[i][j-1][k];
+      clc=iflag[i][j  ][k];
+      clp=iflag[i][j+1][k];
       dxm=phi.dys(j);
       dxp=phi.dyn(j);
       pos0=phi.yc(j);
@@ -354,9 +330,9 @@ void EnthalpyFD::create_system_diffusive(const Scalar * diff_eddy) {
       lsm=solid()->lambda(i,j,k-1);
       lsc=solid()->lambda(i,j,k  );
       lsp=solid()->lambda(i,j,k+1);
-      clm=(*clr)[i][j][k-1];
-      clc=(*clr)[i][j][k  ];
-      clp=(*clr)[i][j][k+1];
+      clm=iflag[i][j][k-1];
+      clc=iflag[i][j][k  ];
+      clp=iflag[i][j][k+1];
       dxm=phi.dzb(k);
       dxp=phi.dzt(k);
       pos0=phi.zc(k);

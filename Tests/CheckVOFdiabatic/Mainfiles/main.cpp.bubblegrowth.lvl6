@@ -1,7 +1,6 @@
 #include "Include/psi-boil.h"
 
 //#define USE_PC /* use old pc */
-//#define USE_ENTH /* use old enth */
 #define SYM
 #define USE_VOF
 
@@ -36,7 +35,7 @@ const int mSimple = 1;
 #endif
 
 /******************************************************************************/
-main(int argc, char ** argv) {
+int main(int argc, char ** argv) {
 
   boil::timer.start();
 
@@ -227,19 +226,8 @@ main(int argc, char ** argv) {
   conc.totalvol();
 
   TIF tsat(tsat0);
-#ifndef USE_ENTH
-  #ifdef USE_VOF
-  EnthalpyFD enthFD(tpr, q, c, uvw2, time, solver, &mixed, tsat,
-                     NULL, conc.topo.fs, conc.topo.adens);
-  #else
-  EnthalpyFD enthFD(tpr, q, c, uvw, time, solver, &mixed, tsat,
-                     NULL, conc.topo.fs, conc.topo.adens);
-  #endif
-#else
-  EnthalpyFD enthFD(tpr, q, c, uvw, time, solver, &mixed, tsat,
-                     NULL, NULL, conc.topo.adens);
-                     //NULL, NULL, NULL);
-#endif
+  EnthalpyFD enthFD(tpr, q, c, uvw2, time, solver, &mixed,
+                    conc.topo, tsat);
   enthFD.convection_set(TimeScheme::forward_euler());
   enthFD.diffusion_set(TimeScheme::backward_euler());
 

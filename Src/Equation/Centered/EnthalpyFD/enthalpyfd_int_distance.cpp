@@ -16,7 +16,7 @@ real EnthalpyFD::distance_x(const int i, const int j, const int k,
 
   if(!old) {
     if(distance1D_x(i,j,k,of,tint,dist)) {
-        //if(j==1&&k==1) boil::oout<<"EnthFD::1Dx "<<i<<" "<<of<<" "<<dist<<" "<<(*clr)[i][j][k]<<" "<<(*clr)[i+of][j][k]<<" "<<(*fs)[Comp::i()][i+(of>0)][j][k]<<boil::endl;
+        //if(j==1&&k==1) boil::oout<<"EnthFD::1Dx "<<i<<" "<<of<<" "<<dist<<" "<<(*clr)[i][j][k]<<" "<<(*clr)[i+of][j][k]<<" "<<fs[Comp::i()][i+(of>0)][j][k]<<boil::endl;
         return dist;
     }
   /* old? */
@@ -43,7 +43,7 @@ bool EnthalpyFD::distance1D_x(const int i, const int j, const int k,
   real centrex = phi.xc(i);
   if(dir>0) {
     real edgex= centrex+0.5*phi.dxc(i);
-    real intx = (*fs)[Comp::i()][i+1][j][k];
+    real intx = fs[Comp::i()][i+1][j][k];
     real offx = phi.xc(i+1);
     if(intx>=centrex&&intx<=edgex) {
       tint = Tint(i,j,k);
@@ -56,7 +56,7 @@ bool EnthalpyFD::distance1D_x(const int i, const int j, const int k,
     }
   } else {
     real edgex= centrex-0.5*phi.dxc(i);
-    real intx = (*fs)[Comp::i()][i  ][j][k];
+    real intx = fs[Comp::i()][i  ][j][k];
     real offx = phi.xc(i-1);
     if(intx<=centrex&&intx>=edgex) {
       tint = Tint(i,j,k);
@@ -129,7 +129,7 @@ real EnthalpyFD::distance_y(const int i, const int j, const int k,
   boil::aout<<"EnthalpyFD::int_dist_y: Error! Flag inconsistent w/ vol. fraction!\n";
   if(!old)
     boil::aout<<"new "<<i<<" "<<j<<" "<<k<<" "<<dir<<" "
-              <<phi.yc(j)<<" "<<phi.yc(j+of)<<" "<<(*fs)[Comp::j()][i][j+(of>0)][k]<<" "
+              <<phi.yc(j)<<" "<<phi.yc(j+of)<<" "<<fs[Comp::j()][i][j+(of>0)][k]<<" "
               <<(*clr)[i][j][k]<<" "<<(*clr)[i][j+of][k]<<boil::endl;
   else
     boil::aout<<"old "<<i<<" "<<j<<" "<<k<<" "<<dir<<" "
@@ -144,7 +144,7 @@ bool EnthalpyFD::distance1D_y(const int i, const int j, const int k,
   real centrey = phi.yc(j);
   if(dir>0) {
     real edgey= centrey+0.5*phi.dyc(j);
-    real inty = (*fs)[Comp::j()][i][j+1][k];
+    real inty = fs[Comp::j()][i][j+1][k];
     real offy = phi.yc(j+1);
     if(inty>=centrey&&inty<=edgey) {
       tint = Tint(i,j,k);
@@ -157,7 +157,7 @@ bool EnthalpyFD::distance1D_y(const int i, const int j, const int k,
     }
   } else {
     real edgey= centrey-0.5*phi.dyc(j);
-    real inty = (*fs)[Comp::j()][i][j  ][k];
+    real inty = fs[Comp::j()][i][j  ][k];
     real offy = phi.yc(j-1);
     if(inty<=centrey&&inty>=edgey) {
       tint = Tint(i,j,k);
@@ -244,7 +244,7 @@ bool EnthalpyFD::distance1D_z(const int i, const int j, const int k,
   real centrez = phi.zc(k);
   if(dir>0) {
     real edgez= centrez+0.5*phi.dzc(k);
-    real intz = (*fs)[Comp::k()][i][j][k+1];
+    real intz = fs[Comp::k()][i][j][k+1];
     real offz = phi.zc(k+1);
     if(intz>=centrez&&intz<=edgez) {
       tint = Tint(i,j,k);
@@ -257,7 +257,7 @@ bool EnthalpyFD::distance1D_z(const int i, const int j, const int k,
     }
   } else {
     real edgez= centrez-0.5*phi.dzc(k);
-    real intz = (*fs)[Comp::k()][i][j][k  ];
+    real intz = fs[Comp::k()][i][j][k  ];
     real offz = phi.zc(k-1);
     //boil::oout<<i<<" "<<j<<" "<<k<<" "<<centrez<<" "<<edgez<<" "<<intz<<" "<<offz<<boil::endl;
     if(intz<=centrez&&intz>=edgez) {

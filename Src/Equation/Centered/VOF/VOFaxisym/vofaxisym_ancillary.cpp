@@ -16,6 +16,10 @@ void VOFaxisym::ancillary(Scalar & scp) {
   /* reconstruct geometry */
   reconstruct_geometry(scp);
 
+
+  /* calculate the real-space normal vector */
+  true_norm_vect(nx,ny,nz,mx,my,mz); 
+
   /* calculate free surface position */
   if(!use_interp) {
     cal_fs3(scp);
@@ -25,6 +29,8 @@ void VOFaxisym::ancillary(Scalar & scp) {
       fs_bnd_nosubgrid(scp);
   }
 
+  /* flag the interface */
+  interfacial_flagging(scp);
 
   boil::timer.stop("vofaxisym ancillary");
 

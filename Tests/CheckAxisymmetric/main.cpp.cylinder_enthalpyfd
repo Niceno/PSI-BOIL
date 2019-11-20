@@ -1,0 +1,187 @@
+#include "Include/psi-boil.h"
+
+const int gLevel = 5;
+const int NX = 17*gLevel;
+const int NZ = 1;
+
+/* domain dimensions (given by problem) */
+const real LX = 1.0;
+const real DX = LX/real(NX);
+
+const real q0 = 100.0;
+const real tout = 50.0;
+const real tsat = tout*2.;
+const real xgamma = LX/3.;
+
+/******************************************************************************/
+int main(int argc, char ** argv) {
+
+  boil::timer.start();
+
+  /*--------------------------------+
+  |  choose the output file format  |
+  +--------------------------------*/
+  boil::plot = new PlotTEC();
+  //boil::plot = new PlotTEC(AsNodes::no(),Buffers::yes());
+
+  /*----------+
+  |  grid(s)  |
+  +----------*/
+#if 0
+  Grid1D gx( Range<real>(0.0,LX), NX, Periodic::no(),
+             BndGrid::symmetry(), BndGrid::wall());
+#else
+  Grid1D gx( Range<real>(0.0,LX), Range<real>(0.5*DX,3.1*DX), NX, Periodic::no(),
+             BndGrid::symmetry(), BndGrid::wall());
+#endif
+  Grid1D gz(DX);
+
+  /*---------+
+  |  domain  |
+  +---------*/
+  Axisymmetric d(gx,gz,DX);
+
+  /*------------------+
+  |  define unknowns  |
+  +------------------*/
+  Vector uvw(d), xyz(d);           // vel
+  Scalar tpr(d), q  (d);           // temperature
+  Scalar tpr2(d), q2(d);           // temperature
+  Scalar c(d), cold(d), g(d), kappa(d); // color
+
+  /*-----------------------------+
+  |  insert boundary conditions  |
+  +-----------------------------*/
+  for_m(m) {
+    uvw.bc(m).add( BndCnd( Dir::imin(), BndType::symmetry() ) );
+    uvw.bc(m).add( BndCnd( Dir::imax(), BndType::outlet() ) );
+    uvw.bc(m).add( BndCnd( Dir::kmin(), BndType::pseudo() ) );
+    uvw.bc(m).add( BndCnd( Dir::kmax(), BndType::pseudo() ) );
+    uvw.bc(m).add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
+    uvw.bc(m).add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
+  }
+
+  tpr.bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
+  tpr.bc().add( BndCnd( Dir::imax(), BndType::dirichlet(),tout ) );
+  tpr.bc().add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
+  tpr.bc().add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
+  tpr.bc().add( BndCnd( Dir::kmin(), BndType::pseudo() ) );
+  tpr.bc().add( BndCnd( Dir::kmax(), BndType::pseudo() ) );
+
+  tpr2 = tpr.shape();
+
+  q.bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
+  q.bc().add( BndCnd( Dir::imax(), BndType::neumann() ) );
+  q.bc().add( BndCnd( Dir::kmin(), BndType::pseudo() ) );
+  q.bc().add( BndCnd( Dir::kmax(), BndType::pseudo() ) );
+  q.bc().add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
+  q.bc().add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
+
+  c = q.shape();
+  q2 = q.shape();
+  cold = q.shape();
+  g = c.shape();
+  kappa = c.shape();
+
+  /*----------------------+
+  |  physical properties  |
+  +----------------------*/
+  Matter liquid(d), gas(d);
+
+  liquid.lambda(0.5);
+  liquid.rho(1.0);
+  liquid.cp(1.0*12.);
+  gas.lambda(0.1);
+  gas.rho(0.01);
+  gas.cp(0.01*8.5);
+
+  Matter mixed(liquid,gas, &c);
+  mixed.sigma(0.1);
+
+  /*-------------------+
+  |  time-integration  |
+  +-------------------*/
+  const int ndt = 5000;
+  const real dt = LX/real(NX);
+  Times time(ndt,dt);
+  time.print_time(false);
+
+  /*-----------------+
+  |  define solvers  |
+  +-----------------*/
+  Krylov * solver = new CG(d, Prec::ic2());
+ 
+  VOFaxisym conc(c, g, kappa, uvw, time, solver);
+   
+  TIF Tsat(tsat);
+  EnthalpyFDaxisym enth(tpr, q, conc.color(), uvw, time, solver, &mixed, Tsat,
+                  NULL, conc.topo.fs, conc.topo.adens);
+  enth.convection_set(TimeScheme::forward_euler());
+  enth.diffusion_set(TimeScheme::backward_euler());
+
+  //Enthalpy enth2(tpr2,q2,uvw,time,solver,&mixed);
+  //enth2.diffusion_set(TimeScheme::backward_euler());
+
+  /*--------------------+
+  |  initial condition  |
+  +--------------------*/
+  for_vijk(c,i,j,k) {
+    if(c.xn(i)<xgamma&&c.xn(i+1)<=xgamma) {
+      cold[i][j][k] = 1.0;
+    } else if(c.xn(i)<=xgamma&&c.xn(i+1)>=xgamma) {
+      cold[i][j][k] = (xgamma-c.xn(i))/(c.xn(i+1)-c.xn(i));
+    } else {
+      cold[i][j][k] = 0.0;
+    }
+  }
+  cold.bnd_update();
+  cold.exchange_all();
+  conc.color_to_vf(cold,c);
+  conc.reconstruct_geometry();
+  conc.test_reconstruction(conc.color(),c);
+  conc.ancillary();
+
+  tpr = 0.0;
+  for_vijk(q,i,j,k)                                 /* fill the source term */
+    q[i][j][k] = c[i][j][k]*q0*q.dV(i,j,k);
+  q2 = q;
+  tpr2 = tpr;
+
+  /*------------+
+  |  time loop  |
+  +------------*/  
+  for(time.start(); time.end(); time.increase()) {
+    /*---------------------------+
+    |  solve transport equation  |
+    +---------------------------*/
+    enth.discretize();
+    enth.new_time_step();
+    enth.solve(ResRat(1e-16),"enth");
+
+    //enth2.discretize();
+    //enth2.new_time_step();
+    //enth2.solve(ResRat(1e-16),"enth2");
+  }
+
+  boil::plot->plot(tpr,q,c,conc.color(), "tpr-q-c-clr");
+
+  for_vi(tpr,i) {
+    int j = boil::BW;
+    int k = boil::BW;
+
+    real pos = tpr.xc(i);
+    real tprref;
+    if(pos<xgamma)
+      tprref = tsat + q0*(xgamma*xgamma-pos*pos)/4./liquid.lambda(i,j,k);
+    else
+      tprref = tsat - (tsat-tout)*log(pos/xgamma)/log(LX/xgamma);
+    boil::oout<<pos<<" "<<tpr[i][j][k]<<" "<<tpr2[i][j][k]<<" "
+              <<tprref<<boil::endl;
+  }
+
+  boil::oout << "Finished!" << boil::endl;
+
+  boil::timer.stop();
+  boil::timer.report();
+
+}	
