@@ -224,7 +224,7 @@ main(int argc, char * argv[]) {
   EnthalpyFD enthFD(tpr, q, c, uvw, time, solver, &mixed ,tsat);
 #else
   TIF Tsat(tsat);
-  EnthalpyTIF enthFD(tpr, q, c, uvw, time, solver, &mixed, Tsat,
+  EnthalpyFD enthFD(tpr, q, c, uvw, time, solver, &mixed, Tsat,
                      NULL, conc.topo.fs, conc.topo.adens);
 #endif
   enthFD.convection_set(TimeScheme::forward_euler());

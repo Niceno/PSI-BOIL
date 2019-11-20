@@ -217,7 +217,7 @@ main(int argc, char ** argv) {
 #ifdef USE_VOF
   VOF conc  (c, g, kappa, uvw, time, solver);
   //VOF conc  (c,  g, kappa, uvw, time, solver, NULL, &mixed);
-  conc.set_curv_method(0);  // height function
+  conc.set_curv_method(CurvMethod::HF());  // height function
   //conc.set_curv_method(1);  // smoothed VOF
 #else
   CIPCSL2 conc  (c, g, kappa, uvw, time, solver);
@@ -229,14 +229,14 @@ main(int argc, char ** argv) {
   TIF tsat(tsat0);
 #ifndef USE_ENTH
   #ifdef USE_VOF
-  EnthalpyTIF enthFD(tpr, q, c, uvw2, time, solver, &mixed, tsat,
+  EnthalpyFD enthFD(tpr, q, c, uvw2, time, solver, &mixed, tsat,
                      NULL, conc.topo.fs, conc.topo.adens);
   #else
-  EnthalpyTIF enthFD(tpr, q, c, uvw, time, solver, &mixed, tsat,
+  EnthalpyFD enthFD(tpr, q, c, uvw, time, solver, &mixed, tsat,
                      NULL, conc.topo.fs, conc.topo.adens);
   #endif
 #else
-  EnthalpyTIF enthFD(tpr, q, c, uvw, time, solver, &mixed, tsat,
+  EnthalpyFD enthFD(tpr, q, c, uvw, time, solver, &mixed, tsat,
                      NULL, NULL, conc.topo.adens);
                      //NULL, NULL, NULL);
 #endif

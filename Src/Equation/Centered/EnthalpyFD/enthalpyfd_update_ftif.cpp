@@ -1,49 +1,25 @@
-#include "enthalpytif.h"
+#include "enthalpyfd.h"
 
 using namespace std;
 
 /***************************************************************************//**
 *  \brief Adds diffusion to right hand side.
-*
-*  This routine adds diffusive terms into right hand side, depending on the
-*  time-stepping scheme being used. 
-*
-*  As an example, for Crank-Nicolson scheme, it is:
-*  \f[
-*      \{f\}_{old} = \{f\}_{old} + \frac{1}{2} \{D\}^{N-1}
-*  \f] 
-*  where \f$ \{D\} \f$ is the diffusive term and \f$ N-1 \f$ is the old time 
-   step.
-*
-*  Diffusive term is defined as:
-*  \f[
-*      \{D\}^{N-1} = [A] \cdot \{ \phi \}^{N-1}
-*  \f] 
-*  where \f$ [A] \f$ is the system matrix containing only diffusive 
-*  contributions and \f$ \{ \phi \}^{N-1} \f$ is the old vector of unknowns. 
-*
-*  \warning
-*  Matrix \f$ [A] \f$ can change in time due to varying pysical properties.
-*  To be fully consistent in such a case, this subroutine has to be invoked
-*  before forming the new system of governing equations. This sequence is 
-*  stipulated in main program. Obviously, these concerns are important for 
-*  non-implicit time stepping schemes only.
 *******************************************************************************/
-void EnthalpyTIF::diffusion_fd(const Scalar * diff_eddy) {
+void EnthalpyFD::update_ftif(const real TS0, const real TSm, const bool nst,
+                              const Scalar * diff_eddy) {
 
-  phi.exchange();
+  tifmodel.tint_field(nst); 
 
   /* get time stepping coefficient */
   real tscn = diff_ts.N();
   assert( tscn > 0.0 );
-  real tsc = diff_ts.Nm1(); /* 0.5 for c.n. 0.0 for fully implicit */
 
   if( !solid() ) {
     /*------------------------+ 
     |  x direction (w and e)  |
     +------------------------*/
     for_ijk(i,j,k){
-      real lc, cp_mass;
+      real lc,cp_mass;
       if((*clr)[i][j][k]>=clrsurf){
         lc = lambdal;
         cp_mass = cpl/rhol;
@@ -89,15 +65,13 @@ void EnthalpyTIF::diffusion_fd(const Scalar * diff_eddy) {
         }
         aflagp=1.0;
       }
-      const real Aw = tsc * lc * vol * 2.0 / (xm*(xm+xp));
-      const real Ac = tsc * lc * vol * 2.0 / (xm*xp);
-      const real Ae = tsc * lc * vol * 2.0 / (xp*(xm+xp));
-      fold[i][j][k] += Aw*pm - Ac*pc + Ae*pp;
+      real cxm = coef_x_m(xm,xp,phi.xc(i));
+      real cxp = coef_x_p(xm,xp,phi.xc(i));
+
       /* add implicit part of the diffusion term */
-      const real Awi = tscn * lc * vol * 2.0 / (xm*(xm+xp)) * aflagm;
-      const real Aei = tscn * lc * vol * 2.0 / (xp*(xm+xp)) * aflagp;
-      ftif[i][j][k] = Awi*pm + Aei*pp;
-      ftifold[i][j][k] = Awi*pm + Aei*pp;
+      const real Awi = tscn * lc * vol * cxm * aflagm;
+      const real Aei = tscn * lc * vol * cxp * aflagp;
+      ftif[i][j][k] = Awi*pm + Aei*pp;// - ftifold[i][j][k];
     }
 
     /*------------------------+ 
@@ -150,14 +124,12 @@ void EnthalpyTIF::diffusion_fd(const Scalar * diff_eddy) {
         }
         aflagp=1.0;
       }
-      const real As = tsc * lc * vol * 2.0 / (ym*(ym+yp));
-      const real Ac = tsc * lc * vol * 2.0 / (ym*yp);
-      const real An = tsc * lc * vol * 2.0 / (yp*(ym+yp));
-      fold[i][j][k] += As*pm - Ac*pc + An*pp;
-      const real Asi = tscn * lc * vol * 2.0 / (ym*(ym+yp)) * aflagm;
-      const real Ani = tscn * lc * vol * 2.0 / (yp*(ym+yp)) * aflagp;
+      real cym = coef_y_m(ym,yp,phi.yc(j));
+      real cyp = coef_y_p(ym,yp,phi.yc(j));
+
+      const real Asi = tscn * lc * vol * cym * aflagm;
+      const real Ani = tscn * lc * vol * cyp * aflagp;
       ftif[i][j][k] += Asi*pm + Ani*pp;
-      ftifold[i][j][k] += Asi*pm + Ani*pp;
     }
 
     /*------------------------+ 
@@ -210,24 +182,20 @@ void EnthalpyTIF::diffusion_fd(const Scalar * diff_eddy) {
         }
         aflagp=1.0;
       }
-      const real Ab = tsc * lc * vol * 2.0 / (zm*(zm+zp));
-      const real Ac = tsc * lc * vol * 2.0 / (zm*zp);
-      const real At = tsc * lc * vol * 2.0 / (zp*(zm+zp));
-      fold[i][j][k] += Ab*pm - Ac*pc + At*pp;
-      const real Abi = tscn * lc * vol * 2.0 / (zm*(zm+zp)) * aflagm;
-      const real Ati = tscn * lc * vol * 2.0 / (zp*(zm+zp)) * aflagp;
+      real czm = coef_z_m(zm,zp,phi.zc(k));
+      real czp = coef_z_p(zm,zp,phi.zc(k));
+
+      const real Abi = tscn * lc * vol * czm * aflagm;
+      const real Ati = tscn * lc * vol * czp * aflagp;
       ftif[i][j][k] += Abi*pm + Ati*pp;
-      ftifold[i][j][k] += Abi*pm + Ati*pp;
     }
     // need to add here immersed boundary without solid !!!
 
-#if 1
   /*------------------------------------------+
   |  features conduction through solid parts  |
   +------------------------------------------*/
   } else {
 
-    bool oldflag = true; /* we are considering previous time step */
     for_m(m){
       int ii,jj,kk;
       ii=jj=kk=0;
@@ -254,6 +222,8 @@ void EnthalpyTIF::diffusion_fd(const Scalar * diff_eddy) {
         real tm, tc, tp;
         real aflagm, aflagp;
         real aream, areap;
+        real pos0;
+        coef_gen coef_m, coef_p;
 
         onm=dom->ibody().on (i-ii,j-jj,k-kk);
         onc=dom->ibody().on (i   ,j   ,k   );
@@ -270,6 +240,9 @@ void EnthalpyTIF::diffusion_fd(const Scalar * diff_eddy) {
 	if(m==Comp::i()){
           dxm=phi.dxw(i);
           dxp=phi.dxe(i);
+          pos0=phi.xc(i);
+          coef_m = &EnthalpyFD::coef_x_m;
+          coef_p = &EnthalpyFD::coef_x_p;
           aream = dSx(Sign::neg(),i,j,k);
           areap = dSx(Sign::pos(),i,j,k);
           fdm=dom->ibody().fdxw(i,j,k);
@@ -279,6 +252,9 @@ void EnthalpyTIF::diffusion_fd(const Scalar * diff_eddy) {
         } else if(m==Comp::j()){
           dxm=phi.dys(j);
           dxp=phi.dyn(j);
+          pos0=phi.yc(j);
+          coef_m = &EnthalpyFD::coef_y_m;
+          coef_p = &EnthalpyFD::coef_y_p;
           aream = dSy(Sign::neg(),i,j,k);
           areap = dSy(Sign::pos(),i,j,k);
           fdm=dom->ibody().fdys(i,j,k);
@@ -288,6 +264,9 @@ void EnthalpyTIF::diffusion_fd(const Scalar * diff_eddy) {
         } else {
           dxm=phi.dzb(k);
           dxp=phi.dzt(k);
+          pos0=phi.zc(k);
+          coef_m = &EnthalpyFD::coef_z_m;
+          coef_p = &EnthalpyFD::coef_z_p;
           aream = dSz(Sign::neg(),i,j,k);
           areap = dSz(Sign::pos(),i,j,k);
           fdm=dom->ibody().fdzb(i,j,k);
@@ -307,6 +286,7 @@ void EnthalpyTIF::diffusion_fd(const Scalar * diff_eddy) {
         diff_matrix(am, ac, ap
                   , tm, tc, tp
                   , aflagm, aflagp
+                  , pos0, coef_m, coef_p
                   , vol, aream, areap
                   , onm, onc, onp, ofm, ofc, ofp
                   , lsm, lsc, lsp
@@ -316,13 +296,14 @@ void EnthalpyTIF::diffusion_fd(const Scalar * diff_eddy) {
                   , edm, edc, edp
                   , i, j, k, m);
   
-        if(tsc!=0){
-          fold[i][j][k] += tsc * (am*tm*aflagm - ac*tc + ap*tp*aflagp);
-        }
         ftif[i][j][k] += tscn * (am*(1.0-aflagm)*tm+ap*(1.0-aflagp)*tp);
-        ftifold[i][j][k] += tscn * (am*(1.0-aflagm)*tm+ap*(1.0-aflagp)*tp);
       }
     }
   }
-#endif
+
+  for_ijk(i,j,k) {
+    ftif[i][j][k] = TS0*ftif[i][j][k]+TSm*ftifold[i][j][k];
+  }
+
+  return;
 }

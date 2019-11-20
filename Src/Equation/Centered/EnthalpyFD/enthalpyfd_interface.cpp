@@ -1,4 +1,4 @@
-#include "enthalpytif.h"
+#include "enthalpyfd.h"
 
 /***************************************************************************//**
  *  Checks if the given cell is near an interface
@@ -7,7 +7,7 @@
 /*------------+
 |  using vof  |
 +------------*/
-bool EnthalpyTIF::Interface(const int dir, const Comp m,
+bool EnthalpyFD::Interface(const int dir, const Comp m,
                             const int i, const int j, const int k) {
   if(fs) {
     int of(0);
@@ -37,7 +37,7 @@ bool EnthalpyTIF::Interface(const int dir, const Comp m,
   return false;
 }
 
-bool EnthalpyTIF::Interface_old(const int dir, const Comp m,
+bool EnthalpyFD::Interface_old(const int dir, const Comp m,
                                 const int i, const int j, const int k) {
   if(fs) {
     int of(0);

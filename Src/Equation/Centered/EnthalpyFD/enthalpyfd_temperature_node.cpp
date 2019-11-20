@@ -1,7 +1,7 @@
-#include "enthalpytif.h"
+#include "enthalpyfd.h"
 
 /******************************************************************************/
-real EnthalpyTIF::temperature_node(real len_s, real lam_s, real tmp_s
+real EnthalpyFD::temperature_node(real len_s, real lam_s, real tmp_s
                                   , real len_f, real lam_f, real tmp_f) {
 /***************************************************************************//**
 *  \brief calculate temperature at node point

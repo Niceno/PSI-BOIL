@@ -70,8 +70,8 @@ void EnthalpyFD::convection(Scalar * conv) {
     umf = (*u)[Comp::u()][i]  [j][k];  // u @ imin
     upf = (*u)[Comp::u()][i+1][j][k];  // u @ imax
     
-    real a_w = dSx(i,j,k);
-    real a_e = dSx(i,j,k);
+    real a_w = dSx(Sign::neg(),i,j,k);
+    real a_e = dSx(Sign::pos(),i,j,k);
     if(dom->ibody().cut(i,j,k)) {
       a_w *= dom->ibody().fSw(i,j,k);
       a_e *= dom->ibody().fSe(i,j,k);
@@ -93,8 +93,8 @@ void EnthalpyFD::convection(Scalar * conv) {
     vmf = (*u)[Comp::v()][i][j]  [k];  // v @ jmin
     vpf = (*u)[Comp::v()][i][j+1][k];  // v @ jmax
 
-    real a_s = dSy(i,j,k);
-    real a_n = dSy(i,j,k);
+    real a_s = dSy(Sign::neg(),i,j,k);
+    real a_n = dSy(Sign::pos(),i,j,k);
     if(dom->ibody().cut(i,j,k)) {
       a_s *= dom->ibody().fSs(i,j,k);
       a_n *= dom->ibody().fSn(i,j,k);
@@ -116,8 +116,8 @@ void EnthalpyFD::convection(Scalar * conv) {
     wmf = (*u)[Comp::w()][i][j][k];    // w @ kmin
     wpf = (*u)[Comp::w()][i][j][k+1];  // w @ kmax
 
-    real a_b = dSz(i,j,k);
-    real a_t = dSz(i,j,k);
+    real a_b = dSz(Sign::neg(),i,j,k);
+    real a_t = dSz(Sign::pos(),i,j,k);
     if(dom->ibody().cut(i,j,k)) {
       a_b *= dom->ibody().fSb(i,j,k);
       a_t *= dom->ibody().fSt(i,j,k);
@@ -157,12 +157,12 @@ void EnthalpyFD::convection(Scalar * conv) {
   for_jk(j,k) (*conv)[si()][j][k] += buff[si()-1][j][k];
 
   for_ijk(i,j,k) {
-    real divu = - dSx(i,j,k)*(*u)[Comp::u()][i]  [j]  [k]
-                + dSx(i,j,k)*(*u)[Comp::u()][i+1][j]  [k]
-                - dSy(i,j,k)*(*u)[Comp::v()][i]  [j]  [k]
-                + dSy(i,j,k)*(*u)[Comp::v()][i]  [j+1][k]
-                - dSz(i,j,k)*(*u)[Comp::w()][i]  [j]  [k]
-                + dSz(i,j,k)*(*u)[Comp::w()][i]  [j]  [k+1];
+    real divu = - dSx(Sign::neg(),i,j,k)*(*u)[Comp::u()][i]  [j]  [k]
+                + dSx(Sign::pos(),i,j,k)*(*u)[Comp::u()][i+1][j]  [k]
+                - dSy(Sign::neg(),i,j,k)*(*u)[Comp::v()][i]  [j]  [k]
+                + dSy(Sign::pos(),i,j,k)*(*u)[Comp::v()][i]  [j+1][k]
+                - dSz(Sign::neg(),i,j,k)*(*u)[Comp::w()][i]  [j]  [k]
+                + dSz(Sign::pos(),i,j,k)*(*u)[Comp::w()][i]  [j]  [k+1];
     (*conv)[i][j][k] += phi[i][j][k] * divu;
     //(*conv)[i][j][k] /= dV(i,j,k);
   }
@@ -198,75 +198,147 @@ void EnthalpyFD::convection(Scalar * conv) {
       wpf = (*u)[Comp::w()][i][j][k+1];
 
       // dtdxm
-      if((clrc-clrsurf)*(clrold[i-1][j][k]-clrsurf)<0.0){
-        real dxm = max(epsl,(clrsurf-clrc)/(clrold[i-1][j][k]-clrc));
-        dxm = dxm * dxw(i);
-        dtdxm = (phi[i][j][k]-tsat)/dxm;
+      real clrw = clrold[i-1][j][k];
+      //if((clrc-clrsurf)*(clrw-clrsurf)<0.0){
+      if(Interface_old(-1,Comp::i(),i,j,k)) {
+        real dxm, ts;
+        if(!fs) {
+          dxm = max(epsl,(clrsurf-clrc)/(clrw-clrc));
+          ts = Tint_old(-1,Comp::i(),dxm,i,j,k);
+          dxm = dxm * dxw(i);
+        } else {
+          dxm = max(epsl*dxw(i),distance_x(i,j,k,-1,ts,true));
+        }
+        dtdxm = (phi[i][j][k]-ts)/dxm;
 #ifndef VERSION_STABLE
         umf = upf;
 #endif
       } else {
-        dtdxm = (phi[i  ][j][k]-phi[i-1][j][k])/dxw(i);
+        if(dom->ibody().off(i-1,j,k)) {
+          dtdxm = gradt_ib(-1,Comp::i(),i,j,k);
+        } else {
+          dtdxm = (phi[i  ][j][k]-phi[i-1][j][k])/dxw(i);
+        }
       }
 
       // dtdxp
-      if((clrc-clrsurf)*(clrold[i+1][j][k]-clrsurf)<0.0){
-        real dxp = max(epsl,(clrsurf-clrc)/(clrold[i+1][j][k]-clrc));
-        dxp = dxp * dxe(i);
-        dtdxp = (tsat-phi[i][j][k])/dxp;
+      real clre = clrold[i+1][j][k];
+      //if((clrc-clrsurf)*(clre-clrsurf)<0.0){
+      if(Interface_old(+1,Comp::i(),i,j,k)) {
+        real dxp, ts;
+        if(!fs) {
+          dxp = max(epsl,(clrsurf-clrc)/(clre-clrc));
+          ts = Tint_old(+1,Comp::i(),dxp,i,j,k);
+          dxp = dxp * dxe(i);
+        } else {
+          dxp = max(epsl*dxe(i),distance_x(i,j,k,+1,ts,true));
+        }
+        dtdxp = (ts-phi[i][j][k])/dxp;
 #ifndef VERSION_STABLE
         upf = umf;
 #endif
       } else {
-        dtdxp = (phi[i+1][j][k]-phi[i  ][j][k])/dxe(i);
+        if(dom->ibody().off(i+1,j,k)) {
+          dtdxp = gradt_ib(+1,Comp::i(),i,j,k);
+        } else {
+          dtdxp = (phi[i+1][j][k]-phi[i  ][j][k])/dxe(i);
+        }
       }
 
       // dtdym
-      if((clrc-clrsurf)*(clrold[i][j-1][k]-clrsurf)<0.0){
-        real dym = max(epsl,(clrsurf-clrc)/(clrold[i][j-1][k]-clrc));
-        dym = dym * dys(j);
-        dtdym = (phi[i][j][k]-tsat)/dym;
+      real clrs = clrold[i][j-1][k];
+      //if((clrc-clrsurf)*(clrs-clrsurf)<0.0){
+      if(Interface_old(-1,Comp::j(),i,j,k)) {
+        real dym, ts;
+        if(!fs) {
+          dym = max(epsl,(clrsurf-clrc)/(clrs-clrc));
+          ts = Tint_old(-1,Comp::j(),dym,i,j,k);
+          dym = dym * dys(j);
+        } else {
+          dym = max(epsl*dys(j),distance_y(i,j,k,-1,ts,true));
+        }
+        dtdym = (phi[i][j][k]-ts)/dym;
 #ifndef VERSION_STABLE
         vmf = vpf;
 #endif
       } else {
-        dtdym = (phi[i][j  ][k]-phi[i][j-1][k])/dys(j);
+        if(dom->ibody().off(i,j-1,k)) {
+          dtdym = gradt_ib(-1,Comp::j(),i,j,k);
+        } else {
+          dtdym = (phi[i][j  ][k]-phi[i][j-1][k])/dys(j);
+        }
       }
 
       // dtdyp
-      if((clrc-clrsurf)*(clrold[i][j+1][k]-clrsurf)<0.0){
-        real dyp = max(epsl,(clrsurf-clrc)/(clrold[i][j+1][k]-clrc));
-        dyp = dyp * dyn(j);
-        dtdyp = (tsat-phi[i][j][k])/dyp;
+      real clrn = clrold[i][j+1][k];
+      //if((clrc-clrsurf)*(clrn-clrsurf)<0.0){
+      if(Interface_old(+1,Comp::j(),i,j,k)) {
+        real dyp, ts;
+        if(!fs) {
+          dyp = max(epsl,(clrsurf-clrc)/(clrn-clrc));
+          ts = Tint_old(+1,Comp::j(),dyp,i,j,k);
+          dyp = dyp * dyn(j);
+        } else {
+          dyp = max(epsl*dyn(j),distance_y(i,j,k,+1,ts,true));
+        }
+        dtdyp = (ts-phi[i][j][k])/dyp;
 #ifndef VERSION_STABLE
         vpf = vmf;
 #endif
       } else {
-        dtdyp = (phi[i][j+1][k]-phi[i][j  ][k])/dyn(j);
+        if(dom->ibody().off(i,j+1,k)) {
+          dtdyp = gradt_ib(+1,Comp::j(),i,j,k);
+        } else {
+          dtdyp = (phi[i][j+1][k]-phi[i][j  ][k])/dyn(j);
+        }
       }
 
       // dtdzm
-      if((clrc-clrsurf)*(clrold[i][j][k-1]-clrsurf)<0.0){
-        real dzm = max(epsl,(clrsurf-clrc)/(clrold[i][j][k-1]-clrc));
-        dzm = dzm * dzb(k);
-        dtdzm = (phi[i][j][k]-tsat)/dzm;
+      real clrb = clrold[i][j][k-1];
+      //if((clrc-clrsurf)*(clrb-clrsurf)<0.0){
+      if(Interface_old(-1,Comp::k(),i,j,k)) {
+        real dzm, ts;
+        if(!fs) {
+          dzm = max(epsl,(clrsurf-clrc)/(clrb-clrc));
+          ts = Tint_old(-1,Comp::k(),dzm,i,j,k);
+          dzm = dzm * dzb(k);
+        } else {
+          dzm = max(epsl*dzb(k),distance_z(i,j,k,-1,ts,true));
+        }
+        dtdzm = (phi[i][j][k]-ts)/dzm;
 #ifndef VERSION_STABLE
         wmf = wpf;
 #endif
       } else {
-        dtdzm = (phi[i][j][k  ]-phi[i][j][k-1])/dzb(k);
+        if(dom->ibody().off(i,j,k-1)) {
+          dtdzm = gradt_ib(-1,Comp::k(),i,j,k);
+        } else {
+          dtdzm = (phi[i][j][k  ]-phi[i][j][k-1])/dzb(k);
+        }
       }
 
       // dtdzp
-      if((clrc-clrsurf)*(clrold[i][j][k+1]-clrsurf)<0.0){
-        real dzp = max(epsl,(clrsurf-clrc)/(clrold[i][j][k+1]-clrc));
-        dzp = dzp * dzt(k);
-        dtdzp = (tsat-phi[i][j][k])/dzp;
+      real clrt = clrold[i][j][k+1];
+      //if((clrc-clrsurf)*(clrt-clrsurf)<0.0){
+      if(Interface_old(+1,Comp::k(),i,j,k)) {
+        real dzp, ts;
+        if(!fs) {
+          dzp = max(epsl,(clrsurf-clrc)/(clrt-clrc));
+          ts = Tint_old(+1,Comp::k(),dzp,i,j,k);
+          dzp = dzp * dzt(k);
+        } else {
+          dzp = max(epsl*dzt(k),distance_z(i,j,k,+1,ts,true));
+        }
+        dtdzp = (ts-phi[i][j][k])/dzp;
 #ifndef VERSION_STABLE
         wpf = wmf;
 #endif
       } else {
-        dtdzp = (phi[i][j][k+1]-phi[i][j][k  ])/dzt(k);
+        if(dom->ibody().off(i,j,k+1)) {
+          dtdzp = gradt_ib(+1,Comp::k(),i,j,k);
+        } else {
+          dtdzp = (phi[i][j][k+1]-phi[i][j][k  ])/dzt(k);
+        }
       }
 
       uc  = 0.5*(umf+upf);
@@ -319,3 +391,4 @@ void EnthalpyFD::convection(Scalar * conv) {
   }
 
 }
+

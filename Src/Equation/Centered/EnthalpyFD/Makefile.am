@@ -1,6 +1,7 @@
 noinst_LIBRARIES = libEnthalpyFD.a
 libEnthalpyFD_a_SOURCES = enthalpyfd.h                    \
                           enthalpyfd.cpp                  \
+                          enthalpyfd_coefficients.cpp     \
                           enthalpyfd_new_time_step.cpp    \
                           enthalpyfd_system_diffusive.cpp \
                           enthalpyfd_system_innertial.cpp \
@@ -9,11 +10,17 @@ libEnthalpyFD_a_SOURCES = enthalpyfd.h                    \
                           enthalpyfd_convection.cpp       \
                           enthalpyfd_diff_matrix.cpp      \
                           enthalpyfd_diffusion_fd.cpp     \
+                          enthalpyfd_gradt_ib.cpp         \
                           enthalpyfd_hflux_wall.cpp       \
                           enthalpyfd_hflux_wall_ib.cpp    \
+                          enthalpyfd_int_distance.cpp     \
+                          enthalpyfd_interface.cpp        \
                           enthalpyfd_setflag.cpp          \
                           enthalpyfd_solve.cpp            \
                           enthalpyfd_solve_sor.cpp        \
-                          enthalpyfd_update_rhs.cpp
+                          enthalpyfd_tint_val.cpp         \
+                          enthalpyfd_temperature_node.cpp \
+                          enthalpyfd_update_rhs.cpp       \
+                          enthalpyfd_update_ftif.cpp      
 
 INCLUDE = -I@top_srcdir@/

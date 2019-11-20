@@ -19,7 +19,7 @@ real EnthalpyFD::hflux_wall_ib(const Scalar * diff_eddy) {
 
     tf = phi[i][j][k];
     real cp_mass;
-    if ((*clr)[i][j][k]<0.5) {
+    if ((*clr)[i][j][k]<clrsurf) {
       lf = lambdav;
       cp_mass = cpv/rhov;
     } else {
@@ -32,62 +32,164 @@ real EnthalpyFD::hflux_wall_ib(const Scalar * diff_eddy) {
 
     // w
     if(dom->ibody().off(i-1,j,k)){
+      tf = phi[i][j][k];
       ts = phi[i-1][j][k];
       ls = solid()->lambda(i-1,j,k);
       fd = dom->ibody().fdxw(i,j,k);
-      tw = (ls*ts*fd + lf*tf*(1.0-fd))/(ls*fd + lf*(1.0-fd));
-      area = phi.dSx(i,j,k);
-      gradt = (ts-tw)/(phi.dxw(i)*(1.0-fd));
+      real dxs = (1.0-fd)*phi.dxw(i);
+      real dxf = fd*phi.dxw(i);
+      area = phi.dSx(Sign::neg(),i,j,k);
+      if(fs&&Interface(-1,Comp::i(),i,j,k)) {
+        dxf = 0.5*phi.dxc(i) - distance_x(i,j,k,-1,tf);
+        /* inversion of lambda */
+        if((*clr)[i][j][k]<clrsurf) {
+          lf = lambdal;
+          cp_mass = cpl/rhol;
+        } else {
+          lf = lambdav;
+          cp_mass = cpv/rhov;
+        }
+        if(diff_eddy){
+          lf += (*diff_eddy)[i][j][k]*cp_mass/turbP;
+        }
+      }
+      tw = temperature_node(dxs, ls, ts, dxf, lf, tf);
+      gradt = (ts-tw)/dxs;
       hflux += area*ls*gradt;
     }
     // e
     if(dom->ibody().off(i+1,j,k)){
+      tf = phi[i][j][k];
       ts = phi[i+1][j][k];
       ls = solid()->lambda(i+1,j,k);
       fd = dom->ibody().fdxe(i,j,k);
-      tw = (ls*ts*fd + lf*tf*(1.0-fd))/(ls*fd + lf*(1.0-fd));
-      area = phi.dSx(i,j,k);
-      gradt = (ts-tw)/(phi.dxe(i)*(1.0-fd));
+      real dxs = (1.0-fd)*phi.dxe(i);
+      real dxf = fd*phi.dxe(i);
+      area = phi.dSx(Sign::pos(),i,j,k);
+      if(fs&&Interface(+1,Comp::i(),i,j,k)) {
+        dxf = 0.5*phi.dxc(i) - distance_x(i,j,k,+1,tf);
+        /* inversion of lambda */
+        if((*clr)[i][j][k]<clrsurf) {
+          lf = lambdal;
+          cp_mass = cpl/rhol;
+        } else {
+          lf = lambdav;
+          cp_mass = cpv/rhov;
+        }
+        if(diff_eddy){
+          lf += (*diff_eddy)[i][j][k]*cp_mass/turbP;
+        }
+      }
+      tw = temperature_node(dxs, ls, ts, dxf, lf, tf);
+      gradt = (ts-tw)/dxs;
       hflux += area*ls*gradt;
     }
     // s
     if(dom->ibody().off(i,j-1,k)){
+      tf = phi[i][j][k];
       ts = phi[i][j-1][k];
       ls = solid()->lambda(i,j-1,k);
       fd = dom->ibody().fdys(i,j,k);
-      tw = (ls*ts*fd + lf*tf*(1.0-fd))/(ls*fd + lf*(1.0-fd));
-      area = phi.dSy(i,j,k);
-      gradt = (ts-tw)/(phi.dys(j)*(1.0-fd));
+      real dys = (1.0-fd)*phi.dys(j);
+      real dyf = fd*phi.dys(j);
+      area = phi.dSy(Sign::neg(),i,j,k);
+      if(fs&&Interface(-1,Comp::j(),i,j,k)) {
+        dyf = 0.5*phi.dyc(j) - distance_y(i,j,k,-1,tf);
+        /* inversion of lambda */
+        if((*clr)[i][j][k]<clrsurf) {
+          lf = lambdal;
+          cp_mass = cpl/rhol;
+        } else {
+          lf = lambdav;
+          cp_mass = cpv/rhov;
+        }
+        if(diff_eddy){
+          lf += (*diff_eddy)[i][j][k]*cp_mass/turbP;
+        }
+      }
+      tw = temperature_node(dys, ls, ts, dyf, lf, tf);
+      gradt = (ts-tw)/dys;
       hflux += area*ls*gradt;
     }
     // n
     if(dom->ibody().off(i,j+1,k)){
+      tf = phi[i][j][k];
       ts = phi[i][j+1][k];
       ls = solid()->lambda(i,j+1,k);
       fd = dom->ibody().fdyn(i,j,k);
-      tw = (ls*ts*fd + lf*tf*(1.0-fd))/(ls*fd + lf*(1.0-fd));
-      area = phi.dSy(i,j,k);
-      gradt = (ts-tw)/(phi.dyn(j)*(1.0-fd));
+      real dys = (1.0-fd)*phi.dyn(j);
+      real dyf = fd*phi.dyn(j);
+      area = phi.dSy(Sign::pos(),i,j,k);
+      if(fs&&Interface(+1,Comp::j(),i,j,k)) {
+        dyf = 0.5*phi.dyc(j) - distance_y(i,j,k,+1,tf);
+        /* inversion of lambda */
+        if((*clr)[i][j][k]<clrsurf) {
+          lf = lambdal;
+          cp_mass = cpl/rhol;
+        } else {
+          lf = lambdav;
+          cp_mass = cpv/rhov;
+        }
+        if(diff_eddy){
+          lf += (*diff_eddy)[i][j][k]*cp_mass/turbP;
+        }
+      }
+      tw = temperature_node(dys, ls, ts, dyf, lf, tf);
+      gradt = (ts-tw)/dys;
       hflux += area*ls*gradt;
     }
     /* b */
     if(dom->ibody().off(i,j,k-1)){
+      tf = phi[i][j][k];
       ts = phi[i][j][k-1];
       ls = solid()->lambda(i,j,k-1);
       fd = dom->ibody().fdzb(i,j,k);
-      tw = (ls*ts*fd + lf*tf*(1.0-fd))/(ls*fd + lf*(1.0-fd));
-      area = phi.dSz(i,j,k);
-      gradt = (ts-tw)/(phi.dzb(k)*(1.0-fd));
+      real dzs = (1.0-fd)*phi.dzb(k);
+      real dzf = fd*phi.dzb(k);
+      area = phi.dSz(Sign::neg(),i,j,k);
+      if(fs&&Interface(-1,Comp::k(),i,j,k)) {
+        dzf = 0.5*phi.dzc(k) - distance_z(i,j,k,-1,tf);
+        /* inversion of lambda */
+        if((*clr)[i][j][k]<clrsurf) {
+          lf = lambdal;
+          cp_mass = cpl/rhol;
+        } else {
+          lf = lambdav;
+          cp_mass = cpv/rhov;
+        }
+        if(diff_eddy){
+          lf += (*diff_eddy)[i][j][k]*cp_mass/turbP;
+        }
+      }
+      tw = temperature_node(dzs, ls, ts, dzf, lf, tf);
+      gradt = (ts-tw)/dzs;
       hflux += area*ls*gradt;
     }
     /* t */
     if(dom->ibody().off(i,j,k+1)){
+      tf = phi[i][j][k];
       ts = phi[i][j][k+1];
       ls = solid()->lambda(i,j,k+1);
       fd = dom->ibody().fdzt(i,j,k);
-      tw = (ls*ts*fd + lf*tf*(1.0-fd))/(ls*fd + lf*(1.0-fd));
-      area = phi.dSz(i,j,k);
-      gradt = (ts-tw)/(phi.dzt(k)*(1.0-fd));
+      real dzs = (1.0-fd)*phi.dzt(k);
+      real dzf = fd*phi.dzt(k);
+      area = phi.dSz(Sign::pos(),i,j,k);
+      if(fs&&Interface(+1,Comp::k(),i,j,k)) {
+        dzf = 0.5*phi.dzc(k) - distance_z(i,j,k,+1,tf);
+        /* inversion of lambda */
+        if((*clr)[i][j][k]<clrsurf) {
+          lf = lambdal;
+          cp_mass = cpl/rhol;
+        } else {
+          lf = lambdav;
+          cp_mass = cpv/rhov;
+        }
+        if(diff_eddy){
+          lf += (*diff_eddy)[i][j][k]*cp_mass/turbP;
+        }
+      }
+      tw = temperature_node(dzs, ls, ts, dzf, lf, tf);
+      gradt = (ts-tw)/dzs;
       hflux += area*ls*gradt;
     }
     areaw += area;
@@ -99,4 +201,5 @@ real EnthalpyFD::hflux_wall_ib(const Scalar * diff_eddy) {
   //boil::oout<<"areaw= "<<areaw<<"\n";
 
   return hflux;
-}
+}	
+

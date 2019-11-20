@@ -8,7 +8,9 @@
 *  Finally, it also computes the inverse of the system matrix diagonal.
 *******************************************************************************/
 void EnthalpyFD::create_system(const Scalar * diff_eddy) {
-                             
+
+  tifmodel.tint_field(); 
+
   /*-----------------------------+ 
   |  create system in the core,  |
   |  correct at the boundaries.  |
@@ -29,3 +31,4 @@ void EnthalpyFD::create_system(const Scalar * diff_eddy) {
 
   A.ci.exchange();
 }
+

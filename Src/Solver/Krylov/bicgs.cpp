@@ -65,7 +65,7 @@ void BiCGS :: solve(Matrix & A, Scalar & x, Scalar & b, const MaxIter & mi,
     /*---------------------------+
     |  if rho == 0 method fails  |
     +---------------------------*/
-    if( sqrt(rho) < res_tol ) break;
+    if( sqrt(fabs(rho)) < res_tol ) break;
 
     if(i == 0) {
       /*--------+ 

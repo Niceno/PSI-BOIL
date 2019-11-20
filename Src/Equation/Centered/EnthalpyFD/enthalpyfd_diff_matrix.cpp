@@ -1,33 +1,41 @@
 #include "enthalpyfd.h"
 using namespace std;
 
+//#define DEBUG
+//#define USE_FDM_SOLID
+#define USE_FDM_FLUID
+
 /***************************************************************************//**
 *  \brief Creates diffusive part of the system matrix \f$ [A] \f$.
 *******************************************************************************/
 void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
                 , real & tm, real & tc, real & tp
                 , real & aflagm, real & aflagp
-                , const real vol, const real area
+                , const real x0, const coef_gen coef_m, const coef_gen coef_p
+                , const real vol, const real aream, const real areap
                 , const bool onm, const bool onc, const bool onp
                 , const bool ofm, const bool ofc, const bool ofp
                 , const real lsm, const real lsc, const real lsp
-                , const real lfm, const real lfc, const real lfp
                 , const real clm, const real clc, const real clp
                 , real dxm, real dxp
                 , real fdm, real fdp, real fdms, real fdps
                 , real pm, real pc, real pp
                 , const real edm, const real edc, const real edp
-                , const int i, const int j, const int k, const Comp m){
+                , const int i, const int j, const int k, const Comp m) {
   // i,j,k,m: used for debugging
   real lm, lc, lp;                      // lambda
   aflagm=aflagp=1.0;
+
+#ifdef DEBUG
+  boil::oout<<"start: "<<i<<" "<<j<<" "<<k<<" "<<m<<" | "<<onm<<" "<<onc<<" "<<onp<<boil::endl;
+#endif
 
   /*--------------------+
   |  material property  |
   +--------------------*/
   // minus
   if(onm){
-    if(clm>=0.5){
+    if(clm>=clrsurf){
       lm = lambdal + edm*cpl/rhol/turbP;
     } else {
       lm = lambdav + edm*cpv/rhov/turbP;
@@ -38,7 +46,7 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
 
   // center
   if(onc){
-    if(clc>=0.5){
+    if(clc>=clrsurf){
       lc = lambdal + edc*cpl/rhol/turbP;
     } else {
       lc = lambdav + edc*cpv/rhov/turbP;
@@ -51,7 +59,7 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
 
   // plus
   if(onp){
-    if(clp>=0.5){
+    if(clp>=clrsurf){
       lp = lambdal + edp*cpl/rhol/turbP;
     } else {
       lp = lambdav + edp*cpv/rhov/turbP;
@@ -60,158 +68,328 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
     lp = lsp;
   }
 
+  /*------------------+
+  |  center in solid  |
+  +------------------*/
   if(ofc){
-    // center:solid
     tm = pm; 
     tc = pc; 
     tp = pp; 
 
     if(ofm && ofp){
-      // s-s-s
+      /* s-s-s */
+#ifdef USE_FDM_SOLID
       /* FDM */
-      //am = lc * vol * 2.0 / (dxm*(dxm+dxp));
-      //ac = lc * vol * 2.0 / (dxm*dxp);
-      //ap = lc * vol * 2.0 / (dxp*(dxm+dxp));
+      am = lc * vol * (this->*coef_m)(dxm,dxp,x0);
+      ac = lc * vol * ((this->*coef_m)(dxm,dxp,x0)+(this->*coef_p)(dxm,dxp,x0));
+      ap = lc * vol * (this->*coef_p)(dxm,dxp,x0);
+#else
       /* FVM */
-      am = 0.5 * (lc + lm) * area / dxm;
-      ap = 0.5 * (lc + lp) * area / dxp;
+      am = 0.5 * (lc + lm) * aream / dxm;
+      ap = 0.5 * (lc + lp) * areap / dxp;
       ac = am + ap;
-
-      //std::cout<<"s-s-s: "<<i<<" "<<j<<" "<<k<<"\n";
+#endif
+#ifdef DEBUG
+      std::cout<<"s-s-s: "<<i<<" "<<j<<" "<<k<<"\n";
+#endif
     } else if(onm && ofp){
-      // f-s-s
-      fdm = max(fdm,epsl);
-      dxm = dxm * fdm;
+      /* f-s-s */
+      if(fs&&Interface(-1,m,i,j,k)) {
+        /* removed from system matrix */
+        aflagm = 0.0;
+        /* dxm,fdm are corrected to account for interface position */
+        /* tm is changed to the saturation temperature */
+        fdm *= dxm;
+        if(m==Comp::i()) 
+          dxm = std::max(epsl*dxm,distance_x(i,j,k,-1,tm));
+        else if(m==Comp::j())
+          dxm = std::max(epsl*dxm,distance_y(i,j,k,-1,tm));
+        else
+          dxm = std::max(epsl*dxm,distance_z(i,j,k,-1,tm));
+        fdm /= dxm; 
+        fdm = max(fdm,epsl);
+        /* dxm is corrected */
+        dxm = dxm * fdm;
+        /* lambdaf is inverted */
+        if(clm>=clrsurf){
+          lm = lambdav + edm*cpv/rhov/turbP;
+        } else {
+          lm = lambdal + edm*cpl/rhol/turbP;
+        }
+      } else {
+        fdm = max(fdm,epsl);
+        dxm = dxm * fdm;
+      }
+#ifdef USE_FDM_SOLID
       /* FDM */
-      //am = lc*vol*2.0/(dxm*(dxm+dxp))*fdm*lm/(fdm*lm+(1.0-fdm)*lc);
-      //ac = lc*vol*2.0/(dxm*dxp)
-      //   - lc*vol*2.0/(dxm*(dxm+dxp))*(1.0-fdm)*lc/(fdm*lm+(1.0-fdm)*lc);
-      //ap = lc*vol*2.0/(dxp*(dxm+dxp));
+      am = lc*vol*(this->*coef_m)(dxm,dxp,x0)*fdm*lm/(fdm*lm+(1.0-fdm)*lc);
+      ac = lc*vol*((this->*coef_m)(dxm,dxp,x0)+(this->*coef_p)(dxm,dxp,x0))
+         - lc*vol*(this->*coef_m)(dxm,dxp,x0)*(1.0-fdm)*lc/(fdm*lm+(1.0-fdm)*lc);
+      ap = lc*vol*(this->*coef_p)(dxm,dxp,x0);
+#else
       /* FVM */
-      am = lc * area / dxm * fdm*lm/((1.0-fdm)*lc+fdm*lm);
-      ap = 0.5 * (lc + lp) * area / dxp;
+      am = lc * aream / dxm * fdm*lm/((1.0-fdm)*lc+fdm*lm);
+      ap = 0.5 * (lc + lp) * areap / dxp;
       ac = am + ap;
-      //std::cout<<"f-s-s: "<<i<<" "<<j<<" "<<k<<" "<<am-ac+ap<<"\n";
+#endif
+#ifdef DEBUG
+      std::cout<<"f-s-s: "<<i<<" "<<j<<" "<<k<<" "<<am-ac+ap<<"\n";
+#endif
     } else if(ofm && onp){
-      // s-s-f
-      fdp = max(fdp,epsl);
-      dxp = dxp * fdp;
+      /* s-s-f */
+      if(fs&&Interface(+1,m,i,j,k)) {
+        /* removed from system matrix */
+        aflagp = 0.0;
+        /* dxp,fdp are corrected to account for interface position */
+        /* tp is changed to the saturation temperature */
+        fdp *= dxp;
+        if(m==Comp::i()) 
+          dxp = std::max(epsl*dxp,distance_x(i,j,k,+1,tp));
+        else if(m==Comp::j())
+          dxp = std::max(epsl*dxp,distance_y(i,j,k,+1,tp));
+        else
+          dxp = std::max(epsl*dxp,distance_z(i,j,k,+1,tp));
+        fdp /= dxp; 
+        fdp = max(fdp,epsl);
+        /* dxp is corrected */
+        dxp = dxp * fdp;
+        /* lambdaf is inverted */
+        if(clp>=clrsurf){
+          lp = lambdav + edp*cpv/rhov/turbP;
+        } else {
+          lp = lambdal + edp*cpl/rhol/turbP;
+        }
+      } else {
+        fdp = max(fdp,epsl);
+        dxp = dxp * fdp;
+      }
+#ifdef USE_FDM_SOLID
       /* FDM */
-      //am = lc*vol*2.0/(dxm*(dxm+dxp));
-      //ac = lc*vol*2.0/(dxm*dxp)
-      //   - lc*vol*2.0/(dxp*(dxm+dxp))*(1.0-fdp)*lc/((1.0-fdp)*lc+fdp*lp);
-      //ap = lc*vol*2.0/(dxp*(dxm+dxp))*fdp*lp/((1.0-fdp)*lc+fdp*lp);
+      am = lc*vol*(this->*coef_m)(dxm,dxp,x0);
+      ac = lc*vol*((this->*coef_m)(dxm,dxp,x0)+(this->*coef_p)(dxm,dxp,x0))
+         - lc*vol*(this->*coef_p)(dxm,dxp,x0)*(1.0-fdp)*lc/((1.0-fdp)*lc+fdp*lp);
+      ap = lc*vol*(this->*coef_p)(dxm,dxp,x0)*fdp*lp/((1.0-fdp)*lc+fdp*lp);
+#else
       /* FVM */
-      am = 0.5 * (lc + lm) * area / dxm;
-      ap = lc * area / dxp * fdp*lp/((1.0-fdp)*lc+fdp*lp);
+      am = 0.5 * (lc + lm) * aream / dxm;
+      ap = lc * areap / dxp * fdp*lp/((1.0-fdp)*lc+fdp*lp);
       ac = am + ap;
-      //std::cout<<"s-s-f: "<<i<<" "<<j<<" "<<k<<" "<<am-ac+ap<<"\n";
+#endif
+#ifdef DEBUG
+      std::cout<<"s-s-f: "<<i<<" "<<j<<" "<<k<<" "<<am-ac+ap<<"\n";
+#endif
     } else {
-      // f-s-f
-      std::cout<<"diff_matrix: need to be develop!!!\n";
+      /* f-s-f */
+      std::cout<<"EnthFD::diff_matrix: Underdevelopment!\n";
       std::cout<<"fluid-solid-fluid.\n";
       exit(0);
     }
 
+  /*------------------+
+  |  center in fluid  |
+  +------------------*/
   } else {
-    // center:fluid
     tm = pm; 
     tc = pc; 
     tp = pp; 
 
     if(onm && onp){
-      // f-f-f
-      if((clm-0.5)*(clc-0.5)>=0){
+      /* f-f-f */
+      //if((clm-clrsurf)*(clc-clrsurf)>=0){
+      if(!Interface(-1,m,i,j,k)){
         dxm=dxm;
       } else {
-        dxm=std::max((0.5-clc)/(clm-clc),epsl)*dxm;
+        if(!fs) {
+          real frac = std::max((clrsurf-clc)/(clm-clc),epsl);
+          dxm=frac*dxm;
+          tm = Tint(-1,m,frac,i,j,k);
+        } else {
+          if(m==Comp::i())
+            dxm = std::max(epsl*dxm,distance_x(i,j,k,-1,tm));
+          else if(m==Comp::j())
+            dxm = std::max(epsl*dxm,distance_y(i,j,k,-1,tm));
+          else
+            dxm = std::max(epsl*dxm,distance_z(i,j,k,-1,tm));
+        }
         aflagm=0.0;
-        tm = tsat;
       }
-      if((clc-0.5)*(clp-0.5)>=0){
+      //if((clc-clrsurf)*(clp-clrsurf)>=0){
+      if(!Interface(+1,m,i,j,k)){
         dxp=dxp;
       } else {
-        dxp=std::max((0.5-clc)/(clp-clc),epsl)*dxp;
+        if(!fs) {
+          real frac = std::max((clrsurf-clc)/(clp-clc),epsl);
+          dxp=frac*dxp;
+          tp = Tint(+1,m,frac,i,j,k);
+        } else {
+          if(m==Comp::i())
+            dxp = std::max(epsl*dxp,distance_x(i,j,k,+1,tp));
+          else if(m==Comp::j())
+            dxp = std::max(epsl*dxp,distance_y(i,j,k,+1,tp));
+          else
+            dxp = std::max(epsl*dxp,distance_z(i,j,k,+1,tp));
+        }
         aflagp=0.0;
-        tp = tsat;
-#if 0
+#ifdef DEBUG
 	std::cout<<"aflagp=0.0: " <<i<<" "<<j<<" "<<k<<"\n";
 #endif
       }
-      if (aflagm==0.0 || aflagp==0.0) {
+#ifdef USE_FDM_FLUID /* now, finite difference is applied always, as in system_diffusive */
+      /* FDM */
+      am = lc * vol * (this->*coef_m)(dxm,dxp,x0);
+      ac = lc * vol * ((this->*coef_m)(dxm,dxp,x0)+(this->*coef_p)(dxm,dxp,x0));
+      ap = lc * vol * (this->*coef_p)(dxm,dxp,x0);
+#else
+      if(aflagm==0.0 || aflagp==0.0) {
+        /* FDM */
+        am = lc * vol * (this->*coef_m)(dxm,dxp,x0);
+        ac = lc * vol * ((this->*coef_m)(dxm,dxp,x0)+(this->*coef_p)(dxm,dxp,x0));
+        ap = lc * vol * (this->*coef_p)(dxm,dxp,x0);
+      } else { 
+        /* FVM */
+        am = 0.5 * (lc + lm) * aream / dxm;
+        ap = 0.5 * (lc + lp) * areap / dxp;
+        ac = am + ap;
+      }
+#endif
+#ifdef DEBUG
+      std::cout<<"f-f-f: "<<i<<" "<<j<<" "<<k<<" "<<am-ac+ap<<"\n";
+#endif
+    } else if(ofm && onp){ 
+      /* s-f-f */
+      //if((clc-clrsurf)*(clp-clrsurf)>=0){
+      if(!Interface(+1,m,i,j,k)){
+        dxp=dxp;
+      } else {
+        if(!fs) {
+          real frac = std::max((clrsurf-clc)/(clp-clc),epsl);
+          dxp=frac*dxp;
+          tp = Tint(+1,m,frac,i,j,k);
+        } else {
+          if(m==Comp::i())
+            dxp = std::max(epsl*dxp,distance_x(i,j,k,+1,tp));
+          else if(m==Comp::j())
+            dxp = std::max(epsl*dxp,distance_y(i,j,k,+1,tp));
+          else
+            dxp = std::max(epsl*dxp,distance_z(i,j,k,+1,tp));
+        }
+        aflagp=0.0;
+      }
+      if(fs&&Interface(-1,m,i,j,k)) {
+        /* removed from system matrix */
+        aflagm = 0.0;
+        /* dxm is corrected to account for interface position */
+        /* tm is changed to the saturation temperature */
+        if(m==Comp::i()) 
+          dxm = std::max(epsl*dxm,distance_x(i,j,k,-1,tm));
+        else if(m==Comp::j())
+          dxm = std::max(epsl*dxm,distance_y(i,j,k,-1,tm));
+        else
+          dxm = std::max(epsl*dxm,distance_z(i,j,k,-1,tm));
+        /* FDM */
+        am = lc * vol * (this->*coef_m)(dxm,dxp,x0);
+        ac = lc * vol * ((this->*coef_m)(dxm,dxp,x0)+(this->*coef_p)(dxm,dxp,x0));
+        ap = lc * vol * (this->*coef_p)(dxm,dxp,x0);
+      } else {
+        fdm = max(fdm,epsl);
+        dxm = dxm * fdm;
+#ifdef USE_FDM_FLUID /* now, finite difference is applied always, as in system_diffusive */
+        /* FDM */
+        am = lc*vol*(this->*coef_m)(dxm,dxp,x0)*fdm*lm/(fdm*lm+(1.0-fdm)*lc);
+        ac = lc*vol*((this->*coef_m)(dxm,dxp,x0)+(this->*coef_p)(dxm,dxp,x0))
+           - lc*vol*(this->*coef_m)(dxm,dxp,x0)*(1.0-fdm)*lc/(fdm*lm+(1.0-fdm)*lc);
+        ap = lc*vol*(this->*coef_p)(dxm,dxp,x0);
+#else
+        if(aflagp==0.0) {
+          /* FDM */
+          am = lc*vol*(this->*coef_m)(dxm,dxp,x0)*fdm*lm/(fdm*lm+(1.0-fdm)*lc);
+          ac = lc*vol*((this->*coef_m)(dxm,dxp,x0)+(this->*coef_p)(dxm,dxp,x0))
+             - lc*vol*(this->*coef_m)(dxm,dxp,x0)*(1.0-fdm)*lc/(fdm*lm+(1.0-fdm)*lc);
+          ap = lc*vol*(this->*coef_p)(dxm,dxp,x0);
+        } else {
+          /* FVM */
+          am = lc * aream / dxm * fdm * lm / (fdm*lm+(1.0-fdm)*lc);
+          ap = 0.5 * (lc + lp) * areap / dxp;
+          ac = am + ap;
+        }
+#endif
+      }
+#ifdef DEBUG
+      std::cout<<"s-f-f: "<<i<<" "<<j<<" "<<k<<" "<<am-ac+ap<<"\n";
+#endif
+    } else if(onm && ofp){
+      /* f-f-s */
+      //if((clm-clrsurf)*(clc-clrsurf)>=0){
+      if(!Interface(-1,m,i,j,k)){
+        dxm=dxm;
+      } else {
+        if(!fs) {
+          real frac = std::max((clrsurf-clc)/(clm-clc),epsl);
+          dxm=frac*dxm;
+          tm = Tint(-1,m,frac,i,j,k);
+        } else {
+          if(m==Comp::i())
+            dxm = std::max(epsl*dxm,distance_x(i,j,k,-1,tm));
+          else if(m==Comp::j())
+            dxm = std::max(epsl*dxm,distance_y(i,j,k,-1,tm));
+          else
+            dxm = std::max(epsl*dxm,distance_z(i,j,k,-1,tm));
+        }
+        aflagm=0.0;
+      }
+      if(fs&&Interface(+1,m,i,j,k)) {
+        /* removed from system matrix */
+        aflagp = 0.0;
+        /* dxp is corrected to account for interface position */
+        /* tp is changed to the saturation temperature */
+        if(m==Comp::i())
+          dxp = std::max(epsl*dxp,distance_x(i,j,k,+1,tp));
+        else if(m==Comp::j())
+          dxp = std::max(epsl*dxp,distance_y(i,j,k,+1,tp));
+        else
+          dxp = std::max(epsl*dxp,distance_z(i,j,k,+1,tp));
         /* FDM */
         am = lc * vol * 2.0 / (dxm*(dxm+dxp));
         ac = lc * vol * 2.0 / (dxm*dxp);
         ap = lc * vol * 2.0 / (dxp*(dxm+dxp));
-      } else { 
-        /* FVM */
-        am = 0.5 * (lc + lm) * area / dxm;
-        ap = 0.5 * (lc + lp) * area / dxp;
-        ac = am + ap;
-      }
-      //std::cout<<"f-f-f: "<<i<<" "<<j<<" "<<k<<" "<<am-ac+ap<<"\n";
-
-    } else if(ofm && onp){ 
-
-      // s-f-f
-      fdm = max(fdm,epsl);
-      dxm = dxm * fdm;
-      if((clc-0.5)*(clp-0.5)>=0){
-        dxp=dxp;
       } else {
-        dxp=std::max((0.5-clc)/(clp-clc),epsl)*dxp;
-        aflagp=0.0;
-        tp = tsat;
-      }
-      if(aflagp==0.0) {
+        fdp = max(fdp,epsl);
+        dxp = dxp * fdp;
+#ifdef USE_FDM_FLUID /* now, finite difference is applied always, as in system_diffusive */
         /* FDM */
-        am = lc*vol*2.0/(dxm*(dxm+dxp))*fdm*lm/(fdm*lm+(1.0-fdm)*lc);
-        ac = lc*vol*2.0/(dxm*dxp)
-           - lc*vol*2.0/(dxm*(dxm+dxp))*(1.0-fdm)*lc/(fdm*lm+(1.0-fdm)*lc);
-        ap = lc*vol*2.0/(dxp*(dxm+dxp));
-      } else {
-        /* FVM */
-        am = lc * area / dxm * fdm * lm / (fdm*lm+(1.0-fdm)*lc);
-        ap = 0.5 * (lc + lp) * area / dxp;
-        ac = am + ap;
+        am = lc*vol*(this->*coef_m)(dxm,dxp,x0);
+        ac = lc*vol*((this->*coef_m)(dxm,dxp,x0)+(this->*coef_p)(dxm,dxp,x0))
+           - lc*vol*(this->*coef_p)(dxm,dxp,x0)*(1.0-fdp)*lc/((1.0-fdp)*lc+fdp*lp);
+        ap = lc*vol*(this->*coef_p)(dxm,dxp,x0)*fdp*lp/((1.0-fdp)*lc+fdp*lp);
+#else
+        if(aflagm==0.0) {
+          /* FVM */
+          am = lc*vol*(this->*coef_m)(dxm,dxp,x0);
+          ac = lc*vol*((this->*coef_m)(dxm,dxp,x0)+(this->*coef_p)(dxm,dxp,x0))
+             - lc*vol*(this->*coef_p)(dxm,dxp,x0)*(1.0-fdp)*lc/((1.0-fdp)*lc+fdp*lp);
+          ap = lc*vol*(this->*coef_p)(dxm,dxp,x0)*fdp*lp/((1.0-fdp)*lc+fdp*lp);
+        } else {
+          /* FVM */
+          am = 0.5 * (lc + lm) * aream / dxm;
+          ap = lc * areap / dxp * fdp * lp / (fdp*lp+(1.0-fdp)*lc);
+          ac = am + ap;
+        }
+#endif
       }
-      //std::cout<<"s-f-f: "<<i<<" "<<j<<" "<<k<<" "<<am-ac+ap<<"\n";
- 
-    } else if(onm && ofp){
-
-      // f-f-s
-      fdp = max(fdp,epsl);
-      dxp = dxp * fdp;
-      if((clm-0.5)*(clc-0.5)>=0){
-        dxm=dxm;
-      } else {
-        dxm=std::max((0.5-clc)/(clm-clc),epsl)*dxm;
-        aflagm=0.0;
-        tm = tsat;
-      }
-      if (aflagm==0.0) {
-        /* FVM */
-        am = lc*vol*2.0/(dxm*(dxm+dxp));
-        ac = lc*vol*2.0/(dxm*dxp)
-           - lc*vol*2.0/(dxp*(dxm+dxp))*(1.0-fdp)*lc/((1.0-fdp)*lc+fdp*lp);
-        ap = lc*vol*2.0/(dxp*(dxm+dxp))*fdp*lp/((1.0-fdp)*lc+fdp*lp);
-      } else {
-        /* FVM */
-        am = 0.5 * (lc + lm) * area / dxm;
-        ap = lc * area / dxp * fdp * lp / (fdp*lp+(1.0-fdp)*lc);
-        ac = am + ap;
-      }
-      //std::cout<<"f-f-s: "<<i<<" "<<j<<" "<<k<<" "<<am-ac+ap<<"\n";
- 
+#ifdef DEBUG
+      std::cout<<"f-f-s: "<<i<<" "<<j<<" "<<k<<" "<<am-ac+ap<<"\n";
+#endif 
     } else {
-
-      // s-f-s
-      std::cout<<"diff_matrix: need to be develop!!!\n";
+      /* s-f-s */
+      std::cout<<"EnthFD::diff_matrix: Underdevelopment!\n";
       std::cout<<"solid-fluid-solid.\n";
       exit(0);
-
     }
   }
+
+#ifdef DEBUG
+  boil::oout<<"end: "<<i<<" "<<j<<" "<<k<<" "<<m<<boil::endl;
+#endif
 
   return;
 }

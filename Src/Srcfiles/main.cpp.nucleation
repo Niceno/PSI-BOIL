@@ -2,10 +2,8 @@
 #include <iomanip>
 #include <string>
 #include <cstring>
-#include "update_step.cpp"
 #define USE_VOF
 #define USE_PC
-#define USE_ENTH
 #define VARIABLE
 
 #define _GNU_SOURCE 1
@@ -32,8 +30,8 @@ const int NX1  = 25*gLevel;
 const int NX2  =  7*gLevel;
 const real dxuni = LX1/real(NX1);
 const real LZ0 = -8.0e-6;
-const int NZ0  =  4;  // solid
-const int NZ1  = 64*gLevel-4;
+const int NZ0  =  6;  // solid
+const int NZ1  = 64*gLevel-6;
 const real LZ1  = LX1/real(NX1)*real(NZ1);
 
 
@@ -399,13 +397,8 @@ main(int argc, char ** argv) {
   }
   input.close();
 
-#ifdef USE_ENTH
-  EnthalpyTIF enthFD(tpr, q, c, uvw, time, solver2, &mixed, tsat,
-                     &nickel, conc.topo.fs, conc.topo.adens);
-#else
-  EnthalpyFD enthFD(tpr, q, c, uvw, time, solver2, &mixed, tsat0,
-                    &nickel);
-#endif
+  EnthalpyFD enthFD(tpr, q, c, uvw, time, solver2, &mixed, tsat,
+                    &nickel, conc.topo.fs, conc.topo.adens);
   enthFD.convection_set(TimeScheme::forward_euler());
   enthFD.diffusion_set(TimeScheme::backward_euler());
 #ifndef USE_VOF

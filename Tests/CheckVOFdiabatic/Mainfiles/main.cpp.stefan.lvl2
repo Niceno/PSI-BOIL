@@ -229,7 +229,7 @@ main(int argc, char * argv[]) {
   conc.totalvol();
 
   TIF tsat(Tsat);
-  EnthalpyTIF enthVOF(tpr, q, c, uvw, time, solver, &mixed, tsat,
+  EnthalpyFD enthVOF(tpr, q, c, uvw, time, solver, &mixed, tsat,
                       NULL, conc.topo.fs, conc.topo.adens);
   enthVOF.convection_set(TimeScheme::forward_euler());
   enthVOF.diffusion_set(TimeScheme::backward_euler());

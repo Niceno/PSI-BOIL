@@ -11,16 +11,22 @@ EnthalpyFD::EnthalpyFD(const Scalar & PHI,
                        Times & T,
                        Krylov * S,
                        Matter * f,
-                       const real Tsat,
-                       Matter * s) :
+                       TIF & tintmodel,
+                       Matter * s,
+                       const Vector * FS,
+                       const Scalar * ADENS) :
 /*---------------------+ 
 |  initialize parent   |
 +---------------------*/
   Centered( PHI.domain(), PHI, F, & U, T, f, s, S ),
-  clrold(  *C  .domain()),
-  iflag (  *C  .domain())
+  clrold (  *C  .domain()),
+  ftif   (  *PHI.domain()),
+  ftifold(  *PHI.domain()),
+  adensold( *PHI.domain()),
+  iflag     (*C  .domain()),
+  fsold(  *U  .domain()),
+  tifmodel(tintmodel)
 {
-  tsat = Tsat,
   rhol = fluid()->rho(1),
   rhov = fluid()->rho(0),
   cpl  = fluid()->cp(1),
@@ -38,6 +44,19 @@ EnthalpyFD::EnthalpyFD(const Scalar & PHI,
   turbP=0.9;
   laminar=true;
 
+  fs = FS;
+  adens = ADENS;
+
+  if(fs) {
+    for_m(m) {
+      fsold(m) = (*fs)(m).shape();
+    }
+  }
+ 
+  ftif = phi.shape();
+  if(adens)
+    adensold = (*adens).shape();
+
   phi.bnd_update();
 
   convection_set(TimeScheme::forward_euler());
@@ -48,4 +67,6 @@ EnthalpyFD::EnthalpyFD(const Scalar & PHI,
 
 /******************************************************************************/
 EnthalpyFD::~EnthalpyFD() {
-}
+}	
+
+/******************************************************************************/

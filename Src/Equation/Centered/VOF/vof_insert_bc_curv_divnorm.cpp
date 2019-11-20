@@ -16,10 +16,12 @@ void VOF::insert_bc_curv_divnorm() {
 *  \brief Calculate curvature on wall boundary condition.
 *******************************************************************************/
 
+#if 0
   boil::oout<<"VOF::insert_bc_curv_divnorm: obsolete code. Use height-functions instead. "
             <<"Exiting."
             <<boil::endl;
   exit(0);
+#endif
 
   /* calculate normal vector at vertex */
   gradphi(phi);

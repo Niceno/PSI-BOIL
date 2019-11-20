@@ -1,4 +1,4 @@
-#include "enthalpytif.h"
+#include "enthalpyfd.h"
 
 /* 
  * dir > 0: positive direction
@@ -6,7 +6,7 @@
 */
 
 /* x-direction */
-real EnthalpyTIF::distance_x(const int i, const int j, const int k,
+real EnthalpyFD::distance_x(const int i, const int j, const int k,
                              const int dir, real & tint,
                              const bool old) { 
   int of(1);
@@ -16,7 +16,7 @@ real EnthalpyTIF::distance_x(const int i, const int j, const int k,
 
   if(!old) {
     if(distance1D_x(i,j,k,of,tint,dist)) {
-        //if(j==1&&k==1) boil::oout<<"ETIF::1Dx "<<i<<" "<<of<<" "<<dist<<" "<<(*clr)[i][j][k]<<" "<<(*clr)[i+of][j][k]<<" "<<(*fs)[Comp::i()][i+(of>0)][j][k]<<boil::endl;
+        //if(j==1&&k==1) boil::oout<<"EnthFD::1Dx "<<i<<" "<<of<<" "<<dist<<" "<<(*clr)[i][j][k]<<" "<<(*clr)[i+of][j][k]<<" "<<(*fs)[Comp::i()][i+(of>0)][j][k]<<boil::endl;
         return dist;
     }
   /* old? */
@@ -26,7 +26,7 @@ real EnthalpyTIF::distance_x(const int i, const int j, const int k,
     }
   }
 
-  boil::aout<<"EnthalpyTIF::int_dist_x: Error! Flag inconsistent w/ vol. fraction!\n";
+  boil::aout<<"EnthalpyFD::int_dist_x: Error! Flag inconsistent w/ vol. fraction!\n";
   if(!old)
     boil::aout<<"new "<<i<<" "<<j<<" "<<k<<" "<<dir<<" "
               <<(*clr)[i][j][k]<<" "<<(*clr)[i+of][j][k]<<boil::endl;
@@ -38,7 +38,7 @@ real EnthalpyTIF::distance_x(const int i, const int j, const int k,
   return 0.0;
 }
 
-bool EnthalpyTIF::distance1D_x(const int i, const int j, const int k,
+bool EnthalpyFD::distance1D_x(const int i, const int j, const int k,
                                const int dir, real & tint, real & dist) {
   real centrex = phi.xc(i);
   if(dir>0) {
@@ -72,7 +72,7 @@ bool EnthalpyTIF::distance1D_x(const int i, const int j, const int k,
   return false;
 }
 
-bool EnthalpyTIF::distance1D_xold(const int i, const int j, const int k,
+bool EnthalpyFD::distance1D_xold(const int i, const int j, const int k,
                                   const int dir, real & tint, real & dist) {
   real centrex = phi.xc(i);
   if(dir>0) {
@@ -107,7 +107,7 @@ bool EnthalpyTIF::distance1D_xold(const int i, const int j, const int k,
 }
 
 /* y-direction */
-real EnthalpyTIF::distance_y(const int i, const int j, const int k,
+real EnthalpyFD::distance_y(const int i, const int j, const int k,
                              const int dir, real & tint,
                              const bool old) { 
   int of(1);
@@ -126,7 +126,7 @@ real EnthalpyTIF::distance_y(const int i, const int j, const int k,
     }
   }
 
-  boil::aout<<"EnthalpyTIF::int_dist_y: Error! Flag inconsistent w/ vol. fraction!\n";
+  boil::aout<<"EnthalpyFD::int_dist_y: Error! Flag inconsistent w/ vol. fraction!\n";
   if(!old)
     boil::aout<<"new "<<i<<" "<<j<<" "<<k<<" "<<dir<<" "
               <<phi.yc(j)<<" "<<phi.yc(j+of)<<" "<<(*fs)[Comp::j()][i][j+(of>0)][k]<<" "
@@ -139,7 +139,7 @@ real EnthalpyTIF::distance_y(const int i, const int j, const int k,
   return 0.0;
 }
 
-bool EnthalpyTIF::distance1D_y(const int i, const int j, const int k,
+bool EnthalpyFD::distance1D_y(const int i, const int j, const int k,
                                const int dir, real & tint, real & dist) {
   real centrey = phi.yc(j);
   if(dir>0) {
@@ -173,7 +173,7 @@ bool EnthalpyTIF::distance1D_y(const int i, const int j, const int k,
   return false;
 }
 
-bool EnthalpyTIF::distance1D_yold(const int i, const int j, const int k,
+bool EnthalpyFD::distance1D_yold(const int i, const int j, const int k,
                                   const int dir, real & tint, real & dist) {
   real centrey = phi.yc(j);
   if(dir>0) {
@@ -208,7 +208,7 @@ bool EnthalpyTIF::distance1D_yold(const int i, const int j, const int k,
 }
 
 /* z-direction */
-real EnthalpyTIF::distance_z(const int i, const int j, const int k,
+real EnthalpyFD::distance_z(const int i, const int j, const int k,
                              const int dir, real & tint,
                              const bool old) { 
   int of(1);
@@ -227,7 +227,7 @@ real EnthalpyTIF::distance_z(const int i, const int j, const int k,
     }
   }
 
-  boil::aout<<"EnthalpyTIF::int_dist_z: Error! Flag inconsistent w/ vol. fraction!\n";
+  boil::aout<<"EnthalpyFD::int_dist_z: Error! Flag inconsistent w/ vol. fraction!\n";
   if(!old)
     boil::aout<<"new "<<i<<" "<<j<<" "<<k<<" "<<dir<<" "
               <<(*clr)[i][j][k]<<" "<<(*clr)[i][j][k+of]<<boil::endl;
@@ -239,7 +239,7 @@ real EnthalpyTIF::distance_z(const int i, const int j, const int k,
   return 0.0;
 }
 
-bool EnthalpyTIF::distance1D_z(const int i, const int j, const int k,
+bool EnthalpyFD::distance1D_z(const int i, const int j, const int k,
                                const int dir, real & tint, real & dist) {
   real centrez = phi.zc(k);
   if(dir>0) {
@@ -274,7 +274,7 @@ bool EnthalpyTIF::distance1D_z(const int i, const int j, const int k,
   return false;
 }
 
-bool EnthalpyTIF::distance1D_zold(const int i, const int j, const int k,
+bool EnthalpyFD::distance1D_zold(const int i, const int j, const int k,
                                   const int dir, real & tint, real & dist) {
   real centrez = phi.zc(k);
   if(dir>0) {

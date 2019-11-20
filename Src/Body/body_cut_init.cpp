@@ -21,12 +21,12 @@ void Body::cut_init(const Domain & dom) {
   vec = new Vector(dom); (*vec) = vin;
 
   /* set boundary condition */
-  if       (dom.period(0)) {
-    sca->bc().add( BndCnd( Dir::imin(), BndType::periodic() ) );
-    sca->bc().add( BndCnd( Dir::imax(), BndType::periodic() ) );
-  } else if(dom.is_dummy(0)) {
+  if       (dom.is_dummy(0)) {
     sca->bc().add( BndCnd( Dir::imin(), BndType::pseudo() ) );
     sca->bc().add( BndCnd( Dir::imax(), BndType::pseudo() ) );
+  } else if(dom.period(0)) {
+    sca->bc().add( BndCnd( Dir::imin(), BndType::periodic() ) );
+    sca->bc().add( BndCnd( Dir::imax(), BndType::periodic() ) );
   } else {
     if(dom.bnd_symmetry(Dir::imin())) {
       sca->bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
@@ -40,12 +40,12 @@ void Body::cut_init(const Domain & dom) {
     }
   }
 
-  if       (dom.period(1)) {
-    sca->bc().add( BndCnd( Dir::jmin(), BndType::periodic() ) );
-    sca->bc().add( BndCnd( Dir::jmax(), BndType::periodic() ) );
-  } else if(dom.is_dummy(1)) {
+  if       (dom.is_dummy(1)) {
     sca->bc().add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
     sca->bc().add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
+  } else if(dom.period(1)) {
+    sca->bc().add( BndCnd( Dir::jmin(), BndType::periodic() ) );
+    sca->bc().add( BndCnd( Dir::jmax(), BndType::periodic() ) );
   } else {
     if(dom.bnd_symmetry(Dir::jmin())) {
       sca->bc().add( BndCnd( Dir::jmin(), BndType::symmetry() ) );
@@ -59,12 +59,12 @@ void Body::cut_init(const Domain & dom) {
     }
   }
 
-  if       (dom.period(2)) {
-    sca->bc().add( BndCnd( Dir::kmin(), BndType::periodic() ) );
-    sca->bc().add( BndCnd( Dir::kmax(), BndType::periodic() ) );
-  } else if(dom.is_dummy(2)) {
+  if       (dom.is_dummy(2)) {
     sca->bc().add( BndCnd( Dir::kmin(), BndType::pseudo() ) );
     sca->bc().add( BndCnd( Dir::kmax(), BndType::pseudo() ) );
+  } else if(dom.period(2)) {
+    sca->bc().add( BndCnd( Dir::kmin(), BndType::periodic() ) );
+    sca->bc().add( BndCnd( Dir::kmax(), BndType::periodic() ) );
   } else {
     if(dom.bnd_symmetry(Dir::kmin())) {
       sca->bc().add( BndCnd( Dir::kmin(), BndType::symmetry() ) );
@@ -81,12 +81,12 @@ void Body::cut_init(const Domain & dom) {
   (*bdist)=sca->shape();
 
   for_m(m) {
-    if       (dom.period(0)) {
-      vec->bc(m).add( BndCnd( Dir::imin(), BndType::periodic() ) );
-      vec->bc(m).add( BndCnd( Dir::imax(), BndType::periodic() ) );
-    } else if(dom.is_dummy(0)) {
+    if       (dom.is_dummy(0)) {
       vec->bc(m).add( BndCnd( Dir::imin(), BndType::pseudo() ) );
       vec->bc(m).add( BndCnd( Dir::imax(), BndType::pseudo() ) );
+    } else if(dom.period(0)) {
+      vec->bc(m).add( BndCnd( Dir::imin(), BndType::periodic() ) );
+      vec->bc(m).add( BndCnd( Dir::imax(), BndType::periodic() ) );
     } else {
       if(dom.bnd_symmetry(Dir::imin())) {
         vec->bc(m).add( BndCnd( Dir::imin(), BndType::symmetry() ) );
@@ -100,12 +100,12 @@ void Body::cut_init(const Domain & dom) {
       }
     }
 
-    if       (dom.period(1)) {
-      vec->bc(m).add( BndCnd( Dir::jmin(), BndType::periodic() ) );
-      vec->bc(m).add( BndCnd( Dir::jmax(), BndType::periodic() ) );
-    } else if(dom.is_dummy(1)) {
+    if       (dom.is_dummy(1)) {
       vec->bc(m).add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
       vec->bc(m).add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
+    } else if(dom.period(1)) {
+      vec->bc(m).add( BndCnd( Dir::jmin(), BndType::periodic() ) );
+      vec->bc(m).add( BndCnd( Dir::jmax(), BndType::periodic() ) );
     } else {
       if(dom.bnd_symmetry(Dir::jmin())) {
         vec->bc(m).add( BndCnd( Dir::jmin(), BndType::symmetry() ) );
@@ -119,12 +119,12 @@ void Body::cut_init(const Domain & dom) {
       }
     }
 
-    if       (dom.period(2)) {
-      vec->bc(m).add( BndCnd( Dir::kmin(), BndType::periodic() ) );
-      vec->bc(m).add( BndCnd( Dir::kmax(), BndType::periodic() ) );
-    } else if(dom.is_dummy(2)) {
+    if       (dom.is_dummy(2)) {
       vec->bc(m).add( BndCnd( Dir::kmin(), BndType::pseudo() ) );
       vec->bc(m).add( BndCnd( Dir::kmax(), BndType::pseudo() ) );
+    } else if(dom.period(2)) {
+      vec->bc(m).add( BndCnd( Dir::kmin(), BndType::periodic() ) );
+      vec->bc(m).add( BndCnd( Dir::kmax(), BndType::periodic() ) );
     } else {
       if(dom.bnd_symmetry(Dir::kmin())) {
         vec->bc(m).add( BndCnd( Dir::kmin(), BndType::symmetry() ) );

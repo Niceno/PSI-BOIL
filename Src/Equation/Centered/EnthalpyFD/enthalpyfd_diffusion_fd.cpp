@@ -44,7 +44,7 @@ void EnthalpyFD::diffusion_fd(const Scalar * diff_eddy) {
     +------------------------*/
     for_ijk(i,j,k){
       real lc, cp_mass;
-      if((*clr)[i][j][k]>=0.5){
+      if((*clr)[i][j][k]>=clrsurf){
         lc = lambdal;
         cp_mass = cpl/rhol;
       } else {
@@ -61,30 +61,46 @@ void EnthalpyFD::diffusion_fd(const Scalar * diff_eddy) {
       const real pc = phi[i][j][k];
       real xm,xp,pm,pp,aflagm,aflagp;
       aflagm=aflagp=0.0;
-      if((clrw-0.5)*(clrc-0.5)>=0){
+      //if((clrw-clrsurf)*(clrc-clrsurf)>=0){
+      if(!Interface(-1,Comp::i(),i,j,k)){
         xm=phi.dxw(i);
         pm=phi[i-1][j][k];
       } else {
-        xm=std::max((0.5-clrc)/(clrw-clrc),epsl)*phi.dxw(i);
-        pm=tsat;
+        if(!fs) {
+          real frac = std::max((clrsurf-clrc)/(clrw-clrc),epsl);
+          xm=frac*phi.dxw(i);
+          pm=Tint(-1,Comp::i(),frac,i,j,k);
+        } else {
+          xm = std::max(epsl*phi.dxw(i),distance_x(i,j,k,-1,pm));
+        }
         aflagm=1.0;
       }
-      if((clrc-0.5)*(clre-0.5)>=0){
+      //if((clrc-clrsurf)*(clre-clrsurf)>=0){
+      if(!Interface(+1,Comp::i(),i,j,k)){
         xp=phi.dxe(i);
         pp=phi[i+1][j][k];
       } else {
-        xp=std::max((0.5-clrc)/(clre-clrc),epsl)*phi.dxe(i);
-        pp=tsat;
+        if(!fs) {
+          real frac = std::max((clrsurf-clrc)/(clre-clrc),epsl);
+          xp=frac*phi.dxe(i);
+          pp=Tint(+1,Comp::i(),frac,i,j,k);
+        } else {
+          xp = std::max(epsl*phi.dxe(i),distance_x(i,j,k,+1,pp));
+        }
         aflagp=1.0;
       }
-      const real Aw = tsc * lc * vol * 2.0 / (xm*(xm+xp));
-      const real Ac = tsc * lc * vol * 2.0 / (xm*xp);
-      const real Ae = tsc * lc * vol * 2.0 / (xp*(xm+xp));
+      real cxm = coef_x_m(xm,xp,phi.xc(i));
+      real cxp = coef_x_p(xm,xp,phi.xc(i));
+
+      const real Aw = tsc * lc * vol * cxm;
+      const real Ac = tsc * lc * vol * (cxm+cxp);
+      const real Ae = tsc * lc * vol * cxp;
       fold[i][j][k] += Aw*pm - Ac*pc + Ae*pp;
       /* add implicit part of the diffusion term */
-      const real Awi = tscn * lc * vol * 2.0 / (xm*(xm+xp)) * aflagm;
-      const real Aei = tscn * lc * vol * 2.0 / (xp*(xm+xp)) * aflagp;
-      fold[i][j][k] += Awi*pm + Aei*pp;
+      const real Awi = tscn * lc * vol * cxm * aflagm;
+      const real Aei = tscn * lc * vol * cxp * aflagp;
+      ftif[i][j][k] = Awi*pm + Aei*pp;
+      ftifold[i][j][k] = Awi*pm + Aei*pp;
     }
 
     /*------------------------+ 
@@ -92,7 +108,7 @@ void EnthalpyFD::diffusion_fd(const Scalar * diff_eddy) {
     +------------------------*/
     for_ijk(i,j,k){
       real lc,cp_mass;
-      if((*clr)[i][j][k]>=0.5){
+      if((*clr)[i][j][k]>=clrsurf){
         lc = lambdal;
         cp_mass = cpl/rhol;
       } else {
@@ -109,29 +125,45 @@ void EnthalpyFD::diffusion_fd(const Scalar * diff_eddy) {
       const real pc = phi[i][j][k];
       real ym,yp,pm,pp,aflagm,aflagp;
       aflagm=aflagp=0.0;
-      if((clrs-0.5)*(clrc-0.5)>=0){
+      //if((clrs-clrsurf)*(clrc-clrsurf)>=0){
+      if(!Interface(-1,Comp::j(),i,j,k)){
         ym=phi.dys(j);
         pm=phi[i][j-1][k];
       } else {
-        ym=std::max((0.5-clrc)/(clrs-clrc),epsl)*phi.dys(j);
-        pm=tsat;
+        if(!fs) {
+          real frac = std::max((clrsurf-clrc)/(clrs-clrc),epsl);
+          ym=frac*phi.dys(j);
+          pm=Tint(-1,Comp::j(),frac,i,j,k);
+        } else {
+          ym = std::max(epsl*phi.dys(j),distance_y(i,j,k,-1,pm));
+        }
         aflagm=1.0;
       }
-      if((clrc-0.5)*(clrn-0.5)>=0){
+      //if((clrc-clrsurf)*(clrn-clrsurf)>=0){
+      if(!Interface(+1,Comp::j(),i,j,k)){
         yp=phi.dyn(j);
         pp=phi[i][j+1][k];
       } else {
-        yp=std::max((0.5-clrc)/(clrn-clrc),epsl)*phi.dyn(j);
-        pp=tsat;
+        if(!fs) {
+          real frac = std::max((clrsurf-clrc)/(clrn-clrc),epsl);
+          yp=frac*phi.dyn(j);
+          pp=Tint(+1,Comp::j(),frac,i,j,k);
+        } else {
+          yp = std::max(epsl*phi.dyn(j),distance_y(i,j,k,+1,pp));
+        }
         aflagp=1.0;
       }
-      const real As = tsc * lc * vol * 2.0 / (ym*(ym+yp));
-      const real Ac = tsc * lc * vol * 2.0 / (ym*yp);
-      const real An = tsc * lc * vol * 2.0 / (yp*(ym+yp));
+      real cym = coef_y_m(ym,yp,phi.yc(j));
+      real cyp = coef_y_p(ym,yp,phi.yc(j));
+
+      const real As = tsc * lc * vol * cym;
+      const real Ac = tsc * lc * vol * (cym+cyp);
+      const real An = tsc * lc * vol * cyp;
       fold[i][j][k] += As*pm - Ac*pc + An*pp;
-      const real Asi = tscn * lc * vol * 2.0 / (ym*(ym+yp)) * aflagm;
-      const real Ani = tscn * lc * vol * 2.0 / (yp*(ym+yp)) * aflagp;
-      fold[i][j][k] += Asi*pm + Ani*pp;
+      const real Asi = tscn * lc * vol * cym * aflagm;
+      const real Ani = tscn * lc * vol * cyp * aflagp;
+      ftif[i][j][k] += Asi*pm + Ani*pp;
+      ftifold[i][j][k] += Asi*pm + Ani*pp;
     }
 
     /*------------------------+ 
@@ -139,7 +171,7 @@ void EnthalpyFD::diffusion_fd(const Scalar * diff_eddy) {
     +------------------------*/
     for_ijk(i,j,k){
       real lc,cp_mass;
-      if((*clr)[i][j][k]>=0.5){
+      if((*clr)[i][j][k]>=clrsurf){
         lc = lambdal;
         cp_mass = cpl/rhol;
       } else {
@@ -156,29 +188,45 @@ void EnthalpyFD::diffusion_fd(const Scalar * diff_eddy) {
       const real pc = phi[i][j][k];
       real zm,zp,pm,pp,aflagm,aflagp;
       aflagm=aflagp=0.0;
-      if((clrb-0.5)*(clrc-0.5)>=0){
+      //if((clrb-clrsurf)*(clrc-clrsurf)>=0){
+      if(!Interface(-1,Comp::k(),i,j,k)){
         zm=phi.dzb(k);
         pm=phi[i][j][k-1];
       } else {
-        zm=std::max((0.5-clrc)/(clrb-clrc),epsl)*phi.dzb(k);
-        pm=tsat;
+        if(!fs) {
+          real frac = std::max((clrsurf-clrc)/(clrb-clrc),epsl);
+          zm=frac*phi.dzb(k);
+          pm=Tint(-1,Comp::k(),frac,i,j,k);
+        } else {
+          zm = std::max(epsl*phi.dzb(k),distance_z(i,j,k,-1,pm));
+        }
         aflagm=1.0;
       }
-      if((clrc-0.5)*(clrt-0.5)>=0){
+      //if((clrc-clrsurf)*(clrt-clrsurf)>=0){
+      if(!Interface(+1,Comp::k(),i,j,k)){
         zp=phi.dzt(k);
         pp=phi[i][j][k+1];
       } else {
-        zp=std::max((0.5-clrc)/(clrt-clrc),epsl)*phi.dzt(k);
-        pp=tsat;
+        if(!fs) {
+          real frac = std::max((clrsurf-clrc)/(clrt-clrc),epsl);
+          zp=frac*phi.dzt(k);
+          pp=Tint(+1,Comp::k(),frac,i,j,k);
+        } else {
+          zp = std::max(epsl*phi.dzt(k),distance_z(i,j,k,+1,pp));
+        }
         aflagp=1.0;
       }
-      const real Ab = tsc * lc * vol * 2.0 / (zm*(zm+zp));
-      const real Ac = tsc * lc * vol * 2.0 / (zm*zp);
-      const real At = tsc * lc * vol * 2.0 / (zp*(zm+zp));
+      real czm = coef_z_m(zm,zp,phi.zc(k));
+      real czp = coef_z_p(zm,zp,phi.zc(k));
+      
+      const real Ab = tsc * lc * vol * czm;
+      const real Ac = tsc * lc * vol * (czm+czp);
+      const real At = tsc * lc * vol * czp;
       fold[i][j][k] += Ab*pm - Ac*pc + At*pp;
-      const real Abi = tscn * lc * vol * 2.0 / (zm*(zm+zp)) * aflagm;
-      const real Ati = tscn * lc * vol * 2.0 / (zp*(zm+zp)) * aflagp;
-      fold[i][j][k] += Abi*pm + Ati*pp;
+      const real Abi = tscn * lc * vol * czm * aflagm;
+      const real Ati = tscn * lc * vol * czp * aflagp;
+      ftif[i][j][k] += Abi*pm + Ati*pp;
+      ftifold[i][j][k] += Abi*pm + Ati*pp;
     }
     // need to add here immersed boundary without solid !!!
 
@@ -188,6 +236,10 @@ void EnthalpyFD::diffusion_fd(const Scalar * diff_eddy) {
   +------------------------------------------*/
   } else {
 
+    ftif = 0.;
+    ftifold = 0.;
+
+    bool oldflag = true; /* we are considering previous time step */
     for_m(m){
       int ii,jj,kk;
       ii=jj=kk=0;
@@ -205,7 +257,7 @@ void EnthalpyFD::diffusion_fd(const Scalar * diff_eddy) {
         real lc, xm, xp;
 
         bool onm, onc, onp, ofm, ofc, ofp; // on & off
-        real lsm, lsc, lsp, lfm, lfc, lfp; // lambda
+        real lsm, lsc, lsp; // lambda
         real clm, clc, clp; // color function
         real dxm, dxp, fdm, fdp, fdms, fdps;
         real edm, edc, edp; // eddy viscosity
@@ -213,7 +265,9 @@ void EnthalpyFD::diffusion_fd(const Scalar * diff_eddy) {
         real am, ac, ap;
         real tm, tc, tp;
         real aflagm, aflagp;
-        real area;
+        real aream, areap;
+        real pos0;
+        coef_gen coef_m, coef_p;
 
         onm=dom->ibody().on (i-ii,j-jj,k-kk);
         onc=dom->ibody().on (i   ,j   ,k   );
@@ -224,16 +278,17 @@ void EnthalpyFD::diffusion_fd(const Scalar * diff_eddy) {
         lsm=solid()->lambda (i-ii,j-jj,k-kk);
         lsc=solid()->lambda (i   ,j   ,k   );
         lsp=solid()->lambda (i+ii,j+jj,k+kk);
-        lfm=fluid()->lambda (i-ii,j-jj,k-kk);
-        lfc=fluid()->lambda (i   ,j   ,k   );
-        lfp=fluid()->lambda (i+ii,j+jj,k+kk);
         clm=(*clr)[i-ii][j-jj][k-kk];
         clc=(*clr)[i   ][j   ][k   ];
         clp=(*clr)[i+ii][j+jj][k+kk];
 	if(m==Comp::i()){
           dxm=phi.dxw(i);
           dxp=phi.dxe(i);
-          area = dSx(i,j,k);
+          pos0=phi.xc(i);
+          coef_m = &EnthalpyFD::coef_x_m;
+          coef_p = &EnthalpyFD::coef_x_p;
+          aream = dSx(Sign::neg(),i,j,k);
+          areap = dSx(Sign::pos(),i,j,k);
           fdm=dom->ibody().fdxw(i,j,k);
           fdp=dom->ibody().fdxe(i,j,k);
           fdms=dom->ibody().fdxe(i-1,j,k);
@@ -241,7 +296,11 @@ void EnthalpyFD::diffusion_fd(const Scalar * diff_eddy) {
         } else if(m==Comp::j()){
           dxm=phi.dys(j);
           dxp=phi.dyn(j);
-          area = dSy(i,j,k);
+          pos0=phi.yc(j);
+          coef_m = &EnthalpyFD::coef_y_m;
+          coef_p = &EnthalpyFD::coef_y_p;
+          aream = dSy(Sign::neg(),i,j,k);
+          areap = dSy(Sign::pos(),i,j,k);
           fdm=dom->ibody().fdys(i,j,k);
           fdp=dom->ibody().fdyn(i,j,k);
           fdms=dom->ibody().fdyn(i,j-1,k);
@@ -249,7 +308,11 @@ void EnthalpyFD::diffusion_fd(const Scalar * diff_eddy) {
         } else {
           dxm=phi.dzb(k);
           dxp=phi.dzt(k);
-          area = dSz(i,j,k);
+          pos0=phi.zc(k);
+          coef_m = &EnthalpyFD::coef_z_m;
+          coef_p = &EnthalpyFD::coef_z_p;
+          aream = dSz(Sign::neg(),i,j,k);
+          areap = dSz(Sign::pos(),i,j,k);
           fdm=dom->ibody().fdzb(i,j,k);
           fdp=dom->ibody().fdzt(i,j,k);
           fdms=dom->ibody().fdzt(i,j,k-1);
@@ -267,9 +330,10 @@ void EnthalpyFD::diffusion_fd(const Scalar * diff_eddy) {
         diff_matrix(am, ac, ap
                   , tm, tc, tp
                   , aflagm, aflagp
-                  , vol, area
+                  , pos0, coef_m, coef_p
+                  , vol, aream, areap
                   , onm, onc, onp, ofm, ofc, ofp
-                  , lsm, lsc, lsp, lfm, lfc, lfp
+                  , lsm, lsc, lsp
                   , clm, clc, clp
                   , dxm, dxp, fdm, fdp, fdms, fdps
                   , pm, pc, pp
@@ -279,7 +343,8 @@ void EnthalpyFD::diffusion_fd(const Scalar * diff_eddy) {
         if(tsc!=0){
           fold[i][j][k] += tsc * (am*tm*aflagm - ac*tc + ap*tp*aflagp);
         }
-        fold[i][j][k] += tscn * (am*(1.0-aflagm)*tm+ap*(1.0-aflagp)*tp);
+        ftif[i][j][k] += tscn * (am*(1.0-aflagm)*tm+ap*(1.0-aflagp)*tp);
+        ftifold[i][j][k] += tscn * (am*(1.0-aflagm)*tm+ap*(1.0-aflagp)*tp);
       }
     }
   }

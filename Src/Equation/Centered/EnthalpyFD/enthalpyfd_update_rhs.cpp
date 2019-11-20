@@ -24,6 +24,7 @@ real EnthalpyFD::update_rhs() {
   +--------------------------*/
   for_ijk(i,j,k) {
     fnew[i][j][k] = fold[i][j][k]
+                  + ftif[i][j][k]
                   + cnew[i][j][k] * conv_ts.N()   
                   + fbnd[i][j][k]
                   + fext[i][j][k];

@@ -38,12 +38,24 @@ void EnthalpyFD::new_time_step(const Scalar * diff_eddy) {
     for_aijk(i,j,k){
       clrold[i][j][k] = (*clr)[i][j][k];
     }
+    if(fs) {
+      for_m(m)
+        for_avmijk(fsold,m,i,j,k)
+          fsold[m][i][j][k] = (*fs)[m][i][j][k];
+    }
+    if(adens) 
+      for_aijk(i,j,k){
+        adensold[i][j][k] = (*adens)[i][j][k];
+      }
     store_clrold = true;
   }
 
   /*---------------------------+
   |  fold = rho * cp * T / dt  |
   +---------------------------*/
+
+  real dti = time->dti();
+
   /* no transport in solid */
   if( !solid() ) 
     for_ijk(i,j,k) {
@@ -53,7 +65,7 @@ void EnthalpyFD::new_time_step(const Scalar * diff_eddy) {
       } else {
         c = cpv;
       }
-      fold[i][j][k] = c * dV(i,j,k) * phi[i][j][k] * time->dti();
+      fold[i][j][k] = c * dV(i,j,k) * phi[i][j][k] * dti;
     }
   /* with transport in solid */
   else {
@@ -66,47 +78,53 @@ void EnthalpyFD::new_time_step(const Scalar * diff_eddy) {
       }
 
       fold[i][j][k] = (cf*fV + cs*(1.0-fV)) * dV(i,j,k)
-                    * phi[i][j][k] * time->dti();
+                    * phi[i][j][k] * dti;
     }
   }
 
   /*-----------------------------------------------------------------------+
   |  fold = fold + C                                                       |
   |  Euler explicit 1st order for convection term                          |
-  |  Semi-laglangian scheme: update convection term, separating diffusion  |
+  |  Semi-lagrangian scheme: update convection term, separating diffusion  |
   +-----------------------------------------------------------------------*/
   convection(&cold);
   for_ijk(i,j,k)
     fold[i][j][k] += conv_ts.Nm1() * cold[i][j][k]; /* conv_ts.Nm1() = 1.5 */
 
-  /* semi-laglangian scheme */
+  /* semi-lagrangian scheme */
   for_ijk(i,j,k){
     if(dom->ibody().on(i,j,k)){
-      real r,c;
+      real c;
       if(clrold[i][j][k]>=clrsurf){
         c = cpl;
       } else {
         c = cpv;
       }
-      real t_new = fold[i][j][k] / (c * dV(i,j,k)) * time->dt();
-      // phase change
+      real t_new = fold[i][j][k] / (c * dV(i,j,k)) / dti;
+
+#if 1
+      /* phase change */
       if( ((*clr)[i][j][k]-clrsurf)*(clrold[i][j][k]-clrsurf) < 0.0){
-        if( (phi[i][j][k]-tsat)*(t_new-tsat)<=0.0 ){
-          t_new = tsat;     /* crude code */
+        if( (phi[i][j][k]-tifmodel.Tint(i,j,k))*(t_new-tifmodel.Tint(i,j,k))<=0.0 ){
+          t_new = tifmodel.Tint(i,j,k);     /* crude code */
         }
-      // phase does not change
+  #if 0
+      /* phase does not change */
       } else {
-        if( (phi[i][j][k]-tsat)*(t_new-tsat)<0.0 ){
-          t_new = tsat;     /* crude code: Is this necesarry? */
+        if( (phi[i][j][k]-tifmodel.Tint(i,j,k))*(t_new-tifmodel.Tint(i,j,k))<0.0 ){
+          t_new = tifmodel.Tint(i,j,k);     /* crude code: Is this necessary? */
         }
+  #endif
       }
+#endif
+
       phi [i][j][k] = t_new;
       if((*clr)[i][j][k]>=clrsurf){
         c = cpl;
       } else {
         c = cpv;
       }
-      fold[i][j][k] = c * dV(i,j,k) * phi[i][j][k] * time->dti();
+      fold[i][j][k] = c * dV(i,j,k) * phi[i][j][k] * dti;
     }
   }
   phi.bnd_update();
@@ -116,11 +134,22 @@ void EnthalpyFD::new_time_step(const Scalar * diff_eddy) {
   for_aijk(i,j,k){
     clrold[i][j][k] = (*clr)[i][j][k];
   }
+  if(fs) {
+    for_m(m)
+      for_avmijk(fsold,m,i,j,k)
+        fsold[m][i][j][k] = (*fs)[m][i][j][k];
+  }
+  if(adens) {
+    for_aijk(i,j,k)
+      adensold[i][j][k] = (*adens)[i][j][k];
+  }
 
   /*---------------------------------------+
   |  fold = fold + D                       |
   |  explicit term on the right hand side  |
   +---------------------------------------*/
+  
   diffusion_fd(diff_eddy);
 
 }
+

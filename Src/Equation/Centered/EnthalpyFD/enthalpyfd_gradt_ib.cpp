@@ -1,7 +1,7 @@
-#include "enthalpytif.h"
+#include "enthalpyfd.h"
 
 /******************************************************************************/
-real EnthalpyTIF::gradt_ib(const int dir, const Comp & mcomp,
+real EnthalpyFD::gradt_ib(const int dir, const Comp & mcomp,
                            const int i, const int j, const int k) {
 /***************************************************************************//**
 *  \brief calculate gradient of temperature near immersed bodies
