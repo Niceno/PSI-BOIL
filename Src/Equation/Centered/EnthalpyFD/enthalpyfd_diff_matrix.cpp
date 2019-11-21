@@ -81,8 +81,8 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
 #ifdef USE_FDM_SOLID
       /* FDM */
       am = lc * vol * (this->*coef_m)(dxm,dxp,x0);
-      ac = lc * vol * ((this->*coef_m)(dxm,dxp,x0)+(this->*coef_p)(dxm,dxp,x0));
       ap = lc * vol * (this->*coef_p)(dxm,dxp,x0);
+      ac = am + ap;
 #else
       /* FVM */
       am = 0.5 * (lc + lm) * aream / dxm;
@@ -123,9 +123,10 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
 #ifdef USE_FDM_SOLID
       /* FDM */
       am = lc*vol*(this->*coef_m)(dxm,dxp,x0)*fdm*lm/(fdm*lm+(1.0-fdm)*lc);
-      ac = lc*vol*((this->*coef_m)(dxm,dxp,x0)+(this->*coef_p)(dxm,dxp,x0))
-         - lc*vol*(this->*coef_m)(dxm,dxp,x0)*(1.0-fdm)*lc/(fdm*lm+(1.0-fdm)*lc);
       ap = lc*vol*(this->*coef_p)(dxm,dxp,x0);
+      //ac = lc*vol*((this->*coef_m)(dxm,dxp,x0)+(this->*coef_p)(dxm,dxp,x0))
+      //   - lc*vol*(this->*coef_m)(dxm,dxp,x0)*(1.0-fdm)*lc/(fdm*lm+(1.0-fdm)*lc);
+      ac = am + ap;
 #else
       /* FVM */
       am = lc * aream / dxm * fdm*lm/((1.0-fdm)*lc+fdm*lm);
@@ -166,9 +167,10 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
 #ifdef USE_FDM_SOLID
       /* FDM */
       am = lc*vol*(this->*coef_m)(dxm,dxp,x0);
-      ac = lc*vol*((this->*coef_m)(dxm,dxp,x0)+(this->*coef_p)(dxm,dxp,x0))
-         - lc*vol*(this->*coef_p)(dxm,dxp,x0)*(1.0-fdp)*lc/((1.0-fdp)*lc+fdp*lp);
       ap = lc*vol*(this->*coef_p)(dxm,dxp,x0)*fdp*lp/((1.0-fdp)*lc+fdp*lp);
+      //ac = lc*vol*((this->*coef_m)(dxm,dxp,x0)+(this->*coef_p)(dxm,dxp,x0))
+      //   - lc*vol*(this->*coef_p)(dxm,dxp,x0)*(1.0-fdp)*lc/((1.0-fdp)*lc+fdp*lp);
+      ac = am + ap;
 #else
       /* FVM */
       am = 0.5 * (lc + lm) * aream / dxm;
@@ -226,15 +228,15 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
 #ifdef USE_FDM_FLUID /* now, finite difference is applied always, as in system_diffusive */
       /* FDM */
       am = lc * vol * (this->*coef_m)(dxm,dxp,x0);
-      ac = lc * vol * ((this->*coef_m)(dxm,dxp,x0)+(this->*coef_p)(dxm,dxp,x0));
       ap = lc * vol * (this->*coef_p)(dxm,dxp,x0);
+      ac = am + ap;
 #else
       //if(aflagm==0.0 || aflagp==0.0) {
       if(fabs(clc)<3) {
         /* FDM */
         am = lc * vol * (this->*coef_m)(dxm,dxp,x0);
-        ac = lc * vol * ((this->*coef_m)(dxm,dxp,x0)+(this->*coef_p)(dxm,dxp,x0));
         ap = lc * vol * (this->*coef_p)(dxm,dxp,x0);
+        ac = am + ap;
       } else { 
         /* FVM */
         am = 0.5 * (lc + lm) * aream / dxm;
@@ -271,8 +273,8 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
           dxm = std::max(epsl*dxm,distance_z(i,j,k,-1,tm));
         /* FDM */
         am = lc * vol * (this->*coef_m)(dxm,dxp,x0);
-        ac = lc * vol * ((this->*coef_m)(dxm,dxp,x0)+(this->*coef_p)(dxm,dxp,x0));
         ap = lc * vol * (this->*coef_p)(dxm,dxp,x0);
+        ac = am + ap;
       } else {
         fdm = max(fdm,epsl);
         dxm = dxm * fdm;
@@ -326,9 +328,9 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
         else
           dxp = std::max(epsl*dxp,distance_z(i,j,k,+1,tp));
         /* FDM */
-        am = lc * vol * 2.0 / (dxm*(dxm+dxp));
-        ac = lc * vol * 2.0 / (dxm*dxp);
-        ap = lc * vol * 2.0 / (dxp*(dxm+dxp));
+        am = lc * vol * (this->*coef_m)(dxm,dxp,x0);
+        ap = lc * vol * (this->*coef_p)(dxm,dxp,x0);
+        ac = am + ap;
       } else {
         fdp = max(fdp,epsl);
         dxp = dxp * fdp;
