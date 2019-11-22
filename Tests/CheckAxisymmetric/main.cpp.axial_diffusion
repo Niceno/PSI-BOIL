@@ -3,6 +3,7 @@
 #include <string>
 #include <cstring>
 
+#define DIRICHLET
 #define _GNU_SOURCE 1
 #include <fenv.h>
 static void __attribute__ ((constructor)) trapfpe(void)
@@ -30,10 +31,11 @@ const int NZ0  = 2*gLevel;  // solid
 const int NZ1  = 64*gLevel;
 const real LZ1  = LX1+LX2;
 const real DZ = LZ1/real(NZ1);
-//const real LZ0 = -real(NZ0)*DZ;
-const real LZ0 = -8.0e-6;
+const real LZ0 = -real(NZ0)*DZ;
+//const real LZ0 = -8.0e-6;
 
-const real zgamma = 0.05*gLevel*DZ;//7.*LZ1/13.;
+//const real zgamma = 0.05*gLevel*DZ;//7.*LZ1/13.;
+const real zgamma = 7.*LZ1/13.;
 
 /* parameter for boundary or initial condition */
 const real tsat0 = -3.;
@@ -67,14 +69,15 @@ int main(int argc, char ** argv) {
               NX2, Periodic::no() );
   Grid1D gx ( gx1, gx2, Periodic::no(), BndGrid::symmetry(), BndGrid::wall());
 #else
-  const real LX = LX1+LX2;
-  const real NX = NX1+NX2;
-  Grid1D gx( Range<real>(0.0,LX), NX, Periodic::no(),
-             BndGrid::symmetry(), BndGrid::wall());
+  Grid1D gx( Range<real>(0.0, -3.*LZ0), NZ0, Periodic::no(), BndGrid::symmetry(), BndGrid::wall() );
 #endif
   Grid1D gz0( Range<real>(LZ0, 0.0), NZ0, Periodic::no() );
   Grid1D gz1( Range<real>(0.0, LZ1), NZ1, Periodic::no() );
+#ifndef DIRICHLET
+  Grid1D gz ( gz0, gz1, Periodic::no(), BndGrid::extrapolate(), BndGrid::wall());
+#else
   Grid1D gz ( gz0, gz1, Periodic::no());
+#endif
 
   /*---------+
   |  domain  |
@@ -82,7 +85,7 @@ int main(int argc, char ** argv) {
 #if 0
   Grid1D gy( Range<real>(0.0,3.*dxuni),3, Periodic::yes() );
 #else
-  Grid1D gy(0.5*dxuni);
+  Grid1D gy(-LZ0/real(NZ0));
 #endif
   Body floor("floor.stl");
 #if 0
@@ -144,7 +147,11 @@ int main(int argc, char ** argv) {
   tpr.bc().add( BndCnd( Dir::imax(), BndType::neumann() ) );
   tpr.bc().add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
   tpr.bc().add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
-  tpr.bc().add( BndCnd( Dir::kmin(), BndType::neumann() ) );
+#ifdef DIRICHLET
+  tpr.bc().add( BndCnd( Dir::kmin(), BndType::dirichlet(),tout) );
+#else
+  tpr.bc().add( BndCnd( Dir::kmin(), BndType::neumann()) );
+#endif
   tpr.bc().add( BndCnd( Dir::kmax(), BndType::dirichlet(),tout) );
 
   /*----------------------+
@@ -157,9 +164,9 @@ int main(int argc, char ** argv) {
   liquid.rho   (4.0);
   liquid.cp    (3.0);   // J/m3
   liquid.lambda(0.6);
-  const real qflux=1000.;     // heater power [W/m2]
+  const real qflux=100000.;     // heater power [W/m2]
 
-#if 1
+#if 0
   nickel.rho    (2.0);
   nickel.cp     (5.0);
   nickel.lambda (1.2);
@@ -216,7 +223,7 @@ int main(int argc, char ** argv) {
 
   /* enthalpy equation */
 #if 1
-  boil::oout<<c.dzc(boil::BW+NZ0)<<" "<<c.dzc(boil::BW+NZ0-1)<<" "<<0.5*c.dzc(boil::BW+NZ0-1)/c.dzt(boil::BW+NZ0-1)<<boil::endl;
+  boil::oout<<c.zc(boil::BW)<<" "<<c.dzc(boil::BW)<<" "<<c.dzb(boil::BW)<<" "<<c.dzt(boil::BW)<<boil::endl;
   TIF tsat(tsat0);
 
   EnthalpyFDaxisym enthFD(tpr, q, conc.color(), uvw, time, solver, &mixed,conc.topo,tsat,&nickel);
@@ -226,6 +233,7 @@ int main(int argc, char ** argv) {
   enthFD.diffusion_set(TimeScheme::backward_euler());
 #endif
 
+  //exit(0);
   tpr = tsat0;
   q=0.0;
   for_vk(tpr,k){
@@ -259,12 +267,21 @@ int main(int argc, char ** argv) {
     real pos = tpr.zc(k);
     real tprref;
 #if 1
+ #ifndef DIRICHLET
     real T0 = tsat0-q0*LZ0*zgamma/liquid.lambda()->value();
     if(pos<0.)
       tprref = q0/2./nickel.lambda()->value() *(2.*LZ0*pos-pos*pos) + T0;
     else if(pos<zgamma)
       tprref = T0 + (tsat0-T0)/zgamma*pos;
+  #else
+    real T0 = (q0/2.*-LZ0 + nickel.lambda()->value()/(-LZ0)*tout + liquid.lambda()->value()/zgamma*tsat0)/(nickel.lambda()->value()/(-LZ0) + liquid.lambda()->value()/zgamma);
+    if(pos<0.)
+      tprref = q0/2./nickel.lambda()->value() *(LZ0*pos-pos*pos) + T0 + (tout-T0)*pos/LZ0;
+    else if(pos<zgamma)
+      tprref = T0 + (tsat0-T0)/zgamma*pos;
+  #endif
 #else
+    /* source also in liquid */
     real T0 = tsat0;
     if(pos<zgamma)
       tprref = q0/2./nickel.lambda()->value() *(2.*LZ0*pos-2.*LZ0*zgamma-pos*pos+zgamma*zgamma) + T0;

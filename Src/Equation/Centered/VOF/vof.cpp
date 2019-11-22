@@ -28,7 +28,6 @@ VOF::VOF(const Scalar & PHI,
   tempflag(*PHI.domain() ),
   tempflag2(*PHI.domain() ),
   adens(*PHI.domain() ),
-  heavi(&phi, NULL, &adens),
   topo(&mx,&my,&mz,&adens,&fs,&iflag),
   norm_method_advance(NormMethod::Mixed()),
   norm_method_curvature(NormMethod::Young()),
@@ -83,6 +82,9 @@ VOF::VOF(const Scalar & PHI,
   bndclr = BNDCLR;
 
   assert(PHI.domain() == F.domain());
+
+  /* runtime polymorphism */
+  heavi = new MarchingCubes(&phi,NULL,&adens);
 
   /* set parameters */
   //dxmin=std::min(phi.dxc(3),std::min(phi.dyc(3),phi.dzc(3)));

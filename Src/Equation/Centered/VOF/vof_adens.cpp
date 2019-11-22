@@ -7,9 +7,7 @@ void VOF::cal_adens() {
 *         Results: adens
 *******************************************************************************/
 
-  //boil::timer.start("vof adens");
-  heavi.calculate_adens();
-  //boil::timer.stop("vof adens");
+  heavi->calculate_adens();
 
   return;
 }

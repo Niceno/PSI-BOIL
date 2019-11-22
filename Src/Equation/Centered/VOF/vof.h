@@ -5,7 +5,7 @@
 #include "../centered.h"
 #include "../../../Parallel/communicator.h"
 #include "../../../Global/global_realistic.h"
-#include "../../Heaviside/heaviside.h"
+#include "../../Heaviside/MarchingCubes/marching_cubes.h"
 #include "../../Topology/topology.h"
 
 #define IB
@@ -396,7 +396,7 @@ class VOF : public Centered {
     bool limit_color, use_subgrid, use_interp;
     real minclr, maxclr;
 
-    Heaviside heavi;
+    Heaviside * heavi;
     NormMethod norm_method_advance, norm_method_curvature;
     Comp mcomp_for_elvira;
     DetachmentModel detachment_model;

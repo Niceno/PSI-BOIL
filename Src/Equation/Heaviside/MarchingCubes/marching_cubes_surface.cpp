@@ -1,11 +1,11 @@
-#include "marching_cube.h"
+#include "marching_cubes.h"
 #include <iostream>
 
-/* interface to call marching_cube_surfval using cell coordinates,
+/* interface to call marching_cubes_surfval using cell coordinates,
    direction and orientation, sig is neg() - negative direction and vice versa */
-real MarchingCube::surface(const Sign sig, const Comp & mcomp,
+real MarchingCubes::surface(const Sign sig, const Comp & mcomp,
                            const int i, const int j, const int k) {
-  CELLFACE face;
+  CELL2D face;
   int isum(0);
   real surf;
 

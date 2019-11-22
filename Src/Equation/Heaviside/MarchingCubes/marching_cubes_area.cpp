@@ -1,14 +1,14 @@
-#include "marching_cube.h"
+#include "marching_cubes.h"
 
 /******************************************************************************/
-real MarchingCube::area(const int i, const int j, const int k){
+real MarchingCubes::area(const int i, const int j, const int k){
 /***************************************************************************//**
 *  \brief calculate iso-surface area of cell (i,j,k)
 *******************************************************************************/
 
   if(dom->ibody().off(i,j,k)) return 0.0;
 
-  GRIDCELL grid;
+  CELL3D grid;
 
   int isum=0;
   for (int m=0; m<=7; m++){
@@ -89,7 +89,7 @@ real MarchingCube::area(const int i, const int j, const int k){
 #endif
 
   real areaval = polygonise_area(grid, clrsurf);
-  //std::cout<<"marching_cube "<<areaval<<"\n";
+  //std::cout<<"marching_cubes "<<areaval<<"\n";
   //exit(0);
   //boil::oout<<i<<" "<<j<<" "<<k<<" "<<areaval;
 

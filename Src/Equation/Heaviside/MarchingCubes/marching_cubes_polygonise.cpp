@@ -1,4 +1,4 @@
-#include "marching_cube.h"
+#include "marching_cubes.h"
 #include <iostream>
 #include <iomanip>
 
@@ -10,7 +10,7 @@
 	0 will be returned if the grid cell is either totally above
    of totally below the isolevel.
 */
-real MarchingCube::polygonise_volume(GRIDCELL grid, real isolevel)
+real MarchingCubes::polygonise_volume(CELL3D grid, real isolevel)
 {
    TRIANGLE triangles[5];
    int i,ntriang;
@@ -42,73 +42,73 @@ real MarchingCube::polygonise_volume(GRIDCELL grid, real isolevel)
    /* Find the vertices where the surface intersects the cube */
    if (edgeTable_volume[cubeindex] & 1) {
       vertlist[0].v =
-         VertexInterp3D(isolevel,grid.p[0],grid.p[1],grid.val[0],grid.val[1]);
+         VertexInterp(isolevel,grid.p[0],grid.p[1],grid.val[0],grid.val[1]);
       if (grid.val[0] < isolevel) vertlist[0].ref = grid.p[0];
       else vertlist[0].ref = grid.p[1];
    }
    if (edgeTable_volume[cubeindex] & 2) {
       vertlist[1].v =
-         VertexInterp3D(isolevel,grid.p[1],grid.p[2],grid.val[1],grid.val[2]);
+         VertexInterp(isolevel,grid.p[1],grid.p[2],grid.val[1],grid.val[2]);
       if (grid.val[1] < isolevel) vertlist[1].ref = grid.p[1];
       else vertlist[1].ref = grid.p[2];
    }
    if (edgeTable_volume[cubeindex] & 4) {
       vertlist[2].v =
-         VertexInterp3D(isolevel,grid.p[2],grid.p[3],grid.val[2],grid.val[3]);
+         VertexInterp(isolevel,grid.p[2],grid.p[3],grid.val[2],grid.val[3]);
       if (grid.val[2] < isolevel) vertlist[2].ref = grid.p[2];
       else vertlist[2].ref = grid.p[3];
    }
    if (edgeTable_volume[cubeindex] & 8) {
       vertlist[3].v =
-         VertexInterp3D(isolevel,grid.p[3],grid.p[0],grid.val[3],grid.val[0]);
+         VertexInterp(isolevel,grid.p[3],grid.p[0],grid.val[3],grid.val[0]);
       if (grid.val[3] < isolevel) vertlist[3].ref = grid.p[3];
       else vertlist[3].ref = grid.p[0];
    }
    if (edgeTable_volume[cubeindex] & 16) {
       vertlist[4].v =
-         VertexInterp3D(isolevel,grid.p[4],grid.p[5],grid.val[4],grid.val[5]);
+         VertexInterp(isolevel,grid.p[4],grid.p[5],grid.val[4],grid.val[5]);
       if (grid.val[4] < isolevel) vertlist[4].ref = grid.p[4];
       else vertlist[4].ref = grid.p[5];
    }
    if (edgeTable_volume[cubeindex] & 32) {
       vertlist[5].v =
-         VertexInterp3D(isolevel,grid.p[5],grid.p[6],grid.val[5],grid.val[6]);
+         VertexInterp(isolevel,grid.p[5],grid.p[6],grid.val[5],grid.val[6]);
       if (grid.val[5] < isolevel) vertlist[5].ref = grid.p[5];
       else vertlist[5].ref = grid.p[6];
    }
    if (edgeTable_volume[cubeindex] & 64) {
       vertlist[6].v =
-         VertexInterp3D(isolevel,grid.p[6],grid.p[7],grid.val[6],grid.val[7]);
+         VertexInterp(isolevel,grid.p[6],grid.p[7],grid.val[6],grid.val[7]);
       if (grid.val[6] < isolevel) vertlist[6].ref = grid.p[6];
       else vertlist[6].ref = grid.p[7];
    }
    if (edgeTable_volume[cubeindex] & 128) {
       vertlist[7].v =
-         VertexInterp3D(isolevel,grid.p[7],grid.p[4],grid.val[7],grid.val[4]);
+         VertexInterp(isolevel,grid.p[7],grid.p[4],grid.val[7],grid.val[4]);
       if (grid.val[7] < isolevel) vertlist[7].ref = grid.p[7];
       else vertlist[7].ref = grid.p[4];
    }
    if (edgeTable_volume[cubeindex] & 256) {
       vertlist[8].v =
-         VertexInterp3D(isolevel,grid.p[0],grid.p[4],grid.val[0],grid.val[4]);
+         VertexInterp(isolevel,grid.p[0],grid.p[4],grid.val[0],grid.val[4]);
       if (grid.val[0] < isolevel) vertlist[8].ref = grid.p[0];
       else vertlist[8].ref = grid.p[4];
    }
    if (edgeTable_volume[cubeindex] & 512) {
       vertlist[9].v =
-         VertexInterp3D(isolevel,grid.p[1],grid.p[5],grid.val[1],grid.val[5]);
+         VertexInterp(isolevel,grid.p[1],grid.p[5],grid.val[1],grid.val[5]);
       if (grid.val[1] < isolevel) vertlist[9].ref = grid.p[1];
       else vertlist[9].ref = grid.p[5];
    }
    if (edgeTable_volume[cubeindex] & 1024) {
       vertlist[10].v =
-         VertexInterp3D(isolevel,grid.p[2],grid.p[6],grid.val[2],grid.val[6]);
+         VertexInterp(isolevel,grid.p[2],grid.p[6],grid.val[2],grid.val[6]);
       if (grid.val[2] < isolevel) vertlist[10].ref = grid.p[2];
       else vertlist[10].ref = grid.p[6];
    }
    if (edgeTable_volume[cubeindex] & 2048) {
       vertlist[11].v =
-         VertexInterp3D(isolevel,grid.p[3],grid.p[7],grid.val[3],grid.val[7]);
+         VertexInterp(isolevel,grid.p[3],grid.p[7],grid.val[3],grid.val[7]);
       if (grid.val[3] < isolevel) vertlist[11].ref = grid.p[3];
       else vertlist[11].ref = grid.p[7];
    }
@@ -142,7 +142,7 @@ real MarchingCube::polygonise_volume(GRIDCELL grid, real isolevel)
 	0 will be returned if the grid cell is either totally above
    of totally below the isolevel.
 */
-real MarchingCube::polygonise_area(GRIDCELL grid, real isolevel)
+real MarchingCubes::polygonise_area(CELL3D grid, real isolevel)
 {
    TRIANGLE triangles[5];
    int i,ntriang;
@@ -170,40 +170,40 @@ real MarchingCube::polygonise_area(GRIDCELL grid, real isolevel)
    /* Find the vertices where the surface intersects the cube */
    if (edgeTable_area[cubeindex] & 1)
       vertlist[0] =
-         VertexInterp3D(isolevel,grid.p[0],grid.p[1],grid.val[0],grid.val[1]);
+         VertexInterp(isolevel,grid.p[0],grid.p[1],grid.val[0],grid.val[1]);
    if (edgeTable_area[cubeindex] & 2)
       vertlist[1] =
-         VertexInterp3D(isolevel,grid.p[1],grid.p[2],grid.val[1],grid.val[2]);
+         VertexInterp(isolevel,grid.p[1],grid.p[2],grid.val[1],grid.val[2]);
    if (edgeTable_area[cubeindex] & 4)
       vertlist[2] =
-         VertexInterp3D(isolevel,grid.p[2],grid.p[3],grid.val[2],grid.val[3]);
+         VertexInterp(isolevel,grid.p[2],grid.p[3],grid.val[2],grid.val[3]);
    if (edgeTable_area[cubeindex] & 8)
       vertlist[3] =
-         VertexInterp3D(isolevel,grid.p[3],grid.p[0],grid.val[3],grid.val[0]);
+         VertexInterp(isolevel,grid.p[3],grid.p[0],grid.val[3],grid.val[0]);
    if (edgeTable_area[cubeindex] & 16)
       vertlist[4] =
-         VertexInterp3D(isolevel,grid.p[4],grid.p[5],grid.val[4],grid.val[5]);
+         VertexInterp(isolevel,grid.p[4],grid.p[5],grid.val[4],grid.val[5]);
    if (edgeTable_area[cubeindex] & 32)
       vertlist[5] =
-         VertexInterp3D(isolevel,grid.p[5],grid.p[6],grid.val[5],grid.val[6]);
+         VertexInterp(isolevel,grid.p[5],grid.p[6],grid.val[5],grid.val[6]);
    if (edgeTable_area[cubeindex] & 64)
       vertlist[6] =
-         VertexInterp3D(isolevel,grid.p[6],grid.p[7],grid.val[6],grid.val[7]);
+         VertexInterp(isolevel,grid.p[6],grid.p[7],grid.val[6],grid.val[7]);
    if (edgeTable_area[cubeindex] & 128)
       vertlist[7] =
-         VertexInterp3D(isolevel,grid.p[7],grid.p[4],grid.val[7],grid.val[4]);
+         VertexInterp(isolevel,grid.p[7],grid.p[4],grid.val[7],grid.val[4]);
    if (edgeTable_area[cubeindex] & 256)
       vertlist[8] =
-         VertexInterp3D(isolevel,grid.p[0],grid.p[4],grid.val[0],grid.val[4]);
+         VertexInterp(isolevel,grid.p[0],grid.p[4],grid.val[0],grid.val[4]);
    if (edgeTable_area[cubeindex] & 512)
       vertlist[9] =
-         VertexInterp3D(isolevel,grid.p[1],grid.p[5],grid.val[1],grid.val[5]);
+         VertexInterp(isolevel,grid.p[1],grid.p[5],grid.val[1],grid.val[5]);
    if (edgeTable_area[cubeindex] & 1024)
       vertlist[10] =
-         VertexInterp3D(isolevel,grid.p[2],grid.p[6],grid.val[2],grid.val[6]);
+         VertexInterp(isolevel,grid.p[2],grid.p[6],grid.val[2],grid.val[6]);
    if (edgeTable_area[cubeindex] & 2048)
       vertlist[11] =
-         VertexInterp3D(isolevel,grid.p[3],grid.p[7],grid.val[3],grid.val[7]);
+         VertexInterp(isolevel,grid.p[3],grid.p[7],grid.val[3],grid.val[7]);
 
    /* Create the triangle */
    ntriang = 0;

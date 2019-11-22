@@ -32,7 +32,7 @@ CIPCSL2::CIPCSL2(const Scalar & PHI,
   fs    ( *U.domain() ),
   adens ( *PHI.domain() ),
   kappa ( &K ),
-  heavi(&phi, NULL, &adens),
+  //heavi(&phi, NULL, &adens),
   topo(&nx,&ny,&nz,&adens,&fs,&intflag)
 
 /*------------------------------------------------------+
@@ -60,6 +60,9 @@ CIPCSL2::CIPCSL2(const Scalar & PHI,
     fs(m)   = (*u)(m).shape();
   }
   assert(PHI.domain() == F.domain());
+
+  /* runtime polymorphism */
+  heavi = new MarchingCubes(&phi,NULL,&adens);
 
   /* set constants */
   pi = acos(-1.0);

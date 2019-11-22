@@ -1,12 +1,12 @@
-#include "marching_cube.h"
+#include "marching_cubes.h"
 
-/* interface to call marching_cube_surfval using cell coordinates,
+/* interface to call marching_cubes_surfval using cell coordinates,
    direction and orientation, sig is neg() - negative direction and vice versa
    - this time, also the cellface is returned */
-MarchingCube::FACEVAL MarchingCube::faceval(const Sign sig, const Comp & mcomp,
+MarchingCubes::VAL2D MarchingCubes::faceval(const Sign sig, const Comp & mcomp,
                                             const int i, const int j, const int k) {
 
-  CELLFACE face;
+  CELL2D face;
   int isum(0);
   real surf;
 
@@ -101,8 +101,8 @@ MarchingCube::FACEVAL MarchingCube::faceval(const Sign sig, const Comp & mcomp,
   else if (isum > 0) 
     area += surfval(face, clrsurf)/surf;
 
-  FACEVAL faceval;
-  faceval.face = face;
+  VAL2D faceval;
+  faceval.cell = face;
   faceval.area = area;
   return faceval;
 }

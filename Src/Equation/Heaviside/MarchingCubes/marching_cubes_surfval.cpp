@@ -1,8 +1,8 @@
-#include "marching_cube.h"
+#include "marching_cubes.h"
 #include <iostream>
 
 /* calculate the surface area below a given isosurface */
-real MarchingCube::surfval(CELLFACE grid, real isolevel) {
+real MarchingCubes::surfval(CELL2D grid, real isolevel) {
   int squareindex(0);
   real area(0.0);
   
@@ -24,8 +24,8 @@ real MarchingCube::surfval(CELLFACE grid, real isolevel) {
     XY vertlist[3];
     
     vertlist[0] = grid.p[0];
-    vertlist[1] = VertexInterp2D(isolevel,grid.p[0],grid.p[1],grid.val[0],grid.val[1]);
-    vertlist[2] = VertexInterp2D(isolevel,grid.p[0],grid.p[3],grid.val[0],grid.val[3]);
+    vertlist[1] = VertexInterp(isolevel,grid.p[0],grid.p[1],grid.val[0],grid.val[1]);
+    vertlist[2] = VertexInterp(isolevel,grid.p[0],grid.p[3],grid.val[0],grid.val[3]);
 
     area += SurfaceArea3(vertlist[0],vertlist[1],vertlist[2]);
   }
@@ -34,8 +34,8 @@ real MarchingCube::surfval(CELLFACE grid, real isolevel) {
     XY vertlist[3];
 
     vertlist[0] = grid.p[1];
-    vertlist[1] = VertexInterp2D(isolevel,grid.p[1],grid.p[0],grid.val[1],grid.val[0]);
-    vertlist[2] = VertexInterp2D(isolevel,grid.p[1],grid.p[2],grid.val[1],grid.val[2]);
+    vertlist[1] = VertexInterp(isolevel,grid.p[1],grid.p[0],grid.val[1],grid.val[0]);
+    vertlist[2] = VertexInterp(isolevel,grid.p[1],grid.p[2],grid.val[1],grid.val[2]);
 
     area += SurfaceArea3(vertlist[0],vertlist[1],vertlist[2]);
   }
@@ -44,8 +44,8 @@ real MarchingCube::surfval(CELLFACE grid, real isolevel) {
     XY vertlist[3];
 
     vertlist[0] = grid.p[2];
-    vertlist[1] = VertexInterp2D(isolevel,grid.p[2],grid.p[1],grid.val[2],grid.val[1]);
-    vertlist[2] = VertexInterp2D(isolevel,grid.p[2],grid.p[3],grid.val[2],grid.val[3]);
+    vertlist[1] = VertexInterp(isolevel,grid.p[2],grid.p[1],grid.val[2],grid.val[1]);
+    vertlist[2] = VertexInterp(isolevel,grid.p[2],grid.p[3],grid.val[2],grid.val[3]);
 
     area += SurfaceArea3(vertlist[0],vertlist[1],vertlist[2]);
   }
@@ -54,8 +54,8 @@ real MarchingCube::surfval(CELLFACE grid, real isolevel) {
     XY vertlist[3];
 
     vertlist[0] = grid.p[3];
-    vertlist[1] = VertexInterp2D(isolevel,grid.p[3],grid.p[0],grid.val[3],grid.val[0]);
-    vertlist[2] = VertexInterp2D(isolevel,grid.p[3],grid.p[2],grid.val[3],grid.val[2]);
+    vertlist[1] = VertexInterp(isolevel,grid.p[3],grid.p[0],grid.val[3],grid.val[0]);
+    vertlist[2] = VertexInterp(isolevel,grid.p[3],grid.p[2],grid.val[3],grid.val[2]);
 
     area += SurfaceArea3(vertlist[0],vertlist[1],vertlist[2]);
   }
@@ -68,8 +68,8 @@ real MarchingCube::surfval(CELLFACE grid, real isolevel) {
 
     vertlist[0] = grid.p[0];
     vertlist[1] = grid.p[1];
-    vertlist[2] = VertexInterp2D(isolevel,grid.p[1],grid.p[2],grid.val[1],grid.val[2]);
-    vertlist[3] = VertexInterp2D(isolevel,grid.p[0],grid.p[3],grid.val[0],grid.val[3]);
+    vertlist[2] = VertexInterp(isolevel,grid.p[1],grid.p[2],grid.val[1],grid.val[2]);
+    vertlist[3] = VertexInterp(isolevel,grid.p[0],grid.p[3],grid.val[0],grid.val[3]);
 
     area += SurfaceArea4(vertlist[0],vertlist[1],vertlist[2],vertlist[3]);
   }
@@ -79,8 +79,8 @@ real MarchingCube::surfval(CELLFACE grid, real isolevel) {
 
     vertlist[0] = grid.p[1];
     vertlist[1] = grid.p[2];
-    vertlist[2] = VertexInterp2D(isolevel,grid.p[2],grid.p[3],grid.val[2],grid.val[3]);
-    vertlist[3] = VertexInterp2D(isolevel,grid.p[1],grid.p[0],grid.val[1],grid.val[0]);
+    vertlist[2] = VertexInterp(isolevel,grid.p[2],grid.p[3],grid.val[2],grid.val[3]);
+    vertlist[3] = VertexInterp(isolevel,grid.p[1],grid.p[0],grid.val[1],grid.val[0]);
 
     area += SurfaceArea4(vertlist[0],vertlist[1],vertlist[2],vertlist[3]);
   }
@@ -90,8 +90,8 @@ real MarchingCube::surfval(CELLFACE grid, real isolevel) {
 
     vertlist[0] = grid.p[0];
     vertlist[1] = grid.p[3];
-    vertlist[2] = VertexInterp2D(isolevel,grid.p[3],grid.p[2],grid.val[3],grid.val[2]);
-    vertlist[3] = VertexInterp2D(isolevel,grid.p[0],grid.p[1],grid.val[0],grid.val[1]);
+    vertlist[2] = VertexInterp(isolevel,grid.p[3],grid.p[2],grid.val[3],grid.val[2]);
+    vertlist[3] = VertexInterp(isolevel,grid.p[0],grid.p[1],grid.val[0],grid.val[1]);
 
     area += SurfaceArea4(vertlist[0],vertlist[1],vertlist[2],vertlist[3]);
   }
@@ -101,8 +101,8 @@ real MarchingCube::surfval(CELLFACE grid, real isolevel) {
 
     vertlist[0] = grid.p[2];
     vertlist[1] = grid.p[3];
-    vertlist[2] = VertexInterp2D(isolevel,grid.p[3],grid.p[0],grid.val[3],grid.val[0]);
-    vertlist[3] = VertexInterp2D(isolevel,grid.p[2],grid.p[1],grid.val[2],grid.val[1]);
+    vertlist[2] = VertexInterp(isolevel,grid.p[3],grid.p[0],grid.val[3],grid.val[0]);
+    vertlist[3] = VertexInterp(isolevel,grid.p[2],grid.p[1],grid.val[2],grid.val[1]);
 
     area += SurfaceArea4(vertlist[0],vertlist[1],vertlist[2],vertlist[3]);
   }
@@ -115,14 +115,14 @@ real MarchingCube::surfval(CELLFACE grid, real isolevel) {
     XY vertlist2[3];
 
     vertlist1[0] = grid.p[0];
-    vertlist1[1] = VertexInterp2D(isolevel,grid.p[0],grid.p[1],grid.val[0],grid.val[1]);
-    vertlist1[2] = VertexInterp2D(isolevel,grid.p[0],grid.p[3],grid.val[0],grid.val[3]);
+    vertlist1[1] = VertexInterp(isolevel,grid.p[0],grid.p[1],grid.val[0],grid.val[1]);
+    vertlist1[2] = VertexInterp(isolevel,grid.p[0],grid.p[3],grid.val[0],grid.val[3]);
 
     area += SurfaceArea3(vertlist1[0],vertlist1[1],vertlist1[2]);
 
     vertlist2[0] = grid.p[2];
-    vertlist2[1] = VertexInterp2D(isolevel,grid.p[2],grid.p[1],grid.val[2],grid.val[1]);
-    vertlist2[2] = VertexInterp2D(isolevel,grid.p[2],grid.p[3],grid.val[2],grid.val[3]);
+    vertlist2[1] = VertexInterp(isolevel,grid.p[2],grid.p[1],grid.val[2],grid.val[1]);
+    vertlist2[2] = VertexInterp(isolevel,grid.p[2],grid.p[3],grid.val[2],grid.val[3]);
 
     area += SurfaceArea3(vertlist2[0],vertlist2[1],vertlist2[2]);
   }
@@ -132,14 +132,14 @@ real MarchingCube::surfval(CELLFACE grid, real isolevel) {
     XY vertlist2[3];
 
     vertlist1[0] = grid.p[1];
-    vertlist1[1] = VertexInterp2D(isolevel,grid.p[1],grid.p[0],grid.val[1],grid.val[0]);
-    vertlist1[2] = VertexInterp2D(isolevel,grid.p[1],grid.p[2],grid.val[1],grid.val[2]);
+    vertlist1[1] = VertexInterp(isolevel,grid.p[1],grid.p[0],grid.val[1],grid.val[0]);
+    vertlist1[2] = VertexInterp(isolevel,grid.p[1],grid.p[2],grid.val[1],grid.val[2]);
 
     area += SurfaceArea3(vertlist1[0],vertlist1[1],vertlist1[2]);
 
     vertlist2[0] = grid.p[3];
-    vertlist2[1] = VertexInterp2D(isolevel,grid.p[3],grid.p[0],grid.val[3],grid.val[0]);
-    vertlist2[2] = VertexInterp2D(isolevel,grid.p[3],grid.p[2],grid.val[3],grid.val[2]);
+    vertlist2[1] = VertexInterp(isolevel,grid.p[3],grid.p[0],grid.val[3],grid.val[0]);
+    vertlist2[2] = VertexInterp(isolevel,grid.p[3],grid.p[2],grid.val[3],grid.val[2]);
 
     area += SurfaceArea3(vertlist2[0],vertlist2[1],vertlist2[2]);
   }
@@ -153,8 +153,8 @@ real MarchingCube::surfval(CELLFACE grid, real isolevel) {
     vertlist[0] = grid.p[0];
     vertlist[1] = grid.p[1];
     vertlist[2] = grid.p[2];
-    vertlist[3] = VertexInterp2D(isolevel,grid.p[2],grid.p[3],grid.val[2],grid.val[3]);
-    vertlist[4] = VertexInterp2D(isolevel,grid.p[0],grid.p[3],grid.val[0],grid.val[3]);
+    vertlist[3] = VertexInterp(isolevel,grid.p[2],grid.p[3],grid.val[2],grid.val[3]);
+    vertlist[4] = VertexInterp(isolevel,grid.p[0],grid.p[3],grid.val[0],grid.val[3]);
 
     area += SurfaceArea5(vertlist[0],vertlist[1],vertlist[2],vertlist[3],vertlist[4]);
   }
@@ -165,8 +165,8 @@ real MarchingCube::surfval(CELLFACE grid, real isolevel) {
     vertlist[0] = grid.p[3];
     vertlist[1] = grid.p[0];
     vertlist[2] = grid.p[1];
-    vertlist[3] = VertexInterp2D(isolevel,grid.p[1],grid.p[2],grid.val[1],grid.val[2]);
-    vertlist[4] = VertexInterp2D(isolevel,grid.p[3],grid.p[2],grid.val[3],grid.val[2]);
+    vertlist[3] = VertexInterp(isolevel,grid.p[1],grid.p[2],grid.val[1],grid.val[2]);
+    vertlist[4] = VertexInterp(isolevel,grid.p[3],grid.p[2],grid.val[3],grid.val[2]);
 
     area += SurfaceArea5(vertlist[0],vertlist[1],vertlist[2],vertlist[3],vertlist[4]);
   }
@@ -177,8 +177,8 @@ real MarchingCube::surfval(CELLFACE grid, real isolevel) {
     vertlist[0] = grid.p[2];
     vertlist[1] = grid.p[3];
     vertlist[2] = grid.p[0];
-    vertlist[3] = VertexInterp2D(isolevel,grid.p[0],grid.p[1],grid.val[0],grid.val[1]);
-    vertlist[4] = VertexInterp2D(isolevel,grid.p[2],grid.p[1],grid.val[2],grid.val[1]);
+    vertlist[3] = VertexInterp(isolevel,grid.p[0],grid.p[1],grid.val[0],grid.val[1]);
+    vertlist[4] = VertexInterp(isolevel,grid.p[2],grid.p[1],grid.val[2],grid.val[1]);
 
     area += SurfaceArea5(vertlist[0],vertlist[1],vertlist[2],vertlist[3],vertlist[4]);
   }
@@ -189,8 +189,8 @@ real MarchingCube::surfval(CELLFACE grid, real isolevel) {
     vertlist[0] = grid.p[1];
     vertlist[1] = grid.p[2];
     vertlist[2] = grid.p[3];
-    vertlist[3] = VertexInterp2D(isolevel,grid.p[3],grid.p[0],grid.val[3],grid.val[0]);
-    vertlist[4] = VertexInterp2D(isolevel,grid.p[1],grid.p[0],grid.val[1],grid.val[0]);
+    vertlist[3] = VertexInterp(isolevel,grid.p[3],grid.p[0],grid.val[3],grid.val[0]);
+    vertlist[4] = VertexInterp(isolevel,grid.p[1],grid.p[0],grid.val[1],grid.val[0]);
 
     area += SurfaceArea5(vertlist[0],vertlist[1],vertlist[2],vertlist[3],vertlist[4]);
   }

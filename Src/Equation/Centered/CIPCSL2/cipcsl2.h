@@ -7,7 +7,7 @@
 #include "../../../Global/global_constants.h"
 #include "../../../Global/global_realistic.h"
 #include "../../Topology/topology.h"
-#include "../../Heaviside/heaviside.h"
+#include "../../Heaviside/MarchingCubes/marching_cubes.h"
 
 #define RCIP
 //#define LOCAL_OLSSON
@@ -263,7 +263,7 @@ class CIPCSL2 : public Centered {
     Scalar clr, sclr;            /* color function, smeared color function */
 
     /* ancillary */
-    Heaviside heavi;
+    Heaviside * heavi;
     Vector fs;
     Scalar adens;
 

@@ -18,7 +18,7 @@ void CIPCSL2::cal_adens() {
     adens[i][j][k] = area/volume;
   }
 #else
-  heavi.calculate_adens();
+  heavi->calculate_adens();
 #endif
   //boil::plot->plot(phi,adens,"clr-adens",0);
 
