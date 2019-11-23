@@ -1,15 +1,23 @@
 #include "marching_cubes.h"
-
+  
 /******************************************************************************/
-real MarchingCubes::area(const int i, const int j, const int k){
+int MarchingCubes::construct_grid(const int i, const int j, const int k,
+                                  CELL3D & grid) {
 /***************************************************************************//**
-*  \brief calculate iso-surface area of cell (i,j,k)
+*  \brief Fill the 3D grid for a given cell
 *******************************************************************************/
+/*
+   https://codegolf.stackexchange.com/questions/126644/draw-an-ascii-cuboid
 
-  if(dom->ibody().off(i,j,k))
-    return 0.0;
-
-  CELL3D grid;
+      7--------6
+     /|       /|
+    / |      / |
+   4--------5  |
+   |  3-----|--2
+   | /      | /
+   |/       |/
+   0--------1
+*/
 
   int isum(0);
   for (int m=0; m<=7; m++) {
@@ -79,25 +87,5 @@ real MarchingCubes::area(const int i, const int j, const int k){
     if(grid.val[m]>clrsurf) isum++;
   }
 
-  if(isum==0||isum==8)
-    return(0.0);
-
-  /* to achieve symmetry, cases isum < 4 are solved using an inverse problem */
-  if (isum < 4) {
-    for (int m=0; m<=7; m++) {
-      grid.val[m] = 1.0 - grid.val[m];
-    }
-  }
-
-  real areaval = polygonise_area(grid, clrsurf);
-
-#if 0
-  if(i==3&&j==3&&k==7) {
-    for(int i(0); i < 8; ++i)
-      boil::oout<<grid.val[i]<<boil::endl;
-    boil::oout<<areaval<<boil::endl;
-  }
-#endif
-
-  return (areaval);
+  return isum;
 }

@@ -20,8 +20,9 @@ SUBDIRS = Equation/Staggered/Momentum                       \
           Equation/Centered                                 \
           Equation/Dispersed                                \
           Equation/Floodfill                                \
-          Equation/Heaviside                                \
           Equation/Heaviside/MarchingCubes                  \
+          Equation/Heaviside/MarchingSquares                \
+          Equation/Heaviside                                \
           Equation/Nucleation                               \
           Equation/Tifmodel                                 \
           Equation/Topology                                 \
@@ -34,8 +35,8 @@ SUBDIRS = Equation/Staggered/Momentum                       \
           Plot/TEC                                          \
           Plot/VTK                                          \
           Custom                                            \
-          Domain                                            \
           Domain/Axisymmetric                               \
+          Domain                                            \
           Body                                              \
           Model                                             \
           Field/Vector                                      \
@@ -73,6 +74,7 @@ LDADD = Equation/Staggered/Momentum/libMomentum.a                             \
         Equation/Dispersed/libDispersed.a                                     \
         Equation/Floodfill/libFloodfill.a                                     \
 	Equation/Heaviside/MarchingCubes/libMarchingCubes.a                   \
+	Equation/Heaviside/MarchingSquares/libMarchingSquares.a               \
 	Equation/Heaviside/libHeaviside.a                                     \
 	Equation/Nucleation/libNucleation.a                                   \
         Equation/Tifmodel/libTif.a                                            \

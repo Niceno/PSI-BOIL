@@ -3,28 +3,27 @@
 
 #include "../heaviside.h"
 #include <array>
-#include <vector>
-#include <iostream>
-#include <iomanip>
 
-/////////////////////
-//                 //
-//  Marching Cube  //
-//                 //
-/////////////////////
+//////////////////////
+//                  //
+//  Marching Cubes  //
+//                  //
+//////////////////////
 class MarchingCubes : public Heaviside {
   public:
     MarchingCubes(const Scalar * CLR, Scalar * PHI = NULL, 
-                 Scalar * ADENS = NULL,const real CLRSURF = 0.5);
+                 Scalar * ADENS = NULL, const real CLRSURF = 0.5);
     ~MarchingCubes() {};
 
+    virtual void evaluate_nodes();
     virtual real vf(const int i, const int j, const int k);
-    virtual real area(const int i, const int j, const int k);
+    virtual real ad(const int i, const int j, const int k);
     real surface(const Sign sig, const Comp & mcomp,
                  const int i, const int j, const int k);
 
   protected:
-    virtual void evaluate_nodes();
+    int construct_grid(const int i, const int j, const int k,
+                       CELL3D & grid);
 
     real cellface_af(const Sign sig, const Comp & mcomp,
                      const int i, const int j, const int k);

@@ -4,6 +4,7 @@
 #include "../../Parallel/mpi_macros.h"
 #include "../../Field/Scalar/scalar.h"
 #include "../../Domain/domain.h"
+#include <vector>
 
 /////////////////
 //             //
@@ -19,12 +20,12 @@ class Heaviside { /* this class is an abstract class! */
 
     const Domain * domain() const {return dom;}
     void calculate(const bool evalflag = true);
-    void calculate_heaviside(const bool evalflag = true);
+    void calculate_vf(const bool evalflag = true);
     void calculate_adens(const bool evalflag = true);
 
     /* pure virtual functions */
     virtual void evaluate_nodes() = 0;
-    virtual real area(const int i, const int j, const int k) = 0;
+    virtual real ad(const int i, const int j, const int k) = 0;
     virtual real vf(const int i, const int j, const int k) = 0;
 
     real operator() (const int i, const int j, const int k) const {
@@ -109,11 +110,11 @@ class Heaviside { /* this class is an abstract class! */
     struct CELL3D {
        XYZ p[8];
        real val[8];
+       real refval;
     };
     struct VAL3D {
       CELL3D cell;
       real value;
-      real refval;
     };
     struct VERT {
       XYZ v;
@@ -172,6 +173,11 @@ class Heaviside { /* this class is an abstract class! */
       LINE(const XY & p1, const XY & p2) {
         p[0] = p1;
         p[1] = p2;
+      }
+
+      inline real length() const {
+        return sqrt( (p[0].x-p[1].x)*(p[0].x-p[1].x)
+                    +(p[0].y-p[1].y)*(p[0].y-p[1].y) );
       }
     };
 

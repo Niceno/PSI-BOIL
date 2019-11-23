@@ -42,6 +42,7 @@ AC_OUTPUT(Makefile                                                      \
           Src/Equation/Dispersed/Makefile                               \
           Src/Equation/Floodfill/Makefile                               \
           Src/Equation/Heaviside/MarchingCubes/Makefile                 \
+          Src/Equation/Heaviside/MarchingSquares/Makefile               \
           Src/Equation/Heaviside/Makefile                               \
           Src/Equation/Nucleation/Makefile                              \
           Src/Equation/Tifmodel/Makefile                                \
