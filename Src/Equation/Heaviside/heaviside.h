@@ -18,13 +18,14 @@ class Heaviside { /* this class is an abstract class! */
     ~Heaviside() {};
 
     const Domain * domain() const {return dom;}
-    void calculate();
-    void calculate_heaviside();
-    void calculate_adens();
+    void calculate(const bool evalflag = true);
+    void calculate_heaviside(const bool evalflag = true);
+    void calculate_adens(const bool evalflag = true);
 
     /* pure virtual functions */
+    virtual void evaluate_nodes() = 0;
     virtual real area(const int i, const int j, const int k) = 0;
-    virtual real volume(const int i, const int j, const int k) = 0;
+    virtual real vf(const int i, const int j, const int k) = 0;
 
     real operator() (const int i, const int j, const int k) const {
       return (*phi)[i][j][k];
@@ -90,6 +91,20 @@ class Heaviside { /* this class is an abstract class! */
     struct TRIANGLE {
        XYZ p[3];
        XYZ v[3];
+
+       real area() const {
+         real x1 = p[1].x-p[0].x;
+         real y1 = p[1].y-p[0].y;
+         real z1 = p[1].z-p[0].z;
+         real x2 = p[2].x-p[0].x;
+         real y2 = p[2].y-p[0].y;
+         real z2 = p[2].z-p[0].z;
+         real val = (y1*z2-z1*y2)*(y1*z2-z1*y2)
+                    +(z1*x2-x1*z2)*(z1*x2-x1*z2)
+                    +(x1*y2-y1*x2)*(x1*y2-y1*x2);
+         return 0.5 * sqrt(val);
+       }
+
     };
     struct CELL3D {
        XYZ p[8];
@@ -97,7 +112,8 @@ class Heaviside { /* this class is an abstract class! */
     };
     struct VAL3D {
       CELL3D cell;
-      real volume;
+      real value;
+      real refval;
     };
     struct VERT {
       XYZ v;
@@ -144,10 +160,19 @@ class Heaviside { /* this class is an abstract class! */
     struct CELL2D {
       XY p[4];
       real val[4];
+      real refval;
     };
     struct VAL2D {
       CELL2D cell;
-      real area;
+      real value;
+    };
+    struct LINE {
+      XY p[2];
+
+      LINE(const XY & p1, const XY & p2) {
+        p[0] = p1;
+        p[1] = p2;
+      }
     };
 
     /* interpolation */
@@ -160,6 +185,20 @@ class Heaviside { /* this class is an abstract class! */
 
     /* cross product */
     XYZ CrossProduct(const XYZ & p1, const XYZ & p2);
+
+    /* shoelace */
+    real Shoelace(const XY & v1, const XY & v2, const XY & v3);
+    real Shoelace(const XY & v1, const XY & v2, const XY & v3,
+                  const XY & v4);
+    real Shoelace(const XY & v1, const XY & v2, const XY & v3,
+                  const XY & v4, const XY & v5);
+
+    /* surface divergence */ 
+    real triangle_surface_divergence(const TRIANGLE & t);
+
+    /* main body of marching squares*/
+    real standing_square(const CELL2D & grid, const real & isolevel,
+                         const real & totarea, std::vector<LINE> & lines);
 };
 
 #endif
