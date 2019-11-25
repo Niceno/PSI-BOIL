@@ -7,8 +7,6 @@ void PhaseChangeVOF::m(const Scalar * diff_eddy) {
 *         M = (qflux_liquid + qflux_vapor) / latent
 *******************************************************************************/
 
-  boil::timer.start("phasechangevof m");
-
   for_ijk(i,j,k){
     if(Interface(i,j,k)){
       real lv = lambdav;
@@ -29,8 +27,6 @@ void PhaseChangeVOF::m(const Scalar * diff_eddy) {
 
   M.bnd_update();
   M.exchange_all();
-
-  boil::timer.stop("phasechangevof m");
 
   return;
 }

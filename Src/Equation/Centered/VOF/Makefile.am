@@ -2,7 +2,6 @@ noinst_LIBRARIES = libVof.a
 libVof_a_SOURCES =      vof.h                           \
                         vof_ravioli.h                   \
                         vof.cpp                         \
-                        vof_adens.cpp                   \
                         vof_advance.cpp                 \
                         vof_advance_x.cpp               \
                         vof_advance_y.cpp               \
@@ -44,6 +43,7 @@ libVof_a_SOURCES =      vof.h                           \
                         vof_norm_elvira.cpp             \
                         vof_norm_mixed.cpp              \
                         vof_norm_young.cpp              \
+                        vof_reconstruct_geometry.cpp    \
                         vof_select_norm.cpp             \
                         vof_set_flag.cpp                \
                         vof_smooth.cpp                  \

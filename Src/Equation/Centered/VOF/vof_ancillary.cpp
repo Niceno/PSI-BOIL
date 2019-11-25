@@ -13,16 +13,8 @@ void VOF::ancillary(Scalar & scp) {
 
   boil::timer.start("vof ancillary");
 
-  /*-------------------------------+
-  |  normal vector at cell center  |
-  +-------------------------------*/
-  norm(scp,norm_method_advance,true); /* alpha is extracted */
-
-  /* iterate boundary normal vector */
-  bdnorm(scp);
-
-  /* prerequisite for marching cubes */
-  update_at_walls(scp);
+  /* reconstruct geometry */
+  reconstruct_geometry(scp);
 
   /* calculate the real-space normal vector */
   true_norm_vect(nx,ny,nz,mx,my,mz); 
@@ -36,12 +28,8 @@ void VOF::ancillary(Scalar & scp) {
       fs_bnd_nosubgrid(scp);
   }
 
-  /* calculate area -> due to the Heaviside bindings, phi is used, not scp */
-  cal_adens();
-#if 0
-  cal_adens_geom(adens);
-  set_adens(adensgeom);
-#endif
+  /* calculate area -> due to the Heaviside bindings, color is used, not scp */
+  heavi->calculate_adens();
 
   /* flag the interface */
   interfacial_flagging(scp);

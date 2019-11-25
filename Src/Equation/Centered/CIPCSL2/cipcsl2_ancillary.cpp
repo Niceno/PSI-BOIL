@@ -18,8 +18,8 @@ void CIPCSL2::ancillary() {
   distfunc(phi,24); 
   gradphic(dist);
 
-  /* calculate area */
-  cal_adens();
+  /* calculate area density */
+  heavi->calculate_adens();
 
   /* flag the interface */
   interfacial_flagging(phi);

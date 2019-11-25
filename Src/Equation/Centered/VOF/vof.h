@@ -35,7 +35,8 @@ class VOF : public Centered {
     virtual void advance(const bool anci = true);
     virtual void advance(Scalar & sca, const bool anci = true);
     void curvature();
-    virtual void ancillary(); /* calcs ancillary params such as adens w/o advance */
+    void ancillary(); /* calcs ancillary params such as adens w/o advance */
+    virtual void reconstruct_geometry();
     void tension(Vector * vec, const Matter matt);
     void tension(Vector * vec, const Matter matt, const Scalar & scp);
     void totalvol();
@@ -45,6 +46,8 @@ class VOF : public Centered {
                      , Range<real> zr );
 
     void init(){ ancillary(); };
+
+    virtual Scalar & color() {return phi;}
 
     // getter for front_minmax
     inline real get_xminft() { return(xminft);};
@@ -204,7 +207,8 @@ class VOF : public Centered {
     Scalar adens;
     Scalar mx,my,mz;/* normal to interface, in real space */
   protected:
-    virtual void ancillary(Scalar & scp);
+    void ancillary(Scalar & scp);
+    virtual void reconstruct_geometry(Scalar & scp);
     virtual void advance_x(Scalar & sca);
     virtual void advance_y(Scalar & sca);
     virtual void advance_z(Scalar & sca);
@@ -331,7 +335,6 @@ class VOF : public Centered {
     void set_flag();
     void insert_bc_flag(ScalarInt & g, const bool b);
 
-    void cal_adens();
     void cal_bndclr(const Scalar & scp);
 
     void set_adens(const Scalar & newadens) {

@@ -4,7 +4,6 @@ libVOFaxisym_a_SOURCES = vofaxisym.h                           \
                          vofaxisym_advance_x.cpp               \
                          vofaxisym_advance_z.cpp               \
                          vofaxisym_alp.cpp                     \
-                         vofaxisym_ancillary.cpp               \
                          vofaxisym_backward_axisymmetric.cpp   \
                          vofaxisym_calc_alpha.cpp              \
                          vofaxisym_calc_flux.cpp               \

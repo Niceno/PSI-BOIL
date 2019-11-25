@@ -4,9 +4,13 @@ MarchingSquares::MarchingSquares(const Comp & M, const Scalar * CLR,
                                  Scalar * PHI, Scalar * ADENS,
                                  const real CLRSURF) :
   Heaviside(CLR,PHI,ADENS,CLRSURF),
+  stmp(*(CLR->domain())),
   perpendicular(M)
 
  {
+
+  stmp = CLR->shape();
+
   /* positional offset */
   ofx = -1;
   ofy = -1;

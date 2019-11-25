@@ -252,7 +252,6 @@ class CIPCSL2 : public Centered {
     real extrapolate_c(const Scalar & sca, const int i, const int j, const int k,
                        const int ofx, const int ofy, const int ofz,
                        const real rat);
-    void cal_adens();
     void update_at_walls(Scalar & sca);
 
     void interfacial_flagging(Scalar & scp);

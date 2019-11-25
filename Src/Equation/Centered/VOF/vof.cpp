@@ -84,7 +84,7 @@ VOF::VOF(const Scalar & PHI,
   assert(PHI.domain() == F.domain());
 
   /* runtime polymorphism */
-  heavi = new MarchingCubes(&phi,NULL,&adens);
+  heavi = new MarchingCubes(&color(),NULL,&adens);
 
   /* set parameters */
   //dxmin=std::min(phi.dxc(3),std::min(phi.dyc(3),phi.dzc(3)));

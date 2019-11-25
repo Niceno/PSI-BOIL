@@ -6,7 +6,7 @@ void VOFaxisym::reconstruct_geometry() {
 }
 
 /******************************************************************************/
-void VOFaxisym::reconstruct_geometry(const Scalar & scp) {
+void VOFaxisym::reconstruct_geometry(Scalar & scp) {
 /***************************************************************************//**
  \brief Reconstruct the geometry of the interface, i.e. calculate the normal
         vector, line constant alpha and color function. The reconstruction pro-

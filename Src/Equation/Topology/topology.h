@@ -3,6 +3,7 @@
 
 #include "../../Parallel/mpi_macros.h"
 #include "../../Field/Scalar/scalar.h"
+#include "../../Field/ScalarInt/scalarint.h"
 #include "../../Field/Vector/vector.h"
 #include "../../Domain/domain.h"
 

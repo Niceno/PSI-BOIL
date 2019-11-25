@@ -77,16 +77,18 @@ class PhaseChangeVOF : public Centered {
 
     //void ext_gradt(Scalar & sca, const int iext, const Comp mcomp);
     void extrapolate(Scalar & sca, const int iext);
-    void insert_bc_ext(const Comp mcomp);
 
+#if 0
+    void insert_bc_ext(const Comp mcomp);
     void subgrid();
     void subgrid_gradt();
     void subgrid_setflag();
+#endif
 
     void calculate_node_temperature(const Scalar * diff_eddy = NULL);
 
-    real grad_2nd(const real tm0, const real tm1, const real tm2,
-                  const real dm1, const real dm2);
+    real second_order_difference(const real tm0, const real tm1, const real tm2,
+                                 const real dm1, const real dm2);
     real gradtx(const int dir, const int i, const int j, const int k);
     real gradty(const int dir, const int i, const int j, const int k);
     real gradtz(const int dir, const int i, const int j, const int k);

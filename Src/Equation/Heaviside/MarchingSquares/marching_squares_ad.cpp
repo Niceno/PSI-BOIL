@@ -5,6 +5,15 @@ real MarchingSquares::ad(const int i, const int j, const int k) {
 /***************************************************************************//**
 *  \brief calculate iso-line length density of cell (i,j,k)
 *******************************************************************************/
+  std::vector<LINE> lines; /* dummy */
+  return ad(i,j,k,lines);
+}
+
+/******************************************************************************/
+real MarchingSquares::ad(const int i, const int j, const int k,
+                         std::vector<LINE> & lines) {
+/******************************************************************************/
+  lines.clear();
 
   if(dom->ibody().off(i,j,k))
     return 0.0;
@@ -28,7 +37,6 @@ real MarchingSquares::ad(const int i, const int j, const int k) {
       exit(0);
     }
 
-    std::vector<LINE> lines; 
     standing_square(grid,clrsurf,surf,lines);
 
     /* allow for virtual implementation */

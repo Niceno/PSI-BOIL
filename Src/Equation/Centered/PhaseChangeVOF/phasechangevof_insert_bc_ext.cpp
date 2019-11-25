@@ -1,6 +1,7 @@
 #include "phasechangevof.h"
 using namespace std;
 
+/* obsolete!!!! */
 /******************************************************************************/
 void PhaseChangeVOF::insert_bc_ext(const Comp mcomp) {
 /***************************************************************************//**

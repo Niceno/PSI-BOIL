@@ -60,7 +60,7 @@ void PhaseChangeVOF::insert_bc_gradt_at_walls(const Scalar * diff_eddy) {
             real ti;
             real dist;
             /* the temperature gradient for inverse phase is set 
-             * extrapolation is turned off in ext_gradt */
+             * extrapolation overwrites them though */
             if       (mcomp==Comp::i()) {
               dist = distance_x(ii,jj,kk,dir,ti);
               dist = clr.dxc(ii)/2.0 - dist;

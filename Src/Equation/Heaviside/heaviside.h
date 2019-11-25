@@ -126,6 +126,11 @@ class Heaviside { /* this class is an abstract class! */
     struct XY {
       real x,y;
 
+      XY() {}
+      XY(const real & a, const real & b) {
+        x = a; y = b;
+      }
+
       /* negation */
       XY operator -() const {
         XY nv;
@@ -167,17 +172,40 @@ class Heaviside { /* this class is an abstract class! */
       CELL2D cell;
       real value;
     };
+    
+    /* the line object represent a plain line. However, for further
+       operation (e.g. normal vector calculation), it is better to
+       assume that it is actually an oriented line, i.e. vector from
+       p[0] to p[1]. The methods in this class follow this assumption;
+       moreover, convention is adopted that the normal vector to the 
+       line points to the right of the line. */
     struct LINE {
       XY p[2];
+      XY tangent; /* tangent vector */
+      XY normal;  /* normal vector */
+      real alpha; /* line constant */
 
       LINE(const XY & p1, const XY & p2) {
         p[0] = p1;
         p[1] = p2;
+
+        assert(length()>0.);
+        tangent.x = (p[1].x-p[0].x)/length();
+        tangent.y = (p[1].y-p[0].y)/length();
+
+        normal.x =  tangent.y;
+        normal.y = -tangent.x;
+
+        alpha = normal*p[0];
       }
 
       inline real length() const {
-        return sqrt( (p[0].x-p[1].x)*(p[0].x-p[1].x)
-                    +(p[0].y-p[1].y)*(p[0].y-p[1].y) );
+        return sqrt( (p[1].x-p[0].x)*(p[1].x-p[0].x)
+                    +(p[1].y-p[0].y)*(p[1].y-p[0].y) );
+      }
+
+      inline XY CoM() const {
+        return XY(0.5*(p[0].x+p[1].x),0.5*(p[0].y+p[1].y));
       }
     };
 

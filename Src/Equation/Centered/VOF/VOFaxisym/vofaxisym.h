@@ -19,9 +19,9 @@ class VOFaxisym : public VOF {
               const Scalar & kappa,
               const Vector & u, 
               Times & t,
-              Krylov * S,
-              Vector * bndclr = NULL) :
-    VOF(phi,f,kappa,u,t,S,bndclr),
+              Krylov * S) :
+              //Vector * bndclr = NULL) : /* bndclr not implemented! */
+    VOF(phi,f,kappa,u,t,S,NULL),
     clr( *phi.domain() ),
     axistmp ( *phi.domain() ),
     axistmp2( *phi.domain() ),
@@ -49,8 +49,7 @@ class VOFaxisym : public VOF {
     virtual void advance(const bool anci = true);
     virtual void advance(Scalar & sca, const bool anci = true);
 
-    virtual void ancillary();
-    void reconstruct_geometry();
+    virtual void reconstruct_geometry();
     void color_to_vf(Scalar & color, Scalar & vf,
                      const bool extalp=true,const bool bdn=true);
     void vf_to_color(const Scalar & vf, Scalar & color);
@@ -58,7 +57,7 @@ class VOFaxisym : public VOF {
     //real calc_alpha_axisymmetric(const real nnx, const real v, const real eta0);
     //real calc_v_axisymmetric(real nnx, real alp, real eta0, real & Kp);
 
-    Scalar & color() {return clr;}
+    virtual Scalar & color() {return clr;}
 
     /* setter for reconstruction */
     void set_reconstruction_parameters(const real rtol, const int riter) {
@@ -85,8 +84,7 @@ class VOFaxisym : public VOF {
     virtual void advance_y(Scalar & sca) {};
     virtual void advance_z(Scalar & sca);
 
-    virtual void ancillary(Scalar & scp);
-    void reconstruct_geometry(const Scalar & scp);
+    virtual void reconstruct_geometry(Scalar & scp);
     real linf_scalar_error(const Scalar & sca, const Scalar & scb
                           // ,int & i, int & j, int & k, bool & ebool
                            );

@@ -1,7 +1,6 @@
 noinst_LIBRARIES = libCipcsl2.a
 libCipcsl2_a_SOURCES = cipcsl2.h                        \
                        cipcsl2.cpp                      \
-                       cipcsl2_adens.cpp                \
                        cipcsl2_advance.cpp              \
                        cipcsl2_ancillary.cpp            \
                        cipcsl2_bdcond.cpp               \
