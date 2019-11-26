@@ -298,6 +298,7 @@ void VOFaxisym::curv_HF() {
     //bdcurv();
   } else if(wall_curv_method==CurvMethod::HFmixedXZ()) {
     insert_bc_curv_HFmixed(clr,Comp::i(),Comp::k(),Sign::neg());
+  } else if(wall_curv_method==CurvMethod::none()) {
   } else {
     /* default */
     boil::oout<<"VOF::curvHF: Wall curvature calculation method not set properly!"

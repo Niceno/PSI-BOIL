@@ -1,6 +1,7 @@
 noinst_LIBRARIES = libVof.a
 libVof_a_SOURCES =      vof.h                           \
                         vof_ravioli.h                   \
+                        vof_inline.h                    \
                         vof.cpp                         \
                         vof_advance.cpp                 \
                         vof_advance_x.cpp               \
@@ -22,7 +23,6 @@ libVof_a_SOURCES =      vof.h                           \
                         vof_front_minmax.cpp            \
                         vof_fs_bnd.cpp                  \
                         vof_fs_bnd_nosubgrid.cpp        \
-                        vof_fs_interp.cpp               \
                         vof_fs3.cpp                     \
                         vof_gradphi.cpp                 \
                         vof_gradphic.cpp                \

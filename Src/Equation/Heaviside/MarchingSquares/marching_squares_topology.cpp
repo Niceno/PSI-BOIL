@@ -1,7 +1,7 @@
 #include "marching_squares.h"
 
 /******************************************************************************/
-void MarchingSquares::topology(Topology & topo) {
+void MarchingSquares::topology(Topology & topo, const bool use_interp) {
 /***************************************************************************//**
 *  \brief build the interface topology (except for iflag)
 *******************************************************************************/
@@ -35,12 +35,56 @@ void MarchingSquares::topology(Topology & topo) {
     exit(0);
   }
 
-  for_vijk(stmp,i,j,k) {
-    /* lines get cleared with every call of this function */
-    (*topo.adens) = ad(i,j,k,lines);
+  (*topo.adens) = 0.0;
+  (*nnx) = 0.0;
+  (*nny) = 0.0;
+  (*nzero) = 0.0;
+  stmp = boil::unreal;
 
-    extract_line_parameters(lines,(*nnx)[i][j][k],(*nny)[i][j][k],stmp[i][j][k]);
-    (*nzero)[i][j][k] = 0.0;
+  for_vijk(stmp,i,j,k) {
+    if(dom->ibody().off(i,j,k)) {
+      continue;
+    }
+
+    /* lines get cleared with every call of this function */
+    (*topo.adens)[i][j][k] = ad(i,j,k,lines);
+ 
+#if 0
+    /* more than single surface */
+    if(extract_line_parameters(lines,
+                               (*nnx)[i][j][k],(*nny)[i][j][k],
+                               stmp[i][j][k]) > 1) {
+      real nxval(0.0), nyval(0.0);
+      if       (perpendicular==Comp::i()) {
+        nxval = (nodalvals[i][j+1][k  ]+nodalvals[i][j+1][k+1])
+               -(nodalvals[i][j  ][k  ]+nodalvals[i][j  ][k+1]);
+        nyval = (nodalvals[i][j  ][k+1]+nodalvals[i][j+1][k+1])
+               -(nodalvals[i][j  ][k  ]+nodalvals[i][j+1][k  ]);
+      } else if(perpendicular==Comp::j()) {
+        nxval = (nodalvals[i+1][j][k  ]+nodalvals[i+1][j][k+1])
+               -(nodalvals[i  ][j][k  ]+nodalvals[i  ][j][k+1]);
+        nyval = (nodalvals[i  ][j][k+1]+nodalvals[i+1][j][k+1])
+               -(nodalvals[i  ][j][k  ]+nodalvals[i+1][j][k  ]);
+      } else if(perpendicular==Comp::k()) {
+        nxval = (nodalvals[i+1][j  ][k]+nodalvals[i+1][j+1][k])
+               -(nodalvals[i  ][j  ][k]+nodalvals[i  ][j+1][k]);
+        nyval = (nodalvals[i  ][j+1][k]+nodalvals[i+1][j+1][k])
+               -(nodalvals[i  ][j  ][k]+nodalvals[i  ][j  ][k]);
+      }
+
+      real nsum = sqrt(nxval*nxval+nyval*nyval)+boil::pico;
+      nxval /= nsum;
+      nyval /= nsum;
+    }
+#else
+    extract_line_parameters(lines,
+                            (*nnx)[i][j][k],(*nny)[i][j][k],
+                            stmp[i][j][k]);
+#endif
+
+
+    //if(i==boil::BW+1&&k==boil::BW+1)
+    //  boil::oout<<"res | "<<(*topo.adens)[i][j][k]<<" "<<(*nnx)[i][j][k]<<" "<<(*nny)[i][j][k]<<" "<<stmp[i][j][k]<<boil::endl;
   }
 
   nnx->exchange_all();
@@ -49,7 +93,11 @@ void MarchingSquares::topology(Topology & topo) {
   stmp.exchange_all();
 
   /* step two: calculate free surface position */
-  //cal_fs(*topo.nx,*topo.ny,*topo.nz,stmp,*topo.fs);
+  if(!use_interp) {
+    cal_fs_geom(*clr,*topo.nx,*topo.ny,*topo.nz,stmp,*topo.fs);
+  } else {
+    cal_fs_interp(*clr,*topo.fs);
+  }
 
   return;
 }

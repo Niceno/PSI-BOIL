@@ -3,57 +3,58 @@ bin_PROGRAMS = Boil
 Boil_SOURCES = main.cpp    \
                Ravioli/*.h
 
-SUBDIRS = Equation/Staggered/Momentum                       \
-          Equation/Staggered                                \
-          Solver                                            \
-          Equation/Centered/Enthalpy                        \
-          Equation/Centered/EnthalpyFD/EnthalpyFDaxisym     \
-          Equation/Centered/EnthalpyFD                      \
-          Equation/Centered/Concentration                   \
-          Equation/Centered/Pressure                        \
-          Equation/Centered/PhaseChange                     \
-          Equation/Centered/PhaseChangeVOF                  \
-          Equation/Centered/CIPCSL2                         \
-          Equation/Centered/VOF/VOFaxisym                   \
-          Equation/Centered/VOF                             \
-          Equation/Centered/Distance                        \
-          Equation/Centered                                 \
-          Equation/Dispersed                                \
-          Equation/Floodfill                                \
-          Equation/Heaviside/MarchingCubes                  \
-          Equation/Heaviside/MarchingSquares                \
-          Equation/Heaviside                                \
-          Equation/Nucleation                               \
-          Equation/Tifmodel                                 \
-          Equation/Topology                                 \
-          Monitor/Rack                                      \
-          Monitor/Location                                  \
-          Matter                                            \
-          LookUpTable                                       \
-          Grid                                              \
-          Plot                                              \
-          Plot/TEC                                          \
-          Plot/VTK                                          \
-          Custom                                            \
-          Domain/Axisymmetric                               \
-          Domain                                            \
-          Body                                              \
-          Model                                             \
-          Field/Vector                                      \
-          Field/Scalar                                      \
-          Field/ScalarBool                                  \
-          Field/VectorBool                                  \
-          Field/ScalarInt                                   \
-          Timer                                             \
-          Formula                                           \
-          Profile                                           \
-          RandomFlow                                        \
-          Global                                            \
-          Boundary                                          \
-          Ravioli                                           \
-          SimulationTime                                    \
-          Parallel/Out                                      \
-          Parallel                                          \
+SUBDIRS = Equation/Staggered/Momentum                              \
+          Equation/Staggered                                       \
+          Solver                                                   \
+          Equation/Centered/Enthalpy                               \
+          Equation/Centered/EnthalpyFD/EnthalpyFDaxisym            \
+          Equation/Centered/EnthalpyFD                             \
+          Equation/Centered/Concentration                          \
+          Equation/Centered/Pressure                               \
+          Equation/Centered/PhaseChange                            \
+          Equation/Centered/PhaseChangeVOF                         \
+          Equation/Centered/CIPCSL2                                \
+          Equation/Centered/VOF/VOFaxisym                          \
+          Equation/Centered/VOF                                    \
+          Equation/Centered/Distance                               \
+          Equation/Centered                                        \
+          Equation/Dispersed                                       \
+          Equation/Floodfill                                       \
+          Equation/Heaviside/MarchingCubes                         \
+          Equation/Heaviside/MarchingSquares/MSaxisym              \
+          Equation/Heaviside/MarchingSquares                       \
+          Equation/Heaviside                                       \
+          Equation/Nucleation                                      \
+          Equation/Tifmodel                                        \
+          Equation/Topology                                        \
+          Monitor/Rack                                             \
+          Monitor/Location                                         \
+          Matter                                                   \
+          LookUpTable                                              \
+          Grid                                                     \
+          Plot                                                     \
+          Plot/TEC                                                 \
+          Plot/VTK                                                 \
+          Custom                                                   \
+          Domain/Axisymmetric                                      \
+          Domain                                                   \
+          Body                                                     \
+          Model                                                    \
+          Field/Vector                                             \
+          Field/Scalar                                             \
+          Field/ScalarBool                                         \
+          Field/VectorBool                                         \
+          Field/ScalarInt                                          \
+          Timer                                                    \
+          Formula                                                  \
+          Profile                                                  \
+          RandomFlow                                               \
+          Global                                                   \
+          Boundary                                                 \
+          Ravioli                                                  \
+          SimulationTime                                           \
+          Parallel/Out                                             \
+          Parallel                                                 \
           Template
 
 LDADD = Equation/Staggered/Momentum/libMomentum.a                             \
@@ -74,6 +75,7 @@ LDADD = Equation/Staggered/Momentum/libMomentum.a                             \
         Equation/Dispersed/libDispersed.a                                     \
         Equation/Floodfill/libFloodfill.a                                     \
 	Equation/Heaviside/MarchingCubes/libMarchingCubes.a                   \
+	Equation/Heaviside/MarchingSquares/MSaxisym/libMSaxisym.a             \
 	Equation/Heaviside/MarchingSquares/libMarchingSquares.a               \
 	Equation/Heaviside/libHeaviside.a                                     \
 	Equation/Nucleation/libNucleation.a                                   \

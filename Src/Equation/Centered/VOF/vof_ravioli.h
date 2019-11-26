@@ -52,6 +52,7 @@ class CurvMethod {
     CurvMethod() {val=-1;}
 
     static const CurvMethod undefined() {return CurvMethod(-1);}
+    static const CurvMethod none()      {return CurvMethod( 0);}
     static const CurvMethod DivNorm()   {return CurvMethod( 1);}
     static const CurvMethod HF()        {return CurvMethod( 2);}
     /* 2D method, X = wall tangent, Z = wall normal dir */
@@ -61,6 +62,7 @@ class CurvMethod {
     friend std::ostream & operator << (std::ostream & ost, const CurvMethod & com) {
       switch(com.val) {
         case(-1): ost << "undefined"; break;
+        case( 0): ost << "none"; break;
         case( 1): ost << "DivNorm"; break;
         case( 2): ost << "HF"; break;
         case( 3): ost << "HFmixedXZ"; break;
@@ -77,6 +79,41 @@ class CurvMethod {
 
     /* avoid implicit conversions of integer to Curv */
     explicit CurvMethod(const int m) {val = m;}
+};
+
+///////////////////////
+//                   //
+//  Topology method  //
+//                   //
+///////////////////////
+/* this is a ravioli class for topology method selection */
+class TopoMethod {
+  public:
+    TopoMethod() {val=-1;}
+
+    static const TopoMethod undefined() {return TopoMethod(-1);}
+    static const TopoMethod Hybrid()    {return TopoMethod( 1);}
+    static const TopoMethod Heaviside() {return TopoMethod( 2);}
+
+    //! Prints the components name.
+    friend std::ostream & operator << (std::ostream & ost, const TopoMethod & com) {
+      switch(com.val) {
+        case(-1): ost << "undefined"; break;
+        case( 1): ost << "Hybrid"; break;
+        case( 2): ost << "Heaviside"; break;
+      }
+
+      return ost;
+    }
+
+    bool operator == (const TopoMethod & o) const {return val == o.val;}
+    bool operator != (const TopoMethod & o) const {return val != o.val;}
+
+  private:
+    int val;
+
+    /* avoid implicit conversions of integer to Topo */
+    explicit TopoMethod(const int m) {val = m;}
 };
 
 ////////////////////////

@@ -20,6 +20,7 @@
 #include "../Equation/Dispersed/dispersed.h"
 #include "../Equation/Floodfill/floodfill.h"
 #include "../Equation/Heaviside/MarchingCubes/marching_cubes.h"
+#include "../Equation/Heaviside/MarchingSquares/MSaxisym/ms_axisym.h"
 #include "../Equation/Heaviside/MarchingSquares/marching_squares.h"
 #include "../Equation/Tifmodel/tif.h"
 #include "../Equation/Topology/topology.h"

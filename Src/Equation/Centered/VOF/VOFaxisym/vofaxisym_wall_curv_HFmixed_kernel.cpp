@@ -59,6 +59,6 @@ real VOFaxisym::wall_curv_HFmixed_kernel(const real hm, const real hc, const rea
   real h_1d = (hc-hm)/dm;
   real h_11 = 2.*(dp*hm+dm*hp-(dp+dm)*hc)/dp/dm/(dp+dm);
 
-  boil::oout<<"near: "<<h_1u<<" "<<h_1c<<" "<<h_1d<<" | "<<h_11<<" "<<-mult*h_11/pow(1.+h_1c*h_1c,1.5)<<" "<< mult/hc * 1./sqrt(1.+h_1c*h_1c)<<" | "<<-mult*h_11/pow(1.+h_1c*h_1c,1.5)/(1.0/1.47721)-1.<<" "<<mult/hc * 1./sqrt(1.+h_1c*h_1c)/(1./1.47721)-1.<<boil::endl;
+  //boil::oout<<"near: "<<h_1u<<" "<<h_1c<<" "<<h_1d<<" | "<<h_11<<" "<<-mult*h_11/pow(1.+h_1c*h_1c,1.5)<<" "<< mult/hc * 1./sqrt(1.+h_1c*h_1c)<<" | "<<-mult*h_11/pow(1.+h_1c*h_1c,1.5)/(1.0/1.47721)-1.<<" "<<mult/hc * 1./sqrt(1.+h_1c*h_1c)/(1./1.47721)-1.<<boil::endl;
   return -mult*(h_11/pow(1.+h_1c*h_1c,1.5) -1./hc * 1./sqrt(1.+h_1c*h_1c));
 }

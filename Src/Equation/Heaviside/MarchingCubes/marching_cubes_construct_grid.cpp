@@ -70,17 +70,17 @@ int MarchingCubes::construct_grid(const int i, const int j, const int k,
     grid.p[m].z = (*clr).zn(kk);
 #endif 
 
-    if(fabs(grid.val[m]-clrsurf) < boil::pico) {
+    if(fabs(grid.val[m]-clrsurf) < boil::nano) {
 #if 1
-      if       ((*clr)[i][j][k]>(1.0-boil::pico)) {
-        grid.val[m]=clrsurf-boil::pico;
-      } else if((*clr)[i][j][k]<boil::pico) {
-        grid.val[m]=clrsurf+boil::pico;
+      if       ((*clr)[i][j][k]>(1.0-boil::nano)) {
+        grid.val[m]=clrsurf-boil::nano;
+      } else if((*clr)[i][j][k]<boil::nano) {
+        grid.val[m]=clrsurf+boil::nano;
       } else {
-        grid.val[m]=clrsurf+boil::pico;
+        grid.val[m]=clrsurf+boil::nano;
       }
 #else
-      grid.val[m]=clrsurf-boil::pico;
+      grid.val[m]=clrsurf-boil::nano;
 #endif
     }
 

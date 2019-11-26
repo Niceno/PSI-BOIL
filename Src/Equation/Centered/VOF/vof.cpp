@@ -33,7 +33,8 @@ VOF::VOF(const Scalar & PHI,
   norm_method_curvature(NormMethod::Young()),
   mcomp_for_elvira(Comp::undefined()), /* undefined for 3D */
   bulk_curv_method(CurvMethod::HF()),
-  wall_curv_method(CurvMethod::DivNorm())
+  wall_curv_method(CurvMethod::DivNorm()),
+  topo_method(TopoMethod::Hybrid())
 
 /*------------------------------------------------------+
 |  this constructor is called only at the finest level  |
@@ -84,7 +85,18 @@ VOF::VOF(const Scalar & PHI,
   assert(PHI.domain() == F.domain());
 
   /* runtime polymorphism */
-  heavi = new MarchingCubes(&color(),NULL,&adens);
+  if(phi.domain()->is_axisymmetric()) {
+    heavi = new MSaxisym(&color(),NULL,&adens);
+  } else {
+    if     (phi.bc().type(Dir::imin(),BndType::pseudo()))
+      heavi = new MarchingSquares(Comp::i(),&color(),NULL,&adens);
+    else if(phi.bc().type(Dir::jmin(),BndType::pseudo()))
+      heavi = new MarchingSquares(Comp::j(),&color(),NULL,&adens);
+    else if(phi.bc().type(Dir::kmin(),BndType::pseudo()))
+      heavi = new MarchingSquares(Comp::k(),&color(),NULL,&adens);
+    else
+      heavi = new MarchingCubes(&color(),NULL,&adens);
+  }
 
   /* set parameters */
   //dxmin=std::min(phi.dxc(3),std::min(phi.dyc(3),phi.dzc(3)));

@@ -314,6 +314,7 @@ void VOF::curv_HF() {
     insert_bc_curv_divnorm();
   } else if(wall_curv_method==CurvMethod::HFmixedXZ()) {
     insert_bc_curv_HFmixed(phi,Comp::i(),Comp::k(),Sign::neg());
+  } else if(wall_curv_method==CurvMethod::none()) {
   } else {
     /* default */
     boil::oout<<"VOF::curvHF: Wall curvature calculation method not set properly!"

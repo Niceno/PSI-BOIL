@@ -175,7 +175,7 @@ real Heaviside::standing_square(const CELL2D & grid, const real & isolevel,
 
       real complement = Shoelace(vertlist1[0],vertlist1[1],vertlist1[2]);
       lines.push_back({vertlist1[1],vertlist1[2]});
-  
+
       /* northeast corner */
       vertlist2[0] = grid.p[3];
       /* between corner and its neighbor in 'south' direction */

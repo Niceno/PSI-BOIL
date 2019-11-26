@@ -1,7 +1,10 @@
-#include "vof.h"
+#include "heaviside.h"
 
 /******************************************************************************/
-void VOF::cal_fs3(const Scalar & scp) {
+void Heaviside::cal_fs_geom(const Scalar & scp, 
+                            const Scalar & nx, const Scalar & ny,
+                            const Scalar & nz, const Scalar & nalpha,
+                            Vector & fs) {
 /***************************************************************************//**
  \brief Calculate free-surface position between cell centers
     if there is no interface in the cell, unreal=yotta (=1e+24) is stored.
@@ -9,10 +12,11 @@ void VOF::cal_fs3(const Scalar & scp) {
     output: fs
 *******************************************************************************/
 
-  /* tolerance is necessary because the linear-planes are not closed */
-  /* with this version, it shouldnt be necessary anymore */
+  /* tolerance, not really necessary */
   real tolf = 0.0e-2;
-        
+  /* if you decide to use it, don't forget to scale by grid spacing, as this is
+     currently implemented as a constant tolerance! */
+
   /* initialize */
   for_m(m)
     for_avmijk(fs,m,i,j,k)
@@ -25,10 +29,9 @@ void VOF::cal_fs3(const Scalar & scp) {
   ******************************************/
 
   m = Comp::i();
-  //for_vmijk(u,m,i,j,k) {  /* don't use vmijk. wall will be skipped! */
-  for(int i=si(); i<=ei()+1; i++)
-  for(int j=sj(); j<=ej()  ; j++)
-  for(int k=sk(); k<=ek()  ; k++) {
+  for(int i=scp.si(); i<=scp.ei()+1; i++)
+  for(int j=scp.sj(); j<=scp.ej()  ; j++)
+  for(int k=scp.sk(); k<=scp.ek()  ; k++) {
 
     /* immersed body */
     if(dom->ibody().off(i-1,j,k)||dom->ibody().off(i,j,k))
@@ -38,49 +41,52 @@ void VOF::cal_fs3(const Scalar & scp) {
     real clrw = scp[i-1][j][k];
     real clre = scp[i  ][j][k];
 
-    if((clrw-phisurf)*(clre-phisurf)>0.0) 
+    if((clrw-clrsurf)*(clre-clrsurf)>0.0) 
       continue;
   
     if(  (clrw<boil::pico&&clre-1.0>-boil::pico)
        ||(clrw-1.0>-boil::pico&&clre<boil::pico)) {
       fs[m][i][j][k] = scp.xn(i);
+      boil::oout<<i<<" "<<j<<" "<<k<<" "<<clrw<<" "<<clre<<boil::endl;
+      exit(0);
       continue;
     }
 
-    /* calculate normalized candidate positions */
-    real fsxw = fs_val(m,i-1,j,k);
-    real fsxe = fs_val(m,i  ,j,k);
+    /* calculate candidate positions */
+    real fsxw = fs_val(m,i-1,j,k,nx,ny,nz,nalpha);
+    real fsxe = fs_val(m,i  ,j,k,nx,ny,nz,nalpha);
 
     /* --------------------------------------------
        first check: are candidate positions 
        a. between cell centres
        b. inside the correct cell (real interface)
     ----------------------------------------------- */
-    bool flagw = (0.5     <= fsxw && fsxw <= 1.0+tolf);
-    bool flage = (0.0-tolf <= fsxe && fsxe <= 0.5    );
+    bool flagw = (scp.xc(i-1)    <= fsxw && fsxw <= scp.xn(i)+tolf);
+    bool flage = (scp.xn(i)-tolf <= fsxe && fsxe <= scp.xc(i)     );
 
     if     ( flagw && !flage) { /* west is real and east is not */
-      fs[m][i][j][k] = scp.xn(i-1) + scp.dxc(i-1) * fsxw;
+      fs[m][i][j][k] = fsxw;
       continue;
     }
     else if(!flagw &&  flage) { /* east is real and west is not */
-      fs[m][i][j][k] = scp.xn(i) + scp.dxc(i) * fsxe;
+      fs[m][i][j][k] = fsxe;
       continue;
     }
     else if( flagw &&  flage) { /* both are real */
 
       /* calculate distance between the two candidate positions */
-      real fsx_diff = fsxe + 1.0 - fsxw;
+      real fsx_diff = fsxe - fsxw;
       if(fabs(fsx_diff)<tolf) { /* they are close to each other */
         fs[m][i][j][k] = scp.xn(i);
       } else {  /* choose the "more real" value */
-        fs[m][i][j][k] = (1.0-fsxw>fsxe) ? 
-                         scp.xn(i-1) + scp.dxc(i-1) * fsxw
-                       : scp.xn(i  ) + scp.dxc(i  ) * fsxe;
+        fs[m][i][j][k] = fabs(fsxw-scp.xn(i))>fabs(fsxe-scp.xn(i)) 
+                         ? fsxw : fsxe;
       }
       continue;
     }
 
+      boil::oout<<i<<" "<<j<<" "<<k<<" "<<flagw<<" "<<flage<<" | "<<fsxw<<" "<<fsxe<<" | "<<scp.xn(i)<<" "<<scp.xc(i-1)<<" | "<<clrw<<" "<<clre<<boil::endl;
+      //exit(0);
     fs[m][i][j][k] = scp.xn(i);
   } 
   
@@ -89,10 +95,9 @@ void VOF::cal_fs3(const Scalar & scp) {
   ******************************************/
 
   m = Comp::j();
-  //for_vmijk(u,m,i,j,k) {  /* don't use vmijk. wall will be skipped! */
-  for(int i=si(); i<=ei()  ; i++)
-  for(int j=sj(); j<=ej()+1; j++)
-  for(int k=sk(); k<=ek()  ; k++) {
+  for(int i=scp.si(); i<=scp.ei()  ; i++)
+  for(int j=scp.sj(); j<=scp.ej()+1; j++)
+  for(int k=scp.sk(); k<=scp.ek()  ; k++) {
 
     /* immersed body */
     if(dom->ibody().off(i,j-1,k)||dom->ibody().off(i,j,k))
@@ -102,7 +107,7 @@ void VOF::cal_fs3(const Scalar & scp) {
     real clrs = scp[i][j-1][k];
     real clrn = scp[i][j  ][k];
 
-    if((clrs-phisurf)*(clrn-phisurf)>0.0) 
+    if((clrs-clrsurf)*(clrn-clrsurf)>0.0) 
       continue;
     
     if(  (clrs<boil::pico&&clrn-1.0>-boil::pico)
@@ -111,36 +116,35 @@ void VOF::cal_fs3(const Scalar & scp) {
       continue;
     }
 
-    /* calculate normalized candidate positions */
-    real fsys = fs_val(m,i,j-1,k);
-    real fsyn = fs_val(m,i,j  ,k);
+    /* calculate  candidate positions */
+    real fsys = fs_val(m,i,j-1,k,nx,ny,nz,nalpha);
+    real fsyn = fs_val(m,i,j  ,k,nx,ny,nz,nalpha);
 
     /* --------------------------------------------
        first check: are candidate positions 
        a. between cell centres
        b. inside the correct cell (real interface)
     ----------------------------------------------- */
-    bool flags = (0.5     <= fsys && fsys <= 1.0+tolf);
-    bool flagn = (0.0-tolf <= fsyn && fsyn <= 0.5);
+    bool flags = (scp.yc(j-1)    <= fsys && fsys <= scp.yn(j)+tolf);
+    bool flagn = (scp.yn(j)-tolf <= fsyn && fsyn <= scp.yc(j)     );
    
     if     ( flags && !flagn) { /* south is real and north is not */
-      fs[m][i][j][k] = scp.yn(j-1) + scp.dyc(j-1) * fsys;
+      fs[m][i][j][k] = fsys;
       continue;
     }
     else if(!flags &&  flagn) { /* north is real and south is not */
-      fs[m][i][j][k] = scp.yn(j) + scp.dyc(j) * fsyn;
+      fs[m][i][j][k] = fsyn;
       continue;
     }
     else if( flags &&  flagn) { /* both are real */
 
       /* calculate distance between the two candidate positions */
-      real fsy_diff = fsyn + 1.0 - fsys;
+      real fsy_diff = fsyn - fsys;
       if(fabs(fsy_diff)<tolf) { /* they are close to each other */
         fs[m][i][j][k] = scp.yn(j);
       } else {  /* choose the "more real" value */
-        fs[m][i][j][k] = (1.0-fsys>fsyn) ? 
-                         scp.yn(j-1) + scp.dyc(j-1) * fsys
-                       : scp.yn(j  ) + scp.dyc(j  ) * fsyn;
+        fs[m][i][j][k] = fabs(fsys-scp.yn(j))>fabs(fsyn-scp.yn(j)) 
+                         ? fsys : fsyn;
       }
       continue;
     }
@@ -152,10 +156,9 @@ void VOF::cal_fs3(const Scalar & scp) {
   ******************************************/
 
   m = Comp::k();
-  //for_vmijk(u,m,i,j,k) {  /* don't use vmijk. wall will be skipped! */
-  for(int i=si(); i<=ei()  ; i++)
-  for(int j=sj(); j<=ej()  ; j++)
-  for(int k=sk(); k<=ek()+1; k++) {
+  for(int i=scp.si(); i<=scp.ei()  ; i++)
+  for(int j=scp.sj(); j<=scp.ej()  ; j++)
+  for(int k=scp.sk(); k<=scp.ek()+1; k++) {
 
     /* immersed body */
     if(dom->ibody().off(i,j,k-1)||dom->ibody().off(i,j,k))
@@ -165,7 +168,7 @@ void VOF::cal_fs3(const Scalar & scp) {
     real clrb = scp[i][j][k-1];
     real clrt = scp[i][j][k  ];
 
-    if((clrb-phisurf)*(clrt-phisurf)>0.0) 
+    if((clrb-clrsurf)*(clrt-clrsurf)>0.0) 
       continue;
     
     if(  (clrb<boil::pico&&clrt-1.0>-boil::pico)
@@ -174,51 +177,42 @@ void VOF::cal_fs3(const Scalar & scp) {
       continue;
     }
 
-    /* calculate normalized candidate positions */
-    real fszb = fs_val(m,i,j,k-1);
-    real fszt = fs_val(m,i,j,k  );
+    /* calculate candidate positions */
+    real fszb = fs_val(m,i,j,k-1,nx,ny,nz,nalpha);
+    real fszt = fs_val(m,i,j,k  ,nx,ny,nz,nalpha);
 
     /* --------------------------------------------
        first check: are candidate positions 
        a. between cell centres
        b. inside the correct cell (real interface)
     ----------------------------------------------- */
-    bool flagb = (0.5     <= fszb && fszb <= 1.0+tolf);
-    bool flagt = (0.0-tolf <= fszt && fszt <= 0.5    );
+    bool flagb = (scp.zc(k-1)    <= fszb && fszb <= scp.zn(k)+tolf);
+    bool flagt = (scp.zn(k)-tolf <= fszt && fszt <= scp.zc(k)     );
    
-    //if(i==46&&j==50&&k==76) boil::oout<<"VOF::cal_FS3 "<<fszb<<" "<<fszt<<boil::endl;
-  
     if     ( flagb && !flagt) { /* bottom is real and top is not */
-      fs[m][i][j][k] = scp.zn(k-1) + scp.dzc(k-1) * fszb;
+      fs[m][i][j][k] = fszb;
       continue;
     }
     else if(!flagb &&  flagt) { /* top is real and bottom is not */
-      fs[m][i][j][k] = scp.zn(k) + scp.dzc(k) * fszt;
+      fs[m][i][j][k] = fszt;
       continue;
     }
     else if( flagb &&  flagt) { /* both are real */
 
       /* calculate distance between the two candidate positions */
-      real fsz_diff = fszt + 1.0 - fszb;
+      real fsz_diff = fszt - fszb;
       if(fabs(fsz_diff)<tolf) { /* they are close to each other */
         fs[m][i][j][k] = scp.zn(k);
       } else {  /* choose the "more real" value */
-        fs[m][i][j][k] = (1.0-fszb>fszt) ? 
-                         scp.zn(k-1) + scp.dzc(k-1) * fszb
-                       : scp.zn(k  ) + scp.dzc(k  ) * fszt;
+        fs[m][i][j][k] = fabs(fszb-scp.zn(k))>fabs(fszt-scp.zn(k)) 
+                         ? fszb : fszt;
       }
       continue;
     }
     fs[m][i][j][k] = scp.zn(k);
   } 
 
-  /* correct at boundaries */
-  if(use_subgrid)
-    fs_bnd(scp);
-  else
-    fs_bnd_nosubgrid(scp);
   //fs.exchange_all();
-
   //boil::plot->plot(fs,scp, "fs-clr", 0);
  
   return;
@@ -227,61 +221,39 @@ void VOF::cal_fs3(const Scalar & scp) {
 /***********************
  * ancillary function
  ***********************/
-real VOF::fs_val(const Comp m, const int i, const int j, const int k) {
+real Heaviside::fs_val(const Comp m, const int i, const int j, const int k,
+                       const Scalar & nx, const Scalar & ny,
+                       const Scalar & nz, const Scalar & nalpha) {
 
   real alpha = nalpha[i][j][k];
   /* degenerate case */
   if(!boil::realistic(alpha))
     return boil::unreal;
 
-  real vn1 = -nx[i][j][k];
-  real vn2 = -ny[i][j][k];
-  real vn3 = -nz[i][j][k];
+  real xpos = nalpha.xc(i);
+  real ypos = nalpha.yc(j);
+  real zpos = nalpha.zc(k);
 
-  real vm1 = fabs(vn1);
-  real vm2 = fabs(vn2);
-  real vm3 = fabs(vn3);
+  real vx = nx[i][j][k]; 
+  real vy = ny[i][j][k]; 
+  real vz = nz[i][j][k]; 
 
-  real xpos = 0.5;
-  real ypos = 0.5;
-  real zpos = 0.5;
-
-#if 1
   if(m==Comp::i()) {
-    real xuni = (alpha-vm2*ypos-vm3*zpos)/(vm1+boil::pico);
-    if(vn1<0)
-      xuni = 1.0-xuni;
-    return xuni;
+    if(fabs(vx)<boil::atto)
+      return boil::unreal;
+    else
+      return (alpha-vy*ypos-vz*zpos)/vx;
   } else if(m==Comp::j()) {
-    real yuni = (alpha-vm1*xpos-vm3*zpos)/(vm2+boil::pico);
-    if(vn2<0)
-      yuni = 1.0-yuni;
-    return yuni;
+    if(fabs(vy)<boil::atto)
+      return boil::unreal;
+    else
+      return (alpha-vx*xpos-vz*zpos)/vy;
   } else {
-    real zuni = (alpha-vm1*xpos-vm2*ypos)/(vm3+boil::pico);
-    if(vn3<0)
-      zuni = 1.0-zuni;
-    return zuni;
+    if(fabs(vz)<boil::atto)
+      return boil::unreal;
+    else
+      return (alpha-vx*xpos-vy*ypos)/vz;
   }
-#else
-  if(m==Comp::i()) {
-    real xuni = (alpha-vn2*ypos-vn3*zpos)/(vm1+boil::pico);
-    if(vn1<0) 
-      xuni = xuni-1.0;
-    return xuni;
-  } else if(m==Comp::j()) {
-    real yuni = (alpha-vn1*xpos-vn3*zpos)/(vm2+boil::pico);
-    if(vn2<0)
-      yuni = yuni-1.0;
-    return yuni;
-  } else {
-    real zuni = (alpha-vn1*xpos-vn2*ypos)/(vm3+boil::pico);
-    if(vn3<0)
-      zuni = zuni-1.0;
-    return zuni;
-  }
-#endif
 
   return boil::unreal;
 }
-

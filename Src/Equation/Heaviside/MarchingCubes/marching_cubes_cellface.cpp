@@ -62,8 +62,8 @@ Heaviside::VAL2D MarchingCubes::cellface_covered(const Sign sig, const Comp & mc
       face.p[m].y = (*clr).zn(kk);
 #endif
 
-      if(fabs(face.val[m]-clrsurf) < boil::pico) {
-        face.val[m]=clrsurf+boil::pico;
+      if(fabs(face.val[m]-clrsurf) < boil::nano) {
+        face.val[m]=clrsurf+boil::nano;
       }
      
       if(face.val[m] > clrsurf)
@@ -114,8 +114,8 @@ Heaviside::VAL2D MarchingCubes::cellface_covered(const Sign sig, const Comp & mc
       face.p[m].y = (*clr).zn(kk);
 #endif
 
-      if(fabs(face.val[m]-clrsurf) < boil::pico) {
-        face.val[m]=clrsurf+boil::pico; 
+      if(fabs(face.val[m]-clrsurf) < boil::nano) {
+        face.val[m]=clrsurf+boil::nano; 
       }
 
       if(face.val[m] > clrsurf)
@@ -167,8 +167,8 @@ Heaviside::VAL2D MarchingCubes::cellface_covered(const Sign sig, const Comp & mc
       face.p[m].y = (*clr).yn(jj);
 #endif
 
-      if(fabs(face.val[m]-clrsurf) < boil::pico) {
-        face.val[m]=clrsurf+boil::pico; 
+      if(fabs(face.val[m]-clrsurf) < boil::nano) {
+        face.val[m]=clrsurf+boil::nano; 
       }
 
       if(face.val[m] > clrsurf)

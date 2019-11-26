@@ -2,7 +2,6 @@
 #define MARCHING_SQUARES_H
 
 #include "../heaviside.h"
-#include "../../Topology/topology.h"
 
 ////////////////////////
 //                    //
@@ -22,7 +21,7 @@ class MarchingSquares : public Heaviside {
     /* ad = length density in 2D terms */
     virtual real ad(const int i, const int j, const int k);
 
-    void topology(Topology & topo);
+    virtual void topology(Topology & topo, const bool use_interp);
 
   protected:
     int construct_grid(const int i, const int j, const int k,
@@ -31,8 +30,8 @@ class MarchingSquares : public Heaviside {
     real ad(const int i, const int j, const int k,
             std::vector<LINE> & lines);
 
-    real line_density(const std::vector<LINE> & lines,
-                      const real & surf);
+    virtual real line_density(const std::vector<LINE> & lines,
+                              const real & surf, const real & com);
     int extract_line_parameters(const std::vector<LINE> & lines,
                                 real & nx, real & ny, real & nalpha);
 

@@ -40,7 +40,7 @@ real MarchingSquares::ad(const int i, const int j, const int k,
     standing_square(grid,clrsurf,surf,lines);
 
     /* allow for virtual implementation */
-    return line_density(lines,surf);
+    return line_density(lines,surf,clr->xc(i));
   }
 
   return 0.0;

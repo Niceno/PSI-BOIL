@@ -17,6 +17,7 @@ void VOF::curvature() {
        exit(0);
     }
     curv_smooth();
+  } else if(bulk_curv_method==CurvMethod::none()) {
   } else {
     boil::oout<<"VOF::curvature: Curvature calculation method not set properly!"
               <<" Exiting."<<boil::endl;
