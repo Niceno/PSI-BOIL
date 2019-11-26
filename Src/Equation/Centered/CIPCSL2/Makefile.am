@@ -33,7 +33,6 @@ libCipcsl2_a_SOURCES = cipcsl2.h                        \
                        cipcsl2_distfunc.cpp             \
                        cipcsl2_ext_sca.cpp              \
                        cipcsl2_front_minmax.cpp         \
-                       cipcsl2_fs_bnd_nosubgrid.cpp     \
                        cipcsl2_funclxyz.cpp             \
                        cipcsl2_gradphi.cpp              \
                        cipcsl2_gradphic.cpp             \

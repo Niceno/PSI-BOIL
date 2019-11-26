@@ -25,10 +25,7 @@ void VOF::ancillary(Scalar & scp) {
     if(!use_interp) {
       cal_fs3(scp);
     } else {
-      heavi->cal_fs_interp(scp,fs);
-      //cal_fs_interp(scp);
-      if(!use_subgrid) 
-        fs_bnd_nosubgrid(scp);
+      heavi->cal_fs_interp(scp,fs,tol_wall,use_subgrid);
     }
 
 
@@ -36,7 +33,7 @@ void VOF::ancillary(Scalar & scp) {
     heavi->calculate_adens();
 
   } else if(topo_method==TopoMethod::Heaviside()) {
-    heavi->topology(topo,use_interp);
+    heavi->topology(topo,tol_wall,use_interp,use_subgrid);
   } else {
     boil::oout<<"VOF::ancillary: Topology calculation method not set properly!"
               <<" Exiting."<<boil::endl;

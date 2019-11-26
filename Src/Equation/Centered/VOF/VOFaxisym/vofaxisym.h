@@ -38,7 +38,7 @@ class VOFaxisym : public VOF {
 
        set_normal_vector_method_all(NormMethod::ElviraXZ());
        set_wall_curv_method(CurvMethod::HFmixedXZ(),Sign::pos());
-       set_topo_method(TopoMethod::Heaviside());
+       set_topo_method(TopoMethod::Hybrid());
 
        reconstruction_tolerance = 1e-4;
        reconstruction_maxiter = 5;

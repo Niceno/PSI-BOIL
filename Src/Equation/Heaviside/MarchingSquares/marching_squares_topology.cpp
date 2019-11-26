@@ -1,7 +1,8 @@
 #include "marching_squares.h"
 
 /******************************************************************************/
-void MarchingSquares::topology(Topology & topo, const bool use_interp) {
+void MarchingSquares::topology(Topology & topo, const real tol_wall,
+                               const bool use_interp, const bool use_subgrid) {
 /***************************************************************************//**
 *  \brief build the interface topology (except for iflag)
 *******************************************************************************/
@@ -81,10 +82,6 @@ void MarchingSquares::topology(Topology & topo, const bool use_interp) {
                             (*nnx)[i][j][k],(*nny)[i][j][k],
                             stmp[i][j][k]);
 #endif
-
-
-    //if(i==boil::BW+1&&k==boil::BW+1)
-    //  boil::oout<<"res | "<<(*topo.adens)[i][j][k]<<" "<<(*nnx)[i][j][k]<<" "<<(*nny)[i][j][k]<<" "<<stmp[i][j][k]<<boil::endl;
   }
 
   nnx->exchange_all();
@@ -94,9 +91,9 @@ void MarchingSquares::topology(Topology & topo, const bool use_interp) {
 
   /* step two: calculate free surface position */
   if(!use_interp) {
-    cal_fs_geom(*clr,*topo.nx,*topo.ny,*topo.nz,stmp,*topo.fs);
+    cal_fs_geom(*clr,*topo.nx,*topo.ny,*topo.nz,stmp,*topo.fs,tol_wall,use_subgrid);
   } else {
-    cal_fs_interp(*clr,*topo.fs);
+    cal_fs_interp(*clr,*topo.fs,tol_wall,use_subgrid);
   }
 
   return;

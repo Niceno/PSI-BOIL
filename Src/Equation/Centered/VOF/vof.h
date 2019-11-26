@@ -87,8 +87,6 @@ class VOF : public Centered {
     void curv_smooth();
     void extract_alpha(const Scalar & scp);
     void extract_alpha_near_bnd(const Scalar & scp);
-    void fs_bnd(const Scalar & scp);
-    void fs_bnd_nosubgrid(const Scalar & scp);
     void standardized_norm_vect(const Scalar & mx,
                                 const Scalar & my,
                                 const Scalar & mz,

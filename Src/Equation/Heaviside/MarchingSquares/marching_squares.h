@@ -21,7 +21,8 @@ class MarchingSquares : public Heaviside {
     /* ad = length density in 2D terms */
     virtual real ad(const int i, const int j, const int k);
 
-    virtual void topology(Topology & topo, const bool use_interp);
+    virtual void topology(Topology & topo, const real tol_wall, 
+                          const bool use_interp, const bool use_subgrid);
 
   protected:
     int construct_grid(const int i, const int j, const int k,

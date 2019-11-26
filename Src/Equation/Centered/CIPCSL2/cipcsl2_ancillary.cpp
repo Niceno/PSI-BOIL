@@ -11,9 +11,9 @@ void CIPCSL2::ancillary() {
   /* wall values extrapolation */
   update_at_walls(phi);
 
-  /*  calculate free surface position */
-  heavi->cal_fs_interp(phi,fs);
-  fs_bnd_nosubgrid(phi);
+  /* calculate free surface position,
+     no subgrid interfaces near walls! */
+  heavi->cal_fs_interp(phi,fs,0.0,false);
 
   /* normal vector */
   distfunc(phi,24); 

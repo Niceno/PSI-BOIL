@@ -4,7 +4,8 @@
 void Heaviside::cal_fs_geom(const Scalar & scp, 
                             const Scalar & nx, const Scalar & ny,
                             const Scalar & nz, const Scalar & nalpha,
-                            Vector & fs) {
+                            Vector & fs, 
+                            const real tol_wall, const bool use_subgrid) {
 /***************************************************************************//**
  \brief Calculate free-surface position between cell centers
     if there is no interface in the cell, unreal=yotta (=1e+24) is stored.
@@ -212,6 +213,11 @@ void Heaviside::cal_fs_geom(const Scalar & scp,
     fs[m][i][j][k] = scp.zn(k);
   } 
 
+  /* correct at boundaries */
+  if(use_subgrid)
+    fs_bnd_subgrid(scp,fs,tol_wall);
+  else
+    fs_bnd_nosubgrid(scp,fs,tol_wall);
   //fs.exchange_all();
   //boil::plot->plot(fs,scp, "fs-clr", 0);
  

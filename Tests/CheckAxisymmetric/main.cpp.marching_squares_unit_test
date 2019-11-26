@@ -1,0 +1,165 @@
+#include "Include/psi-boil.h"
+#include "test_reconstruction.cpp"
+#include <fstream>
+
+void fill(Scalar & c, const std::array<real,9> & vals) {
+  /* to respect visual ordering */
+  c[boil::BW  ][boil::BW][boil::BW+2] = vals[0];
+  c[boil::BW+1][boil::BW][boil::BW+2] = vals[1];
+  c[boil::BW+2][boil::BW][boil::BW+2] = vals[2];
+ 
+  c[boil::BW  ][boil::BW][boil::BW+1] = vals[3];
+  c[boil::BW+1][boil::BW][boil::BW+1] = vals[4];
+  c[boil::BW+2][boil::BW][boil::BW+1] = vals[5];
+
+  c[boil::BW  ][boil::BW][boil::BW  ] = vals[6];
+  c[boil::BW+1][boil::BW][boil::BW  ] = vals[7];
+  c[boil::BW+2][boil::BW][boil::BW  ] = vals[8];
+
+  return;
+}
+
+/******************************************************************************/
+int main(int argc, char * argv[]) {
+
+  boil::timer.start();
+
+  /*--------------------------------+
+  |  choose the output file format  |
+  +--------------------------------*/
+  boil::plot = new PlotTEC();
+
+  /*----------+
+  |  grid(s)  |
+  +----------*/
+  real DX = 1.0;
+  Grid1D gx( Range<real>(0.,3.*DX), 3, Periodic::no() );
+  Grid1D gy(DX);
+  /*---------+
+  |  domain  |
+  +---------*/
+  Domain d(gx, gy, gx);
+
+  /*------------------+
+  |  define unknowns  |
+  +------------------*/
+  Scalar c(d), g(d), kappa(d);
+  Scalar h(d);
+  Scalar adens(d);
+
+  /*-----------------------------+ 
+  |  insert boundary conditions  |
+  +-----------------------------*/
+  c.bc().add( BndCnd( Dir::imin(), BndType::wall() ) );
+  c.bc().add( BndCnd( Dir::imax(), BndType::wall() ) );
+  c.bc().add( BndCnd( Dir::kmin(), BndType::wall() ) );
+  c.bc().add( BndCnd( Dir::kmax(), BndType::wall() ) );
+  c.bc().add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
+  c.bc().add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
+
+  h = c.shape();
+  g = c.shape();
+  kappa = c.shape();
+  adens = c.shape();
+  Heaviside * heavi = new MarchingSquares(Comp::j(),&c,&h,&adens);
+  //MarchingSquares heavi(Comp::j(),&c,&h,&adens);
+
+  std::array<real,9> vals;
+  std::fstream f;
+  f.open("input.txt");
+
+  Scalar nx(d),ny(d),nz(d);
+  ScalarInt iflag(d);
+  Vector fs(d), uvw(d);
+  Krylov * solver = new CG(d, Prec::ic2());
+  Times time;
+  VOF conc(c, g, kappa, uvw, time, solver);
+#if 0
+  real x;
+  while(f>>x&&i<9) {
+    vals[i] = x;
+    i++;
+  }
+  fill(c,vals);
+#else
+  real nnx, nny, nnz, nalp;
+  f >> nnx;
+  f >> nny;
+  f >> nnz;
+  f >> nalp;
+  /* setup triangle */
+  real nsum = sqrt(nnx*nnx+nny*nny+nnz*nnz);
+  nnx /= nsum;
+  nny /= nsum;
+  nnz /= nsum;
+
+  for_vijk(c,i,j,k) {
+    real xpos = c.xn(i);
+    real ypos = c.yn(j);
+    real zpos = c.zn(k);
+    conc.nx[i][j][k] = nnx;
+    conc.ny[i][j][k] = nny;
+    conc.nz[i][j][k] = nnz;
+    conc.nalpha[i][j][k] = (nalp-fabs(nnx)*xpos-fabs(nny)*ypos-fabs(nnz)*zpos);
+    conc.nalpha[i][j][k] /= c.dxc(i);
+  }
+  conc.forward(c);
+  boil::oout<<c.xn(boil::BW)<<" "<<c.yn(boil::BW)<<" "<<c.zn(boil::BW)<<boil::endl;
+  boil::oout<<conc.nalpha[boil::BW+1][boil::BW][boil::BW+1]<<" "
+            <<conc.nx[boil::BW+1][boil::BW][boil::BW+1]<<" "
+            <<conc.ny[boil::BW+1][boil::BW][boil::BW+1]<<" "
+            <<conc.nz[boil::BW+1][boil::BW][boil::BW+1]<<" "
+            <<c[boil::BW+1][boil::BW][boil::BW+1]<<boil::endl;
+
+  boil::oout<<"--------------\n"
+            <<c[boil::BW  ][boil::BW][boil::BW+2]<<" "
+            <<c[boil::BW+1][boil::BW][boil::BW+2]<<" "
+            <<c[boil::BW+2][boil::BW][boil::BW+2]<<"\n"
+
+            <<c[boil::BW  ][boil::BW][boil::BW+1]<<" "
+            <<c[boil::BW+1][boil::BW][boil::BW+1]<<" "
+            <<c[boil::BW+2][boil::BW][boil::BW+1]<<"\n"
+
+            <<c[boil::BW  ][boil::BW][boil::BW  ]<<" "
+            <<c[boil::BW+1][boil::BW][boil::BW  ]<<" "
+            <<c[boil::BW+2][boil::BW][boil::BW  ]<<"\n"
+            <<"--------------\n";
+#endif
+
+  f.close();
+
+  c.bnd_update();
+  c.exchange_all();
+
+  nx = c.shape();
+  ny = c.shape();
+  nz = c.shape();
+  iflag = c.shape();
+  Topology topo(&nx,&ny,&nz,&adens,&fs,&iflag);
+
+  conc.ancillary();
+  heavi->topology(topo);
+
+  boil::oout<<(*conc.topo.fs)[Comp::u()][1+boil::BW][boil::BW][1+boil::BW]<<" "
+             <<fs[Comp::u()][1+boil::BW][boil::BW][1+boil::BW]<<" | "
+             <<(*conc.topo.fs)[Comp::v()][1+boil::BW][boil::BW][1+boil::BW]<<" "
+             <<fs[Comp::v()][1+boil::BW][boil::BW][1+boil::BW]<<" | "
+             <<(*conc.topo.fs)[Comp::w()][1+boil::BW][boil::BW][1+boil::BW]<<" "
+             <<fs[Comp::w()][1+boil::BW][boil::BW][1+boil::BW]<<" | "
+             <<boil::endl;
+  boil::oout<<(*conc.topo.fs)[Comp::u()][2+boil::BW][boil::BW][1+boil::BW]<<" "
+             <<fs[Comp::u()][2+boil::BW][boil::BW][1+boil::BW]<<" | "
+             <<(*conc.topo.fs)[Comp::v()][1+boil::BW][1+boil::BW][1+boil::BW]<<" "
+             <<fs[Comp::v()][1+boil::BW][1+boil::BW][1+boil::BW]<<" | "
+             <<(*conc.topo.fs)[Comp::w()][1+boil::BW][boil::BW][2+boil::BW]<<" "
+             <<fs[Comp::w()][1+boil::BW][boil::BW][2+boil::BW]<<" | "
+             <<boil::endl;
+
+  boil::plot->plot(conc.color(),h,adens,heavi->nodalvals, "c-h-adens-nodal", 0);
+
+  boil::oout << "finished" << boil::endl;
+
+  boil::timer.stop();
+  boil::timer.report();
+
+}	

@@ -214,9 +214,9 @@ void VOF::cal_fs3(const Scalar & scp) {
 
   /* correct at boundaries */
   if(use_subgrid)
-    fs_bnd(scp);
+    heavi->fs_bnd_subgrid(scp,fs,tol_wall);
   else
-    fs_bnd_nosubgrid(scp);
+    heavi->fs_bnd_nosubgrid(scp,fs,tol_wall);
   //fs.exchange_all();
 
   //boil::plot->plot(fs,scp, "fs-clr", 0);

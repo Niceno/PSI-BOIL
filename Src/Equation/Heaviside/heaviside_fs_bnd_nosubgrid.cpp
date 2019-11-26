@@ -1,7 +1,8 @@
-#include "cipcsl2.h"
+#include "heaviside.h"
 
 /******************************************************************************/
-void CIPCSL2::fs_bnd_nosubgrid(const Scalar & scp) {
+void Heaviside::fs_bnd_nosubgrid(const Scalar & scp, Vector & fs,
+                                 const real & tol_wall) {
 /***************************************************************************//**
 *  \brief Corrects fs at boundaries. No subgrid interfaces are considered.
 *         IMPORTANT: does not work when immersed boundaries do not correspond
@@ -9,11 +10,7 @@ void CIPCSL2::fs_bnd_nosubgrid(const Scalar & scp) {
 ******************************************************************************/
 
   /* tolerance is necessary because of errors */
-  /* e.g. 1.0 approx 0.999 */
   real tolf = 0.0e-2;
-  /* tol_wall is defined in header */
-  //real tol_wall = 0.5e-2; 
-  /* consistent tol_wall with update_at_walls: ie for clr */
 
   for( int b=0; b<scp.bc().count(); b++ ) {
 
@@ -26,35 +23,6 @@ void CIPCSL2::fs_bnd_nosubgrid(const Scalar & scp) {
       if(d != Dir::undefined()) {
         Comp mcomp;
         int of(0), ofx(0), ofy(0), ofz(0);
-#if 0 /* doesn't work without constexpr */
-        switch(d) {
-          case Dir::imin() : mcomp = Comp::i();
-                             of  = +1;
-                             ofx = +1;
-                             break;  
-          case Dir::imax() : mcomp = Comp::i();
-                             of  = 0;
-                             ofx = -1;
-                             break;  
-          case Dir::jmin() : mcomp = Comp::j();
-                             of  = +1;
-                             ofy = +1;
-                             break;  
-          case Dir::jmax() : mcomp = Comp::j();
-                             of  = 0;
-                             ofy = -1;
-                             break;  
-          case Dir::kmin() : mcomp = Comp::k();
-                             of  = +1;
-                             ofz = +1;
-                             break;  
-          case Dir::kmax() : mcomp = Comp::k();
-                             of  = 0;
-                             ofz = -1;
-                             break;  
-          default : continue;
-        }
-#else
         if (d == Dir::imin()) {
           mcomp = Comp::i();
           of  = +1;
@@ -82,10 +50,9 @@ void CIPCSL2::fs_bnd_nosubgrid(const Scalar & scp) {
         } else {
           continue;
         }
-#endif
        
         for_vijk( scp.bc().at(b), i,j,k ) { 
-          /* at first, the fs value is reset */
+          /* the fs value is reset */
           if(mcomp==Comp::i()) {
             fs[mcomp][i+of][j][k] = boil::unreal;
           } else if(mcomp==Comp::j()) {
@@ -166,8 +133,6 @@ void CIPCSL2::fs_bnd_nosubgrid(const Scalar & scp) {
     if (dom->ibody().off(i,j,k-1)) {
       mcomp = Comp::k();
       fs[mcomp][i][j][k  ] = boil::unreal;
-      
-      //boil::oout<<"VOF-fs_bnd "<<i<<" "<<j<<" "<<k<<" | "<<scp.zn(k)<<" "<<fsval<<" "<<scp.dzc(k)<<" "<<fs[mcomp][i][j][k  ]<<boil::endl;
     }
 
     /* top */

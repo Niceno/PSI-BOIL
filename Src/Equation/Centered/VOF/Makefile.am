@@ -21,8 +21,6 @@ libVof_a_SOURCES =      vof.h                           \
                         vof_flood.cpp                   \
                         vof_forward.cpp                 \
                         vof_front_minmax.cpp            \
-                        vof_fs_bnd.cpp                  \
-                        vof_fs_bnd_nosubgrid.cpp        \
                         vof_fs3.cpp                     \
                         vof_gradphi.cpp                 \
                         vof_gradphic.cpp                \
