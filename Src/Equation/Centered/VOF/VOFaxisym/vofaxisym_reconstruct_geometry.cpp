@@ -38,13 +38,13 @@ void VOFaxisym::reconstruct_geometry(Scalar & scp) {
     //forward_cartesian(axistmp);
     forward(axistmp);
     /* color to vf contains calculations of normal vector and update at walls */
-    color_to_vf(axistmp,axistmp2,true,true);
+    color_to_vf(axistmp,stmp2,true,true);
     /* calculate Linf error norm of reconstruction in phi-space */
   #if 0
     int imax,jmax,kmax;
     bool elvibool;
   #endif
-    linferr = linf_scalar_error(axistmp2,scp);
+    linferr = linf_scalar_error(stmp2,scp);
                                 //,imax,jmax,kmax,elvibool);
 
     iter++;
@@ -52,7 +52,7 @@ void VOFaxisym::reconstruct_geometry(Scalar & scp) {
     boil::oout<<"VOFaxisym::reconstruct_geometry: "<<time->current_time()
               <<" "<<iter<<" "<<linferr
               <<" | "<<" "<<imax<<" "<<kmax<<" "
-              <<" | "<<axistmp[imax][jmax][kmax]<<" "<<axistmp2[imax][jmax][kmax]<<" "<<scp[imax][jmax][kmax]<<" "<<nalpha[imax][jmax][kmax]/(fabs(nx[imax][jmax][kmax])+fabs(nz[imax][jmax][kmax])+boil::atto)<<" "<<nx[imax][jmax][kmax]<<" "<<nz[imax][jmax][kmax]<<" "<<elvibool
+              <<" | "<<axistmp[imax][jmax][kmax]<<" "<<stmp2[imax][jmax][kmax]<<" "<<scp[imax][jmax][kmax]<<" "<<nalpha[imax][jmax][kmax]/(fabs(nx[imax][jmax][kmax])+fabs(nz[imax][jmax][kmax])+boil::atto)<<" "<<nx[imax][jmax][kmax]<<" "<<nz[imax][jmax][kmax]<<" "<<elvibool
               <<boil::endl;
     boil::plot->plot(scp,axistmp,nx,nz,nalpha,"phi-clr-nx-nz-nalp", time->current_step());
     if(time->current_step()==1)exit(0);

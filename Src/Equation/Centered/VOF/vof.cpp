@@ -23,6 +23,7 @@ VOF::VOF(const Scalar & PHI,
   mz( *PHI.domain() ),
   nalpha( *PHI.domain() ),
   stmp( *PHI.domain() ),
+  stmp2(*PHI.domain() ),
   fs( *U.domain() ),
   iflag(*PHI.domain() ),
   tempflag(*PHI.domain() ),
@@ -45,17 +46,19 @@ VOF::VOF(const Scalar & PHI,
   nz     = phi.shape();
   mx     = phi.shape();
   my     = phi.shape();
-  mz    = phi.shape();
+  mz     = phi.shape();
   nalpha = phi.shape();
   stmp   = phi.shape();
+  stmp2  = phi.shape();
   iflag  = phi.shape();
-  tempflag  = phi.shape();
-  tempflag2  = phi.shape();
   adens  = phi.shape();
+  tempflag  = phi.shape();
+  tempflag2 = phi.shape();
 
   for( int b=0; b<phi.bc().count(); b++ ) {
     if(    phi.bc().type(b) == BndType::dirichlet()
         || phi.bc().type(b) == BndType::inlet()
+        || phi.bc().type(b) == BndType::outlet()
         || phi.bc().type(b) == BndType::insert()
         || phi.bc().type(b) == BndType::convective()
        ) {
@@ -67,11 +70,19 @@ VOF::VOF(const Scalar & PHI,
        mx.bc().type(b) = BndType::neumann();
        my.bc().type(b) = BndType::neumann();
        mx.bc().type(b) = BndType::neumann();
+       iflag.bc().type(b) = BndType::neumann();
+       tempflag.bc().type(b) = BndType::neumann();
+       tempflag2.bc().type(b) = BndType::neumann();
+       stmp.bc().type(b) = BndType::neumann();
+       stmp2.bc().type(b) = BndType::neumann();
 
        boil::oout << "Adjusting b.c.s for geometrical properties at " << b
                   << boil::endl;
     }
   }
+
+  /* used in ev_solve */
+  fold = 0.;
 
   for_m(m)
     fs(m) = (*u)(m).shape();

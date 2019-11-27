@@ -4,6 +4,8 @@ using namespace std;
 //#define DEBUG
 //#define USE_FDM_SOLID
 //#define USE_FDM_FLUID
+/* using FDM worsens the performance. Also, for FDM, the correct BndGrid for Ne
+   umann boundary condition is extrapolate, rather than wall */
 
 /***************************************************************************//**
 *  \brief Creates diffusive part of the system matrix \f$ [A] \f$.

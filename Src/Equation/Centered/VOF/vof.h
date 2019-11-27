@@ -3,11 +3,12 @@
 
 #include <cmath>
 #include "../centered.h"
-#include "../../../Parallel/communicator.h"
-#include "../../../Global/global_realistic.h"
 #include "../../Heaviside/MarchingSquares/MSaxisym/ms_axisym.h"
 #include "../../Heaviside/MarchingCubes/marching_cubes.h"
 #include "../../Topology/topology.h"
+#include "../../../Global/global_realistic.h"
+#include "../../../Parallel/communicator.h"
+#include "../../../Ravioli/resrat.h"
 
 #define IB
 
@@ -48,6 +49,11 @@ class VOF : public Centered {
 
     void init(){ ancillary(); };
 
+    void extrapolate_velocities(const Scalar & scp, const Scalar & fext,
+                                const Matter * fluid, const Vector & umixed, 
+                                Vector & uliq, Vector & ugas,
+                                const ResRat & resrat);
+
     virtual Scalar & color() {return phi;}
 
 #include "vof_inline.h"
@@ -63,6 +69,17 @@ class VOF : public Centered {
     virtual void advance_x(Scalar & sca);
     virtual void advance_y(Scalar & sca);
     virtual void advance_z(Scalar & sca);
+
+    void ev_discretize(const Matter * fluid, const ScalarInt & pflag,
+                       Matrix & A);
+    void ev_flagging(const Scalar & scp, const ScalarInt & iflag,
+                     ScalarInt & otpflag);
+    void ev_solve(const ScalarInt & pflag, const Matrix & A,
+                  const Scalar & b, Scalar & x, Scalar & xold,
+                  const bool init_guess, const int niter,
+                  const ResRat & resrat);
+    void ev_project(const ScalarInt & pflag, const Matter * fluid,
+                    const Scalar & frc, Vector & u);
 
     void interfacial_flagging(Scalar & scp);
     bool Interface(const Sign dir, const Comp m,
@@ -230,7 +247,7 @@ class VOF : public Centered {
     real frontPosition(const int i, const int j, const int k, const Comp m);
 
     Scalar kappa;        /* curvature */
-    Scalar stmp;
+    Scalar stmp, stmp2;
     ScalarInt iflag,tempflag,tempflag2;
 
     Vector fs;

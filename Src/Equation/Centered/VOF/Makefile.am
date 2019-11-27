@@ -17,7 +17,12 @@ libVof_a_SOURCES =      vof.h                           \
                         vof_curvature.cpp               \
                         vof_curv_HF.cpp                 \
                         vof_curv_smooth.cpp             \
+                        vof_ev_discretize.cpp           \
+                        vof_ev_flagging.cpp             \
+                        vof_ev_project.cpp              \
+                        vof_ev_solve.cpp                \
                         vof_extract_alpha.cpp           \
+                        vof_extrapolate_velocities.cpp  \
                         vof_flood.cpp                   \
                         vof_forward.cpp                 \
                         vof_front_minmax.cpp            \

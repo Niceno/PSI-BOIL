@@ -212,7 +212,7 @@ main(int argc, char ** argv) {
 
   AC multigrid2( &pr2 );
   multigrid2.min_cycles(6); 
-  multigrid2.stop_if_diverging(true);
+  multigrid2.stop_if_diverging(false);
 
 #ifdef USE_VOF
   VOF conc  (c, g, kappa, uvw, time, solver);

@@ -24,7 +24,6 @@ class VOFaxisym : public VOF {
     VOF(phi,f,kappa,u,t,S,NULL),
     clr( *phi.domain() ),
     axistmp ( *phi.domain() ),
-    axistmp2( *phi.domain() ),
     Ktmp( *phi.domain() )
     {
        if(phi.domain()->is_cartesian()) {
@@ -33,7 +32,6 @@ class VOFaxisym : public VOF {
        }
        clr = phi.shape();
        axistmp = phi.shape();
-       axistmp2= phi.shape();
        Ktmp = phi.shape();
 
        set_normal_vector_method_all(NormMethod::ElviraXZ());
@@ -181,7 +179,7 @@ class VOFaxisym : public VOF {
                                  const real mmz,const real eta0);
 
     Scalar clr;
-    Scalar axistmp, axistmp2, Ktmp;
+    Scalar axistmp, Ktmp;
 
     real reconstruction_tolerance;
     int reconstruction_maxiter;
