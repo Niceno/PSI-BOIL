@@ -83,6 +83,7 @@ int main(int argc, char ** argv) {
   Scalar p  (d), f  (d); // pressure
   Scalar tpr(d), q  (d); // temperature
   Scalar mdot(d), mflx(d);        // phase-change
+  Vector uvw_liq(d), uvw_gas(d);
 
   /*-----------------------------+
   |  insert boundary conditions  |
@@ -101,6 +102,8 @@ int main(int argc, char ** argv) {
 #endif
 
     uvw_old(m)=uvw(m).shape();
+    uvw_liq(m)=uvw(m).shape();
+    uvw_gas(m)=uvw(m).shape();
   }
 
   p.bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
@@ -188,9 +191,9 @@ int main(int argc, char ** argv) {
   |  define solvers  |
   +-----------------*/
 #ifdef AXISYM
-  VOFaxisym conc(c, g, kappa, uvw, time, solver);
+  VOFaxisym conc(c, g, kappa, uvw_liq, time, solver);
 #else
-  VOF conc(c, g, kappa, uvw, time, solver);
+  VOF conc(c, g, kappa, uvw_liq, time, solver);
 #endif
   conc.set_curv_method(CurvMethod::HF());  // height function
   conc.set_topo_method(TopoMethod::Hybrid());
@@ -199,16 +202,16 @@ int main(int argc, char ** argv) {
 
   TIF tsat(tsat0);
 #ifdef AXISYM
-  EnthalpyFDaxisym enthFD(tpr, q, c, uvw, time, solver, &mixed,
+  EnthalpyFDaxisym enthFD(tpr, q, conc.color(), uvw, uvw_liq, uvw_gas, time, solver, &mixed,
                           conc.topo, tsat);
 #else
-  EnthalpyFD enthFD(tpr, q, c, uvw, time, solver, &mixed,
+  EnthalpyFD enthFD(tpr, q, conc.color(), uvw, uvw_liq, uvw_gas, time, solver, &mixed,
                     conc.topo, tsat);
 #endif
   enthFD.convection_set(TimeScheme::forward_euler());
   enthFD.diffusion_set(TimeScheme::backward_euler());
 
-  PhaseChangeVOF pc(mdot, mflx, tpr, q, c, g, f, uvw, conc.topo,
+  PhaseChangeVOF pc(mdot, mflx, tpr, q, conc.color(), g, f, uvw, conc.topo,
                     tsat, time, &mixed, latent);
 
   Momentum ns(uvw, xyz, time, solver, &mixed);
@@ -423,10 +426,12 @@ int main(int argc, char ** argv) {
 
       ns.cfl_max();
 
+      conc.extrapolate_velocity(conc.color(),f,&mixed,uvw,uvw_liq,ResRat(1e-8),Sign::pos());
+      conc.extrapolate_velocity(conc.color(),f,&mixed,uvw,uvw_gas,ResRat(1e-8),Sign::neg());
       conc.advance(cold);
       conc.totalvol();
 
-      pc.modify_vel(uvw,c,cold);
+      //pc.modify_vel(uvw,c,cold);
     }
 
     conc.front_minmax();

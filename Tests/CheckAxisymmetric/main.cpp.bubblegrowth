@@ -425,7 +425,7 @@ int main(int argc, char ** argv) {
       conc.advance(cold);
       conc.totalvol();
 
-      pc.modify_vel(uvw,c,cold);
+      //pc.modify_vel(uvw,c,cold);
     }
 
     conc.front_minmax();
