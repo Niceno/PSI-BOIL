@@ -24,6 +24,8 @@ VOF::VOF(const Scalar & PHI,
   nalpha( *PHI.domain() ),
   stmp( *PHI.domain() ),
   stmp2(*PHI.domain() ),
+  pold_neg(*PHI.domain() ),
+  pold_pos(*PHI.domain() ),
   fs( *U.domain() ),
   iflag(*PHI.domain() ),
   tempflag(*PHI.domain() ),
@@ -52,6 +54,8 @@ VOF::VOF(const Scalar & PHI,
   stmp2  = phi.shape();
   iflag  = phi.shape();
   adens  = phi.shape();
+  pold_neg  = phi.shape();
+  pold_pos  = phi.shape();
   tempflag  = phi.shape();
   tempflag2 = phi.shape();
 
@@ -75,6 +79,8 @@ VOF::VOF(const Scalar & PHI,
        tempflag2.bc().type(b) = BndType::neumann();
        stmp.bc().type(b) = BndType::neumann();
        stmp2.bc().type(b) = BndType::neumann();
+       pold_neg.bc().type(b) = BndType::neumann();
+       pold_pos.bc().type(b) = BndType::neumann();
 
        boil::oout << "Adjusting b.c.s for geometrical properties at " << b
                   << boil::endl;
@@ -82,7 +88,8 @@ VOF::VOF(const Scalar & PHI,
   }
 
   /* used in ev_solve */
-  fold = 0.;
+  pold_neg = 0.;
+  pold_pos = 0.;
 
   for_m(m)
     fs(m) = (*u)(m).shape();

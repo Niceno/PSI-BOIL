@@ -11,7 +11,7 @@
 *  iflag = +1 : color function >= clrsurf & at interface 
 *  iflag = -1000 solid cell
 *******************************************************************************/
-void VOF::interfacial_flagging(Scalar & scp) {
+void VOF::interfacial_flagging(const Scalar & scp) {
 
   for_aijk(i,j,k) {
     iflag[i][j][k]=-3;

@@ -91,6 +91,7 @@ int main(int argc, char * argv[]) {
   |  choose the output file format  |
   +--------------------------------*/
   boil::plot = new PlotTEC();
+  //boil::plot = new PlotTEC(AsNodes::no(),Buffers::yes());
 
   /*----------+
   |  grid(s)  |
@@ -251,7 +252,7 @@ int main(int argc, char * argv[]) {
 #endif
   conc.totalvol();
 
-  conc.set_curv_method(0);  // height function
+  conc.set_curv_method(CurvMethod::HF());  // height function
   conc.set_cangle(cangle);
   conc.set_normal_vector_method_all(NormMethod::ElviraXZ());
   if(!inverted) {
@@ -259,14 +260,14 @@ int main(int argc, char * argv[]) {
   }
   if(detachment_model) {
     if(!inverted)
-      conc.set_wall_curv_method(WallCurvMethod::HFmixedXZ(),Sign::pos(),cangle);
+      conc.set_wall_curv_method(CurvMethod::HFmixedXZ(),Sign::pos(),cangle);
     else
-      conc.set_wall_curv_method(WallCurvMethod::HFmixedXZ(),Sign::neg(),cangle);
+      conc.set_wall_curv_method(CurvMethod::HFmixedXZ(),Sign::neg(),cangle);
   } else {
     if(!inverted)
-      conc.set_wall_curv_method(WallCurvMethod::HFmixedXZ(),Sign::pos());
+      conc.set_wall_curv_method(CurvMethod::HFmixedXZ(),Sign::pos());
     else
-      conc.set_wall_curv_method(WallCurvMethod::HFmixedXZ(),Sign::neg());
+      conc.set_wall_curv_method(CurvMethod::HFmixedXZ(),Sign::neg());
   }
 
   conc.ancillary();

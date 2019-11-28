@@ -2,7 +2,7 @@
 
 /******************************************************************************/
 void VOF::ev_flagging(const Scalar & scp, const ScalarInt & iflag,
-                      ScalarInt & otpflag) {
+                      ScalarInt & otpflag, const Sign & sig) {
 /***************************************************************************//**
 *  \brief Flag the interface for the Poisson problem.
 *  otpflag = -1 : color function <  clrsurf & at interface
@@ -12,15 +12,17 @@ void VOF::ev_flagging(const Scalar & scp, const ScalarInt & iflag,
 *  otpflag = -3 : color function <  clrsurf & bulk
 *  otpflag = +4 : color function >= clrsurf & bulk
 *  otpflag = -1000: solid cell
+*
+*  sig == neg -> inversion of above
 *******************************************************************************/
  
   otpflag = -1000;
 
   for_aijk(i,j,k) {
     if(  abs(iflag[i][j][k])==1 /* cells at the interface */
-       ||iflag[i][j][k]==-3) /* bulk gas cell */
-      otpflag[i][j][k] = iflag[i][j][k];
-    if(iflag[i][j][k]==3) /* bulk liquid cell */
+       ||iflag[i][j][k]==-3*sig) /* bulk gas cell */
+      otpflag[i][j][k] = iflag[i][j][k]*sig;
+    if(iflag[i][j][k]==3*sig) /* bulk liquid cell */
       otpflag[i][j][k] = 4;
   }
 
@@ -32,7 +34,8 @@ void VOF::ev_flagging(const Scalar & scp, const ScalarInt & iflag,
          ||abs(otpflag[i][j+1][k])==1
          ||abs(otpflag[i][j][k-1])==1
          ||abs(otpflag[i][j][k+1])==1)
-        otpflag[i][j][k] = 2*((scp[i][j][k]>phisurf)-(scp[i][j][k]<phisurf));
+        otpflag[i][j][k] = 2*sig
+                            *((scp[i][j][k]>phisurf)-(scp[i][j][k]<phisurf));
     }
   }
 

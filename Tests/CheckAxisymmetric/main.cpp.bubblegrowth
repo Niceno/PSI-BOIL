@@ -2,7 +2,8 @@
 
 #define SYM
 //#define FS_TEST
-//#define USE_TWO_VELS
+#define USE_LIQ_VEL_VOF
+#define USE_LIQ_VEL_EFD
 //#define CARTESIAN
 
 /******************************************************************************/
@@ -194,36 +195,40 @@ int main(int argc, char ** argv) {
   multigrid2.min_cycles(6); 
   multigrid2.stop_if_diverging(true);
 
-#ifdef CARTESIAN
-  VOF conc(c, g, kappa, uvw, time, solver);
+#ifdef USE_LIQ_VEL_VOF
+  Vector & uvwvof = uvw_liq;
 #else
-  VOFaxisym conc(c, g, kappa, uvw, time, solver);
-#endif
-  conc.set_curv_method(CurvMethod::HF());  // height function
-  conc.set_wall_curv_method(CurvMethod::none());
-#if 0
-  conc.set_topo_method(TopoMethod::Heaviside());
-  conc.set_use_interp(true);
+  Vector & uvwvof = uvw;
 #endif
 
+#ifdef CARTESIAN
+  VOF conc(c, g, kappa, uvwvof, time, solver);
+#else
+  VOFaxisym conc(c, g, kappa, uvwvof, time, solver);
+#endif
+  conc.set_curv_method(CurvMethod::HF());  // height function
+  conc.set_topo_method(TopoMethod::Hybrid());
+  conc.set_wall_curv_method(CurvMethod::none());
+  conc.set_use_interp(true);
+
   TIF tsat(tsat0);
-#ifdef USE_TWO_VELS
-  Vector & uvwenth = uvw2;
+#ifdef USE_LIQ_VEL_EFD
+  Vector & uvwenth = uvw_liq;
 #else
   Vector & uvwenth = uvw;
 #endif
 
 #ifdef CARTESIAN
-  EnthalpyFD enthFD(tpr, q, c, uvwenth, time, solver, &mixed,
+  EnthalpyFD enthFD      (tpr, q, conc.color(), uvw, uvwenth, uvw, time, solver, &mixed,
                           conc.topo, tsat);
 #else
-  EnthalpyFDaxisym enthFD(tpr, q, c, uvwenth, time, solver, &mixed,
+  EnthalpyFDaxisym enthFD(tpr, q, conc.color(), uvw, uvwenth, uvw, time, solver, &mixed,
                           conc.topo, tsat);
 #endif
   enthFD.convection_set(TimeScheme::forward_euler());
   enthFD.diffusion_set(TimeScheme::backward_euler());
 
-  PhaseChangeVOF pc(mdot, mflx, tpr, q, c, g, f, uvw, conc.topo,
+  PhaseChangeVOF pc(mdot, mflx, tpr, q, conc.color(), g, f, uvw, conc.topo,
                     tsat, time, &mixed, latent);
 
   /*-------------------+
@@ -378,19 +383,6 @@ int main(int argc, char ** argv) {
     ns.vol_phase_change(&f);
 #endif
 
-#ifdef USE_TWO_VELS
-    for_m(m)
-      for_avmijk(uvw2,m,i,j,k)
-        uvw2[m][i][j][k]=0.0;
-    ns2.vol_phase_change(&f);
-    ns2.outlet();
-    p=0.0;
-    pr2.discretize();
-    pr2.coarsen();
-    if (multigrid2.vcycle(ResRat(1e-6))) OMS(converged);
-    ns2.project(p);
-#endif
-    
     // store velocity
     for_m(m)
       uvw_old(m) = uvw(m);
@@ -428,6 +420,8 @@ int main(int argc, char ** argv) {
 
       ns.cfl_max();
 
+      conc.extrapolate_velocity(conc.color(),f,&mixed,uvw,uvw_liq,ResRat(1e-8),Sign::pos());
+      //conc.extrapolate_velocity(conc.color(),f,&mixed,uvw,uvw_gas,ResRat(1e-8),Sign::neg());
       conc.advance(cold);
       conc.totalvol();
 
@@ -435,8 +429,6 @@ int main(int argc, char ** argv) {
     }
 
     conc.front_minmax();
-    boil::oout<<"x-min-front= "<<time.current_time()<<" "<<conc.get_xminft()
-              <<" "<<conc.get_xmaxft()<<"\n";
 
     /* dt control */
     time.control_dt(ns.cfl_max(),0.10,dt);

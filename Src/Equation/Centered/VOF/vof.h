@@ -49,10 +49,10 @@ class VOF : public Centered {
 
     void init(){ ancillary(); };
 
-    void extrapolate_velocities(const Scalar & scp, const Scalar & fext,
-                                const Matter * fluid, const Vector & umixed, 
-                                Vector & uliq, Vector & ugas,
-                                const ResRat & resrat);
+    void extrapolate_velocity(const Scalar & scp, const Scalar & fext,
+                              const Matter * fluid, const Vector & umixed, 
+                              Vector & unew, const ResRat & resrat,
+                              const Sign & sig);
 
     virtual Scalar & color() {return phi;}
 
@@ -73,15 +73,18 @@ class VOF : public Centered {
     void ev_discretize(const Matter * fluid, const ScalarInt & pflag,
                        Matrix & A);
     void ev_flagging(const Scalar & scp, const ScalarInt & iflag,
-                     ScalarInt & otpflag);
+                     ScalarInt & otpflag, const Sign & sig);
     void ev_solve(const ScalarInt & pflag, const Matrix & A,
                   const Scalar & b, Scalar & x, Scalar & xold,
                   const bool init_guess, const int niter,
                   const ResRat & resrat);
     void ev_project(const ScalarInt & pflag, const Matter * fluid,
                     const Scalar & frc, Vector & u);
+    void ev_complement(const ScalarInt & pflag, const Scalar & scp,
+                       const Vector & umixed, const Vector & uliq, 
+                       Vector & ugas, const Vector * bndclr);
 
-    void interfacial_flagging(Scalar & scp);
+    void interfacial_flagging(const Scalar & scp);
     bool Interface(const Sign dir, const Comp m,
                    const int i, const int j, const int k);
     bool Interface(const int i, const int j, const int k);
@@ -248,6 +251,7 @@ class VOF : public Centered {
 
     Scalar kappa;        /* curvature */
     Scalar stmp, stmp2;
+    Scalar pold_pos, pold_neg; /* extrapolation */
     ScalarInt iflag,tempflag,tempflag2;
 
     Vector fs;

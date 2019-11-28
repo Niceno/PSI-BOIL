@@ -16,8 +16,8 @@ int main(int argc, char ** argv) {
   boil::timer.start();
 
   if(argc<3){
-    boil::oout<<"Two command line arguments required!"<<"\n";
-    boil::oout<<"./Boil wmin glevel"<<"\n";
+    boil::oout<<"Two arguments required!"<<"\n";
+    boil::oout<<"./Boil wmin gLevel"<<"\n";
     exit(0);
   }
   int wmin=atoi(argv[1]);
@@ -26,6 +26,7 @@ int main(int argc, char ** argv) {
   const int gLevel = atoi(argv[2]);
   boil::oout<<"gLevel= "<<gLevel<<"\n";
 
+  /* computed parameters */
   const real radius=2.1e-4;
 
   /* domain dimensions (given by problem) */
@@ -72,12 +73,6 @@ int main(int argc, char ** argv) {
   Domain d(gx, gx, gz);
 #endif
 
-  /*----------------+
-  |  linear solver  |
-  +----------------*/
-  //Krylov * solver = new CG(d, Prec::ic2());
-  Krylov * solver = new BiCGS(d, Prec::di());
-
   /*------------------+
   |  define unknowns  |
   +------------------*/
@@ -89,7 +84,7 @@ int main(int argc, char ** argv) {
   Scalar tpr(d), q  (d); // temperature
   Scalar mdot(d), mflx(d);        // phase-change
 
-  /*-----------------------------+ 
+  /*-----------------------------+
   |  insert boundary conditions  |
   +-----------------------------*/
   for_m(m) {
@@ -175,14 +170,19 @@ int main(int argc, char ** argv) {
   /*-------------------+
   |  time-integration  |
   +-------------------*/
-  const int  ndt = 7000*gLevel;
-  const real tint = 0.005;
-  const int  nint2= ndt/3;
   const real dxmin = d.dxyz_min();
-  boil::oout<<"main:dxmin= "<<dxmin<<" "<<boil::cart.iam()<<"\n";
-  const real dt  =100.0*pow(0.5*pow(dxmin,3.0)
-                 / (2.0*3.1415*mixed.sigma()->value()),0.5)/2.5;
+  const real dt = 40.0 * pow(0.5*pow(dxmin,3.0)
+                           /(2.0*3.1415*mixed.sigma()->value()),0.5);
+  const int  ndt = 7000*gLevel;
+  const int  nint2= ndt/3;
+  const real tint = 0.005;
   Times time(ndt, dt);
+
+  /*----------------+
+  |  linear solver  |
+  +----------------*/
+  //Krylov * solver = new CG(d, Prec::ic2());
+  Krylov * solver = new BiCGS(d, Prec::di());
 
   /*-----------------+
   |  define solvers  |
@@ -192,8 +192,10 @@ int main(int argc, char ** argv) {
 #else
   VOF conc(c, g, kappa, uvw, time, solver);
 #endif
-  conc.set_curv_method(CurvMethod::HF());
+  conc.set_curv_method(CurvMethod::HF());  // height function
+  conc.set_topo_method(TopoMethod::Hybrid());
   conc.set_wall_curv_method(CurvMethod::none());
+  conc.set_use_interp(true);
 
   TIF tsat(tsat0);
 #ifdef AXISYM
@@ -209,7 +211,7 @@ int main(int argc, char ** argv) {
   PhaseChangeVOF pc(mdot, mflx, tpr, q, c, g, f, uvw, conc.topo,
                     tsat, time, &mixed, latent);
 
-  Momentum ns( uvw, xyz, time, solver, &mixed);
+  Momentum ns(uvw, xyz, time, solver, &mixed);
   if(mSimple==1)
     ns.convection_set(TimeScheme::forward_euler());
   else
@@ -265,7 +267,6 @@ int main(int argc, char ** argv) {
     time.first_step(ts);
     time.current_time(t);
     time.set_dt(dtf);
-
   } else {
     boil::oout << "######################" << boil::endl;
     boil::oout << "#                    #" << boil::endl;
@@ -339,11 +340,10 @@ int main(int argc, char ** argv) {
     tpr.bnd_update();
     tpr.exchange_all();
     boil::plot->plot(uvw,c,tpr,press,mdot,"uvw-c-tpr-press-mdot",0);
-  }
-  input.close();
-
+  } // restart
   conc.init();
   conc.ancillary();
+  input.close();
 
   /* set iint */
   int iint = int(time.current_time()/tint) + 1;
@@ -455,9 +455,25 @@ int main(int argc, char ** argv) {
     if((time.current_step()) % (nint2)==0 ) {
       uvw  .save("uvw",   time.current_step());
       press.save("press", time.current_step());
-      c .save("c",  time.current_step());
-      tpr  .save("tpr",   time.current_step());
-    } 
+      c    .save("c"   ,  time.current_step());
+      tpr  .save("tpr" ,  time.current_step());
+      if( boil::cart.iam()==0) {
+        std::fstream output;
+        std::stringstream ss;
+        ss <<"time-"<<time.current_step()<<".txt";
+        std::string fname = ss.str();
+        int len = fname.length();
+        char * cfname = new char[len+1];
+        memcpy(cfname, fname.c_str(), len+1);
+        output << std::setprecision(16);
+        output.open(cfname, std::ios::out);
+        output << time.current_step() << "\n";
+        output << time.current_time()+time.dt() << "\n";
+        output << time.dt() << "\n";
+        output.close();
+      }
+    }
+
     if( boil::timer.current_min() > wmin-12.0
       || time.current_step()==time.total_steps()) {
       uvw  .save("uvw",   time.current_step());
@@ -484,7 +500,8 @@ int main(int argc, char ** argv) {
   }
 
   boil::oout << "finished" << boil::endl;
+
   boil::timer.stop();
   boil::timer.report();
 
-}
+}	

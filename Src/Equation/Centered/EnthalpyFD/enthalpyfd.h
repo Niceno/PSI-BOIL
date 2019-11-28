@@ -53,15 +53,31 @@ class EnthalpyFD : public Centered {
 
     /* Most general constructor */
     EnthalpyFD(const Scalar & phi, 
-                const Scalar & f,
-                const Scalar & clr,
-                const Vector & u,
-                Times & t,
-                Krylov * sm,
-                Matter * flu,
-                Topology & topo,
-                TIF & tifmodel,
-                Matter * sol = NULL);
+               const Scalar & f,
+               const Scalar & clr,
+               const Vector & umixed,
+               const Vector & uliq,
+               const Vector & ugas,
+               Times & t,
+               Krylov * sm,
+               Matter * flu,
+               Topology & topo,
+               TIF & tifmodel,
+               Matter * sol = NULL);
+
+    /* Delegating constructor */
+    EnthalpyFD(const Scalar & phi,
+               const Scalar & f,
+               const Scalar & clr,
+               const Vector & umixed,
+               Times & t,
+               Krylov * sm,
+               Matter * flu,
+               Topology & topo,
+               TIF & tifmodel,
+               Matter * sol = NULL) :
+      EnthalpyFD(phi,f,clr,umixed,umixed,umixed,t,sm,flu,topo,tifmodel,sol) {};
+
 
     ~EnthalpyFD();
 
@@ -106,8 +122,8 @@ class EnthalpyFD : public Centered {
     void convection();
 
     /* to be removed */
-    void update_ftif(const real ts0 = 1.0, const real tsm = 0.0,
-                     const bool nst = false, const Scalar * diff_eddy = NULL);
+    //void update_ftif(const real ts0 = 1.0, const real tsm = 0.0,
+    //                 const bool nst = false, const Scalar * diff_eddy = NULL);
 
   protected:
     typedef real (EnthalpyFD::*coef_gen)(const real,const real,const real);
@@ -144,12 +160,13 @@ class EnthalpyFD : public Centered {
     real rhol,rhov,cpl,cpv,lambdal,lambdav,clrsurf,epsl;
     bool store_clrold;
     Scalar clrold;
-    Scalar ftif,ftifold; /* tbd */
+    Scalar ftif,ftifold; /* tbr */
     ScalarInt iflag,iflagold;
     real turbP; /* turbulent Prandtl number */
     bool laminar;
 
-    Vector fs,fsold;
+    Vector fs, fsold;
+    const Vector * uliq, * ugas;
 
     TIF & tifmodel;  
 

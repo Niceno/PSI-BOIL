@@ -56,8 +56,6 @@ void Pressure::discretize() {
     A.t[i][j][k] = a_t / dzt(k) / rhop;
   }
 
-  Centered::create_system_bnd();
-
   /*-------------------------------+
   |  a "touch" from immersed body  |
   +-------------------------------*/
@@ -104,6 +102,12 @@ void Pressure::discretize() {
   for_ijk(i,j,k) A.c[i][j][k] = A.w[i][j][k] + A.e[i][j][k] 
                               + A.s[i][j][k] + A.n[i][j][k]
                               + A.b[i][j][k] + A.t[i][j][k];
+
+  /*------------------------+
+  |  boundaries correction  |
+  +------------------------*/
+  /* 19-11-28: moved here to allow other bcs than zero-Neumann */
+  Centered::create_system_bnd();
 
   for_ijk(i,j,k) A.ci[i][j][k] = 1.0 / A.c[i][j][k];
 
