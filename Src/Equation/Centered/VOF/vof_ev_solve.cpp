@@ -3,7 +3,7 @@
 //#define DEBUG
 
 /******************************************************************************/
-void VOF::ev_solve(const ScalarInt & pflag, const Matrix & A,
+bool VOF::ev_solve(const ScalarInt & pflag, const Matrix & A,
                    const Scalar & b, Scalar & x, Scalar & xold, 
                    const bool init_guess, const int niter,
                    const ResRat & resrat) { 
@@ -79,5 +79,5 @@ void VOF::ev_solve(const ScalarInt & pflag, const Matrix & A,
   if(!converged)
     boil::oout<<"VOF::ev_solve did not converge after "<<niter<<" steps! \n";
 
-  return;
+  return converged;
 }

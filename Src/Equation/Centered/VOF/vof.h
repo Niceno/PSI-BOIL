@@ -74,7 +74,7 @@ class VOF : public Centered {
                        Matrix & A);
     void ev_flagging(const Scalar & scp, const ScalarInt & iflag,
                      ScalarInt & otpflag, const Sign & sig);
-    void ev_solve(const ScalarInt & pflag, const Matrix & A,
+    bool ev_solve(const ScalarInt & pflag, const Matrix & A,
                   const Scalar & b, Scalar & x, Scalar & xold,
                   const bool init_guess, const int niter,
                   const ResRat & resrat);

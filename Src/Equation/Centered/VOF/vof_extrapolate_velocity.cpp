@@ -51,14 +51,15 @@ void VOF::extrapolate_velocity(const Scalar & scp, const Scalar & fext,
 
   /* step three: solve the system A*p = fext */
   const int niter = 200;
-  //ev_solve(tempflag,A,fext,stmp,stmp2,false,niter,resrat);
-  ev_solve(tempflag,A,fext,stmp,*pold,true,niter,resrat);
+  //const bool converged = ev_solve(tempflag,A,fext,stmp,stmp2,false,niter,resrat);
+  const bool converged = ev_solve(tempflag,A,fext,stmp,*pold,true,niter,resrat);
 
   /* step four: project using the mixture-to-single velocity correction */
   for_m(m)
     for_avmijk(umixed,m,i,j,k)
       unew[m][i][j][k] = umixed[m][i][j][k];
-  ev_project(tempflag,fluid,stmp,unew);
+  if(converged)
+    ev_project(tempflag,fluid,stmp,unew);
 
 #ifdef DEBUG
   boil::plot->plot(unew,scp, fext, stmp, "ucorr-c-f-p",time->current_step());
