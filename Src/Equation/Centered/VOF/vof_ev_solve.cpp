@@ -21,6 +21,7 @@ bool VOF::ev_solve(const ScalarInt & pflag, const Matrix & A,
   /* Jacobi iterations */
   bool converged(false);
   real l2err_first, linferr_first;
+  real l2err(0.0), linferr(0.0);
   for(int n(0); n<niter; ++n) {
     for_ijk(i,j,k) {
       if(abs(pflag[i][j][k])<3) {
@@ -38,8 +39,10 @@ bool VOF::ev_solve(const ScalarInt & pflag, const Matrix & A,
 
     /* measure error */
     int nele(0);
-    real l2err(0.0), linferr(0.0);
+    l2err=0.;
+    linferr=0.;
     for_ijk(i,j,k) {
+#if 0
       if(abs(pflag[i][j][k])<3) {
         nele++;
         real diff = fabs(x[i][j][k] - xold[i][j][k]);
@@ -47,6 +50,21 @@ bool VOF::ev_solve(const ScalarInt & pflag, const Matrix & A,
         if(diff>linferr)
           linferr = diff;
       }
+#else
+      if(abs(pflag[i][j][k])==1&&fabs(b[i][j][k]>boil::pico)) {
+        nele++;
+        real diff = b[i][j][k] - A.w[i][j][k]*x[i-1][j][k]
+                               - A.e[i][j][k]*x[i+1][j][k]
+                               - A.s[i][j][k]*x[i][j-1][k]
+                               - A.n[i][j][k]*x[i][j+1][k]
+                               - A.b[i][j][k]*x[i][j][k-1]
+                               - A.t[i][j][k]*x[i][j][k+1]
+                               - A.c[i][j][k]*x[i][j][k];
+        diff /= b[i][j][k];
+        if(diff>linferr)
+          linferr = diff;
+      }
+#endif
     }
     boil::cart.sum_int(&nele);
     boil::cart.sum_real(&l2err);
@@ -66,18 +84,20 @@ bool VOF::ev_solve(const ScalarInt & pflag, const Matrix & A,
     xold = x;
 
     /* converged? */
-    if(linferr/linferr_first<resrat) {
+    //if(linferr/linferr_first<resrat) {
+    if(linferr<resrat) {
       converged = true;
-#ifdef DEBUG
-      boil::oout<<"VOF::ev_solve converged after "<<n<<" steps, final rel. error: "
-                <<linferr/linferr_first<<"\n";
-#endif
+//#ifdef DEBUG
+      boil::oout<<"VOF::ev_solve converged after "<<n<<" steps, final abs./rel. error: "
+                <<linferr<<" "<<linferr/linferr_first<<"\n";
+//#endif
       break;
     }
   }
 
   if(!converged)
-    boil::oout<<"VOF::ev_solve did not converge after "<<niter<<" steps! \n";
+    boil::oout<<"VOF::ev_solve did not converge after "<<niter<<" steps, final abs./rel. error: "
+                <<linferr<<" "<<linferr/linferr_first<<" !\n";
 
   return converged;
 }

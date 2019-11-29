@@ -33,7 +33,7 @@ CIPCSL2::CIPCSL2(const Scalar & PHI,
   adens ( *PHI.domain() ),
   kappa ( &K ),
   //heavi(&phi, NULL, &adens),
-  topo(&nx,&ny,&nz,&adens,&fs,&intflag)
+  topo(&phi,&nx,&ny,&nz,&adens,&fs,&intflag)
 
 /*------------------------------------------------------+
 |  this constructor is called only at the finest level  |

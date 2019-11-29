@@ -1,16 +1,16 @@
 #include "phasechangevof.h"
 
 /******************************************************************************/
-void PhaseChangeVOF::sources_clrs() {
+void PhaseChangeVOF::sources_vfs() {
 /***************************************************************************//**
-*  \brief calculate source term for color function
+*  \brief calculate source term for volume fraction
 *******************************************************************************/
 
   for_ijk(i,j,k){
     real mdotc=phi[i][j][k];
-    clrs[i][j][k]= -(1.0/rhol)*mdotc;
+    vfs[i][j][k]= -(1.0/rhol)*mdotc;
   }
-  clrs.exchange();
+  vfs.exchange();
 
   return;
 }

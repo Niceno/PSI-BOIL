@@ -54,7 +54,6 @@ class EnthalpyFD : public Centered {
     /* Most general constructor */
     EnthalpyFD(const Scalar & phi, 
                const Scalar & f,
-               const Scalar & clr,
                const Vector & umixed,
                const Vector & uliq,
                const Vector & ugas,
@@ -68,7 +67,6 @@ class EnthalpyFD : public Centered {
     /* Delegating constructor */
     EnthalpyFD(const Scalar & phi,
                const Scalar & f,
-               const Scalar & clr,
                const Vector & umixed,
                Times & t,
                Krylov * sm,
@@ -76,7 +74,7 @@ class EnthalpyFD : public Centered {
                Topology & topo,
                TIF & tifmodel,
                Matter * sol = NULL) :
-      EnthalpyFD(phi,f,clr,umixed,umixed,umixed,t,sm,flu,topo,tifmodel,sol) {};
+      EnthalpyFD(phi,f,umixed,umixed,umixed,t,sm,flu,topo,tifmodel,sol) {};
 
 
     ~EnthalpyFD();

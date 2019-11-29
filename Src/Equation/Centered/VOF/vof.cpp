@@ -31,7 +31,7 @@ VOF::VOF(const Scalar & PHI,
   tempflag(*PHI.domain() ),
   tempflag2(*PHI.domain() ),
   adens(*PHI.domain() ),
-  topo(&mx,&my,&mz,&adens,&fs,&iflag),
+  topo(&color(),&mx,&my,&mz,&adens,&fs,&iflag),
   norm_method_advance(NormMethod::Mixed()),
   norm_method_curvature(NormMethod::Young()),
   mcomp_for_elvira(Comp::undefined()), /* undefined for 3D */
@@ -58,6 +58,9 @@ VOF::VOF(const Scalar & PHI,
   pold_pos  = phi.shape();
   tempflag  = phi.shape();
   tempflag2 = phi.shape();
+
+  /* just to be sure */
+  topo.clr = &color();
 
   for( int b=0; b<phi.bc().count(); b++ ) {
     if(    phi.bc().type(b) == BndType::dirichlet()

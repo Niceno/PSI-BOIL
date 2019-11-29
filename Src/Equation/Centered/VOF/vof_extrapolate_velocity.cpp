@@ -50,9 +50,9 @@ void VOF::extrapolate_velocity(const Scalar & scp, const Scalar & fext,
 #endif
 
   /* step three: solve the system A*p = fext */
-  const int niter = 200;
-  //const bool converged = ev_solve(tempflag,A,fext,stmp,stmp2,false,niter,resrat);
-  const bool converged = ev_solve(tempflag,A,fext,stmp,*pold,true,niter,resrat);
+  const int niter = 2000;
+  const bool converged = ev_solve(tempflag,A,fext,stmp,stmp2,false,niter,resrat);
+  //const bool converged = ev_solve(tempflag,A,fext,stmp,*pold,true,niter,resrat);
 
   /* step four: project using the mixture-to-single velocity correction */
   for_m(m)

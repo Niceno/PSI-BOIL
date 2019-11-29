@@ -19,7 +19,7 @@ void PhaseChangeVOF::m(const Scalar * diff_eddy) {
       real ql =  ll*tnl[i][j][k];
       M[i][j][k] = (qv + ql) / latent;
 
-      //boil::oout<<"PCV_m: "<<i<<" "<<j<<" "<<k<<" | "<<phi.zc(k)<<" | "<<clr[i][j][k]<<" "<<adens[i][j][k]<<" "<<fs[Comp::w()][i][j][k]<<" | "<<tnv[i][j][k]<<" "<<tnl[i][j][k]<<" | "<<M[i][j][k]<<boil::endl;
+      //boil::oout<<"PCV_m: "<<i<<" "<<j<<" "<<k<<" | "<<phi.xc(i)<<" | "<<clr[i][j][k]<<" "<<adens[i][j][k]<<" "<<fs[Comp::i()][i][j][k]<<" "<<fs[Comp::i()][i+1][j][k]<<" | "<<txv[i][j][k]<<" "<<txl[i][j][k]<<" | "<<M[i][j][k]<<boil::endl;
     } else {
       M[i][j][k] = 0.0;
     }

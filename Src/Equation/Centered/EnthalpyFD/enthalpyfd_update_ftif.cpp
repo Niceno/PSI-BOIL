@@ -31,13 +31,9 @@ void EnthalpyFD::update_ftif(const real TS0, const real TSm, const bool nst,
         lc += (*diff_eddy)[i][j][k]*cp_mass/turbP;
       }
       const real vol = phi.dV(i,j,k);
-      const real clrw = std::min(std::max((*clr)[i-1][j][k],0.0),1.0);
-      const real clrc = std::min(std::max((*clr)[i  ][j][k],0.0),1.0);
-      const real clre = std::min(std::max((*clr)[i+1][j][k],0.0),1.0);
       const real pc = phi[i][j][k];
       real xm,xp,pm,pp,aflagm,aflagp;
       aflagm=aflagp=0.0;
-      //if((clrw-clrsurf)*(clrc-clrsurf)>=0){
       if(!Interface(-1,Comp::i(),i,j,k)){
         xm=phi.dxw(i);
         pm=phi[i-1][j][k];
@@ -45,7 +41,6 @@ void EnthalpyFD::update_ftif(const real TS0, const real TSm, const bool nst,
         xm = std::max(epsl*phi.dxw(i),distance_x(i,j,k,-1,pm));
         aflagm=1.0;
       }
-      //if((clrc-clrsurf)*(clre-clrsurf)>=0){
       if(!Interface(+1,Comp::i(),i,j,k)){
         xp=phi.dxe(i);
         pp=phi[i+1][j][k];
@@ -78,13 +73,9 @@ void EnthalpyFD::update_ftif(const real TS0, const real TSm, const bool nst,
         lc += (*diff_eddy)[i][j][k]*cp_mass/turbP;
       }
       const real vol = phi.dV(i,j,k);
-      const real clrs = std::min(std::max((*clr)[i][j-1][k],0.0),1.0);
-      const real clrc = std::min(std::max((*clr)[i][j  ][k],0.0),1.0);
-      const real clrn = std::min(std::max((*clr)[i][j+1][k],0.0),1.0);
       const real pc = phi[i][j][k];
       real ym,yp,pm,pp,aflagm,aflagp;
       aflagm=aflagp=0.0;
-      //if((clrs-clrsurf)*(clrc-clrsurf)>=0){
       if(!Interface(-1,Comp::j(),i,j,k)){
         ym=phi.dys(j);
         pm=phi[i][j-1][k];
@@ -92,7 +83,6 @@ void EnthalpyFD::update_ftif(const real TS0, const real TSm, const bool nst,
         ym = std::max(epsl*phi.dys(j),distance_y(i,j,k,-1,pm));
         aflagm=1.0;
       }
-      //if((clrc-clrsurf)*(clrn-clrsurf)>=0){
       if(!Interface(+1,Comp::j(),i,j,k)){
         yp=phi.dyn(j);
         pp=phi[i][j+1][k];
@@ -124,13 +114,9 @@ void EnthalpyFD::update_ftif(const real TS0, const real TSm, const bool nst,
         lc += (*diff_eddy)[i][j][k]*cp_mass/turbP;
       }
       const real vol = phi.dV(i,j,k);
-      const real clrb = std::min(std::max((*clr)[i][j][k-1],0.0),1.0);
-      const real clrc = std::min(std::max((*clr)[i][j][k  ],0.0),1.0);
-      const real clrt = std::min(std::max((*clr)[i][j][k+1],0.0),1.0);
       const real pc = phi[i][j][k];
       real zm,zp,pm,pp,aflagm,aflagp;
       aflagm=aflagp=0.0;
-      //if((clrb-clrsurf)*(clrc-clrsurf)>=0){
       if(!Interface(-1,Comp::k(),i,j,k)){
         zm=phi.dzb(k);
         pm=phi[i][j][k-1];
@@ -138,7 +124,6 @@ void EnthalpyFD::update_ftif(const real TS0, const real TSm, const bool nst,
         zm = std::max(epsl*phi.dzb(k),distance_z(i,j,k,-1,pm));
         aflagm=1.0;
       }
-      //if((clrc-clrsurf)*(clrt-clrsurf)>=0){
       if(!Interface(+1,Comp::k(),i,j,k)){
         zp=phi.dzt(k);
         pp=phi[i][j][k+1];

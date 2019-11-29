@@ -6,7 +6,6 @@
 *******************************************************************************/
 EnthalpyFD::EnthalpyFD(const Scalar & PHI, 
                        const Scalar & F,
-                       const Scalar & C,
                        const Vector & U,
                        const Vector & Uliq,
                        const Vector & Ugas,
@@ -20,12 +19,12 @@ EnthalpyFD::EnthalpyFD(const Scalar & PHI,
 |  initialize parent   |
 +---------------------*/
   Centered( PHI.domain(), PHI, F, & U, T, f, s, S ),
-  clrold (  *C  .domain()),
+  clrold (  *PHI.domain()),
   ftif   (  *PHI.domain()),
   ftifold(  *PHI.domain()),
   fs(topo.fs),
   iflag(topo.iflag),
-  iflagold  (*C  .domain()),
+  iflagold  (*PHI  .domain()),
   fsold(  *U  .domain()),
   uliq(&Uliq),
   ugas(&Ugas),
@@ -37,7 +36,7 @@ EnthalpyFD::EnthalpyFD(const Scalar & PHI,
   cpv  = fluid()->cp(0),
   lambdal = fluid()->lambda(1),
   lambdav = fluid()->lambda(0),
-  clr = &C;
+  clr = topo.clr;
   clrsurf = 0.5;
   clrold = (*clr).shape();
   iflagold  = (*clr).shape();

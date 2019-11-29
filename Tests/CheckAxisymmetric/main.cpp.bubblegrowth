@@ -3,7 +3,7 @@
 #define SYM
 //#define FS_TEST
 #define USE_LIQ_VEL_VOF
-#define USE_LIQ_VEL_EFD
+//#define USE_LIQ_VEL_EFD
 //#define CARTESIAN
 
 /******************************************************************************/
@@ -73,7 +73,7 @@ int main(int argc, char ** argv) {
   /*------------------+
   |  define unknowns  |
   +------------------*/
-  Vector uvw(d), uvw_old(d), uvw_liq(d), uvw2(d); // vel
+  Vector uvw(d), uvw_old(d), uvw_liq(d), uvw_gas(d), uvw2(d); // vel
   Vector xyz(d); // body force
   Scalar c  (d), g  (d), kappa(d), cold(d); // concentration
   Scalar press  (d), p(d), f  (d);
@@ -99,6 +99,7 @@ int main(int argc, char ** argv) {
     uvw.bc(m).add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
     uvw_old(m)=uvw(m).shape();
     uvw_liq(m)=uvw(m).shape();
+    uvw_gas(m)=uvw(m).shape();
     uvw2(m)=uvw(m).shape();
   }
 
@@ -213,22 +214,24 @@ int main(int argc, char ** argv) {
 
   TIF tsat(tsat0);
 #ifdef USE_LIQ_VEL_EFD
-  Vector & uvwenth = uvw_liq;
+  Vector & uvwenth1 = uvw_liq;
+  Vector & uvwenth2 = uvw_gas;
 #else
-  Vector & uvwenth = uvw;
+  Vector & uvwenth1 = uvw;
+  Vector & uvwenth2 = uvw;
 #endif
 
 #ifdef CARTESIAN
-  EnthalpyFD enthFD      (tpr, q, conc.color(), uvw, uvwenth, uvw, time, solver, &mixed,
+  EnthalpyFD enthFD      (tpr, q, uvw, uvwenth1, uvwenth2, time, solver, &mixed,
                           conc.topo, tsat);
 #else
-  EnthalpyFDaxisym enthFD(tpr, q, conc.color(), uvw, uvwenth, uvw, time, solver, &mixed,
+  EnthalpyFDaxisym enthFD(tpr, q, uvw, uvwenth1, uvwenth2, time, solver, &mixed,
                           conc.topo, tsat);
 #endif
   enthFD.convection_set(TimeScheme::forward_euler());
   enthFD.diffusion_set(TimeScheme::backward_euler());
 
-  PhaseChangeVOF pc(mdot, mflx, tpr, q, conc.color(), g, f, uvw, conc.topo,
+  PhaseChangeVOF pc(mdot, mflx, tpr, q, c, g, f, uvw, conc.topo,
                     tsat, time, &mixed, latent);
 
   /*-------------------+
@@ -420,8 +423,8 @@ int main(int argc, char ** argv) {
 
       ns.cfl_max();
 
-      conc.extrapolate_velocity(conc.color(),f,&mixed,uvw,uvw_liq,ResRat(1e-8),Sign::pos());
-      //conc.extrapolate_velocity(conc.color(),f,&mixed,uvw,uvw_gas,ResRat(1e-8),Sign::neg());
+      conc.extrapolate_velocity(conc.color(),f,&liquid,uvw,uvw_liq,ResRat(1e-4),Sign::pos());
+      conc.extrapolate_velocity(conc.color(),f,&vapor,uvw,uvw_gas,ResRat(1e-4),Sign::neg());
       conc.advance(cold);
       conc.totalvol();
 

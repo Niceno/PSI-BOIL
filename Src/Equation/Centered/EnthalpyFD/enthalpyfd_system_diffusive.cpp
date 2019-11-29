@@ -29,12 +29,8 @@ void EnthalpyFD::create_system_diffusive(const Scalar * diff_eddy) {
         lc += (*diff_eddy)[i][j][k]*cp_mass/turbP;
       }
       const real vol = phi.dV(i,j,k);
-      const real clrw = std::min(std::max((*clr)[i-1][j][k],0.0),1.0);
-      const real clrc = std::min(std::max((*clr)[i  ][j][k],0.0),1.0);
-      const real clre = std::min(std::max((*clr)[i+1][j][k],0.0),1.0);
       real xm,xp,aflagm,aflagp;
       aflagm=aflagp=1.0;
-      //if((clrw-clrsurf)*(clrc-clrsurf)>=0){
       if(!Interface(-1,Comp::i(),i,j,k)){
         xm=phi.dxw(i);
       } else {
@@ -42,7 +38,6 @@ void EnthalpyFD::create_system_diffusive(const Scalar * diff_eddy) {
         xm = std::max(epsl*phi.dxw(i),distance_x(i,j,k,-1,ts));
         aflagm=0.0;
       }
-      //if((clrc-clrsurf)*(clre-clrsurf)>=0){
       if(!Interface(+1,Comp::i(),i,j,k)){
         xp=phi.dxe(i);
       } else {
@@ -72,12 +67,8 @@ void EnthalpyFD::create_system_diffusive(const Scalar * diff_eddy) {
         lc += (*diff_eddy)[i][j][k]*cp_mass/turbP;
       }
       const real vol = phi.dV(i,j,k);
-      const real clrs = std::min(std::max((*clr)[i][j-1][k],0.0),1.0);
-      const real clrc = std::min(std::max((*clr)[i][j  ][k],0.0),1.0);
-      const real clrn = std::min(std::max((*clr)[i][j+1][k],0.0),1.0);
       real ym,yp,aflagm,aflagp;
       aflagm=aflagp=1.0;
-      //if((clrs-clrsurf)*(clrc-clrsurf)>=0){
       if(!Interface(-1,Comp::j(),i,j,k)){
         ym=phi.dys(j);
       } else {
@@ -85,7 +76,6 @@ void EnthalpyFD::create_system_diffusive(const Scalar * diff_eddy) {
         ym = std::max(epsl*phi.dys(j),distance_y(i,j,k,-1,ts));
         aflagm=0.0;
       }
-      //if((clrc-clrsurf)*(clrn-clrsurf)>=0){
       if(!Interface(+1,Comp::j(),i,j,k)){
         yp=phi.dyn(j);
       } else {
@@ -115,12 +105,8 @@ void EnthalpyFD::create_system_diffusive(const Scalar * diff_eddy) {
         lc += (*diff_eddy)[i][j][k]*cp_mass/turbP;
       }
       const real vol = phi.dV(i,j,k);
-      const real clrb = std::min(std::max((*clr)[i][j][k-1],0.0),1.0);
-      const real clrc = std::min(std::max((*clr)[i][j][k  ],0.0),1.0);
-      const real clrt = std::min(std::max((*clr)[i][j][k+1],0.0),1.0);
       real zm,zp,aflagm,aflagp;
       aflagm=aflagp=1.0;
-      //if((clrb-clrsurf)*(clrc-clrsurf)>=0){
       if(!Interface(-1,Comp::k(),i,j,k)){
         zm=phi.dzb(k);
       } else {
@@ -128,7 +114,6 @@ void EnthalpyFD::create_system_diffusive(const Scalar * diff_eddy) {
         zm = std::max(epsl*phi.dzb(k),distance_z(i,j,k,-1,ts));
         aflagm=0.0;
       }
-      //if((clrc-clrsurf)*(clrt-clrsurf)>=0){
       if(!Interface(+1,Comp::k(),i,j,k)){
         zp=phi.dzt(k);
       } else {

@@ -15,8 +15,9 @@
 /* A class for safe argument passing from interface tracking to other classes */
 class Topology {
   public:
-    Topology(Scalar * NX, Scalar * NY, Scalar * NZ, 
+    Topology(Scalar * CLR, Scalar * NX, Scalar * NY, Scalar * NZ, 
              Scalar * ADENS, Vector * FS, ScalarInt * IFLAG) :
+        clr(CLR),
         nx(NX),
         ny(NY),
         nz(NZ),
@@ -25,6 +26,7 @@ class Topology {
         iflag(IFLAG) { }
     ~Topology() {};
 
+    Scalar * clr;
     Scalar * nx;
     Scalar * ny;
     Scalar * nz;

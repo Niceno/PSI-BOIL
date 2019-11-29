@@ -19,8 +19,8 @@ class PhaseChangeVOF : public Centered {
                    const Scalar & mflx,
                    const Scalar & tpr,
                    const Scalar & tprs,
-                   const Scalar & clr,
-                   const Scalar & clrs,
+                   const Scalar & vf,
+                   const Scalar & vfs,
                    const Scalar & vs,
                    const Vector & u, 
                    Topology & topo,
@@ -63,10 +63,7 @@ class PhaseChangeVOF : public Centered {
     bool Interface1D_z(const int i, const int j, const int k, const int dir);
 #endif
     void m(const Scalar * diff_eddy = NULL);
-#if 1
-    real mdot_cut(real m, real c);
-    void mdot_cut();
-#endif
+    real mdot_cut(real m, real c, real & mcut);
     void mdot();
 
     void cal_gradt_fluid(const Scalar * diff_eddy = NULL);
@@ -99,7 +96,7 @@ class PhaseChangeVOF : public Centered {
     real gradty9(const int dir, const int i, const int j, const int k);
     real gradtz9(const int dir, const int i, const int j, const int k);
 
-    void sources_clrs();
+    void sources_vfs();
     void sources_fext();
     void sources_sum();
 
@@ -134,8 +131,8 @@ class PhaseChangeVOF : public Centered {
     Scalar txl, tyl, tzl;
     Scalar tnv, tnl;
 
-    Scalar tpr, tprs, clr, clrs;
-    Scalar adens;
+    Scalar tpr, tprs, vf, vfs;
+    Scalar clr,adens;
     Scalar nx;
     Scalar ny;
     Scalar nz;
