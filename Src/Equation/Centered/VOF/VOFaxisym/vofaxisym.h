@@ -45,10 +45,8 @@ class VOFaxisym : public VOF {
 
     ~VOFaxisym() {};
 
-    virtual void advance(const bool anci = true);
-    virtual void advance(Scalar & sca, const bool anci = true);
-
     virtual void reconstruct_geometry();
+    virtual void reconstruct_geometry(Scalar & scp);
     void color_to_vf(Scalar & color, Scalar & vf,
                      const bool extalp=true,const bool bdn=true);
     void vf_to_color(const Scalar & vf, Scalar & color);
@@ -83,7 +81,6 @@ class VOFaxisym : public VOF {
     virtual void advance_y(Scalar & sca) {};
     virtual void advance_z(Scalar & sca);
 
-    virtual void reconstruct_geometry(Scalar & scp);
     real linf_scalar_error(const Scalar & sca, const Scalar & scb
                           // ,int & i, int & j, int & k, bool & ebool
                            );

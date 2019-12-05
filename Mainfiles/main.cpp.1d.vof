@@ -291,7 +291,9 @@ int main(int argc, char * argv[]) {
 #else
   VOF conc(c,  g, kappa, uvw_liq, time, solver);
   conc.set_normal_vector_method_all(NormMethod::ElviraXZ());
-  conc.set_use_interp(true);
+  //conc.set_use_interp(true);
+  conc.set_use_interp(false);
+  conc.set_use_subgrid(true);
 #endif
   conc.init();
   conc.front_minmax();
@@ -417,7 +419,8 @@ int main(int argc, char * argv[]) {
 #ifdef ADIABATIC
     real maxtif(0.);
     for_vijk(tpr,i,j,k) {
-      if(tsat.Tint(i,j,k)>maxtif) maxtif = tsat.Tint(i,j,k);
+      if((*conc.topo.adens)[i][j][k]>boil::pico&&tsat.Tint(i,j,k)>maxtif)
+        maxtif = tsat.Tint(i,j,k);
     }
     boil::cart.max_real(&maxtif);
     for_vijk(tpr,i,j,k) {

@@ -134,6 +134,8 @@ VOF::VOF(const Scalar & PHI,
   limit_color=false;
   use_subgrid=false;
   use_interp=false;
+  store_pressure_extrap=false;
+  niter_pressure_extrap=1000;
 
   discretize();
 

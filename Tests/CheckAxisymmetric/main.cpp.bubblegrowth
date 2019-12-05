@@ -3,7 +3,7 @@
 #define SYM
 //#define FS_TEST
 #define USE_LIQ_VEL_VOF
-//#define USE_LIQ_VEL_EFD
+#define USE_LIQ_VEL_EFD
 //#define CARTESIAN
 
 /******************************************************************************/
@@ -73,7 +73,7 @@ int main(int argc, char ** argv) {
   /*------------------+
   |  define unknowns  |
   +------------------*/
-  Vector uvw(d), uvw_old(d), uvw_liq(d), uvw_gas(d), uvw2(d); // vel
+  Vector uvw(d), uvw_old(d), uvw_liq(d), uvw_gas(d); // vel
   Vector xyz(d); // body force
   Scalar c  (d), g  (d), kappa(d), cold(d); // concentration
   Scalar press  (d), p(d), f  (d);
@@ -100,7 +100,6 @@ int main(int argc, char ** argv) {
     uvw_old(m)=uvw(m).shape();
     uvw_liq(m)=uvw(m).shape();
     uvw_gas(m)=uvw(m).shape();
-    uvw2(m)=uvw(m).shape();
   }
 
   c.bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
@@ -175,8 +174,12 @@ int main(int argc, char ** argv) {
   Krylov * solver = new BiCGS(d, Prec::di());
   //Krylov * solver = new BiCGS(d, Prec::di());
   Momentum ns( uvw, xyz, time, solver, &mixed);
-  ns.convection_set(TimeScheme::backward_euler()); //ns.convection is mandatory
+  if(mSimple==1)
+    ns.convection_set(TimeScheme::forward_euler());
+  else
+    ns.convection_set(TimeScheme::backward_euler());
   ns.diffusion_set(TimeScheme::backward_euler());
+
   Pressure pr(p, f, uvw, time, solver, &mixed);
 
   AC multigrid( &pr );
@@ -188,13 +191,6 @@ int main(int argc, char ** argv) {
   }
 
   multigrid.stop_if_diverging(false);
-
-  Momentum ns2( uvw2, xyz, time, solver, &mixed);
-  Pressure pr2(p, f, uvw2, time, solver, &mixed);
-
-  AC multigrid2( &pr2 );
-  multigrid2.min_cycles(6); 
-  multigrid2.stop_if_diverging(true);
 
 #ifdef USE_LIQ_VEL_VOF
   Vector & uvwvof = uvw_liq;
@@ -210,12 +206,14 @@ int main(int argc, char ** argv) {
   conc.set_curv_method(CurvMethod::HF());  // height function
   conc.set_topo_method(TopoMethod::Hybrid());
   conc.set_wall_curv_method(CurvMethod::none());
-  conc.set_use_interp(true);
+  conc.set_use_interp(false);
+  conc.set_pressure_extrapolation_parameters(true,300);
 
   TIF tsat(tsat0);
 #ifdef USE_LIQ_VEL_EFD
   Vector & uvwenth1 = uvw_liq;
-  Vector & uvwenth2 = uvw_gas;
+  //Vector & uvwenth2 = uvw_gas;
+  Vector & uvwenth2 = uvw;
 #else
   Vector & uvwenth1 = uvw;
   Vector & uvwenth2 = uvw;
@@ -374,7 +372,6 @@ int main(int argc, char ** argv) {
     /*------------------------+
     |  solve energy equation  |
     +------------------------*/
-#if 1
     enthFD.discretize();
     enthFD.new_time_step();
     enthFD.solve(ResRat(1e-16),"enthFD");
@@ -384,7 +381,6 @@ int main(int argc, char ** argv) {
     +---------------*/
     pc.update();
     ns.vol_phase_change(&f);
-#endif
 
     // store velocity
     for_m(m)
@@ -423,14 +419,17 @@ int main(int argc, char ** argv) {
 
       ns.cfl_max();
 
-      conc.extrapolate_velocity(conc.color(),f,&liquid,uvw,uvw_liq,ResRat(1e-4),Sign::pos());
-      conc.extrapolate_velocity(conc.color(),f,&vapor,uvw,uvw_gas,ResRat(1e-4),Sign::neg());
-      conc.advance(cold);
-      conc.totalvol();
+      conc.advance_phase_change(cold);
+      conc.extrapolate_velocity(conc.color(),f,&liquid,uvw,uvw_liq,ResRat(1e-4),Sign::pos(),true);
+      //conc.extrapolate_velocity(conc.color(),f,&vapor,uvw,uvw_gas,ResRat(1e-4),Sign::neg(),false);
+      conc.reconstruct_geometry(cold);
+      conc.advance_geometric(cold);
+      conc.ancillary();
 
       //pc.modify_vel(uvw,c,cold);
     }
 
+    conc.totalvol();
     conc.front_minmax();
 
     /* dt control */

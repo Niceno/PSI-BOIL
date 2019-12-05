@@ -156,3 +156,16 @@ void set_topo_method(const TopoMethod tpm) {
 
 /* getter for topology method */
 inline TopoMethod get_topo_method() { return topo_method;};
+
+/* setter for pressure extrapolation */
+void set_pressure_extrapolation_parameters(const bool eflag, const int eiter) {
+  store_pressure_extrap = eflag;
+  niter_pressure_extrap = eiter;
+  boil::oout<<"set_pressure_extrapolation_parameters: store_pressure= "<<eflag<<" ; "
+                <<"maxiter= "<<eiter<<"\n";
+  return;
+}
+
+/* getter for pressure extrapolation */
+inline bool get_store_pressure_extrapolation_flag() { return store_pressure_extrap;}
+inline int get_pressure_extrapolation_maxiter() { return niter_pressure_extrap;}

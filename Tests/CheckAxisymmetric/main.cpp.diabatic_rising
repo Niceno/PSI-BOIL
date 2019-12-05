@@ -1,6 +1,7 @@
 #include "Include/psi-boil.h"
 
 #define AXISYM
+//#define USE_LIQ_VEL_EFD
 
 #define _GNU_SOURCE 1
 #include <fenv.h>
@@ -90,15 +91,15 @@ int main(int argc, char ** argv) {
   +-----------------------------*/
   for_m(m) {
     uvw.bc(m).add( BndCnd( Dir::imin(), BndType::symmetry() ) );
-    uvw.bc(m).add( BndCnd( Dir::imax(), BndType::wall() ) );
-    uvw.bc(m).add( BndCnd( Dir::kmin(), BndType::wall() ) );
+    uvw.bc(m).add( BndCnd( Dir::imax(), BndType::outlet() ) );
+    uvw.bc(m).add( BndCnd( Dir::kmin(), BndType::outlet() ) );
     uvw.bc(m).add( BndCnd( Dir::kmax(), BndType::outlet() ) );
 #ifdef AXISYM
     uvw.bc(m).add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
     uvw.bc(m).add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
 #else
     uvw.bc(m).add( BndCnd( Dir::jmin(), BndType::symmetry() ) );
-    uvw.bc(m).add( BndCnd( Dir::jmax(), BndType::wall() ) );
+    uvw.bc(m).add( BndCnd( Dir::jmax(), BndType::outlet() ) );
 #endif
 
     uvw_old(m)=uvw(m).shape();
@@ -184,8 +185,8 @@ int main(int argc, char ** argv) {
   /*----------------+
   |  linear solver  |
   +----------------*/
-  //Krylov * solver = new CG(d, Prec::ic2());
-  Krylov * solver = new BiCGS(d, Prec::di());
+  Krylov * solver = new CG(d, Prec::ic2());
+  //Krylov * solver = new BiCGS(d, Prec::di());
 
   /*-----------------+
   |  define solvers  |
@@ -198,20 +199,30 @@ int main(int argc, char ** argv) {
   conc.set_curv_method(CurvMethod::HF());  // height function
   conc.set_topo_method(TopoMethod::Hybrid());
   conc.set_wall_curv_method(CurvMethod::none());
-  conc.set_use_interp(true);
+  conc.set_use_interp(false);
+  conc.set_pressure_extrapolation_parameters(true,300);
 
   TIF tsat(tsat0);
+#ifdef USE_LIQ_VEL_EFD
+  Vector & uvwenth1 = uvw_liq;
+  Vector & uvwenth2 = uvw_gas;
+  //Vector & uvwenth2 = uvw;
+#else
+  Vector & uvwenth1 = uvw;
+  Vector & uvwenth2 = uvw;
+#endif
+
 #ifdef AXISYM
-  EnthalpyFDaxisym enthFD(tpr, q, conc.color(), uvw, uvw_liq, uvw_gas, time, solver, &mixed,
+  EnthalpyFDaxisym enthFD(tpr, q, uvw, uvwenth1, uvwenth2, time, solver, &mixed,
                           conc.topo, tsat);
 #else
-  EnthalpyFD enthFD(tpr, q, conc.color(), uvw, uvw_liq, uvw_gas, time, solver, &mixed,
+  EnthalpyFD enthFD(tpr, q, uvw, uvwenth1, uvwenth2, time, solver, &mixed,
                     conc.topo, tsat);
 #endif
   enthFD.convection_set(TimeScheme::forward_euler());
   enthFD.diffusion_set(TimeScheme::backward_euler());
 
-  PhaseChangeVOF pc(mdot, mflx, tpr, q, conc.color(), g, f, uvw, conc.topo,
+  PhaseChangeVOF pc(mdot, mflx, tpr, q, c, g, f, uvw, conc.topo,
                     tsat, time, &mixed, latent);
 
   Momentum ns(uvw, xyz, time, solver, &mixed);
@@ -227,8 +238,10 @@ int main(int argc, char ** argv) {
     multigrid.max_cycles(8);
   } else {
     multigrid.min_cycles(10);
+    multigrid.max_cycles(20);
   }
-  multigrid.stop_if_diverging(true);
+  //multigrid.stop_if_diverging(true);
+  multigrid.stop_if_diverging(false);
 
   /*-------------------+
   |  check if restart  |
@@ -426,14 +439,19 @@ int main(int argc, char ** argv) {
 
       ns.cfl_max();
 
-      conc.extrapolate_velocity(conc.color(),f,&mixed,uvw,uvw_liq,ResRat(1e-8),Sign::pos());
-      conc.extrapolate_velocity(conc.color(),f,&mixed,uvw,uvw_gas,ResRat(1e-8),Sign::neg());
-      conc.advance(cold);
-      conc.totalvol();
+      conc.advance_phase_change(cold);
+      conc.extrapolate_velocity(conc.color(),f,&liquid,uvw,uvw_liq,ResRat(1e-4),Sign::pos(),true);
+#ifdef USE_LIQ_VEL_EFD
+      conc.extrapolate_velocity(conc.color(),f,&vapor,uvw,uvw_gas,ResRat(1e-4),Sign::neg(),false);
+#endif
+      conc.reconstruct_geometry(cold);
+      conc.advance_geometric(cold);
+      conc.ancillary();
 
       //pc.modify_vel(uvw,c,cold);
     }
 
+    conc.totalvol();
     conc.front_minmax();
 
     /* shift pressure */

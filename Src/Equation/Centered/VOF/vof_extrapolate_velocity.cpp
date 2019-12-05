@@ -6,7 +6,7 @@
 void VOF::extrapolate_velocity(const Scalar & scp, const Scalar & fext,
                                const Matter * fluid, const Vector & umixed, 
                                Vector & unew, const ResRat & resrat,
-                               const Sign & sig) {
+                               const Sign & sig, const bool flagging) {
 /***************************************************************************//**
 *  \brief Calculate divergence-free velocity field extension. Interface has to
 *         be properly flagged.
@@ -21,9 +21,8 @@ void VOF::extrapolate_velocity(const Scalar & scp, const Scalar & fext,
 
   boil::timer.start("vof extrapolate velocities");
 
-#ifdef DEBUG
-  interfacial_flagging(scp);
-#endif
+  if(flagging)
+    interfacial_flagging(scp);
 
   /* step zero: choose direction */
   Scalar * pold;
@@ -50,9 +49,8 @@ void VOF::extrapolate_velocity(const Scalar & scp, const Scalar & fext,
 #endif
 
   /* step three: solve the system A*p = fext */
-  const int niter = 2000;
-  const bool converged = ev_solve(tempflag,A,fext,stmp,stmp2,false,niter,resrat);
-  //const bool converged = ev_solve(tempflag,A,fext,stmp,*pold,true,niter,resrat);
+  const bool converged = ev_solve(tempflag,A,fext,stmp,*pold,
+                                  store_pressure_extrap,niter_pressure_extrap,resrat);
 
   /* step four: project using the mixture-to-single velocity correction */
   for_m(m)
