@@ -14,7 +14,8 @@ PhaseChangeVOF::PhaseChangeVOF(const Scalar & MDOT,
                                Times & T, 
                                Matter * f,
                                real LAT,
-                               Matter * s) :
+                               Matter * s,
+                               Sign SIG) :
 /*---------------------+ 
 |  initialize parent   |
 +---------------------*/
@@ -44,7 +45,8 @@ PhaseChangeVOF::PhaseChangeVOF(const Scalar & MDOT,
   stmp2   ( *MDOT.domain()),
   delta   ( *MDOT.domain()),
   tempflag( *MDOT.domain()),
-  tifmodel(TIFMODEL)
+  tifmodel(TIFMODEL),
+  sig(SIG)
 {
   txv      = MDOT.shape();
   tyv      = MDOT.shape();

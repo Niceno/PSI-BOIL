@@ -28,7 +28,8 @@ class PhaseChangeVOF : public Centered {
                    Times & t,
                    Matter * flu,
                    real lat,
-                   Matter * sol = NULL);
+                   Matter * sol = NULL,
+                   Sign sig = Sign::pos());
  
     ~PhaseChangeVOF();
     void update(const Scalar * diff_eddy = NULL);
@@ -142,6 +143,7 @@ class PhaseChangeVOF : public Centered {
     Scalar M;
 
     const TIF & tifmodel;
+    const Sign sig; /* pos: liquid is phi=1 and vice versa */
  
     real tol_ext;
 

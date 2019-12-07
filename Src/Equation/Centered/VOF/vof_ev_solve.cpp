@@ -77,8 +77,12 @@ bool VOF::ev_solve(const ScalarInt & pflag, const Matrix & A,
       linferr_first = linferr;
     }
 #ifdef DEBUG
+    real errrat(0);
+    if(linferr_first>0) {
+      errrat = linferr/linferr_first;
+    }
     boil::oout<<"VOF::ev_solve: "
-              <<" "<<n<<" "<<linferr<<" "<<linferr/linferr_first<<" ( "<<nele<<" els)"
+              <<" "<<n<<" "<<linferr<<" "<<errrat<<" ( "<<nele<<" els)"
               <<boil::endl;
 #endif
     xold = x;
@@ -88,8 +92,12 @@ bool VOF::ev_solve(const ScalarInt & pflag, const Matrix & A,
     if(linferr<resrat) {
       converged = true;
 //#ifdef DEBUG
+      real errrat(0);
+      if(linferr_first>0) {
+        errrat = linferr/linferr_first;
+      }
       boil::oout<<"VOF::ev_solve converged after "<<n<<" steps, final abs./rel. error: "
-                <<linferr<<" "<<linferr/linferr_first<<"\n";
+                <<linferr<<" "<<errrat<<"\n";
 //#endif
       break;
     }
