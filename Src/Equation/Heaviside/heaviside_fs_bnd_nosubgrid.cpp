@@ -106,37 +106,37 @@ void Heaviside::fs_bnd_nosubgrid(const Scalar & scp, Vector & fs,
     }
 
     /* west is in solid domain */
-    if (dom->ibody().off(i-1,j,k)) {
+    if(dom->ibody().off(i-1,j,k)) {
       mcomp = Comp::i();
       fs[mcomp][i  ][j][k] = boil::unreal;
     }
 
     /* east */
-    if (dom->ibody().off(i+1,j,k)) {
+    if(dom->ibody().off(i+1,j,k)) {
       mcomp = Comp::i();
       fs[mcomp][i+1][j][k] = boil::unreal;
     }
 
     /* south */
-    if (dom->ibody().off(i,j-1,k)) {
+    if(dom->ibody().off(i,j-1,k)) {
       mcomp = Comp::j();
       fs[mcomp][i][j  ][k] = boil::unreal;
     }
 
     /* north */
-    if (dom->ibody().off(i,j+1,k)) {
+    if(dom->ibody().off(i,j+1,k)) {
       mcomp = Comp::j();
       fs[mcomp][i][j+1][k] = boil::unreal;
     }
 
     /* bottom */
-    if (dom->ibody().off(i,j,k-1)) {
+    if(dom->ibody().off(i,j,k-1)) {
       mcomp = Comp::k();
       fs[mcomp][i][j][k  ] = boil::unreal;
     }
 
     /* top */
-    if (dom->ibody().off(i,j,k+1)) {
+    if(dom->ibody().off(i,j,k+1)) {
       mcomp = Comp::k();
       fs[mcomp][i][j][k+1] = boil::unreal;
     }

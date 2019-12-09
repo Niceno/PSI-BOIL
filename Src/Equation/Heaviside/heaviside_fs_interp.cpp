@@ -23,10 +23,6 @@ void Heaviside::cal_fs_interp(const Scalar & scp, Vector & fs,
   m = Comp::i();
   for_wvmijk(fs,m,i,j,k) {  /* don't use vmijk. wall will be skipped! */
 
-    /* immersed body */
-    if(dom->ibody().off(i-1,j,k)&&dom->ibody().off(i,j,k))
-      continue;
-
     /* degenerate cases */
     real clrw = scp[i-1][j][k];
     real clre = scp[i  ][j][k];
@@ -55,10 +51,6 @@ void Heaviside::cal_fs_interp(const Scalar & scp, Vector & fs,
   m = Comp::j();
   for_wvmijk(fs,m,i,j,k) {  /* don't use vmijk. wall will be skipped! */
 
-    /* immersed body */
-    if(dom->ibody().off(i,j-1,k)&&dom->ibody().off(i,j,k))
-      continue;
-
     /* degenerate cases */
     real clrs = scp[i][j-1][k];
     real clrn = scp[i][j  ][k];
@@ -86,10 +78,6 @@ void Heaviside::cal_fs_interp(const Scalar & scp, Vector & fs,
 
   m = Comp::k();
   for_wvmijk(fs,m,i,j,k) {  /* don't use vmijk. wall will be skipped! */
-
-    /* immersed body */
-    if(dom->ibody().off(i,j,k-1)&&dom->ibody().off(i,j,k))
-      continue;
 
     /* degenerate cases */
     real clrb = scp[i][j][k-1];

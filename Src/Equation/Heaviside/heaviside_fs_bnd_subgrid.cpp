@@ -148,7 +148,7 @@ void Heaviside::fs_bnd_subgrid(const Scalar & scp, Vector & fs,
     }
 
     /* south */
-    if (dom->ibody().off(i,j-1,k)) {
+    if(dom->ibody().off(i,j-1,k)) {
       mcomp = Comp::j();
       real & fsval = fs[mcomp][i][j  ][k];
       real refpos = scp.yn(j);
@@ -158,7 +158,7 @@ void Heaviside::fs_bnd_subgrid(const Scalar & scp, Vector & fs,
     }
 
     /* north */
-    if (dom->ibody().off(i,j+1,k)) {
+    if(dom->ibody().off(i,j+1,k)) {
       mcomp = Comp::j();
       real & fsval = fs[mcomp][i][j+1][k];
       real refpos = scp.yn(j+1);
@@ -168,7 +168,7 @@ void Heaviside::fs_bnd_subgrid(const Scalar & scp, Vector & fs,
     }
 
     /* bottom */
-    if (dom->ibody().off(i,j,k-1)) {
+    if(dom->ibody().off(i,j,k-1)) {
       mcomp = Comp::k();
       real & fsval = fs[mcomp][i][j][k  ];
       real refpos = scp.zn(k);
@@ -178,7 +178,7 @@ void Heaviside::fs_bnd_subgrid(const Scalar & scp, Vector & fs,
     }
 
     /* top */
-    if (dom->ibody().off(i,j,k+1)) {
+    if(dom->ibody().off(i,j,k+1)) {
       mcomp = Comp::k();
       real & fsval = fs[mcomp][i][j][k+1];
       real refpos = scp.zn(k+1);

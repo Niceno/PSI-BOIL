@@ -30,10 +30,6 @@ void VOF::cal_fs3(const Scalar & scp) {
   for(int j=sj(); j<=ej()  ; j++)
   for(int k=sk(); k<=ek()  ; k++) {
 
-    /* immersed body */
-    if(dom->ibody().off(i-1,j,k)||dom->ibody().off(i,j,k))
-      continue;
-  
     /* degenerate cases */
     real clrw = scp[i-1][j][k];
     real clre = scp[i  ][j][k];
@@ -94,10 +90,6 @@ void VOF::cal_fs3(const Scalar & scp) {
   for(int j=sj(); j<=ej()+1; j++)
   for(int k=sk(); k<=ek()  ; k++) {
 
-    /* immersed body */
-    if(dom->ibody().off(i,j-1,k)||dom->ibody().off(i,j,k))
-      continue;
-               
     /* degenerate cases */
     real clrs = scp[i][j-1][k];
     real clrn = scp[i][j  ][k];
@@ -157,10 +149,6 @@ void VOF::cal_fs3(const Scalar & scp) {
   for(int j=sj(); j<=ej()  ; j++)
   for(int k=sk(); k<=ek()+1; k++) {
 
-    /* immersed body */
-    if(dom->ibody().off(i,j,k-1)||dom->ibody().off(i,j,k))
-      continue;
-               
     /* degenerate cases */
     real clrb = scp[i][j][k-1];
     real clrt = scp[i][j][k  ];
