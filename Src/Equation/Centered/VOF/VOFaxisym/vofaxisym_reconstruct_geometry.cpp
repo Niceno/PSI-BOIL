@@ -34,7 +34,7 @@ void VOFaxisym::reconstruct_geometry(Scalar & scp) {
 #if 1
   /* iteration procedure */
   do {
-    backward_axisymmetric(phi,nalpha);
+    backward_axisymmetric(scp,nalpha);
     //forward_cartesian(axistmp);
     forward(axistmp);
     /* color to vf contains calculations of normal vector and update at walls */
@@ -76,7 +76,7 @@ void VOFaxisym::reconstruct_geometry(Scalar & scp) {
     boil::oout<<"VOFaxisym::reconstruct_geometry did not converge after "
               <<iter<<" iterations! "
               <<"Final error: "<<time->current_time()<<" "<<linferr<<boil::endl;
-    //boil::plot->plot(phi,clr,nx,nz,nalpha,"phi-clr-nx-nz-nalp", time->current_step());
+    //boil::plot->plot(scp,clr,nx,nz,nalpha,"phi-clr-nx-nz-nalp", time->current_step());
     //exit(0);
   }
 

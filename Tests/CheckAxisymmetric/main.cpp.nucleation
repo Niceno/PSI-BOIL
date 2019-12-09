@@ -449,8 +449,8 @@ int main(int argc, char ** argv) {
    //tsat.set_ur(0.01);
 #endif
     conc.init();
-    boil::plot->plot(uvw,c,tpr,press,mdot,(*(conc.topo.adens))
-                    ,"uvw-c-tpr-press-mdot-adens",0);
+    boil::plot->plot(uvw,c,tpr,conc.color(),mdot,(*(conc.topo.adens))
+                    ,"uvw-c-tpr-clr-mdot-adens",0);
   }
   input.close();
 
@@ -744,8 +744,8 @@ int main(int argc, char ** argv) {
     //if(time.current_step()>time.total_steps()-3) {
       iint++;// = int(time.current_time() / tint);
       tpr.exchange_all();
-      boil::plot->plot(uvw,c,tpr,press,mdot,(*(conc.topo.adens))
-                     ,"uvw-c-tpr-press-mdot-adens",iint);
+      boil::plot->plot(uvw,c,tpr,conc.color(),mdot,(*(conc.topo.adens))
+                     ,"uvw-c-tpr-clr-mdot-adens",iint);
       //iint = int(time.current_time()/tint) + 1;
     }
 

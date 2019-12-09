@@ -59,7 +59,7 @@ VOF::VOF(const Scalar & PHI,
   tempflag  = phi.shape();
   tempflag2 = phi.shape();
 
-  /* just to be sure */
+  /* dangerous: needs to be overridden in derived class!!! */
   topo.clr = &color();
 
   for( int b=0; b<phi.bc().count(); b++ ) {
@@ -107,6 +107,7 @@ VOF::VOF(const Scalar & PHI,
 
   /* runtime polymorphism */
   if(phi.domain()->is_axisymmetric()) {
+    /* dangerous: needs to be overridden in the derived class!!! */
     heavi = new MSaxisym(&color(),NULL,&adens);
   } else {
     if     (phi.bc().type(Dir::imin(),BndType::pseudo()))
@@ -280,5 +281,6 @@ VOF::VOF(const Scalar & PHI,
 
 /******************************************************************************/
 VOF::~VOF() {
+  delete heavi;
 }	
 
