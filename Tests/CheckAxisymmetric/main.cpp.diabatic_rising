@@ -91,8 +91,8 @@ int main(int argc, char ** argv) {
   +-----------------------------*/
   for_m(m) {
     uvw.bc(m).add( BndCnd( Dir::imin(), BndType::symmetry() ) );
-    uvw.bc(m).add( BndCnd( Dir::imax(), BndType::outlet() ) );
-    uvw.bc(m).add( BndCnd( Dir::kmin(), BndType::outlet() ) );
+    uvw.bc(m).add( BndCnd( Dir::imax(), BndType::wall() ) );
+    uvw.bc(m).add( BndCnd( Dir::kmin(), BndType::wall() ) );
     uvw.bc(m).add( BndCnd( Dir::kmax(), BndType::outlet() ) );
 #ifdef AXISYM
     uvw.bc(m).add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
@@ -129,8 +129,9 @@ int main(int argc, char ** argv) {
   kappa = p.shape();
 
   c.bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
-  c.bc().add( BndCnd( Dir::imax(), BndType::neumann() ) );
-  c.bc().add( BndCnd( Dir::kmin(), BndType::dirichlet(), 1.0 ) );
+  c.bc().add( BndCnd( Dir::imax(), BndType::wall() ) );
+  c.bc().add( BndCnd( Dir::kmin(), BndType::wall() ) );
+  //c.bc().add( BndCnd( Dir::kmin(), BndType::dirichlet(), 1.0 ) );
   c.bc().add( BndCnd( Dir::kmax(), BndType::outlet() ) );
 #ifdef AXISYM
   c.bc().add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
@@ -200,7 +201,7 @@ int main(int argc, char ** argv) {
   conc.set_topo_method(TopoMethod::Hybrid());
   conc.set_wall_curv_method(CurvMethod::none());
   conc.set_use_interp(false);
-  conc.set_pressure_extrapolation_parameters(true,300);
+  conc.set_pressure_extrapolation_parameters(false,300);
 
   TIF tsat(tsat0);
 #ifdef USE_LIQ_VEL_EFD

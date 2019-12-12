@@ -6,9 +6,10 @@
 Nucleation::Nucleation ( Scalar * c, Scalar *tp, Scalar *qs,
                      const Times * t, Scalar & DM,
                      Matter *f, const real rs, const real dm, const real l,
-                     const real ca ) :
+                     const real ca, const Sign SIG ) :
   dmicro(&DM),
-  flu(f)
+  flu(f),
+  sig(SIG)
 {
   clr=c;
   tpr=tp;

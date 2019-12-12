@@ -41,9 +41,15 @@ void Nucleation::replant () {
     |  and (4) bottom of previous bubble is higher than zplant()     |
     |  and (5) avoid replant immediately after cutneck.              |
     +---------------------------------------------------------------*/
+    bool clr_seed_cond;
+    if(sig==Sign::pos()) {
+      clr_seed_cond = clr_seed > 0.5;
+    } else {
+      clr_seed_cond = clr_seed < 0.5;
+    }
     if( tpr_seed > sites[ns].active_tpr() && 
         sites[ns].seed_prev()==false &&
-        clr_seed > 0.5  &&
+        clr_seed_cond &&
         bheight &&
         t_current > (sites[ns].time_cutneck() + period_cut_replant) ) {
 
@@ -97,7 +103,13 @@ void Nucleation::replant () {
   |  replant  |
   +----------*/
   real eps = dxmin * 1.5;
-  real rhov = fluid()->rho(0);
+  real rhov;
+  if(sig==Sign::pos()) {
+    rhov = fluid()->rho(0);
+  } else {
+    rhov = fluid()->rho(1);
+  }
+
 
   /* genuine sites */
   //for(int ns=0; ns<size(); ns++){
@@ -155,7 +167,11 @@ void Nucleation::replant () {
                 cseed=real(itmp)/real(mm*mm*mm);
 #endif
               }
-              (*clr)[i][j][k]=std::min((*clr)[i][j][k],cseed);
+              if(sig==Sign::pos()) {
+                (*clr)[i][j][k]=std::min((*clr)[i][j][k],cseed);
+              } else {
+                (*clr)[i][j][k]=1.0-std::min(1.0-(*clr)[i][j][k],cseed);
+              }
               vol_seed += clr->dV(i,j,k) * (1.0-cseed);
               if (clr->domain()->ibody().off(i,j,k-1)) {
                 area_base += clr->dSz(Sign::neg(),i,j,k) * (1.0-cseed);

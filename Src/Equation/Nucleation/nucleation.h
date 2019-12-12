@@ -19,7 +19,8 @@ class Nucleation {
     Nucleation ( Scalar * c, Scalar * tpr, Scalar * qsrc,
                  const Times * t, Scalar & dmicro,
                  Matter * f, const real rs, const real dm, 
-                 const real l, const real ca );
+                 const real l, const real ca, const Sign sig = Sign::pos() );
+    /* sign positive -> liquid = 1, works for plant/replant */
     ~Nucleation();
 
     void save(const char *, const int);
@@ -92,6 +93,7 @@ class Nucleation {
     real rmax;
     bool bzoning;
     std::vector<int> id_nearRegion, idd_nearRegion;
+    Sign sig;
 };
 
 #endif

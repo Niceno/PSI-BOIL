@@ -5,7 +5,12 @@
 *******************************************************************************/
 void Nucleation::plant () {
 
-  real rhov = fluid()->rho(0);
+  real rhov;
+  if(sig==Sign::pos()) {
+    rhov = fluid()->rho(0);
+  } else {
+    rhov = fluid()->rho(1);
+  }
 
   if (bzoning!=true) {
     zoning();
@@ -69,9 +74,13 @@ void Nucleation::plant () {
               cseed=real(itmp)/real(mm*mm*mm);
 #endif
             }
-            (*clr)[i][j][k]=std::min((*clr)[i][j][k],cseed);
+            if(sig==Sign::pos()) {
+              (*clr)[i][j][k]=std::min((*clr)[i][j][k],cseed);
+            } else {
+              (*clr)[i][j][k]=1.0-std::min(1.0-(*clr)[i][j][k],cseed);
+            }
             vol_seed += clr->dV(i,j,k) * (1.0-cseed);
-            if (clr->domain()->ibody().off(i,j,k-1)) {
+            if(clr->domain()->ibody().off(i,j,k-1)) {
               area_base += clr->dSz(Sign::neg(),i,j,k) * (1.0-cseed);
               kadj=k;
             }
@@ -132,7 +141,11 @@ void Nucleation::plant () {
             cseed= 0.5 + adist/(2.0*eps) 
                  + 1.0/(2.0*boil::pi)*sin(boil::pi*adist/eps);
           }
-          (*clr)[i][j][k]=std::min((*clr)[i][j][k],cseed);
+          if(sig==Sign::pos()) {
+            (*clr)[i][j][k]=std::min((*clr)[i][j][k],cseed);
+          } else {
+            (*clr)[i][j][k]=1.0-std::min(1.0-(*clr)[i][j][k],cseed);
+          }
         }
       }
     }

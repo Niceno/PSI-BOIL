@@ -2,8 +2,6 @@
 #include <fstream>
 #include <iostream>
 #include <fenv.h>
-#define SYM
-#define USE_CARTESIAN
 #define _GNU_SOURCE 1
 #if 1
 static void __attribute__ ((constructor)) trapfpe(void)
@@ -93,7 +91,7 @@ int main(int argc, char ** argv) {
   |  define unknowns  |
   +------------------*/
   Vector uvw(d), xyz(d);           // vel
-  Vector uvw_1(d), uvw_2(d);   // phasic vel
+  Vector uvw_1(d), uvw_2(d);       // phasic vel
   Scalar p  (d), f  (d), press(d); // pressure
   Scalar c  (d), g  (d), kappa(d); // concentration
   Scalar tpr(d), q  (d);           // temperature
@@ -321,8 +319,13 @@ int main(int argc, char ** argv) {
   real rseed = 2.0*dxmin;
   real zplant= 0.05*0.001; // when bottom of bubble reaches zplant, next seed is set
   real tseed = twall-0.001;  // when temp of nucleation site reaches tseed, next ...
+#ifdef INVERTED
   Nucleation nucl( &c, &tpr, &q, &time, dmicro, &mixed, rseed
                  , 0.0e-10, latent, conc.get_cangle());
+#else
+  Nucleation nucl( &c, &tpr, &q, &time, dmicro, &mixed, rseed
+                 , 0.0e-10, latent, conc.get_cangle(), Sign::neg());
+#endif
   nucl.set_slope(1.0*4.46e-3);
   nucl.set_seed_period(0.001);
 
@@ -412,6 +415,11 @@ int main(int argc, char ** argv) {
     +--------------------*/
     for_vijk(c,i,j,k) 
       c[i][j][k] = 1.0;
+#ifndef INVERTED
+    for_vijk(c,i,j,k) {
+      c[i][j][k] = 1. - c[i][j][k];
+    }
+#endif
 
     /* set seed */
     real zsite=rseed*cos(0.0/180.0*boil::pi);
@@ -421,11 +429,6 @@ int main(int argc, char ** argv) {
     nucl.plant();
     for(int ns=0; ns<nucl.size(); ns++){
       nucl.sites[ns].set_time_seed(0.0);
-    }
-#endif
-#ifndef INVERTED
-    for_vijk(c,i,j,k) {
-      c[i][j][k] = 1. - c[i][j][k];
     }
 #endif
     c.bnd_update();
@@ -509,13 +512,6 @@ int main(int argc, char ** argv) {
     pc.update();
     //pc.micro(&xyz);
     ns.vol_phase_change(&f);
-
-#if 0
-    /* bottom area */
-    real area_l=pc.get_hflux_area_l(Dir::ibody());
-    real area_v=pc.get_hflux_area_v(Dir::ibody());
-    boil::oout<<"area= "<<time.current_time()<<" "<<area_l<<" "<<area_v<<"\n";
-#endif
 
     /*--------------------------+
     |  solve momentum equation  |
@@ -615,54 +611,8 @@ int main(int argc, char ** argv) {
     /*---------------------------+
     |  replant seed or cut neck  |
     +---------------------------*/ 
-#ifdef INVERTED
     nucl.replant();
-#endif
 
-#if 0
-    /*-------------------------------+
-    |  outlet region: delete bubbles |
-    +-------------------------------*/
-    /* flash */
-    int kkm = -1;
-    real clrmin_m=boil::exa;
-    real clrmin_p=boil::exa;
-    if (d.contains_z(z0)) {
-      kkm=c.k(z0);
-      for_vij(c,i,j) {
-        if(clrmin_m>c[i][j][kkm-1]) clrmin_m=c[i][j][kkm-1];
-      }
-      for_vij(c,i,j) {
-        if(clrmin_p>c[i][j][kkm]) clrmin_p=c[i][j][kkm];
-      }
-    }
-    boil::cart.min_real(&clrmin_m);
-    boil::cart.min_real(&clrmin_p);
-    //std::cout<<"main:clrmin_m= "<<clrmin_m<<" "<<clrmin_p<<" "<<kkm<<"\n";
-    if ( (clrmin_m>0.5) && (clrmin_p>0.5) ){
-      for_avk(c,k){
-        if(c.zc(k)>z0){
-          for_avij(c,i,j){
-            c[i][j][k]= 1.0;
-          }
-        }
-      }
-    }
-#endif
-
-//JSM:commented out because TBL is greater than domain size
-//added if condition
-#if 0
-    for_avk(tpr,k){
-      if(c.zc(k)>z0){
-        for_avij(c,i,j){
-          tpr[i][j][k]= tout;
-        }
-      }
-    }
-    tpr.exchange_all();
-#endif
-;
     /* update clr after seed, cutneck and outlet-region */
     c.bnd_update();
     c.exchange_all();
@@ -687,14 +637,6 @@ int main(int argc, char ** argv) {
     }
 #endif
 
-#if 0
-    boil::oout<<"hflux:time,_total[W],_micro[W] "
-              <<time.current_time()<<"  "
-              <<pc.get_hflux(Dir::ibody())<<" "
-              <<pc.get_hflux_micro(Dir::ibody())<<"\n";
-#endif
-
-
     /*-------------+
     |  dt control  |
     +-------------*/
@@ -702,39 +644,7 @@ int main(int argc, char ** argv) {
     conc.color_minmax();
     boil::oout<<"main:color_min,max= "<<time.current_time()<<" "
              <<conc.minval()<<" "<<conc.maxval()<<"\n";
-#if 0
-    real clrmin=conc.minval();
-
-    bool request_replant=false;
-    for(int nsd=0; nsd<nucl.size(); nsd++){
-      if( nucl.sites[nsd].req_replant() ) request_replant=true;
-    }
-
-    if ( clrmin < 0.5 || request_replant ) {
-      /* interface is included */
-      time.control_dt(ns.cfl_max(), cfl_with, dt);
-    } else {
-
-      /* interface is not included */
-      time.control_dt(ns.cfl_max(), cfl_wo, 0.002);
-    }
-
-    real cflmax = ns.cfl_max();
-    boil::oout<<"main:cflmax= "<<cflmax<<"\n";
-    for(int nsd=0; nsd<nucl.size(); nsd++){
-      if( cflmax<=cfl_with && time.dt()<=dt) {
-        nucl.sites[nsd].set_allow_replant(true);
-      } else {
-        nucl.sites[nsd].set_allow_replant(false);
-      }
-    }
-
-    boil::oout<<"main:request= "<<request_replant<<" "
-              <<nucl.sites[0].allow_replant()<<" "
-              <<cflmax<<" "<<time.dt()<<" "<<dt<<"\n";
-#else
     time.control_dt(ns.cfl_max(), cfl_with, dt);
-#endif
 
     /*--------------+
     |  output data  |
@@ -750,19 +660,15 @@ int main(int argc, char ** argv) {
     }
 
     /* diameter */
-    if(nucl.size()==1) {
-      real dia=0.0;
-      real height=0.0;
-      //if (area_v>0.0) {
-        real zft=0.006;
-        conc.front_minmax( Range<real>(-LX2,LX2) ,Range<real>(-LX2,LX2)
-                          ,Range<real>(0, zft));
-        dia = conc.get_xmaxft() - conc.get_xminft();
-        height = conc.get_zmaxft();
-      //}
-      boil::oout<<"Diameter= "<<time.current_time()<<" "<<dia<<" "
-                <<height<<"\n";
-    }
+    real dia=0.0;
+    real height=0.0;
+    real zft=0.006;
+    conc.front_minmax( Range<real>(-LX2,LX2) ,Range<real>(-LX2,LX2)
+                      ,Range<real>(0, zft));
+    dia = conc.get_xmaxft() - conc.get_xminft();
+    height = conc.get_zmaxft();
+    boil::oout<<"Diameter= "<<time.current_time()<<" "<<dia<<" "
+              <<height<<"\n";
 
     /*--------------+
     |  backup data  |
@@ -787,7 +693,6 @@ int main(int argc, char ** argv) {
         memcpy(cfname, fname.c_str(), len+1);
         output << std::setprecision(16);
         output.open(cfname, std::ios::out);
-        //output.open("time.txt", std::ios::out);
         output << time.current_step() << boil::endl;
         output << time.current_time()+time.dt() << boil::endl;
         output << time.dt() << boil::endl;
