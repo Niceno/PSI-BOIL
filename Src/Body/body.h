@@ -38,6 +38,10 @@ class Body {
   public:
     Body(const std::string name);
     Body() {sca=NULL; vec=NULL;}
+
+    //! Is empty
+    virtual bool is_empty() { return false; }
+
     //! Number of Polygons (cells).
     int npolys() const {return polys.size();}
 

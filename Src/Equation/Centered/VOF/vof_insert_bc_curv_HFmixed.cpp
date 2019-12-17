@@ -48,6 +48,8 @@ void VOF::insert_bc_curv_HFmixed(const Scalar & scp,
   boil::cart.max_real(&dzzt1);
   boil::cart.max_real(&dzzc1);
 
+  boil::oout<<"VOF::bccurv-h0: "<<time->current_time()<<" "<<h0<<" "<<h1<<" "<<h2<<boil::endl;
+
   if(!detachment_model.initialized()||!detachment_model.detached()) {
 
     real kappa_wall = wall_curv_HFmixed_kernel(h0,h1,dzzc0,dzzt0,

@@ -27,13 +27,14 @@
 class Domain {
   public:
     Domain(const Grid1D & ogx, const Grid1D & ogy, const Grid1D & ogz,
+           Body * b = NULL, /* it will change, that is why it is pointer */ 
            const std::string n="domain", const Decompose dec=Decompose::xyz(),
            const bool print_statistics = true);
-
-    Domain(const Grid1D & ogx, const Grid1D & ogy, const Grid1D & ogz,
-           Body * b, /* it will change, that is why it is pointer */ 
-           const std::string n="domain", const Decompose dec=Decompose::xyz(),
-           const bool print_statistics = true);
+ 
+    Domain(const Domain & fine_dom,
+           const Step cx, const Step cy, const Step cz,
+           Body * b = NULL,
+           const bool print_statistics = false);
 
     ~Domain(){}
 
@@ -95,6 +96,17 @@ class Domain {
     real global_max_x() const {return grid_x_original->x_max();}
     real global_max_y() const {return grid_y_original->x_max();}
     real global_max_z() const {return grid_z_original->x_max();}
+
+    /* original grids */
+    const Grid1D * grid_x_org() const {return grid_x_original; }
+    const Grid1D * grid_y_org() const {return grid_y_original; }
+    const Grid1D * grid_z_org() const {return grid_z_original; }
+
+    /* name */
+    std::string dom_name() const { return name; }
+
+    /* decomposition */
+    Decompose decomp() const { return dc; }
 
     /* careful: these return global logical coordinates */
     int I(const real x) const;
@@ -260,6 +272,9 @@ class Domain {
     real min_dxyz, max_dxyz;
     real min_dV, max_dV;
     real max_ar; /* aspect ratio */
+
+    /* decomposition */
+    const Decompose dc;
 };	
 
 #endif

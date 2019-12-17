@@ -17,21 +17,7 @@
 class Axisymmetric : public Domain {
   public:
     Axisymmetric(const Grid1D & ogx, const Grid1D & ogz, const real dy,
-                 const std::string n="axisym_domain",
-                 const Decompose dec=Decompose::xz(),
-                 const bool print_statistics = true) :
-    Domain(ogx,Grid1D(dy),ogz,n,dec,false),
-    ydummy(dy),
-    angle(1.0) { 
-      grid_y_original = &ydummy;
-      check_radial_grid(ogx);
-
-      if(print_statistics)
-        statistics();
-    };
-
-    Axisymmetric(const Grid1D & ogx, const Grid1D & ogz, const real dy,
-                 Body * b, /* it will change, that is why it is pointer */
+                 Body * b = NULL, /* it will change, that is why it is pointer */
                  const std::string n="axisym_domain", 
                  const Decompose dec=Decompose::xz(),
                  const bool print_statistics = true) :
@@ -41,8 +27,14 @@ class Axisymmetric : public Domain {
       grid_y_original = &ydummy;
       check_radial_grid(ogx);
 
-      if(print_statistics)
-        statistics(body);
+      if(b) {
+        if(print_statistics)
+          statistics(body);
+      } else {
+        if(print_statistics)
+          statistics();
+      }
+
     };
 
     ~Axisymmetric() {};

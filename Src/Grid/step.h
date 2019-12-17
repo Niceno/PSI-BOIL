@@ -16,6 +16,12 @@ class Step {
     explicit Step(const int i) : val(i) {}
     int size() const     {return val;}
 
+    //! Prints the step value.
+    friend std::ostream & operator << (std::ostream & ost, const Step & stp) {
+      ost << stp.size();
+      return ost;
+    }
+
   private:
     const int val;
 };

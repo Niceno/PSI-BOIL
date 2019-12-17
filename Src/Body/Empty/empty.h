@@ -12,6 +12,9 @@ class Empty : public Body {
   public:
     Empty() {}
 
+    //! Is empty
+    virtual bool is_empty() { return true; }
+
     bool cut(int i, int j, int k) const {return false;}
     bool off(int i, int j, int k) const {return false;}
     bool on (int i, int j, int k) const {return true;}
