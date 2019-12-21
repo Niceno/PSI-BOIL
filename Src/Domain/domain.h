@@ -32,7 +32,7 @@ class Domain {
            const bool print_statistics = true);
  
     Domain(const Domain & fine_dom,
-           const Step cx, const Step cy, const Step cz,
+           const Step cx, const Step cy = Step(-1), const Step cz = Step(-1),
            Body * b = NULL,
            const bool print_statistics = false);
 

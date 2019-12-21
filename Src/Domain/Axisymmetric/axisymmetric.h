@@ -37,6 +37,24 @@ class Axisymmetric : public Domain {
 
     };
 
+    Axisymmetric(const Axisymmetric & fine_dom,
+                 const Step cx, const Step cz,
+                 Body * b = NULL,
+                 const bool print_statistics = false) :
+    Domain(fine_dom,cx,Step(1),cz,b,false),
+    ydummy(fine_dom.grid_x_org()->lx()),
+    angle(1.0) {
+      if(b) {
+        if(print_statistics)
+          statistics(body);
+      } else {
+        if(print_statistics)
+          statistics();
+      }
+
+    };
+
+
     ~Axisymmetric() {};
 
     /* get angle of simulated wedge in radians */

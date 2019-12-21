@@ -47,12 +47,25 @@ Domain::Domain(const Domain & fine_dom,
   name(fine_dom.dom_name()+" - coarsened"), 
   dc(fine_dom.decomp()) {
 
-  boil::oout<<"Creating coarser grid with strides "
-            <<cx<<" "<<cy<<" "<<cz<<" .\n";
+  const Step * c1 = &cx;  
+  const Step * c2 = &cy;  
+  const Step * c3 = &cz;  
 
-  grid_x_original = new Grid1D(*fine_dom.grid_x_org(),cx);
-  grid_y_original = new Grid1D(*fine_dom.grid_y_org(),cy);
-  grid_z_original = new Grid1D(*fine_dom.grid_z_org(),cz);
+  if       (cy.size()<0&&cz.size()<0) {
+    c2 = &cx;
+    c3 = &cx;
+  } else if( cx.size()<=0 || cy.size()<=0 || cz.size()<=0 ) {
+    boil::oout<<"Disallowed step values! "<<cx<<" "<<cy<<" "<<cz<<" .\n"
+              <<"Exiting."<<boil::endl;
+    exit(0);
+  }
+
+  boil::oout<<"Creating coarser grid with strides "
+            <<*c1<<" "<<*c2<<" "<<*c3<<" .\n";
+
+  grid_x_original = new Grid1D(*fine_dom.grid_x_org(),*c1);
+  grid_y_original = new Grid1D(*fine_dom.grid_y_org(),*c2);
+  grid_z_original = new Grid1D(*fine_dom.grid_z_org(),*c3);
 
   if(stl_body) {
     body = stl_body;

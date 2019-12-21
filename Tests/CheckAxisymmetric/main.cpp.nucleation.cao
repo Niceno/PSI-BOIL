@@ -41,8 +41,10 @@ int main(int argc, char ** argv) {
   const int NX2  =  7*gLevel;
   const real dxuni = LX1/real(NX1);
   const real LZ0 = -100e-6;
-  const int NZ0 = 10;
-  const int NZ1  = 64*gLevel-NZ0;
+  //const int NZ0 = 10;
+  //const int NZ1  = 64*gLevel-NZ0;
+  const int NZ0 = 4*gLevel;
+  const int NZ1  = 64*gLevel;
   const real LZ1  = LX1/real(NX1)*real(NZ1);
   const real z0=0.9*LZ1;//JSM:changed from0.3
   const real z1=LZ1;//JSM:changed from 0.4
@@ -53,8 +55,8 @@ int main(int argc, char ** argv) {
   const real tout = tsat0;
   const real twall = 11.+tsat0;
 
-  const bool detachment_model = true;
-  //const bool detachment_model = false;
+  //const bool detachment_model = true;
+  const bool detachment_model = false;
 
   /*--------------------------------+
   |  choose the output file format  |
@@ -155,7 +157,7 @@ int main(int argc, char ** argv) {
   const real sig = 7.9e-3;
   const real latent = 76900.;
   const real gravity = boil::g;
-  real cangle = 30.;
+  real cangle = 1.;
   /* for now */
   const real liquid_drhodt=0.0;   //[kg/m3K]
   const real vapor_drhodt=0.0; //[kg/m3K]
@@ -231,6 +233,7 @@ int main(int argc, char ** argv) {
   conc.set_pressure_extrapolation_parameters(false,300);
 
   conc.set_use_subgrid(true);
+  //conc.set_use_subgrid(false);
   /* 1-cangle */
 #ifndef INVERTED
   cangle = 180.-cangle;

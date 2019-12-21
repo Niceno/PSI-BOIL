@@ -99,7 +99,7 @@ int main(int argc, char ** argv) {
     uvw.bc(m).add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
 #else
     uvw.bc(m).add( BndCnd( Dir::jmin(), BndType::symmetry() ) );
-    uvw.bc(m).add( BndCnd( Dir::jmax(), BndType::outlet() ) );
+    uvw.bc(m).add( BndCnd( Dir::jmax(), BndType::wall() ) );
 #endif
 
     uvw_old(m)=uvw(m).shape();
@@ -138,7 +138,7 @@ int main(int argc, char ** argv) {
   c.bc().add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
 #else
   c.bc().add( BndCnd( Dir::jmin(), BndType::symmetry() ) );
-  c.bc().add( BndCnd( Dir::jmax(), BndType::neumann() ) );
+  c.bc().add( BndCnd( Dir::jmax(), BndType::wall() ) );
 #endif
 
   cold = c.shape();
