@@ -70,6 +70,13 @@ void VOF::insert_bc_curv_HFmixed(const Scalar & scp,
           } else {
             kappa[i][j][k] = kappa_wall;
             tempflag[i][j][k] = 2;
+#else
+          } else if( (scp.xn(i+1)<h0) && (h0<scp.xn(i+2)) ) {
+            kappa[i][j][k] = kappa_wall;
+            tempflag[i][j][k] = 2;
+          } else if( (scp.xn(i-1)<h0) && (h0<scp.xn(i  )) ) {
+            kappa[i][j][k] = kappa_wall;
+            tempflag[i][j][k] = 2;
 #endif
           }
           if( (scp.xn(i  )<h1) && (h1<scp.xn(i+1)) ) {

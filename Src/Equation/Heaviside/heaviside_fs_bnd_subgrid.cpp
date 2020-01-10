@@ -132,7 +132,7 @@ void Heaviside::fs_bnd_subgrid(const Scalar & scp, Vector & fs,
       mcomp = Comp::i();
       real & fsval = fs[mcomp][i  ][j][k];
       real refpos = scp.xn(i);
-      bool test = (fsval < refpos);
+      bool test = (fsval <= refpos);
       if(test)
         fsval = boil::unreal;
     }
@@ -142,7 +142,7 @@ void Heaviside::fs_bnd_subgrid(const Scalar & scp, Vector & fs,
       mcomp = Comp::i();
       real & fsval = fs[mcomp][i+1][j][k];
       real refpos = scp.xn(i+1);
-      bool test = (fsval > refpos);
+      bool test = (fsval >= refpos);
       if(test)
         fsval = boil::unreal;
     }
@@ -152,7 +152,7 @@ void Heaviside::fs_bnd_subgrid(const Scalar & scp, Vector & fs,
       mcomp = Comp::j();
       real & fsval = fs[mcomp][i][j  ][k];
       real refpos = scp.yn(j);
-      bool test = (fsval < refpos);
+      bool test = (fsval <= refpos);
       if(test)
         fsval = boil::unreal;
     }
@@ -162,7 +162,7 @@ void Heaviside::fs_bnd_subgrid(const Scalar & scp, Vector & fs,
       mcomp = Comp::j();
       real & fsval = fs[mcomp][i][j+1][k];
       real refpos = scp.yn(j+1);
-      bool test = (fsval > refpos);
+      bool test = (fsval >= refpos);
       if(test)
         fsval = boil::unreal;
     }
@@ -172,7 +172,7 @@ void Heaviside::fs_bnd_subgrid(const Scalar & scp, Vector & fs,
       mcomp = Comp::k();
       real & fsval = fs[mcomp][i][j][k  ];
       real refpos = scp.zn(k);
-      bool test = (fsval < refpos);
+      bool test = (fsval <= refpos);
       if(test)
         fsval = boil::unreal;
     }
@@ -182,7 +182,7 @@ void Heaviside::fs_bnd_subgrid(const Scalar & scp, Vector & fs,
       mcomp = Comp::k();
       real & fsval = fs[mcomp][i][j][k+1];
       real refpos = scp.zn(k+1);
-      bool test = (fsval > refpos);
+      bool test = (fsval >= refpos);
       if(test)
         fsval = boil::unreal;
     }

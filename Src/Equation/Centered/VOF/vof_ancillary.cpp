@@ -1,7 +1,7 @@
 #include "vof.h"
 
 void VOF::ancillary() {
-  ancillary(phi);
+  ancillary(color());
   return;
 }
 

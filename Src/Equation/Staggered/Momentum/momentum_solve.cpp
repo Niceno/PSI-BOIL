@@ -38,6 +38,7 @@ void Momentum::solve(const ResRat & factor) {
         if( dom->ibody().off(i,   j,   k   ) || 
             dom->ibody().off(i-ip,j-jp,k-kp) ) {
           fnew[m][i][j][k] = 0.0;
+          //fnew[m][i][j][k] = u[m][i][j][k];
         }
       }
     }
@@ -80,7 +81,9 @@ void Momentum::solve(const ResRat & factor) {
   if(dom->ibody().nccells() > 0) {
     for_m(m){
       for_mijk(m,i,j,k)
-        if(dom->ibody().off(m,i,j,k))u[m][i][j][k]=0.0;
+        if(dom->ibody().off(m,i,j,k)) {
+          u[m][i][j][k]=0.0;
+        }
     }
   }
 

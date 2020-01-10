@@ -27,7 +27,7 @@ void VOF::advance(Scalar & scp, const bool anci) {
   boil::timer.stop("vof advance");
 
   if(anci)
-    ancillary(phi);
+    ancillary(color());
 
   return;
 }
