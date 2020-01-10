@@ -65,19 +65,19 @@ void Heaviside::fs_bnd_subgrid(const Scalar & scp, Vector & fs,
           if(mcomp==Comp::i()) {
             real & fsval = fs[mcomp][i+of][j][k];
             real refpos = scp.xn(i+of);
-            bool test = (d == Dir::imin()) ? (fsval < refpos) : (fsval > refpos);
+            bool test = (d == Dir::imin()) ? (fsval <= refpos) : (fsval >= refpos);
             if(errint||test)
               fsval = boil::unreal;
           } else if(mcomp==Comp::j()) {
             real & fsval = fs[mcomp][i][j+of][k];
             real refpos = scp.yn(j+of);
-            bool test = (d == Dir::jmin()) ? (fsval < refpos) : (fsval > refpos);
+            bool test = (d == Dir::jmin()) ? (fsval <= refpos) : (fsval >= refpos);
             if(errint||test)
               fsval = boil::unreal;
           } else {
             real & fsval = fs[mcomp][i][j][k+of];
             real refpos = scp.zn(k+of);
-            bool test = (d == Dir::kmin()) ? (fsval < refpos) : (fsval > refpos);
+            bool test = (d == Dir::kmin()) ? (fsval <= refpos) : (fsval >= refpos);
             if(errint||test)
               fsval = boil::unreal;
           }
