@@ -116,6 +116,45 @@ class TopoMethod {
     explicit TopoMethod(const int m) {val = m;}
 };
 
+//////////////////////
+//                  //
+//  Subgrid method  //
+//                  //
+//////////////////////
+/* this is a ravioli class for subgrid method selection */
+class SubgridMethod {
+  public:
+    SubgridMethod() {val=-1;}
+
+    static const SubgridMethod undefined()  {return SubgridMethod(-1);}
+    static const SubgridMethod None()       {return SubgridMethod( 1);}
+    static const SubgridMethod PLIC()       {return SubgridMethod( 2);}
+    static const SubgridMethod SLICliquid() {return SubgridMethod( 3);}
+    static const SubgridMethod SLICgas()    {return SubgridMethod( 4);}
+
+    //! Prints the components name.
+    friend std::ostream & operator << (std::ostream & ost, const SubgridMethod & com) {
+      switch(com.val) {
+        case(-1): ost << "undefined"; break;
+        case( 1): ost << "None"; break;
+        case( 2): ost << "PLIC"; break;
+        case( 3): ost << "PLIC-liquid"; break;
+        case( 4): ost << "PLIC-gas"; break;
+      }
+
+      return ost;
+    }
+
+    bool operator == (const SubgridMethod & o) const {return val == o.val;}
+    bool operator != (const SubgridMethod & o) const {return val != o.val;}
+
+  private:
+    int val;
+
+    /* avoid implicit conversions of integer to Subgrid */
+    explicit SubgridMethod(const int m) {val = m;}
+};
+
 ////////////////////////
 //                    //
 //  Detachment model  //

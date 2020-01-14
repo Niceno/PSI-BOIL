@@ -271,7 +271,7 @@ class VOF : public Centered {
     bool iminw, imaxw, jminw, jmaxw, kminw, kmaxw; // true = wall
     bool iminc, imaxc, jminc, jmaxc, kminc, kmaxc; // true = cut-stencil
     bool ifull, jfull, kfull; // true = not a dummy direction
-    bool limit_color, use_subgrid, use_interp, store_pressure_extrap;
+    bool limit_color, use_interp, store_pressure_extrap;
     real minclr, maxclr;
 
     Heaviside * heavi;
@@ -279,6 +279,7 @@ class VOF : public Centered {
     Comp mcomp_for_elvira;
     DetachmentModel detachment_model;
     CurvMethod bulk_curv_method, wall_curv_method;
+    SubgridMethod subgrid_method;
     TopoMethod topo_method;
 
     int nlayer, niter_pressure_extrap;

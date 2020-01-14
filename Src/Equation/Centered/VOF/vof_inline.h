@@ -45,13 +45,13 @@ inline void set_limit_color(const bool b) {
 /* getter for limit_color */
 inline bool get_limit_color() { return(limit_color);};
 
-/* setter for use_subgrid */
-inline void set_use_subgrid(const bool b) {
-  use_subgrid=b;
-  boil::oout<<"set_use_subgrid= "<<b<<"\n";
+/* setter for subgrid method */
+inline void set_subgrid_method(const SubgridMethod b) {
+  subgrid_method=b;
+  boil::oout<<"Subgrid method: "<<subgrid_method<<boil::endl;
 }
-/* getter for use_subgrid */
-inline bool get_use_subgrid() { return(use_subgrid);};
+/* getter for subgrid method */
+inline SubgridMethod get_subgrid_method() { return(subgrid_method);};
 
 /* setter for use_interp */
 inline void set_use_interp(const bool b) {

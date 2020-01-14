@@ -1,8 +1,8 @@
 #include "heaviside.h"
 
 /******************************************************************************/
-void Heaviside::fs_bnd_subgrid(const Scalar & scp, Vector & fs, 
-                               const real & tol_wall) {
+void Heaviside::fs_bnd_geometric(const Scalar & scp, Vector & fs, 
+                                 const real & tol_wall) {
 /***************************************************************************//**
 *  \brief Corrects fs at boundaries.
 *         scalar_exchange(_all) should take account of periodic condition.

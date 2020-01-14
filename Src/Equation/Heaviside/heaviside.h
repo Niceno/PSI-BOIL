@@ -41,8 +41,10 @@ class Heaviside { /* this class is an abstract class! */
 
     void fs_bnd_nosubgrid(const Scalar & scp, Vector & fs,
                           const real & tol_wall);
-    void fs_bnd_subgrid(const Scalar & scp, Vector & fs, 
-                        const real & tol_wall);
+    void fs_bnd_geometric(const Scalar & scp, Vector & fs, 
+                          const real & tol_wall);
+    void fs_bnd_1D(const Scalar & scp, Vector & fs, 
+                   const real & tol_wall, const Sign & sig);
 
     real operator() (const int i, const int j, const int k) const {
       return (*phi)[i][j][k];

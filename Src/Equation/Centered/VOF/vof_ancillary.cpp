@@ -14,7 +14,8 @@ void VOF::ancillary(Scalar & scp) {
   boil::timer.start("vof ancillary");
 
   /* reconstruct geometry */
-  reconstruct_geometry(scp);
+  /* attention! PHI must be used here! */
+  reconstruct_geometry(phi);
 
   if(topo_method==TopoMethod::Hybrid()) {
 
@@ -25,14 +26,36 @@ void VOF::ancillary(Scalar & scp) {
     if(!use_interp) {
       cal_fs3(scp);
     } else {
-      heavi->cal_fs_interp(scp,fs,tol_wall,use_subgrid);
-    }
 
+      /* with interpolation, only binary subgrid division is possible */
+      bool use_subgrid;
+      if(subgrid_method == SubgridMethod::None()) {
+        use_subgrid = false;
+      } else {
+        use_subgrid = true;
+      }
+
+      heavi->cal_fs_interp(scp,fs,tol_wall,use_subgrid);
+
+    }
 
     /* calculate area -> due to the Heaviside bindings, color is used, not scp */
     heavi->calculate_adens();
 
   } else if(topo_method==TopoMethod::Heaviside()) {
+
+    /* under-developed part */
+    bool use_subgrid;
+    if       (subgrid_method == SubgridMethod::PLIC()) {
+      use_subgrid = true;
+    } else if(subgrid_method == SubgridMethod::None()) {
+      use_subgrid = false;
+    } else {
+      boil::oout<<"VOF::ancillary: Underdevelopment!"
+                <<" Exiting."<<boil::endl;
+      exit(0);
+    }
+
     heavi->topology(topo,tol_wall,use_interp,use_subgrid);
   } else {
     boil::oout<<"VOF::ancillary: Topology calculation method not set properly!"

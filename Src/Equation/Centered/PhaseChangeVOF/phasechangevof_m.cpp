@@ -7,7 +7,7 @@ void PhaseChangeVOF::m(const Scalar * diff_eddy) {
 *         M = (qflux_liquid + qflux_vapor) / latent
 *******************************************************************************/
 
-#if 0 /* obtaining phase change rate from the underlying solid */
+#if 1 /* obtaining phase change rate from the underlying solid */
   for_ijk(i,j,k){
     if(Interface(i,j,k)){
       real lv = lambdav;
@@ -45,8 +45,17 @@ void PhaseChangeVOF::m(const Scalar * diff_eddy) {
         assert(boil::realistic(tmp_w));
         
         tnl[i][j][k] = lam_s/ll*(tmp_w-tmp_s)/len_s * (-1);
+        tnv[i][j][k] = 0.0;
+
+      } else if(phi.zn(k)<0.5*phi.dzc(k)) {
+        real clrc = clr[i][j][k];
+
+        if(clrc<0.95&&clrc>0.01) {
+          tnl[i][j][k] = (Tint(i,j,k)-tpr[i][j][k-1])/(clrc*phi.dzc(k)) * (-1);
+          tnv[i][j][k] = 0.0;
+        }
       }
-    }
+    } /* interface */
   }
 #endif
 

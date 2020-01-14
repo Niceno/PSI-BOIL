@@ -37,6 +37,7 @@ VOF::VOF(const Scalar & PHI,
   mcomp_for_elvira(Comp::undefined()), /* undefined for 3D */
   bulk_curv_method(CurvMethod::HF()),
   wall_curv_method(CurvMethod::DivNorm()),
+  subgrid_method(SubgridMethod::PLIC()),
   topo_method(TopoMethod::Hybrid())
 
 /*------------------------------------------------------+
@@ -133,7 +134,6 @@ VOF::VOF(const Scalar & PHI,
   cangle=90.0/180.0*boil::pi;
   mult_wall = 1.;
   limit_color=false;
-  use_subgrid=false;
   use_interp=false;
   store_pressure_extrap=false;
   niter_pressure_extrap=1000;

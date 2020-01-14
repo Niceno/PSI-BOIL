@@ -102,7 +102,7 @@ void Heaviside::cal_fs_interp(const Scalar & scp, Vector & fs,
 
   /* correct at boundaries */
   if(use_subgrid)
-    fs_bnd_subgrid(scp,fs,tol_wall);
+    fs_bnd_geometric(scp,fs,tol_wall);
   else
     fs_bnd_nosubgrid(scp,fs,tol_wall);
   //fs.exchange_all();
