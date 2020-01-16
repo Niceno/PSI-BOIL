@@ -214,7 +214,7 @@ void test_reconstruction_sphere(bool partial,
   real err_c_l1(0.0),  err_c_linf(0.0);
   int cnt(0);
   for_vijk(ctest,i,j,k) {
-    if(*conc.topo.adens[i][j][k]>boil::pico) {
+    if((*conc.topo.adens)[i][j][k]>boil::pico) {
       cnt++;
 
       /* surface normal to a sphere

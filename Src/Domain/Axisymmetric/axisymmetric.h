@@ -40,9 +40,9 @@ class Axisymmetric : public Domain {
     Axisymmetric(const Axisymmetric & fine_dom,
                  const Step cx, const Step cz,
                  Body * b = NULL,
-                 const bool print_statistics = false) :
-    Domain(fine_dom,cx,Step(1),cz,b,false),
-    ydummy(fine_dom.grid_x_org()->lx()),
+                 const bool print_statistics = true) :
+    Domain(fine_dom,cx,cx,cz,b,false),
+    ydummy(cx.size()*fine_dom.grid_x_org()->lx()),
     angle(1.0) {
       if(b) {
         if(print_statistics)
@@ -108,6 +108,9 @@ class Axisymmetric : public Domain {
     virtual real dV_xstag(const int i, const int j, const int k) const;
     virtual real dV_ystag(const int i, const int j, const int k) const;
     virtual real dV_zstag(const int i, const int j, const int k) const;
+
+    /* Cartesian area projection */
+    virtual real dSy_cartesian(const int i, const int j, const int k) const;
 
   private:
     void check_radial_grid(const Grid1D & gx);

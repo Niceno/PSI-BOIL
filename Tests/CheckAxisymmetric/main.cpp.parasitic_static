@@ -1,5 +1,4 @@
 #include "Include/psi-boil.h"
-#include "setup_circle.cpp"
 #include "test_reconstruction.cpp"
 #include <fstream>
 #include <iostream>
@@ -218,8 +217,8 @@ int main(int argc, char * argv[]) {
   #endif
   //conc.set_reconstruction_parameters(1e-5,conc.get_reconstruction_maxiter());
 #endif
-  conc.set_curv_method(0);  // height function
-  //conc.set_curv_method(1);  // smoothed VOF
+  conc.set_curv_method(CurvMethod::HF());  // height function
+  conc.set_wall_curv_method(CurvMethod::none());
 
 #if 1
   /*--------------------+
@@ -231,7 +230,7 @@ int main(int argc, char * argv[]) {
 
   cold = 0.0;
 
-  setup_circle_xz(cold,radius,xcent,ycent);
+  boil::setup_circle_xz(cold,radius,xcent,ycent);
   if(inverted) {
     for_avijk(cold,i,j,k)
       cold[i][j][k] = 1. - cold[i][j][k];
@@ -360,7 +359,7 @@ int main(int argc, char * argv[]) {
     nmv.push_back(nm);
     test_reconstruction_sphere(partial,conc,conc.color(),cold,kappa,inverted,radius,0.,0.,0.,nm,nl1,nli,kl1,kli);
     int q = nl1.size()-1;
-    //boil::oout<<"curv= "<<q<<" "<<radmult<<" "<<gLevel<<" | "<<nmv[q]<<" "<<nl1[q]<<" "<<nli[q]<<" "<<kl1[q]<<" "<<kli[q]<<boil::endl;
+    boil::oout<<"curv= "<<q<<" "<<radmult<<" "<<gLevel<<" | "<<nmv[q]<<" "<<nl1[q]<<" "<<nli[q]<<" "<<kl1[q]<<" "<<kli[q]<<boil::endl;
 
     if(time.current_step() % nint == 0 || time.current_step()==1 ) {
       boil::plot->plot(uvw, c, press,"uvw-c-press",  time.current_step());

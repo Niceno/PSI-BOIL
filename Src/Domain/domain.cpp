@@ -63,9 +63,24 @@ Domain::Domain(const Domain & fine_dom,
   boil::oout<<"Creating coarser grid with strides "
             <<*c1<<" "<<*c2<<" "<<*c3<<" .\n";
 
-  grid_x_original = new Grid1D(*fine_dom.grid_x_org(),*c1);
-  grid_y_original = new Grid1D(*fine_dom.grid_y_org(),*c2);
-  grid_z_original = new Grid1D(*fine_dom.grid_z_org(),*c3);
+  /* properly coarsen dummy grids */
+  if(fine_dom.grid_x_org()->is_dummy()) {
+    grid_x_original = new Grid1D(c1->size()*fine_dom.grid_x_org()->lx());
+  } else {
+    grid_x_original = new Grid1D(*fine_dom.grid_x_org(),*c1);
+  }
+
+  if(fine_dom.grid_y_org()->is_dummy()) {
+    grid_y_original = new Grid1D(c2->size()*fine_dom.grid_y_org()->lx());
+  } else {
+    grid_y_original = new Grid1D(*fine_dom.grid_y_org(),*c2);
+  }
+
+  if(fine_dom.grid_z_org()->is_dummy()) {
+    grid_z_original = new Grid1D(c3->size()*fine_dom.grid_z_org()->lx());
+  } else {
+    grid_z_original = new Grid1D(*fine_dom.grid_z_org(),*c3);
+  }
 
   if(stl_body) {
     body = stl_body;

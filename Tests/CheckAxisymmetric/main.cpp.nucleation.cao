@@ -16,7 +16,7 @@ static void __attribute__ ((constructor)) trapfpe(void)
 #define USE_PHASE_VEL_VOF
 //#define USE_PHASE_VEL_EFD
 #define USE_SOLID
-#define USE_BIG
+//#define USE_BIG
 
 /******************************************************************************/
 int main(int argc, char ** argv) {
@@ -457,6 +457,7 @@ int main(int argc, char ** argv) {
 #endif
     c.bnd_update();
     c.exchange_all();
+    conc.init();
 
     const real betal = 0.057;
     const real ztconst = 7.4*std::pow(liquid.mu()->value()*liquid.lambda()->value()/liquid.cp()->value()/liquid.rho()->value()/gravity/(twall0-tout)/betal,1./3.);
@@ -684,7 +685,7 @@ int main(int argc, char ** argv) {
     +--------------*/
     //if((time.current_time()) / (tint) >= real(iint) ) {
     //if(true) {
-    if((time.current_step()) / (50*gLevel) >= real(iint) ) {
+    if((time.current_step()) / (500*gLevel) >= real(iint) ) {
       iint++;// = int(time.current_time() / tint);
       tpr.exchange_all();
       boil::plot->plot(uvw,c,tpr,conc.color(),mdot,(*(conc.topo.adens))

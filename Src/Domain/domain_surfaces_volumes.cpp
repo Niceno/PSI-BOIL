@@ -68,3 +68,8 @@ real Domain::dV_ystag(const int i, const int j, const int k) const
   { return dxc(i) * dys(j) * dzc(k); }
 real Domain::dV_zstag(const int i, const int j, const int k) const
   { return dxc(i) * dyc(j) * dzb(k); }
+
+/* used as Cartesian area projection in Axisymmetric */
+real Domain::dSy_cartesian(const int i, const int j, const int k) const 
+  { return dSy(i,j,k); };
+

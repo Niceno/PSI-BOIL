@@ -1,6 +1,6 @@
 #include "Include/psi-boil.h"
 
-const int gLevel = 2;
+const int gLevel = 4;
 const int AR = 3;
 const int NX = 24*gLevel;
 const int NZ = AR*NX;
@@ -13,14 +13,15 @@ const real DX = LX/real(NX);
 const real tw0 = 100.0;
 const real qflux = 1.;
 const real um = 1.;
-const real volflow = boil::pi*LX*LX*um;
 const real Cp = 1.;
-const real gradtm = 2.*LX*boil::pi*qflux/volflow/Cp;
 
 /******************************************************************************/
 int main(int argc, char ** argv) {
 
   boil::timer.start();
+
+  const real volflow = boil::pi*LX*LX*um;
+  const real gradtm = 2.*LX*boil::pi*qflux/volflow/Cp;
 
   /*--------------------------------+
   |  choose the output file format  |
@@ -32,7 +33,7 @@ int main(int argc, char ** argv) {
   |  grid(s)  |
   +----------*/
 #if 1
-  Grid1D gx( Range<real>(0.0,LX), NX, Periodic::no() );
+  Grid1D gx( Range<real>(0.0,LX), NX, Periodic::no(), BndGrid::symmetry(), BndGrid::wall() );
 #else
   Grid1D gx( Range<real>(0.0,LX), Range<real>(3.1*DX,0.5*DX), NX, Periodic::no() );
 #endif
@@ -42,17 +43,22 @@ int main(int argc, char ** argv) {
   |  domain  |
   +---------*/
   Axisymmetric d(gx,gz,DX);
+  Axisymmetric coarse(d,Step(2),Step(2),NULL,true);
+  
+  //exit(0);
 
   /*------------------+
   |  define unknowns  |
   +------------------*/
-  Vector uvw(d), xyz(d);           // vel
-  Scalar p  (d), f  (d); // pressure
-  Scalar press(d);
+  Vector uvw(d);           // vel
+  Vector uvw_coarse(coarse), xyz_coarse(coarse);           // vel
+  Scalar p  (coarse), f  (coarse); // pressure
+  Scalar press(coarse);
   Scalar tpr(d), q  (d);           // temperature
   Scalar tprsol(d), tprdiff(d);
   Vector uvwsol(d), uvwdiff(d);
 
+  Scalar aux(coarse);
   Scalar test(d);
 
   /*----------------------+
@@ -78,12 +84,19 @@ int main(int argc, char ** argv) {
   std::strcpy(eqUz, eq.c_str());
 
   for_m(m) {
-    uvw.bc(m).add( BndCnd( Dir::imin(), BndType::wall() ) );
+    uvw.bc(m).add( BndCnd( Dir::imin(), BndType::symmetry() ) );
     uvw.bc(m).add( BndCnd( Dir::imax(), BndType::wall() ) );
     uvw.bc(m).add( BndCnd( Dir::kmin(), BndType::inlet(), 0.0, 0.0, eqUz ) );
     uvw.bc(m).add( BndCnd( Dir::kmax(), BndType::outlet() ) );
     uvw.bc(m).add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
     uvw.bc(m).add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
+
+    uvw_coarse.bc(m).add( BndCnd( Dir::imin(), BndType::symmetry() ) );
+    uvw_coarse.bc(m).add( BndCnd( Dir::imax(), BndType::wall() ) );
+    uvw_coarse.bc(m).add( BndCnd( Dir::kmin(), BndType::inlet(), 0.0, 0.0, eqUz ) );
+    uvw_coarse.bc(m).add( BndCnd( Dir::kmax(), BndType::outlet() ) );
+    uvw_coarse.bc(m).add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
+    uvw_coarse.bc(m).add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
   }
 
   std::string STR_tw0 = std::to_string(tw0);
@@ -102,14 +115,16 @@ int main(int argc, char ** argv) {
   char *eqTz = new char[eq.length()+1];
   std::strcpy(eqTz, eq.c_str());
 
-  tpr.bc().add( BndCnd( Dir::imin(), BndType::neumann() ) );
+  //exit(0);
+
+  tpr.bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
   tpr.bc().add( BndCnd( Dir::imax(), BndType::dirichlet(), eqTr ) );
   tpr.bc().add( BndCnd( Dir::kmin(), BndType::dirichlet(), eqTz ) );
   tpr.bc().add( BndCnd( Dir::kmax(), BndType::dirichlet(), eqTz ) );
   tpr.bc().add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
   tpr.bc().add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
 
-  p.bc().add( BndCnd( Dir::imin(), BndType::neumann() ) );
+  p.bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
   p.bc().add( BndCnd( Dir::imax(), BndType::neumann() ) );
   p.bc().add( BndCnd( Dir::kmin(), BndType::neumann() ) );
   p.bc().add( BndCnd( Dir::kmax(), BndType::neumann() ) );
@@ -119,13 +134,19 @@ int main(int argc, char ** argv) {
   /* copy b.c. from p */
   press = p.shape();
   f = p.shape();
-  q = p.shape();
+
+  q.bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
+  q.bc().add( BndCnd( Dir::imax(), BndType::neumann() ) );
+  q.bc().add( BndCnd( Dir::kmin(), BndType::neumann() ) );
+  q.bc().add( BndCnd( Dir::kmax(), BndType::neumann() ) );
+  q.bc().add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
+  q.bc().add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
 
   /*-------------------+
   |  time-integration  |
   +-------------------*/
   const int  ndt = 5000;
-  const real dxmin = d.dxyz_min();
+  const real dxmin = coarse.dxyz_min();
   const real umax = 2.*um;
   const real cfl_limit = 0.3;
   const real dt = cfl_limit*dxmin/umax;
@@ -139,12 +160,13 @@ int main(int argc, char ** argv) {
   |  define solvers  |
   +-----------------*/
   Krylov * solver = new CG(d, Prec::ic2());
+  Krylov * solver_coarse = new CG(coarse, Prec::ic2());
 
-  Momentum ns( uvw, xyz, time, solver, &liquid);
+  Momentum ns( uvw_coarse, xyz_coarse, time, solver_coarse, &liquid);
   ns.diffusion_set (TimeScheme::backward_euler());
   ns.convection_set(ConvScheme::upwind());
 
-  Pressure pr(p, f, uvw, time, solver, &liquid);
+  Pressure pr(p, f, uvw_coarse, time, solver_coarse, &liquid);
   AC multigrid( &pr );
   multigrid.stop_if_diverging(true);
   multigrid.min_cycles(6);
@@ -173,18 +195,26 @@ int main(int argc, char ** argv) {
     const real pos = uvw.xc(mcomp,i);
     uvwsol[mcomp][i][j][k] = 2.*um*(1.-pos*pos/LX/LX);
 
-    uvw[mcomp][i][j][k] = uvwsol[mcomp][i][j][k];
+    //uvw[mcomp][i][j][k] = uvwsol[mcomp][i][j][k];
 
     uvwdiff[mcomp][i][j][k] = uvwsol[mcomp][i][j][k] - uvw[mcomp][i][j][k];
   }
+
+  for_avmijk(uvw_coarse,mcomp,i,j,k) {
+    const real pos = uvw_coarse.xc(mcomp,i);
+    uvw_coarse[mcomp][i][j][k] = 2.*um;//*(1.-pos*pos/LX/LX);
+  }
+  boil::interpolateXZ(uvw_coarse,uvw,aux,test,liquid);
 
   for_vijk(test,i,j,k) {
     test[i][j][k] = uvw.outflow(i,j,k);
   }
 
-  boil::plot->plot(uvw,tpr,press,test, "uvw-tpr-press-test",0);
+  boil::plot->plot(uvw,tpr,test, "uvw-tpr-udiv",0);
+  boil::plot->plot(uvw_coarse,press, "uvw-press",0);
   boil::plot->plot(uvwsol,tprsol, "uvwsol-tprsol",0);
-  boil::plot->plot(uvwdiff,tprdiff, "uvwdiff-tprdiff",0);
+
+  test = 0.;
 
   /*------------+
   |  time loop  |
@@ -199,10 +229,14 @@ int main(int argc, char ** argv) {
     boil::oout << "# WTIME:     " << boil::timer.current_min() << boil::endl;
     boil::oout << "########################" << boil::endl;
 
-#if 0
+#if 1
     /*---------------------------+
     |  solve transport equation  |
     +---------------------------*/
+    enth.discretize();
+    enth.new_time_step();
+    enth.solve(ResRat(1e-16),"enth");
+
     enth.discretize();
     enth.new_time_step();
     enth.solve(ResRat(1e-16),"enth");
@@ -223,6 +257,7 @@ int main(int argc, char ** argv) {
     ns.project(p);
     press += p;    // p_n+1 = p_n + dp
     press.exchange();
+    boil::interpolateXZ(uvw_coarse,uvw,aux,test,liquid);
 
     /* dt control */
     time.control_dt(ns.cfl_max(), cfl_limit, dt);
@@ -241,9 +276,9 @@ int main(int argc, char ** argv) {
     test[i][j][k] = uvw.outflow(i,j,k);
   }
 
-  boil::plot->plot(uvw,tpr,press,test, "uvw-tpr-press-test",1);
+  boil::plot->plot(uvw,tpr,test, "uvw-tpr-udiv",1);
+  boil::plot->plot(uvw_coarse,press, "uvw-press",1);
   boil::plot->plot(uvwsol,tprsol, "uvwsol-tprsol",1);
-  boil::plot->plot(uvwdiff,tprdiff, "uvwdiff-tprdiff",1);
 
 #if 0
   for_vk(tpr,k) {

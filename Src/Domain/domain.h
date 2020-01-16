@@ -34,7 +34,7 @@ class Domain {
     Domain(const Domain & fine_dom,
            const Step cx, const Step cy = Step(-1), const Step cz = Step(-1),
            Body * b = NULL,
-           const bool print_statistics = false);
+           const bool print_statistics = true);
 
     ~Domain(){}
 
@@ -152,6 +152,9 @@ class Domain {
     virtual real dV_xstag(const int i, const int j, const int k) const;
     virtual real dV_ystag(const int i, const int j, const int k) const;
     virtual real dV_zstag(const int i, const int j, const int k) const;
+
+    /* used as Cartesian area projection in Axisymmetric */
+    virtual real dSy_cartesian(const int i, const int j, const int k) const;
 
     bool  period(const int i) const {return per[i];}
     bool  is_dummy(const int i) const {return dummy[i];}

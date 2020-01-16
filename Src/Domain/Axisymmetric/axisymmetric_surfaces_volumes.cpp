@@ -79,3 +79,8 @@ real Axisymmetric::dV_ystag(const int i, const int j, const int k) const
   { return dSz_ystag(i,j,k) * dzc(k); }
 real Axisymmetric::dV_zstag(const int i, const int j, const int k) const
   { return dSz_zstag(i,j,k) * dzb(k); }
+
+/* area value for Cartesian projection */
+real Axisymmetric::dSy_cartesian(const int i, const int j, const int k) const
+  { return dxc(i)*dzc(k); }
+

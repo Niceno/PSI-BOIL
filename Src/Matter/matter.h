@@ -141,6 +141,10 @@ class Matter {
     const Property * beta()   const {return texp;}
     const Property * sigma()  const {return tens;}
 
+    /* rescale properties by factors of length and time */
+    void rescale(const real xmult = 1., const real tmult = 1.,
+                 const real mmult = 1.);
+
     /* set certain property to be variable */
     void variable(const Set & s);
 
@@ -151,6 +155,9 @@ class Matter {
     void look_up(const Set & s, const Scalar & sca,
                  const LookUpTable & pt,  
                  const Column & col0, const Column & col1);
+
+    /* check if matter is mixture */
+    inline bool mixture() const { return mixt; }
 
 //  friend std::ostream & 
 //    operator << (std::ostream & os, const Property & prop);
@@ -167,6 +174,8 @@ class Matter {
     const Domain * dom;
 
     std::string nam;
+
+    bool mixt;
 };
 
 #endif

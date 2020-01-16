@@ -11,21 +11,27 @@ real Momentum::cfl_max() const {
   int km  =  0;
 
   Comp m = Comp::u();
-  for_mijk(m,i,j,k) {
-    cfl = fabs(u[m][i][j][k]) * time->dt() / u.dxc(m,i);
-    if( cfl > cflm ) {cflm = cfl; dir = m; im=i; jm=j; km=k;} 
+  if(ifull) {
+    for_mijk(m,i,j,k) {
+      cfl = fabs(u[m][i][j][k]) * time->dt() / u.dxc(m,i);
+      if( cfl > cflm ) {cflm = cfl; dir = m; im=i; jm=j; km=k;} 
+    }
   }
   
   m = Comp::v();
-  for_mijk(m,i,j,k) {
-    cfl = fabs(u[m][i][j][k]) * time->dt() / u.dyc(m,j);
-    if( cfl > cflm ) {cflm = cfl; dir = m; im=i; jm=j; km=k;}
+  if(jfull) {
+    for_mijk(m,i,j,k) {
+      cfl = fabs(u[m][i][j][k]) * time->dt() / u.dyc(m,j);
+      if( cfl > cflm ) {cflm = cfl; dir = m; im=i; jm=j; km=k;}
+    }
   }
 
   m = Comp::w();
-  for_mijk(m,i,j,k) {
-    cfl = fabs(u[m][i][j][k]) * time->dt() / u.dzc(m,k);
-    if( cfl > cflm ) {cflm = cfl; dir = m; im=i; jm=j; km=k;}
+  if(kfull) {
+    for_mijk(m,i,j,k) {
+      cfl = fabs(u[m][i][j][k]) * time->dt() / u.dzc(m,k);
+      if( cfl > cflm ) {cflm = cfl; dir = m; im=i; jm=j; km=k;}
+    }
   }
 
   real cflm_l = cflm;

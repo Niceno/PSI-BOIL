@@ -85,6 +85,7 @@ void VOF::advance_geometric(Scalar & scp) {
     }
     boil::cart.sum_int(&ierr);
     if (ierr>=1) {
+      boil::plot->plot((*u),phi,color(),kappa, "uvw-phi-clr-kappa", time->current_step());
       exit(0);
     }
   }

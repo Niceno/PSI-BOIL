@@ -7,6 +7,8 @@ Matter::Matter(const Domain & d) {
 
   nam = "";
 
+  mixt = false;
+
   dens = new Property("density");
   visc = new Property("viscosity");
   capa = new Property("capacity");
@@ -22,6 +24,8 @@ Matter::Matter(const Domain & d, const char * nm) {
   dom = & d;
 
   nam = nm;
+
+  mixt = false;
 
   assert(nam.length() > 0);
 
@@ -43,6 +47,8 @@ Matter::Matter(const Matter & a,
                const Scalar * cdb) {
 
   dom = ca->domain();
+
+  mixt = true;
 
   assert(a.dens != NULL);
   assert(a.visc != NULL);
@@ -87,6 +93,8 @@ Matter::Matter(const Matter & a,
                const Scalar * cdb) {
 
   dom = ca->domain();
+
+  mixt = true;
 
   assert(a.dens != NULL);
   assert(a.visc != NULL);
