@@ -42,8 +42,8 @@ int main(int argc, char ** argv) {
 
 /******************************************************************************/
 /* ------------ rescaling factors */
-  const real xmult = 1e6;
-  const real tmult = 1e6;
+  const real xmult = 1e0;
+  const real tmult = 1e0;
   const real mmult = xmult*tmult;
 
 /******************************************************************************/
@@ -67,9 +67,8 @@ int main(int argc, char ** argv) {
 
 /******************************************************************************/
 /* ------------ values to be directly rescaled */
-  real Mv = 18.015e-3; /* kg/mol */
-  real R  = 8.3144621; /* [J/molK] */
   real gravity = boil::g; /* m/s2 */
+  real R = boil::R;
 
   real liquid_drhodt=-1.6;  /* [kg/m3K] */
   real vapor_drhodt=-0.101; /* kg/m3K] */
@@ -85,17 +84,14 @@ int main(int argc, char ** argv) {
 
 #ifdef CASE_1
   real qflux=7.29*1000.0;     // heater power [W/m2]
-  real latent=1677.7*1000.0;
 #else
   real qflux=12.2*1000.0;     // heater power [W/m2]
-  real latent=1865.02*1000.0;
 #endif
 
   /* rescaling */
   gravity *= xmult/tmult/tmult; /* [m/s2] */
   liquid_drhodt *= mmult/xmult/xmult/xmult;   //[kg/m3K]
   vapor_drhodt  *= mmult/xmult/xmult/xmult;  //[kg/m3K]
-  latent *= xmult*xmult/tmult/tmult; /* [m2/s2] */
   R *= mmult*xmult*xmult/tmult/tmult; /* [kgm2/s2/mol/K] */
 
   seedper *= tmult;
@@ -150,6 +146,7 @@ int main(int argc, char ** argv) {
 
 /******************************************************************************/
 /* ------------ material properties */
+  const real Mv = 18.015e-3;
 #ifdef CASE_1  
   const real muv = 1.776e-5;
   const real rhov = 22.5504;
@@ -162,6 +159,7 @@ int main(int argc, char ** argv) {
   const real lambdal = 0.6097;
 
   const real sig = 0.024;
+  const real latent=1677.7*1000.0;
 
 #else
   const real muv = 1.634e-5;
@@ -175,6 +173,7 @@ int main(int argc, char ** argv) {
   const real lambdal = 0.61293;
 
   const real sig = 0.034;
+  const real latent=1865.02*1000.0;
 #endif
 
   /* heater */
@@ -329,10 +328,12 @@ int main(int argc, char ** argv) {
   vapor  .rho   (rhov);
   vapor  .cp    (cpv);  // J/m3
   vapor  .lambda(lambdav);
+  vapor  .mmass (Mv);
   liquid.mu    (mul);
   liquid.rho   (rhol);
   liquid.cp    (cpl);   // J/m3
   liquid.lambda(lambdal);
+  liquid.mmass (Mv);
 
   /* nickel */
   heater.rho    (rhosol);
@@ -347,6 +348,7 @@ int main(int argc, char ** argv) {
 #endif
   Matter mixed(*one,*zero, &c);
   mixed.sigma(sig);
+  mixed.latent(latent);
 
   /* rescaling */
   vapor.rescale(xmult,tmult,mmult);
@@ -447,9 +449,7 @@ int main(int argc, char ** argv) {
 #ifndef VARIABLE
   TIF tsat(tsat0);
 #else
-  const real resist = pow(tsat0_K,1.5)/2.0/vapor.rho()->value()/latent/sqrt(Mv/(2.0*boil::pi*R));
-  boil::oout<<"Mass transfer resistance: "<<resist<<boil::endl;
-  TIF tsat(tsat0, latent, resist, &mixed, *conc.topo.adens, mflx);
+  TIF tsat(tsat0, &mixed, *conc.topo.adens, mflx);
   tsat.set_weak_limiting(tsat0,twall);
 #endif
 
@@ -472,10 +472,10 @@ int main(int argc, char ** argv) {
   real rseed = 2.0*dxmin;
   #ifdef INVERTED
   Nucleation nucl( &c, &tpr, &q, &time, auxscalar, &mixed, rseed
-                 , 0.0e-10, latent, conc.get_cangle());
+                 , 0.0e-10, conc.get_cangle());
   #else
   Nucleation nucl( &c, &tpr, &q, &time, auxscalar, &mixed, rseed
-                 , 0.0e-10, latent, conc.get_cangle(), Sign::neg());
+                 , 0.0e-10, conc.get_cangle(), Sign::neg());
   #endif
   /* useless microlayer parameter */
   nucl.set_slope(1.0*4.46e-3);
@@ -500,10 +500,10 @@ int main(int argc, char ** argv) {
   /* phase change */
 #ifdef INVERTED
   PhaseChangeVOF pc(mdot, mflx, tpr, q, c, g, f, uvw, conc.topo,
-                    tsat, time, &mixed, latent, sld);
+                    tsat, time, &mixed, sld);
 #else
   PhaseChangeVOF pc(mdot, mflx, tpr, q, c, g, f, uvw, conc.topo,
-                    tsat, time, &mixed, latent, sld,Sign::neg());
+                    tsat, time, &mixed, sld,Sign::neg());
 #endif
 
   /*-------------------+
