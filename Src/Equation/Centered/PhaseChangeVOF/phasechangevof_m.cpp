@@ -69,7 +69,7 @@ void PhaseChangeVOF::m(const Scalar * diff_eddy) {
       }
       real qv = -lv*tnv[i][j][k];
       real ql =  ll*tnl[i][j][k];
-      M[i][j][k] = (qv + ql) / latent;
+      M[i][j][k] = (qv + ql) / fluid()->latent(i,j,k);
 
 #if 0
       if(i==3&&j==3&&k==3) {

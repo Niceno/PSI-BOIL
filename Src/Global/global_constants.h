@@ -34,6 +34,9 @@ namespace boil {
 
   /* gravitational constant  */
   extern real g; 
+
+  /* universal gas constant */
+  extern real R;
 }
 
 #endif

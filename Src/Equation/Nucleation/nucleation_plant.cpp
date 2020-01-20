@@ -109,7 +109,7 @@ void Nucleation::plant () {
         }
         if (clr->domain()->ibody().off(i,j,k-1)) {
           if (area_base>0.0) {
-            (*qsrc)[i][j][k-1] -= rhov * vol_seed * latent
+            (*qsrc)[i][j][k-1] -= rhov * vol_seed * flu->latent(i,j,k)
                                / (area_base * time->dt() * clr->dzc(k-1)) 
                                * (1.0-cseed) * clr->dV(i,j,k-1);
           }

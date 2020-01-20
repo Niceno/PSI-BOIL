@@ -13,9 +13,11 @@ void Matter::rescale(const real xmult, const real tmult, const real mmult) {
   mu :   M/L/T        -> mu'    = mu     *mmult/xmult/tmult 
   cp :   M/T^2/L /K   -> cp'    = cp     *mmult/xmult/tmult^2
   lambda:M*L/T^3 /K   -> lambda'= lambda *mmult*xmult/tmult^3
-  gamma: M/L/T =      -> gamma' = gamma  *mmult/xmult/tmult
+  gamma: M/L/T        -> gamma' = gamma  *mmult/xmult/tmult
   beta:  1/K          -> beta'  = beta   *1
-  sigma: M/T^2 =      -> sigma' = sigma  *mmult/tmult/tmult
+  mmass: M/mol        -> mmass' = mmass  *mmult
+  sigma: M/T^2        -> sigma' = sigma  *mmult/tmult^2
+  latent:L^2/T^2      -> latent'= latent *xmult^2/tmult^2
 
   furthermore, regarding observables
 
@@ -31,7 +33,10 @@ void Matter::rescale(const real xmult, const real tmult, const real mmult) {
   cp'     = cp/tmult
   lambda' = lambda
   gamma'  = gamma
+  beta'   = beta
+  mmass'  = mmass*mmult
   sigma'  = sigma
+  latent' = latent
 
   as well as
 
@@ -54,8 +59,10 @@ void Matter::rescale(const real xmult, const real tmult, const real mmult) {
     lambda(lambda()->value()*mmult*xmult/tmult/tmult/tmult);
     gamma(gamma()->value()  *mmult/xmult/tmult);
     beta(beta()->value());
+    mmass(mmass()->value()  *mmult);
   } else {
     sigma(sigma()->value()  *mmult/tmult/tmult);
+    latent(latent()->value()*xmult*xmult/tmult/tmult);
   }
 
   return;

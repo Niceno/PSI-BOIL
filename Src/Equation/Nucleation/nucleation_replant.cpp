@@ -207,12 +207,12 @@ void Nucleation::replant () {
               if (clr->domain()->ibody().off(i,j,k-1)) {
                 //if(boil::cart.iam()==2)std::cout<<"area_base="<<area_base<<"\n";
                 if (area_base>0.0) {
-                  (*qsrc)[i][j][k-1] -= rhov * vol_seed * latent
+                  (*qsrc)[i][j][k-1] -= rhov * vol_seed * flu->latent(i,j,k)
                              / (area_base * time->dt() * clr->dzc(k-1))
                              * (1.0-cseed) * clr->dV(i,j,k-1);
                 }
                 //boil::aout<<"replant:heat sink "<<rhov<<" "<<vol_seed<<" "
-                //  <<latent<<" "<<area_base<<" "<<time->dt()<<" "
+                //  <<flu->latent(i,j,k)<<" "<<area_base<<" "<<time->dt()<<" "
                 //  <<clr->dzc(k-1)<<" "<<(1.0-cseed)<<" "<<clr->dV(i,j,k-1)<<" "
                 //  <<(*qsrc)[i][j][k-1]<<"\n";
               }

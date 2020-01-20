@@ -14,8 +14,6 @@ class TIF {
   public:
     TIF(const real tref); 
     TIF(const real tref, 
-        const real latent,
-        const real mresis,
         Matter * flu,
         const Scalar & adens,
         const Scalar & mflx,
@@ -30,17 +28,24 @@ class TIF {
     }
     void tint_field(const bool newstep = true);
 
-    real get_ur() { return factor; }
-    void set_ur(const real factnew) {
+    inline real get_ur() { return factor; }
+    inline void set_ur(const real factnew) {
       factor = factnew;
       boil::oout<<"TIFmodel: Underrelaxation factor = "<<factnew<<boil::endl;
     }
 
-    real tref() { return tr; }
-    void set_tref(const real tnew) {
+    inline real tref() { return tr; }
+    inline void set_tref(const real tnew) {
       tr = tnew;
       boil::oout<<"TIFmodel: Tref = "<<tnew<<boil::endl;
     }
+
+    inline real get_mass_resistance() { return mresis; }
+    inline void set_mass_resistance(const real mresisnew) {
+      mresis = mresisnew;
+      boil::oout<<"TIFmodel: Mass transfer resistance= "<<mresisnew<<boil::endl;
+    }
+
 
     Scalar tif, tifold;
 
@@ -63,7 +68,7 @@ class TIF {
     real clrsurf;
 
     bool store_tif,variable_tif;
-    real tr, latent, mresis, rhol;
+    real tr, mresis, rhol;
 
     const Matter * fluid() const {return flu;}
     Matter * flu;

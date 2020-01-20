@@ -27,4 +27,8 @@ namespace boil {
   /* gravitational constant for earth.  
      should be changed if martians start to use psi-boil */
   real g(9.81);
+
+  /* universal gas constant */
+  real R(8.3144621); /* [J/molK] */
+
 }

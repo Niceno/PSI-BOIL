@@ -13,7 +13,6 @@ PhaseChangeVOF::PhaseChangeVOF(const Scalar & MDOT,
                                const TIF & TIFMODEL,
                                Times & T, 
                                Matter * f,
-                               real LAT,
                                Matter * s,
                                Sign SIG) :
 /*---------------------+ 
@@ -81,7 +80,6 @@ PhaseChangeVOF::PhaseChangeVOF(const Scalar & MDOT,
   }
 
   /* set arguments */
-  latent = LAT;
   rhol = fluid()->rho(1);
   rhov = fluid()->rho(0);
   rhoave = 0.5*(rhol+rhov);

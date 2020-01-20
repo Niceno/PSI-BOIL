@@ -105,6 +105,18 @@ class Matter {
                 }
     real beta  (const int comp) const {return texp->value_comp(comp);}
 
+    real mmass (const int i,
+                const int j,
+                const int k) const {return molm->value(i,j,k);}
+    real mmass (const Comp & m,
+                const int i,
+                const int j,
+                const int k) const {
+                    return molm->value(m,i,j,k);
+                }
+    real mmass (const int comp) const {return molm->value_comp(comp);}
+
+
     real sigma (const int i,
                 const int j,
                 const int k) const {assert(tens); return tens->value(i,j,k);}
@@ -115,6 +127,17 @@ class Matter {
                   assert(tens);
                   return tens->value(m,i,j,k);
                 }
+    
+    real latent(const int i,
+                const int j,
+                const int k) const {assert(heat); return heat->value(i,j,k);}
+    real latent(const Comp & m,
+                const int i,
+                const int j,
+                const int k) const {
+                  assert(heat);
+                  return heat->value(m,i,j,k);
+                }
 
     /* set (initialize) physical properties */
     void rho   (const real & v) {dens->value(v);}
@@ -123,6 +146,8 @@ class Matter {
     void lambda(const real & v) {cond->value(v);}
     void gamma (const real & v) {diff->value(v);}
     void beta  (const real & v) {texp->value(v);}
+    void mmass (const real & v) {molm->value(v);}
+
     void sigma (const real & v) {
       if(tens == NULL) {
         boil::oout << "# Fatal: specifying surface tension ";
@@ -132,6 +157,16 @@ class Matter {
       }
       tens->value(v);
     }
+    void latent(const real & v) {
+      if(heat == NULL) {
+        boil::oout << "# Fatal: specifying latent heat ";
+        boil::oout << "makes sense only for mixtures. Exiting!";
+        boil::oout << boil::endl;
+        exit(0);
+      }
+      heat->value(v);
+    }
+
     
     const Property * rho()    const {return dens;}
     const Property * mu()     const {return visc;}
@@ -139,7 +174,10 @@ class Matter {
     const Property * lambda() const {return cond;}
     const Property * gamma()  const {return diff;}
     const Property * beta()   const {return texp;}
+    const Property * mmass()  const {return molm;}
+
     const Property * sigma()  const {return tens;}
+    const Property * latent() const {return heat;}
 
     /* rescale properties by factors of length and time */
     void rescale(const real xmult = 1., const real tmult = 1.,
@@ -169,7 +207,9 @@ class Matter {
     Property * cond;
     Property * diff;
     Property * texp;
+    Property * molm;
     Property * tens;
+    Property * heat;
 
     const Domain * dom;
 

@@ -27,7 +27,6 @@ class PhaseChangeVOF : public Centered {
                    const TIF & tifmodel,
                    Times & t,
                    Matter * flu,
-                   real lat,
                    Matter * sol = NULL,
                    Sign sig = Sign::pos());
  
@@ -147,7 +146,7 @@ class PhaseChangeVOF : public Centered {
  
     real tol_ext;
 
-    real latent, rhol, rhov, lambdal, lambdav, cpl, cpv;
+    real rhol, rhov, lambdal, lambdav, cpl, cpv;
     real rhoave, rhodlt;
     real dxmin, clrsurf, pi;
     real turbP;

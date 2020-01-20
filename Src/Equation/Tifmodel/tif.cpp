@@ -9,8 +9,6 @@ TIF::TIF(const real Tref) {
 }
 
 TIF::TIF(const real Tref, 
-         const real Latent,
-         const real Mresis,
          Matter * FLU,
          const Scalar & ADENS,
          const Scalar & MFLX,
@@ -23,11 +21,14 @@ TIF::TIF(const real Tref,
 {
   dpres = PRES;
 
-  const int comp = 1; /* liquid */
-  rhol = fluid()->rho(comp);
+  rhol = fluid()->rho(1);
+  real rhov = fluid()->rho(0);
+  real mmass = fluid()->mmass(0);
   tr = Tref;
-  latent = Latent;
-  mresis = Mresis;
+  mresis = pow(tr,1.5)/2.0/rhov/fluid()->latent()->value()
+                      /sqrt(mmass/(2.0*boil::pi*boil::R));
+  boil::oout<<"TIFmodel: Mass transfer resistance= "<<mresis<<boil::endl;
+
 
   tmin = -boil::unreal;
   tmax = boil::unreal;

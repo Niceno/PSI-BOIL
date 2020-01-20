@@ -5,7 +5,7 @@
 *******************************************************************************/
 Nucleation::Nucleation ( Scalar * c, Scalar *tp, Scalar *qs,
                      const Times * t, Scalar & DM,
-                     Matter *f, const real rs, const real dm, const real l,
+                     Matter *f, const real rs, const real dm,
                      const real ca, const Sign SIG ) :
   dmicro(&DM),
   flu(f),
@@ -17,7 +17,6 @@ Nucleation::Nucleation ( Scalar * c, Scalar *tp, Scalar *qs,
   time=t;
   rseed=rs;
   dmicro_min = dm;
-  latent = l;
   cang = ca;
 
   /* default value */
