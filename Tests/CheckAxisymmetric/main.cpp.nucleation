@@ -18,7 +18,17 @@ static void __attribute__ ((constructor)) trapfpe(void)
 #define USE_SOLID
 //#define USE_BIG
 //#define OUTLET_VISC
-#define CASE_1 /* water at 44.7 bar or at 22.3 bar */
+#define CASE 3
+/* 1 = sakashita, water @ 44.7 bar
+   2 = sakashita, water @ 22.3 bar
+   3 = cao, fc-72 @ atmospheric conditions */
+
+#if CASE == 3
+  #define USE_BOTTOM_DIRICHLET
+#endif
+#ifdef USE_SOLID
+  #define USE_BOTTOM_DIRICHLET
+#endif
 
 /******************************************************************************/
 int main(int argc, char ** argv) {
@@ -50,16 +60,23 @@ int main(int argc, char ** argv) {
 /* ------------ boundary or initial conditions */
   const real tsat0 = 0.0;
   const real tout = tsat0;
-  const real cangle = 10.;
 
-#ifdef CASE_1
+#if CASE == 1
+  const real cangle = 10.;
   const real twall = tsat0 + 1.824;
-  const real tsat0_K = 257.+273.15;
-#else
-  const real twall = tsat0 + 2.694;
-  const real tsat0_K = 217.24+273.15;
-#endif
   const real twall0 = twall;
+  const real tsat0_K = 257.+273.15;
+#elif CASE == 2
+  const real cangle = 10.;
+  const real twall = tsat0 + 2.694;
+  const real twall0 = twall;
+  const real tsat0_K = 217.24+273.15;
+#else 
+  const real cangle = 1.;
+  const real twall = 11.+tsat0;
+  const real twall0 = twall-0.0025;
+  const real tsat0_K = 55.7+273.15;
+#endif
 
 #ifndef USE_BIG
   const real tseed = twall0-0.001;  // when temp of nucleation site reaches tseed, next ...
@@ -70,8 +87,17 @@ int main(int argc, char ** argv) {
   real gravity = boil::g; /* m/s2 */
   real R = boil::R;
 
+#if CASE == 1
   real liquid_drhodt=-1.6;  /* [kg/m3K] */
   real vapor_drhodt=-0.101; /* kg/m3K] */
+#elif CASE == 2
+  real liquid_drhodt=-1.6;  /* [kg/m3K] */
+  real vapor_drhodt=-0.101; /* kg/m3K] */
+#else
+  /* for now */
+  real liquid_drhodt=0.0;   //[kg/m3K]
+  real vapor_drhodt=0.0; //[kg/m3K]
+#endif
 
 #ifndef USE_BIG
   /* nucleation parameters */
@@ -79,10 +105,12 @@ int main(int argc, char ** argv) {
   real seedper = 1e-3; /* s */
 #endif
 
-#ifdef CASE_1
+#if CASE == 1
   real qflux=7.29*1000.0;     // heater power [W/m2]
-#else
+#elif CASE == 2
   real qflux=12.2*1000.0;     // heater power [W/m2]
+#else 
+  real qflux=0.0;
 #endif
 
   /* rescaling */
@@ -107,7 +135,13 @@ int main(int argc, char ** argv) {
   /* if yes, plotting each tperlot seconds. Else, each n_per_plot steps */
   const bool use_t_per_plot = false;
   const real t_per_plot = 1.0e-3*tmult;
+#if CASE == 1
+  const int n_per_plot = 1000*4*gLevel;
+#elif CASE == 2
   const int n_per_plot = 1000*gLevel;
+#else
+  const int n_per_plot = 1000*3*gLevel;
+#endif
 
   const real surftens_dt_coef = 10.;
   const real initdtcoef = 1./30.;
@@ -128,7 +162,13 @@ int main(int argc, char ** argv) {
   //const bool multigrid_stop_if_diverging = false;
 
   const int multigrid_min_cycles = 3;
+#if CASE == 1
   const int multigrid_max_cycles = 10+gLevel/2;
+#elif CASE == 2
+  const int multigrid_max_cycles = 10+gLevel/8;
+#else
+  const int multigrid_max_cycles = 10+gLevel/6;
+#endif
 
   /* vof */
   const CurvMethod curv_method = CurvMethod::HF();
@@ -138,12 +178,12 @@ int main(int argc, char ** argv) {
   const bool subgrid_method = true; /* use slic subgrid */
   const bool use_fs_interp = false;
   const bool store_pressure_extrap = false;
-  const int niter_pressure_extrap = 500; 
+  const int niter_pressure_extrap = 1000; 
 
 /******************************************************************************/
 /* ------------ material properties */
+#if CASE == 1  
   const real Mv = 18.015e-3;
-#ifdef CASE_1  
   const real muv = 1.776e-5;
   const real rhov = 22.5504;
   const real cpv = 3959.9*rhov;
@@ -159,7 +199,8 @@ int main(int argc, char ** argv) {
 
   const real betal = 0.00158; 
 
-#else
+#elif CASE == 2
+  const real Mv = 18.015e-3;
   const real muv = 1.634e-5;
   const real rhov = 11.17922;
   const real cpv = 3114.8052*rhov;
@@ -174,12 +215,39 @@ int main(int argc, char ** argv) {
   const real latent=1865.02*1000.0;
 
   const real betal = 0.00141; 
+#else
+  /* FC-72 from Cao(2019) and FC-72 3M product sheet */
+  const real Mv = 338e-3;
+  const real muv = 1.2e-5;
+  const real rhov = 13.33;
+  const real cpv = 894.*rhov;
+  const real lambdav = 0.0129;
+
+  const real mul = 4.4e-4;
+  const real rhol = 1740.-2.61*(tsat0_K-273.15);
+  const real cpl = (1014+1.554*(tsat0_K-273.15))*rhol;
+  const real lambdal = 0.06-0.00011*tsat0_K;
+
+  const real sig = 7.9e-3;
+  const real latent = 76900.;
+  
+  const real betal = 0.00156;
 #endif
 
+#if CASE == 1 
   /* heater */
   const real rhosol = 8908.0;
   const real cpsol = 444.0*rhosol;
   const real lambdasol = 90.9;
+#elif CASE == 2
+  const real rhosol = 8908.0;
+  const real cpsol = 444.0*rhosol;
+  const real lambdasol = 90.9;
+#else 
+  const real rhosol = 2329.;
+  const real cpsol = 700.*rhosol;
+  const real lambdasol = 130.;
+#endif
 
   /* natural convection BL thickness */
   real ztconst = xmult*7.4*
@@ -191,17 +259,24 @@ int main(int argc, char ** argv) {
 /* ------------ domain dimensions */
   const int NX1  = 25*gLevel;
   const int NX2  =  7*gLevel;
-  const int NZ0 = std::max(4,3*gLevel);
   const int NZ1 = 64*gLevel;
 
-#ifdef CASE_1
+#if CASE == 1
+  const int NZ0 = std::max(4,3*gLevel);
   real LX1 =  0.1e-3;
   real LX2 =  0.15e-3;
-#else
-  real LX1 =  0.3e-3;
-  real LX2 =  0.15e-3;
-#endif
   real LZ0 = -8.0e-6;
+#elif CASE == 2
+  const int NZ0 = std::max(4,gLevel);
+  real LX1 =  0.4e-3;
+  real LX2 =  0.6e-3;
+  real LZ0 = -8.0e-6;
+#else
+  const int NZ0 = 12*gLevel;
+  real LX1 =  0.3e-3;
+  real LX2 =  0.45e-3;
+  real LZ0 = -100e-6;
+#endif
 
   LX1 *= xmult;
   LX2 *= xmult;
@@ -317,7 +392,7 @@ int main(int argc, char ** argv) {
 
   tpr.bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
   tpr.bc().add( BndCnd( Dir::imax(), BndType::neumann() ) );
-#ifdef USE_SOLID
+#ifdef USE_BOTTOM_DIRICHLET
   tpr.bc().add( BndCnd( Dir::kmin(), BndType::neumann() ) );
 #else
   tpr.bc().add( BndCnd( Dir::kmin(), BndType::dirichlet(), twall ) );
