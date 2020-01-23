@@ -26,7 +26,7 @@ static void __attribute__ ((constructor)) trapfpe(void)
 #if CASE == 3
   #define USE_BOTTOM_DIRICHLET
 #endif
-#ifdef USE_SOLID
+#ifndef USE_SOLID
   #define USE_BOTTOM_DIRICHLET
 #endif
 
@@ -226,7 +226,7 @@ int main(int argc, char ** argv) {
   const real mul = 4.4e-4;
   const real rhol = 1740.-2.61*(tsat0_K-273.15);
   const real cpl = (1014+1.554*(tsat0_K-273.15))*rhol;
-  const real lambdal = 0.06-0.00011*tsat0_K;
+  const real lambdal = 0.06-0.00011*(tsat0_K-273.15);
 
   const real sig = 7.9e-3;
   const real latent = 76900.;
@@ -393,9 +393,9 @@ int main(int argc, char ** argv) {
   tpr.bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
   tpr.bc().add( BndCnd( Dir::imax(), BndType::neumann() ) );
 #ifdef USE_BOTTOM_DIRICHLET
-  tpr.bc().add( BndCnd( Dir::kmin(), BndType::neumann() ) );
-#else
   tpr.bc().add( BndCnd( Dir::kmin(), BndType::dirichlet(), twall ) );
+#else
+  tpr.bc().add( BndCnd( Dir::kmin(), BndType::neumann() ) );
 #endif
   tpr.bc().add( BndCnd( Dir::kmax(), BndType::dirichlet(),tout) );
   tpr.bc().add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
