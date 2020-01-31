@@ -47,6 +47,15 @@ EnthalpyFD::EnthalpyFD(const Scalar & PHI,
   turbP=0.9;
   laminar=true;
 
+  /* see header for explanation */
+  if(solid()) {
+    safe_solid = solid();
+    accelerated_no_solid = false;
+  } else {
+    safe_solid = fluid();
+    accelerated_no_solid = true;
+  }
+
   ftif = phi.shape();
   phi.bnd_update();
 

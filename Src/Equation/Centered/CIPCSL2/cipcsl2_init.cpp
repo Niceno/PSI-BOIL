@@ -152,5 +152,7 @@ void CIPCSL2::init() {
   plot_sxyz("sxyzk.dat",Comp::k());
 #endif
 
+  ancillary();
+
   return;
 }

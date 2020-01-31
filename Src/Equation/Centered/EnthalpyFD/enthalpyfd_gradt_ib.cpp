@@ -6,6 +6,11 @@ real EnthalpyFD::gradt_ib(const int dir, const Comp & mcomp,
 /***************************************************************************//**
 *  \brief calculate gradient of temperature near immersed bodies
 *******************************************************************************/
+
+  /* if ibody can co-exist with no conduction in solid, this needs to change */
+  if(!solid())
+    return 0.;
+
   int of(+1);
   if(dir<0)
     of = -1;

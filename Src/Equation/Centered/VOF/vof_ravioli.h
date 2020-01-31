@@ -138,8 +138,8 @@ class SubgridMethod {
         case(-1): ost << "undefined"; break;
         case( 1): ost << "None"; break;
         case( 2): ost << "PLIC"; break;
-        case( 3): ost << "PLIC-liquid"; break;
-        case( 4): ost << "PLIC-gas"; break;
+        case( 3): ost << "SLIC-liquid"; break;
+        case( 4): ost << "SLIC-gas"; break;
       }
 
       return ost;

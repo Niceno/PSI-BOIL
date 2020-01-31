@@ -99,6 +99,8 @@ PhaseChangeVOF::PhaseChangeVOF(const Scalar & MDOT,
   //epsl = 1.0e-2;
   dxmin = dom->dxyz_min();
 
+  near_wall_modelling = false;
+
 #if 1
   upwind_flag = false;
 #else

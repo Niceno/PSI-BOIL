@@ -33,12 +33,6 @@ class PhaseChangeVOF : public Centered {
     ~PhaseChangeVOF();
     void update(const Scalar * diff_eddy = NULL);
 
-    real get_turbP(){return turbP;}
-    void set_turbP(real a){
-      turbP=a;
-      boil::oout<<"EnthalpyFD:turbP= "<<turbP<<"\n";
-    }
-
     void cal_massflux(const Scalar * diff_eddy = NULL);
     void initialize();
     void finalize();
@@ -47,8 +41,24 @@ class PhaseChangeVOF : public Centered {
     void modify_vel(Vector & uvw, 
                     const Scalar & cnew, const Scalar & cold);
 
-    bool get_upwind_flag() { return upwind_flag; }
-    void set_upwind_flag(const bool flag = true) { upwind_flag = flag; }
+    inline real get_turbP() const { return turbP; }
+    inline void set_turbP(const real a) {
+      turbP = a;
+      boil::oout<<"PhaseChangeVOF::turbP= "<<turbP<<"\n";
+    }
+
+    inline bool get_upwind_flag() const { return upwind_flag; }
+    inline void set_upwind_flag(const bool flag = true) {
+      upwind_flag = flag;
+      boil::oout<<"PhaseChangeVOF::upwind_flag= "<<upwind_flag<<"\n";
+    }
+
+    inline bool get_near_wall_modelling() const { return near_wall_modelling; }
+    inline void set_near_wall_modelling(const bool flag) {
+      near_wall_modelling = flag; 
+      boil::oout<<"PhaseChangeVOF::near_wall_modelling= "<<near_wall_modelling
+                <<"\n";
+    }
 
   private:
     bool Interface(const int dir, const Comp m,
@@ -75,12 +85,7 @@ class PhaseChangeVOF : public Centered {
     //void ext_gradt(Scalar & sca, const int iext, const Comp mcomp);
     void extrapolate(Scalar & sca, const int iext);
 
-#if 0
-    void insert_bc_ext(const Comp mcomp);
-    void subgrid();
-    void subgrid_gradt();
-    void subgrid_setflag();
-#endif
+    void near_wall_model(const Scalar * diff_eddy = NULL);
 
     void calculate_node_temperature(const Scalar * diff_eddy = NULL);
 
@@ -123,8 +128,7 @@ class PhaseChangeVOF : public Centered {
     real lambda(const int i, const int j, const int k,
                 const Scalar * diff_eddy = NULL) const;
 
-
-    bool upwind_flag;
+    bool upwind_flag, near_wall_modelling;
 
     ScalarInt tempflag,iflag;
     Scalar txv, tyv, tzv;

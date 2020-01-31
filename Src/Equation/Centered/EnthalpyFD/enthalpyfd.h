@@ -111,17 +111,21 @@ class EnthalpyFD : public Centered {
       boil::timer.stop("enthalpy discretize");
     }
 
-    real get_turbP(){return turbP;}
-    void set_turbP(real a){
-      turbP=a;
-      boil::oout<<"EnthalpyFD:turbP= "<<turbP<<"\n";
+    inline real get_turbP() const { return turbP; }
+    inline void set_turbP(const real a) {
+      turbP = a;
+      boil::oout<<"EnthalpyFD::turbP= "<<turbP<<"\n";
+    }
+
+    inline bool get_no_solid_acceleration() const
+      { return accelerated_no_solid; }
+    inline void set_no_solid_acceleration(const bool flag) {
+      accelerated_no_solid = flag;
+      boil::oout<<"EnthalpyFD::no_solid_acceleration= "
+                <<accelerated_no_solid<<"\n";
     }
 
     void convection();
-
-    /* to be removed */
-    //void update_ftif(const real ts0 = 1.0, const real tsm = 0.0,
-    //                 const bool nst = false, const Scalar * diff_eddy = NULL);
 
   protected:
     typedef real (EnthalpyFD::*coef_gen)(const real,const real,const real);
@@ -133,12 +137,6 @@ class EnthalpyFD : public Centered {
     real update_rhs();
     void convection(Scalar * sca);
     void diffusion_fd(const Scalar * diff_eddy = NULL);
-    real dVFD(const int i, const int j, const int k){
-      real vol = 0.5 * (phi.dxw(i)+phi.dxe(i))
-               * 0.5 * (phi.dys(j)+phi.dyn(j))
-               * 0.5 * (phi.dzb(k)+phi.dzt(k));
-      return vol;
-    };
     void diff_matrix(real & am, real & ac, real & ap
                 , real & tm, real & tc, real & tp
                 , real & aflagm, real & aflagp
@@ -214,6 +212,13 @@ class EnthalpyFD : public Centered {
 
     real gradt_ib(const int dir, const Comp & mcomp,
                   const int i, const int j, const int k);
+
+    /* This points to solid if solid() = true and fluid() otherwise.
+       So you can always dereference it without segfaults */
+    const Matter * safe_solid; 
+
+    /* faster diffusion matrix and ftif construction */
+    bool accelerated_no_solid;
 
 };	
 #endif

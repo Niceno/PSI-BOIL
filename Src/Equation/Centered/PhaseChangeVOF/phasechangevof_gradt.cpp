@@ -85,11 +85,10 @@ void PhaseChangeVOF::gradt(const Scalar * diff_eddy) {
 #endif
 
 #endif
-
-#if 0
-  /* subgrid treatment - obsolete! */
-  subgrid();
-#endif
+  
+  /* for increased stability in the near-wall region */
+  if(near_wall_modelling)
+    near_wall_model(diff_eddy);
 
 #if 0
   boil::plot->plot(clr,tnl,tnv,"clr-tnl-tnv",time->current_step());

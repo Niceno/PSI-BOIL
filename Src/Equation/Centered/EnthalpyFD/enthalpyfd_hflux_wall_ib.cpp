@@ -6,6 +6,10 @@ using namespace std;
 *******************************************************************************/
 real EnthalpyFD::hflux_wall_ib(const Scalar * diff_eddy) {
 
+  /* if ibody can co-exist with no conduction in solid, this needs to change */
+  if(!solid())
+    return 0;
+
   real hflux=0.0;
   real areaw=0.0;
 

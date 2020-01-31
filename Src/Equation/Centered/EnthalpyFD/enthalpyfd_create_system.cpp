@@ -23,9 +23,9 @@ void EnthalpyFD::create_system(const Scalar * diff_eddy) {
   exit(0);
 #endif
 
-  /*----------------------------------------------+ 
-  |  compute invlerse of the central coefficient  |
-  +----------------------------------------------*/
+  /*---------------------------------------------+ 
+  |  compute inverse of the central coefficient  |
+  +---------------------------------------------*/
   for_ijk(i,j,k) 
     A.ci[i][j][k] = 1.0 / A.c[i][j][k];
 

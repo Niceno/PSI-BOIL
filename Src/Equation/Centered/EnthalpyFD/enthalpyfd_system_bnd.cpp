@@ -192,6 +192,8 @@ void EnthalpyFD::create_system_bnd() {
          }
 
       /* this part should be deprecated! */
+      /* if you decide to change it, note that also gradt_ib and hflux_ib
+         need fixing */
       if( d == Dir::ibody() ) {
         boil::oout << "EnthFD::system_bnd: Underdevelopment!"<<boil::endl;
         boil::oout << "ibody without conduction in solid." <<boil::endl;

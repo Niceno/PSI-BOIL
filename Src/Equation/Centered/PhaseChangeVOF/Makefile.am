@@ -21,6 +21,7 @@ libPhaseChangeVOF_a_SOURCES = phasechangevof.h                           \
                               phasechangevof_mdot.cpp                    \
                               phasechangevof_mdot_cut.cpp                \
                               phasechangevof_modify_vel.cpp              \
+                              phasechangevof_near_wall_model.cpp         \
                               phasechangevof_prepare_node_temperature.cpp\
                               phasechangevof_sources_fext.cpp            \
                               phasechangevof_sources_sum.cpp             \

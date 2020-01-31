@@ -59,6 +59,8 @@ class VOF : public Centered {
 
     virtual Scalar & color() {return phi;}
 
+    void interfacial_flagging(const Scalar & scp);
+
 #include "vof_inline.h"
 
     Vector * bndclr;
@@ -86,7 +88,7 @@ class VOF : public Centered {
                        const Vector & umixed, const Vector & uliq, 
                        Vector & ugas, const Vector * bndclr);
 
-    void interfacial_flagging(const Scalar & scp);
+    //void interfacial_flagging(const Scalar & scp);
     bool Interface(const Sign dir, const Comp m,
                    const int i, const int j, const int k);
     bool Interface(const int i, const int j, const int k);

@@ -13,7 +13,7 @@ void EnthalpyFD::create_system_diffusive(const Scalar * diff_eddy) {
   /*------------------------------------+
   |  no conduction through solid parts  |
   +------------------------------------*/
-  if( !solid() ) {
+  if( accelerated_no_solid ) {
 
     /* coefficients in i direction (w and e) */
     for_ijk(i,j,k) {
@@ -187,10 +187,19 @@ void EnthalpyFD::create_system_diffusive(const Scalar * diff_eddy) {
 
     } /* is there an immersed body */
 
-  /*------------------------------------------+
-  |  features conduction through solid parts  |
-  +------------------------------------------*/
+  /*---------------------------------------------+
+  |  can feature conduction through solid parts  |
+  +---------------------------------------------*/
   } else {
+
+    /* if this is used without solid, that is, if accelerated_no_solid == true
+       and at the same time solid() == false, it is necessary to prevent
+       segfaults when the 'solid' conductivities are referenced. However, since
+       they will not be used for anything inside diff_matrix, we can set any
+       value to them. For acceleration (to avoid checking a flag for each cell
+       and each direction), the matter pointer is set to fluid in the constructor
+       instead. Note that if, at one point, existence of ibodies without solid
+       conduction is allowed, this of course needs rewriting */
 
     for_ijk(i,j,k) {
 
@@ -216,12 +225,13 @@ void EnthalpyFD::create_system_diffusive(const Scalar * diff_eddy) {
       ofm=dom->ibody().off(i-1,j,k);
       ofc=dom->ibody().off(i  ,j,k);
       ofp=dom->ibody().off(i+1,j,k);
-      lsm=solid()->lambda(i-1,j,k);
-      lsc=solid()->lambda(i  ,j,k);
-      lsp=solid()->lambda(i+1,j,k);
+      lsm=safe_solid->lambda(i-1,j,k);
+      lsc=safe_solid->lambda(i  ,j,k);
+      lsp=safe_solid->lambda(i+1,j,k);
       clm=iflag[i-1][j][k];
       clc=iflag[i  ][j][k];
       clp=iflag[i+1][j][k];
+ 
       dxm=phi.dxw(i);
       dxp=phi.dxe(i);
       pos0=phi.xc(i);
@@ -264,9 +274,9 @@ void EnthalpyFD::create_system_diffusive(const Scalar * diff_eddy) {
       ofm=dom->ibody().off(i,j-1,k);
       ofc=dom->ibody().off(i,j  ,k);
       ofp=dom->ibody().off(i,j+1,k);
-      lsm=solid()->lambda(i,j-1,k);
-      lsc=solid()->lambda(i,j  ,k);
-      lsp=solid()->lambda(i,j+1,k);
+      lsm=safe_solid->lambda(i,j-1,k);
+      lsc=safe_solid->lambda(i,j  ,k);
+      lsp=safe_solid->lambda(i,j+1,k);
       clm=iflag[i][j-1][k];
       clc=iflag[i][j  ][k];
       clp=iflag[i][j+1][k];
@@ -312,9 +322,9 @@ void EnthalpyFD::create_system_diffusive(const Scalar * diff_eddy) {
       ofm=dom->ibody().off(i,j,k-1);
       ofc=dom->ibody().off(i,j,k  );
       ofp=dom->ibody().off(i,j,k+1);
-      lsm=solid()->lambda(i,j,k-1);
-      lsc=solid()->lambda(i,j,k  );
-      lsp=solid()->lambda(i,j,k+1);
+      lsm=safe_solid->lambda(i,j,k-1);
+      lsc=safe_solid->lambda(i,j,k  );
+      lsp=safe_solid->lambda(i,j,k+1);
       clm=iflag[i][j][k-1];
       clc=iflag[i][j][k  ];
       clp=iflag[i][j][k+1];

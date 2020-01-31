@@ -141,12 +141,12 @@ class Body {
     real fdzb(const int cc) const; 
     real fdzt(const int cc) const; 
 
-    real fdxw(int i, int j, int k) const;
-    real fdxe(int i, int j, int k) const;
-    real fdys(int i, int j, int k) const;
-    real fdyn(int i, int j, int k) const;
-    real fdzb(int i, int j, int k) const;
-    real fdzt(int i, int j, int k) const;
+    virtual real fdxw(int i, int j, int k) const;
+    virtual real fdxe(int i, int j, int k) const;
+    virtual real fdys(int i, int j, int k) const;
+    virtual real fdyn(int i, int j, int k) const;
+    virtual real fdzb(int i, int j, int k) const;
+    virtual real fdzt(int i, int j, int k) const;
 
     real fdxw(const Comp & m, const int cc) const; 
     real fdxe(const Comp & m, const int cc) const; 

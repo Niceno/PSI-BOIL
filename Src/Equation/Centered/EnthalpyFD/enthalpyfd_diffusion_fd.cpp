@@ -38,7 +38,7 @@ void EnthalpyFD::diffusion_fd(const Scalar * diff_eddy) {
   assert( tscn > 0.0 );
   real tsc = diff_ts.Nm1(); /* 0.5 for c.n. 0.0 for fully implicit */
 
-  if( !solid() ) {
+  if( accelerated_no_solid ) {
     /*------------------------+ 
     |  x direction (w and e)  |
     +------------------------*/
@@ -179,11 +179,19 @@ void EnthalpyFD::diffusion_fd(const Scalar * diff_eddy) {
     }
     // need to add here immersed boundary without solid !!!
 
-#if 1
-  /*------------------------------------------+
-  |  features conduction through solid parts  |
-  +------------------------------------------*/
+  /*---------------------------------------------+
+  |  can feature conduction through solid parts  |
+  +---------------------------------------------*/
   } else {
+
+    /* if this is used without solid, that is, if accelerated_no_solid == true
+       and at the same time solid() == false, it is necessary to prevent
+       segfaults when the 'solid' conductivities are referenced. However, since
+       they will not be used for anything inside diff_matrix, we can set any
+       value to them. For acceleration (to avoid checking a flag for each cell
+       and each direction), the matter pointer is set to fluid in the constructor
+       instead. Note that if, at one point, existence of ibodies without solid
+       conduction is allowed, this of course needs rewriting */
 
     ftif = 0.;
     ftifold = 0.;
@@ -223,9 +231,9 @@ void EnthalpyFD::diffusion_fd(const Scalar * diff_eddy) {
         ofm=dom->ibody().off(i-ii,j-jj,k-kk);
         ofc=dom->ibody().off(i   ,j   ,k   );
         ofp=dom->ibody().off(i+ii,j+jj,k+kk);
-        lsm=solid()->lambda (i-ii,j-jj,k-kk);
-        lsc=solid()->lambda (i   ,j   ,k   );
-        lsp=solid()->lambda (i+ii,j+jj,k+kk);
+        lsm=safe_solid->lambda (i-ii,j-jj,k-kk);
+        lsc=safe_solid->lambda (i   ,j   ,k   );
+        lsp=safe_solid->lambda (i+ii,j+jj,k+kk);
         clm=iflag[i-ii][j-jj][k-kk];
         clc=iflag[i   ][j   ][k   ];
         clp=iflag[i+ii][j+jj][k+kk];
@@ -295,6 +303,8 @@ void EnthalpyFD::diffusion_fd(const Scalar * diff_eddy) {
         ftifold[i][j][k] += tscn * (am*(1.0-aflagm)*tm+ap*(1.0-aflagp)*tp);
       }
     }
-  }
-#endif
+  } /* solid conduction */
+
+  return;
+
 }

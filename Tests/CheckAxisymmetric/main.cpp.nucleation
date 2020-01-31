@@ -17,13 +17,16 @@ static void __attribute__ ((constructor)) trapfpe(void)
 //#define USE_PHASE_VEL_EFD
 #define USE_SOLID
 //#define USE_BIG
-//#define OUTLET_VISC
-#define CASE 3
+#define MULTI_BUBBLES
+//#define SETUP_ONLY
+#define CASE 4
 /* 1 = sakashita, water @ 44.7 bar
    2 = sakashita, water @ 22.3 bar
-   3 = cao, fc-72 @ atmospheric conditions */
+   3 = sakashita, water @ 31.7 bar
+   4 = son & dhir, water @ atmospheric conditions
+   5 = cao, fc-72 @ atmospheric conditions */
 
-#if CASE == 3
+#if CASE > 3
   #define USE_BOTTOM_DIRICHLET
 #endif
 #ifndef USE_SOLID
@@ -64,19 +67,26 @@ int main(int argc, char ** argv) {
 #if CASE == 1
   const real cangle = 10.;
   const real twall = tsat0 + 1.824;
-  const real twall0 = twall;
   const real tsat0_K = 257.+273.15;
 #elif CASE == 2
   const real cangle = 10.;
   const real twall = tsat0 + 2.694;
-  const real twall0 = twall;
   const real tsat0_K = 217.24+273.15;
+#elif CASE == 3
+  const real cangle = 20;
+  const real twall = tsat0 + 2.315;
+  const real tsat0_K = 236.93+273.15;
+#elif CASE == 4
+  const real cangle = 50;
+  const real twall = tsat0 + 7.;
+  const real tsat0_K = 99.97+273.15;
 #else 
   const real cangle = 1.;
   const real twall = 11.+tsat0;
-  const real twall0 = twall-0.0025;
   const real tsat0_K = 55.7+273.15;
 #endif
+
+  const real twall0 = twall;
 
 #ifndef USE_BIG
   const real tseed = twall0-0.001;  // when temp of nucleation site reaches tseed, next ...
@@ -87,10 +97,7 @@ int main(int argc, char ** argv) {
   real gravity = boil::g; /* m/s2 */
   real R = boil::R;
 
-#if CASE == 1
-  real liquid_drhodt=-1.6;  /* [kg/m3K] */
-  real vapor_drhodt=-0.101; /* kg/m3K] */
-#elif CASE == 2
+#if CASE < 5
   real liquid_drhodt=-1.6;  /* [kg/m3K] */
   real vapor_drhodt=-0.101; /* kg/m3K] */
 #else
@@ -99,18 +106,21 @@ int main(int argc, char ** argv) {
   real vapor_drhodt=0.0; //[kg/m3K]
 #endif
 
-#ifndef USE_BIG
-  /* nucleation parameters */
-  real zplant= 0.05*0.001; // when bottom of bubble reaches zplant, next seed is set
-  real seedper = 1e-3; /* s */
-#endif
-
 #if CASE == 1
   real qflux=7.29*1000.0;     // heater power [W/m2]
 #elif CASE == 2
   real qflux=12.2*1000.0;     // heater power [W/m2]
+#elif CASE == 3
+  real qflux=9.72*1000.0;     // heater power [W/m2]
+#elif CASE == 4
+  real qflux=0.0;
 #else 
   real qflux=0.0;
+#endif
+
+#ifndef USE_BIG
+  /* nucleation parameters, this value needs to reflect growth dynamics !!! */
+  real seedper = 1e-3; /* s */
 #endif
 
   /* rescaling */
@@ -120,7 +130,6 @@ int main(int argc, char ** argv) {
   R *= mmult*xmult*xmult/tmult/tmult; /* [kgm2/s2/mol/K] */
 
   seedper *= tmult;
-  zplant *= xmult;
 
   qflux *= mmult/tmult/tmult/tmult;     // [kg/s3]
 
@@ -129,20 +138,31 @@ int main(int argc, char ** argv) {
 
   /* total number of steps */
   const int ndt = 700000;
+
   /* steps per backup */
   const int n_per_backup= 10000;
 
-  /* if yes, plotting each tperlot seconds. Else, each n_per_plot steps */
-  const bool use_t_per_plot = false;
-  const real t_per_plot = 1.0e-3*tmult;
+  /* Domain size scale expressed in 9 mm / LX. If scaling factor is low,
+     higher grid level is necessary to obtain a given spatial resolution 
+     and vice versa */
 #if CASE == 1
-  const int n_per_plot = 1000*4*gLevel;
+  const int scaling_factor = 60;
 #elif CASE == 2
-  const int n_per_plot = 1000*gLevel;
+  const int scaling_factor = 15;
+#elif CASE == 3
+  const int scaling_factor = 20;
+#elif CASE == 4
+  const int scaling_factor = 2;
 #else
-  const int n_per_plot = 1000*3*gLevel;
+  const int scaling_factor = 20;
 #endif
 
+  /* if yes, plotting each t_per_plot seconds. Else, each n_per_plot steps */
+  const bool use_t_per_plot = true;
+  const real t_per_plot = 1e-3*tmult;
+  const int n_per_plot = 70*scaling_factor*gLevel;
+
+  /* dt settings */
   const real surftens_dt_coef = 10.;
   const real initdtcoef = 1./30.;
 
@@ -162,23 +182,24 @@ int main(int argc, char ** argv) {
   //const bool multigrid_stop_if_diverging = false;
 
   const int multigrid_min_cycles = 3;
-#if CASE == 1
-  const int multigrid_max_cycles = 10+gLevel/2;
-#elif CASE == 2
-  const int multigrid_max_cycles = 10+gLevel/8;
-#else
-  const int multigrid_max_cycles = 10+gLevel/6;
-#endif
+  const int multigrid_max_cycles = 10+gLevel*scaling_factor/120;
 
   /* vof */
   const CurvMethod curv_method = CurvMethod::HF();
   const TopoMethod topo_method = TopoMethod::Hybrid();
 
+#ifdef MULTI_BUBBLES
+  const bool detachment_model = true;
+#else
   const bool detachment_model = false;
+#endif
   const bool subgrid_method = true; /* use slic subgrid */
   const bool use_fs_interp = false;
   const bool store_pressure_extrap = false;
   const int niter_pressure_extrap = 1000; 
+
+  /* phase change */
+  const bool near_wall_modelling = true; /* use near wall modelling */
 
 /******************************************************************************/
 /* ------------ material properties */
@@ -215,6 +236,39 @@ int main(int argc, char ** argv) {
   const real latent=1865.02*1000.0;
 
   const real betal = 0.00141; 
+#elif CASE == 3
+  const real Mv = 18.015e-3;
+  const real muv = 1.701e-5;
+  const real rhov = 15.86432;
+  const real cpv = 3470.07*rhov;
+  const real lambdav = 0.047509521;
+
+  const real mul = 1.125e-4;
+  const real rhol = 817.915;
+  const real cpl = 4741.35*rhol;
+  const real lambdal = 0.61293;
+
+  const real sig = 0.03;
+  const real latent=1779.35*1000.0;
+
+  const real betal = 0.0015;
+#elif CASE == 4
+  const real Mv = 18.015e-3;
+
+  const real muv = 1.2268e-5;
+  const real rhov = 0.59766;
+  const real cpv = 2.0799e3*rhov;
+  const real lambdav = 0.025093; 
+
+  const real mul = 0.2818e-3;
+  const real rhol = 958.4;
+  const real cpl = 4.2159e3*rhol;
+  const real lambdal = 679.1e-3;
+
+  const real sig = 58.91e-3;
+  const real latent = 2.260e6;
+
+  const real betal = 0.752e-3;
 #else
   /* FC-72 from Cao(2019) and FC-72 3M product sheet */
   const real Mv = 338e-3;
@@ -234,26 +288,28 @@ int main(int argc, char ** argv) {
   const real betal = 0.00156;
 #endif
 
-#if CASE == 1 
   /* heater */
-  const real rhosol = 8908.0;
-  const real cpsol = 444.0*rhosol;
-  const real lambdasol = 90.9;
-#elif CASE == 2
+#if CASE < 4
+  /* copper or some other metal? */
   const real rhosol = 8908.0;
   const real cpsol = 444.0*rhosol;
   const real lambdasol = 90.9;
 #else 
+  /* silicon */
   const real rhosol = 2329.;
   const real cpsol = 700.*rhosol;
   const real lambdasol = 130.;
 #endif
 
   /* natural convection BL thickness */
-  real ztconst = xmult*7.4*
+  real ztconst = xmult*7.14*
                  std::pow(mul*lambdal/cpl/rhol/gravity/(twall0-tout)/betal,1./3.);
   //0.324e-3;
   boil::oout<<"BL thickness: "<<ztconst<<boil::endl;
+
+  const real Jal = cpl*(twall-tsat0)/(latent*rhov);
+  boil::oout << "Jal= "<<Jal<<boil::endl;
+  //exit(0);
 
 /******************************************************************************/
 /* ------------ domain dimensions */
@@ -262,19 +318,27 @@ int main(int argc, char ** argv) {
   const int NZ1 = 64*gLevel;
 
 #if CASE == 1
-  const int NZ0 = std::max(4,3*gLevel);
-  real LX1 =  0.1e-3;
-  real LX2 =  0.15e-3;
-  real LZ0 = -8.0e-6;
+  real LX1 = 0.1e-3;
 #elif CASE == 2
-  const int NZ0 = std::max(4,gLevel);
-  real LX1 =  0.4e-3;
-  real LX2 =  0.6e-3;
-  real LZ0 = -8.0e-6;
+  real LX1 = 0.4e-3;
+#elif CASE == 3
+  real LX1 = 0.3e-3;
+#elif CASE == 4
+  real LX1 = 3e-3;
 #else
-  const int NZ0 = 12*gLevel;
-  real LX1 =  0.3e-3;
-  real LX2 =  0.45e-3;
+  real LX1 = 0.3e-3;
+#endif
+
+  real LX2 = 1.5*LX1;
+
+#if CASE < 4
+  const int NZ0 = std::max(4,scaling_factor*gLevel/30); /* DZ is uniform */
+  real LZ0 = -8.0e-6;
+#elif CASE == 4
+  const int NZ0 = std::max(4,scaling_factor*gLevel*2); /* DZ is uniform */
+  real LZ0 = -480e-6; /* arbitrary, originally, 1.3 mm is used */
+#else
+  const int NZ0 = std::max(4,scaling_factor*gLevel*5/12); /* DZ is uniform */
   real LZ0 = -100e-6;
 #endif
 
@@ -287,14 +351,21 @@ int main(int argc, char ** argv) {
   const real LZ1  = LX1/real(NX1)*real(NZ1);
   const real dxuni = LX1/real(NX1);
 
-#ifdef OUTLET_VISC
-  /* settings for increased viscosity */
-  const real z0=0.9*LZ1;
-  const real z1=LZ1;
-#endif
+#ifdef MULTI_BUBBLES
+  /* settings for increased viscosity and bubble deletion */
+  const real z0=0.5*LZ1;
+  const real z1=0.65*LZ1;
 
   /* settings for calculating xyz extents */
+  const real zft=0.25*LZ1;
+#else
   const real zft=LZ1;
+#endif
+
+#ifndef USE_BIG
+  /* nucleation parameters */
+  const real zplant= LZ1/18.; // when bottom of bubble reaches zplant, next seed is set
+#endif
 
   /* heater power */
   real qsrc=qflux/fabs(LZ0);  // [W/m3]
@@ -587,6 +658,8 @@ int main(int argc, char ** argv) {
                     tsat, time, &mixed, sld,Sign::neg());
 #endif
 
+  pc.set_near_wall_modelling(near_wall_modelling);
+
   /*-------------------+
   |  check if restart  |
   +-------------------*/
@@ -728,13 +801,24 @@ int main(int argc, char ** argv) {
   input.close();
 
   /* set iint */
-  int iint = int(time.current_time()/t_per_plot);
+  int iint;
+  if(use_t_per_plot) {
+    iint = time.current_time() / t_per_plot;
+  } else {
+    if(time.current_time()<time.dt()) {
+      iint = 0;
+    } else {
+      iint = time.current_step() / n_per_plot;
+    }
+  }
+
+
   boil::oout<<"iint= "<<iint<<"\n";
 
   /*------------+
   |  time loop  |
   +------------*/
-#if 1
+#ifndef SETUP_ONLY
   for(time.start(); time.end(); time.increase()) {
 
     boil::oout << "########################" << boil::endl;
@@ -773,7 +857,7 @@ int main(int argc, char ** argv) {
     boil::oout<<"MaxMinTif: "<<time.current_time()<<" " <<maxtif<<" "<<mintif<<boil::endl;
 #endif
 
-#ifdef OUTLET_VISC
+#ifdef MULTI_BUBBLES
     /* increase viscosity in outlet region */
     for_avk(c,k){
       if(c.zc(k)>z0){
@@ -860,13 +944,14 @@ int main(int argc, char ** argv) {
     |  solve transport equation  |
     +---------------------------*/
     conc.advance_phase_change(c);
+    conc.reconstruct_geometry(c);
+    conc.interfacial_flagging(conc.color());
 #ifdef USE_PHASE_VEL_VOF
     conc.extrapolate_velocity(conc.color(),f,one,uvw,uvw_1,ResRat(1e-4),Sign::pos(),true);
   #ifdef USE_PHASE_VEL_EFD
     conc.extrapolate_velocity(conc.color(),f,zero,uvw,uvw_2,ResRat(1e-4),Sign::neg(),false);
   #endif
 #endif
-    conc.reconstruct_geometry(c);
     conc.advance_geometric(c);
 
     /*---------------------------+
@@ -874,6 +959,41 @@ int main(int argc, char ** argv) {
     +---------------------------*/ 
 #ifdef USE_SOLID
     nucl.replant();
+#endif
+
+#ifdef MULTI_BUBBLES
+  #ifndef INVERTED
+    boil::oout<<"main::Underdevelopment!"<<boil::endl;
+    exit(0);
+  #endif
+
+    /*-------------------------------+
+    |  outlet region: delete bubbles |
+    +-------------------------------*/
+    int kkm = -1;
+    real clrmin_m=boil::exa;
+    real clrmin_p=boil::exa;
+    if (d.contains_z(z0)) {
+      kkm=c.k(z0);
+      for_vij(c,i,j) {
+        if(clrmin_m>conc.color()[i][j][kkm-1]) clrmin_m=conc.color()[i][j][kkm-1];
+      }
+      for_vij(c,i,j) {
+        if(clrmin_p>conc.color()[i][j][kkm]) clrmin_p=conc.color()[i][j][kkm];
+      }
+    }
+    boil::cart.min_real(&clrmin_m);
+    boil::cart.min_real(&clrmin_p);
+    //std::cout<<"main:clrmin_m= "<<clrmin_m<<" "<<clrmin_p<<" "<<kkm<<"\n";
+    if ( (clrmin_m>0.5) && (clrmin_p>0.5) ){
+      for_avk(c,k){
+        if(c.zc(k)>=(z0-c.dzc(k))){
+          for_avij(c,i,j){
+            c[i][j][k]= 1.0;
+          }
+        }
+      }
+    }
 #endif
 
     /* update clr after seed, cutneck and outlet-region */
@@ -888,12 +1008,77 @@ int main(int argc, char ** argv) {
     enthFD.discretize();
     enthFD.new_time_step();
     enthFD.solve(ResRat(1e-16),"enthFD");
+
     /*-------------+
     |  dt control  |
     +-------------*/
     /* minimum color function */
     conc.color_minmax();
+
+    /* front */
+    conc.front_minmax( Range<real>(-LX2,LX2) ,Range<real>(-LX2,LX2)
+                      ,Range<real>(0, zft));
+
+#ifdef MULTI_BUBBLES
+  #ifndef INVERTED
+    boil::oout<<"main::Underdevelopment!"<<boil::endl;
+    exit(0);
+  #endif
+
+    real clrmin=conc.minval();
+    real frontmin = conc.get_zminft();
+
+  #if 0
+    bool request_replant=false;
+    for(int nsd=0; nsd<nucl.size(); nsd++){
+      if( nucl.sites[nsd].req_replant() ) request_replant=true;
+    }
+
+    if ( clrmin < 0.5 || request_replant ) {
+      /* interface is included */
+      time.control_dt(ns.cfl_max(), cfl_with, dt);
+    } else {
+
+      /* interface is not included */
+      time.control_dt(ns.cfl_max(), cfl_wo, 2.*seedper);
+    }
+
+    real cflmax = ns.cfl_max();
+    boil::oout<<"main:cflmax= "<<time.current_time()<<" "<<cflmax<<"\n";
+    for(int nsd=0; nsd<nucl.size(); nsd++){
+      if( cflmax<=cfl_with && time.dt()<=dt) {
+        nucl.sites[nsd].set_allow_replant(true);
+      } else {
+        nucl.sites[nsd].set_allow_replant(false);
+      }
+    }
+
+    boil::oout<<"main:request= "<<request_replant<<" "
+              <<nucl.sites[0].allow_replant()<<" "
+              <<cflmax<<" "<<time.dt()<<" "<<dt<<"\n";
+  #else
+    bool request_replant = frontmin>zplant;
+
+    if ( clrmin < 0.5 || request_replant ) {
+      /* interface is included */
+      time.control_dt(ns.cfl_max(), cfl_with, dt);
+    } else {
+      /* interface is not included */
+      time.control_dt(ns.cfl_max(), cfl_wo, 2.*seedper);
+    }
+
+    if(request_replant) {
+      boil::oout<<"main::replant: "<<time.current_time()<<boil::endl;
+      /* plant seed manually */
+      nucl.plant();
+      for(int ns=0; ns<nucl.size(); ns++){
+        nucl.sites[ns].set_time_seed(0.0);
+      }
+    }
+  #endif
+#else
     time.control_dt(ns.cfl_max(), cfl_with, dt);
+#endif
 
     /*--------------+
     |  output data  |
@@ -909,13 +1094,10 @@ int main(int argc, char ** argv) {
                      ,"uvw-c-tpr-clr-mdot-adens",iint);
     }
 
-    conc.front_minmax( Range<real>(-LX2,LX2) ,Range<real>(-LX2,LX2)
-                      ,Range<real>(0, zft));
-
     /*--------------+
     |  backup data  |
     +--------------*/
-    if((time.current_step()) % n_per_plot == 0 ){
+    if((time.current_step()) % n_per_backup == 0 ){
       uvw  .save("uvw",   time.current_step());
       press.save("press", time.current_step());
       c.save("c",  time.current_step());
