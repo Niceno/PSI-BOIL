@@ -20,7 +20,12 @@ void Domain::init(const Decompose & dec) {
 
   /* get the resolution in each direction */
   //int res[] = { gi()-2 , gj()-2 , gk()-2 };
-  int res[] = { gi()-2*boil::BW , gj()-2*boil::BW , gk()-2*boil::BW }; //2019.0615
+  int res[] = { gi()-2*boil::BW , gj()-2*boil::BW , gk()-2*boil::BW }; /* 2019.0615 */
+
+  /* this way, the decomposition can be augmented using the static members */
+  res[0] /= factor_x;
+  res[1] /= factor_y;
+  res[2] /= factor_z;
 
   /* take care of constrained decompositions */
   if( dec != Decompose::x()  && 

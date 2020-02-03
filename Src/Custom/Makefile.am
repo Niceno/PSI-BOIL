@@ -5,6 +5,7 @@ libCustom_a_SOURCES = custom.h                       \
                       custom_restrict.cpp            \
                       custom_scalar_error.cpp        \
                       custom_setup_circle.cpp        \
+                      custom_setup_sphere.cpp        \
                       custom_update_step.cpp
 
 INCLUDE = -I@top_srcdir@/

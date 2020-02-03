@@ -15,7 +15,11 @@ static void __attribute__ ((constructor)) trapfpe(void)
 //#define FS_TEST
 #define USE_PHASE_VEL_VOF
 //#define USE_PHASE_VEL_EFD
-//#define CARTESIAN
+#define CASE 3
+/* case 1 = axisymmetric
+        2 = cartesian 2D
+        3 = cartesian 3D
+*/
 
 /******************************************************************************/
 int main(int argc, char ** argv) {
@@ -143,11 +147,13 @@ int main(int argc, char ** argv) {
   /*---------+
   |  domain  |
   +---------*/
-#ifdef CARTESIAN
-  Grid1D gy(DX);
-  Domain d(gx,gy,gz);
-#else
+#if CASE == 1
   Axisymmetric d(gx, gz, DX);
+#elif CASE == 2
+  Grid1D gy(DX);
+  Domain d(gz,gy,gz);
+#else
+  Domain d(gz,gz,gz);
 #endif
   const real dxmin = d.dxyz_min();
 
@@ -166,8 +172,18 @@ int main(int argc, char ** argv) {
   |  insert boundary conditions  |
   +-----------------------------*/
   for_m(m) {
+#if CASE == 1
     uvw.bc(m).add( BndCnd( Dir::imin(), BndType::symmetry() ) );
     uvw.bc(m).add( BndCnd( Dir::imax(), BndType::outlet() ) );
+#else
+  #ifdef SYM
+    uvw.bc(m).add( BndCnd( Dir::imin(), BndType::symmetry() ) );
+    uvw.bc(m).add( BndCnd( Dir::imax(), BndType::outlet() ) );
+  #else
+    uvw.bc(m).add( BndCnd( Dir::imin(), BndType::outlet() ) );
+    uvw.bc(m).add( BndCnd( Dir::imax(), BndType::outlet() ) );
+  #endif
+#endif
 #ifdef SYM
     uvw.bc(m).add( BndCnd( Dir::kmin(), BndType::symmetry() ) );
     uvw.bc(m).add( BndCnd( Dir::kmax(), BndType::outlet() ) );
@@ -175,14 +191,34 @@ int main(int argc, char ** argv) {
     uvw.bc(m).add( BndCnd( Dir::kmin(), BndType::outlet() ) );
     uvw.bc(m).add( BndCnd( Dir::kmax(), BndType::outlet() ) );
 #endif
+#if CASE < 3
     uvw.bc(m).add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
     uvw.bc(m).add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
+#else 
+  #ifdef SYM
+    uvw.bc(m).add( BndCnd( Dir::jmin(), BndType::symmetry() ) );
+    uvw.bc(m).add( BndCnd( Dir::jmax(), BndType::outlet() ) );
+  #else
+    uvw.bc(m).add( BndCnd( Dir::jmin(), BndType::outlet() ) );
+    uvw.bc(m).add( BndCnd( Dir::jmax(), BndType::outlet() ) );
+  #endif
+#endif
     uvw_1(m)=uvw(m).shape();
     uvw_2(m)=uvw(m).shape();
   }
 
+#if CASE == 1
   c.bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
   c.bc().add( BndCnd( Dir::imax(), BndType::outlet() ) );
+#else
+  #ifdef SYM
+  c.bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
+  c.bc().add( BndCnd( Dir::imax(), BndType::outlet() ) );
+  #else
+  c.bc().add( BndCnd( Dir::imin(), BndType::outlet() ) );
+  c.bc().add( BndCnd( Dir::imax(), BndType::outlet() ) );
+  #endif
+#endif
 #ifdef SYM
   c.bc().add( BndCnd( Dir::kmin(), BndType::symmetry() ) );
   c.bc().add( BndCnd( Dir::kmax(), BndType::outlet() ) );
@@ -190,8 +226,18 @@ int main(int argc, char ** argv) {
   c.bc().add( BndCnd( Dir::kmin(), BndType::outlet() ) );
   c.bc().add( BndCnd( Dir::kmax(), BndType::outlet() ) );
 #endif
+#if CASE < 3
   c.bc().add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
   c.bc().add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
+#else
+  #ifdef SYM
+  c.bc().add( BndCnd( Dir::jmin(), BndType::symmetry() ) );
+  c.bc().add( BndCnd( Dir::jmax(), BndType::outlet() ) );
+  #else
+  c.bc().add( BndCnd( Dir::jmin(), BndType::outlet() ) );
+  c.bc().add( BndCnd( Dir::jmax(), BndType::outlet() ) );
+  #endif
+#endif
 
   press=c.shape();
   p=c.shape();
@@ -203,8 +249,18 @@ int main(int argc, char ** argv) {
   q = p.shape();
   g = c.shape();
 
+#if CASE == 1
   tpr.bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
   tpr.bc().add( BndCnd( Dir::imax(), BndType::dirichlet(), tout ) );
+#else
+  #ifdef SYM
+  tpr.bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
+  tpr.bc().add( BndCnd( Dir::imax(), BndType::dirichlet(), tout ) );
+  #else
+  tpr.bc().add( BndCnd( Dir::imin(), BndType::dirichlet(), tout ) );
+  tpr.bc().add( BndCnd( Dir::imax(), BndType::dirichlet(), tout ) );
+  #endif
+#endif
 #ifdef SYM
   tpr.bc().add( BndCnd( Dir::kmin(), BndType::symmetry() ) );
   tpr.bc().add( BndCnd( Dir::kmax(), BndType::dirichlet(), tout ) );
@@ -212,8 +268,18 @@ int main(int argc, char ** argv) {
   tpr.bc().add( BndCnd( Dir::kmin(), BndType::dirichlet(), tout ) );
   tpr.bc().add( BndCnd( Dir::kmax(), BndType::dirichlet(), tout ) );
 #endif
+#if CASE < 3
   tpr.bc().add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
-  tpr.bc().add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
+  tpr.bc().add( BndCnd( Dir::jmax(), BndType::pseudo() ) ); 
+#else
+  #ifdef SYM
+  tpr.bc().add( BndCnd( Dir::jmin(), BndType::symmetry() ) );
+  tpr.bc().add( BndCnd( Dir::jmax(), BndType::dirichlet(), tout ) );
+  #else
+  tpr.bc().add( BndCnd( Dir::jmin(), BndType::dirichlet(), tout ) );
+  tpr.bc().add( BndCnd( Dir::jmax(), BndType::dirichlet(), tout ) );
+  #endif
+#endif
 
   /*----------------------+
   |  physical properties  |
@@ -278,7 +344,7 @@ int main(int argc, char ** argv) {
 #else
   Vector & uvwvof = uvw;
 #endif
-#ifdef CARTESIAN
+#if CASE > 1
   VOF conc(c, g, kappa, uvwvof, time, solver);
 #else
   VOFaxisym conc(c, g, kappa, uvwvof, time, solver);
@@ -305,7 +371,7 @@ int main(int argc, char ** argv) {
   Vector & uvwenth2 = uvw;
 #endif
 
-#ifdef CARTESIAN
+#if CASE > 1
   EnthalpyFD enthFD      (tpr, q, uvw, uvwenth1, uvwenth2, time, solver  , &mixed,
                           conc.topo, tsat);
 #else
@@ -380,10 +446,14 @@ int main(int argc, char ** argv) {
     const real ycent=0.0;
     const real zcent=0.0;
 
+#if CASE < 3
     boil::setup_circle_xz(conc.color(), radius, xcent, zcent);
+#else
+    boil::setup_sphere(conc.color(), radius, xcent, ycent, zcent);
+#endif
     conc.color().bnd_update();
     conc.color().exchange_all();
-#ifndef CARTESIAN
+#if CASE == 1
     conc.color_to_vf(conc.color(),c);
 #endif
     for_vijk(c,i,j,k)
@@ -395,6 +465,9 @@ int main(int argc, char ** argv) {
 
     for_vijk(c,i,j,k) {
       real dist = pow(c.xc(i)-xcent,2.0)
+#if CASE == 3
+                 +pow(c.yc(j)-ycent,2.0)
+#endif
                  +pow(c.zc(k)-zcent,2.0);
 
       real radius2=70.0e-6;

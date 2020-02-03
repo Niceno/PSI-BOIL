@@ -235,6 +235,9 @@ class Domain {
     real dV_min()   const {return min_dV;}
     real dV_max()   const {return max_dV;}
 
+    static void set_decomposition_factors(const int fx, 
+                                          const int fy, const int fz);
+
   //private:
   protected:
     Domain(const Grid1D * ogx, const Grid1D * ogy, const Grid1D * ogz,
@@ -278,6 +281,9 @@ class Domain {
 
     /* decomposition */
     const Decompose dc;
+    /* with the factors below, more fine-grained user-control over
+       decomposition can be achieved */
+    static int factor_x, factor_y, factor_z;
 };	
 
 #endif

@@ -78,7 +78,7 @@ int main(int argc, char ** argv) {
   const real tsat0_K = 236.93+273.15;
 #elif CASE == 4
   const real cangle = 50;
-  const real twall = tsat0 + 7.;
+  const real twall = tsat0 + 7.;//8.5;
   const real tsat0_K = 99.97+273.15;
 #else 
   const real cangle = 1.;
@@ -973,6 +973,7 @@ int main(int argc, char ** argv) {
     int kkm = -1;
     real clrmin_m=boil::exa;
     real clrmin_p=boil::exa;
+    conc.color().exchange_all();
     if (d.contains_z(z0)) {
       kkm=c.k(z0);
       for_vij(c,i,j) {
@@ -982,10 +983,12 @@ int main(int argc, char ** argv) {
         if(clrmin_p>conc.color()[i][j][kkm]) clrmin_p=conc.color()[i][j][kkm];
       }
     }
+    boil::cart.max_int(&kkm);
     boil::cart.min_real(&clrmin_m);
     boil::cart.min_real(&clrmin_p);
-    //std::cout<<"main:clrmin_m= "<<clrmin_m<<" "<<clrmin_p<<" "<<kkm<<"\n";
     if ( (clrmin_m>0.5) && (clrmin_p>0.5) ){
+      boil::oout<<"main::buble-del= "<<time.current_time()<<" "
+                 <<clrmin_m<<" "<<clrmin_p<<" "<<kkm<<"\n";
       for_avk(c,k){
         if(c.zc(k)>=(z0-c.dzc(k))){
           for_avij(c,i,j){

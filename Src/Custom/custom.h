@@ -24,6 +24,11 @@ namespace boil {
   /* setup circle */
   void setup_circle_xz(Scalar & c, const real radius, const real xcent, const real zcent);
 
+  /* setup sphere */
+  real setup_sphere(Scalar & c, const real radius,
+                    const real xcent, const real ycent, const real zcent,
+                    const real mm = 20);
+
   /* interpolate velocities */
   void interpolateXZ(const Vector & coarse, Vector & fine, 
                      const Scalar & cs, const Scalar & mdot,

@@ -101,7 +101,6 @@ Domain::Domain(const Domain & fine_dom,
   }
 }
 
-
 /******************************************************************************/
 Domain::Domain(const Grid1D * ogx, const Grid1D * ogy, const Grid1D * ogz,
                const Grid1D * lgx, const Grid1D * lgy, const Grid1D * lgz,
@@ -127,3 +126,21 @@ Domain::Domain(const Grid1D * ogx, const Grid1D * ogy, const Grid1D * ogz,
   boil::oout << "Domain level " << level() << " created !" << boil::endl;
   //TMP if(boil::plot) boil::plot->plot(*this, name.c_str(), level());
 }	
+
+/******************************************************************************/
+/*----------------+
+|  static members |
++----------------*/
+int Domain::factor_x = 1;
+int Domain::factor_y = 1;
+int Domain::factor_z = 1;
+
+void Domain::set_decomposition_factors(const int fx,
+                                       const int fy,
+                                       const int fz) {
+  factor_x = fx;
+  factor_y = fy;
+  factor_z = fz;
+
+  return;
+} 
