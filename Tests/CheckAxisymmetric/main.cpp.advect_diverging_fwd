@@ -195,7 +195,7 @@ int main(int argc, char * argv[]) {
   #ifdef USE_CARTESIAN
     uvw[m][i][j][k]=(+A)*zpos/LX;
   #else
-    uvw[m][i][j][k]=2.*A*zpos;
+    uvw[m][i][j][k]=2.*A*zpos/LX;
   #endif 
   }
   uvw.exchange();

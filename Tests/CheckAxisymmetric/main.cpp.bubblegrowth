@@ -396,7 +396,7 @@ int main(int argc, char ** argv) {
     input.open("run.txt", std::ios::in);
     if( !input.fail() ) {
       input >> irun;
-      std::cout<<"read irun.  irun= "<<irun<<"\n";
+      boil::oout<<"read irun.  irun= "<<irun<<"\n";
     }
     input.close();
   }
@@ -420,8 +420,8 @@ int main(int argc, char ** argv) {
     input >> ts;
     input >> t;
     input >> dtf;
-    uvw.  load("uvw",   ts);
-    press.load("press",   ts);
+    uvw.  load("uvw",ts);
+    press.load("press",ts);
     c. load("c", ts);
     tpr.  load("tpr", ts);
     time.first_step(ts);
@@ -462,6 +462,7 @@ int main(int argc, char ** argv) {
     c.bnd_update();
     c.exchange_all();
     conc.init();
+    conc.totalvol();
 
     for_vijk(c,i,j,k) {
       real dist = pow(c.xc(i)-xcent,2.0)
@@ -489,7 +490,6 @@ int main(int argc, char ** argv) {
     }
     tpr.bnd_update();
     tpr.exchange_all();
-    conc.init();
     boil::plot->plot(uvw,c,tpr,press,mdot,mflx,"uvw-c-tpr-press-mdot-mflx",0); 
 
   }
