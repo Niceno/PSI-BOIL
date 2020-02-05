@@ -355,6 +355,7 @@ int main(int argc, char ** argv) {
   /* settings for increased viscosity and bubble deletion */
   const real z0=0.5*LZ1;
   const real z1=0.65*LZ1;
+  const real zmax=0.9*LZ1; /* only liquid beyond 0.9*LZ1 */
 
   /* settings for calculating xyz extents */
   const real zft=0.25*LZ1;
@@ -456,10 +457,16 @@ int main(int argc, char ** argv) {
   q = p.shape();
   mu_t = p.shape();
   kappa = p.shape();
+  g = p.shape();
+  auxscalar = p.shape();
 
-  c = p.shape();
-  g = c.shape();
-  auxscalar = c.shape();
+  /* should avoid spurious flows from the outlet */
+  c.bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
+  c.bc().add( BndCnd( Dir::imax(), BndType::neumann() ) );
+  c.bc().add( BndCnd( Dir::kmin(), BndType::wall() ) );
+  c.bc().add( BndCnd( Dir::kmax(), BndType::dirichlet(), 1.0 ) );
+  c.bc().add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
+  c.bc().add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
 
   tpr.bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
   tpr.bc().add( BndCnd( Dir::imax(), BndType::neumann() ) );
@@ -994,6 +1001,14 @@ int main(int argc, char ** argv) {
           for_avij(c,i,j){
             c[i][j][k]= 1.0;
           }
+        }
+      }
+    }
+
+    for_avk(c,k) {
+      if(c.zc(k)>=(zmax-c.dzc(k))) {
+        for_avij(c,i,j) {
+          c[i][j][k]= 1.0;
         }
       }
     }

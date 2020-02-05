@@ -34,10 +34,27 @@ class VOF : public Centered {
 
     void new_time_step(){};
     void forward(Scalar & scp);
+
     void advance(const bool anci = true);
     void advance(Scalar & sca, const bool anci = true);
+
+    void advance_with_extrapolation(const bool anci, const ResRat & resrat,
+                                    const Vector & umixed, const Scalar & fext,
+                                    const Matter * fluid_1, Vector * uvw_1,
+                                    const Matter * fluid_2 = NULL,
+                                    Vector * uvw_2 = NULL);
+
+    void advance_with_extrapolation(Scalar & sca,
+                                    const bool anci, const ResRat & resrat,
+                                    const Vector & umixed, const Scalar & fext,
+                                    const Matter * fluid_1, Vector * uvw_1,
+                                    const Matter * fluid_2 = NULL,
+                                    Vector * uvw_2 = NULL);
+
     void advance_phase_change(Scalar & scp);
     void advance_geometric(Scalar & scp);
+    
+
     void curvature();
     void ancillary(); /* calcs ancillary params such as adens w/o advance */
     virtual void reconstruct_geometry();
@@ -108,7 +125,6 @@ class VOF : public Centered {
     void flood(Scalar & scp,const real mult);
 
     void cal_fs3(const Scalar & scp);
-    void curv_smooth();
     void extract_alpha(const Scalar & scp);
     void extract_alpha_near_bnd(const Scalar & scp);
     void standardized_norm_vect(const Scalar & mx,
@@ -116,13 +132,9 @@ class VOF : public Centered {
                                 const Scalar & mz,
                                 Scalar & nx, Scalar & ny, Scalar & nz);
     void gradphi(const Scalar & g);
-    void gradphic(const Scalar & g);
     void ib_norm(const Scalar & g);
     void ib_norm_cal(const int cc, const int i, const int j, const int k);
-    void insert_bc(const Scalar & g);
-    void insert_bc_gradphic(const Scalar & g);
     void insert_bc_gradphi(const Scalar & g);
-    void insert_bc_norm();
     void nib(const real & n1, const real & n2, const real & n3
            , const real & n4, const real & n5, const real & n6
            , real r[]);
@@ -204,9 +216,6 @@ class VOF : public Centered {
                          const Comp & mcomp);
 
 
-    void set_flag();
-    void insert_bc_flag(ScalarInt & g, const bool b);
-
     void cal_bndclr(const Scalar & scp);
 
     void set_adens(const Scalar & newadens) {
@@ -284,11 +293,12 @@ class VOF : public Centered {
     SubgridMethod subgrid_method;
     TopoMethod topo_method;
 
-    int nlayer, niter_pressure_extrap;
+    int niter_pressure_extrap;
     real cangle;
     real mult_wall;
 
     inline real signum(const real a, const real b) { return a*((b>0.)-(b<0.)); }
+    inline int signum(const int a, const int b) { return a*((b>0)-(b<0)); }
 };	
 #endif
 

@@ -16,7 +16,6 @@ libVof_a_SOURCES =      vof.h                           \
                         vof_color_minmax.cpp            \
                         vof_curvature.cpp               \
                         vof_curv_HF.cpp                 \
-                        vof_curv_smooth.cpp             \
                         vof_ev_complement.cpp           \
                         vof_ev_discretize.cpp           \
                         vof_ev_flagging.cpp             \
@@ -29,15 +28,10 @@ libVof_a_SOURCES =      vof.h                           \
                         vof_front_minmax.cpp            \
                         vof_fs3.cpp                     \
                         vof_gradphi.cpp                 \
-                        vof_gradphic.cpp                \
                         vof_ib_norm.cpp                 \
-                        vof_insert_bc.cpp               \
                         vof_insert_bc_curv_divnorm.cpp  \
                         vof_insert_bc_curv_HFmixed.cpp  \
-                        vof_insert_bc_flag.cpp          \
                         vof_insert_bc_gradphi.cpp       \
-                        vof_insert_bc_gradphic.cpp      \
-                        vof_insert_bc_norm.cpp          \
                         vof_interfacial_flagging.cpp    \
                         vof_norm.cpp                    \
                         vof_normalize.cpp               \
@@ -49,7 +43,6 @@ libVof_a_SOURCES =      vof.h                           \
                         vof_norm_young.cpp              \
                         vof_reconstruct_geometry.cpp    \
                         vof_select_norm.cpp             \
-                        vof_set_flag.cpp                \
                         vof_smooth.cpp                  \
                         vof_standardized_norm_vect.cpp  \
                         vof_tension.cpp                 \

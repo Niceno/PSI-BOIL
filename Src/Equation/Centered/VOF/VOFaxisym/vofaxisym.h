@@ -87,6 +87,9 @@ class VOFaxisym : public VOF {
     virtual void advance_y(Scalar & sca) {};
     virtual void advance_z(Scalar & sca);
 
+    void set_reconstruction_flag(const Scalar & scp, ScalarInt & flag,
+                                 const int nlayer);
+
     real linf_scalar_error(const Scalar & sca, const Scalar & scb
                           // ,int & i, int & j, int & k, bool & ebool
                            );

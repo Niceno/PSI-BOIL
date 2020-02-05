@@ -31,12 +31,25 @@ void VOFaxisym::reconstruct_geometry(Scalar & scp) {
   /* iterate boundary normal vector */
   bdnorm(clr);
 
+  /* doing the reconstruction in the whole domain is unstable; therefore,
+     only a band around the presumed interface is considered */
+  const int nlayer = 4;
+  set_reconstruction_flag(scp,tempflag,nlayer);
+
 #if 1
   /* iteration procedure */
   do {
     backward_axisymmetric(scp,nalpha);
     //forward_cartesian(axistmp);
     forward(axistmp);
+
+    /* correction */
+    for_avijk(axistmp,i,j,k) {
+      if(abs(tempflag[i][j][k])>nlayer) {
+        axistmp[i][j][k] = std::max(0.0,std::min(1.0,scp[i][j][k]));
+      }
+    }
+
     /* color to vf contains calculations of normal vector and update at walls */
     color_to_vf(axistmp,stmp2,true,true);
     /* calculate Linf error norm of reconstruction in phi-space */

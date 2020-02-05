@@ -13,6 +13,7 @@ libVOFaxisym_a_SOURCES = vofaxisym.h                           \
                          vofaxisym_linf_scalar_error.cpp       \
                          vofaxisym_norm.cpp                    \
                          vofaxisym_reconstruct_geometry.cpp    \
+                         vofaxisym_reconstruction_flag.cpp     \
                          vofaxisym_test_reconstruction.cpp     \
                          vofaxisym_vf_to_color.cpp             \
                          vofaxisym_wall_curv_HFmixed_kernel.cpp\

@@ -129,7 +129,6 @@ VOF::VOF(const Scalar & PHI,
 
   epsnorm=1.0e-12;
   phisurf=0.5;
-  nlayer=6;
   tol_wall = 0.01; /* tolerance 0.99 \approx 1.0 near walls */
   cangle=90.0/180.0*boil::pi;
   mult_wall = 1.;

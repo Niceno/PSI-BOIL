@@ -22,6 +22,8 @@ void set_curv_method(const CurvMethod cm) {
     boil::oout<<"VOF: height function is used for curvature calculation.\n";
   } else if(cm==CurvMethod::DivNorm()){
     boil::oout<<"VOF: smoothed VOF is used for curvature calculation.\n";
+    boil::oout<<"Obsolete! Exiting."<<boil::endl;
+    exit(0);
   } else {
     boil::oout<<"Curv method should be HF or DivNorm.\n";
     boil::oout<<"Exiting."<<boil::endl;
