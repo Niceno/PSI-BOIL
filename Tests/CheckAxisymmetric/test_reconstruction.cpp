@@ -62,8 +62,8 @@ void test_reconstruction_circle_xz(VOF & conc, Scalar & c, Scalar & ctest,
     err_c_l1 /= real(cnt);
   }
 
-  boil::oout<<"Error-normal-vector-for "<<nm<<": "<<err_n_linf<<" "<<err_n_l1<<" (in "<<cnt<<" cells)"<<boil::endl;
-  boil::oout<<"Error-color-for "<<nm<<": "<<err_c_linf<<" "<<err_c_l1<<" (in "<<cnt<<" cells)"<<boil::endl;
+  //boil::oout<<"Error-normal-vector-for "<<nm<<": "<<err_n_linf<<" "<<err_n_l1<<" (in "<<cnt<<" cells)"<<boil::endl;
+  //boil::oout<<"Error-color-for "<<nm<<": "<<err_c_linf<<" "<<err_c_l1<<" (in "<<cnt<<" cells)"<<boil::endl;
 
   /* curvature */
   real err_k_l1(0.0),  err_k_linf(0.0);
@@ -89,7 +89,7 @@ void test_reconstruction_circle_xz(VOF & conc, Scalar & c, Scalar & ctest,
     err_k_l1 /= real(knt);
   }
 
-  boil::oout<<"Error-kappa-for "<<nm<<": "<<err_k_linf<<" "<<err_k_l1<<" (in "<<knt<<" cells)"<<boil::endl;
+  //boil::oout<<"Error-kappa-for "<<nm<<": "<<err_k_linf<<" "<<err_k_l1<<" (in "<<knt<<" cells)"<<boil::endl;
 
   nl1.push_back(err_n_l1);
   nli.push_back(err_n_linf);
@@ -282,8 +282,8 @@ void test_reconstruction_sphere(bool partial,
     err_c_l1 /= real(cnt);
   }
 
-  boil::oout<<"Error-normal-vector-for "<<nm<<": "<<err_n_linf<<" "<<err_n_l1<<" (in "<<cnt<<" cells)"<<boil::endl;
-  boil::oout<<"Error-color-for "<<nm<<": "<<err_c_linf<<" "<<err_c_l1<<" (in "<<cnt<<" cells)"<<boil::endl;
+  //boil::oout<<"Error-normal-vector-for "<<nm<<": "<<err_n_linf<<" "<<err_n_l1<<" (in "<<cnt<<" cells)"<<boil::endl;
+  //boil::oout<<"Error-color-for "<<nm<<": "<<err_c_linf<<" "<<err_c_l1<<" (in "<<cnt<<" cells)"<<boil::endl;
 
   /* curvature */
   real err_k_l1(0.0),  err_k_linf(0.0);
@@ -313,7 +313,7 @@ void test_reconstruction_sphere(bool partial,
     err_k_l1 /= real(knt);
   }
 
-  boil::oout<<"Error-kappa-for "<<nm<<": "<<err_k_linf<<" "<<err_k_l1<<" (in "<<knt<<" cells)"<<boil::endl;
+  //boil::oout<<"Error-kappa-for "<<nm<<": "<<err_k_linf<<" "<<err_k_l1<<" (in "<<knt<<" cells)"<<boil::endl;
 
   nl1.push_back(err_n_l1);
   nli.push_back(err_n_linf);
@@ -383,8 +383,8 @@ void test_reconstruction_cone(const int NX, const int NZ,
     err_n_l1 /= real(cnt);
   }
 
-  boil::oout<<"Error-normal-vector-for "<<nm<<": "<<err_n_linf<<" "<<err_n_l1<<" (in "<<cnt<<" cells)"<<boil::endl;
-  boil::oout<<"Error-color-for "<<nm<<": "<<err_c_linf<<" "<<err_c_l1<<" (in "<<cnt<<" cells)"<<boil::endl;
+  //boil::oout<<"Error-normal-vector-for "<<nm<<": "<<err_n_linf<<" "<<err_n_l1<<" (in "<<cnt<<" cells)"<<boil::endl;
+  //boil::oout<<"Error-color-for "<<nm<<": "<<err_c_linf<<" "<<err_c_l1<<" (in "<<cnt<<" cells)"<<boil::endl;
 
   /* curvature */
   real err_k_l1(0.0),  err_k_linf(0.0);
@@ -444,7 +444,7 @@ void test_reconstruction_cone(const int NX, const int NZ,
     err_k_l1 /= real(knt);
   }
 
-  boil::oout<<"Error-kappa-for "<<nm<<": "<<err_k_linf<<" "<<err_k_l1<<" (in "<<knt<<" cells)"<<boil::endl;
+  //boil::oout<<"Error-kappa-for "<<nm<<": "<<err_k_linf<<" "<<err_k_l1<<" (in "<<knt<<" cells)"<<boil::endl;
 
   nl1.push_back(err_n_l1);
   nli.push_back(err_n_linf);
@@ -516,8 +516,8 @@ void test_reconstruction_doughnut(bool partial_major, bool partial_minor,
     err_c_l1 /= real(cnt);
   }
 
-  boil::oout<<"Error-normal-vector-for "<<nm<<": "<<err_n_linf<<" "<<err_n_l1<<" (in "<<cnt<<" cells)"<<boil::endl;
-  boil::oout<<"Error-color-for "<<nm<<": "<<err_c_linf<<" "<<err_c_l1<<" (in "<<cnt<<" cells)"<<boil::endl;
+  //boil::oout<<"Error-normal-vector-for "<<nm<<": "<<err_n_linf<<" "<<err_n_l1<<" (in "<<cnt<<" cells)"<<boil::endl;
+  //boil::oout<<"Error-color-for "<<nm<<": "<<err_c_linf<<" "<<err_c_l1<<" (in "<<cnt<<" cells)"<<boil::endl;
 
   /* curvature */
   real err_k_l1(0.0),  err_k_linf(0.0);
@@ -565,7 +565,7 @@ void test_reconstruction_doughnut(bool partial_major, bool partial_minor,
       }
       err_k_l1 += err;
       
-      boil::oout<<i<<" "<<k<<" | "<<" "<<radius_major<<" "<<radius_minor<<" "<<kap<<" "<<kappa_real<<" | "<<err<<" "<<err_k_l1<<" "<<err_k_linf<<boil::endl;
+      //boil::oout<<i<<" "<<k<<" | "<<" "<<radius_major<<" "<<radius_minor<<" "<<kap<<" "<<kappa_real<<" | "<<err<<" "<<err_k_l1<<" "<<err_k_linf<<boil::endl;
     }
   }
   boil::cart.max_real(&err_k_linf);
@@ -576,7 +576,7 @@ void test_reconstruction_doughnut(bool partial_major, bool partial_minor,
     err_k_l1 /= real(knt);
   }
 
-  boil::oout<<"Error-kappa-for "<<nm<<": "<<err_k_linf<<" "<<err_k_l1<<" (in "<<knt<<" cells)"<<boil::endl;
+  //boil::oout<<"Error-kappa-for "<<nm<<": "<<err_k_linf<<" "<<err_k_l1<<" (in "<<knt<<" cells)"<<boil::endl;
 
   nl1.push_back(err_n_l1);
   nli.push_back(err_n_linf);

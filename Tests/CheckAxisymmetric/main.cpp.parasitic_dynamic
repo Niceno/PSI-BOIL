@@ -1,8 +1,7 @@
 #include "Include/psi-boil.h"
-#include "setup_circle.cpp"
-#include "test_reconstruction.cpp"
 #include <fstream>
 #include <iostream>
+#include "test_reconstruction.cpp"
 #include <fenv.h>
 //#define SYM
 //#define USE_BNDCLR
@@ -22,37 +21,41 @@ int main(int argc, char * argv[]) {
 
   boil::timer.start();
 
-  if(argc<=9){
-    boil::oout<<"Nine command line arguments required!"<<"\n";
-    boil::oout<<"./Boil La rhorat murat gridlevel radius-mult dt-mult cfl inverted msimple"<<boil::endl;
+  if(argc<=10){
+    boil::oout<<"Ten command line arguments required!"<<"\n";
+    boil::oout<<"./Boil wmin La rhorat murat gridlevel radius-mult dt-mult wvel inverted msimple"<<boil::endl;
+    boil::oout<<"(wmin::wall time in minute)"<<"\n";
     exit(0);
   }
 
-  const real La = atof(argv[1]);
+  const int wmin=atoi(argv[1]);
+  boil::oout<<"wmin= "<<wmin<<"\n";
+
+  const real La = atof(argv[2]);
   boil::oout<<"La= "<<La<<"\n";
 
-  const real rhorat = atof(argv[2]);
+  const real rhorat = atof(argv[3]);
   boil::oout<<"rhorat= "<<rhorat<<boil::endl;
 
-  const real murat = atof(argv[3]);
+  const real murat = atof(argv[4]);
   boil::oout<<"murat= "<<murat<<boil::endl;
 
-  const int gLevel = atoi(argv[4]);
+  const int gLevel = atoi(argv[5]);
   boil::oout<<"gLevel= "<<gLevel<<"\n";
 
-  const real radmult = atof(argv[5]);
+  const real radmult = atof(argv[6]);
   boil::oout<<"radmult= "<<radmult<<"\n";
 
-  const real dtmult = atof(argv[6]);
+  const real dtmult = atof(argv[7]);
   boil::oout<<"dtmult= "<<dtmult<<"\n";
 
-  const real cfl_max = atof(argv[7]);
-  boil::oout<<"cfl_max= "<<cfl_max<<"\n";
+  real wvel = atof(argv[8]);
+  boil::oout<<"wvel= "<<wvel<<"\n";
 
-  const bool inverted = atoi(argv[8]);
+  const bool inverted = atoi(argv[9]);
   boil::oout<<"inverted= "<<inverted<<"\n";
 
-  const int mSimple = atoi(argv[9]);
+  const int mSimple = atoi(argv[10]);
   boil::oout<<"mSimple= "<<mSimple<<"\n";
 
   /* computed parameters */
@@ -124,10 +127,10 @@ int main(int argc, char * argv[]) {
   +-----------------------------*/
   for_m(m) {
     uvw.bc(m).add( BndCnd( Dir::imin(), BndType::symmetry() ) );
-    uvw.bc(m).add( BndCnd( Dir::imax(), BndType::outlet() ) );
+    uvw.bc(m).add( BndCnd( Dir::imax(), BndType::wall() ) );
 #ifdef SYM
     uvw.bc(m).add( BndCnd( Dir::kmin(), BndType::symmetry() ) );
-    uvw.bc(m).add( BndCnd( Dir::kmax(), BndType::outlet() ) );
+    uvw.bc(m).add( BndCnd( Dir::kmax(), BndType::wall() ) );
 #else
     uvw.bc(m).add( BndCnd( Dir::kmin(), BndType::periodic() ) );
     uvw.bc(m).add( BndCnd( Dir::kmax(), BndType::periodic() ) );
@@ -142,10 +145,10 @@ int main(int argc, char * argv[]) {
   }
 
   c.bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
-  c.bc().add( BndCnd( Dir::imax(), BndType::outlet() ) );
+  c.bc().add( BndCnd( Dir::imax(), BndType::neumann() ) );
 #ifdef SYM
   c.bc().add( BndCnd( Dir::kmin(), BndType::symmetry() ) );
-  c.bc().add( BndCnd( Dir::kmax(), BndType::outlet() ) );
+  c.bc().add( BndCnd( Dir::kmax(), BndType::neumann() ) );
 #else
   c.bc().add( BndCnd( Dir::kmin(), BndType::periodic() ) );
   c.bc().add( BndCnd( Dir::kmax(), BndType::periodic() ) );
@@ -186,20 +189,24 @@ int main(int argc, char * argv[]) {
 
   const real tsig = sqrt(rhoinside*pow(2.*radius,3.)/mixed.sigma()->value());
   boil::oout<<"tsig.scale= "<<tsig<<boil::endl;
+ 
+  wvel *= usig;
 
   /*-------------------+
   |  time-integration  |
   +-------------------*/
   real dxmin = d.dxyz_min();
-  const real dt = dtmult * pow(std::min(air.rho()->value(),water.rho()->value())*pow(dxmin,3.0)
-                           /(2.0*3.1415*mixed.sigma()->value()),0.5);
-  const real tend = std::max(tsig,tmu);
-  const real wvel = dxmin/dt * cfl_max;
+  const real dt = std::min(0.2*dxmin/wvel,
+                           dtmult * pow(std::min(air.rho()->value(),water.rho()->value())*pow(dxmin,3.0)
+                             /(2.0*3.1415*mixed.sigma()->value()),0.5));
+  const real tend = 5*std::max(tsig,tmu);
   const int ndt = tend/dt;
   const int nint = ndt/10;
   Times time(ndt, dt); 
 
   boil::oout<<"wvel= "<<wvel<<" "<<wvel/usig<<boil::endl;
+  boil::oout<<"times= "<<0.2*dxmin/wvel<<" "<<dtmult * pow(std::min(air.rho()->value(),water.rho()->value())*pow(dxmin,3.0)
+                             /(2.0*3.1415*mixed.sigma()->value()),0.5)<<" "<<dt<<" "<<ndt<<boil::endl;
 	
   //exit(0);
 #if 1
@@ -228,9 +235,11 @@ int main(int argc, char * argv[]) {
   #endif
   //conc.set_reconstruction_parameters(1e-5,conc.get_reconstruction_maxiter());
 #endif
-  conc.set_curv_method(0);  // height function
+  conc.set_curv_method(CurvMethod::HF());  // height function
+  conc.set_wall_curv_method(CurvMethod::none());  // height function
   //conc.set_curv_method(1);  // smoothed VOF
 
+  int ts=0;
 #if 1
   /*--------------------+
   |  initial condition  |
@@ -241,7 +250,7 @@ int main(int argc, char * argv[]) {
 
   cold = 0.0;
 
-  setup_circle_xz(cold,radius,xcent,ycent);
+  boil::setup_circle_xz(cold,radius,xcent,ycent);
   if(inverted) {
     for_avijk(cold,i,j,k)
       cold[i][j][k] = 1. - cold[i][j][k];
@@ -251,7 +260,8 @@ int main(int argc, char * argv[]) {
   cold.exchange_all();
 
   Momentum ns( uvw, xyz, time, solver, &mixed);
-  ns.convection_set(TimeScheme::backward_euler()); //ns.convection is mandatory
+  //ns.convection_set(TimeScheme::backward_euler()); //ns.convection is mandatory
+  ns.convection_set(TimeScheme::forward_euler()); 
   ns.diffusion_set(TimeScheme::backward_euler());
   Pressure pr(p, f, uvw, time, solver, &mixed);
 
@@ -277,7 +287,7 @@ int main(int argc, char * argv[]) {
   conc.totalvol();
 
   Comp mcom = Comp::w();
-#if 1
+#if 0
   for_avmijk(uvw,mcom,i,j,k) {
     uvw[mcom][i][j][k] += wvel;
   }
@@ -291,68 +301,45 @@ int main(int argc, char * argv[]) {
 
   for(time.start(); time.end(); time.increase()) {
 
-    // store velocity
+    /* reset body force */
     for_m(m)
-      uvw_old(m) = uvw(m);
-    // store color function
-    cold = c;
-#ifdef USE_BNDCLR
-    for_m(m)
-      bndclrold(m) = bndclr(m);
-#endif
+      for_avmijk(xyz,m,i,j,k)
+        xyz[m][i][j][k]=0.0;
 
-    /* inner loop */
-    for(int mloop=0; mloop<mSimple; mloop++) {
+    /* surface tension */
+    conc.tension(&xyz, mixed,conc.color());
 
-      //reset body force
-      for_m(m)
-        for_avmijk(xyz,m,i,j,k)
-          xyz[m][i][j][k]=0.0;
+    /* essential for moving front */
+    ns.discretize();
+    pr.discretize();
+    pr.coarsen();
 
-      /* surface tension */
-#ifdef USE_CARTESIAN
-      conc.tension(&xyz, mixed);
-#else
-      conc.tension(&xyz, mixed,conc.color());
-      //conc.tension(&xyz, mixed);
-#endif
+    /* momentum */
+    ns.new_time_step();
+    //ns.convection();
+    ns.grad(press);
+    ns.solve(ResRat(1e-8));
 
-      /* essential for moving front */
-      ns.discretize();
-      pr.discretize();
-      pr.coarsen();
+    p=0.0;
+    if (multigrid.vcycle(ResRat(1e-6))) OMS(converged);
 
-      /* momentum */
-      ns.new_time_step(uvw_old);
-      ns.convection();
-      ns.grad(press);
-      ns.solve(ResRat(1e-8));
+    ns.project(p);
+    press += p;
+    press.exchange();
 
-      p=0.0;
-      if (multigrid.vcycle(ResRat(1e-6))) OMS(converged);
-
-      ns.project(p);
-      press += p;
-      press.exchange();
-
-#if 0
-      if(time.current_time()>tim0&&mloop==mSimple-1)
-        for_avmijk(uvw,mcom,i,j,k) {
-          uvw[mcom][i][j][k] += wvel;
-        }
-#endif
-      ns.cfl_max();
-
-      conc.advance(cold);
-      conc.totalvol();
-
-#if 0
-      if(time.current_time()>tim0&&mloop==mSimple-1)
-        for_avmijk(uvw,mcom,i,j,k) {
-          uvw[mcom][i][j][k] -= wvel;
-        }
-#endif
+    for_avmijk(uvw,mcom,i,j,k) {
+      uvw[mcom][i][j][k] += wvel;
     }
+
+    ns.cfl_max();
+
+    conc.advance();
+    conc.totalvol();
+
+    for_avmijk(uvw,mcom,i,j,k) {
+      uvw[mcom][i][j][k] -= wvel;
+    }
+
     /* post process */
     //velocity
     real umax=0.0, vmax=0.0, wmax=0.0;
@@ -361,7 +348,8 @@ int main(int argc, char * argv[]) {
     for_vijk(c,i,j,k) {
       real utmp=fabs(0.5*(uvw[Comp::u()][i][j][k]+uvw[Comp::u()][i+1][j][k]))/usig;
       real vtmp=fabs(0.5*(uvw[Comp::v()][i][j][k]+uvw[Comp::v()][i][j+1][k]))/usig;
-      real wtmp=fabs(0.5*(uvw[Comp::w()][i][j][k]+uvw[Comp::w()][i][j][k+1])-wvel)/usig;
+      //real wtmp=fabs(0.5*(uvw[Comp::w()][i][j][k]+uvw[Comp::w()][i][j][k+1])-wvel)/usig;
+      real wtmp=fabs(0.5*(uvw[Comp::w()][i][j][k]+uvw[Comp::w()][i][j][k+1]))/usig;
       if (umax<utmp) umax=utmp;
       if (vmax<vtmp) vmax=vtmp;
       if (wmax<wtmp) wmax=wtmp;
@@ -388,10 +376,31 @@ int main(int argc, char * argv[]) {
     NormMethod nm = NormMethod::ElviraXZ();
     nmv.push_back(nm);
     test_reconstruction_sphere(partial,conc,conc.color(),cold,kappa,inverted,radius,0.,0.,0.,nm,nl1,nli,kl1,kli);
+    boil::oout<<"main::curv: "<<time.current_step()<<" "<<radmult<<" "<<gLevel<<" | "<<nmv[time.current_step()-1]<<" "<<nl1[time.current_step()-1]<<" "<<nli[time.current_step()-1]<<" "<<kl1[time.current_step()-1]<<" "<<kli[time.current_step()-1]<<boil::endl;
 
     if(time.current_step() % nint == 0 || time.current_step()==1 ) {
       boil::plot->plot(uvw, c, press,"uvw-c-press",  time.current_step());
       boil::plot->plot(xyz, c, kappa,"xyz-c-kappa",  time.current_step());
+    }
+
+    if( boil::timer.current_min() > wmin-12.0
+      || time.current_step()==time.total_steps()) {
+      uvw  .save("uvw",   time.current_step());
+      press.save("press", time.current_step());
+      c .save("c",  time.current_step());
+      std::fstream output;
+      output.open("time.txt", std::ios::out);
+      output << time.current_step() << boil::endl;
+      output << time.current_time()+time.dt() << boil::endl;
+      output << time.dt() << boil::endl;
+      output.close();
+      output.open("run.txt", std::ios::out);
+      output << 0 << boil::endl;
+      output.close();
+      uvw  .rm("uvw", ts);
+      press.rm("press", ts);
+      c .rm("c", ts);
+      break;
     }
 
   }
@@ -401,7 +410,7 @@ int main(int argc, char * argv[]) {
   std::ofstream output;
   output.open( "results_kappa_parasitic.txt", std::ios::out | std::ios::app );
   for(int i(0); i<nl1.size(); ++i) {
-    boil::oout<<i<<" "<<radmult<<" "<<gLevel<<" | "<<nmv[i]<<" "<<nl1[i]<<" "<<nli[i]<<" "<<kl1[i]<<" "<<kli[i]<<boil::endl;
+    boil::oout<<"main::curv: "<<i<<" "<<radmult<<" "<<gLevel<<" | "<<nmv[i]<<" "<<nl1[i]<<" "<<nli[i]<<" "<<kl1[i]<<" "<<kli[i]<<boil::endl;
     output<<i<<" "<<radmult<<" "<<gLevel<<" | "<<nmv[i]<<" "<<nl1[i]<<" "<<nli[i]<<" "<<kl1[i]<<" "<<kli[i]<<boil::endl;
   }
   output.close();

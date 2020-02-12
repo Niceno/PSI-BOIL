@@ -65,8 +65,8 @@ void VOFaxisym::curv_HF() {
     /* this is the only implemented instance atm */
     assert(wall_curv_method==CurvMethod::HFmixedXZ());
 
-    flood(phi,-mult_wall);
-    normal_vector_near_bnd(phi,norm_method_curvature);
+    flood(clr,-mult_wall);
+    normal_vector_near_bnd(clr,norm_method_curvature);
   }
 
   /* nx, ny, nz themselves are changed */

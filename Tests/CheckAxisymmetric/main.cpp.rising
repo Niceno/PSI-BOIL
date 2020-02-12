@@ -4,7 +4,6 @@
 |  Case (d)-de/20 in Fig.23                                                   |
 +----------------------------------------------------------------------------*/
 #include "Include/psi-boil.h"
-#include "setup_circle.cpp"
 #include <fstream>
 #include <iostream>
 #include <fenv.h>
@@ -202,7 +201,8 @@ int main(int argc, char * argv[]) {
 
   VOFaxisym conc(c, g, kappa, uvw, time, solver);
   //conc.set_reconstruction_parameters(1e-5,conc.get_reconstruction_maxiter());
-  conc.set_curv_method(0);  // height function
+  conc.set_curv_method(CurvMethod::HF());  // height function
+  conc.set_wall_curv_method(CurvMethod::none());  // height function
 
   /*-------------------+
   |  check if restart  |
@@ -254,7 +254,7 @@ int main(int argc, char * argv[]) {
     |  initial condition  |
     +--------------------*/
 
-    setup_circle_xz(cold,radius,xcent,zcent);
+    boil::setup_circle_xz(cold,radius,xcent,zcent);
 #ifndef INVERTED
     for_avijk(cold,i,j,k)
       cold[i][j][k] = 1. - cold[i][j][k];

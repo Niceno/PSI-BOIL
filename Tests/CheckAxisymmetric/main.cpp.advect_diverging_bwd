@@ -1,6 +1,4 @@
 #include "Include/psi-boil.h"
-#include "setup_circle.cpp"
-#include "l2_scalar_error.cpp"
 #include <fstream>
 #include <iostream>
 #include <fenv.h>
@@ -56,7 +54,7 @@ int main(int argc, char * argv[]) {
   boil::oout<<"inversion= "<<inverted<<"\n";
 
   /* computed parameters */
-  const int AR = 5;
+  const int AR = 1;
   const int NX = 100*level;
   const int NZ = AR*NX;
 
@@ -87,9 +85,9 @@ int main(int argc, char * argv[]) {
   +---------*/
 #ifdef USE_CARTESIAN
   Grid1D gy(DX);
-  Domain d(gx,gy,gz,"name",Decompose::x());
+  Domain d(gx,gy,gz,NULL,"name",Decompose::x());
 #else
-  Axisymmetric d(gx,gz,DX,"name",Decompose::x());
+  Axisymmetric d(gx,gz,DX,NULL,"name",Decompose::x());
 #endif
 
   /*------------------+
@@ -215,7 +213,7 @@ int main(int argc, char * argv[]) {
   cold = 0.0;
 
 #if 1
-  setup_circle_xz(cold,0.1,0.1*LX+DX,0.0);
+  boil::setup_circle_xz(cold,0.1,0.1*LX+DX,0.0);
   cold.bnd_update();
   cold.exchange_all();
 #else 
@@ -277,8 +275,6 @@ int main(int argc, char * argv[]) {
   conc.color_to_vf(cold,c);
   conc.color_to_vf(cold,cold2);
 #endif
-  conc.set_curv_method(0);  // height function
-  //conc.set_curv_method(1);  // smoothed VOF
 
   conc.ancillary();
   conc.totalvol();
@@ -384,8 +380,8 @@ int main(int argc, char * argv[]) {
   boil::oout<<level<<" "<<inverted<<" | "<<cmax_l2<<" "<<cmin_l2<<" | "
             <<fabs(cmax_linf_linf-1.)<<" "<<fabs(cmin_linf_linf)<<boil::endl;
 
-  real toterr = li_scalar_error(cold2,c);
-  real toterr2 = l2_scalar_error(cold2,c);
+  real toterr = boil::li_scalar_error(cold2,c);
+  real toterr2 = boil::l2_scalar_error(cold2,c);
 
   boil::oout<<"Linf/2 error: ";
   boil::oout<<level<<" "<<inverted<<" "<<toterr<<" "<<toterr2<<boil::endl;

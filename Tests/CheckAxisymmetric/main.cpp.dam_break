@@ -1,5 +1,4 @@
 #include "Include/psi-boil.h"
-#include "setup_circle.cpp"
 #include <fstream>
 #include <iostream>
 #include <fenv.h>
@@ -12,43 +11,46 @@ static void __attribute__ ((constructor)) trapfpe(void)
 }
 #endif
 
-//#define WATER_STEP
-
 /* KIT dam break SA-D1-3 -and- KIT water step SA-D1X-3 */
 /******************************************************************************/
 int main(int argc, char * argv[]) {
 
   boil::timer.start();
 
-  if(argc<=2){
-    boil::oout<<"Two command line arguments required!"<<"\n";
-    boil::oout<<"./Boil gridlevel msimple"<<boil::endl;
+  if(argc<=5){
+    boil::oout<<"Six command line arguments required!"<<"\n";
+    boil::oout<<"./Boil wmin gridlevel d1 h0 h1 tend [vals in cm,s]"<<boil::endl;
     exit(0);
   }
 
-  const int gLevel = atoi(argv[1]);
+  const int wmin = atoi(argv[1]);
+  boil::oout<<"wmin= "<<wmin<<"\n";
+
+  const int gLevel = atoi(argv[2]);
   boil::oout<<"gLevel= "<<gLevel<<"\n";
 
-  const int mSimple = atoi(argv[2]);
-  boil::oout<<"mSimple= "<<mSimple<<"\n";
+  const real d1 = atof(argv[3])*1e-2;
+  boil::oout<<"d1= "<<d1<<"\n";
+
+  const real h0 = atof(argv[4])*1e-2;
+  boil::oout<<"h0= "<<h0<<"\n";
+
+  const real h1 = atof(argv[5])*1e-2;
+  boil::oout<<"h1= "<<h1<<"\n";
+
+  const real tend = 0.5;//atof(argv[6]);
+  boil::oout<<"tend= "<<tend<<"\n";
 
   /* grid parameters */
-  const int xmult = 2;
-  const int zmult = 10;
-  const int base= 8*4*gLevel;
-  const real AR = zmult/xmult;
+  const int zmult = 2;
+  const int base= 22*2*2*gLevel;
 
   /* domain dimensions (given by problem) */
+  const real LZ = zmult*h1;
   const real LX = 0.5*44.*1e-2; /* diameter = 44 cm */
-  const real LZ = AR*LX;
+  const real AR = LX/LZ;
 
-  const real radius = 0.5*11.*1e-2; /* column diameter 11 cm */
-  const real h1 = 20e-2; /* column height 20 cm */
-#ifdef WATER_STEP
-  const real h0 = 5e-2; /* for water step, sec. height 5 cm */
-#else
-  const real h0 = 0e-2; /* for dam break, dry bottom */
-#endif
+  const real radius = 0.5*d1; 
 
   /*--------------------------------+
   |  choose the output file format  |
@@ -59,10 +61,11 @@ int main(int argc, char * argv[]) {
   /*----------+
   |  grid(s)  |
   +----------*/
-#if 0
-  const int NX = xmult*base;
-  const int NZ = zmult*base;
+#if 1
+  const int NX = base;
   const real DX = LX/real(NX);
+  const int NZ = int(real(base)/AR);
+  boil::oout<<"dims: "<<NX<<" "<<NZ<<" "<<LX<<" "<<LZ<<" "<<DX<<boil::endl;
   Grid1D gx( Range<real>(0.0,LX), NX, Periodic::no(),
              BndGrid::symmetry(), BndGrid::wall() );
 
@@ -98,10 +101,6 @@ int main(int argc, char * argv[]) {
   Scalar c  (d), g  (d), kappa(d), cold(d); // concentration
   Scalar press  (d), p(d), f  (d);
 
-#ifdef USE_BNDCLR
-  Vector bndclr(d), bndclrold(d);
-#endif
-
   /*-----------------------------+ 
   |  insert boundary conditions  |
   +-----------------------------*/
@@ -113,10 +112,6 @@ int main(int argc, char * argv[]) {
     uvw.bc(m).add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
     uvw.bc(m).add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
     uvw_old(m)=uvw(m).shape();
-#ifdef USE_BNDCLR
-    bndclr(m)    = uvw(m).shape();
-    bndclrold(m) = uvw(m).shape();
-#endif
   }
 
   c.bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
@@ -138,11 +133,7 @@ int main(int argc, char * argv[]) {
   water.mu    (0.9532e-3);
   water.rho   (997.76);
 
-#ifdef USE_BNDCLR
-  Matter mixed(water, air, &c, &bndclr);
-#else
   Matter mixed(water, air, &c);
-#endif
   mixed.sigma (0.072);
 
   /*-------------------+
@@ -151,11 +142,6 @@ int main(int argc, char * argv[]) {
   real dxmin = d.dxyz_min();
   const real dt = 10.0 * pow(air.rho()->value()*pow(dxmin,3.0)
                              /(2.0*boil::pi*mixed.sigma()->value()),0.5);
-#ifdef WATER_STEP
-  const real tend = 2.0;
-#else
-  const real tend = 1.0;
-#endif
   const int ndt = 1e6;
   const int nint = ndt/10;
   const real tint = 1e-2;
@@ -174,21 +160,10 @@ int main(int argc, char * argv[]) {
   Krylov * solver = new CG(d, Prec::ic2());
   //Krylov * solver = new CG(d, Prec::di());
 
-#ifdef USE_CARTESIAN
-  #ifdef USE_BNDCLR
-  VOF conc(c, g, kappa, uvw, time, solver, &bndclr);
-  #else
-  VOF conc(c, g, kappa, uvw, time, solver);
-  #endif
-#else
-  #ifdef USE_BNDCLR
-  VOFaxisym conc(c, g, kappa, uvw, time, solver, &bndclr);
-  #else
   VOFaxisym conc(c, g, kappa, uvw, time, solver);
-  #endif
-  //conc.set_reconstruction_parameters(1e-5,conc.get_reconstruction_maxiter());
-#endif
-  conc.set_curv_method(0);  // h1 function
+  conc.set_curv_method(CurvMethod::HF());
+  conc.set_wall_curv_method(CurvMethod::none());
+  conc.set_topo_method(TopoMethod::Hybrid());
 
 #if 1
   /*--------------------+
@@ -200,62 +175,33 @@ int main(int argc, char * argv[]) {
 
   cold = 0.0;
 
-#if 1
   for_avijk(cold,i,j,k) {
-    if       (cold.xc(i)<radius && cold.zn(k+1)<h1) {
+    if       (cold.zn(k+1)<h0) {
       cold[i][j][k] = 1.0;
-    } else if(cold.xc(i)<radius && cold.zn(k)<h1) {
-      cold[i][j][k] = (h1-cold.zn(k))/(cold.zn(k+1)-cold.zn(k));
-    } else if(cold.zn(k+1)<h0) {
-      cold[i][j][k] = 1.0;
-    } else if(cold.zn(k)<h0) {
+    } else if(cold.zn(k  )<h0) {
       cold[i][j][k] = (h0-cold.zn(k))/(cold.zn(k+1)-cold.zn(k));
+    } else if(cold.xn(i+1)<radius && cold.zn(k+1)<h1) {
+      cold[i][j][k] = 1.0;
+    } else if(cold.xn(i+1)<radius && cold.zn(k  )<h1) {
+      cold[i][j][k] = (h1-cold.zn(k))/(cold.zn(k+1)-cold.zn(k));
+    } else if(cold.xn(i  )<radius && cold.zn(k+1)<h1) {
+      cold[i][j][k] = (radius-cold.xn(i))/(cold.xn(i+1)-cold.xn(i));
+    } else if(cold.xn(i  )<radius && cold.zn(k  )<h1) {
+      cold[i][j][k] = (radius-cold.xn(i))/(cold.xn(i+1)-cold.xn(i))
+                    * (h1-cold.zn(k))/(cold.zn(k+1)-cold.zn(k));
     }
   }
-#else
-  real mmx = 1.;
-  real mmy = 0.;
-  real mmz = 0.4;
-
-  /* setup triangle */
-  const real msum = sqrt(mmx*mmx+mmy*mmy+mmz*mmz);
-  const real nnx = mmx/msum;
-  const real nny = mmy/msum;
-  const real nnz = mmz/msum;
-
-  /* alpha */
-  const real nalp = nnx*1.1*radius;
-
-  for_vijk(c,i,j,k) {
-    real xpos = c.xn(i);
-    real ypos = c.yn(j);
-    real zpos = c.zn(k);
-    conc.nx[i][j][k] = nnx;
-    conc.ny[i][j][k] = nny;
-    conc.nz[i][j][k] = nnz;
-    conc.nalpha[i][j][k] = (nalp-nnx*xpos-nny*ypos-nnz*zpos);
-    conc.nalpha[i][j][k] /= c.dxc(i);
-  }
-  conc.forward_cartesian(cold);
-#endif
 
   cold.bnd_update();
   cold.exchange_all();
 
   Momentum ns( uvw, xyz, time, solver, &mixed);
-  ns.convection_set(TimeScheme::backward_euler()); //ns.convection is mandatory
+  ns.convection_set(TimeScheme::forward_euler());
   ns.diffusion_set(TimeScheme::backward_euler());
   Pressure pr(p, f, uvw, time, solver, &mixed);
 
   AC multigrid( &pr );
-  if(mSimple>1) {
-    multigrid.min_cycles(4);  // 4
-    multigrid.max_cycles(8); // 8
-  } else {
-    multigrid.min_cycles(6);  // 6
-  }
-  multigrid.stop_if_diverging(true);
-
+  multigrid.min_cycles(6);  // 6
 
   conc.color_to_vf(cold,c);
   conc.reconstruct_geometry();
@@ -263,7 +209,7 @@ int main(int argc, char * argv[]) {
   conc.totalvol();
 
   //boil::plot->plot(c,conc.color(),conc.nx,conc.ny,conc.nz, "phi-c-nx-ny-nz", 0);
-  boil::plot->plot(uvw, c, press,kappa,"uvw-c-press-kappa", 0);
+  boil::plot->plot(uvw, c, conc.color(),kappa,"uvw-c-clr-kappa", 0);
   //exit(0);
   int iint(1);
   for(time.start(); time.end(); time.increase()) {
@@ -279,68 +225,49 @@ int main(int argc, char * argv[]) {
     }
 #endif
 
-    // store velocity
+    /* reset body force */
     for_m(m)
-      uvw_old(m) = uvw(m);
-    // store color function
-    cold = c;
-#ifdef USE_BNDCLR
-    for_m(m)
-      bndclrold(m) = bndclr(m);
-#endif
+      for_avmijk(xyz,m,i,j,k)
+        xyz[m][i][j][k]=0.0;
 
-    /* inner loop */
-    for(int mloop=0; mloop<mSimple; mloop++) {
-
-      /* reset body force */
-      for_m(m)
-        for_avmijk(xyz,m,i,j,k)
-          xyz[m][i][j][k]=0.0;
-
-      const Comp m = Comp::w();
-      for_vmijk(xyz,m,i,j,k) {
-        real rhomix = mixed.rho(m,i,j,k);
-                      //liquid.rho()->value()*phil + vapor.rho()->value() *phiv;
-        xyz[m][i][j][k] += -boil::g * xyz.dV(m,i,j,k) * rhomix;
-      }
-
-      /* surface tension */
-      conc.tension(&xyz, mixed,conc.color());
-      //conc.tension(&xyz, mixed);
-
-      /* essential for moving front */
-      ns.discretize();
-      pr.discretize();
-      pr.coarsen();
-
-      /* momentum */
-      ns.new_time_step(uvw_old);
-      ns.convection();
-      ns.grad(press);
-      ns.solve(ResRat(1e-8));
-
-      p=0.0;
-      if (multigrid.vcycle(ResRat(1e-6))) OMS(converged);
-
-      ns.project(p);
-      press += p;
-      press.exchange();
-
-      //ns.cfl_max();
-
-      conc.advance(cold);
-      conc.totalvol();
-
+    const Comp m = Comp::w();
+    for_vmijk(xyz,m,i,j,k) {
+      real rhomix = mixed.rho(m,i,j,k);
+                    //liquid.rho()->value()*phil + vapor.rho()->value() *phiv;
+      xyz[m][i][j][k] += -boil::g * xyz.dV(m,i,j,k) * rhomix;
     }
+
+    /* surface tension */
+    conc.tension(&xyz, mixed,conc.color());
+    //conc.tension(&xyz, mixed);
+
+    /* essential for moving front */
+    ns.discretize();
+    pr.discretize();
+    pr.coarsen();
+
+    /* momentum */
+    ns.new_time_step();
+    ns.grad(press);
+    ns.solve(ResRat(1e-8));
+
+    p=0.0;
+    if (multigrid.vcycle(ResRat(1e-6))) OMS(converged);
+
+    ns.project(p);
+    press += p;
+    press.exchange();
+
+    //ns.cfl_max();
+
+    conc.advance();
+    conc.totalvol();
 
     /* dt control */
     time.control_dt(ns.cfl_max(),0.2,dt);
 
     /* post-process */
     conc.front_minmax();
-    boil::oout<<"x-min-front= "<<time.current_time()<<" "
-              <<conc.get_xminft()<<" "<<conc.get_xmaxft()<<" "
-              <<conc.get_zminft()<<" "<<conc.get_zmaxft()<<"\n";
 
     /* shift pressure */
     real pmin=1.0e+300;
@@ -354,10 +281,18 @@ int main(int argc, char * argv[]) {
     press.bnd_update();
     press.exchange_all();
 
+    real height(0.0);
+    for_vijk(c,i,j,k) {
+     if((LX-DX)<c.xc(i))
+       height += conc.color()[i][j][k]*c.dzc(k);
+    }
+    boil::cart.sum_real(&height);
+    boil::oout<<"main::height= "<<time.current_time()<<" "<<height<<boil::endl;
+
     /* output data */
     if((time.current_time()) / (tint) >= real(iint)) {
     //if(true) { 
-      boil::plot->plot(uvw, c, press,kappa,"uvw-c-press-kappa", iint);
+      boil::plot->plot(uvw, c, conc.color(),kappa,"uvw-c-clr-kappa", iint);
       iint++;
     }
 
