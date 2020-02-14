@@ -11,7 +11,7 @@ static const int majorext(mof*2+1);
 static const int minorext(nof*2+1);
 /* warning: if stencil size is changed in the minorext direction,
    the kernel must be properly adjusted! */
-static const real blending_angle = 37./180.*boil::pi;
+static const real blending_angle = 40./180.*3.1415;//boil::pi = 0 at this point!
 static const real n0square = 1.-1./(1.+tan(blending_angle)*tan(blending_angle));
 static const real n0 = sqrt(n0square);
 
@@ -115,6 +115,7 @@ void VOFaxisym::curv_HF() {
       real abs_nz = fabs(nnz);
       real max_n;
 
+#if 0
       if       (abs_nx<n0) {
         mMax = Comp::k();
         max_n = nnz;
@@ -122,6 +123,15 @@ void VOFaxisym::curv_HF() {
         mMax = Comp::i();
         max_n = nnx;
       }
+#else
+      if(abs_nx<abs_nz) {
+        mMax = Comp::k();
+        max_n = nnz;
+      } else {
+        mMax = Comp::i();
+        max_n = nnx;
+      }
+#endif
 
       if(mMax==Comp::i()) {
         if(!ifull) {
@@ -153,6 +163,7 @@ void VOFaxisym::curv_HF() {
                                               kap_cart,kap_cyl,
                                               i,j,k);
           kappa[i][j][k] = kap_cart + kap_cyl;
+
         } else {
           tempflag[i][j][k] = 0;
         }
@@ -187,6 +198,7 @@ void VOFaxisym::curv_HF() {
                                               kap_cart,kap_cyl,
                                               i,j,k);
           kappa[i][j][k] = kap_cart + kap_cyl;
+
         } else {
           tempflag[i][j][k] = 0;
         }
@@ -276,11 +288,8 @@ void VOFaxisym::curv_HF() {
 #else
           kappa[i][j][k] += kap_x_cart + kap_z_cart;
 #endif
-
         }
       } /* blending */
-
-      //boil::oout<<i<<" "<<k<<" "<<mMax<<" "<<kappa[i][j][k]<<boil::endl;
 
     } /* tempflag = 1 */
   } /* for ijk */

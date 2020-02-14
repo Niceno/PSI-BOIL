@@ -380,7 +380,7 @@ int main(int argc, char * argv[]) {
 
     if(time.current_step() % nint == 0 || time.current_step()==1 ) {
       boil::plot->plot(uvw, c, press,"uvw-c-press",  time.current_step());
-      boil::plot->plot(xyz, c, kappa,"xyz-c-kappa",  time.current_step());
+      boil::plot->plot(xyz, conc.color(), kappa,"xyz-c-kappa",  time.current_step());
     }
 
     if( boil::timer.current_min() > wmin-12.0
