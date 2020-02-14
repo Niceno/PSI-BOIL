@@ -50,7 +50,8 @@ inline bool get_limit_color() { return(limit_color);};
 /* setter for subgrid method */
 inline void set_subgrid_method(const SubgridMethod b) {
   subgrid_method=b;
-  boil::oout<<"Subgrid method: "<<subgrid_method<<boil::endl;
+  if(!boil::cart.iam())
+    boil::oout<<"Subgrid method: "<<subgrid_method<<boil::endl;
 }
 /* getter for subgrid method */
 inline SubgridMethod get_subgrid_method() { return(subgrid_method);};
@@ -73,7 +74,8 @@ inline void set_maxval(real r) {maxclr=r;}
 /* setter for normal vector method */
 void set_normal_vector_method_advance(const NormMethod nm) {
   norm_method_advance = nm;
-  boil::oout<<"Normal vector method for advance: "<<nm<<boil::endl;
+  if(!boil::cart.iam())
+    boil::oout<<"Normal vector method for advance: "<<nm<<boil::endl;
   if(nm==NormMethod::ElviraYZ()) {
     mcomp_for_elvira = Comp::i();
   } else if(nm==NormMethod::ElviraXZ()) {
@@ -86,7 +88,8 @@ void set_normal_vector_method_advance(const NormMethod nm) {
 }
 void set_normal_vector_method_curvature(const NormMethod nm) {
   norm_method_curvature = nm;
-  boil::oout<<"Normal vector method for curvature: "<<nm<<boil::endl;
+  if(!boil::cart.iam())
+    boil::oout<<"Normal vector method for curvature: "<<nm<<boil::endl;
   if(nm==NormMethod::ElviraYZ()) {
     mcomp_for_elvira = Comp::i();
   } else if(nm==NormMethod::ElviraXZ()) {
@@ -100,7 +103,8 @@ void set_normal_vector_method_curvature(const NormMethod nm) {
 void set_normal_vector_method_all(const NormMethod nm) {
   norm_method_advance = nm;
   norm_method_curvature = nm;
-  boil::oout<<"Normal vector method: "<<nm<<boil::endl;
+  if(!boil::cart.iam())
+    boil::oout<<"Normal vector method: "<<nm<<boil::endl;
   if(nm==NormMethod::ElviraYZ()) {
     mcomp_for_elvira = Comp::i();
   } else if(nm==NormMethod::ElviraXZ()) {
@@ -125,7 +129,8 @@ void set_wall_curv_method(const CurvMethod wcm,
                           const Sign sig = Sign::undefined(),
                           const real cangle = -1.) {
   wall_curv_method = wcm;
-  boil::oout<<"Wall curvature method: "<<wcm<<boil::endl;
+  if(!boil::cart.iam())
+    boil::oout<<"Wall curvature method: "<<wcm<<boil::endl;
   if(wcm==CurvMethod::HFmixedXZ()) {
     if       (sig==Sign::pos()) {
       mult_wall =  1;
@@ -152,7 +157,8 @@ inline CurvMethod get_wall_curv_method() { return wall_curv_method;};
 /* setter for topoogy method */
 void set_topo_method(const TopoMethod tpm) {
   topo_method = tpm;
-  boil::oout<<"Topology method: "<<tpm<<boil::endl;
+  if(!boil::cart.iam())
+    boil::oout<<"Topology method: "<<tpm<<boil::endl;
   return;
 }
 
