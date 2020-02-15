@@ -237,7 +237,6 @@ int main(int argc, char * argv[]) {
 #endif
   conc.set_curv_method(CurvMethod::HF());  // height function
   conc.set_wall_curv_method(CurvMethod::none());  // height function
-  //conc.set_curv_method(1);  // smoothed VOF
 
   int ts=0;
 #if 1
@@ -376,7 +375,7 @@ int main(int argc, char * argv[]) {
     NormMethod nm = NormMethod::ElviraXZ();
     nmv.push_back(nm);
     test_reconstruction_sphere(partial,conc,conc.color(),cold,kappa,inverted,radius,0.,0.,0.,nm,nl1,nli,kl1,kli);
-    boil::oout<<"main::curv: "<<time.current_step()<<" "<<radmult<<" "<<gLevel<<" | "<<nmv[time.current_step()-1]<<" "<<nl1[time.current_step()-1]<<" "<<nli[time.current_step()-1]<<" "<<kl1[time.current_step()-1]<<" "<<kli[time.current_step()-1]<<boil::endl;
+    boil::oout<<"main::curv: "<<time.current_time()<<" "<<kl1[time.current_step()-1]<<" "<<kli[time.current_step()-1]<<boil::endl;
 
     if(time.current_step() % nint == 0 || time.current_step()==1 ) {
       boil::plot->plot(uvw, c, press,"uvw-c-press",  time.current_step());
@@ -405,15 +404,6 @@ int main(int argc, char * argv[]) {
 
   }
 #endif
-
-  /* write results */
-  std::ofstream output;
-  output.open( "results_kappa_parasitic.txt", std::ios::out | std::ios::app );
-  for(int i(0); i<nl1.size(); ++i) {
-    boil::oout<<"main::curv: "<<i<<" "<<radmult<<" "<<gLevel<<" | "<<nmv[i]<<" "<<nl1[i]<<" "<<nli[i]<<" "<<kl1[i]<<" "<<kli[i]<<boil::endl;
-    output<<i<<" "<<radmult<<" "<<gLevel<<" | "<<nmv[i]<<" "<<nl1[i]<<" "<<nli[i]<<" "<<kl1[i]<<" "<<kli[i]<<boil::endl;
-  }
-  output.close();
 
   boil::oout << "finished" << boil::endl;
 

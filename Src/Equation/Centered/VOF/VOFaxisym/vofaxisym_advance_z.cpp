@@ -22,7 +22,7 @@ void VOFaxisym::advance_z(Scalar & scp) {
     if((*u)[m][i][j][k]<0.0) kup = k;             
 
     real dt=time->dt();
-#if 1
+#if 0
     real refval = clr[i][j][kup];
 #else
     real refval = phi[i][j][kup];

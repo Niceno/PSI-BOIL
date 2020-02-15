@@ -102,20 +102,42 @@ void VOF::norm_elvira_kernel(real & nx_val, real & ny_val, real & nz_val,
      ||(valcc-phisurf)*(valpm-phisurf)<=0.0
      ||(valcc-phisurf)*(valmp-phisurf)<=0.0
      ||(valcc-phisurf)*(valpp-phisurf)<=0.0) {
+
+#if 0
+    valcc = 1-valcc;
+    valmc = 1-valmc;
+    valpc = 1-valpc;
+    valcm = 1-valcm;
+    valcp = 1-valcp;
+    valmm = 1-valmm;
+    valpm = 1-valpm;
+    valmp = 1-valmp;
+    valpp = 1-valpp;
+#endif
+
     norm_elvira_kernel_full(nx_val, ny_val, nz_val, nalpha_val, 
                             mcomp_for_elvira,
                             i,j,k,valcc,valmc,valpc,valcm,valcp,
                                         valmm,valpm,valmp,valpp);
+#if 0   
+    nx_val = -nx_val;
+    ny_val = -ny_val;
+    nz_val = -nz_val;
+    nalpha_val = alpha_val(sca[i][j][k],
+                           nx_val,ny_val,nz_val);
+#endif
+
   /* otherwise, standard method is used */
   } else {
-    norm_mixed_kernel(nx_val, ny_val, nz_val, nalpha_val, i,j,k, sca);
+    //norm_mixed_kernel(nx_val, ny_val, nz_val, nalpha_val, i,j,k, sca);
+    norm_young_kernel(nx_val, ny_val, nz_val, nalpha_val, i,j,k, sca);
     real scpval = sca[i][j][k];
     if(scpval==0.5) scpval += boil::pico;
     nalpha_val = alpha_val(scpval,
                            nx_val,ny_val,nz_val);
   }
 #else
-  norm_elvira_kernel_full(nx_val, ny_val, nz_val, *nalpha_val,
+  norm_elvira_kernel_full(nx_val, ny_val, nz_val, nalpha_val,
                           mcomp_for_elvira,
                           i,j,k,valcc,valmc,valpc,valcm,valcp,
                                       valmm,valpm,valmp,valpp);

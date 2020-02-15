@@ -5,8 +5,6 @@
 
 #define IB
 
-using arr2D = std::vector< std::vector<real> >;
-
 ///////////
 //       //
 //  VOF  //

@@ -22,7 +22,7 @@ void VOFaxisym::advance_x(Scalar & scp) {
     if((*u)[m][i][j][k]<0.0) iup = i;             
 
     real dt = time->dt();
-    real refval = clr[iup][j][k];
+    real refval = phi[iup][j][k];
     real n2sum = nx[iup][j][k]*nx[iup][j][k]+nz[iup][j][k]*nz[iup][j][k];
 
     if (refval < boil::pico || n2sum<0.5) {

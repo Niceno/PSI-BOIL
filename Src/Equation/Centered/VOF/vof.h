@@ -12,6 +12,7 @@
 
 #define IB
 
+using arr2D = std::vector< std::vector<real> >;
 using arr3D = std::vector< std::vector< std::vector<real> > >;
 
 #include "vof_ravioli.h"
