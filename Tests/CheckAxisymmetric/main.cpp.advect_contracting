@@ -54,9 +54,9 @@ int main(int argc, char * argv[]) {
   boil::oout<<"inversion= "<<inverted<<"\n";
 
   /* computed parameters */
-  const int AR = 1;
+  const real AR = 0.5;
   const int NX = 100*level;
-  const int NZ = AR*NX;
+  const int NZ = int(AR*NX);
 
   /* domain dimensions (given by problem) */
   const real LX = 1.0;
@@ -169,7 +169,7 @@ int main(int argc, char * argv[]) {
   const real vel_max = A*AR;
 #endif
   const real dt  = cfl_max*DX/vel_max;
-  const int  ndt = 1600*AR*level;
+  const int  ndt = 22*level*int(5.*AR*240./(100.*cfl_max));
   const int nint = ndt/20;
   Times time(ndt,dt);
 

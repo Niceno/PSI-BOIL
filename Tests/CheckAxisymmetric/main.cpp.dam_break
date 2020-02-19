@@ -344,7 +344,10 @@ int main(int argc, char * argv[]) {
       output << time.dt() << boil::endl;
       output.close();
       output.open("run.txt", std::ios::out);
-      output << 0 << boil::endl;
+      if(boil::timer.current_min() > wmin-12.0)
+        output << 0 << boil::endl;
+      else
+        output << 1 << boil::endl;
       output.close();
       boil::timer.stop();
       boil::timer.report();

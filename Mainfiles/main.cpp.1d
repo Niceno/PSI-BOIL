@@ -1,66 +1,62 @@
 #include "Include/psi-boil.h"
-#include "update_step.cpp"
 #include "disjoint_pressure.cpp"
 
-//#define STANDARD
-//#define USE_VOF
-#define USE_UPW
-///#define STRETCH
-
-const int level=2;
-
-#ifdef STRETCH
-const int NX = 50*level;
-const int NZ = 4;
-
-const int AR = 4;
-const real mult = 1.2;
-real DXi  = 3e-9/real(level);
-
-int NXst  = 15; /* from aspect ratio */
-int NXun  = NX - NXst;
-real DXf  = DXi * pow(mult,real(NXst-1));
-
-real LXst = DXi * (1.0-pow(mult,real(NXst)))/(1.0-mult);
-real LXun = DXf * real(NXun);
-real LX   = LXst + LXun;
-
-real DZ = DXi*real(AR);
-real LZ = real(NZ)*DZ;
-
-real DXu = sqrt(DXi*DXf);
-real thickness = 5e-7;
-#else
-real DXu = 20e-9/real(level);
-real DXf = DXu;
-real thickness = 5e-7;
-
-const int NX = 50*level;
-const int NZ = 4;
-#endif
-
-real LXu = real(NX)*DXu;
-real DZu = DXu;
-real LZu = real(NZ)*DZu;
-
-const real Tout=101.0+273.15;
-const real Tsat=100.0+273.15;
+//#define STANDARD  /* no interfacial resistance */
+#define USE_VOF   /* use vof instead of clr */
+//#define STRETCH /* use stretched grid */
+//#define MIRRORED /* mirror the geometry */
+#define ADIABATIC /* no thermal conductivity in vapor */
 
 /******************************************************************************/
-main(int argc, char * argv[]) {
+int main(int argc, char * argv[]) {
 
   boil::timer.start();
 
-  if(argc==1){
-    boil::oout<<"One command line argument is required!"<<"\n";
-    boil::oout<<"./Boil wmin (wmin::wall time in minute)"<<"\n";
+  if(argc<3){
+    boil::oout<<"Two arguments required!"<<"\n";
+    boil::oout<<"./Boil wmin gLevel"<<"\n";
     exit(0);
   }
   int wmin=atoi(argv[1]);
   boil::oout<<"wmin= "<<wmin<<"\n";
 
+  int level=atoi(argv[2]);
+  boil::oout<<"level= "<<level<<"\n";
+
+  real thickness = 5e-7;
+  const int NX = 50*level;
+
+#ifdef STRETCH
+  const int AR = 4;
+  const real mult = 1.2;
+  real DXi  = 3e-9/real(level);
+
+  int NXst  = 15; /* from aspect ratio */
+  int NXun  = NX - NXst;
+  real DXf  = DXi * pow(mult,real(NXst-1));
+
+  real LXst = DXi * (1.0-pow(mult,real(NXst)))/(1.0-mult);
+  real LXun = DXf * real(NXun);
+  real LX   = LXst + LXun;
+
+  real DXu = sqrt(DXi*DXf);
+  real DZ = DXu*real(AR);
+
+#else
+  real DX = 20e-9/real(level);
+  real DZ = DX;
+  real DXf = DX;
+  real LX = real(NX)*DX;
+#endif
+  real LZ = DZ;
+
+  const real Tout=101.0+273.15;
+  const real Tsat=100.0+273.15;
+
+#ifndef USE_VOF
   boil::oout<<"Edit cipcsl2_sharpen.cpp!\n";
   boil::oout<<"#if 1 (for 1D)\n";
+#endif
 
   /*--------------------------------+
   |  choose the output file format  |
@@ -72,32 +68,34 @@ main(int argc, char * argv[]) {
   +----------*/
 #ifdef STRETCH
   Grid1D gx_st(Range<real>( 0.0, LXst ),
+  #ifdef MIRRORED
+               Range<real>( DXf, DXi  ),
+  #else
                Range<real>( DXi, DXf  ),
+  #endif
                NXst, Periodic::no());
   Grid1D gx_un(Range<real>( 0.0, LXun ),
                NXun, Periodic::no());
 
+  #ifdef MIRRORED
+  Grid1D gx(gx_un, gx_st, Periodic::no());
+  #else
   Grid1D gx(gx_st, gx_un, Periodic::no());
-  Grid1D gz( Range<real>( 0.0,LZ), NZ, Periodic::yes() );
+  #endif
 #else
-  DXf = DXu;
-  Grid1D gx( Range<real>( 0.0,LXu), NX, Periodic::no() );
-  Grid1D gz( Range<real>( 0.0,LZu), NZ, Periodic::yes() );
+  Grid1D gx( Range<real>( 0.0,LX), NX, Periodic::no() );
 #endif
+  Grid1D gz(DZ);
 
   /*---------+
   |  domain  |
   +---------*/
   Domain d(gx, gz, gz);
 
-  int iref = d.local_i(1);
-  int jref = d.local_j(1);
-  int kref = d.local_k(1);
-
   /*----------------+
   |  linear solver  |
   +----------------*/
-  Krylov * solver = new CG(d, Prec::di());
+  Krylov * solver = new BiCGS(d, Prec::di());
 
   /*------------------+
   |  define unknowns  |
@@ -110,63 +108,71 @@ main(int argc, char * argv[]) {
   Scalar step(d), sflag(d); // temperature
   Scalar mdot(d);        // phase-change
 
+  Scalar mflx(d);
   Scalar pcc(d);
-  Scalar heaviside(d);
-  Scalar deltaT(d);
+#ifdef USE_VOF
+  Vector uvw_1(d), uvw_2(d);
+#endif
 
   /*-----------------------------+ 
   |  insert boundary conditions  |
   +-----------------------------*/
+#ifdef MIRRORED
+  Dir dxm = Dir::imin();
+  Dir dxp = Dir::imax();
+#else
+  Dir dxm = Dir::imax();
+  Dir dxp = Dir::imin();
+#endif
+ 
+
   for_m(m) {
-    uvw.bc(m).add( BndCnd( Dir::imin(), BndType::wall() ) );
-    uvw.bc(m).add( BndCnd( Dir::imax(), BndType::outlet() ) );
-    uvw.bc(m).add( BndCnd( Dir::kmin(), BndType::periodic() ) );
-    uvw.bc(m).add( BndCnd( Dir::kmax(), BndType::periodic() ) );
-    uvw.bc(m).add( BndCnd( Dir::jmin(), BndType::periodic() ) );
-    uvw.bc(m).add( BndCnd( Dir::jmax(), BndType::periodic() ) );
+    uvw.bc(m).add( BndCnd( dxp, BndType::wall() ) );
+    uvw.bc(m).add( BndCnd( dxm, BndType::outlet() ) );
+    uvw.bc(m).add( BndCnd( Dir::kmin(), BndType::pseudo() ) );
+    uvw.bc(m).add( BndCnd( Dir::kmax(), BndType::pseudo() ) );
+    uvw.bc(m).add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
+    uvw.bc(m).add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
+#ifdef USE_VOF
+    uvw_1(m) = uvw(m).shape();
+    uvw_2(m) = uvw(m).shape();
+#endif
   }
 
-  p.bc().add( BndCnd( Dir::imin(), BndType::neumann() ) );
-  p.bc().add( BndCnd( Dir::imax(), BndType::neumann() ) );
-  p.bc().add( BndCnd( Dir::kmin(), BndType::periodic() ) );
-  p.bc().add( BndCnd( Dir::kmax(), BndType::periodic() ) );
-  p.bc().add( BndCnd( Dir::jmin(), BndType::periodic() ) );
-  p.bc().add( BndCnd( Dir::jmax(), BndType::periodic() ) );
+  p.bc().add( BndCnd( dxp, BndType::neumann() ) );
+  p.bc().add( BndCnd( dxm, BndType::neumann() ) );
+  p.bc().add( BndCnd( Dir::kmin(), BndType::pseudo() ) );
+  p.bc().add( BndCnd( Dir::kmax(), BndType::pseudo() ) );
+  p.bc().add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
+  p.bc().add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
 
   /* copy b.c. from p */
   press = p.shape();
   f = p.shape();
   mdot = p.shape();
   q = p.shape();
+  mflx = p.shape();
 
-  c.bc().add( BndCnd( Dir::imin(), BndType::wall() ) );
-  c.bc().add( BndCnd( Dir::imax(), BndType::outlet() ) );
-  c.bc().add( BndCnd( Dir::kmin(), BndType::periodic() ) );
-  c.bc().add( BndCnd( Dir::kmax(), BndType::periodic() ) );
-  c.bc().add( BndCnd( Dir::jmin(), BndType::periodic() ) );
-  c.bc().add( BndCnd( Dir::jmax(), BndType::periodic() ) );
+  c.bc().add( BndCnd( dxp, BndType::wall() ) );
+  c.bc().add( BndCnd( dxm, BndType::outlet() ) );
+  c.bc().add( BndCnd( Dir::kmin(), BndType::pseudo() ) );
+  c.bc().add( BndCnd( Dir::kmax(), BndType::pseudo() ) );
+  c.bc().add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
+  c.bc().add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
   g = c.shape();
   step = c.shape();
   sflag = c.shape();
   cold = c.shape();
 
-  tpr.bc().add( BndCnd( Dir::imin(), BndType::dirichlet(), Tout ) );
-  tpr.bc().add( BndCnd( Dir::imax(), BndType::dirichlet(), Tsat ) );
-  tpr.bc().add( BndCnd( Dir::kmin(), BndType::periodic() ) );
-  tpr.bc().add( BndCnd( Dir::kmax(), BndType::periodic() ) );
-  tpr.bc().add( BndCnd( Dir::jmin(), BndType::periodic() ) );
-  tpr.bc().add( BndCnd( Dir::jmax(), BndType::periodic() ) );
+  tpr.bc().add( BndCnd( dxp, BndType::dirichlet(), Tout ) );
+  tpr.bc().add( BndCnd( dxm, BndType::dirichlet(), Tsat ) );
+  tpr.bc().add( BndCnd( Dir::kmin(), BndType::pseudo() ) );
+  tpr.bc().add( BndCnd( Dir::kmax(), BndType::pseudo() ) );
+  tpr.bc().add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
+  tpr.bc().add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
   OPR( Tout );
 
   pcc   = p.shape();
-  heaviside = c.shape();
-
-  deltaT.bc().add( BndCnd( Dir::imin(), BndType::dirichlet(), 0.0 ) );
-  deltaT.bc().add( BndCnd( Dir::imax(), BndType::dirichlet(), 0.0 ) );
-  deltaT.bc().add( BndCnd( Dir::kmin(), BndType::periodic() ) );
-  deltaT.bc().add( BndCnd( Dir::kmax(), BndType::periodic() ) );
-  deltaT.bc().add( BndCnd( Dir::jmin(), BndType::periodic() ) );
-  deltaT.bc().add( BndCnd( Dir::jmax(), BndType::periodic() ) );
 
   /*----------------------+
   |  physical properties  |
@@ -174,38 +180,52 @@ main(int argc, char * argv[]) {
   Matter vapor(d), liquid(d);
   vapor  .mu    (1.255e-5);
   vapor  .rho   (0.597);
-  vapor  .cp    (2030*0.597);
+#ifdef ADIABATIC
+  vapor  .lambda(1000.0);
+  vapor  .cp    (0.1);
+#else
   vapor  .lambda(0.025);
+  vapor  .cp    (2030*0.597);
+#endif
   liquid.mu    (0.28e-3);
   liquid.rho   (958.4);
   liquid.cp    (4215.9*958.4);
   liquid.lambda(0.679);
-  const real latent=2258.0*1e3;
 
   const real Mv = 18.015e-3;
-  const real pi = atan(1.0) * 4.0;
-  const real R  = 8.3144621;
-  const real resist = pow(Tsat,1.5)/2.0/vapor.rho()->value()/latent/sqrt(Mv/(2.0*pi*R));
+  vapor.mmass(Mv);
+  liquid.mmass(Mv);
 
+  const real latent=2258.0*1e3;
   const real hamaker = 5.0e-20;
   const real pc0 = (Tout/Tsat-1.0)*latent*liquid.rho()->value();
   const real delta0 = pow(hamaker/pc0,1.0/3.0);
 
+#ifndef USE_VOF
   Matter mixed(liquid, vapor,& step); //c=1: full of liquid, c=0: full of vapor
+#else
+  Matter mixed(liquid, vapor,& c);
+#endif
   mixed.sigma(2.3610e-2);
+  mixed.latent(latent);
 
   /*-------------------+
   |  time-integration  |
   +-------------------*/
-  const int  ndt = 300000*level;
-  const int  nint = ndt/20;
-  const int  bint = ndt/10;
+  const int  ndt = 2*150000*level;
+  const int  nint = 10000;//ndt/4;
+  const int  bint = ndt/1.5;
   const real dt  = 1.0e-8/real(level);
   const real dxmin = d.dxyz_min();
   const real cfl_limit = 0.2;
   Times time(ndt, dt);
-  time.print_time(false);
   time.set_coef_dec(0.2);
+
+#ifndef USE_VOF
+  #ifdef STRETCH
+  time.set_dt(dt/4.);
+  #endif
+#endif
 
   OPR(  NX );
   OPR(  dt );
@@ -214,41 +234,56 @@ main(int argc, char * argv[]) {
   for_vijk(c,i,j,k) 
     c[i][j][k] = 0.0;
 
+#ifdef STANDARD
+  real tint0 = Tsat;
+#else
+  real tint0 = Tsat+hamaker/pow(thickness,3.)*Tsat/liquid.rho()->value()/latent;
+#endif
   for_vijk(c,i,j,k) {
-    if(c.xc(i)<thickness-DXf) {
+#ifdef MIRRORED
+    if(c.xn(i)>LX-thickness) {
       c[i][j][k]=1.0;
-    } else if(c.xc(i)<thickness) { 
-      c[i][j][k]=0.7;
+      tpr[i][j][k] = Tout+(Tsat-Tout)*(LX-tpr.xc(i))/thickness; 
+    } else if(c.xn(i+1)>LX-thickness) {
+      c[i][j][k]=1.-(LX-thickness-c.xn(i))/c.dxc(i);
+      if(c[i][j][k]>0.5) {
+        tpr[i][j][k] = Tout+(Tsat-Tout)*(LX-tpr.xc(i))/thickness; 
+      } else {
+        tpr[i][j][k] = Tsat;
+      }
+#else
+    if(c.xn(i+1)<thickness) {
+      c[i][j][k]=1.0;
+      tpr[i][j][k] = Tout+(Tsat-Tout)*tpr.xc(i)/thickness; 
+    } else if(c.xn(i)<thickness) { 
+      c[i][j][k]=(thickness-c.xn(i))/c.dxc(i);
+      if(c[i][j][k]>0.5) {
+        tpr[i][j][k] = Tout+(Tsat-Tout)*tpr.xc(i)/thickness; 
+      } else {
+        tpr[i][j][k] = Tsat;
+      }
+#endif
     } else {
       c[i][j][k]=0.0;
+      tpr[i][j][k] = Tsat; 
     }
   }
+  c.bnd_update();
   c.exchange_all();
+  tpr.bnd_update();
+  tpr.exchange_all();
 
-  for_avijk(tpr,i,j,k){
-    //tpr[i][j][k] = (tpr.xc(i)<thickness ? Tout+(Tsat-Tout)*tpr.xc(i)/thickness : Tsat);
-    tpr[i][j][k] = Tsat;
-  }
-
-  for_avijk(c,i,j,k){
-    step[i][j][k]=c[i][j][k];
-  }
-
-  pcc   = 0.0;
-  deltaT= 0.0;
+  step = c;
+  pcc  = 0.0;
 
   /*-----------------+
   |  define solvers  |
   +-----------------*/
   Momentum ns( uvw, xyz, time, solver, &mixed);
-  ns.diffusion_set (TimeScheme::backward_euler());
-  ns.convection_set(ConvScheme::upwind());
-
   Pressure pr(p, f, uvw, time, solver, &mixed);
   AC multigrid( &pr );
-  //multigrid.stop_if_diverging(false);
   multigrid.stop_if_diverging(true);
-  multigrid.min_cycles(3);
+  multigrid.min_cycles(4);
 
 #ifndef USE_VOF
   CIPCSL2 conc  (c,  g, kappa, uvw, time, solver);
@@ -256,33 +291,33 @@ main(int argc, char * argv[]) {
   conc.set_nredist(1);
   conc.set_itsharpen(32);
 #else
-  VOF conc  (c,  g, kappa, uvw, time, solver);
+  VOF conc(c,  g, kappa, uvw_1, time, solver);
 #endif
-
-#ifdef USE_UPW
-  PhaseChange pc(mdot, tpr, q, c, g, f, step, uvw, time, &mixed, latent, Tsat, NULL, &(conc.sxyz));
-#else
-  PhaseChange pc(mdot, tpr, q, c, g, f, step, uvw, time, &mixed, latent, Tsat);
-#endif
+  conc.init();
+  conc.front_minmax();
+  conc.totalvol();
 
 #ifdef STANDARD
-  EnthalpyFD enthFD(tpr, q, c, uvw, time, solver, &mixed, Tsat);
-#else 
-  EnthalpyTIF enthFD(tpr, q, c, uvw, time, solver, &mixed, Tsat, latent, resist, &(pc.M), &pcc);
+  TIF tsat(Tsat);
+#else
+  TIF tsat(Tsat, &mixed, (*conc.topo.adens), mflx, &pcc); 
+  tsat.set_weak_limiting(Tsat,Tout);
+  tsat.tif  = tint0;
 #endif
-  //EnthalpyTIF enthFD(tpr, q, c, uvw, time, solver, &mixed, Tsat);
-  //EnthalpyTIF enthFD(tpr, q, c, uvw, time, solver, &mixed, Tsat, latent, resist, NULL, &pcc);
+  EnthalpyFD enthFD(tpr, q, uvw, time, solver, &mixed,
+                    conc.topo, tsat);
+
   enthFD.convection_set(TimeScheme::forward_euler());
   enthFD.diffusion_set(TimeScheme::backward_euler());
 
+  PhaseChangeVOF pc(mdot, mflx, tpr, q, c, g , f , uvw, conc.topo,
+                    tsat, time, &mixed);
+
 #ifndef STANDARD
-  pc.set_tif(&(enthFD.tif));
-  boil::plot->plot(uvw,c,tpr,mdot,enthFD.tif,"uvw-c-tpr-mdot-tif",0);
+  boil::plot->plot(uvw,c,tpr,mdot,tsat.tif,"uvw-c-tpr-mdot-tif",0);
 #else
   boil::plot->plot(uvw,c,tpr,mdot,"uvw-c-tpr-mdot",0);
 #endif
-
-  Heaviside indicator(heaviside, &c);
 
   /*---------------------------------------------------------------+
   |                     start computation                          |
@@ -330,7 +365,7 @@ main(int argc, char * argv[]) {
 #endif
     tpr.  load("tpr",ts);
 #ifndef STANDARD
-    (enthFD.tif).load("tif",ts);
+    (tsat.tif).load("tif",ts);
 #endif
     time.first_step(ts);
     time.current_time(t);
@@ -344,7 +379,9 @@ main(int argc, char * argv[]) {
     boil::oout << "######################" << boil::endl;
 #endif
 
+#ifndef USE_VOF
   update_step(c, step, sflag);
+#endif
   int testint = 1;
   /*-------------------+
   |  reset body force  |
@@ -353,72 +390,45 @@ main(int argc, char * argv[]) {
     for_avmijk(xyz,m,i,j,k)
       xyz[m][i][j][k] = 0.0;
 
-  conc.front_minmax();
-  boil::oout<<"x-min-front= "<<time.current_time()<<" "
-            <<conc.get_xminft()<<"\n";
-  conc.totalvol();
-
-#ifdef USE_VOF
-  #ifdef USE_UPW
-    conc.calc_sxyz();
-  #endif
-#endif
   /*------------+
   |  time loop  |
   +------------*/
   for(time.start(); time.end(); time.increase()) {
 
-    boil::oout << "##################" << boil::endl;
-    boil::oout << "# TIME:      " << time.current_time() << boil::endl;
-    boil::oout << "# TIME STEP: " << time.current_step() << boil::endl;
-    boil::oout << "# WTIME:     " << boil::timer.current_min() << boil::endl;
-    boil::oout << "##################" << boil::endl;
-
     /*---------------------------------------+
     |  solve energy equation + phase change  |
     +---------------------------------------*/
-    indicator.calculate(); 
-    calculate_disjoint_pressure_x(pcc,conc.sxyz,kappa,
-                                  mixed.sigma()->value(),hamaker,delta0);
- 
-#ifndef STANDARD
-    enthFD.tint_field(heaviside);
-#endif
+    calculate_disjoint_pressure_x(pcc, c, (*conc.topo.adens), (*conc.topo.fs),
+                                  hamaker, delta0);
+
+    //tsat.set_ur(0.2);
+
     enthFD.discretize();
     enthFD.new_time_step();
     enthFD.solve(ResRat(1e-16),"Enthalpy");
-#ifndef STANDARD
-    pc.initialize();
-    pc.cal_massflux();
-    real resT(1.0);
-    int ctr(0);
-    while(resT>1e-3 && ctr<10) {
-      enthFD.deltat(deltaT,heaviside,ResRat(1e-16),"T-correction"); 
-      resT = 0.0;
-      for_avijk(tpr,i,j,k) {
-        real del = deltaT[i][j][k];
-        if((fabs(del)/tpr[i][j][k])>resT) {
-          resT = fabs(del)/tpr[i][j][k];
-          tpr[i][j][k] += del;
-        }
-      }
-      pc.cal_massflux();
-      boil::cart.max_real(&resT);
-      ctr++;
-      boil::oout << "dTresidual: "<<time.current_time() << " "<< ctr<< " "<< resT << boil::endl;
-    } 
-  #if 0
-   for_avijk(tpr,i,j,k) {
-     if(j==1&&k==1) boil::oout<<" "<<i<<" "<<tpr[i][j][k]<<" "<<deltaT[i][j][k]<<boil::endl;
-   }
-   exit(0);
-  #endif
-    //boil::plot->plot(c,tpr,deltaT,pc.M,enthFD.tif,"c-tpr-deltaT-M-tif",time.current_step());
-    pc.finalize();
-#else
-    pc.update();
+#ifdef ADIABATIC
+    real maxtif(0.);
+    for_vijk(tpr,i,j,k) {
+      if((*conc.topo.adens)[i][j][k]>boil::pico&&tsat.Tint(i,j,k)>maxtif)
+        maxtif = tsat.Tint(i,j,k);
+    }
+    boil::cart.max_real(&maxtif);
+    for_vijk(tpr,i,j,k) {
+      if(c[i][j][k]<0.5) tpr[i][j][k] = maxtif;
+    }
+    tpr.bnd_update();
+    tpr.exchange();
 #endif
-#if 1
+
+    pc.update();
+   
+    //for_vijk(c,i,jj,kk) {
+    for_vi(c,i) {
+      int jj(1+boil::BW), kk(1+boil::BW);
+      if(fabs(mdot[i][jj][kk])>boil::atto) boil::aout<<"main:: "<<i<<" "<<jj<<" "<<kk<<" "<<mdot[i][jj][kk]<<" | "<<c[i-1][jj][kk]<<" "<<c[i][jj][kk]<<" "<<c[i+1][jj][kk]<<" | "<<tpr[i-1][jj][kk]<<" "<<tpr[i][jj][kk]<<" "<<tpr[i+1][jj][kk]<<" | "<<tsat.Tint(i,jj,kk)<<boil::endl;
+    }
+    //if(time.current_step()==11)exit(0);
+  
     ns.vol_phase_change(&f);
 
     /* essential for moving front */
@@ -435,13 +445,17 @@ main(int argc, char * argv[]) {
 
     ns.grad(press);
     ns.solve(ResRat(1e-14));
+
     p = 0.0;
     if (multigrid.vcycle(ResRat(1e-6))) OMS(converged);
     p.exchange();
     ns.project(p);
     press += p;
     press.exchange();
-#endif
+
+    for_vi(c,i)
+      if((*conc.topo.adens)[i][0+boil::BW][0+boil::BW]>boil::atto)
+        boil::aout<<"main2:: "<<i<<" "<<uvw[Comp::u()][i-1][0+boil::BW][0+boil::BW]<<" "<<uvw[Comp::u()][i][0+boil::BW][0+boil::BW]<<" "<<uvw[Comp::u()][i+1][0+boil::BW][0+boil::BW]<<" | "<<uvw.outflow(i,boil::BW,boil::BW)<<" "<<(*conc.topo.adens)[i][0+boil::BW][0+boil::BW]<<" "<<(*conc.topo.adens)[i+1][0+boil::BW][0+boil::BW]<<" "<<boil::endl;
 
 #if 0
     /* this part does not work in parallel computation */
@@ -454,23 +468,36 @@ main(int argc, char * argv[]) {
     |  solve transport equation  |
     +---------------------------*/
     cold=c;
-    if(time.current_step()<5 || time.current_step()>1500*level) conc.advance();
-    //if(time.current_step()<5) conc.advance();
+#ifndef USE_VOF
+    conc.advance();
+#else
+    conc.advance_with_extrapolation(true,ResRat(1e-6),uvw,f,
+                                    &liquid,&uvw_1);
+#endif
+
+    conc.color_minmax();
     conc.front_minmax();
-    boil::oout<<"x-min-front= "<<time.current_time()<<" "
-              <<conc.get_xminft()<<"\n";
     conc.totalvol();
 
-    update_step(c, step, sflag);
-
-    pc.modify_vel(uvw,c,cold);
-
-#if 0
-    if(time.current_step()== 2) {
-    for_vi(c,i) boil::oout<<i<<" "<<c[i][1][1]<<boil::endl;
-    exit(0);
+    /* necessary corrections for 1D */
+    real mflx_max(0.0);
+    for_vijk(c,i,j,k) {
+      if(mflx[i][j][k]>mflx_max)
+        mflx_max = mflx[i][j][k];
     }
+    boil::cart.max_real(&mflx_max);
+    mflx = mflx_max;
+    for_avijk(c,i,j,k) {
+      if((*conc.topo.adens)[i][j][k]>0.0 && (*conc.topo.adens)[i-1][j][k]>0.0) {
+        (*conc.topo.adens)[i][j][k] = 0.0;
+      }
+    }
+
+#ifndef USE_VOF
+    update_step(c, step, sflag);
+    pc.modify_vel(uvw,c,cold);
 #endif
+
     /*-------------+
     |  dt control  |
     +-------------*/
@@ -486,7 +513,7 @@ main(int argc, char * argv[]) {
 
     if(time.current_step() % (nint)==0 ||time.current_step()==1) {
 #ifndef STANDARD
-      boil::plot->plot(uvw,c,tpr,mdot,enthFD.tif,"uvw-c-tpr-mdot-tif",time.current_step());
+      boil::plot->plot(uvw,c,tpr,mdot,tsat.tif,"uvw-c-tpr-mdot-tif",time.current_step());
 #else
       boil::plot->plot(uvw,c,tpr,mdot,"uvw-c-tpr-mdot",time.current_step());
 #endif
@@ -513,7 +540,7 @@ main(int argc, char * argv[]) {
 #endif
       tpr  .save("tpr",   time.current_step());
 #ifndef STANDARD
-      (enthFD.tif).save("tif",   time.current_step());
+      (tsat.tif).save("tif",   time.current_step());
 #endif
       if( boil::cart.iam()==0) {
         std::fstream output;
@@ -542,7 +569,7 @@ main(int argc, char * argv[]) {
 #endif    
       tpr  .save("tpr",   time.current_step());
 #ifndef STANDARD
-      (enthFD.tif).save("tif",   time.current_step());
+      (tsat.tif).save("tif",   time.current_step());
 #endif
       std::fstream output;
       output << std::setprecision(16);
@@ -558,49 +585,21 @@ main(int argc, char * argv[]) {
       boil::timer.report();
       uvw  .rm("uvw", ts);
       press.rm("press", ts);
+#ifndef USE_VOF
       conc .rm("conc", ts);
+#else
+      c .rm("conc", ts);
+#endif    
       tpr  .rm("tpr", ts);
 #ifndef STANDARD
-      (enthFD.tif).rm("tif",ts);
+      (tsat.tif).rm("tif",ts);
 #endif
       exit(0);
     }
 #endif
   }
 
-#if 0
-  std::ofstream fout;
-  fout.open("velocity-u.txt");
-  Comp m=Comp::u();
-  for_vmi(uvw,m,i) {
-       fout << uvw.xc(m,i) << "  " << uvw[m][i][1][1] << "\n";
-  }
-  fout.close();
-
-  fout.open("color.txt");
-  for_vi(c,i) {
-       fout << c.xc(i) << "  " << c[i][1][1] << "\n";
-  }
-  fout.close();
-
-  fout.open("temperature.txt");
-  for_vi(tpr,i) {
-       fout << tpr.xc(i) << "  " << tpr[i][1][1] << "\n";
-  }
-  fout.close();
-
-  fout.open("mdot.txt");
-  for_vi(tpr,i) {
-       fout << mdot.xc(i) << "  " << mdot[i][1][1] << "\n";
-  }
-  fout.close();
-#endif
-
-
   boil::timer.stop();
   boil::timer.report();
 
 }	
-/*-----------------------------------------------------------------------------+
- '$Id: main-JCP-phaseChange-stefan.cpp,v 1.3 2018/04/30 08:45:18 sato Exp $'/
-+-----------------------------------------------------------------------------*/

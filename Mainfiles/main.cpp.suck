@@ -1,29 +1,46 @@
 #include "Include/psi-boil.h"
-#define NEU /* use etif */
-#define PCC /* use pcvof */
-//#define BDC /* use bndcolor */
+
 #define USE_VOF
 
-/* computed parameters */
-const int Level = 6;  //Level = 1,2,4
-const int dtLevel = 1; // 1 or 2
-const int NX = 2*40*Level;
-const int NZ = 3;
-
-/* domain dimensions (given by problem) */
-const real LX =   8.0e-3;
-const real LZ =   LX*real(NZ)/real(NX);
-
-const real tout=378.15;
-const real twall=373.15;
-
 /******************************************************************************/
-main(int argc, char * argv[]) {
+int main(int argc, char * argv[]) {
 
-  // Journal of Computational Physics, 249, 127-161
-  // Sucking problem
+  /* Journal of Computational Physics, 249, 127-161 */
+  /* Sucking problem */
 
   boil::timer.start();
+
+  if(argc<3) {
+    boil::oout<<"Two command line arguments required!"<<"\n";
+    boil::oout<<"./Boil wmin level (wmin::wall time in minute)"<<"\n";
+    exit(0);
+  }
+  int wmin=atoi(argv[1]);
+  boil::oout<<"wmin= "<<wmin<<"\n";
+
+  const int Level=atoi(argv[2]);
+  boil::oout<<"level= "<<Level<<"\n";
+
+  /* computed parameters */
+  const int dtLevel = 1; // 1 or 2
+  const int NX = 2*40*Level;
+
+  /* domain dimensions (given by problem) */
+  const real LX = 8.0e-3;
+  const real DX = LX/real(NX);
+
+  const real xint = 0.002205323668813564;
+  const real x0 = xint-1.01*DX;
+
+  const real Tout=5.;
+  const real Tsat=0.;
+
+#ifndef USE_VOF
+  boil::oout<<"Edit cipcsl2_sharpen.cpp!\n";
+  boil::oout<<"#if 1 (for 1D)\n";
+  const int NZ = 3;
+  const real LZ = DX*real(NZ);
+#endif
 
   /*--------------------------------+
   |  choose the output file format  |
@@ -34,8 +51,12 @@ main(int argc, char * argv[]) {
   /*----------+
   |  grid(s)  |
   +----------*/
-  Grid1D gx( Range<real>(-0.0*LX,1.0*LX), NX, Periodic::no() );
-  Grid1D gz( Range<real>( 0.0,LZ), NZ, Periodic::no() , BndGrid::symmetry());
+  Grid1D gx( Range<real>(0.0*LX+x0,1.0*LX+x0), NX, Periodic::no() );
+#ifndef USE_VOF
+  Grid1D gz( Range<real>(0.0,LZ), NZ, Periodic::yes() );
+#else
+  Grid1D gz(DX);
+#endif
 
   /*---------+
   |  domain  |
@@ -45,20 +66,19 @@ main(int argc, char * argv[]) {
   /*----------------+
   |  linear solver  |
   +----------------*/
-  Krylov * solver = new CG(d, Prec::ic2());
+  Krylov * solver = new CG(d, Prec::di());
 
   /*------------------+
   |  define unknowns  |
   +------------------*/
-  Vector uvw(d), xyz(d); // vel
+  Vector uvw(d), xyz(d), uvw_1(d); // vel
   Scalar p  (d), f  (d); // pressure
   Scalar c  (d), g  (d), kappa(d), cold(d); // concentration
   Scalar press(d);
   Scalar tpr(d), q  (d), step(d); // temperature
   Scalar mdot(d);        // phase-change
-
-  Scalar mflx(d);
-  Vector bndclr(d), bndclrold(d);
+  Scalar mflx(d);        // phase-change
+  Scalar sflag(d);        // phase-change
 
   /*-----------------------------+ 
   |  insert boundary conditions  |
@@ -66,121 +86,139 @@ main(int argc, char * argv[]) {
   for_m(m) {
     uvw.bc(m).add( BndCnd( Dir::imin(), BndType::wall() ) );
     uvw.bc(m).add( BndCnd( Dir::imax(), BndType::outlet() ) );
-    uvw.bc(m).add( BndCnd( Dir::kmin(), BndType::symmetry() ) );
-    uvw.bc(m).add( BndCnd( Dir::kmax(), BndType::symmetry() ) );
-    uvw.bc(m).add( BndCnd( Dir::jmin(), BndType::symmetry() ) );
-    uvw.bc(m).add( BndCnd( Dir::jmax(), BndType::symmetry() ) );
-
-    bndclr(m)    = uvw(m).shape();
-    bndclrold(m) = uvw(m).shape();
+#ifndef USE_VOF
+    uvw.bc(m).add( BndCnd( Dir::kmin(), BndType::periodic() ) );
+    uvw.bc(m).add( BndCnd( Dir::kmax(), BndType::periodic() ) );
+    uvw.bc(m).add( BndCnd( Dir::jmin(), BndType::periodic() ) );
+    uvw.bc(m).add( BndCnd( Dir::jmax(), BndType::periodic() ) );
+#else
+    uvw.bc(m).add( BndCnd( Dir::kmin(), BndType::pseudo() ) );
+    uvw.bc(m).add( BndCnd( Dir::kmax(), BndType::pseudo() ) );
+    uvw.bc(m).add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
+    uvw.bc(m).add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
+#endif
+    uvw_1(m) = uvw(m).shape();
   }
 
   p.bc().add( BndCnd( Dir::imin(), BndType::neumann() ) );
-  p.bc().add( BndCnd( Dir::imax(), BndType::neumann() ) );
-  p.bc().add( BndCnd( Dir::kmin(), BndType::symmetry() ) );
-  p.bc().add( BndCnd( Dir::kmax(), BndType::symmetry() ) );
-  p.bc().add( BndCnd( Dir::jmin(), BndType::symmetry() ) );
-  p.bc().add( BndCnd( Dir::jmax(), BndType::symmetry() ) );
+  p.bc().add( BndCnd( Dir::imax(), BndType::outlet() ) );
+#ifndef USE_VOF
+  p.bc().add( BndCnd( Dir::kmin(), BndType::periodic() ) );
+  p.bc().add( BndCnd( Dir::kmax(), BndType::periodic() ) );
+  p.bc().add( BndCnd( Dir::jmin(), BndType::periodic() ) );
+  p.bc().add( BndCnd( Dir::jmax(), BndType::periodic() ) );
+#else
+  p.bc().add( BndCnd( Dir::kmin(), BndType::pseudo() ) );
+  p.bc().add( BndCnd( Dir::kmax(), BndType::pseudo() ) );
+  p.bc().add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
+  p.bc().add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
+#endif
 
   /* copy b.c. from p */
   press = p.shape();
   f = p.shape();
   mdot = p.shape();
+  mflx = p.shape();
   q = p.shape();
 
-  mflx = p.shape();
-
-  c.bc().add( BndCnd( Dir::imin(), BndType::wall() ) );
-  c.bc().add( BndCnd( Dir::imax(), BndType::outlet() ) );
-  c.bc().add( BndCnd( Dir::kmin(), BndType::symmetry() ) );
-  c.bc().add( BndCnd( Dir::kmax(), BndType::symmetry() ) );
-  c.bc().add( BndCnd( Dir::jmin(), BndType::symmetry() ) );
-  c.bc().add( BndCnd( Dir::jmax(), BndType::symmetry() ) );
+  c = p.shape();
   g = c.shape();
   step = c.shape();
+  cold = c.shape();
+  sflag = c.shape();
 
-  tpr.bc().add( BndCnd( Dir::imin(), BndType::dirichlet(), twall ) );
-  tpr.bc().add( BndCnd( Dir::imax(), BndType::dirichlet(), tout ) );
-  tpr.bc().add( BndCnd( Dir::kmin(), BndType::symmetry() ) );
-  tpr.bc().add( BndCnd( Dir::kmax(), BndType::symmetry() ) );
-  tpr.bc().add( BndCnd( Dir::jmin(), BndType::symmetry() ) );
-  tpr.bc().add( BndCnd( Dir::jmax(), BndType::symmetry() ) );
+  tpr.bc().add( BndCnd( Dir::imin(), BndType::dirichlet(), Tsat ) );
+  tpr.bc().add( BndCnd( Dir::imax(), BndType::dirichlet(), Tout ) );
+#ifndef USE_VOF
+  tpr.bc().add( BndCnd( Dir::kmin(), BndType::periodic() ) );
+  tpr.bc().add( BndCnd( Dir::kmax(), BndType::periodic() ) );
+  tpr.bc().add( BndCnd( Dir::jmin(), BndType::periodic() ) );
+  tpr.bc().add( BndCnd( Dir::jmax(), BndType::periodic() ) );
+#else
+  tpr.bc().add( BndCnd( Dir::kmin(), BndType::pseudo() ) );
+  tpr.bc().add( BndCnd( Dir::kmax(), BndType::pseudo() ) );
+  tpr.bc().add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
+  tpr.bc().add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
+#endif
 
   /*----------------------+
   |  physical properties  |
   +----------------------*/
   Matter vapor(d), liquid(d);
-  //vapor  .mu    (1.255e-1);
   vapor  .mu    (1.255e-5);
   vapor  .rho   (0.597);
   vapor  .cp    (2030*0.597);
   vapor  .lambda(0.025);
-  //liquid.mu    (0.28e-1);
   liquid.mu    (0.28e-3);
   liquid.rho   (958.4);
   liquid.cp    (4215.9*958.4);
   liquid.lambda(0.679);
-  const real latent=2258.0*1e3;
-  const real tsat=373.15;
 
-#ifdef BDC
-  Matter mixed(liquid, vapor,& step,& bndclr);
+#ifndef USE_VOF
+  Matter mixed(liquid, vapor,& step); //c=1: full of liquid, c=0: full of vapor
 #else
-  Matter mixed(liquid, vapor, & step); //c=1: full of liquid, c=0: full of vapor
+  Matter mixed(liquid, vapor,& c); //c=1: full of liquid, c=0: full of vapor
 #endif
+  mixed.sigma(2.3610e-2);
+  mixed.latent(2258.0*1e3);
 
   /*-------------------+
   |  time-integration  |
   +-------------------*/
   const int  ndt =500*Level*dtLevel;
-  //const int  ndt = 1000*Level*dtLevel;
   const int  nint = 100*Level*dtLevel;
   const real dt  = 1.0e-3/real(Level*dtLevel);
 
   Times time(ndt, dt);
 
   OPR(  NX );
+  OPR(  LX );
   OPR(  dt );
   OPR( ndt );
-  
+ 
   /*--------------------+
   |  initial condition  |
   +--------------------*/
-  // read from file
+  /* read from file */
   real xi[200],tprin[200];
   std::fstream input;
-  input.open("input.txt");
+  input.open("input.sucking");
   if( input.fail() ) {
-      boil::oout<<"Error: input.txt is necesarry!!!";
+      boil::oout<<"Error: input.sucking is necessary!!!";
       exit(0);
   } else {
     for(int i=0; i<200; i++){
       input>>xi[i]>>tprin[i];
     }
   }
-  real xint=2.0e-4;
-  // color function
-  for_vijk(c,i,j,k){ 
-    if(c.xc(i)<xint-c.dxc(i)) {
-      c[i][j][k] = 0.0;
-    } else if(c.xc(i)<xint) {
-      c[i][j][k] = 0.001;
+
+  /* color function */
+  for_vijk(c,i,j,k)
+    c[i][j][k] = 1.0;
+  for_vijk(c,i,j,k) {
+    if(i==boil::BW&&((c.xc(boil::BW)-x0)<2.*c.dxc(boil::BW))) {
+      c[i][j][k]=0.0;
+    } else if(i==1+boil::BW&&((c.xc(boil::BW)-x0)<2.*c.dxc(boil::BW))) {
+      c[i][j][k]=0.99; /* approximately one cell */
     } else {
       c[i][j][k] = 1.0;
     }
   }
+  c.bnd_update();
   c.exchange_all();
-  // temperature
+
+  /* temperature */
   for(int i=0; i<200; i++){
     xi[i]+=xint;
+    tprin[i] -= 373.15;
   }
   real xiend=xi[199];
   for_vijk(tpr,i,j,k){
     real xtmp=tpr.xc(i);
     if(xtmp>=xiend){
-      tpr[i][j][k]=tout;
+      tpr[i][j][k] = Tout;
     } else if (xtmp<=xint) {
-      tpr[i][j][k]=tsat;
+      tpr[i][j][k] = Tsat;
     } else {
       for(int ii=0; ii<199; ii++){
         if((xtmp-xi[ii])*(xtmp-xi[ii+1])<=0) {
@@ -191,6 +229,7 @@ main(int argc, char * argv[]) {
       }
     }
   }
+  tpr.bnd_update();
   tpr.exchange_all();
 
   boil::plot->plot(uvw, c, tpr, mdot, "uvw-c-tpr-mdot", 0);
@@ -203,67 +242,45 @@ main(int argc, char * argv[]) {
   |  define solvers  |
   +-----------------*/
   Momentum ns( uvw, xyz, time, solver, &mixed);
-  ns.diffusion_set(TimeScheme::backward_euler());
   Pressure pr(p, f, uvw, time, solver, &mixed);
 #ifndef USE_VOF
   CIPCSL2 conc  (c,  g, kappa, uvw, time, solver);
   conc.set_nredist(1);
   conc.set_itsharpen(4);
-#else
-  #ifdef BDC
-  VOF conc(c,  g, kappa, uvw, time, solver, &bndclr, &mixed);
-  #else
-  VOF conc(c,  g, kappa, uvw, time, solver);
-  #endif   
+#else 
+  VOF conc  (c,  g, kappa, uvw_1, time, solver);
 #endif
+  AC multigrid( &pr );
+  multigrid.stop_if_diverging(true);
+  multigrid.min_cycles(4);
+
   conc.init();
+  c.exchange_all();
   conc.ancillary();
   conc.front_minmax();
   conc.totalvol();
-#ifndef NEU
-  EnthalpyFD enthFD(tpr, q, c, uvw, time, solver, &mixed ,tsat);
-#else
-  TIF Tsat(tsat);
-  EnthalpyTIF enthFD(tpr, q, c, uvw, time, solver, &mixed, Tsat,
-                     NULL, conc.topo.fs, conc.topo.adens);
-#endif
+
+  TIF tsat(Tsat);
+  EnthalpyFD enthFD(tpr, q, uvw, time, solver, &mixed,
+                     conc.topo,tsat);
   enthFD.convection_set(TimeScheme::forward_euler());
   enthFD.diffusion_set(TimeScheme::backward_euler());
-#ifndef NEU
-  PhaseChange pc(mdot, tpr, q, c, g, f, step, uvw, time, &mixed , latent, tsat);
-#else
-  #ifdef PCC
   PhaseChangeVOF pc(mdot, mflx, tpr, q, c, g , f , uvw, conc.topo,
-                    Tsat, time, &mixed, latent);
-  #else
-  PhaseChange pc(mdot, tpr, q, c, g, f, step, uvw, time, &mixed , latent, tsat);
-  #endif
-#endif
-  AC multigrid( &pr );
-  multigrid.stop_if_diverging(false);
-  multigrid.min_cycles(3);
-  multigrid.max_cycles(10);
+                    tsat, time, &mixed);
+
+  boil::plot->plot(uvw, c, tpr, mdot, "uvw-c-tpr-mdot", 0);
 
   /*------------+
   |  time loop  |
   +------------*/
   for(time.start(); time.end(); time.increase()) {
 
-    boil::oout << "########################" << boil::endl;
-    boil::oout << "#                       " << boil::endl;
-    boil::oout << "# TIME:      " << time.current_time() << boil::endl;
-    boil::oout << "#                       " << boil::endl;
-    boil::oout << "# TIME STEP: " << time.current_step() 
-               << "/"             << time.total_steps() << boil::endl;
-    boil::oout << "#                       " << boil::endl;
-    boil::oout << "########################" << boil::endl;
-
     /*------------------------+
     |  solve energy equation  |
     +------------------------*/
     enthFD.discretize();
     enthFD.new_time_step();
-    enthFD.solve(ResRat(1e-16),"enthalpy");
+    enthFD.solve(ResRat(1e-4));
 
     /*---------------+
     |  phase change  |
@@ -281,58 +298,39 @@ main(int argc, char * argv[]) {
 
     for_m(m)
       for_avmijk(xyz,m,i,j,k)
-        xyz[m][i][j][k]=0.0;
+	xyz[m][i][j][k]=0.0;
 
     ns.grad(press);
-    ns.solve(ResRat(0.01));
+    ns.solve(ResRat(0.001));
 
     p = 0.0;
-    //if (multigrid.vcycle(1e-8)) OMS(converged);
-    if (multigrid.vcycle(ResRat(1e-4))) OMS(converged);
-    //pr.solve(1e-12);
+    if (multigrid.vcycle(ResRat(5e-7))) OMS(converged);
     p.exchange();
     ns.project(p);
     press += p;
     press.exchange();
 
-#if 0
-    /* this part does not work in parallel computation */
-    real dltp = press[1][1][1];
-    for_vijk(press,i,j,k)
-      press[i][j][k] -= dltp;
-#endif
+    //exit(0);
 
     /*---------------------------+
     |  solve transport equation  |
     +---------------------------*/
     cold=c;
-    for_m(m)
-      bndclrold(m) = bndclr(m);
+#ifndef USE_VOF
     conc.advance();
-
-#if 1 
-    for_avi(c,i) {
-      for_avjk(c,j,k) {
-        c[i][j][k] = c[i][1+boil::BW][1+boil::BW];
-      }
-    }
-    c.bnd_update();
-    c.exchange_all();
-    conc.ancillary();
+#else
+    conc.advance_with_extrapolation(true,ResRat(1e-4),uvw,f,
+                                    &liquid,&uvw_1);
 #endif
-   
+ 
     conc.front_minmax();
-    boil::oout<<"x-min-front= "<<time.current_time()<<" "
-              <<conc.get_xminft()<<"\n";
     conc.totalvol();
 
     for_avijk(c,i,j,k){
       step[i][j][k]=c[i][j][k];
     }
 
-#ifdef BDC
-    pc.modify_vel(uvw,bndclr,bndclrold);
-#else
+#ifndef USE_VOF
     pc.modify_vel(uvw,c,cold);
 #endif
 
@@ -341,6 +339,7 @@ main(int argc, char * argv[]) {
     }
   }
 
+#if 1
   std::ofstream fout;
   fout.open("velocity-u.txt");
   Comp m=Comp::u();
@@ -357,15 +356,16 @@ main(int argc, char * argv[]) {
 
   fout.open("temperature.txt");
   for_vi(tpr,i) {
-       fout << tpr.xc(i) << "  " << tpr[i][1][1] << "\n";
+        fout << tpr.xc(i) << "  " << tpr[i][1][1] << "\n";
   }
   fout.close();
 
   fout.open("mdot.txt");
   for_vi(tpr,i) {
-       fout << mdot.xc(i) << "  " << mdot[i][1][1] << "\n";
+        fout << c.xc(i) << "  " << mdot[i][1][1] << "\n";
   }
   fout.close();
+#endif
 
   boil::oout << "finished" << boil::endl;
   boil::timer.stop();
