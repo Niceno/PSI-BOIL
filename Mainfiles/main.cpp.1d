@@ -488,7 +488,7 @@ int main(int argc, char * argv[]) {
     boil::cart.max_real(&mflx_max);
     mflx = mflx_max;
     for_avijk(c,i,j,k) {
-      if((*conc.topo.adens)[i][j][k]>0.0 && (*conc.topo.adens)[i-1][j][k]>0.0) {
+      if(i>boil::BW&&(*conc.topo.adens)[i][j][k]>0.0 && (*conc.topo.adens)[i-1][j][k]>0.0) {
         (*conc.topo.adens)[i][j][k] = 0.0;
       }
     }

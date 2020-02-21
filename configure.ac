@@ -29,6 +29,7 @@ AC_OUTPUT(Makefile                                                      \
           Src/Equation/Centered/EnthalpyFD/EnthalpyFDaxisym/Makefile    \
           Src/Equation/Centered/EnthalpyFD/Makefile                     \
           Src/Equation/Centered/Concentration/Makefile                  \
+          Src/Equation/Centered/ConcentrationTP/Makefile                \
           Src/Equation/Centered/Pressure/Makefile                       \
           Src/Equation/Centered/PhaseChange/Makefile                    \
           Src/Equation/Centered/PhaseChangeVOF/Makefile                 \
@@ -46,6 +47,8 @@ AC_OUTPUT(Makefile                                                      \
           Src/Equation/Heaviside/MarchingSquares/Makefile               \
           Src/Equation/Heaviside/Makefile                               \
           Src/Equation/Nucleation/Makefile                              \
+          Src/Equation/Tifmodel/Clapeyron/Makefile                      \
+          Src/Equation/Tifmodel/Schrage/Makefile                        \
           Src/Equation/Tifmodel/Makefile                                \
           Src/Equation/Topology/Makefile                                \
           Src/Boundary/Makefile                                         \

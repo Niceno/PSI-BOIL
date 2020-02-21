@@ -6,6 +6,8 @@ libMarchingSquares_a_SOURCES = marching_squares.h                           \
                                marching_squares_evaluate_nodes.cpp          \
                                marching_squares_extract_line_parameters.cpp \
                                marching_squares_line_density.cpp            \
+                               marching_squares_surface.cpp                 \
+                               marching_squares_status.cpp                  \
                                marching_squares_topology.cpp                \
                                marching_squares_vf.cpp  
 

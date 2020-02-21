@@ -5,7 +5,6 @@ libPhaseChangeVOF_a_SOURCES = phasechangevof.h                           \
                               phasechangevof_cal_gradt_ib.cpp            \
                               phasechangevof_cal_massflux.cpp            \
                               phasechangevof_correct_gradt_at_ib.cpp     \
-                              phasechangevof_extrapolate.cpp             \
                               phasechangevof_second_order_difference.cpp \
                               phasechangevof_gradt.cpp                   \
                               phasechangevof_gradt_xyz.cpp               \

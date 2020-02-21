@@ -16,6 +16,7 @@ class MarchingCubes : public Heaviside {
     ~MarchingCubes() {};
 
     virtual void evaluate_nodes();
+    virtual int status(const int i, const int j, const int k);
     virtual real vf(const int i, const int j, const int k);
     virtual real ad(const int i, const int j, const int k);
 
@@ -26,15 +27,13 @@ class MarchingCubes : public Heaviside {
       exit(0);
     }
 
-    real surface(const Sign sig, const Comp & mcomp,
-                 const int i, const int j, const int k);
+    virtual real surface(const Sign sig, const Comp & mcomp,
+                         const int i, const int j, const int k);
 
   protected:
     int construct_grid(const int i, const int j, const int k,
                        CELL3D & grid);
 
-    real cellface_af(const Sign sig, const Comp & mcomp,
-                     const int i, const int j, const int k);
     VAL2D cellface_covered(const Sign sig, const Comp & mcomp,
                            const int i, const int j, const int k);
 

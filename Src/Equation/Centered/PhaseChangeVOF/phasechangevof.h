@@ -82,9 +82,6 @@ class PhaseChangeVOF : public Centered {
     void insert_bc_gradt_at_walls(const Scalar * diff_eddy = NULL);
     void gradt(const Scalar * diff_eddy = NULL);
 
-    //void ext_gradt(Scalar & sca, const int iext, const Comp mcomp);
-    void extrapolate(Scalar & sca, const int iext);
-
     void near_wall_model(const Scalar * diff_eddy = NULL);
 
     void calculate_node_temperature(const Scalar * diff_eddy = NULL);
@@ -140,19 +137,16 @@ class PhaseChangeVOF : public Centered {
     Scalar nx;
     Scalar ny;
     Scalar nz;
-    Scalar stmp,stmp2,delta;
     Vector fs;
     Vector bndtpr;
     Scalar M;
 
     const TIF & tifmodel;
     const Sign sig; /* pos: liquid is phi=1 and vice versa */
+    Topology * topo;
  
-    real tol_ext;
-
     real rhol, rhov, lambdal, lambdav, cpl, cpv;
-    real rhoave, rhodlt;
-    real dxmin, clrsurf, pi;
+    real clrsurf;
     real turbP;
     real epsl; 
     real smdot_pos, smdot_neg, smdot_pos_macro, smdot_neg_macro;

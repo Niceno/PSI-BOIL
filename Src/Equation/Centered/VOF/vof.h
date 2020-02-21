@@ -76,6 +76,8 @@ class VOF : public Centered {
                               const Sign & sig, const bool flagging);
 
     virtual Scalar & color() {return phi;}
+    const Vector & flow() { return vflow; }
+    Heaviside * heaviside() { return heavi; }
 
     void interfacial_flagging(const Scalar & scp);
 
@@ -268,7 +270,7 @@ class VOF : public Centered {
     Scalar pold_pos, pold_neg; /* extrapolation */
     ScalarInt iflag,tempflag,tempflag2;
 
-    Vector fs;
+    Vector fs, vflow;
     Scalar adens;
     Scalar mx,my,mz;/* normal to interface, in real space */
 

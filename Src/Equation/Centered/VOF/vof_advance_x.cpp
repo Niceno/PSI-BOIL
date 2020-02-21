@@ -52,6 +52,7 @@ void VOF::advance_x(Scalar & scp) {
     // update stmp
     stmp[i-1][j][k] = stmp[i-1][j][k] - f;
     stmp[i  ][j][k] = stmp[i  ][j][k] + f;
+    vflow[m][i][j][k] = f;
 
   }
 

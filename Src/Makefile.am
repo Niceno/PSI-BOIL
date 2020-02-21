@@ -10,6 +10,7 @@ SUBDIRS = Equation/Staggered/Momentum                              \
           Equation/Centered/EnthalpyFD/EnthalpyFDaxisym            \
           Equation/Centered/EnthalpyFD                             \
           Equation/Centered/Concentration                          \
+          Equation/Centered/ConcentrationTP                        \
           Equation/Centered/Pressure                               \
           Equation/Centered/PhaseChange                            \
           Equation/Centered/PhaseChangeVOF                         \
@@ -25,6 +26,8 @@ SUBDIRS = Equation/Staggered/Momentum                              \
           Equation/Heaviside/MarchingSquares                       \
           Equation/Heaviside                                       \
           Equation/Nucleation                                      \
+          Equation/Tifmodel/Clapeyron                              \
+          Equation/Tifmodel/Schrage                                \
           Equation/Tifmodel                                        \
           Equation/Topology                                        \
           Monitor/Rack                                             \
@@ -64,6 +67,7 @@ LDADD = Equation/Staggered/Momentum/libMomentum.a                             \
         Equation/Centered/EnthalpyFD/EnthalpyFDaxisym/libEnthalpyFDaxisym.a   \
         Equation/Centered/EnthalpyFD/libEnthalpyFD.a                          \
         Equation/Centered/Concentration/libConcentration.a                    \
+        Equation/Centered/ConcentrationTP/libConcentrationTP.a                \
         Equation/Centered/Pressure/libPressure.a                              \
         Equation/Centered/PhaseChange/libPhaseChange.a                        \
         Equation/Centered/PhaseChangeVOF/libPhaseChangeVOF.a                  \
@@ -79,6 +83,8 @@ LDADD = Equation/Staggered/Momentum/libMomentum.a                             \
 	Equation/Heaviside/MarchingSquares/libMarchingSquares.a               \
 	Equation/Heaviside/libHeaviside.a                                     \
 	Equation/Nucleation/libNucleation.a                                   \
+        Equation/Tifmodel/Clapeyron/libClapeyron.a                            \
+        Equation/Tifmodel/Schrage/libSchrage.a                                \
         Equation/Tifmodel/libTif.a                                            \
         Equation/Topology/libTopology.a                                       \
         Monitor/Rack/libRack.a                                                \

@@ -62,6 +62,7 @@ void VOFaxisym::advance_z(Scalar & scp) {
     /* update stmp */
     stmp[i][j][k-1] = stmp[i][j][k-1] - f;
     stmp[i  ][j][k] = stmp[i  ][j][k] + f;
+    vflow[m][i][j][k] = f;
 
   }
 

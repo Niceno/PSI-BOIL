@@ -27,6 +27,7 @@ VOF::VOF(const Scalar & PHI,
   pold_neg(*PHI.domain() ),
   pold_pos(*PHI.domain() ),
   fs( *U.domain() ),
+  vflow( *U.domain() ),
   iflag(*PHI.domain() ),
   tempflag(*PHI.domain() ),
   tempflag2(*PHI.domain() ),
@@ -95,8 +96,10 @@ VOF::VOF(const Scalar & PHI,
   pold_neg = 0.;
   pold_pos = 0.;
 
-  for_m(m)
+  for_m(m) {
     fs(m) = (*u)(m).shape();
+    vflow(m) = (*u)(m).shape();
+  }
 
   for_m(m)
     for_avmijk(fs,m,i,j,k)

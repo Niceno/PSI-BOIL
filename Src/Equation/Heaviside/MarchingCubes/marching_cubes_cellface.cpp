@@ -11,8 +11,8 @@
    |       |
    1-------2 
 */
-real MarchingCubes::cellface_af(const Sign sig, const Comp & mcomp,
-                                const int i, const int j, const int k) {
+real MarchingCubes::surface(const Sign sig, const Comp & mcomp,
+                            const int i, const int j, const int k) {
   return (cellface_covered(sig,mcomp,i,j,k)).value;
 }
 

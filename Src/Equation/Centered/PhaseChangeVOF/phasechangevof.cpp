@@ -9,7 +9,7 @@ PhaseChangeVOF::PhaseChangeVOF(const Scalar & MDOT,
                                const Scalar & VFS,
                                const Scalar & VS,
                                const Vector & U, 
-                               Topology & topo,
+                               Topology & TOPO,
                                const TIF & TIFMODEL,
                                Times & T, 
                                Matter * f,
@@ -21,16 +21,17 @@ PhaseChangeVOF::PhaseChangeVOF(const Scalar & MDOT,
   Centered( MDOT.domain(), MDOT, VS, & U, T, f, s, NULL ),
   tpr(&TPR),
   tprs(&TPRS),
-  clr(topo.clr),
+  clr(TOPO.clr),
   vf(&VF),
   vfs(&VFS),
   M(&MFLX),
-  nx(topo.nx),
-  ny(topo.ny),
-  nz(topo.nz),
-  fs(topo.fs),
-  adens(topo.adens),
-  iflag(topo.iflag),
+  topo(&TOPO),
+  nx(TOPO.nx), /* these are aliases for easier use */
+  ny(TOPO.ny),
+  nz(TOPO.nz),
+  fs(TOPO.fs),
+  adens(TOPO.adens),
+  iflag(TOPO.iflag),
   bndtpr  ( *U   .domain() ),
   txv     ( *MDOT.domain()),
   tyv     ( *MDOT.domain()),
@@ -40,9 +41,6 @@ PhaseChangeVOF::PhaseChangeVOF(const Scalar & MDOT,
   tzl     ( *MDOT.domain()),
   tnl     ( *MDOT.domain()),
   tnv     ( *MDOT.domain()),
-  stmp    ( *MDOT.domain()),
-  stmp2   ( *MDOT.domain()),
-  delta   ( *MDOT.domain()),
   tempflag( *MDOT.domain()),
   tifmodel(TIFMODEL),
   sig(SIG)
@@ -55,9 +53,6 @@ PhaseChangeVOF::PhaseChangeVOF(const Scalar & MDOT,
   tzl      = MDOT.shape();
   tnl      = MDOT.shape();
   tnv      = MDOT.shape();
-  stmp     = MDOT.shape();
-  stmp2    = MDOT.shape();
-  delta    = MDOT.shape();
   tempflag = MDOT.shape();
   for_m(m) bndtpr(m) = U(m).shape(); /* a mistake? */
 
@@ -82,22 +77,17 @@ PhaseChangeVOF::PhaseChangeVOF(const Scalar & MDOT,
   /* set arguments */
   rhol = fluid()->rho(1);
   rhov = fluid()->rho(0);
-  rhoave = 0.5*(rhol+rhov);
-  rhodlt = fabs(rhol-rhov);
   lambdal = fluid()->lambda(1);
   lambdav = fluid()->lambda(0);
   cpl = fluid()->cp(1);
   cpv = fluid()->cp(0);
 
   /* set constants */
-  pi = acos(-1.0);
   clrsurf = 0.5;
   turbP = 0.9;
 
-  tol_ext = 1e-7;
   epsl = 5.0e-2;
   //epsl = 1.0e-2;
-  dxmin = dom->dxyz_min();
 
   near_wall_modelling = false;
 

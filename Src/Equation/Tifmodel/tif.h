@@ -13,39 +13,26 @@
 class TIF {
   public:
     TIF(const real tref); 
-    TIF(const real tref, 
-        Matter * flu,
-        const Scalar & adens,
-        const Scalar & mflx,
-        const Scalar * pres = NULL);
+    TIF(const real tref, const Scalar & s); 
     ~TIF() {}
 
     void update_tifold() {
-      for_vijk(tifold,i,j,k) 
-        tifold[i][j][k] = tif[i][j][k];
+      tifold = tif;
       store_tif = true;
-      tifold.exchange();
     }
     void tint_field(const bool newstep = true);
 
-    inline real get_ur() { return factor; }
+    inline real get_ur() const { return factor; }
     inline void set_ur(const real factnew) {
       factor = factnew;
       boil::oout<<"TIFmodel: Underrelaxation factor = "<<factnew<<boil::endl;
     }
 
-    inline real tref() { return tr; }
+    inline real tref() const { return tr; }
     inline void set_tref(const real tnew) {
       tr = tnew;
       boil::oout<<"TIFmodel: Tref = "<<tnew<<boil::endl;
     }
-
-    inline real get_mass_resistance() { return mresis; }
-    inline void set_mass_resistance(const real mresisnew) {
-      mresis = mresisnew;
-      boil::oout<<"TIFmodel: Mass transfer resistance= "<<mresisnew<<boil::endl;
-    }
-
 
     Scalar tif, tifold;
 
@@ -57,35 +44,23 @@ class TIF {
     real Tint_old(const int i, const int j, const int k) const; 
 
     void set_weak_limiting(const real tmin, const real tmax);
-    void set_strong_limiting(const Scalar * tpr,
-                             const Scalar * clr,
-                             const real clrsurf);
 
   protected:
     real factor; /* under-relaxation factor */
     real tmin, tmax;
-    bool weaklim, stronglim;
-    real clrsurf;
+    bool weaklim;
 
     bool store_tif,variable_tif;
-    real tr, mresis, rhol;
+    real tr;
 
-    const Matter * fluid() const {return flu;}
-    Matter * flu;
+    const Scalar * adens;
 
-    const Scalar mflx;
-    const Scalar adens;
-    const Scalar * dpres;
-    const Scalar * clr;
-    const Scalar * tpr;
-
-    void Pressure_effect();
-    void Mass_src_effect();
-    void Extend_tint    ();
+    virtual void model() {};
+    void extend_tint();
 
     bool Vicinity(const int i, const int j, const int k);
     bool Interface(const int i, const int j, const int k);
-    inline real Underrelaxation(const real tintnew, const real tifold);
+    inline real underrelaxation(const real tintnew, const real tifold);
 };
 
 #endif

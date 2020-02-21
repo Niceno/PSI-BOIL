@@ -180,6 +180,7 @@ class CIPCSL2 : public Centered {
 
     Topology topo;
     void ancillary();
+    Heaviside * heaviside() { return heavi; }
 
   protected:
     void bnd_wall_kappa();

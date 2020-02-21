@@ -31,8 +31,11 @@ class Heaviside { /* this class is an abstract class! */
 
     /* pure virtual functions */
     virtual void evaluate_nodes() = 0;
+    virtual int status(const int i, const int j, const int k) = 0;
     virtual real ad(const int i, const int j, const int k) = 0;
     virtual real vf(const int i, const int j, const int k) = 0;
+    virtual real surface(const Sign sig, const Comp & mcomp,
+                         const int i, const int j, const int k) = 0;
 
     virtual void topology(Topology & topo, const real tol_wall, 
                           const bool use_interp, const bool use_subgrid) = 0;
