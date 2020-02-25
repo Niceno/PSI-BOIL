@@ -4,7 +4,7 @@
 #include <fenv.h>
 //#define USE_BNDCLR
 //#define USE_CARTESIAN
-#define USE_CONTINUOUS
+//#define USE_CONTINUOUS
 
 #define _GNU_SOURCE 1
 #if 1
