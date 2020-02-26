@@ -16,9 +16,7 @@ static void __attribute__ ((constructor)) trapfpe(void)
 #define USE_SOLID
 #define SMALL
 //#define SETUP_ONLY
-#ifndef USE_SOLID
-  #define USE_BOTTOM_DIRICHLET
-#endif
+#define USE_BOTTOM_DIRICHLET
 
 /******************************************************************************/
 int main(int argc, char ** argv) {
@@ -51,8 +49,8 @@ int main(int argc, char ** argv) {
   const real tsat0 = 0.0;
   const real tout = tsat0;
 
-  const real cangle = 65.;
-  const real twall = tsat0 + 23.;
+  const real cangle = 30.;
+  const real twall = tsat0 + 10.;
   const real tsat0_K = 373.12;
 
   const real twall0 = twall;
@@ -96,16 +94,16 @@ int main(int argc, char ** argv) {
   const real initdtcoef = 1./10.;
 
   /* cfl with and without interfaces */
-  const real cfl_with = 0.05;
+  const real cfl_with = 0.1; //0.05
   const real cfl_wo   = 0.2;
 
 /* ------------ optional simulation settings */
 
   /* multigrid */
-  const bool multigrid_stop_if_diverging = true;
-  //const bool multigrid_stop_if_diverging = false;
+  //const bool multigrid_stop_if_diverging = true;
+  const bool multigrid_stop_if_diverging = false;
 
-  const int multigrid_min_cycles = 3;
+  const int multigrid_min_cycles = 10;
   const int multigrid_max_cycles = 10+2*gLevel;
 
   /* vof */
@@ -188,9 +186,9 @@ int main(int argc, char ** argv) {
   NZ += NZ1;
 #endif
   const int NZ2 = NX2;
-  NZ += NZ2;
   const int NZ3 = NX3;
 #ifndef SMALL
+  NZ += NZ2;
   NZ += NZ3;
 #endif
 
@@ -221,7 +219,7 @@ int main(int argc, char ** argv) {
   /*----------+
   |  grid(s)  |
   +----------*/
-  Grid1D gx1( Range<real>(0.0,LX1), NX1, Periodic::no() );
+  Grid1D gx1( Range<real>(0.0,LX1), NX1, Periodic::no(), BndGrid::symmetry(), BndGrid::wall() );
   Grid1D gx2( Range<real>(LX1,LX2),
               Range<real>(DX0,DX1),
               NX2, Periodic::no() );
@@ -241,8 +239,10 @@ int main(int argc, char ** argv) {
   Grid1D gzf_large(gz1, gz2, gz3, Periodic::no());
 
 #ifdef SMALL
-  Grid1D & gx = gx_small;
-  Grid1D & gzf = gzf_small;
+  //Grid1D & gx = gx_small;
+  Grid1D & gx = gx1;
+  //Grid1D & gzf = gzf_small;
+  Grid1D & gzf = gz1;
 #else
   Grid1D & gx = gx_large;
   Grid1D & gzf = gzf_large;

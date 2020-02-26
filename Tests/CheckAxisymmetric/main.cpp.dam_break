@@ -205,7 +205,7 @@ int main(int argc, char * argv[]) {
     boil::oout << "#                    #" << boil::endl;
     boil::oout << "######################" << boil::endl;
 
-      /*--------------------+
+    /*--------------------+
     |  initial condition  |
     +--------------------*/
     for_m(m)
@@ -233,6 +233,9 @@ int main(int argc, char * argv[]) {
 
     cold.bnd_update();
     cold.exchange_all();
+
+    conc.color_to_vf(cold,c);
+    conc.reconstruct_geometry();
   }
   input.close();
 
@@ -244,8 +247,7 @@ int main(int argc, char * argv[]) {
   AC multigrid( &pr );
   multigrid.min_cycles(6);  // 6
 
-  conc.color_to_vf(cold,c);
-  conc.reconstruct_geometry();
+  conc.init();
   //conc.test_reconstruction(conc.color(),c);
   conc.totalvol();
 
