@@ -1,9 +1,9 @@
 #include "vof.h"
 
 /******************************************************************************/
-void VOF::insert_bc_curv_HFmixed(const Scalar & scp, 
-                                 const Comp ctangential, const Comp cnormal,
-                                 const Sign sig) {
+void VOF::insert_bc_curv_HFparallel(const Scalar & scp, 
+                                    const Comp ctangential, const Comp cnormal,
+                                    const Sign sig) {
 /***************************************************************************//**
 *  \brief Calculate curvature using hybrid height-function/divergence-of-normal
 *         approach in 2D geometry. The detachment criterion is set.
@@ -52,13 +52,13 @@ void VOF::insert_bc_curv_HFmixed(const Scalar & scp,
 
   if(!detachment_model.initialized()||!detachment_model.detached()) {
 
-    real kappa_wall = wall_curv_HFmixed_kernel(h0,h1,dzzc0,dzzt0,
-                                               mult_wall,
-                                               cangle);
+    real kappa_wall = wall_curv_HFparallel_kernel(h0,h1,dzzc0,dzzt0,
+                                                  mult_wall,
+                                                  cangle);
     
-    real kappa_above = wall_curv_HFmixed_kernel(h0,h1,h2,
-                                                dzzt0,dzzc1,dzzt1,
-                                                mult_wall);
+    real kappa_above = wall_curv_HFparallel_kernel(h0,h1,h2,
+                                                   dzzt0,dzzc1,dzzt1,
+                                                   mult_wall);
    
     for_ijk(i,j,k) {
       if(dom->ibody().on(i,j,k)) {
@@ -66,7 +66,7 @@ void VOF::insert_bc_curv_HFmixed(const Scalar & scp,
           if( (scp.xn(i  )<h0) && (h0<scp.xn(i+1)) ) {
             kappa[i][j][k] = kappa_wall;
             tempflag[i][j][k] = 1;
-#if 0
+#if 1
           } else {
             kappa[i][j][k] = kappa_wall;
             tempflag[i][j][k] = 2;
@@ -82,7 +82,7 @@ void VOF::insert_bc_curv_HFmixed(const Scalar & scp,
           if( (scp.xn(i  )<h1) && (h1<scp.xn(i+1)) ) {
             kappa[i][j][k+1] = kappa_above;
             tempflag[i][j][k+1] = 1;
-#if 0
+#if 1
           } else {
             kappa[i][j][k+1] = kappa_above;
             tempflag[i][j][k+1] = 2;

@@ -1,13 +1,13 @@
 #include "vof.h"
 
 /******************************************************************************/
-real VOF::wall_curv_HFmixed_kernel(const real hc, const real hp,
-                                   const real dc, const real dp,
-                                   const real mult,
-                                   const real cang) {
+real VOF::wall_curv_HFparallel_kernel(const real hc, const real hp,
+                                      const real dc, const real dp,
+                                      const real mult,
+                                      const real cang) {
 /***************************************************************************//**
 *  \brief Calculate curvature using hybrid height-function/divergence-of-normal
-*         approach in 2D geometry.
+*         approach in 2D geometry, heights constructed in parallel direction.
 *
 *     output: kappa
 *******************************************************************************/
@@ -38,12 +38,14 @@ real VOF::wall_curv_HFmixed_kernel(const real hc, const real hp,
 }
 
 /******************************************************************************/
-real VOF::wall_curv_HFmixed_kernel(const real hm, const real hc, const real hp,
-                                   const real dm, const real dc, const real dp,
-                                   const real mult) {
+real VOF::wall_curv_HFparallel_kernel(const real hm,
+                                      const real hc, const real hp,
+                                      const real dm, const real dc,
+                                      const real dp,
+                                      const real mult) {
 /***************************************************************************//**
 *  \brief Calculate curvature using hybrid height-function/divergence-of-normal
-*         approach in 2D geometry.
+*         approach in 2D geometry, heights constructed in parallel direction.
 *
 *     output: kappa
 *******************************************************************************/

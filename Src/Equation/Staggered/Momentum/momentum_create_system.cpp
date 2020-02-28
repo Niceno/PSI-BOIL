@@ -330,6 +330,7 @@ void Momentum::create_system(const Scalar * mu_eddy) {
     for( int b=0; b<u.bc(m).count(); b++ ) {
 
       if( u.bc(m).type(b) == BndType::symmetry() ||
+          u.bc(m).type(b) == BndType::neumann() || /* same as symmetry */
           u.bc(m).type(b) == BndType::pseudo() ||
           u.bc(m).type(b) == BndType::outlet() ) {
 

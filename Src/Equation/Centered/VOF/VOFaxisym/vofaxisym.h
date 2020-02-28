@@ -33,7 +33,7 @@ class VOFaxisym : public VOF {
        Ktmp = phi.shape();
 
        set_normal_vector_method_all(NormMethod::ElviraXZ());
-       set_wall_curv_method(CurvMethod::HFmixedXZ(),Sign::pos());
+       set_wall_curv_method(CurvMethod::HFparallelXZ(),Sign::pos());
        set_topo_method(TopoMethod::Hybrid());
 
        reconstruction_tolerance = 1e-4;
@@ -92,13 +92,20 @@ class VOFaxisym : public VOF {
                           // ,int & i, int & j, int & k, bool & ebool
                            );
     
-    virtual real wall_curv_HFmixed_kernel(const real hc, const real hp,
-                                          const real dc, const real dp,
-                                          const real mult,
-                                          const real cang);
-    virtual real wall_curv_HFmixed_kernel(const real hm, const real hc, const real hp,
-                                          const real dm, const real dc, const real dp,
-                                          const real mult);
+    virtual real wall_curv_HFnormal_kernel(const real x0, const real hm,
+                                           const real hc, const real hp,
+                                           const real dm,
+                                           const real dc, const real dp,
+                                           const real mult, const real cang);
+    virtual real wall_curv_HFparallel_kernel(const real hc, const real hp,
+                                             const real dc, const real dp,
+                                             const real mult,
+                                             const real cang);
+    virtual real wall_curv_HFparallel_kernel(const real hm,
+                                             const real hc, const real hp,
+                                             const real dm,
+                                             const real dc, const real dp,
+                                             const real mult);
 
     //virtual real calc_v(const real alpha, const real vma, const real vmb, const real vmc);
     real calc_v_axisymmetric(real nnx, real alp, real eta0, real & Kp);

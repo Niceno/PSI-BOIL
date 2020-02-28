@@ -2,17 +2,6 @@
 #define LOPEZ_COLORING
 #define LOPEZ_SMOOTHING
 
-/* parameters */
-static const int mof(3); /* symmetric stencil is constructed */
-static const int nof(1);
-static const int majorext(mof*2+1);
-static const int minorext(nof*2+1);
-/* warning: if stencil size is changed in the minorext direction,
-   the kernel must be properly adjusted! */
-
-static const int iterloop(5); /* 2019.07.09 */
-static const real theta_crit = 0.8; /* Eq. (6) in Lopez's paper */
-
 /******************************************************************************/
 void VOF::curv_HF() {
 /***************************************************************************//**
@@ -27,6 +16,11 @@ void VOF::curv_HF() {
 *
 *     output: kappa
 *******************************************************************************/
+
+  const int & mof = hf_set.mof;
+  const int & nof = hf_set.nof;
+  const int & majorext = hf_set.majorext;
+  const int & minorext = hf_set.minorext;
 
   /*-----------------------------------------------------------------+
   |  Step 1: calculate normal vector                                 |
@@ -61,7 +55,7 @@ void VOF::curv_HF() {
   /* detachment treatment = flooding of walls */
   if(detachment_model.initialized()&&detachment_model.detached()) {
     /* this is the only implemented instance atm */
-    assert(wall_curv_method==CurvMethod::HFmixedXZ());
+    assert(wall_curv_method==CurvMethod::HFparallelXZ());
 
     flood(phi,-mult_wall);
     normal_vector_near_bnd(phi,norm_method_curvature);
@@ -152,21 +146,37 @@ void VOF::curv_HF() {
 
         /* check stencil size */
         int imin=-mof;
-        int imax=mof;  /* normal stencil size 2*mof+1 */
+        int imax= mof;  /* normal stencil size 2*mof+1 */
 
         /* limit stencil size for cut-stencil */
         if(iminc) imin=std::max(-mof,si()-i);
         if(imaxc) imax=std::min( mof,ei()-i);
 
-        for(int ii(2); ii<=mof; ++ii) {
+        /* because of ghost grid in solid/walls */
+        int imin_grid = imin;
+        int imax_grid = imax;
+        
+        /* update at walls */
+        if( iminw && -mof<si()-i ) {
+          imin = si()-i-1;
+          imin_grid = imin+1;
+        }
+        if( imaxw &&  mof>ei()-i ) {
+          imax = ei()-i+1;
+          imax_grid = imax-1;
+        }
+
+        for(int ii(1); ii<=mof; ++ii) {
           if(dom->ibody().off(i-ii,j,k)) {
-            imin=-ii+1;
+            imin = -ii;
+            imin_grid = imin+1;
             break;
           }
         }
-        for(int ii(2); ii<=mof; ++ii) {
+        for(int ii(1); ii<=mof; ++ii) {
           if(dom->ibody().off(i+ii,j,k)) {
-            imax=ii-1;
+            imax = ii;
+            imax_grid = imax-1;
             break;
           }
         }
@@ -182,6 +192,22 @@ void VOF::curv_HF() {
             for(int ii(imin); ii<=imax; ++ii) {
               gridstencil[jj+nof][kk+nof][ii+mof] = phi.dxc(i+ii);
               stencil[jj+nof][kk+nof][ii+mof] = std::min(1.0,std::max(0.0,phi[i+ii][j+jj][k+kk]));
+            }
+          }
+        }
+
+        /* correct grid stencil near solid/walls */
+        if(imin_grid != imin) {
+          for(int jj(-nof); jj<=nof; ++jj) {
+            for(int kk(-nof); kk<=nof; ++kk) {
+              gridstencil[jj+nof][kk+nof][imin+mof] = phi.dxc(i+imin_grid);
+            }
+          }
+        }
+        if(imax_grid != imax) {
+          for(int jj(-nof); jj<=nof; ++jj) {
+            for(int kk(-nof); kk<=nof; ++kk) {
+              gridstencil[jj+nof][kk+nof][imax+mof] = phi.dxc(i+imax_grid);
             }
           }
         }
@@ -204,21 +230,37 @@ void VOF::curv_HF() {
 
         /* check stencil size */
         int jmin=-mof;
-        int jmax=mof;  /* normal stencil size 2*mof+1 */
+        int jmax= mof;  /* normal stencil size 2*mof+1 */
 
         /* limit stencil size for cut-stencil */
         if(jminc) jmin=std::max(-mof,sj()-j);
         if(jmaxc) jmax=std::min( mof,ej()-j);
 
-        for(int jj(2); jj<=mof; ++jj) {
+        /* because of ghost grid in solid/walls */
+        int jmin_grid = jmin;
+        int jmax_grid = jmax;
+        
+        /* update at walls */
+        if( jminw && -mof<sj()-j ) {
+          jmin = sj()-j-1;
+          jmin_grid = jmin+1;
+        }
+        if( jmaxw &&  mof>ej()-j ) {
+          jmax = ej()-j+1;
+          jmax_grid = jmax-1;
+        }
+
+        for(int jj(1); jj<=mof; ++jj) {
           if(dom->ibody().off(i,j-jj,k)) {
-            jmin=-jj+1;
+            jmin = -jj;
+            jmin_grid = jmin+1;
             break;
           }
         }
-        for(int jj(2); jj<=mof; ++jj) {
+        for(int jj(1); jj<=mof; ++jj) {
           if(dom->ibody().off(i,j+jj,k)) {
-            jmax=jj-1;
+            jmax = jj;
+            jmax_grid = jmax-1;
             break;
           }
         }
@@ -234,6 +276,22 @@ void VOF::curv_HF() {
             for(int jj(jmin); jj<=jmax; ++jj) {
               gridstencil[ii+nof][kk+nof][jj+mof] = phi.dyc(j+jj);
               stencil[ii+nof][kk+nof][jj+mof] = std::min(1.0,std::max(0.0,phi[i+ii][j+jj][k+kk]));
+            }
+          }
+        }
+
+        /* correct grid stencil near solid/walls */
+        if(jmin_grid != jmin) {
+          for(int ii(-nof); ii<=nof; ++ii) {
+            for(int kk(-nof); kk<=nof; ++kk) {
+              gridstencil[ii+nof][kk+nof][jmin+mof] = phi.dyc(j+jmin_grid);
+            }
+          }
+        }
+        if(jmax_grid != jmax) {
+          for(int ii(-nof); ii<=nof; ++ii) {
+            for(int kk(-nof); kk<=nof; ++kk) {
+              gridstencil[ii+nof][kk+nof][jmax+mof] = phi.dyc(j+jmax_grid);
             }
           }
         }
@@ -256,21 +314,37 @@ void VOF::curv_HF() {
 
         /* check stencil size */
         int kmin=-mof;
-        int kmax=mof;  /* normal stencil size 2*mof+1 */ 
+        int kmax= mof;  /* normal stencil size 2*mof+1 */ 
 
         /* limit stencil size for cut-stencil */
         if(kminc) kmin=std::max(-mof,sk()-k);
         if(kmaxc) kmax=std::min( mof,ek()-k);
 
-        for(int kk(2); kk<=mof; ++kk) {
+        /* because of ghost grid in solid/walls */
+        int kmin_grid = kmin;
+        int kmax_grid = kmax;
+        
+        /* update at walls */
+        if( kminw && -mof<sk()-k ) {
+          kmin = sk()-k-1;
+          kmin_grid = kmin+1;
+        }
+        if( kmaxw &&  mof>ek()-k ) {
+          kmax = ek()-k+1;
+          kmax_grid = kmax-1;
+        }
+
+        for(int kk(1); kk<=mof; ++kk) {
           if(dom->ibody().off(i,j,k-kk)) {
-            kmin=-kk+1;
+            kmin = -kk;
+            kmin_grid = kmin+1;
             break;
           }
         }
-        for(int kk(2); kk<=mof; ++kk) {
+        for(int kk(1); kk<=mof; ++kk) {
           if(dom->ibody().off(i,j,k+kk)) {
-            kmax=kk-1;
+            kmax = kk;
+            kmax_grid = kmax-1;
             break;
           }
         }
@@ -286,6 +360,22 @@ void VOF::curv_HF() {
             for(int kk(kmin); kk<=kmax; ++kk) {
               gridstencil[ii+nof][jj+nof][kk+mof] = phi.dzc(k+kk);
               stencil[ii+nof][jj+nof][kk+mof] = std::min(1.0,std::max(0.0,phi[i+ii][j+jj][k+kk]));
+            }
+          }
+        }
+
+        /* correct grid stencil near solid/walls */
+        if(kmin_grid != kmin) {
+          for(int ii(-nof); ii<=nof; ++ii) {
+            for(int jj(-nof); jj<=nof; ++jj) {
+              gridstencil[ii+nof][jj+nof][kmin+mof] = phi.dzc(k+kmin_grid);
+            }
+          }
+        }
+        if(kmax_grid != kmax) {
+          for(int ii(-nof); ii<=nof; ++ii) {
+            for(int jj(-nof); jj<=nof; ++jj) {
+              gridstencil[ii+nof][jj+nof][kmax+mof] = phi.dzc(k+kmax_grid);
             }
           }
         }
@@ -312,8 +402,10 @@ void VOF::curv_HF() {
   /* near-wall calculations */
   if       (wall_curv_method==CurvMethod::DivNorm()) {
     insert_bc_curv_divnorm();
-  } else if(wall_curv_method==CurvMethod::HFmixedXZ()) {
-    insert_bc_curv_HFmixed(phi,Comp::i(),Comp::k(),Sign::neg());
+  } else if(wall_curv_method==CurvMethod::HFparallelXZ()) {
+    insert_bc_curv_HFparallel(phi,Comp::i(),Comp::k(),Sign::neg());
+  } else if(wall_curv_method==CurvMethod::HFnormalXZ()) {
+    insert_bc_curv_HFnormal(phi,Comp::i(),Comp::k(),Sign::neg());
   } else if(wall_curv_method==CurvMethod::none()) {
   } else {
     /* default */
@@ -327,7 +419,8 @@ void VOF::curv_HF() {
   stmp  = kappa;
   tempflag2 = tempflag;
   
-  for(int iloop=1; iloop<iterloop; iloop++) { /* 2019.07.09 */
+  //if(false) {
+  for(int iloop=1; iloop<hf_set.iterloop; iloop++) { /* 2019.07.09 */
     for_ijk(i,j,k) {
       if(dom->ibody().off(i,j,k)) continue;
       if(tempflag[i][j][k]==0) {
@@ -396,6 +489,10 @@ void VOF::curv_HF_kernel(arr3D & stencil, const arr3D & gridstencil,
                          const bool truedir1, const bool truedir2,
                          real & kap, int & flag) {
                          //const int i, const int j, const int k) {
+
+  const int & mof = hf_set.mof;
+  const int & nof = hf_set.nof;
+  const real & theta_crit = hf_set.theta_crit;
 
   /* color is inverted if normal vector points in negative dir */
   real mult(1.0);

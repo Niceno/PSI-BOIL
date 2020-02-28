@@ -55,8 +55,9 @@ class CurvMethod {
     static const CurvMethod none()      {return CurvMethod( 0);}
     static const CurvMethod DivNorm()   {return CurvMethod( 1);}
     static const CurvMethod HF()        {return CurvMethod( 2);}
-    /* 2D method, X = wall tangent, Z = wall normal dir */
-    static const CurvMethod HFmixedXZ() {return CurvMethod( 3);}
+    /* 2D methods, X = wall tangent, Z = wall normal dir */
+    static const CurvMethod HFparallelXZ() {return CurvMethod( 3);}
+    static const CurvMethod HFnormalXZ()   {return CurvMethod( 4);}
 
     //! Prints the components name.
     friend std::ostream & operator << (std::ostream & ost, const CurvMethod & com) {
@@ -65,7 +66,8 @@ class CurvMethod {
         case( 0): ost << "none"; break;
         case( 1): ost << "DivNorm"; break;
         case( 2): ost << "HF"; break;
-        case( 3): ost << "HFmixedXZ"; break;
+        case( 3): ost << "HFparallelXZ"; break;
+        case( 4): ost << "HFnormalXZ"; break;
       }
 
       return ost;
@@ -216,3 +218,35 @@ class DetachmentModel {
     real cangleval;
     real etacrit, etacurr;
 };
+
+/////////////
+//         //
+//  HFset  //
+//         //
+/////////////
+/* this is a ravioli struct for holding HF parameters,
+ *
+ *   mof, nof, majorext, minorext --- (symmetric) grid size
+ *   iterloop --- extrapolation
+ *   theta_crit --- for 3D, Eq. (6) in Lopez's paper
+ *   blending_angle, n0square, n0, overshoot --- for 2D blending, 
+     unused at the moment (2020.02.28) */
+struct HFset {
+  HFset() : mof(3), nof(1), /* symmetric stencil is constructed */
+            majorext(mof*2+1), minorext(nof*2+1),
+            /* warning: if stencil size is changed in the minorext direction,
+                        the kernel must be properly adjusted! */
+            iterloop(5), /* 2019.07.09 */
+            theta_crit(0.8),
+            blending_angle(40./180.*boil::pi),
+            n0square(1.-1./(1.+tan(blending_angle)*tan(blending_angle))),
+            n0(sqrt(n0square)),
+            overshoot(0.5)
+  {};
+
+  const int mof, nof, majorext, minorext;
+  const int iterloop;
+  const real theta_crit;
+  const real blending_angle, n0square, n0, overshoot;
+};
+

@@ -4,20 +4,6 @@
 //#define ONLY_CYL
 //#define BLEND_CART
 
-/* parameters */
-static const int mof(3); /* symmetric stencil is constructed */
-static const int nof(1);
-static const int majorext(mof*2+1);
-static const int minorext(nof*2+1);
-/* warning: if stencil size is changed in the minorext direction,
-   the kernel must be properly adjusted! */
-static const real blending_angle = 40./180.*3.1415;//boil::pi = 0 at this point!
-static const real n0square = 1.-1./(1.+tan(blending_angle)*tan(blending_angle));
-static const real n0 = sqrt(n0square);
-
-static const int iterloop(5); /* 2019.07.09 */
-static const real overshoot(0.5);
-
 /******************************************************************************/
 void VOFaxisym::curv_HF() {
 /***************************************************************************//**
@@ -34,6 +20,12 @@ void VOFaxisym::curv_HF() {
 *
 *     output: kappa
 *******************************************************************************/
+
+  const int & mof = hf_set.mof;
+  const int & nof = hf_set.nof;
+  const int & majorext = hf_set.majorext;
+  const int & minorext = hf_set.minorext;
+  const real & overshoot = hf_set.overshoot;
 
   /*-----------------------------------------------------------------+
   |  Step 1: calculate normal vector                                 |
@@ -63,7 +55,7 @@ void VOFaxisym::curv_HF() {
   /* detachment treatment = flooding of walls */
   if(detachment_model.initialized()&&detachment_model.detached()) {
     /* this is the only implemented instance atm */
-    assert(wall_curv_method==CurvMethod::HFmixedXZ());
+    assert(wall_curv_method==CurvMethod::HFparallelXZ());
 
     flood(clr,-mult_wall);
     normal_vector_near_bnd(clr,norm_method_curvature);
@@ -245,7 +237,8 @@ void VOFaxisym::curv_HF() {
           tempflag[i][j][k] = 0;
         } else {
           /* blending factor for z-component */
-          real bfactor = ( flag_x_adj& flag_z_adj)*(abs_nz*abs_nz - n0square)/(1.-2.*n0square)
+          real bfactor = ( flag_x_adj& flag_z_adj)
+                       * ( abs_nz*abs_nz - hf_set.n0square)/(1.-2.*hf_set.n0square)
                        + ( flag_x_adj&!flag_z_adj)*0.0
                        + (!flag_x_adj& flag_z_adj)*1.0;
           if(flag_x_adj) {
@@ -305,8 +298,10 @@ void VOFaxisym::curv_HF() {
               <<boil::endl;
     exit(0);
     //bdcurv();
-  } else if(wall_curv_method==CurvMethod::HFmixedXZ()) {
-    insert_bc_curv_HFmixed(clr,Comp::i(),Comp::k(),Sign::neg());
+  } else if(wall_curv_method==CurvMethod::HFparallelXZ()) {
+    insert_bc_curv_HFparallel(clr,Comp::i(),Comp::k(),Sign::neg());
+  } else if(wall_curv_method==CurvMethod::HFnormalXZ()) {
+    insert_bc_curv_HFnormal(clr,Comp::i(),Comp::k(),Sign::neg());
   } else if(wall_curv_method==CurvMethod::none()) {
   } else {
     /* default */
@@ -319,7 +314,7 @@ void VOFaxisym::curv_HF() {
   stmp  = kappa;
   tempflag2 = tempflag;
   
-  for(int iloop=1; iloop<iterloop; iloop++) { 
+  for(int iloop=1; iloop<hf_set.iterloop; iloop++) { 
     for_ijk(i,j,k) {
       if(dom->ibody().off(i,j,k)) continue;
       if(tempflag[i][j][k]==0) {
@@ -366,24 +361,42 @@ void VOFaxisym::curv_HF() {
 void VOFaxisym::fill_stencil_x(arr2D & stencil, arr2D & gridstencil,
                                int & imin, int & imax,
                                const int i, const int j, const int k) {
+  const int & mof = hf_set.mof;
+  const int & nof = hf_set.nof;
 
   /* check stencil size */
   imin=-mof;
-  imax=mof;  /* normal stencil size 2*mof+1 */
+  imax= mof;  /* normal stencil size 2*mof+1 */
 
   /* limit stencil size for cut-stencil */
   if(iminc) imin=std::max(-mof,si()-i);
   if(imaxc) imax=std::min( mof,ei()-i);
 
-  for(int ii(2); ii<=mof; ++ii) {
+  /* because of ghost grid in solid/walls */
+  int imin_grid = imin;
+  int imax_grid = imax;
+
+  /* update at walls */
+  if( iminw && -mof<si()-i ) {
+    imin = si()-i-1;
+    imin_grid = imin+1; 
+  }
+  if( imaxw &&  mof>ei()-i ) {
+    imax = ei()-i+1;
+    imax_grid = imax-1;
+  }
+
+  for(int ii(1); ii<=mof; ++ii) {
     if(dom->ibody().off(i-ii,j,k)) {
-      imin=-ii+1;
+      imin = -ii;
+      imin_grid = imin+1;
       break;
     }
   }
-  for(int ii(2); ii<=mof; ++ii) {
+  for(int ii(1); ii<=mof; ++ii) {
     if(dom->ibody().off(i+ii,j,k)) {
-      imax=ii-1;
+      imax = ii;
+      imax_grid = imax-1;
       break;
     }
   }
@@ -401,29 +414,60 @@ void VOFaxisym::fill_stencil_x(arr2D & stencil, arr2D & gridstencil,
     }
   }
 
+  /* correct grid stencil near solid/walls */
+  if(imin_grid != imin) {
+    for(int kk(-nof); kk<=nof; ++kk) {
+      gridstencil[kk+nof][imin+mof] = clr.dxc(i+imin_grid);
+    }
+  }
+  if(imax_grid != imax) {
+    for(int kk(-nof); kk<=nof; ++kk) {
+      gridstencil[kk+nof][imax+mof] = clr.dxc(i+imax_grid);
+    }
+  }
+
   return;
 }
 
 void VOFaxisym::fill_stencil_z(arr2D & stencil, arr2D & gridstencil,
                                int & kmin, int & kmax,
                                const int i, const int j, const int k) {
+  const int & mof = hf_set.mof;
+  const int & nof = hf_set.nof;
+
   /* check stencil size */
   kmin=-mof;
-  kmax=mof;  /* normal stencil size 2*mof+1 */
+  kmax= mof;  /* normal stencil size 2*mof+1 */
 
   /* limit stencil size for cut-stencil */
   if(kminc) kmin=std::max(-mof,sk()-k);
   if(kmaxc) kmax=std::min( mof,ek()-k);
 
-  for(int kk(2); kk<=mof; ++kk) {
+  /* because of ghost grid in solid/walls */
+  int kmin_grid = kmin;
+  int kmax_grid = kmax;
+        
+  /* update at walls */
+  if( kminw && -mof<sk()-k ) {
+    kmin = sk()-k-1;
+    kmin_grid = kmin+1; 
+  }
+  if( kmaxw &&  mof>ek()-k ) {
+    kmax = ek()-k+1;
+    kmax_grid = kmax-1;
+  }
+
+  for(int kk(1); kk<=mof; ++kk) {
     if(dom->ibody().off(i,j,k-kk)) {
-      kmin=-kk+1;
+      kmin = -kk;
+      kmin_grid = kmin+1;
       break;
     }
   }
-  for(int kk(2); kk<=mof; ++kk) {
+  for(int kk(1); kk<=mof; ++kk) {
     if(dom->ibody().off(i,j,k+kk)) {
-      kmax=kk-1;
+      kmax = kk;
+      kmax_grid = kmax-1;
       break;
     }
   }
@@ -441,6 +485,18 @@ void VOFaxisym::fill_stencil_z(arr2D & stencil, arr2D & gridstencil,
     }
   }
 
+  /* correct grid stencil near solid/walls */
+  if(kmin_grid != kmin) {
+    for(int ii(-nof); ii<=nof; ++ii) {
+      gridstencil[ii+nof][kmin+mof] = clr.dzc(k+kmin_grid);
+    }
+  }
+  if(kmax_grid != kmax) {
+    for(int ii(-nof); ii<=nof; ++ii) {
+      gridstencil[ii+nof][kmax+mof] = clr.dzc(k+kmax_grid);
+    }
+  }
+
   return;
 }
 
@@ -452,6 +508,8 @@ void VOFaxisym::calculate_heights(arr2D & stencil, const arr2D & gridstencil,
                                   const real max_n, real & mult,
                                   real & hm, real & hc, real & hp, 
                                   real & nhc) {
+  const int & mof = hf_set.mof;
+  const int & nof = hf_set.nof;
 
   /* color is inverted if normal vector points in negative dir */
   mult = 1.0;

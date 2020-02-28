@@ -114,16 +114,25 @@ class VOF : public Centered {
     bool Interface(const int i, const int j, const int k);
 
     void insert_bc_curv_divnorm();
-    void insert_bc_curv_HFmixed(const Scalar & scp,
-                                const Comp ctangential, const Comp cnormal,
-                                const Sign sig);
-    virtual real wall_curv_HFmixed_kernel(const real hc, const real hp,
-                                          const real dc, const real dp,
-                                          const real mult,
-                                          const real cang);
-    virtual real wall_curv_HFmixed_kernel(const real hm, const real hc, const real hp,
-                                          const real dm, const real dc, const real dp,
-                                          const real mult);
+    void insert_bc_curv_HFnormal(const Scalar & scp,
+                                 const Comp ctangential, const Comp cnormal,
+                                 const Sign sig); 
+    void insert_bc_curv_HFparallel(const Scalar & scp,
+                                   const Comp ctangential, const Comp cnormal,
+                                   const Sign sig);
+    virtual real wall_curv_HFnormal_kernel(const real x0, const real hm,
+                                           const real hc, const real hp,
+                                           const real dm,
+                                           const real dc, const real dp,
+                                           const real mult, const real cang);
+    virtual real wall_curv_HFparallel_kernel(const real hc, const real hp,
+                                             const real dc, const real dp,
+                                             const real mult, const real cang);
+    virtual real wall_curv_HFparallel_kernel(const real hm,
+                                             const real hc, const real hp,
+                                             const real dm,
+                                             const real dc, const real dp,
+                                             const real mult);
     
     void flood(Scalar & scp,const real mult);
 
@@ -295,6 +304,7 @@ class VOF : public Centered {
     CurvMethod bulk_curv_method, wall_curv_method;
     SubgridMethod subgrid_method;
     TopoMethod topo_method;
+    HFset hf_set;
 
     int niter_pressure_extrap;
     real cangle;

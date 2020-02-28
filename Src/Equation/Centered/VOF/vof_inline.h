@@ -131,7 +131,7 @@ void set_wall_curv_method(const CurvMethod wcm,
   wall_curv_method = wcm;
   if(!boil::cart.iam())
     boil::oout<<"Wall curvature method: "<<wcm<<boil::endl;
-  if(wcm==CurvMethod::HFmixedXZ()) {
+  if(wcm==CurvMethod::HFparallelXZ()) {
     if       (sig==Sign::pos()) {
       mult_wall =  1;
     } else if(sig==Sign::neg()) {
@@ -177,3 +177,8 @@ void set_pressure_extrapolation_parameters(const bool eflag, const int eiter) {
 /* getter for pressure extrapolation */
 inline bool get_store_pressure_extrapolation_flag() { return store_pressure_extrap;}
 inline int get_pressure_extrapolation_maxiter() { return niter_pressure_extrap;}
+
+/* bounded color */
+inline real bounded_color(const real cval) {
+  return std::max(0.0,std::min(1.0,cval));
+}

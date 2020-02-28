@@ -11,14 +11,14 @@ void test_reconstruction_circle_xz(VOF & conc, Scalar & c, Scalar & ctest,
                                    std::vector<real> & nli,
                                    std::vector<real> & kl1,
                                    std::vector<real> & kli) {
-
+#if 1
   conc.forward(ctest);
 
   real err_n_l1(0.0),  err_n_linf(0.0);
   real err_c_l1(0.0),  err_c_linf(0.0);
   int cnt(0);
   for_vijk(ctest,i,j,k) {
-    if(*conc.topo.adens[i][j][k]>boil::pico) {
+    if((*conc.topo.adens)[i][j][k]>boil::pico) {
       cnt++;
       real theta = atan(fabs((ctest.zc(k)-zcent)/(ctest.xc(i)-xcent+boil::atto)));
       real nxtest = cos(theta);
@@ -64,7 +64,7 @@ void test_reconstruction_circle_xz(VOF & conc, Scalar & c, Scalar & ctest,
 
   //boil::oout<<"Error-normal-vector-for "<<nm<<": "<<err_n_linf<<" "<<err_n_l1<<" (in "<<cnt<<" cells)"<<boil::endl;
   //boil::oout<<"Error-color-for "<<nm<<": "<<err_c_linf<<" "<<err_c_l1<<" (in "<<cnt<<" cells)"<<boil::endl;
-
+#endif
   /* curvature */
   real err_k_l1(0.0),  err_k_linf(0.0);
   int knt(0);

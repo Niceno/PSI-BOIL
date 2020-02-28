@@ -12,8 +12,9 @@ void Momentum::insert_bc() {
   for_m(m)
     for( int b=0; b<u.bc(m).count(); b++ ) {
  
-      if( u.bc(m).type(b) == BndType::dirichlet() ||
-          u.bc(m).type(b) == BndType::neumann() ) {
+      if(   u.bc(m).type(b) == BndType::dirichlet()
+        // || u.bc(m).type(b) == BndType::neumann() 
+        ) {
         boil::oout << "Unsupported b.c. for momentum at " << b << boil::endl; 
         exit(0);
       }
@@ -22,7 +23,8 @@ void Momentum::insert_bc() {
   /* set-up the symmetry in a better way */
   for_m(m)
     for( int b=0; b<u.bc(m).count(); b++ ) {
-      if( u.bc(m).type(b) == BndType::symmetry() ) {
+      if(   u.bc(m).type(b) == BndType::symmetry()
+         || u.bc(m).type(b) == BndType::neumann() ) {
         Dir d = u.bc(m).direction(b);
         if(
            m == Comp::u() && ( d == Dir::imin() || d == Dir::imax()) ||

@@ -39,7 +39,8 @@ VOF::VOF(const Scalar & PHI,
   bulk_curv_method(CurvMethod::HF()),
   wall_curv_method(CurvMethod::DivNorm()),
   subgrid_method(SubgridMethod::PLIC()),
-  topo_method(TopoMethod::Hybrid())
+  topo_method(TopoMethod::Hybrid()),
+  hf_set()
 
 /*------------------------------------------------------+
 |  this constructor is called only at the finest level  |
