@@ -115,6 +115,7 @@ int main(int argc, char ** argv) {
   const CurvMethod curv_method = CurvMethod::HF();
   //const CurvMethod wall_curv_method = CurvMethod::HFnormalXZ();
   const CurvMethod wall_curv_method = CurvMethod::HFmixedXZ();
+  const int Nfilm_crit = 4;
   const TopoMethod topo_method = TopoMethod::Hybrid();
 
   const bool detachment_model = false;
@@ -431,15 +432,15 @@ int main(int argc, char ** argv) {
 
   if(detachment_model) {
 #ifndef INVERTED
-      conc.set_wall_curv_method(wall_curv_method,Sign::pos(),cangle);
+      conc.set_wall_curv_method(wall_curv_method,Sign::pos(),cangle,Nfilm_crit);
 #else
-      conc.set_wall_curv_method(wall_curv_method,Sign::neg(),cangle);
+      conc.set_wall_curv_method(wall_curv_method,Sign::neg(),cangle,Nfilm_crit);
 #endif
   } else {
 #ifndef INVERTED
-      conc.set_wall_curv_method(wall_curv_method,Sign::pos());
+      conc.set_wall_curv_method(wall_curv_method,Sign::pos(),cangle,Nfilm_crit);
 #else
-      conc.set_wall_curv_method(wall_curv_method,Sign::neg());
+      conc.set_wall_curv_method(wall_curv_method,Sign::neg(),cangle,Nfilm_crit);
 #endif 
   }
   
@@ -571,8 +572,8 @@ int main(int argc, char ** argv) {
     }
     tpr.bnd_update();
     tpr.exchange_all();
-    boil::plot->plot(uvw,c,tpr,conc.color(),mdot,(*(conc.topo.adens))
-                    ,"uvw-c-tpr-clr-mdot-adens",0);
+    boil::plot->plot(uvw,c,tpr,kappa,mdot,(*(conc.topo.adens))
+                    ,"uvw-c-tpr-curv-mdot-adens",0);
     
     std::fstream output;
     std::stringstream ss;
@@ -762,8 +763,8 @@ int main(int argc, char ** argv) {
       otpcond = time.current_step() / n_per_plot >= real(iint);
     if(otpcond) {
       iint++;
-      boil::plot->plot(uvw,c,tpr,conc.color(),mdot,(*(conc.topo.adens))
-                     ,"uvw-c-tpr-clr-mdot-adens",iint);
+      boil::plot->plot(uvw,c,tpr,kappa,mdot,(*(conc.topo.adens))
+                      ,"uvw-c-tpr-curv-mdot-adens",iint);
       std::fstream output;
       std::stringstream ss;
       ss <<"profile-"<<iint<<".txt";
@@ -834,8 +835,8 @@ int main(int argc, char ** argv) {
 #ifdef VARIABLE
       (tsat.tif).rm("tif",ts);
 #endif
-      boil::plot->plot(uvw,c,tpr,conc.color(),mdot,(*(conc.topo.adens))
-                     ,"uvw-c-tpr-clr-mdot-adens",time.current_step());
+      boil::plot->plot(uvw,c,tpr,kappa,mdot,(*(conc.topo.adens))
+                      ,"uvw-c-tpr-curv-mdot-adens",time.current_step());
 
       break;
     }

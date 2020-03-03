@@ -195,10 +195,11 @@ void VOF::insert_bc_curv_HFmixed(const Scalar & scp,
     int Nfilm = Icont_0_end-Icont_0_start+1;
 
 #ifdef DEBUG
-    boil::oout<<Icont_0_start<<" "<<Icont_0_end<<boil::endl;
-    boil::oout<<Icont_1_start<<" "<<Icont_1_end<<boil::endl;
-    boil::oout<<Icont_2_start<<" "<<Icont_2_end<<boil::endl;
-    boil::oout<<Nfilm<<boil::endl;
+//#if 1
+    boil::oout<<Icont_0_start<<" "<<Icont_0_end<<" | ";
+    boil::oout<<Icont_1_start<<" "<<Icont_1_end<<" | ";
+    boil::oout<<Icont_2_start<<" "<<Icont_2_end<<" | ";
+    boil::oout<<Nfilm<<" "<<Nfilm_crit<<boil::endl;
 #endif
 
     if(Nfilm>Nfilm_crit) {
