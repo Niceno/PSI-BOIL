@@ -22,7 +22,7 @@ real VOFaxisym::wall_curv_HFnormal_kernel(const real x0, const real hm,
     nxm = hxm/sqrt(1.+hxm*hxm)*-mult;
     nzm = -1./sqrt(1.+hxm*hxm)*-mult;
   } else {
-    nxm = -sin(cang);
+    nxm = -mult*sin(cang);
     nzm =  cos(cang);
   }
 
@@ -31,14 +31,33 @@ real VOFaxisym::wall_curv_HFnormal_kernel(const real x0, const real hm,
     nxp = hxp/sqrt(1.+hxp*hxp)*-mult;
     nzp = -1./sqrt(1.+hxp*hxp)*-mult;
   } else {
-    nxm =  sin(cang);
-    nzm =  cos(cang);
+    nxp =  mult*sin(cang);
+    nzp =  cos(cang);
   }
+
+  //boil::oout<<nxp<<" "<<nxm<<" "<<dc<<boil::endl;
 
   /* droplets have positive curvature */
   return (nxp-nxm)/dc + 0.5*(nxp+nxm)/x0;
 #else
-  /* needs changing to normal */
-  exit(0);
+  real hhm = hm;
+  real hhp = hp;
+  if(hm<=0.) {
+    hhm = hc - dm*tan(mult*cang);
+  }
+  if(hp<=0.) {
+    hhp = hc - dc*tan(mult*cang);
+  }
+
+  real h_1c = (hhp-hhm)/(dm+dp);
+  real h_1u = (hhp-hc)/dp;
+  real h_1d = (hc-hhm)/dm;
+  real h_11 = 2.*(dp*hhm+dm*hhp-(dp+dm)*hc)/dp/dm/(dp+dm);
+
+  real nxc = h_1c/sqrt(1.+h_1c*h_1c)*-mult;
+
+  //boil::oout<<hhm<<" "<<hc<<" "<<hhp<<" "<<dc<<boil::endl;
+
+  return -mult*h_11/pow(1.+h_1c*h_1c,1.5) +nxc/x0;
 #endif
 }

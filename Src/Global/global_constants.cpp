@@ -21,6 +21,7 @@ namespace boil {
   real yocto(1.0e-24);
 
   real unreal = yotta;
+  int unint(INT_MAX);
 
   real pi(acos(-1.0));
 

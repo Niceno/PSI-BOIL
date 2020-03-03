@@ -127,11 +127,12 @@ inline NormMethod get_normal_vector_method_curvature() {
 /* setter for near-wall curvature method */
 void set_wall_curv_method(const CurvMethod wcm,
                           const Sign sig = Sign::undefined(),
-                          const real cangle = -1.) {
+                          const real cangle = -1.,
+                          const int nfilm_crit = -1) {
   wall_curv_method = wcm;
   if(!boil::cart.iam())
     boil::oout<<"Wall curvature method: "<<wcm<<boil::endl;
-  if(wcm==CurvMethod::HFparallelXZ()) {
+  if(wcm==CurvMethod::HFparallelXZ()||wcm==CurvMethod::HFmixedXZ()) {
     if       (sig==Sign::pos()) {
       mult_wall =  1;
     } else if(sig==Sign::neg()) {
@@ -143,7 +144,21 @@ void set_wall_curv_method(const CurvMethod wcm,
                 <<boil::endl;
       exit(0);
     }
+  }
+  if(wcm==CurvMethod::HFmixedXZ()) {
+    if       (nfilm_crit>0) {
+      Nfilm_crit = nfilm_crit;
+    } else if(cangle>0.) {
+      /* estimate */
+      real cangrad = cangle*boil::pi/180.;
+      Nfilm_crit = std::max(4,abs(cos(cangrad)/sin(cangrad)));
+      boil::oout<<"Wall critical film length: "<<Nfilm_crit<<boil::endl;
+    } else {
+      Nfilm_crit = boil::unint;
+    }
+  }
 
+  if(wcm==CurvMethod::HFparallelXZ()) {
     if(cangle>0.) {
       detachment_model.set_detachment_params(cangle);
     }
@@ -153,6 +168,9 @@ void set_wall_curv_method(const CurvMethod wcm,
 
 /* getter for near-wall curvature method */
 inline CurvMethod get_wall_curv_method() { return wall_curv_method;};
+
+/* getter for critical film length */
+inline int get_critical_film_length() { return Nfilm_crit;};
 
 /* setter for topoogy method */
 void set_topo_method(const TopoMethod tpm) {

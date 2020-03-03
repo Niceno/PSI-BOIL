@@ -23,9 +23,9 @@ int main(int argc, char ** argv) {
 
   boil::timer.start();
 
-  if(argc<3){
-    boil::oout<<"Two command line arguments required!"<<"\n";
-    boil::oout<<"./Boil wmin glevel"<<"\n";
+  if(argc<5){
+    boil::oout<<"Four command line arguments required!"<<"\n";
+    boil::oout<<"./Boil wmin glevel cangle deltat"<<"\n";
 
     exit(0);
   }
@@ -95,7 +95,8 @@ int main(int argc, char ** argv) {
   const int n_per_plot = ndt/100;
 
   /* dt settings */
-  const real surftens_dt_coef = 10.;
+  const real surftens_dt_coef = 3.;
+  //const real surftens_dt_coef = 10.;
   const real initdtcoef = 1./10.;
 
   /* cfl with and without interfaces */
@@ -112,6 +113,8 @@ int main(int argc, char ** argv) {
 
   /* vof */
   const CurvMethod curv_method = CurvMethod::HF();
+  //const CurvMethod wall_curv_method = CurvMethod::HFnormalXZ();
+  const CurvMethod wall_curv_method = CurvMethod::HFmixedXZ();
   const TopoMethod topo_method = TopoMethod::Hybrid();
 
   const bool detachment_model = false;
@@ -428,15 +431,15 @@ int main(int argc, char ** argv) {
 
   if(detachment_model) {
 #ifndef INVERTED
-      conc.set_wall_curv_method(CurvMethod::HFmixedXZ(),Sign::pos(),cangle);
+      conc.set_wall_curv_method(wall_curv_method,Sign::pos(),cangle);
 #else
-      conc.set_wall_curv_method(CurvMethod::HFmixedXZ(),Sign::neg(),cangle);
+      conc.set_wall_curv_method(wall_curv_method,Sign::neg(),cangle);
 #endif
   } else {
 #ifndef INVERTED
-      conc.set_wall_curv_method(CurvMethod::HFmixedXZ(),Sign::pos());
+      conc.set_wall_curv_method(wall_curv_method,Sign::pos());
 #else
-      conc.set_wall_curv_method(CurvMethod::HFmixedXZ(),Sign::neg());
+      conc.set_wall_curv_method(wall_curv_method,Sign::neg());
 #endif 
   }
   

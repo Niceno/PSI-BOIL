@@ -23,9 +23,9 @@ int main(int argc, char ** argv) {
 
   boil::timer.start();
 
-  if(argc<3){
-    boil::oout<<"Two command line arguments required!"<<"\n";
-    boil::oout<<"./Boil wmin glevel"<<"\n";
+  if(argc<5){
+    boil::oout<<"Four command line arguments required!"<<"\n";
+    boil::oout<<"./Boil wmin glevel cangle deltat"<<"\n";
 
     exit(0);
   }
@@ -38,6 +38,12 @@ int main(int argc, char ** argv) {
   const int gLevel = atoi(argv[2]); /* domain dimensions */
   boil::oout<<"glevel= "<<gLevel<<"\n";
 
+  const real cangle = atof(argv[3]); /* contact angle */
+  boil::oout<<"cangle= "<<cangle<<"\n";
+
+  const real deltat = atof(argv[4]); /* superheat */
+  boil::oout<<"deltat= "<<deltat<<"\n";
+
 /******************************************************************************/
 /* ------------ rescaling factors */
   const real xmult = 1e0;
@@ -49,8 +55,7 @@ int main(int argc, char ** argv) {
   const real tsat0 = 0.0;
   const real tout = tsat0;
 
-  const real cangle = 30.;
-  const real twall = tsat0 + 10.;
+  const real twall = tsat0 + deltat;
   const real tsat0_K = 373.12;
 
   const real twall0 = twall;
@@ -108,6 +113,7 @@ int main(int argc, char ** argv) {
 
   /* vof */
   const CurvMethod curv_method = CurvMethod::HF();
+  const CurvMethod wall_curv_method = CurvMethod::HFmixedXZ();
   const TopoMethod topo_method = TopoMethod::Hybrid();
 
   const bool detachment_model = false;
@@ -435,15 +441,15 @@ int main(int argc, char ** argv) {
 
   if(detachment_model) {
 #ifndef INVERTED
-      conc.set_wall_curv_method(CurvMethod::HFmixedXZ(),Sign::pos(),cangle);
+      conc.set_wall_curv_method(wall_curv_method,Sign::pos(),cangle);
 #else
-      conc.set_wall_curv_method(CurvMethod::HFmixedXZ(),Sign::neg(),cangle);
+      conc.set_wall_curv_method(wall_curv_method,Sign::neg(),cangle);
 #endif
   } else {
 #ifndef INVERTED
-      conc.set_wall_curv_method(CurvMethod::HFmixedXZ(),Sign::pos());
+      conc.set_wall_curv_method(wall_curv_method,Sign::pos());
 #else
-      conc.set_wall_curv_method(CurvMethod::HFmixedXZ(),Sign::neg());
+      conc.set_wall_curv_method(wall_curv_method,Sign::neg());
 #endif 
   }
   
@@ -845,7 +851,7 @@ int main(int argc, char ** argv) {
       output << time.current_time()+time.dt() << boil::endl;
       output << time.dt() << boil::endl;
       output.close();
-      if(time.current_time<tend) {
+      if(time.current_time()<tend) {
         output.open("run.txt", std::ios::out);
         output << 0 << boil::endl;
         output.close();

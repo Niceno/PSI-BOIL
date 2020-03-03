@@ -136,6 +136,7 @@ VOF::VOF(const Scalar & PHI,
   tol_wall = 0.01; /* tolerance 0.99 \approx 1.0 near walls */
   cangle=90.0/180.0*boil::pi;
   mult_wall = 1.;
+  Nfilm_crit = boil::unint;
   limit_color=false;
   use_interp=false;
   store_pressure_extrap=false;

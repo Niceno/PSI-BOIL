@@ -2,6 +2,7 @@
 #define CONSTANTS_H
 
 #include <cmath>
+#include <limits.h>
 #include "global_precision.h"
 
 #define DIM 3
@@ -28,6 +29,7 @@ namespace boil {
 
   /* special */
   extern real unreal;
+  extern int unint;
 
   /* pi */
   extern real pi;

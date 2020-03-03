@@ -116,10 +116,15 @@ class VOF : public Centered {
     void insert_bc_curv_divnorm();
     void insert_bc_curv_HFnormal(const Scalar & scp,
                                  const Comp ctangential, const Comp cnormal,
-                                 const Sign sig); 
+                                 const Sign sig, 
+                                 const Range<int> ridx = Range<int>(-1,-2)); 
     void insert_bc_curv_HFparallel(const Scalar & scp,
                                    const Comp ctangential, const Comp cnormal,
-                                   const Sign sig);
+                                   const Sign sig,
+                                   const Range<int> ridx = Range<int>(-1,-2)); 
+    void insert_bc_curv_HFmixed(const Scalar & scp,
+                                const Comp ctangential, const Comp cnormal,
+                                const Sign sig);
     virtual real wall_curv_HFnormal_kernel(const real x0, const real hm,
                                            const real hc, const real hp,
                                            const real dm,
@@ -307,6 +312,7 @@ class VOF : public Centered {
     HFset hf_set;
 
     int niter_pressure_extrap;
+    int Nfilm_crit;
     real cangle;
     real mult_wall;
 

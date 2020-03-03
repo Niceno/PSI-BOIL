@@ -58,6 +58,7 @@ class CurvMethod {
     /* 2D methods, X = wall tangent, Z = wall normal dir */
     static const CurvMethod HFparallelXZ() {return CurvMethod( 3);}
     static const CurvMethod HFnormalXZ()   {return CurvMethod( 4);}
+    static const CurvMethod HFmixedXZ()    {return CurvMethod( 5);}
 
     //! Prints the components name.
     friend std::ostream & operator << (std::ostream & ost, const CurvMethod & com) {
@@ -68,6 +69,7 @@ class CurvMethod {
         case( 2): ost << "HF"; break;
         case( 3): ost << "HFparallelXZ"; break;
         case( 4): ost << "HFnormalXZ"; break;
+        case( 5): ost << "HFmixedXZ"; break;
       }
 
       return ost;

@@ -1,7 +1,5 @@
 #include "Include/psi-boil.h"
-#include "setup_circle.cpp"
 #include "test_reconstruction.cpp"
-#include "droplet_parameters.cpp"
 #include <fstream>
 #include <iostream>
 #include <fenv.h>
@@ -15,6 +13,14 @@ static void __attribute__ ((constructor)) trapfpe(void)
   feenableexcept(FE_INVALID|FE_DIVBYZERO|FE_OVERFLOW);
 }
 #endif
+
+#define CASE 3
+/* 
+   0 - no wall curv method
+   1 - parallel curv method
+   2 - normal curv method
+   3 - mixed curv method
+*/
 
 
 /******************************************************************************/
@@ -60,9 +66,9 @@ int main(int argc, char * argv[]) {
   const real xcent = 0.0;
 
 #ifdef USE_CARTESIAN
-  droplet_parameters_2D(cangle,boil::pi*R0*R0,radius,zcent,chord);
+  boil::droplet_parameters_2D(cangle,boil::pi*R0*R0,radius,zcent,chord);
 #else
-  droplet_parameters_3D(cangle,4./3.*boil::pi*R0*R0*R0,radius,zcent,chord);
+  boil::droplet_parameters_3D(cangle,4./3.*boil::pi*R0*R0*R0,radius,zcent,chord);
 #endif
   boil::oout<<"dropparams= "<<radius<<" "<<zcent<<" "<<chord<<boil::endl;
 
@@ -86,10 +92,10 @@ int main(int argc, char * argv[]) {
   LX = real(NX)*DZ/real(xmult);
   const int NY = 1;
 
-
   /*--------------------------------+
   |  choose the output file format  |
   +--------------------------------*/
+  //boil::plot = new PlotTEC(AsNodes::no(),Buffers::yes());
   boil::plot = new PlotTEC();
 
   /*----------+
@@ -101,7 +107,7 @@ int main(int argc, char * argv[]) {
 #else
   Grid1D gx( Range<real>(-LX,LX), NX, Periodic::no() );
 #endif
-  Grid1D gz( Range<real>(0.0,LZ), NZ, Periodic::no() );
+  Grid1D gz( Range<real>(0.0,LZ), NZ, Periodic::no(), BndGrid::extrapolate() );
   /*---------+
   |  domain  |
   +---------*/
@@ -180,6 +186,14 @@ int main(int argc, char * argv[]) {
   const real tsig = sqrt(rhoinside*pow(2.*radius,3.)/mixed.sigma()->value());
   boil::oout<<"tsig.scale= "<<tsig<<boil::endl;
 
+#if 0
+  for(int i(1); i<180;++i) {
+    real cang = i*boil::pi/180.;
+    boil::oout<<i<<" "<<int(cos(cang)/sin(cang))<<boil::endl;
+  }
+  exit(0);
+#endif
+
   /*-------------------+
   |  time-integration  |
   +-------------------*/
@@ -201,12 +215,18 @@ int main(int argc, char * argv[]) {
 
   cold = 0.0;
 
-  setup_circle_xz(cold,radius,xcent,zcent);
+  boil::setup_circle_xz(cold,radius,xcent,zcent);
   if(inverted) {
     for_avijk(cold,i,j,k)
       cold[i][j][k] = 1. - cold[i][j][k];
     cangle = 180.-cangle;
   }
+
+#if 0
+  for_avijk(cold,i,j,k) {
+    cold[i][j][k] = sin(i-boil::BW);
+  }
+#endif
 
   cold.bnd_update();
   cold.exchange_all();
@@ -249,18 +269,25 @@ int main(int argc, char * argv[]) {
 #endif
   conc.totalvol();
 
-  conc.set_curv_method(0);  // height function
+  CurvMethod wcm = CurvMethod::none();
+#if CASE == 1
+  wcm = CurvMethod::HFparallelXZ();
+#elif CASE == 2
+  wcm = CurvMethod::HFnormalXZ();
+#elif CASE == 3
+  wcm = CurvMethod::HFmixedXZ();
+#endif
   conc.set_cangle(cangle);
   conc.set_normal_vector_method_all(NormMethod::ElviraXZ());
   if(!inverted)
-    conc.set_wall_curv_method(WallCurvMethod::HFmixedXZ(),Sign::pos());
+    conc.set_wall_curv_method(wcm,Sign::pos(),cangle,4);
   else
-    conc.set_wall_curv_method(WallCurvMethod::HFmixedXZ(),Sign::neg());
+    conc.set_wall_curv_method(wcm,Sign::neg(),cangle,4);
 
   conc.ancillary();
   conc.curvature();
 
-  boil::plot->plot(uvw,c,press,kappa, "uvw-c-press-kappa", 0);
+  boil::plot->plot(uvw,c,press,kappa,(*conc.topo.nx),(*conc.topo.nz), "uvw-c-press-kappa-nx-nz", 0);
 
   /* curvature */
   int cnt(0);

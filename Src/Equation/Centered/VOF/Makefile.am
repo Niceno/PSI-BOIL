@@ -31,6 +31,7 @@ libVof_a_SOURCES =      vof.h                              \
                         vof_ib_norm.cpp                    \
                         vof_insert_bc_curv_divnorm.cpp     \
                         vof_insert_bc_curv_HFnormal.cpp    \
+                        vof_insert_bc_curv_HFmixed.cpp     \
                         vof_insert_bc_curv_HFparallel.cpp  \
                         vof_insert_bc_gradphi.cpp          \
                         vof_interfacial_flagging.cpp       \

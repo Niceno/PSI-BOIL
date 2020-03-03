@@ -55,10 +55,10 @@ void VOF::curv_HF() {
   /* detachment treatment = flooding of walls */
   if(detachment_model.initialized()&&detachment_model.detached()) {
     /* this is the only implemented instance atm */
-    assert(wall_curv_method==CurvMethod::HFparallelXZ());
-
-    flood(phi,-mult_wall);
-    normal_vector_near_bnd(phi,norm_method_curvature);
+    if(wall_curv_method==CurvMethod::HFparallelXZ()) {
+      flood(phi,-mult_wall);
+      normal_vector_near_bnd(phi,norm_method_curvature);
+    }
   }
 
   /* nx, ny, nz themselves are changed */
@@ -402,6 +402,8 @@ void VOF::curv_HF() {
   /* near-wall calculations */
   if       (wall_curv_method==CurvMethod::DivNorm()) {
     insert_bc_curv_divnorm();
+  } else if(wall_curv_method==CurvMethod::HFmixedXZ()) {
+    insert_bc_curv_HFmixed(phi,Comp::i(),Comp::k(),Sign::neg());
   } else if(wall_curv_method==CurvMethod::HFparallelXZ()) {
     insert_bc_curv_HFparallel(phi,Comp::i(),Comp::k(),Sign::neg());
   } else if(wall_curv_method==CurvMethod::HFnormalXZ()) {
