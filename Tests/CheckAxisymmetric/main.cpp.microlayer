@@ -161,7 +161,7 @@ int main(int argc, char ** argv) {
   real LX2 = 1.5e-3;
   real LX3 = 2.0e-3;
 
-  const int NX1 = 490*gLevel;
+  const int NX1 = 512*gLevel;
   const int NX2 = 150*gLevel;
   const int NX3 = 160*gLevel;
 
@@ -703,7 +703,7 @@ int main(int argc, char ** argv) {
     ns.solve(ResRat(1e-14));
 
     p = 0.0;
-    if (multigrid.vcycle(ResRat(1e-6))) OMS(converged);
+    if (multigrid.vcycle(ResRat(5e-5))) OMS(converged);
     //pr.solve(ResRat(1e-6));
     p.exchange();
     ns.project(p);

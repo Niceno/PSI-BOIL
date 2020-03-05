@@ -137,7 +137,7 @@ int main(int argc, char ** argv) {
 /* ------------ numerical simulation settings */
 
   /* total number of steps */
-  const int ndt = 700000;
+  const int ndt = 700000*3;
 
   /* steps per backup */
   const int n_per_backup= 10000;
@@ -186,6 +186,8 @@ int main(int argc, char ** argv) {
 
   /* vof */
   const CurvMethod curv_method = CurvMethod::HF();
+  //const CurvMethod wall_curv_method = CurvMethod::HFnormalXZ();
+  const CurvMethod wall_curv_method = CurvMethod::HFparallelXZ();
   const TopoMethod topo_method = TopoMethod::Hybrid();
 
 #ifdef MULTI_BUBBLES
@@ -589,15 +591,15 @@ int main(int argc, char ** argv) {
 #ifdef AXISYMMETRIC
   if(detachment_model) {
   #ifndef INVERTED
-      conc.set_wall_curv_method(CurvMethod::HFmixedXZ(),Sign::pos(),cangle);
+      conc.set_wall_curv_method(wall_curv_method,Sign::pos(),cangle);
   #else
-      conc.set_wall_curv_method(CurvMethod::HFmixedXZ(),Sign::neg(),cangle);
+      conc.set_wall_curv_method(wall_curv_method,Sign::neg(),cangle);
   #endif
   } else {
   #ifndef INVERTED
-      conc.set_wall_curv_method(CurvMethod::HFmixedXZ(),Sign::pos());
+      conc.set_wall_curv_method(wall_curv_method,Sign::pos());
   #else
-      conc.set_wall_curv_method(CurvMethod::HFmixedXZ(),Sign::neg());
+      conc.set_wall_curv_method(wall_curv_method,Sign::neg());
   #endif 
   }
 #else
