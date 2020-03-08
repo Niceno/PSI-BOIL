@@ -51,7 +51,8 @@ bool VOF::ev_solve(const ScalarInt & pflag, const Matrix & A,
           linferr = diff;
       }
 #else
-      if(abs(pflag[i][j][k])==1&&fabs(b[i][j][k]>boil::pico)) {
+      if(abs(pflag[i][j][k])==1&&fabs(b[i][j][k])>boil::atto) {
+      //if(abs(pflag[i][j][k])==1) {
         nele++;
         real diff = b[i][j][k] - A.w[i][j][k]*x[i-1][j][k]
                                - A.e[i][j][k]*x[i+1][j][k]
@@ -61,8 +62,8 @@ bool VOF::ev_solve(const ScalarInt & pflag, const Matrix & A,
                                - A.t[i][j][k]*x[i][j][k+1]
                                - A.c[i][j][k]*x[i][j][k];
         diff /= b[i][j][k];
-        if(diff>linferr)
-          linferr = diff;
+        if(fabs(diff)>linferr)
+          linferr = fabs(diff);
       }
 #endif
     }

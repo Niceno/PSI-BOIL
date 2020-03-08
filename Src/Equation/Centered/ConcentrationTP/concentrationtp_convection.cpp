@@ -73,8 +73,8 @@ void ConcentrationTP::convection(Scalar * conv) {
     flxp = (*colorflow)[mcomp][i+1][j][k]*time->dti();
 
     /* total volume flux */
-    gfxm = dSx(i,j,k)*umf;
-    gfxp = dSx(i,j,k)*upf;
+    gfxm = dSx(Sign::neg(),i,j,k)*umf;
+    gfxp = dSx(Sign::pos(),i,j,k)*upf;
 
     if(dom->ibody().cut(i,j,k)) {
       gfxm *= dom->ibody().fSw(i,j,k);
@@ -111,8 +111,8 @@ void ConcentrationTP::convection(Scalar * conv) {
     flxp = (*colorflow)[mcomp][i][j+1][k]*time->dti();
 
     /* total volume flux */
-    gfxm = dSy(i,j,k)*vmf;
-    gfxp = dSy(i,j,k)*vpf;
+    gfxm = dSy(Sign::neg(),i,j,k)*vmf;
+    gfxp = dSy(Sign::pos(),i,j,k)*vpf;
  
     if(dom->ibody().cut(i,j,k)) {
       gfxm *= dom->ibody().fSs(i,j,k);
@@ -150,8 +150,8 @@ void ConcentrationTP::convection(Scalar * conv) {
     flxp = (*colorflow)[mcomp][i][j][k+1]*time->dti();
   
     /* total volume flux */
-    gfxm = dSz(i,j,k)*wmf;
-    gfxp = dSz(i,j,k)*wpf;
+    gfxm = dSz(Sign::neg(),i,j,k)*wmf;
+    gfxp = dSz(Sign::pos(),i,j,k)*wpf;
  
     if(dom->ibody().cut(i,j,k)) {
       gfxm *= dom->ibody().fSb(i,j,k);

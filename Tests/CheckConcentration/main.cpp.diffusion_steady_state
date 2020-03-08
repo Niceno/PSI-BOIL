@@ -1,0 +1,163 @@
+#include "Include/psi-boil.h"
+
+#define AXISYMMETRIC
+
+const int gLevel = 8;
+const int NX = 24*gLevel;
+const int NZ = 1;
+
+/* domain dimensions (given by problem) */
+const real LX = 1.0;
+const real DX = LX/real(NX);
+
+const real q0 = 0.1;
+const real tout = 0.1;
+
+/******************************************************************************/
+int main(int argc, char ** argv) {
+
+  boil::timer.start();
+
+  /*--------------------------------+
+  |  choose the output file format  |
+  +--------------------------------*/
+  boil::plot = new PlotTEC();
+  //boil::plot = new PlotTEC(AsNodes::no(),Buffers::yes());
+
+  /*----------+
+  |  grid(s)  |
+  +----------*/
+  Grid1D gx( Range<real>(0.0,LX), NX, Periodic::no(),
+             BndGrid::symmetry(), BndGrid::wall() );
+  Grid1D gz(DX);
+
+  /*---------+
+  |  domain  |
+  +---------*/
+#ifdef AXISYMMETRIC
+  Axisymmetric d(gx,gz,DX);
+#else
+  Domain d(gx,gz,gz);
+#endif
+
+  /*------------------+
+  |  define unknowns  |
+  +------------------*/
+  Vector uvw(d), xyz(d);           // vel
+  Scalar tpr(d), q  (d);           // temperature
+  Scalar eps(d), mdot_eps (d);     // concentration
+  Scalar c(d), g(d), kappa(d);
+
+  /*-----------------------------+
+  |  insert boundary conditions  |
+  +-----------------------------*/
+  for_m(m) {
+    uvw.bc(m).add( BndCnd( Dir::imin(), BndType::symmetry() ) );
+    uvw.bc(m).add( BndCnd( Dir::imax(), BndType::wall() ) );
+    uvw.bc(m).add( BndCnd( Dir::kmin(), BndType::pseudo() ) );
+    uvw.bc(m).add( BndCnd( Dir::kmax(), BndType::pseudo() ) );
+    uvw.bc(m).add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
+    uvw.bc(m).add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
+  }
+
+  tpr.bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
+  tpr.bc().add( BndCnd( Dir::imax(), BndType::dirichlet(),tout ) );
+  tpr.bc().add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
+  tpr.bc().add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
+  tpr.bc().add( BndCnd( Dir::kmin(), BndType::pseudo() ) );
+  tpr.bc().add( BndCnd( Dir::kmax(), BndType::pseudo() ) );
+
+  eps = tpr.shape();
+
+  q.bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
+  q.bc().add( BndCnd( Dir::imax(), BndType::neumann() ) );
+  q.bc().add( BndCnd( Dir::kmin(), BndType::pseudo() ) );
+  q.bc().add( BndCnd( Dir::kmax(), BndType::pseudo() ) );
+  q.bc().add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
+  q.bc().add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
+
+  c = q.shape();
+  kappa = c.shape();
+  g = q.shape();
+  mdot_eps = q.shape();
+
+  /*----------------------+
+  |  physical properties  |
+  +----------------------*/
+  Matter liquid(d);
+
+  liquid.lambda(0.5);
+  liquid.rho(1.0);
+  liquid.cp(1.0);
+  liquid.gamma(0.5);
+
+  /*-------------------+
+  |  time-integration  |
+  +-------------------*/
+  const int  ndt = 1000;
+  const real dt = d.dxyz_min();
+
+  Times time(ndt,dt);
+
+  /*-----------------+
+  |  define solvers  |
+  +-----------------*/
+  Krylov * solver = new CG(d, Prec::di());
+
+  VOFaxisym conc(c, g, kappa, uvw, time, solver);
+
+  ConcentrationTP ngtransp(eps,mdot_eps,uvw,
+                           c,conc.flow(),conc.heaviside(),&(conc.topo),
+                           time, solver, &liquid);
+
+  Enthalpy enth(tpr,q,uvw,time,solver,&liquid);
+  enth.diffusion_set(TimeScheme::backward_euler());
+
+  /*--------------------+
+  |  initial condition  |
+  +--------------------*/
+  tpr = 0.0;
+  for_vijk(q,i,j,k)                                 /* fill the source term */
+    q[i][j][k] = q0*q.dV(i,j,k);
+
+  c = 0.0;
+  eps = tpr;
+  mdot_eps = q;
+
+  conc.init();
+
+  /*------------+
+  |  time loop  |
+  +------------*/  
+  for(time.start(); time.end(); time.increase()) {
+    enth.discretize();
+    enth.new_time_step();
+    enth.solve(ResRat(1e-16),"enth");
+
+    ngtransp.discretize();
+    ngtransp.new_time_step();
+    ngtransp.solve(ResRat(1e-16),"enth");
+  }
+
+  boil::plot->plot(tpr,eps, "tpr-eps");
+
+  for_vi(tpr,i) {
+    int j = boil::BW;
+    int k = boil::BW;
+
+    real pos = tpr.xc(i);
+#ifdef AXISYMMETRIC
+    real coef = 4.;
+#else
+    real coef = 2.;
+#endif
+    boil::oout<<pos<<" "<<tpr[i][j][k]<<" "<<eps[i][j][k]<<" "
+              <<tout + q0*(LX*LX-pos*pos)/coef/liquid.lambda(i,j,k)<<boil::endl;
+  }
+
+  boil::oout << "Finished!" << boil::endl;
+
+  boil::timer.stop();
+  boil::timer.report();
+
+}	

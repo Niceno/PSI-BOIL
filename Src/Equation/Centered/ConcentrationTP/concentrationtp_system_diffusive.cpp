@@ -30,8 +30,8 @@ void ConcentrationTP::create_system_diffusive(const Scalar * diff_eddy) {
       dcp += ((*diff_eddy)[i  ][j][k] +
               (*diff_eddy)[i+1][j][k] )/(2.0*turbS);
     } 
-    real sw = dSx(i,j,k)*(1.0-clrm);
-    real se = dSx(i,j,k)*(1.0-clrp);
+    real sw = dSx(Sign::neg(),i,j,k)*(1.0-clrm);
+    real se = dSx(Sign::pos(),i,j,k)*(1.0-clrp);
 
     gm =  tscn * dcm * sw / dxw;
     gp =  tscn * dcp * se / dxe;
@@ -61,8 +61,8 @@ void ConcentrationTP::create_system_diffusive(const Scalar * diff_eddy) {
       dcp += ((*diff_eddy)[i][j  ][k] +
               (*diff_eddy)[i][j+1][k] )/(2.0*turbS);
     } 
-    real ss = dSy(i,j,k)*(1.0-clrm);
-    real sn = dSy(i,j,k)*(1.0-clrp);
+    real ss = dSy(Sign::neg(),i,j,k)*(1.0-clrm);
+    real sn = dSy(Sign::pos(),i,j,k)*(1.0-clrp);
 
     gm = tscn * dcm * ss / dys;
     gp = tscn * dcp * sn / dyn;
@@ -92,8 +92,8 @@ void ConcentrationTP::create_system_diffusive(const Scalar * diff_eddy) {
       dcp += ((*diff_eddy)[i][j][k  ] +
               (*diff_eddy)[i][j][k+1] )/(2.0*turbS);
     } 
-    real sb = dSz(i,j,k)*(1.0-clrm);
-    real st = dSz(i,j,k)*(1.0-clrp);
+    real sb = dSz(Sign::neg(),i,j,k)*(1.0-clrm);
+    real st = dSz(Sign::pos(),i,j,k)*(1.0-clrp);
 
     gm = tscn * dcm * sb / dzb;
     gp = tscn * dcp * st / dzt;
