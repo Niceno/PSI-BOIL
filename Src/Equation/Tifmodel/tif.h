@@ -16,6 +16,15 @@ class TIF {
     TIF(const real tref, const Scalar & s); 
     ~TIF() {}
 
+    void init() {
+      if(variable_tif) { 
+        model(); 
+        tif.bnd_update();
+        tif.exchange_all();
+        extend_tint();
+      }
+    }
+
     void update_tifold() {
       tifold = tif;
       store_tif = true;
