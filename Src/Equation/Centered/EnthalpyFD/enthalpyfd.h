@@ -42,8 +42,8 @@ class EnthalpyFD : public Centered {
         \param f   - external source array (\f$\dot{q}\f$),
         \param u   - convection velocity (\f${\bf u}\f$),
         \param t   - simulation (physical) time (\f${t}\f$),
-        \param sm  - Krylov subspace solver. It acts as a solver, or as a
-                     smoother for AC multirid.
+        \param sm  - Linear solver. It acts as a solver, or as a
+                     smoother for AC multigrid.
         \param flu - Holds all fluid properties (\f$\rho, C_p, \lambda\f$),
         \param topo - properties of the free surface (from ITM).
         \param tifmodel - interfacial temperature model.
@@ -57,7 +57,7 @@ class EnthalpyFD : public Centered {
                const Vector & uliq,
                const Vector & ugas,
                Times & t,
-               Krylov * sm,
+               Linear * sm,
                Matter * flu,
                Topology & topo,
                TIF & tifmodel,
@@ -68,7 +68,7 @@ class EnthalpyFD : public Centered {
                const Scalar & f,
                const Vector & umixed,
                Times & t,
-               Krylov * sm,
+               Linear * sm,
                Matter * flu,
                Topology & topo,
                TIF & tifmodel,

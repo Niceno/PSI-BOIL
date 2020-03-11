@@ -1,21 +1,21 @@
-#include "jacobi.h"
+#include "gaussseidel.h"
 
 //#define DEBUG
 
 /***************************************************************************//**
-*  \brief Implementation of the Jacobi solver.
+*  \brief Implementation of the Gauss-Seidel solver.
 *
 *  \note The arguments are explained in the parent-parent, Linear.
 *******************************************************************************/
-void Jacobi :: solve(Matrix & A, Scalar & x, Scalar & b, const MaxIter & mi,
-                     const char * name,
-                     const ResRat & res_rat, const ResTol & res_tol) {
+void GaussSeidel :: solve(Matrix & A, Scalar & x, Scalar & b,
+                          const MaxIter & mi, const char * name,
+                          const ResRat & res_rat, const ResTol & res_tol) {
 
   r = x.shape(); r=0.0;
 
-  /*----------------------+
-  |  compute r = b - A x  |
-  +----------------------*/
+  /*-----------------------------------+
+  |  exchange and compute r = b - A x  |
+  +-----------------------------------*/
   r = b - A * x;
   real res = r.dot(r); 
   real res0 = res;
@@ -35,7 +35,15 @@ void Jacobi :: solve(Matrix & A, Scalar & x, Scalar & b, const MaxIter & mi,
     
     /* perform one iteration step */
     for_vijk(x,i,j,k) {
-      x[i][j][k] = A.ci[i][j][k]*(r[i][j][k]+A.c[i][j][k]*x[i][j][k]);
+      x[i][j][k] = A.ci[i][j][k]*(
+                       b[i][j][k]
+                     + A.w[i][j][k] * x[i-1][j][k]
+                     + A.e[i][j][k] * x[i+1][j][k]
+                     + A.s[i][j][k] * x[i][j-1][k]
+                     + A.n[i][j][k] * x[i][j+1][k]
+                     + A.b[i][j][k] * x[i][j][k-1]
+                     + A.t[i][j][k] * x[i][j][k+1]
+                    );
     }
 
     /* exchange and compute residual */

@@ -26,7 +26,7 @@ class AC {
 	
   public:
     //! Basic constructor
-    AC(Centered * cen); 
+    AC(Centered * cen, Linear * sol = NULL); 
 
     //! The solution algorithm + shorthand calls added for simplicity. 
     bool cycle(const Cycle & init, const Cycle & loop, 
@@ -99,6 +99,8 @@ class AC {
     int converged(const ResRat & factor, const int & cycle,
                   const real & res_0, const real & res0,
                   int * ncyc);
+    void call_smoother(const int l, const MaxIter & mi,
+                       const ResRat & res_rat, const ResTol & res_tol); 
     void call_solver(const int l, const MaxIter & mi,
                      const ResRat & res_rat, const ResTol & res_tol); 
 
@@ -110,6 +112,9 @@ class AC {
     //! Pointers to coarser levels. 
     Centered * L[64];
     int        nlevels;
+
+    //! Solver at coarsest level.
+    Linear * solver;
 
     //! Parameters for steering of a cycle
     int  max_cyc;

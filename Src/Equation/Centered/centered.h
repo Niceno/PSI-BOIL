@@ -33,7 +33,7 @@
 *  \f[
 *      [A] \cdot \{ \phi \}^N = \{ f \}
 *  \f] 
-*  which can be solved with either one of the Krylov sub-space family of 
+*  which can be solved with either one of the Linear sub-space family of 
 *  solvers (CG, CGS, BiCGS), or the Additive Correction (AC) multigrid.
 *  The superscript \f$ N \f$ in the above equation denotes the new time
 *  step. All the terms without a superscript are time-averaged over 
@@ -70,15 +70,15 @@ class Centered : public Equation {
         \param t - simulation (physical) time (\f$ {t} \f$),
         \param flu - holds all material properties 
                      (\f$ \rho, B_{\phi}, \Gamma_{\phi} \f$),
-        \param sm - Krylov subspace solver. It acts as a solver, or as a
-                    smoother for AC multirid.
+        \param sm - Linear solver. It acts as a solver, or as a
+                    smoother for AC multigrid.
     */
     Centered(const Domain * d,
              const Scalar & s, const Scalar & g, 
              const Vector * v, const Times & t, 
              Matter * flu,
              Matter * sol,
-             Krylov * sm = NULL) 
+             Linear * sm = NULL) 
      : Equation(d, &t, flu, sol, sm), phi(&s), A(phi), fext(&g), u(v), 
                     fold(*d), fnew(*d), fbnd(*d), 
                     cold(*d), cnew(*d), buff(*d), 
@@ -134,7 +134,7 @@ class Centered : public Equation {
 
     //! Constructor for coarser levels. 
     Centered(const Centered * fin, const Domain *, 
-             BndCnd & ubc, Krylov * sm);  
+             BndCnd & ubc, Linear * sm);  
 
     int ni() const {return phi.ni();} 
     int nj() const {return phi.nj();} 

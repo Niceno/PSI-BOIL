@@ -37,15 +37,15 @@ class Pressure : public Centered {
         \param f   - right hand side array,
         \param v   - velocity field, 
         \param t   - simulation (physical) time (\f${t}\f$),
-        \param sm  - Krylov subspace solver. It acts as a solver, or as a
-                     smoother for AC multirid.
+        \param sm  - Linear solver. It acts as a solver, or as a
+                     smoother for AC multigrid.
         \param mat - Holds fluid properties (\f$\rho\f$).
     */
     Pressure(const Scalar & phi, 
              const Scalar & f,  
              const Vector & v, 
              Times & t, 
-             Krylov * sm,
+             Linear * sm,
              Matter * mat);
     ~Pressure();
 	  

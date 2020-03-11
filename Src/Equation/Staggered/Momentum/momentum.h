@@ -64,7 +64,7 @@ class Momentum : public Staggered {
     Momentum(const Vector & U, 
              const Vector & F, 
              Times & t, 
-             Krylov * sm,
+             Linear * sm,
              Matter * M);
     ~Momentum();
 

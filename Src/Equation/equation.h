@@ -23,7 +23,7 @@ class Equation {
              const Times  * t, 
              Matter * f, 
              Matter * s, 
-             Krylov * sm) : 
+             Linear * sm) : 
       dom(d), time(t), flu(f), sol(s), solver(sm),
       conv_ts(TimeScheme::adams_bashforth()),
       diff_ts(TimeScheme::crank_nicolson()),
@@ -35,7 +35,7 @@ class Equation {
     void convection_set(const TimeScheme & ts) {conv_ts = ts;}
     void convection_set(const ConvScheme & cs) {lim.set(cs);}
 
-    Krylov * solver;
+    Linear * solver;
 
     const Matter * fluid() const {return flu;}
     const Matter * solid() const {return sol;}

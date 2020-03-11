@@ -69,11 +69,21 @@ int AC::converged(const ResRat & factor, const int & cycle,
 }
 
 /******************************************************************************/
-void AC::call_solver(const int l, const MaxIter & mi, 
-                     const ResRat & res_rat, const ResTol & res_tol) {
+void AC::call_smoother(const int l, const MaxIter & mi, 
+                       const ResRat & res_rat, const ResTol & res_tol) {
 
   L[l] -> solver->solve( L[l]->A, L[l]->phi, L[l]->fnew,
                          mi, sname, res_rat, res_tol );
+
+  return;
+}
+
+/******************************************************************************/
+void AC::call_solver(const int l, const MaxIter & mi, 
+                     const ResRat & res_rat, const ResTol & res_tol) {
+
+  solver->solve( L[l]->A, L[l]->phi, L[l]->fnew,
+                 mi, sname, res_rat, res_tol );
 
   return;
 }

@@ -4,7 +4,7 @@
 Momentum::Momentum(const Vector & U, 
                    const Vector & F,
                    Times & T,   
-                   Krylov * sm,
+                   Linear * sm,
                    Matter * M) :
   Staggered(U.domain(), U, F, T, M, NULL, sm) { /* NULL is for solid */
 

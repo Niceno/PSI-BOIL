@@ -7,7 +7,7 @@ VOF::VOF(const Scalar & PHI,
          const Scalar & K,
          const Vector & U, 
          Times & T,
-         Krylov * S,
+         Linear * S,
          Vector * BNDCLR) :
 /*---------------------+ 
 |  initialize parent   | NULL is for solid

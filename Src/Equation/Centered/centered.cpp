@@ -6,7 +6,7 @@
 *  \note It is recursive (i.e. calls itself).
 *******************************************************************************/
 Centered::Centered(const Centered * fn, const Domain * d, 
-                   BndCnd & ubc, Krylov * sm) :
+                   BndCnd & ubc, Linear * sm) :
 
   Equation(d, NULL, NULL, NULL, sm), phi(*d, ubc), A(phi), 
                fnew(*d), buff(*d), res(*d), 

@@ -43,7 +43,7 @@ class ConcentrationTP : public Centered {
         \param heavi  - phase indicator object
         \param topo   - topology object
         \param t      - simulation (physical) time (\f${t}\f$),
-        \param sm   - Krylov subspace solver. It acts as a solver, or as a
+        \param sm   - Linear solver. It acts as a solver, or as a
                       smoother for AC multigrid.
         \param flu  - Holds material properties of diffusing species.
     */
@@ -55,7 +55,7 @@ class ConcentrationTP : public Centered {
                     Heaviside * heavi,
                     Topology * topo,
                     Times & t,
-                    Krylov * sm,
+                    Linear * sm,
                     Matter * flu); 
     ~ConcentrationTP();
 	  

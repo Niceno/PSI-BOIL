@@ -8,7 +8,7 @@ CIPCSL2::CIPCSL2(const Scalar & PHI,
                  const Scalar & K,
                  const Vector & U, 
                  Times & T,
-                 Krylov * S) :
+                 Linear * S) :
 /*---------------------+ 
 |  initialize parent   | NULL is for solid
 +---------------------*/

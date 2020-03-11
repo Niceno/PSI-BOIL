@@ -12,7 +12,7 @@ ConcentrationTP::ConcentrationTP(const Scalar & PHI,
                                  Heaviside * HEAVI,
                                  Topology * TOPO,
                                  Times & T, 
-                                 Krylov * S,
+                                 Linear * S,
                                  Matter * f     /* the diffusing species */
                                 ) :
 /*---------------------+ 

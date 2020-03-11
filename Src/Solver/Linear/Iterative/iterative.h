@@ -28,4 +28,5 @@ class Iterative : public Linear {
 
 #endif
 
+#include "gaussseidel.h"
 #include "jacobi.h"

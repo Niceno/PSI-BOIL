@@ -62,7 +62,7 @@ bool AC::cycle(const Cycle & init, const Cycle & loop,
       w_cycle(0,true);
     /* just solve */
     } else {
-      call_solver(0,MaxIter(40),ResRat(0.001),ResTol(boil::femto));
+      call_smoother(0,MaxIter(40),ResRat(0.001),ResTol(boil::femto));
       real res1 = residual(*L[0]);
       boil::oout << "res = " << res1 << boil::endl;
       break;

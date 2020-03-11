@@ -5,9 +5,9 @@
 *  for which it is meant to be used. As a second step, stores pointers to
 *  variable's levels.  
 *******************************************************************************/
-AC::AC(Centered * cen) {
+AC::AC(Centered * cen, Linear * sol) {
 
-  /* set variables which steer the v-cycle */
+  /* set variables which steer the cycle */
   max_cyc = 20;
   min_cyc =  0;
   targ_res_val = boil::nano;
@@ -26,6 +26,13 @@ AC::AC(Centered * cen) {
       nlevels = i;
       break;
     }
+  }
+
+  /* is there a distinct solver at finest level? */
+  if(sol!=NULL) {
+    solver = sol;
+  } else {
+    solver = L[0] -> solver;
   }
 
   boil::oout << "Number of cycling levels: " << nlevels << boil::endl;
