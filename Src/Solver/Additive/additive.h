@@ -28,7 +28,7 @@ class AC {
     //! Basic constructor
     AC(Centered * cen); 
 
-    //! The solution algorithm. VFW-cycle shorthand calls added for simplicity. 
+    //! The solution algorithm + shorthand calls added for simplicity. 
     bool cycle(const Cycle & init, const Cycle & loop, 
                const ResRat & factor, int * ncyc = NULL);
 
@@ -42,6 +42,11 @@ class AC {
       return cycle(Cycle::none(),Cycle::W(),factor,ncyc);
     }
 
+    bool fullcycle(const Cycle & loop, const ResRat & factor,
+                   int * ncyc = NULL) { 
+      return cycle(Cycle::V(),loop,factor,ncyc);
+    }
+
     //! Another way to call cycles (temporary) 
     bool cycle(const Cycle & init, const Cycle & loop,
                int * ncyc = NULL) {
@@ -51,6 +56,10 @@ class AC {
     bool vcycle(int * ncyc = NULL) {return vcycle(ResRat(targ_res_rat), ncyc);}
     bool fcycle(int * ncyc = NULL) {return fcycle(ResRat(targ_res_rat), ncyc);}
     bool wcycle(int * ncyc = NULL) {return wcycle(ResRat(targ_res_rat), ncyc);}
+
+    bool fullcycle(const Cycle & loop, int * ncyc = NULL) {
+      return fullcycle(loop,ResRat(targ_res_rat), ncyc);
+    }
 
     //! Set and get the maximum number of cycles
     void max_cycles(const int mc) {max_cyc = mc;}
@@ -96,6 +105,7 @@ class AC {
     void v_cycle(const int l);
     void f_cycle(const int l, const bool upstream);
     void w_cycle(const int l, const bool upstream);
+    void full_cycle(const int l, const Cycle & cyc);
 
     //! Pointers to coarser levels. 
     Centered * L[64];

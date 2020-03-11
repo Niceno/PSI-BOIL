@@ -24,15 +24,21 @@ bool AC::cycle(const Cycle & init, const Cycle & loop,
   |    after a certain, (large) number of time steps     |
   |           (different for full multigrid)             |
   +-----------------------------------------------------*/
-  if(init==Cycle::none()) {
-    for(int l=1; l<nlevels; l++) {
-      L[l]->phi  = 0.0;
-      L[l]->fnew = 0.0;
-    }
+  for(int l=1; l<nlevels-1; l++) {
+    L[l]->phi  = 0.0;
+    L[l]->fnew = 0.0;
+  }
+  if(init!=Cycle::none()) {
+    L[0]->phi = 0.0;
+    L[nlevels-1]->fnew = 0.0;
+    full_cycle(0,init);
+
+    /* evaluate convergence */
+    real res0 = residual(*L[0]);
+    int con = converged(factor,0,res_0,res0,ncyc);
   } else {
-    boil::oout<<"Cycle::underdevelopment! Exiting."
-              <<boil::endl;
-    exit(0);
+    L[nlevels-1]->phi  = 0.0;
+    L[nlevels-1]->fnew = 0.0;
   }
 
   /*--------------------------+

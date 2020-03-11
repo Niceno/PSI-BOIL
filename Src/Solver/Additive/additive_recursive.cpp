@@ -17,6 +17,7 @@ void AC::v_cycle(const int l) {
     /* post-smooth */
     call_solver(l,MaxIter(20 * (l+1)),ResRat(0.01),ResTol(boil::pico));
 
+    /* prolongate to a finer level */
     if(l > 0)
       interpolation(*L[l], *L[l-1]);
 
@@ -24,6 +25,7 @@ void AC::v_cycle(const int l) {
     /* solve 'precisely' at the coarsest level */
     call_solver(l,MaxIter(40 * (l+1)),ResRat(0.001),ResTol(boil::femto));
 
+    /* prolongate to a finer level */
     interpolation(*L[l], *L[l-1]);
   }
 
@@ -64,6 +66,7 @@ void AC::f_cycle(const int l, const bool upstream) {
     /* post-smooth */
     call_solver(l,MaxIter(20 * (l+1)),ResRat(0.01),ResTol(boil::pico));
 
+    /* prolongate to a finer level */
     if(l > 0)
       interpolation(*L[l], *L[l-1]);
 
@@ -71,6 +74,7 @@ void AC::f_cycle(const int l, const bool upstream) {
     /* solve 'precisely' at the coarsest level */
     call_solver(l,MaxIter(40 * (l+1)),ResRat(0.001),ResTol(boil::femto));
 
+    /* prolongate to a finer level */
     interpolation(*L[l], *L[l-1]);
   }
 
@@ -111,6 +115,7 @@ void AC::w_cycle(const int l, const bool upstream) {
     /* post-smooth */
     call_solver(l,MaxIter(20 * (l+1)),ResRat(0.01),ResTol(boil::pico));
 
+    /* prolongate to a finer level */
     if(l > 0)
       interpolation(*L[l], *L[l-1]);
 
@@ -118,8 +123,51 @@ void AC::w_cycle(const int l, const bool upstream) {
     /* solve 'precisely' at the coarsest level */
     call_solver(l,MaxIter(40 * (l+1)),ResRat(0.001),ResTol(boil::femto));
 
+    /* prolongate to a finer level */
     interpolation(*L[l], *L[l-1]);
   }
 
   return;
 }
+
+/******************************************************************************/
+void AC::full_cycle(const int l, const Cycle & cyc) {
+
+  if(l!=nlevels-1) {
+    /* restrict fnew to coarser grid */
+    restriction(*L[l], *L[l+1]);
+
+    /* recursive call to a coarser level */
+    full_cycle(l+1,cyc);
+
+    /* recursive call to a coarser level on the way back */
+    if       (cyc==Cycle::V()) {
+      v_cycle(l);
+    } else if(cyc==Cycle::F1()) {
+      f_cycle(l,false);
+    } else if(cyc==Cycle::F2()) {
+      f_cycle(l,true);
+    } else if(cyc==Cycle::W1()) {
+      w_cycle(l,false);
+    } else if(cyc==Cycle::W2()) {
+      w_cycle(l,true);
+      /* just solve (shouldn't happen) */
+    } else {
+      call_solver(l,MaxIter(20 * (l+1)),ResRat(0.01),ResTol(boil::pico));
+    }
+
+    /* prolongate to a finer level */
+    if(l > 0)
+      interpolation(*L[l], *L[l-1]);
+
+  } else {
+    /* solve 'precisely' at the coarsest level */
+    call_solver(l,MaxIter(40 * (l+1)),ResRat(0.001),ResTol(boil::femto));
+
+    /* prolongate to a finer level */
+    interpolation(*L[l], *L[l-1]);
+  }
+
+  return;
+}
+
