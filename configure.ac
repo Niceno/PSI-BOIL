@@ -52,7 +52,12 @@ AC_OUTPUT(Makefile                                                      \
           Src/Equation/Tifmodel/Makefile                                \
           Src/Equation/Topology/Makefile                                \
           Src/Boundary/Makefile                                         \
-          Src/Solver/Makefile                                           \
+          Src/Solver/Additive/Makefile                                  \
+          Src/Solver/Linear/Makefile                                    \
+          Src/Solver/Linear/Gauss/Makefile                              \
+          Src/Solver/Linear/Iterative/Makefile                          \
+          Src/Solver/Linear/Krylov/Makefile                             \
+          Src/Solver/Preconditioner/Makefile                            \
           Src/Ravioli/Makefile                                          \
           Src/SimulationTime/Makefile                                   \
           Src/RandomFlow/Makefile                                       \

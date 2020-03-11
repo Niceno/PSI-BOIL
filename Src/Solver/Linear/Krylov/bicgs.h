@@ -1,11 +1,6 @@
 #ifndef BICGS_H
 #define BICGS_H
 
-#include "../../Parallel/mpi_macros.h"
-#include <iostream>
-#include <cmath>
-#include "../../Domain/domain.h"
-#include "../../Matrix/matrix.h"
 #include "krylov.h"
 
 /***************************************************************************//**

@@ -4,6 +4,9 @@
 
 /******************************************************************************/
 void Gauss::solve(Matrix & A, Scalar & X, Scalar & B) {
+ 
+  boil::oout<<"Gauss: possibly obsolete!!! Check before using."<<boil::endl;
+  exit(0);
 
   real ** a;
   real  * x;

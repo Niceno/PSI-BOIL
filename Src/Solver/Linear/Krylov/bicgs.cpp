@@ -4,7 +4,7 @@
 *  \brief Implementation of the Bi-Conjugate Gradient Stabilized (BiCGS) 
 *         solver.
 *
-*  \note The arguments are explained in the parent, Krylov.
+*  \note The arguments are explained in the parent-parent, Linear.
 *******************************************************************************/
 void BiCGS :: solve(Matrix & A, Scalar & x, Scalar & b, const MaxIter & mi, 
                     const char * name,

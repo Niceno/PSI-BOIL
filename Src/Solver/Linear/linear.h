@@ -1,5 +1,5 @@
-#ifndef KRYLOV_H
-#define KRYLOV_H
+#ifndef LINEAR_H
+#define LINEAR_H
 
 #include "../../Parallel/mpi_macros.h"
 #include <iostream>
@@ -13,22 +13,22 @@
 #include "../Preconditioner/preconditioner.h"
 
 /***************************************************************************//**
-*  \brief Parent class for all Krylov subspace solvers.
+*  \brief Parent class for all linear algebraic solvers.
 *
-*  It stores all the scalar arrays (Scalar) needed for for solver algorythm,
-*  as well as preconditioning matrix (Matrix) and Preconditiner. 
-*  It also contains virtual function "solve", which calls solving algorythm 
+*  It stores all the scalar arrays (Scalar) needed for for solver algorithm,
+*  as well as preconditioning matrix (Matrix) and Preconditioner. 
+*  It also contains virtual function "solve", which calls solving algorithm 
 *  implementation of a child solver.
 *******************************************************************************/
 
 //////////////
 //          //
-//  Krylov  //
+//  Linear  //
 //          //
 //////////////
-class Krylov {
+class Linear {
   public:
-    Krylov(const Domain & d, const Prec & pc = Prec::di()); 
+    Linear(const Domain & d, const Prec & pc = Prec::di()); 
 
     //! Pointer to preconditioner associated with the solver. 
     Preconditioner * prec; 
@@ -36,7 +36,7 @@ class Krylov {
     //! Calls solving algorythm implemented in the child.
     /*!
         \param A - system matrix,
-        \param x - unknow vector,
+        \param x - unknown vector,
         \param b - right hand side vector,
         \param iter - maximum number of iterations.
         \param var_name - variable name, used for timing routines (Timer)
@@ -76,7 +76,3 @@ class Krylov {
 };
 
 #endif
-
-#include "cg.h"
-#include "cgs.h"
-#include "bicgs.h"

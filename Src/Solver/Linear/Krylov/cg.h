@@ -1,11 +1,6 @@
 #ifndef CG_H
 #define CG_H
 
-#include "../../Parallel/mpi_macros.h"
-#include <iostream>
-#include <cmath>
-#include "../../Domain/domain.h"
-#include "../../Matrix/matrix.h"
 #include "krylov.h"
 
 /***************************************************************************//**
@@ -22,9 +17,10 @@ class CG : public Krylov {
     CG(const Domain & s, const Prec & pc) : Krylov(s, pc) {allocate(s);}
     CG(const Domain & s)                  : Krylov(s)     {allocate(s);}
 
-    void solve(Matrix & A, Scalar & x, Scalar & b, const MaxIter & mi, 
-               const char * name = NULL,
-               const ResRat & rr = ResRat(), const ResTol & rt = ResTol());
+    virtual void solve(Matrix & A, Scalar & x, Scalar & b, 
+                       const MaxIter & mi, const char * name = NULL,
+                       const ResRat & rr = ResRat(),
+                       const ResTol & rt = ResTol());
 
   private:
     void allocate(const Domain & s) {

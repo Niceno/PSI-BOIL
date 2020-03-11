@@ -9,7 +9,7 @@
 #include "../Ravioli/timescheme.h"
 #include "../SimulationTime/simulation_time.h"
 #include "../Domain/domain.h"
-#include "../Solver/Krylov/krylov.h"
+#include "../Solver/Linear/Krylov/krylov.h"
 #include "../Matter/matter.h"
 
 ////////////////

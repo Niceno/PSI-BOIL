@@ -14,6 +14,7 @@ bool AC::cycle(const Cycle & init, const Cycle & loop,
   +--------------------*/
   real res_0;
   if(init_cycles(res_0,ncyc)) {
+    boil::oout<<"res_0 "<<res_0<<boil::endl;
     boil::timer.stop("cycle");
     return true;
   }

@@ -3,18 +3,19 @@
 *
 *  Direct solution of system of linear algebraic equations by Gaussian 
 *  elimination. It was designed for coarsest levels of AdditiveCorrection 
+*  CURRENTLY OBSOLETE!!!!
 *******************************************************************************/
 
 #ifndef GAUSS_H
 #define GAUSS_H
 
-#include "../../Parallel/mpi_macros.h"
+#include "../../../Parallel/mpi_macros.h"
 #include <cstdio>
 #include <cmath>
 #include <cstdlib>
 
-#include "../../Global/global_malloc.h"
-#include "../../Matrix/matrix.h"
+#include "../../../Global/global_malloc.h"
+#include "../../../Matrix/matrix.h"
 
 /////////////
 //         //

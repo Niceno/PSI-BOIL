@@ -1,7 +1,7 @@
-#include "krylov.h"
+#include "linear.h"
 
 /***************************************************************************//**
-*  \brief Parent class class constructor for all Krylov subspace solvers.
+*  \brief Parent class class constructor for all linear algebraic solvers.
 *
 *  Stores the domain on which the solver is created and sets the 
 *  Preconditioner. The defualt Preconditioner is "di", diagonal.
@@ -10,7 +10,7 @@
 *    It does not allocate the memory for children solvers, since they are
 *    different for each child. 
 *******************************************************************************/
-Krylov::Krylov(const Domain & d, const Prec & pc) 
+Linear::Linear(const Domain & d, const Prec & pc) 
  : /* p (), 
    q (), 
    r (), 

@@ -5,7 +5,6 @@
 #include <cmath>
 #include "../centered.h"
 #include "../../../Parallel/communicator.h"
-#include "../../../Solver/Gauss/gauss.h"
 #include "../../../Timer/timer.h"
 #include "../../../Global/global_realistic.h"
 #include "../../Tifmodel/tif.h"
@@ -82,22 +81,6 @@ class EnthalpyFD : public Centered {
     void new_time_step(const Scalar * diff_eddy = NULL);
     void solve(const ResRat & fact, const char * name = NULL);
     void solve_sor(const int & it, const real & r, const char * name = NULL);
-
-#if 0
-    //! Direct solver introduced just for checking it.
-    void direct() {
-      for_ijk(i,j,k)
-        fnew[i][j][k] = fold[i][j][k]
-                      + cnew[i][j][k] * conv_ts.N()
-                      + fbnd[i][j][k]
-                      + fext[i][j][k];
-
-      boil::timer.start("enthalpy solver");
-      Gauss gs;
-      gs.solve(A, phi, fnew);
-      boil::timer.stop("enthalpy solver");
-    }
-#endif
 
     real hflux_wall(const Scalar & s, const Dir d
                   , const Scalar * diff_eddy = NULL);

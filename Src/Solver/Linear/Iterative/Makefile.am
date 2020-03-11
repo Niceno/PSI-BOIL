@@ -1,0 +1,6 @@
+noinst_LIBRARIES = libIterative.a
+libIterative_a_SOURCES = iterative.h                   \
+                         jacobi.h                      \
+                         jacobi.cpp
+
+INCLUDE = -I@top_srcdir@/

@@ -4,7 +4,6 @@
 #include <cmath>
 #include "../centered.h"
 #include "../../../Parallel/communicator.h"
-#include "../../../Solver/Gauss/gauss.h"
 #include "../../../Timer/timer.h"
 #include "../../../Global/global_realistic.h"
 #include "../../Tifmodel/tif.h"

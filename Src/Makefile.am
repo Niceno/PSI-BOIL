@@ -5,7 +5,12 @@ Boil_SOURCES = main.cpp    \
 
 SUBDIRS = Equation/Staggered/Momentum                              \
           Equation/Staggered                                       \
-          Solver                                                   \
+          Solver/Additive                                          \
+          Solver/Linear/Gauss                                      \
+          Solver/Linear/Iterative                                  \
+          Solver/Linear/Krylov                                     \
+          Solver/Linear                                            \
+          Solver/Preconditioner                                    \
           Equation/Centered/Enthalpy                               \
           Equation/Centered/EnthalpyFD/EnthalpyFDaxisym            \
           Equation/Centered/EnthalpyFD                             \
@@ -62,7 +67,12 @@ SUBDIRS = Equation/Staggered/Momentum                              \
 
 LDADD = Equation/Staggered/Momentum/libMomentum.a                             \
         Equation/Staggered/libStaggered.a                                     \
-        Solver/libSolver.a                                                    \
+        Solver/Additive/libAdditive.a                                         \
+        Solver/Linear/Gauss/libGauss.a                                        \
+        Solver/Linear/Iterative/libIterative.a                                \
+        Solver/Linear/Krylov/libKrylov.a                                      \
+        Solver/Linear/libLinear.a                                             \
+        Solver/Preconditioner/libPreconditioner.a                             \
         Equation/Centered/Enthalpy/libEnthalpy.a                              \
         Equation/Centered/EnthalpyFD/EnthalpyFDaxisym/libEnthalpyFDaxisym.a   \
         Equation/Centered/EnthalpyFD/libEnthalpyFD.a                          \
