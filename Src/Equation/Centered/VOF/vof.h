@@ -60,6 +60,14 @@ class VOF : public Centered {
     void ancillary(); /* calcs ancillary params such as adens w/o advance */
     virtual void reconstruct_geometry();
     virtual void reconstruct_geometry(Scalar & scp);
+
+    /* mainly used in VOFaxisym */
+    virtual void color_to_vf(Scalar & color, Scalar & vf,
+                             const bool extalp=true,const bool bdn=true) {
+      vf = color;
+      return;
+    }
+
     void tension(Vector * vec, const Matter matt);
     void tension(Vector * vec, const Matter matt, const Scalar & scp);
     void totalvol();

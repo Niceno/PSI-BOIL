@@ -18,6 +18,7 @@ static void __attribute__ ((constructor)) trapfpe(void)
 //#define SETUP_ONLY
 #define USE_BOTTOM_DIRICHLET
 //#define USE_NUCLEATION
+#define CARTESIAN
 
 /******************************************************************************/
 int main(int argc, char ** argv) {
@@ -250,10 +251,19 @@ int main(int argc, char ** argv) {
   |  domain  |
   +---------*/
   Body floor("floor.stl");
-#ifdef USE_SOLID
-  Axisymmetric d(gx,gz,DX0,&floor);
+#ifdef CARTESIAN
+  Grid1D gy(DX0);
+  #ifdef USE_SOLID
+  Domain d(gx,gy,gz,&floor);
+  #else
+  Domain d(gx,gy,gzf);
+  #endif
 #else
+  #ifdef USE_SOLID
+  Axisymmetric d(gx,gz,DX0,&floor);
+  #else
   Axisymmetric d(gx,gzf,DX0);
+  #endif
 #endif
   const real dxmin = d.dxyz_min();
 
@@ -400,7 +410,11 @@ int main(int argc, char ** argv) {
 
   /* color function */
   Vector & uvwvof = uvw_1;
+#ifdef CARTESIAN
+  VOF conc(c, g, kappa, uvwvof, time, solver);
+#else
   VOFaxisym conc(c, g, kappa, uvwvof, time, solver);
+#endif
  
   conc.set_curv_method(curv_method);
   conc.set_topo_method(topo_method);
@@ -472,8 +486,13 @@ int main(int argc, char ** argv) {
 #ifdef USE_SOLID
   sld = &heater;
 #endif
+#ifdef CARTESIAN
+  EnthalpyFD enthFD(tpr, q, uvw, uvwenth1, uvwenth2, time, solver  , &mixed,
+                    conc.topo, tsat,sld);
+#else
   EnthalpyFDaxisym enthFD(tpr, q, uvw, uvwenth1, uvwenth2, time, solver  , &mixed,
                           conc.topo, tsat,sld);
+#endif
   enthFD.convection_set(TimeScheme::forward_euler());
   enthFD.diffusion_set(TimeScheme::backward_euler());
 
@@ -700,8 +719,8 @@ int main(int argc, char ** argv) {
     ns.solve(ResRat(1e-14));
 
     p = 0.0;
-    if (multigrid.vcycle(ResRat(1e-4))) OMS(converged);
-    //pr.solve(ResRat(1e-6));
+    if (multigrid.vcycle(ResRat(1e-6))) OMS(converged);
+    //pr.solve(ResRat(1e-6),"Pressure");
     p.exchange();
     ns.project(p);
     press += p;

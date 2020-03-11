@@ -15,6 +15,8 @@
 *  Temperature, Concentration ...
 *******************************************************************************/
 
+#include "additive_ravioli.h"
+
 //////////
 //      //
 //  AC  //
@@ -26,11 +28,29 @@ class AC {
     //! Basic constructor
     AC(Centered * cen); 
 
-    //! The solution algorythm. V-cycle. 
-    bool vcycle(const ResRat & factor, int * ncyc = NULL);
+    //! The solution algorithm. VFW-cycle shorthand calls added for simplicity. 
+    bool cycle(const Cycle & init, const Cycle & loop, 
+               const ResRat & factor, int * ncyc = NULL);
 
-    //! Another way to call vcycle (temporary) 
+    bool vcycle(const ResRat & factor, int * ncyc = NULL) { 
+      return cycle(Cycle::none(),Cycle::V(),factor,ncyc);
+    }
+    bool fcycle(const ResRat & factor, int * ncyc = NULL) { 
+      return cycle(Cycle::none(),Cycle::F(),factor,ncyc);
+    }
+    bool wcycle(const ResRat & factor, int * ncyc = NULL) { 
+      return cycle(Cycle::none(),Cycle::W(),factor,ncyc);
+    }
+
+    //! Another way to call cycles (temporary) 
+    bool cycle(const Cycle & init, const Cycle & loop,
+               int * ncyc = NULL) {
+      return cycle(init,loop,ResRat(targ_res_rat), ncyc);
+    }
+
     bool vcycle(int * ncyc = NULL) {return vcycle(ResRat(targ_res_rat), ncyc);}
+    bool fcycle(int * ncyc = NULL) {return fcycle(ResRat(targ_res_rat), ncyc);}
+    bool wcycle(int * ncyc = NULL) {return wcycle(ResRat(targ_res_rat), ncyc);}
 
     //! Set and get the maximum number of cycles
     void max_cycles(const int mc) {max_cyc = mc;}
@@ -65,11 +85,23 @@ class AC {
     //! Creates coarser discretized system
     void coarsen_system(const Centered & h, Centered & H) const; 
 
+    //! Individual components of a cycle
+    bool init_cycles(real & res_0, int * ncyc);
+    int converged(const ResRat & factor, const int & cycle,
+                  const real & res_0, const real & res0,
+                  int * ncyc);
+    void call_solver(const int l, const MaxIter & mi,
+                     const ResRat & res_rat, const ResTol & res_tol); 
+
+    void v_cycle(const int l);
+    void f_cycle(const int l, const bool upstream);
+    void w_cycle(const int l, const bool upstream);
+
     //! Pointers to coarser levels. 
     Centered * L[64];
     int        nlevels;
 
-    //! Parameters for steering of v-cycle
+    //! Parameters for steering of a cycle
     int  max_cyc;
     int  min_cyc;
     bool stop_if_div;

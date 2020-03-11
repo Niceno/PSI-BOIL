@@ -13,11 +13,14 @@ libSolver_a_SOURCES = Krylov/krylov.h                         \
                       Gauss/gauss.h                           \
                       Gauss/gauss.cpp                         \
                       Additive/additive.h                     \
+                      Additive/additive_ravioli.h             \
                       Additive/additive.cpp                   \
                       Additive/additive_coarsen_system.cpp    \
+                      Additive/additive_cycle.cpp             \
+                      Additive/additive_cycle_functions.cpp   \
                       Additive/additive_interpolation.cpp     \
+                      Additive/additive_recursive.cpp         \
                       Additive/additive_residual.cpp          \
-                      Additive/additive_restriction.cpp       \
-                      Additive/additive_vcycle.cpp
+                      Additive/additive_restriction.cpp
 
 INCLUDE = -I@top_srcdir@/

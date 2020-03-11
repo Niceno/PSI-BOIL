@@ -182,8 +182,8 @@ int main(int argc, char ** argv) {
 /* ------------ optional simulation settings */
 
   /* multigrid */
-  const bool multigrid_stop_if_diverging = true;
-  //const bool multigrid_stop_if_diverging = false;
+  //const bool multigrid_stop_if_diverging = true;
+  const bool multigrid_stop_if_diverging = false;
 
   const int multigrid_min_cycles = 3;
   const int multigrid_max_cycles = 20;
@@ -653,7 +653,7 @@ int main(int argc, char ** argv) {
   Krylov * solverCGdi = new CG(d, Prec::di());
   Krylov * solverBICG = new BiCGS(d, Prec::di());
 
-  Krylov * solver = solverCGdi;
+  Krylov * solver = solverCGic;
 
   /*-------------------+
   |  define equations  |
@@ -706,7 +706,7 @@ int main(int argc, char ** argv) {
 
   ConcentrationTP ngtransp(eps,mdot_eps,uvw,
                            c,conc.flow(),conc.heaviside(),&(conc.topo),
-                           time, solver, &gas);
+                           time, solverCGdi, &gas);
 
   /*---------------------------------------------------------------+
   |                     start computation                          |

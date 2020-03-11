@@ -1,5 +1,7 @@
 #include "cg.h"
 
+//#define DEBUG
+
 /***************************************************************************//**
 *  \brief Implementation of the Conjugate Gradient (CG) solver.
 *
@@ -33,10 +35,12 @@ void CG :: solve(Matrix & A, Scalar & x, Scalar & b, const MaxIter & mi,
   real res = r.dot(r); 
   real res0 = res;
 
-  // OMS(------------);
-  // OPR(sqrt(res0));
-  // OPR(res_tol);
-  // OPR(res_rat);
+#ifdef DEBUG
+  OMS(------------);
+  OPR(sqrt(res0));
+  OPR(res_tol);
+  OPR(res_rat);
+#endif
 
   /* should res be scaled with A and x? */
   if(sqrt(res) < res_tol) return; // temporary meassure
@@ -96,7 +100,9 @@ void CG :: solve(Matrix & A, Scalar & x, Scalar & b, const MaxIter & mi,
     +--------------------*/
     res = r.dot(r);
 
-    // OPR( sqrt(res) );
+#ifdef DEBUG
+    OPR( sqrt(res) );
+#endif
 
     /* should res be scaled with A and x? */
     if( sqrt(res) < res_tol ) break;
