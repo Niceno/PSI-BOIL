@@ -18,7 +18,7 @@ static void __attribute__ ((constructor)) trapfpe(void)
 //#define SETUP_ONLY
 #define USE_BOTTOM_DIRICHLET
 //#define USE_NUCLEATION
-#define CARTESIAN
+//#define CARTESIAN
 
 /******************************************************************************/
 int main(int argc, char ** argv) {
@@ -110,11 +110,11 @@ int main(int argc, char ** argv) {
 /* ------------ optional simulation settings */
 
   /* multigrid */
-  //const bool multigrid_stop_if_diverging = true;
-  const bool multigrid_stop_if_diverging = false;
+  const bool multigrid_stop_if_diverging = true;
+  //const bool multigrid_stop_if_diverging = false;
 
-  const int multigrid_min_cycles = 10;
-  const int multigrid_max_cycles = 10+2*gLevel;
+  const int multigrid_min_cycles = 5;
+  const int multigrid_max_cycles = 20;//10+2*gLevel;
 
   /* vof */
   const CurvMethod curv_method = CurvMethod::HF();
@@ -163,11 +163,13 @@ int main(int argc, char ** argv) {
 
 /******************************************************************************/
 /* ------------ domain dimensions */
-  real LX1 = 3.2e-3;
+  //real LX1 = 3.2e-3;
+  real LX1 = 6.4e-3;
   real LX2 = 3.5e-3;
   real LX3 = 5.0e-3;
 
-  const int NX1 = 4*128*gLevel;
+  //const int NX1 = 4*128*gLevel;
+  const int NX1 = 2*4*128*gLevel;
   const int NX2 = 140*gLevel;
   const int NX3 = 160*gLevel;
 
@@ -387,11 +389,13 @@ int main(int argc, char ** argv) {
   /*-----------------+
   |  define solvers  |
   +-----------------*/
-  Krylov * solverCGic = new CG(d, Prec::ic2());
-  Krylov * solverCGdi = new CG(d, Prec::di());
-  Krylov * solverBICG = new BiCGS(d, Prec::di());
+  Linear * solverCGic = new CG(d, Prec::ic2());
+  Linear * solverCGdi = new CG(d, Prec::di());
+  Linear * solverBICG = new BiCGS(d, Prec::di());
+  //Linear * solverIT = new Jacobi(d);
+  Linear * solverIT = new GaussSeidel(d);
 
-  Krylov * solver = solverCGic;
+  Linear * solver = solverCGic;
 
   /*-------------------+
   |  define equations  |
@@ -760,6 +764,7 @@ int main(int argc, char ** argv) {
 #endif
 
     for_vijk(c,i,j,k) {
+/*
 #ifndef USE_NUCLEATION
   #ifdef INVERTED
       if(c[i][j][k]>cold[i][j][k]) {
@@ -769,6 +774,7 @@ int main(int argc, char ** argv) {
         c[i][j][k] = cold[i][j][k];
       }
 #endif
+*/
       if(c.xc(i)>=(xmax-c.dxc(i))) {
         for_avjk(c,j,k) {
 #ifdef INVERTED
