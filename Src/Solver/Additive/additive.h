@@ -4,6 +4,7 @@
 #include "../../Parallel/mpi_macros.h"
 #include <iostream>
 #include <cmath>
+#include <array>
 #include "../../Equation/Centered/centered.h"
 #include "../../Timer/timer.h"
 
@@ -30,35 +31,31 @@ class AC {
 
     //! The solution algorithm + shorthand calls added for simplicity. 
     bool cycle(const Cycle & init, const Cycle & loop, 
-               const ResRat & factor, int * ncyc = NULL);
+               const ResRat & factor, const std::array<MaxIter,3> & mv,
+               int * ncyc = NULL);
 
     bool vcycle(const ResRat & factor, int * ncyc = NULL) { 
-      return cycle(Cycle::none(),Cycle::V(),factor,ncyc);
+      return cycle(Cycle::none(),Cycle::V(),factor,mv_def,ncyc);
     }
     bool fcycle(const ResRat & factor, int * ncyc = NULL) { 
-      return cycle(Cycle::none(),Cycle::F(),factor,ncyc);
+      return cycle(Cycle::none(),Cycle::F(),factor,mv_def,ncyc);
     }
     bool wcycle(const ResRat & factor, int * ncyc = NULL) { 
-      return cycle(Cycle::none(),Cycle::W(),factor,ncyc);
+      return cycle(Cycle::none(),Cycle::W(),factor,mv_def,ncyc);
     }
 
     bool fullcycle(const Cycle & loop, const ResRat & factor,
                    int * ncyc = NULL) { 
-      return cycle(Cycle::V(),loop,factor,ncyc);
+      return cycle(Cycle::V(),loop,factor,mv_def,ncyc);
     }
 
     //! Another way to call cycles (temporary) 
-    bool cycle(const Cycle & init, const Cycle & loop,
-               int * ncyc = NULL) {
-      return cycle(init,loop,ResRat(targ_res_rat), ncyc);
-    }
-
     bool vcycle(int * ncyc = NULL) {return vcycle(ResRat(targ_res_rat), ncyc);}
     bool fcycle(int * ncyc = NULL) {return fcycle(ResRat(targ_res_rat), ncyc);}
     bool wcycle(int * ncyc = NULL) {return wcycle(ResRat(targ_res_rat), ncyc);}
 
     bool fullcycle(const Cycle & loop, int * ncyc = NULL) {
-      return fullcycle(loop,ResRat(targ_res_rat), ncyc);
+      return fullcycle(loop,ResRat(targ_res_rat),ncyc);
     }
 
     //! Set and get the maximum number of cycles
@@ -76,6 +73,10 @@ class AC {
     //! Set and get target residual ratio
     void target_residual_ratio(const real & r) {targ_res_rat = r;}
     real target_residual_ratio() const         {return targ_res_rat;}
+
+    //! Set and get max-iteration array
+    void max_iter_array(const std::array<MaxIter,3> & mn) {mv_def = mn;}
+    std::array<MaxIter,3> max_iter_array() const          {return mv_def;}
 
     //! Stop id diverging
     void stop_if_diverging(const bool & s) {stop_if_div = s;}
@@ -104,10 +105,10 @@ class AC {
     void call_solver(const int l, const MaxIter & mi,
                      const ResRat & res_rat, const ResTol & res_tol); 
 
-    void v_cycle(const int l);
-    void f_cycle(const int l, const bool upstream);
-    void w_cycle(const int l, const bool upstream);
-    void full_cycle(const int l, const Cycle & cyc);
+    void v_cycle(const int l, const std::array<MaxIter,3> & mv);
+    void f_cycle(const int l, const std::array<MaxIter,3> & mv);
+    void w_cycle(const int l, const std::array<MaxIter,3> & mv);
+    void full_cycle(const int l, const Cycle & cyc, const std::array<MaxIter,3> & mv);
 
     //! Pointers to coarser levels. 
     Centered * L[64];
@@ -122,6 +123,7 @@ class AC {
     bool stop_if_div;
     real targ_res_val;
     real targ_res_rat;
+    std::array<MaxIter,3> mv_def;
 };
 
 #endif

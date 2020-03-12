@@ -13,6 +13,7 @@ AC::AC(Centered * cen, Linear * sol) {
   targ_res_val = boil::nano;
   targ_res_rat = 0.01;
   stop_if_div  = true;
+  mv_def = {MaxIter(20),MaxIter(20),MaxIter(20)};
 
   /* coarsen the variable */
   cen -> coarsen();	

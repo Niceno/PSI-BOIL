@@ -2,7 +2,8 @@
 
 /******************************************************************************/
 bool AC::cycle(const Cycle & init, const Cycle & loop,
-               const ResRat & factor, int * ncyc) {
+               const ResRat & factor, const std::array<MaxIter,3> & mv,
+               int * ncyc) {
 /*------------------+
 |  make few cycles  |
 +------------------*/
@@ -32,7 +33,7 @@ bool AC::cycle(const Cycle & init, const Cycle & loop,
   if(init!=Cycle::none()) {
     L[0]->phi = 0.0;
     L[nlevels-1]->fnew = 0.0;
-    full_cycle(0,init);
+    full_cycle(0,init,mv);
 
     /* evaluate convergence */
     real res0 = residual(*L[0]);
@@ -51,18 +52,14 @@ bool AC::cycle(const Cycle & init, const Cycle & loop,
 
     /* recursive kernel */
     if       (loop==Cycle::V()) {
-      v_cycle(0);
-    } else if(loop==Cycle::F1()) {
-      f_cycle(0,false);
-    } else if(loop==Cycle::F2()) {
-      f_cycle(0,true);
-    } else if(loop==Cycle::W1()) {
-      w_cycle(0,false);
-    } else if(loop==Cycle::W2()) {
-      w_cycle(0,true);
+      v_cycle(0,mv);
+    } else if(loop==Cycle::F()) {
+      f_cycle(0,mv);
+    } else if(loop==Cycle::W()) {
+      w_cycle(0,mv);
     /* just solve */
     } else {
-      call_smoother(0,MaxIter(40),ResRat(0.001),ResTol(boil::femto));
+      call_solver(0,MaxIter(40),ResRat(0.001),ResTol(boil::femto));
       real res1 = residual(*L[0]);
       boil::oout << "res = " << res1 << boil::endl;
       break;
