@@ -9,6 +9,7 @@ class Cycle {
     Cycle() {val=-1;}
 
     static const Cycle none() {return Cycle(-1);}
+    static const Cycle Z()    {return Cycle(-1);}
     static const Cycle V()    {return Cycle( 1);}
     static const Cycle F()    {return Cycle( 2);}
     static const Cycle W()    {return Cycle( 4);}

@@ -30,8 +30,14 @@ void ConcentrationTP::create_system_diffusive(const Scalar * diff_eddy) {
       dcp += ((*diff_eddy)[i  ][j][k] +
               (*diff_eddy)[i+1][j][k] )/(2.0*turbS);
     } 
-    real sw = dSx(Sign::neg(),i,j,k)*(1.0-clrm);
-    real se = dSx(Sign::pos(),i,j,k)*(1.0-clrp);
+
+    if(sig==Sign::neg()) {
+      clrm = 1.-clrm;
+      clrp = 1.-clrp;
+    }
+
+    real sw = dSx(Sign::neg(),i,j,k)*clrm;
+    real se = dSx(Sign::pos(),i,j,k)*clrp;
 
     gm =  tscn * dcm * sw / dxw;
     gp =  tscn * dcp * se / dxe;
@@ -61,8 +67,14 @@ void ConcentrationTP::create_system_diffusive(const Scalar * diff_eddy) {
       dcp += ((*diff_eddy)[i][j  ][k] +
               (*diff_eddy)[i][j+1][k] )/(2.0*turbS);
     } 
-    real ss = dSy(Sign::neg(),i,j,k)*(1.0-clrm);
-    real sn = dSy(Sign::pos(),i,j,k)*(1.0-clrp);
+
+    if(sig==Sign::neg()) {
+      clrm = 1.-clrm;
+      clrp = 1.-clrp;
+    }
+
+    real ss = dSy(Sign::neg(),i,j,k)*clrm;
+    real sn = dSy(Sign::pos(),i,j,k)*clrp;
 
     gm = tscn * dcm * ss / dys;
     gp = tscn * dcp * sn / dyn;
@@ -92,8 +104,14 @@ void ConcentrationTP::create_system_diffusive(const Scalar * diff_eddy) {
       dcp += ((*diff_eddy)[i][j][k  ] +
               (*diff_eddy)[i][j][k+1] )/(2.0*turbS);
     } 
-    real sb = dSz(Sign::neg(),i,j,k)*(1.0-clrm);
-    real st = dSz(Sign::pos(),i,j,k)*(1.0-clrp);
+
+    if(sig==Sign::neg()) {
+      clrm = 1.-clrm;
+      clrp = 1.-clrp;
+    }
+
+    real sb = dSz(Sign::neg(),i,j,k)*clrm;
+    real st = dSz(Sign::pos(),i,j,k)*clrp;
 
     gm = tscn * dcm * sb / dzb;
     gp = tscn * dcp * st / dzt;
@@ -109,8 +127,44 @@ void ConcentrationTP::create_system_diffusive(const Scalar * diff_eddy) {
   if(dom->ibody().nccells() > 0) {
     for(int cc=0; cc<dom->ibody().nccells(); cc++) {
       int i,j,k;
+      /* cell[i][j][k] is wall adjacent cell in fluid domain */
       dom->ibody().ijk(cc,&i,&j,&k); // OPR(i); OPR(j); OPR(k);
 
+#if 1 /* only works for grid-aligned ibs */
+
+      /* w */
+      if(dom->ibody().off(i-1,j,k)) {
+        A.c[i][j][k] -= A.w[i][j][k];
+        A.w[i][j][k] = 0.0;
+      }
+      /* e */
+      if(dom->ibody().off(i+1,j,k)) {
+        A.c[i][j][k] -= A.e[i][j][k];
+        A.e[i][j][k] = 0.0;
+      }
+
+      /* s */
+      if(dom->ibody().off(i,j-1,k)) {
+        A.c[i][j][k] -= A.s[i][j][k];
+        A.s[i][j][k] = 0.0;
+      }
+      /* n */
+      if(dom->ibody().off(i,j+1,k)) {
+        A.c[i][j][k] -= A.n[i][j][k];
+        A.n[i][j][k] = 0.0;
+      }
+
+      /* b */
+      if(dom->ibody().off(i,j,k-1)) {
+        A.c[i][j][k] -= A.b[i][j][k];
+        A.b[i][j][k] = 0.0;
+      }
+      /* t */
+      if(dom->ibody().off(i,j,k+1)) {
+        A.c[i][j][k] -= A.t[i][j][k];
+        A.t[i][j][k] = 0.0;
+      }
+#else
       /* w */
       if( dom->ibody().on(i-1,j,k) ) {
         const real fSw  = dom->ibody().fSw(cc);
@@ -157,7 +211,7 @@ void ConcentrationTP::create_system_diffusive(const Scalar * diff_eddy) {
         if( dom->ibody().on(i,j,k) ) A.t[i][j][k]   *= (fSt / fdzt);
         else if(fdzt != 1.0)         A.b[i][j][k+1] /= (1.0 - fdzt);
       }
-
+#endif
     }
 
   } /* is there an immersed body */

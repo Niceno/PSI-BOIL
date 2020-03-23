@@ -10,7 +10,7 @@ void ConcentrationTP::extrapolate() {
   extrapolation_flag();
 
   /* extrapolate epsilon from vapor to liquid */
-  topo->extrapolate(phi,Sign::pos(),eflag);
+  topo->extrapolate(phi,-sig,eflag);
 
   return;
 }

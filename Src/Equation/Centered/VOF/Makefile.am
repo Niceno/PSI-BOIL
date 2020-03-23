@@ -43,6 +43,7 @@ libVof_a_SOURCES =      vof.h                              \
                         vof_norm_elvira.cpp                \
                         vof_norm_mixed.cpp                 \
                         vof_norm_young.cpp                 \
+                        vof_output_cangle.cpp              \
                         vof_reconstruct_geometry.cpp       \
                         vof_select_norm.cpp                \
                         vof_smooth.cpp                     \

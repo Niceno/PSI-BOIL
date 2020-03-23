@@ -252,6 +252,24 @@ class Scalar {
     real dot(const Scalar & s) 
      {real d=0.0; for_ijk(i,j,k) d+=val[i][j][k]*s.val[i][j][k]; 
       boil::cart.sum_real(&d); return d;}
+    /*
+       sum */
+    real sum() {
+      real r(0.);
+      for_ijk(i,j,k)
+        r += val[i][j][k];
+      boil::cart.sum_real(&r);
+      return r;
+    }
+    /*
+       sum */
+    real sum_abs() {
+      real r(0.);
+      for_ijk(i,j,k)
+        r += fabs(val[i][j][k]);
+      boil::cart.sum_real(&r);
+      return r;
+    }
 
     /*-------------------------------------+
     |  accelerated mathematical operators  |

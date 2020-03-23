@@ -47,11 +47,25 @@ class Domain {
     int  ni()    const {return grid_x_local->ncell_b();}
     int  nj()    const {return grid_y_local->ncell_b();}
     int  nk()    const {return grid_z_local->ncell_b();}
+    int  ntot()    const {return ni()*nj()*nk();}
+
+    /* local number of internal cells */
+    int  nii()    const {return grid_x_local->ncell();}
+    int  nij()    const {return grid_y_local->ncell();}
+    int  nik()    const {return grid_z_local->ncell();}
+    int  nitot()    const {return nii()*nij()*nik();}
 
     /* global number of cells */
     int  gi() const {return grid_x_original->ncell_b();}
     int  gj() const {return grid_y_original->ncell_b();}
     int  gk() const {return grid_z_original->ncell_b();}
+    int  gtot()    const {return gi()*gj()*gk();}
+
+    /* global number of internal cells */
+    int  gii() const {return grid_x_original->ncell();}
+    int  gij() const {return grid_y_original->ncell();}
+    int  gik() const {return grid_z_original->ncell();}
+    int  gitot()    const {return gii()*gij()*gik();}
 
     /*  global extents of the domain */
     const Range<int> & cxg() const {return cr_x;}

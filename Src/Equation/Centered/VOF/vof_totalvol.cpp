@@ -1,7 +1,7 @@
 #include "vof.h"
 
 /******************************************************************************/
-void VOF::totalvol() {
+real VOF::totalvol(real * vapss) {
 
    /*---------+
    | method 1 |
@@ -25,5 +25,8 @@ void VOF::totalvol() {
               <<" "<< phisum << " "<<vapsum<< boil::endl;
    std::cout.unsetf(std::ios_base::floatfield);
 
-   return;
+   if(vapss)
+     *vapss = vapsum;
+
+   return phisum;
 }

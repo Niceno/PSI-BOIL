@@ -18,17 +18,19 @@
 ////////////
 class Sign {
   public:
-    Sign()            {val=-1;}
+    Sign() {val=0;} /* undefined */
 
     static const Sign undefined()   {return Sign(0);}
     static const Sign pos() {return Sign(+1);}
     static const Sign neg() {return Sign(-1);}
     
-    operator int () const {return val;}
-    
     //! Prints the sign name.
     friend std::ostream & 
       operator << (std::ostream & os, const Sign & sig);
+
+    //! Operators.
+    Sign operator - () const {return Sign(-val);}
+    operator int () const {return val;}
 
   private:
     /* prevent creation of new signs */

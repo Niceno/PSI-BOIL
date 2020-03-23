@@ -13,7 +13,8 @@ static void __attribute__ ((constructor)) trapfpe(void)
 
 #define SYM
 //#define SETUP_ONLY
-#define STATIC
+//#define STATIC
+#define RADIAL
 #define ANALYTIC
 #define CASE 1
 /* case 1 = axisymmetric
@@ -163,17 +164,21 @@ int main(int argc, char ** argv) {
 /* ------------ numerical simulation settings */
 
 #ifndef STATIC
-  exit(0);
+  /* total number of steps */
+  const int ndt = 10000*gLevel*3;
 #else
   /* total number of steps */
   const int ndt = 10000*gLevel;
+#endif
 
   /* steps per backup */
-  const int n_per_backup = ndt/1;
+  const int n_per_backup = ndt/5;
 
   /* steps per plot */
-  const int n_per_plot = ndt/5;
-#endif
+  const int n_per_plot = ndt/100;
+
+  /* surface tension multiplier */
+  const real surftens_dt_coef = 10.;
 
   /* cfl limit */
   const real cfl_limit = 0.1;
@@ -182,8 +187,8 @@ int main(int argc, char ** argv) {
 /* ------------ optional simulation settings */
 
   /* multigrid */
-  //const bool multigrid_stop_if_diverging = true;
-  const bool multigrid_stop_if_diverging = false;
+  const bool multigrid_stop_if_diverging = true;
+  //const bool multigrid_stop_if_diverging = false;
 
   const int multigrid_min_cycles = 3;
   const int multigrid_max_cycles = 20;
@@ -198,7 +203,7 @@ int main(int argc, char ** argv) {
   const int niter_pressure_extrap = 1000;
 
   /* tifmodel */
-  const real ur = 0.01;
+  const real ur = 0.05;
 
 /******************************************************************************/
 /* ------------ material properties */
@@ -377,6 +382,8 @@ int main(int argc, char ** argv) {
   const real keps = log(epswb/epsinf)*radius;
   const real ktpr = log( latent / (latent + Kpg * (Twb-Tinf)) )*radius;
 
+  boil::oout<<"Coefficients: "<<keps<<" "<<ktpr<<boil::endl;
+
   const real Twb_red  = Twb  + latent/Kpg;
   const real Tinf_red = Tinf - Twb_red;
 
@@ -536,8 +543,13 @@ int main(int argc, char ** argv) {
   //std::string eq = (STR_Tinr+"*"+STR_eul+"^("+STR_ktpr+"/(x*x+z*z)^0.5)+"+STR_Twbr);
 
   boil::oout<<eq<<"\n";
+#ifndef RADIAL
   char *eqTpr = new char[eq.length()+1];
   std::strcpy(eqTpr, eq.c_str());
+#else 
+  real eqTpr = Tinf_red*exp(ktpr/LX)+Twb_red;
+  boil::oout<<"tpredge= "<<eqTpr<<boil::endl;
+#endif
 
 #if CASE == 1
   tpr.bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
@@ -575,8 +587,13 @@ int main(int argc, char ** argv) {
   eq = STR_epsinf+"*"+STR_eul+"^("+STR_keps+"/(x*x+y*y+z*z)^0.5)";
 
   boil::oout<<eq<<"\n";
+#ifndef RADIAL
   char *eqEps = new char[eq.length()+1];
   std::strcpy(eqEps, eq.c_str());
+#else 
+  real eqEps = epsinf*exp(keps/LX);
+  boil::oout<<"epsedge= "<<eqEps<<boil::endl;
+#endif
 
 #if CASE == 1
   eps.bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
@@ -856,7 +873,33 @@ int main(int argc, char ** argv) {
   for(time.start(); time.end(); time.increase()) {
 
 #ifndef STATIC
-   update boundary conditions
+  #ifndef RADIAL
+     update boundary conditions
+  #endif
+#endif
+
+#ifdef RADIAL
+    real xcent, ycent, zcent;
+    xcent = ycent = zcent = 0.;
+    for_vijk(c,i,j,k) {
+      real dist = pow(c.xc(i)-xcent,2.0)
+  #if CASE == 3
+                 +pow(c.yc(j)-ycent,2.0)
+  #endif
+                 +pow(c.zc(k)-zcent,2.0);
+
+        dist = sqrt(dist);
+      if(dist>=LX) {
+        tpr[i][j][k] = eqTpr;
+        eps[i][j][k] = eqEps;
+
+        //boil::oout<<dist<<" "<<tpr[i][j][k]<<" "<<eps[i][j][k]<<boil::endl;
+      }
+    }
+    tpr.bnd_update();
+    tpr.exchange_all();
+    eps.bnd_update();
+    eps.exchange_all();
 #endif
 
     /*------------------------+
@@ -950,7 +993,6 @@ int main(int argc, char ** argv) {
 
     /* front */
     conc.front_minmax();
-    conc.totalvol();
 
     time.control_dt(ns.cfl_max(),cfl_limit,dt);
 
@@ -1002,18 +1044,44 @@ int main(int argc, char ** argv) {
     mgamma  /= weight;
     mgamma2 /= weight;
 
+#ifndef STATIC
+    real rad = conc.totalvol();
+  #if CASE == 3
+    #ifdef SYM
+    rad *= 8.;
+    #endif
+  #elif CASE == 2
+    boil::oout<<"Unsuported combination. Exiting."<<boil::endl;
+    exit(0);
+  #elif CASE == 1
+    rad *= 2.*boil::pi;
+    #ifdef SYM
+    rad *= 2.;
+    #endif
+  #endif
+    rad = pow(0.75*rad/boil::pi,1./3.);
+#else
+    conc.totalvol();
+    real rad = radius;
+#endif
 
     real tstd = sqrt(std::max(0.0,tgamma2-tgamma*tgamma));
     real estd = sqrt(std::max(0.0,egamma2-egamma*egamma));
     real mstd = sqrt(std::max(0.0,mgamma2-mgamma*mgamma));
 
-    real Sh = mgamma*radius*2./(diffcoef*rhog*log(epsinf/egamma)); 
+    real Sh1 = mgamma*rad*2./(diffcoef*rhog*log(epsinf/egamma)); 
+#ifndef RADIAL
+    real Sh2 = Sh1;
+#else
+    real Sh2 = mgamma*rad*2./(diffcoef*rhog*log(eqEps/egamma))
+             * (1.-rad/LX); 
+#endif
 
     boil::oout<<"interface: "<<time.current_time()<<" "
               <<tgamma<<" "<<tstd<<" "
               <<egamma<<" "<<estd<<" "
               <<mgamma<<" "<<mstd<<" "
-              <<weight<<" "<<Sh<<" "
+              <<weight<<" "<<Sh1<<" "<<Sh2
               <<boil::endl;
 
     if(time.current_step() % n_per_plot == 0 || time.current_step()==1 ) {

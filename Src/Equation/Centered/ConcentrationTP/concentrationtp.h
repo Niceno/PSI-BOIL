@@ -46,6 +46,7 @@ class ConcentrationTP : public Centered {
         \param sm   - Linear solver. It acts as a solver, or as a
                       smoother for AC multigrid.
         \param flu  - Holds material properties of diffusing species.
+        \param sig  - decides if gas is color = 0 (Sign::neg()) or vice versa
     */
     ConcentrationTP(const Scalar & phi,
                     const Scalar & f,
@@ -56,7 +57,8 @@ class ConcentrationTP : public Centered {
                     Topology * topo,
                     Times & t,
                     Linear * sm,
-                    Matter * flu); 
+                    Matter * flu,
+                    const Sign sig = Sign::neg()); 
     ~ConcentrationTP();
 	  
     //! Interface call to parent's discretization.
@@ -120,5 +122,6 @@ class ConcentrationTP : public Centered {
     bool store_clrold;
     real turbS; /* turbulent schmidt number */
     bool laminar;
+    const Sign sig;
 };	
 #endif

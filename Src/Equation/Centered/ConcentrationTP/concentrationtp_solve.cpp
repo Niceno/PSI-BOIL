@@ -24,7 +24,7 @@ void ConcentrationTP::solve(const ResRat & fact, const char * name) {
   update_rhs();
 
   for_avijk(phi,i,j,k) {
-    if(heavi->status(i,j,k)==1) {
+    if(heavi->status(i,j,k)==-sig) {
       fnew[i][j][k] = phi[i][j][k];
     }
   }

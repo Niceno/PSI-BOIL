@@ -13,9 +13,11 @@ void ConcentrationTP::create_system_innertial() {
   for_ijk(i,j,k) {
     real r = rho_dif->value(i,j,k);
     real col_new = (*clr)[i][j][k];
+
+    if(sig==Sign::neg()) col_new = 1.-col_new;
  
     /* gas diffusive innertial */
-    A.c[i][j][k] = dV(i,j,k) * dti * r * (1.0 - col_new);
+    A.c[i][j][k] = dV(i,j,k) * dti * r * col_new;
   }
  
   if(dom->ibody().nccells() > 0) {

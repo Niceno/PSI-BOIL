@@ -1,0 +1,969 @@
+#include "Include/psi-boil.h"
+#include <fstream>
+#include <iostream>
+#include <fenv.h>
+#define _GNU_SOURCE 1
+#if 1
+static void __attribute__ ((constructor)) trapfpe(void)
+{
+  /* Enable some exceptions. At startup all exceptions are masked. */
+  feenableexcept(FE_INVALID|FE_DIVBYZERO|FE_OVERFLOW);
+}
+#endif
+
+#define AXISYMMETRIC
+//#define USE_PHASE_VEL_VOF
+//#define VARIABLE
+//#define TEST_VARIABLE
+//#define INVERTED
+//#define USE_PHASE_VEL_EFD
+//#define USE_SOLID
+//#define SETUP_ONLY
+#define USE_BOTTOM_DIRICHLET
+
+/******************************************************************************/
+int main(int argc, char ** argv) {
+
+  boil::timer.start();
+
+  if(argc<6) {
+    boil::oout<<"Five command line arguments required!"<<"\n";
+    boil::oout<<"./Boil wmin glevel diam[mm] CA[deg] twall[degC]"<<"\n";
+
+    exit(0);
+  }
+
+/******************************************************************************/
+/* ------------ input from command line */
+  int wmin=atoi(argv[1]);
+  boil::oout<<"wmin= "<<wmin<<"\n";
+
+  const int gLevel = atoi(argv[2]); /* domain dimensions */ 
+  boil::oout<<"glevel= "<<gLevel<<"\n";
+
+  real diameter = atof(argv[3]); 
+  boil::oout<<"diameter= "<<diameter<<"\n";
+
+  const real cangle = atof(argv[4]);  
+  boil::oout<<"cangle= "<<cangle<<"\n";
+
+  real twall = atof(argv[5]);  
+  boil::oout<<"twall= "<<twall<<"\n";
+  
+/******************************************************************************/
+/* ------------ rescaling factors */
+  const real xmult = 1e0;
+  const real tmult = 1e0;
+  const real mmult = xmult*tmult;
+
+/******************************************************************************/
+/* ------------ boundary or initial conditions */
+  const real tout = 20.+273.15; /* ambient */
+  twall += 273.15;
+
+  /* n-heptane */
+  const real tsat0 = 98.4+273.15;
+  const real twall0 = twall;
+
+/******************************************************************************/
+/* ------------ values to be directly rescaled */
+  real gravity = boil::g; /* m/s2 */
+  real R = boil::R;
+
+  /* for now */
+  real liquid_drhodt=0.0;   //[kg/m3K]
+  real vapor_drhodt=0.0; //[kg/m3K]
+
+  real qflux=0.0;
+
+  /* rescaling */
+  gravity *= xmult/tmult/tmult; /* [m/s2] */
+  liquid_drhodt *= mmult/xmult/xmult/xmult;   //[kg/m3K]
+  vapor_drhodt  *= mmult/xmult/xmult/xmult;  //[kg/m3K]
+  R *= mmult*xmult*xmult/tmult/tmult; /* [kgm2/s2/mol/K] */
+
+  qflux *= mmult/tmult/tmult/tmult;     // [kg/s3]
+  diameter *= 1e-3*xmult; /* to m and then rescale */
+
+  const real radius = 0.5*diameter;
+
+/******************************************************************************/
+/* ------------ numerical simulation settings */
+
+  /* total number of steps */
+  const int ndt = 700000*3;
+
+  /* steps per backup */
+  const int n_per_backup= 10000;
+
+  /* if yes, plotting each t_per_plot seconds. Else, each n_per_plot steps */
+  const bool use_t_per_plot = true;
+  const real t_per_plot = 1e-3*tmult;
+  const int n_per_plot = n_per_backup;
+
+  /* dt settings */
+  const real surftens_dt_coef = 10.;
+  const real initdtcoef = 1e-4;
+
+  /* cfl limit */
+  const real cfl_limit = 0.1;
+
+  /* under-relaxation */
+  //const real ur = 0.001;
+  const real ur = 0.01;
+
+/* ------------ optional simulation settings */
+
+  /* multigrid */
+  const bool multigrid_stop_if_diverging = true;
+  //const bool multigrid_stop_if_diverging = false;
+
+  const int multigrid_min_cycles = 1;
+  const int multigrid_max_cycles = 20;
+
+  /* vof */
+  const CurvMethod curv_method = CurvMethod::HF();
+  //const CurvMethod wall_curv_method = CurvMethod::HFnormalXZ();
+  const CurvMethod wall_curv_method = CurvMethod::HFparallelXZ();
+  const TopoMethod topo_method = TopoMethod::Hybrid();
+
+  const bool detachment_model = false;
+  const bool subgrid_method = true; /* use slic subgrid */
+  const bool use_fs_interp = false;
+  const bool store_pressure_extrap = false;
+  const int niter_pressure_extrap = 1000; 
+
+  /* phase change */
+#ifdef USE_SOLID
+  const bool near_wall_modelling = true; /* use near wall modelling */
+#else
+  const bool near_wall_modelling = false; /* use near wall modelling */
+#endif
+
+/******************************************************************************/
+/* ------------ material properties */
+  /* n-heptane (60 degC), gas modelled as dry air */
+  const real Mv = 100.21e-3; /* needed for Clapeyron, value for heptane */
+  const real mug = 1.962e-5;
+  const real rhog = 1.086;
+  const real cpg = 1.0063e3*rhog;
+  const real lambdag = 2.816e-2;
+
+  const real mul = 0.00027155;
+  const real rhol = 649.41;
+  const real cpl = 2.3825e3*rhol;
+  const real lambdal = 0.12238;
+
+  const real sig = 16.3e-3;
+  const real latent=344*1000.0;
+  /* rescaled to 60 degC using FSG correlation from 25 */
+  real diffcoef = 0.073*1e-4;
+  diffcoef *= pow(twall0/(273.15+25),1.75);
+
+  const real betal = 0.00124; 
+  const real betag = 1./twall0; /* ideal gas approximation */
+
+  /* heater */
+  /* aluminum */
+  const real rhosol = 2.71e3;
+  const real cpsol = 921.096*rhosol;
+  const real lambdasol = 205.;
+
+  /* natural convection BL thickness */
+  real ztconst = xmult*7.14*
+                 std::pow(mug*lambdag/cpg/rhog/gravity/(twall0-tout)/betag,1./3.);
+  boil::oout<<"BL thickness: "<<ztconst<<boil::endl;
+
+/******************************************************************************/
+/* ------------ domain dimensions */
+  const int NX1  = 20*gLevel;
+  const int NX2  = 12*gLevel;
+
+  const real LX1 = 1.1*radius;
+  const real LX2 = 2.0*LX1;
+
+  const int NZ0 = 4;
+  const int NZ  = 16*gLevel;
+#ifdef USE_SOLID
+  const int NZ1 = NZ-NZ0;
+#else
+  const int NZ1 = NZ;
+#endif
+  
+/******************************************************************************/
+/* ------------ calculated values */
+  const real DX0 = LX1/real(NX1);
+  const real LZ0 = -NZ0*DX0;
+  const real LZ1 = DX0*real(NZ1);
+  const real dxuni = DX0;
+
+  boil::oout<<"grid: "<<LX1<<" "<<LX2<<" "<<DX0<<boil::endl;
+
+  /* heater power */
+  real qsrc=qflux/fabs(LZ0);  // [W/m3]
+  boil::oout<<"#qsrc= "<<qsrc<<" qflux= "<<qflux<<"\n";
+
+/******************************************************************************/
+/* ------------- setup finished */
+/******************************************************************************/
+/* below this line, NO VALUES AND SETTINGS CAN BE ENTERED! */
+/******************************************************************************/
+
+  /*--------------------------------+
+  |  choose the output file format  |
+  +--------------------------------*/
+  boil::plot = new PlotTEC();
+
+  /*----------+
+  |  grid(s)  |
+  +----------*/
+  Grid1D gx1( Range<real>(0.0,LX1), NX1, Periodic::no() );
+  Grid1D gx2( Range<real>(LX1,LX2),
+              Range<real>(dxuni,3.0*dxuni),
+              NX2, Periodic::no() );
+  Grid1D gx ( gx1, gx2, Periodic::no(), BndGrid::symmetry(), BndGrid::wall());
+  Grid1D gz0( Range<real>(LZ0, 0.0), NZ0, Periodic::no() );
+
+  Grid1D gz1( Range<real>(0.0, LZ1), NZ1, Periodic::no() );
+  Grid1D gz ( gz0, gz1, Periodic::no());
+
+  /*---------+
+  |  domain  |
+  +---------*/
+  Body floor("floor.stl");
+#ifdef USE_SOLID
+  #ifndef AXISYMMETRIC
+  Domain d(gx, gx, gz, & floor);
+  #else
+  Axisymmetric d(gx,gz,dxuni,&floor);
+  #endif
+#else
+  #ifndef AXISYMMETRIC
+  Domain d(gx, gx, gz1);
+  #else
+  Axisymmetric d(gx,gz1,dxuni);
+  #endif
+#endif
+  const real dxmin = d.dxyz_min();
+
+  /*------------------+
+  |  define unknowns  |
+  +------------------*/
+  Vector uvw(d), xyz(d);           // vel
+  Vector uvw_1(d), uvw_2(d);       // phasic vel
+  Scalar p  (d), f  (d), press(d); // pressure
+  Scalar c  (d), g  (d), kappa(d); // concentration
+  Scalar tpr(d), q  (d);           // temperature
+  Scalar mdot(d), mflx(d);         // phase-change rate
+
+  Scalar eps(d), mdot_eps(d);      /* NG concentration */
+
+  /*-----------------------------+ 
+  |  insert boundary conditions  |
+  +-----------------------------*/
+  for_m(m) {
+    uvw.bc(m).add( BndCnd( Dir::imin(), BndType::symmetry() ) );
+    uvw.bc(m).add( BndCnd( Dir::imax(), BndType::wall() ) );
+    uvw.bc(m).add( BndCnd( Dir::kmin(), BndType::wall() ) );
+    uvw.bc(m).add( BndCnd( Dir::kmax(), BndType::outlet() ) );
+    uvw.bc(m).add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
+    uvw.bc(m).add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
+
+    uvw_1(m)=uvw(m).shape();
+    uvw_2(m)=uvw(m).shape();
+  }
+
+  p.bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
+  p.bc().add( BndCnd( Dir::imax(), BndType::neumann() ) );
+  p.bc().add( BndCnd( Dir::kmin(), BndType::wall() ) );
+  p.bc().add( BndCnd( Dir::kmax(), BndType::outlet() ) );
+  p.bc().add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
+  p.bc().add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
+
+  /* copy b.c. from p */
+  press = p.shape();
+  f = p.shape();
+  mdot = p.shape();
+  mflx = p.shape();
+  q = p.shape();
+  mdot_eps = p.shape();
+  kappa = p.shape();
+  g = p.shape();
+
+  /* should avoid spurious flows from the outlet */
+  c.bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
+  c.bc().add( BndCnd( Dir::imax(), BndType::neumann() ) );
+  c.bc().add( BndCnd( Dir::kmin(), BndType::wall() ) );
+#ifdef INVERTED
+  c.bc().add( BndCnd( Dir::kmax(), BndType::dirichlet(), 1.0 ) );
+#else
+  c.bc().add( BndCnd( Dir::kmax(), BndType::dirichlet(), 0.0 ) );
+#endif
+  c.bc().add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
+  c.bc().add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
+
+  eps.bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
+  eps.bc().add( BndCnd( Dir::imax(), BndType::neumann() ) );
+  eps.bc().add( BndCnd( Dir::kmin(), BndType::wall() ) );
+#ifndef TEST_VARIABLE
+  eps.bc().add( BndCnd( Dir::kmax(), BndType::dirichlet(), 1.0 ) );
+#else
+  eps.bc().add( BndCnd( Dir::kmax(), BndType::neumann() ) );
+#endif
+  eps.bc().add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
+  eps.bc().add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
+
+  tpr.bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
+  tpr.bc().add( BndCnd( Dir::imax(), BndType::neumann() ) );
+#ifdef USE_BOTTOM_DIRICHLET
+  tpr.bc().add( BndCnd( Dir::kmin(), BndType::dirichlet(), twall ) );
+#else
+  tpr.bc().add( BndCnd( Dir::kmin(), BndType::neumann() ) );
+#endif
+  tpr.bc().add( BndCnd( Dir::kmax(), BndType::dirichlet(),tout) );
+  tpr.bc().add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
+  tpr.bc().add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
+
+  /*----------------------+
+  |  physical properties  |
+  +----------------------*/
+  Matter gas(d), liquid(d), heater(d);
+  gas.mu       (mug);
+  gas.rho      (rhog);
+  gas.cp       (cpg);  // J/m3
+  gas.lambda   (lambdag);
+  gas.mmass    (Mv);
+  gas.gamma    (diffcoef*rhog);
+  liquid.mu    (mul);
+  liquid.rho   (rhol);
+  liquid.cp    (cpl);   // J/m3
+  liquid.lambda(lambdal);
+  liquid.mmass (Mv);
+
+  heater.rho    (rhosol);
+  heater.cp     (cpsol);
+  heater.lambda (lambdasol);
+
+  Matter * zero = &gas;
+  Matter * one = &liquid;
+#ifdef INVERTED
+  zero = &liquid;
+  one = &gas;
+#endif
+  Matter mixed(*one,*zero, &c);
+  mixed.sigma(sig);
+  mixed.latent(latent);
+
+  /* rescaling */
+  gas.rescale(xmult,tmult,mmult);
+  liquid.rescale(xmult,tmult,mmult);
+  mixed.rescale(xmult,tmult,mmult);
+  heater.rescale(xmult,tmult,mmult);
+
+  /*-------------------+
+  |  time-integration  |
+  +-------------------*/
+  const real dt = surftens_dt_coef*pow(gas.rho()->value()*pow(dxmin,3.0)
+                / (2.0*boil::pi*mixed.sigma()->value()),0.5);
+  boil::oout<<"main:dxmin= "<<dxmin<<" "<<boil::cart.iam()<<" "<<dt<<"\n";
+  Times time(ndt, dt);
+  time.set_coef_dec(0.75);
+  time.set_dt(dt*initdtcoef);
+
+  /*-----------------+
+  |  define solvers  |
+  +-----------------*/
+  Krylov * solverCGic = new CG(d, Prec::ic2());
+  Krylov * solverCGdi = new CG(d, Prec::di());
+  Krylov * solverBICG = new BiCGS(d, Prec::di());
+
+  Krylov * solver = solverCGic;
+
+  /*-------------------+
+  |  define equations  |
+  +-------------------*/
+  /* momentum equation */
+  Momentum ns( uvw, xyz, time, solver, &mixed);
+  ns.convection_set(TimeScheme::forward_euler());
+  ns.diffusion_set(TimeScheme::backward_euler());
+
+  /* pressure solver */
+  Pressure pr(p, f, uvw, time, solver, &mixed);
+  AC multigrid( &pr );
+  multigrid.stop_if_diverging(multigrid_stop_if_diverging);
+  multigrid.min_cycles(multigrid_min_cycles);
+  multigrid.max_cycles(multigrid_max_cycles);
+
+  /* color function */
+#ifdef USE_PHASE_VEL_VOF
+  Vector & uvwvof = uvw_1;
+#else
+  Vector & uvwvof = uvw;
+#endif
+#ifndef AXISYMMETRIC
+  VOF conc(c, g, kappa, uvwvof, time, solver);
+#else
+  VOFaxisym conc(c, g, kappa, uvwvof, time, solver);
+#endif
+  conc.set_curv_method(curv_method);
+  conc.set_topo_method(topo_method);
+  conc.set_wall_curv_method(wall_curv_method,Sign::pos());
+  conc.set_use_interp(use_fs_interp);
+  conc.set_pressure_extrapolation_parameters(store_pressure_extrap,niter_pressure_extrap);
+
+  if(subgrid_method) {
+#ifndef INVERTED
+    conc.set_subgrid_method(SubgridMethod::SLICliquid());
+#else
+    conc.set_subgrid_method(SubgridMethod::SLICgas());
+#endif
+  } else {
+    conc.set_subgrid_method(SubgridMethod::None());
+  }
+
+#ifndef INVERTED
+  conc.set_cangle(cangle);
+  conc.set_wall_curv_method(wall_curv_method,Sign::pos());
+  //conc.set_cangle(5.);
+#else
+  conc.set_cangle(180.-cangle);
+  conc.set_wall_curv_method(wall_curv_method,Sign::neg());
+  //conc.set_cangle(180.-5.);
+#endif
+
+  /* enthalpy equation */
+#ifndef VARIABLE
+  TIF tsat(tsat0);
+#else
+  Clapeyron tsat(tsat0,conc.topo.adens,eps,Mv,latent);
+  tsat.set_ur(ur);
+#endif
+
+#ifdef USE_PHASE_VEL_VOF
+  #ifdef USE_PHASE_VEL_EFD
+  Vector & uvwenth1 = uvw_1;
+  Vector & uvwenth2 = uvw_2;
+  //Vector & uvwenth2 = uvw;
+  #else
+  Vector & uvwenth1 = uvw;
+  Vector & uvwenth2 = uvw;
+  #endif
+#else
+  Vector & uvwenth1 = uvw;
+  Vector & uvwenth2 = uvw;
+#endif
+
+  Matter * sld = NULL;
+#ifdef USE_SOLID
+  sld = &heater;
+#endif
+
+#ifndef AXISYMMETRIC
+  EnthalpyFD enthFD      (tpr, q, uvw, uvwenth1, uvwenth2, time, solver  , &mixed,
+                          conc.topo, tsat,sld);
+#else
+  EnthalpyFDaxisym enthFD(tpr, q, uvw, uvwenth1, uvwenth2, time, solver  , &mixed,
+                          conc.topo, tsat,sld);
+#endif
+  enthFD.convection_set(TimeScheme::forward_euler());
+  enthFD.diffusion_set(TimeScheme::backward_euler());
+
+  /* phase change */
+#ifdef INVERTED
+  PhaseChangeVOF pc(mdot, mflx, tpr, q, c, g, f, uvw, conc.topo,
+                    tsat, time, &mixed,sld,Sign::neg());
+#else
+  PhaseChangeVOF pc(mdot, mflx, tpr, q, c, g, f, uvw, conc.topo,
+                    tsat, time, &mixed, sld);
+#endif
+
+#ifdef USE_SOLID
+  pc.set_near_wall_modelling(near_wall_modelling);
+#endif
+
+  /* ng transport */
+#ifdef INVERTED
+  ConcentrationTP ngtransp(eps,mdot_eps,uvw,
+                           c,conc.flow(),conc.heaviside(),&(conc.topo),
+                           time, solverCGdi, &gas,Sign::pos());
+#else
+  ConcentrationTP ngtransp(eps,mdot_eps,uvw,
+                           c,conc.flow(),conc.heaviside(),&(conc.topo),
+                           time, solverCGdi, &gas);
+#endif
+
+  /*-------------------+
+  |  check if restart  |
+  +-------------------*/
+  std::fstream input;
+  int irun = 0;
+  if(boil::cart.iam()==0){
+    input.open("run.txt", std::ios::in);
+    if( !input.fail() ) {
+      input >> irun;
+      std::cout<<"read irun.  irun= "<<irun<<"\n";
+    }
+    input.close();
+  }
+  boil::cart.sum_int(&irun);
+  if (irun==1){
+    boil::oout<<"exit job due to irun=1"<<"\n";
+    exit(0);
+  }
+
+  if(boil::cart.iam()==0){
+    std::fstream output;
+    output.open("run.txt", std::ios::out);
+    output << 1 << boil::endl;
+    output.close();
+  }
+
+  int ts=0;
+  input.open("time.txt", std::ios::in);
+  if( !input.fail() ) {
+    real t,dtf;
+    input >> ts;
+    input >> t;
+    input >> dtf;
+    uvw.  load("uvw",   ts);
+    press.load("press",   ts);
+    c. load("c", ts);
+    tpr.  load("tpr", ts);
+#ifdef VARIABLE
+    (tsat.tif).load("tif",ts);
+#endif
+    eps.  load("eps",ts);
+    time.first_step(ts);
+    time.current_time(t);
+    time.set_dt(dtf);
+
+    conc.init();
+  } else {
+    boil::oout << "######################" << boil::endl;
+    boil::oout << "#                    #" << boil::endl;
+    boil::oout << "# START FROM SCRATCH #" << boil::endl;
+    boil::oout << "#                    #" << boil::endl;
+    boil::oout << "######################" << boil::endl;
+
+    /*--------------------+
+    |  initial condition  |
+    +--------------------*/
+    real R0, zcent, volume;
+    const real xcent = 0.0;
+    const real chord = 2.*radius;
+    boil::droplet_parameters_3D(cangle,volume,R0,zcent,chord);
+
+#ifdef AXISYMMETRIC
+    boil::setup_circle_xz(conc.color(),R0,xcent,zcent);
+    conc.color().bnd_update();
+    conc.color().exchange_all();
+
+    conc.color_to_vf(conc.color(),c);
+    conc.reconstruct_geometry();
+    conc.test_reconstruction(conc.color(),c);
+#else
+    boil::oout<<"Underdevelopment! Need to add setup sphere. Exiting."
+              <<boil::endl;
+    exit(0);
+#endif
+#ifdef INVERTED
+  for_vijk(c,i,j,k) {
+    c[i][j][k] = 1. - c[i][j][k];
+  }
+#endif
+    for_avijk(c,i,j,k) {
+      if(d.ibody().off(i,j,k))
+        c[i][j][k] = -1.;
+    }
+
+    c.bnd_update();
+    c.exchange_all();
+    conc.init();
+
+    for_vijk(c,i,j,k) {
+      if(tpr.zc(k)<0.0) {
+        tpr[i][j][k] = twall0 + tpr.zc(k)/LZ0 * (twall-twall0);
+#ifndef INVERTED
+      } else if(conc.color()[i][j][k]>0.5) {
+#else
+      } else if(conc.color()[i][j][k]<0.5) {
+#endif
+        tpr[i][j][k] = twall0;
+      } else if(tpr.zc(k)<=ztconst) {
+        tpr[i][j][k] = twall0 + (tout-twall0)/ztconst * tpr.zc(k);
+      } else {
+        tpr[i][j][k] = tout;
+      }
+    }
+    tpr.bnd_update();
+    tpr.exchange_all();
+#ifdef VARIABLE
+    for_avijk(c,i,j,k) {
+      (tsat.tif)[i][j][k] = twall0;
+    }
+#endif
+
+#ifdef VARIABLE
+    for_vijk(c,i,j,k) {
+  #ifndef INVERTED
+      if(conc.color()[i][j][k]>0.0) {
+  #else
+      if(conc.color()[i][j][k]<1.0) {
+  #endif
+        eps[i][j][k] = tsat.epsilon(twall0-0.5);
+      } else {
+        real dist = pow(c.xc(i)-xcent,2.0)
+  #ifndef AXISYMMETRIC
+                   +pow(c.yc(j)-ycent,2.0)
+  #endif
+                   +pow(c.zc(k)-zcent,2.0);
+        
+        dist = sqrt(dist);
+  #ifndef TEST_VARIABLE
+        eps[i][j][k] = pow(tsat.epsilon(twall0-0.5),R0/dist);
+  #else
+        eps[i][j][k] = tsat.epsilon(twall0-0.5);
+  #endif
+      }
+    }
+    eps.bnd_update();
+    eps.exchange_all();   
+#else
+    eps = 1.;
+#endif
+
+    tsat.init();
+#ifndef VARIABLE
+      boil::plot->plot(uvw,c,tpr,eps,mdot,
+                       "uvw-c-tpr-eps-mdot",0);
+#else
+      boil::plot->plot(uvw,c,tpr,eps,mdot,tsat.tif,
+                       "uvw-c-tpr-eps-mdot-tif",0);
+#endif
+    std::fstream output;
+    std::stringstream ss;
+    ss <<"profile-"<<0<<".txt";
+    output.open(ss.str(), std::ios::out);
+    boil::output_profile_xz(conc.color(),output,NZ);
+    boil::cart.barrier();
+    output.close();
+    conc.output_cangle_2d(Comp::i(),Comp::k(),Sign::neg());
+  }
+  input.close();
+
+  /* set iint */
+  int iint;
+  if(use_t_per_plot) {
+    iint = time.current_time() / t_per_plot;
+  } else {
+    if(time.current_time()<time.dt()) {
+      iint = 0;
+    } else {
+      iint = time.current_step() / n_per_plot;
+    }
+  }
+
+  boil::oout<<"iint= "<<iint<<"\n";
+
+  /*------------+
+  |  time loop  |
+  +------------*/
+#ifndef SETUP_ONLY
+  for(time.start(); time.end(); time.increase()) {
+
+    /*----------------------------------------------+
+    |  reset body force & source term for enthalpy  |
+    +----------------------------------------------*/
+    for_m(m)
+      for_avmijk(xyz,m,i,j,k)
+        xyz[m][i][j][k]=0.0;
+
+    q=0.0; 
+    for_vk(tpr,k){
+      if((tpr.zc(k)<0.0)){
+        for_vij(tpr,i,j){
+          q[i][j][k]=qsrc*tpr.dV(i,j,k);
+        }
+      }
+    }
+
+    /*------------------------+
+    |  solve energy equation  |
+    +------------------------*/
+    //enthFD.tint_field(); /* called in discretize */
+    enthFD.discretize();
+    enthFD.new_time_step();
+    enthFD.solve(ResRat(1e-16),"Enthalpy");
+
+    /*---------------+
+    |  phase change  |
+    +---------------*/
+    pc.update();
+    ns.vol_phase_change(&f);
+
+    /*--------------------------+
+    |  solve momentum equation  |
+    +--------------------------*/
+    /* gravity force */
+    Comp m = Comp::w();
+    for_vmijk(xyz,m,i,j,k){
+#ifdef INVERTED
+      real phil=std::max(0.0,std::min(1.0,c[i][j][k]));
+      real phig=1.0-phil;
+#else
+      real phig=std::max(0.0,std::min(1.0,c[i][j][k]));
+      real phil=1.0-phig;
+#endif
+      real deltmp=tpr[i][j][k]-twall0;
+      real rhomix = phil*boil::rho(liquid.rho()->value(),
+                                   liquid.beta()->value(),deltmp)
+                  + phig*boil::rho(gas.rho()->value(),
+                                   gas.beta()->value(),deltmp);
+      if(d.ibody().on(m,i,j,k))
+        xyz[m][i][j][k] += -gravity * xyz.dV(m,i,j,k) * rhomix;
+    }
+
+    /* surface tension */
+    conc.tension(&xyz, mixed,conc.color());
+
+    /*--------------------------+
+    |  solve momentum equation  |
+    +--------------------------*/
+    /* essential for moving front */
+    ns.discretize();
+    pr.discretize();
+    pr.coarsen();
+
+    /* momentum */
+    ns.new_time_step();
+
+    ns.grad(press);
+    ns.solve(ResRat(1e-14));
+
+    p = 0.0;
+    if (multigrid.wcycle(ResRat(1e-6))) OMS(converged);
+    //pr.solve(ResRat(1e-6));
+    p.exchange();
+    ns.project(p);
+    press += p;
+
+    /* shift pressure */
+    real pmin=1.0e+300;
+    for_vijk(press,i,j,k){
+      if(d.ibody().on(i,j,k)){
+        if(pmin>press[i][j][k]) pmin=press[i][j][k];
+      }
+    }
+    boil::cart.min_real(&pmin);
+
+    for_vijk(press,i,j,k){
+      if(d.ibody().on(i,j,k)){
+        press[i][j][k] -= pmin;
+      } else {
+        press[i][j][k] = 0.0;
+      }
+    }
+    press.bnd_update();
+    press.exchange_all();
+    
+    ns.cfl_max();
+
+    /*---------------------------+
+    |  solve transport equation  |
+    +---------------------------*/
+#ifdef USE_PHASE_VEL_VOF
+  #ifdef USE_PHASE_VEL_EFD
+    conc.advance_with_extrapolation(true,ResRat(1e-9),uvw,f,
+                                    one,&uvw_1,
+                                    zero,&uvw_2);
+  #else
+    conc.advance_with_extrapolation(true,ResRat(1e-9),uvw,f,
+                                    one,&uvw_1);
+  #endif
+#else
+    conc.advance();
+#endif
+
+    /*-------------------------+
+    |  solve species equation  |
+    +-------------------------*/
+#ifdef VARIABLE
+  #ifndef TEST_VARIABLE
+    ngtransp.discretize();
+    ngtransp.new_time_step();
+    ngtransp.solve(ResRat(1e-14),"Concentration");
+    ngtransp.extrapolate();
+    eps.bnd_update();
+    eps.exchange_all();
+  #endif
+#endif
+
+    /*-------------+
+    |  dt control  |
+    +-------------*/
+    /* minimum color function */
+    conc.color_minmax();
+
+    /* front */
+    conc.front_minmax();
+
+    time.control_dt(ns.cfl_max(),cfl_limit,dt);
+
+    /*--------------+
+    |  output data  |
+    +--------------*/
+    conc.totalvol();
+    conc.output_cangle_2d(Comp::i(),Comp::k(),Sign::neg());
+
+    int ncell(0);
+    real tgamma(0.), tgamma2(0.);
+    real egamma(0.), egamma2(0.);
+    real mgamma(0.), mgamma2(0.);
+    real weight(0.);
+    for_vijk(c,i,j,k) {
+      if((*conc.topo.adens)[i][j][k]>boil::atto) {
+         real t1 = tsat.Tint(i,j,k);
+         real t2 = t1*t1;
+
+         real e1 = eps[i][j][k];
+         real e2 = e1*e1;
+
+         real m1 = mflx[i][j][k];
+         real m2 = m1*m1;
+
+         real wt = (*conc.topo.adens)[i][j][k]*c.dV(i,j,k);
+
+         tgamma  += t1*wt;
+         tgamma2 += t2*wt;
+         egamma  += e1*wt;
+         egamma2 += e2*wt;
+         mgamma  += m1*wt;
+         mgamma2 += m2*wt;
+
+         weight += wt;
+         ncell++;
+      }
+    }
+
+    boil::cart.sum_real(&tgamma );
+    boil::cart.sum_real(&tgamma2);
+    boil::cart.sum_real(&egamma );
+    boil::cart.sum_real(&egamma2);
+    boil::cart.sum_real(&mgamma );
+    boil::cart.sum_real(&mgamma2);
+    boil::cart.sum_real(&weight );
+    boil::cart.sum_int(&ncell);
+
+    tgamma  /= weight;
+    tgamma2 /= weight;
+    egamma  /= weight;
+    egamma2 /= weight;
+    mgamma  /= weight;
+    mgamma2 /= weight;
+
+    real tstd = sqrt(std::max(0.0,tgamma2-tgamma*tgamma));
+    real estd = sqrt(std::max(0.0,egamma2-egamma*egamma));
+    real mstd = sqrt(std::max(0.0,mgamma2-mgamma*mgamma));
+
+    boil::oout<<"interface: "<<time.current_time()<<" "
+              <<tgamma<<" "<<tstd<<" "
+              <<egamma<<" "<<estd<<" "
+              <<mgamma<<" "<<mstd<<" "
+              <<weight<<" "<<ncell
+              <<boil::endl;
+
+
+    bool otpcond;
+    if(use_t_per_plot) 
+      otpcond = time.current_time() / t_per_plot >= real(iint);
+    else
+      otpcond = time.current_step() / n_per_plot >= real(iint);
+    if(otpcond
+      //||(time.current_step()>1230)
+      //||(time.current_step()>720&&time.current_step()<730)
+      ) {
+      iint++;
+#ifndef VARIABLE
+      boil::plot->plot(uvw,c,tpr,eps,mdot,
+                       "uvw-c-tpr-eps-mdot",iint);
+#else
+      boil::plot->plot(uvw,c,tpr,eps,mdot,tsat.tif,
+                       "uvw-c-tpr-eps-mdot-tif",iint);
+#endif
+      std::fstream output;
+      std::stringstream ss;
+      ss <<"profile-"<<iint<<".txt";
+      output.open(ss.str(), std::ios::out);
+      boil::output_profile_xz(conc.color(),output,NZ);
+      boil::cart.barrier();
+      output.close();
+    }
+
+    /*--------------+
+    |  backup data  |
+    +--------------*/
+    if((time.current_step()) % n_per_backup == 0 ){
+      uvw  .save("uvw",   time.current_step());
+      press.save("press", time.current_step());
+      c.save("c",  time.current_step());
+      tpr  .save("tpr",   time.current_step());
+#ifdef VARIABLE
+      (tsat.tif).save("tif",   time.current_step());
+#endif
+      eps  .save("eps",      time.current_step());
+      if( boil::cart.iam()==0) {
+        std::fstream output;
+        std::stringstream ss;
+        ss <<"time-"<<time.current_step()<<".txt";
+        std::string fname = ss.str();
+        int len = fname.length();
+        char * cfname = new char[len+1];
+        memcpy(cfname, fname.c_str(), len+1);
+        output << std::setprecision(16);
+        output.open(cfname, std::ios::out);
+        output << time.current_step() << boil::endl;
+        output << time.current_time()+time.dt() << boil::endl;
+        output << time.dt() << boil::endl;
+        output.close();
+      }
+    } 
+    if( boil::timer.current_min() > (wmin-30.0)
+      || time.current_step()==time.total_steps()) {
+      uvw  .save("uvw",   time.current_step());
+      press.save("press", time.current_step());
+      c.save("c",  time.current_step());
+      tpr  .save("tpr",   time.current_step());
+#ifdef VARIABLE
+      (tsat.tif).save("tif",   time.current_step());
+#endif
+      eps       .save("eps",   time.current_step());
+      std::fstream output;
+      output << std::setprecision(16);
+      output.open("time.txt", std::ios::out);
+      output << time.current_step() << boil::endl;
+      output << time.current_time()+time.dt() << boil::endl;
+      output << time.dt() << boil::endl;
+      output.close();
+      output.open("run.txt", std::ios::out);
+      output << 0 << boil::endl;
+      output.close();
+      boil::timer.stop();
+      boil::timer.report();
+      uvw  .rm("uvw", ts);
+      press.rm("press", ts);
+      c.rm("c", ts);
+      tpr  .rm("tpr", ts);
+#ifdef VARIABLE
+      (tsat.tif).rm("tif",ts);
+#endif
+      eps  .rm("eps", ts);
+      exit(0); 
+    }
+  }
+#endif
+
+  boil::oout << "finished" << boil::endl;
+  boil::timer.stop();
+  boil::timer.report();
+
+}

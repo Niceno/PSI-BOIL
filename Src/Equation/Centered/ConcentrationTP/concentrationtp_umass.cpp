@@ -25,10 +25,11 @@ void ConcentrationTP::compute_umass(Vector & umass, const Vector & uvol,
     const real r = gas->rho(m,i,j,k);
     const real r_dif = gas->rho(1);
     const real r_env = gas->rho(0);
-    const real clrf = surface_color(m,i,j,k);
+    real clrf = surface_color(m,i,j,k);
+    if(sig==Sign::neg()) clrf = 1.-clrf;
     
     umass[m][i][j][k] = uvol[m][i][j][k]
-                      - (1.0 - clrf) * dc/r_dif * (r_dif - r_env)/r
+                      - clrf * dc/r_dif * (r_dif - r_env)/r
                       * (phip-phim) / (umass.dxc(m,i));
   }
 
@@ -48,10 +49,11 @@ void ConcentrationTP::compute_umass(Vector & umass, const Vector & uvol,
     const real r = gas->rho(m,i,j,k);
     const real r_dif = gas->rho(1);
     const real r_env = gas->rho(0);
-    const real clrf = surface_color(m,i,j,k);
+    real clrf = surface_color(m,i,j,k);
+    if(sig==Sign::neg()) clrf = 1.-clrf;
 
     umass[m][i][j][k] = uvol[m][i][j][k]
-                      - (1.0 - clrf) * dc/r_dif * (r_dif - r_env)/r
+                      - clrf * dc/r_dif * (r_dif - r_env)/r
                       * (phip-phim) / (umass.dyc(m,j));
   }
 
@@ -71,10 +73,11 @@ void ConcentrationTP::compute_umass(Vector & umass, const Vector & uvol,
     const real r = gas->rho(m,i,j,k);
     const real r_dif = gas->rho(1);
     const real r_env = gas->rho(0);
-    const real clrf = surface_color(m,i,j,k);
+    real clrf = surface_color(m,i,j,k);
+    if(sig==Sign::neg()) clrf = 1.-clrf;
 
     umass[m][i][j][k] = uvol[m][i][j][k]
-                      - (1.0 - clrf) * dc/r_dif * (r_dif - r_env)/r
+                      - clrf * dc/r_dif * (r_dif - r_env)/r
                       * (phip-phim) / (umass.dzc(m,k));
   }
 

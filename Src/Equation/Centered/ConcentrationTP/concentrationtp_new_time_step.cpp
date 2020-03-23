@@ -50,9 +50,11 @@ void ConcentrationTP::new_time_step(const Scalar * diff_eddy) {
     real col_new = (*clr)[i][j][k];
     real col_old = clrold[i][j][k];
     real r = rho_dif->value(i,j,k);
+
+    if(sig==Sign::neg()) col_old = 1.-col_old;
  
     fold[i][j][k] = r * dV(i,j,k) * time->dti() *
-                    phi[i][j][k] * (1.0-col_old);
+                    phi[i][j][k] * col_old;
   }
 
   if(dom->ibody().nccells() > 0) {

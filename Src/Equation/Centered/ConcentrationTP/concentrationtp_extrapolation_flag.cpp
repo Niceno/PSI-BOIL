@@ -18,7 +18,12 @@ void ConcentrationTP::extrapolation_flag() {
     } else {
       eflag[i][j][k]=-3;
     }
-    if(heavi->status(i,j,k)==0.0) eflag[i][j][k] = 0;
+    if(heavi->status(i,j,k)==0) eflag[i][j][k] = 0;
+  }
+
+  for_aijk(i,j,k) {
+    if(dom->ibody().off(i,j,k))
+      eflag[i][j][k]=-1000;
   }
 
   //boil::plot->plot((*clr),eflag, "clr-eflag", time->current_step());
@@ -28,7 +33,7 @@ void ConcentrationTP::extrapolation_flag() {
     for_vjk((*clr),j,k){
       bool eflagc  = eflag[i  ][j][k];
       bool eflagp  = eflag[i+1][j][k];      
-      if(eflagc ^ eflagp) {
+      if(eflagc ^ eflagp && (eflagc+eflagp)>-500) {
         if(eflagc) {
           eflag[i  ][j][k] = heavi->status(i  ,j,k); /* should be zero or one */
         } else {
@@ -42,7 +47,7 @@ void ConcentrationTP::extrapolation_flag() {
     for_vik((*clr),i,k){
       bool eflagc  = eflag[i][j  ][k];
       bool eflagp  = eflag[i][j+1][k]; 
-      if(eflagc ^ eflagp) {
+      if(eflagc ^ eflagp && (eflagc+eflagp)>-500) {
         if(eflagc) {
           eflag[i][j  ][k] = heavi->status(i,j  ,k); /* should be zero or one */
         } else {
@@ -56,7 +61,7 @@ void ConcentrationTP::extrapolation_flag() {
     for_vij((*clr),i,j){
       bool eflagc  = eflag[i][j][k  ];
       bool eflagp  = eflag[i][j][k+1];
-      if(eflagc ^ eflagp) {
+      if(eflagc ^ eflagp && (eflagc+eflagp)>-500) {
         if(eflagc) {
           eflag[i][j][k  ] = heavi->status(i,j,k  ); /* should be zero or one */
         } else {
@@ -64,11 +69,6 @@ void ConcentrationTP::extrapolation_flag() {
         }
       }
     }
-  }
-
-  for_ijk(i,j,k) {
-    if(dom->ibody().off(i,j,k))
-      eflag[i][j][k]=-1000;
   }
 
   eflag.exchange_all();

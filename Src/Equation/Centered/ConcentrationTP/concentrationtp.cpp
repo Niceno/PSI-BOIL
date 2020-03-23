@@ -13,7 +13,8 @@ ConcentrationTP::ConcentrationTP(const Scalar & PHI,
                                  Topology * TOPO,
                                  Times & T, 
                                  Linear * S,
-                                 Matter * f     /* the diffusing species */
+                                 Matter * f,     /* the diffusing species */
+                                 const Sign SIG
                                 ) :
 /*---------------------+ 
 |  initialize parent   |
@@ -23,7 +24,8 @@ ConcentrationTP::ConcentrationTP(const Scalar & PHI,
   clrold( *COLOR.domain()),
   colorflow(&FLUXCLR),
   heavi(HEAVI),
-  topo(TOPO)
+  topo(TOPO),
+  sig(SIG)
 {
   rho_dif = (f->rho());     /* pointer at property */
   dcoef   = (f->gamma());   /* pointer at property */

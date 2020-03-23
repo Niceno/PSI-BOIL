@@ -70,7 +70,7 @@ class VOF : public Centered {
 
     void tension(Vector * vec, const Matter matt);
     void tension(Vector * vec, const Matter matt, const Scalar & scp);
-    void totalvol();
+    real totalvol(real * vaps = NULL);
     void front_minmax();
     void front_minmax( Range<real> xr
                      , Range<real> yr
@@ -88,6 +88,9 @@ class VOF : public Centered {
     Heaviside * heaviside() { return heavi; }
 
     void interfacial_flagging(const Scalar & scp);
+
+    void output_cangle_2d(const Comp ctangential, const Comp cnormal,
+                          const Sign sig);
 
 #include "vof_inline.h"
 
@@ -148,6 +151,12 @@ class VOF : public Centered {
                                              const real mult);
     
     void flood(Scalar & scp,const real mult);
+    void output_cangle_2d(const Scalar & scp,
+                          const Comp ctangential, const Comp cnormal,
+                          const Sign sig, const Range<int> ridx,
+                          real & h0, real & h1, real & h2,
+                          real & dzzt0, real & dzzc0,
+                          real & dzzt1, real & dzzc1);
 
     void cal_fs3(const Scalar & scp);
     void extract_alpha(const Scalar & scp);

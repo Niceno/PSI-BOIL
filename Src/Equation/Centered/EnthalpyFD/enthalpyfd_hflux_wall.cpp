@@ -30,7 +30,7 @@ real EnthalpyFD::hflux_wall(const Scalar & val, const Dir din
           int iof=0, jof=0, kof=0;
       	  int of(0);
 	  Comp mcomp;
-          Sign sig;
+          Sign sig = Sign::undefined();
 
           if(d == Dir::imin()) { iof++; mcomp = Comp::i(); of = -1; sig = Sign::neg(); }
           if(d == Dir::imax()) { iof--; mcomp = Comp::i(); of = +1; sig = Sign::pos(); }

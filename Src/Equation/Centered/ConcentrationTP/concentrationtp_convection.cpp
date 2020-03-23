@@ -68,22 +68,27 @@ void ConcentrationTP::convection(Scalar * conv) {
     umf = (*u)[mcomp][i  ][j][k];  /* u @ imin */
     upf = (*u)[mcomp][i+1][j][k];  /* u @ imax */
 
-    /* liquid flux */
-    flxm = (*colorflow)[mcomp][i  ][j][k]*time->dti();
-    flxp = (*colorflow)[mcomp][i+1][j][k]*time->dti();
+    if(sig==Sign::neg()) {
+      /* liquid flux */
+      flxm = (*colorflow)[mcomp][i  ][j][k]*time->dti();
+      flxp = (*colorflow)[mcomp][i+1][j][k]*time->dti();
 
-    /* total volume flux */
-    gfxm = dSx(Sign::neg(),i,j,k)*umf;
-    gfxp = dSx(Sign::pos(),i,j,k)*upf;
+      /* total volume flux */
+      gfxm = dSx(Sign::neg(),i,j,k)*umf;
+      gfxp = dSx(Sign::pos(),i,j,k)*upf;
 
-    if(dom->ibody().cut(i,j,k)) {
-      gfxm *= dom->ibody().fSw(i,j,k);
-      gfxp *= dom->ibody().fSe(i,j,k);
+      if(dom->ibody().cut(i,j,k)) {
+        gfxm *= dom->ibody().fSw(i,j,k);
+        gfxp *= dom->ibody().fSe(i,j,k);
+      }
+
+      /* gas flux */
+      gfxm = gfxm - flxm;
+      gfxp = gfxp - flxp;
+    } else {
+      gfxm = (*colorflow)[mcomp][i  ][j][k]*time->dti();
+      gfxp = (*colorflow)[mcomp][i+1][j][k]*time->dti();
     }
-
-    /* gas flux */
-    gfxm = gfxm - flxm;
-    gfxp = gfxp - flxp;
  
     phim = lim.limit(-gfxm, (phi)[i+1][j][k],(phi)[i][j][k],(phi)[i-1][j][k]);
     if(i==si() && imin) phim = (phi)[i-1][j][k];
@@ -106,22 +111,27 @@ void ConcentrationTP::convection(Scalar * conv) {
     vmf = (*u)[mcomp][i][j  ][k];  /* v @ jmin */
     vpf = (*u)[mcomp][i][j+1][k];  /* v @ jmax */
 
-    /* liquid flux */
-    flxm = (*colorflow)[mcomp][i][j  ][k]*time->dti();
-    flxp = (*colorflow)[mcomp][i][j+1][k]*time->dti();
+    if(sig==Sign::neg()) {
+      /* liquid flux */
+      flxm = (*colorflow)[mcomp][i][j  ][k]*time->dti();
+      flxp = (*colorflow)[mcomp][i][j+1][k]*time->dti();
 
-    /* total volume flux */
-    gfxm = dSy(Sign::neg(),i,j,k)*vmf;
-    gfxp = dSy(Sign::pos(),i,j,k)*vpf;
+      /* total volume flux */
+      gfxm = dSy(Sign::neg(),i,j,k)*vmf;
+      gfxp = dSy(Sign::pos(),i,j,k)*vpf;
  
-    if(dom->ibody().cut(i,j,k)) {
-      gfxm *= dom->ibody().fSs(i,j,k);
-      gfxp *= dom->ibody().fSn(i,j,k);
-    }
+      if(dom->ibody().cut(i,j,k)) {
+        gfxm *= dom->ibody().fSs(i,j,k);
+        gfxp *= dom->ibody().fSn(i,j,k);
+      }
   
-    /* gas flux */
-    gfxm = gfxm - flxm;
-    gfxp = gfxp - flxp;
+      /* gas flux */
+      gfxm = gfxm - flxm;
+      gfxp = gfxp - flxp;
+    } else {
+      gfxm = (*colorflow)[mcomp][i][j  ][k]*time->dti();
+      gfxp = (*colorflow)[mcomp][i][j+1][k]*time->dti();
+    }
 
     phim = lim.limit(-gfxm, (phi)[i][j+1][k],(phi)[i][j][k],(phi)[i][j-1][k]);
     if(j==sj() && jmin) phim = (phi)[i][j-1][k];   
@@ -145,22 +155,27 @@ void ConcentrationTP::convection(Scalar * conv) {
     wmf = (*u)[mcomp][i][j][k  ];  /* w @ kmin */
     wpf = (*u)[mcomp][i][j][k+1];  /* w @ kmax */
 
-    /* liquid flux */
-    flxm = (*colorflow)[mcomp][i][j][k  ]*time->dti();
-    flxp = (*colorflow)[mcomp][i][j][k+1]*time->dti();
+    if(sig==Sign::neg()) {
+      /* liquid flux */
+      flxm = (*colorflow)[mcomp][i][j][k  ]*time->dti();
+      flxp = (*colorflow)[mcomp][i][j][k+1]*time->dti();
   
-    /* total volume flux */
-    gfxm = dSz(Sign::neg(),i,j,k)*wmf;
-    gfxp = dSz(Sign::pos(),i,j,k)*wpf;
+      /* total volume flux */
+      gfxm = dSz(Sign::neg(),i,j,k)*wmf;
+      gfxp = dSz(Sign::pos(),i,j,k)*wpf;
  
-    if(dom->ibody().cut(i,j,k)) {
-      gfxm *= dom->ibody().fSb(i,j,k);
-      gfxp *= dom->ibody().fSt(i,j,k);
-    }
+      if(dom->ibody().cut(i,j,k)) {
+        gfxm *= dom->ibody().fSb(i,j,k);
+        gfxp *= dom->ibody().fSt(i,j,k);
+      }
 
-    /* gas flux */
-    gfxm = gfxm - flxm;
-    gfxp = gfxp - flxp;
+      /* gas flux */
+      gfxm = gfxm - flxm;
+      gfxp = gfxp - flxp;
+    } else {
+      gfxm = (*colorflow)[mcomp][i][j][k  ]*time->dti();
+      gfxp = (*colorflow)[mcomp][i][j][k+1]*time->dti();
+    }
 
     phim = lim.limit(-gfxm, (phi)[i][j][k+1], (phi)[i][j][k], (phi)[i][j][k-1]);
     if(k==sk() && kmin) phim = (phi)[i][j][k-1];

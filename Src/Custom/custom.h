@@ -20,6 +20,8 @@ namespace boil {
                              real & radius, real & zcent, real & chord);
   void droplet_parameters_3D(const real cang, const real volume,
                              real & radius, real & zcent, real & chord);
+  void droplet_parameters_3D(const real cang, real & volume,
+                             real & radius, real & zcent, const real chord);
 
   /* output scalar profile */
   void output_profile_xz(const Scalar & c, std::ostream & otp, const int NZ);

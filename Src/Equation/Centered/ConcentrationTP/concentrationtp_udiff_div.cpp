@@ -21,8 +21,12 @@ void ConcentrationTP::compute_udiff_div(Scalar & p, const Property * mu_fluid,
     up = -udiff[m][i+1][j][k];
     dxc= p.dxc(i);
 
-    gm = 1.0-surface_color(Sign::neg(),m,i,j,k);
-    gp = 1.0-surface_color(Sign::pos(),m,i,j,k);
+    gm = surface_color(Sign::neg(),m,i,j,k);
+    gp = surface_color(Sign::pos(),m,i,j,k);
+    if(sig==Sign::neg()) {
+      gm = 1.-gm;
+      gp = 1.-gp;
+    }
 
     divu += (gp*up-gm*um)/dxc;
 
@@ -32,8 +36,12 @@ void ConcentrationTP::compute_udiff_div(Scalar & p, const Property * mu_fluid,
     up = -udiff[m][i][j+1][k];
     dyc= p.dyc(j);
 
-    gm = 1.0-surface_color(Sign::neg(),m,i,j,k);
-    gp = 1.0-surface_color(Sign::pos(),m,i,j,k);
+    gm = surface_color(Sign::neg(),m,i,j,k);
+    gp = surface_color(Sign::pos(),m,i,j,k);
+    if(sig==Sign::neg()) {
+      gm = 1.-gm;
+      gp = 1.-gp;
+    }
 
     divu += (gp*up-gm*um)/dyc;
 
@@ -43,8 +51,12 @@ void ConcentrationTP::compute_udiff_div(Scalar & p, const Property * mu_fluid,
     up = -udiff[m][i][j][k+1];
     dzc= p.dzc(k);
                  
-    gm = 1.0-surface_color(Sign::neg(),m,i,j,k);
-    gp = 1.0-surface_color(Sign::pos(),m,i,j,k);
+    gm = surface_color(Sign::neg(),m,i,j,k);
+    gp = surface_color(Sign::pos(),m,i,j,k);
+    if(sig==Sign::neg()) {
+      gm = 1.-gm;
+      gp = 1.-gp;
+    }
 
     divu += (gp*up-gm*um)/dzc;
    
