@@ -12,12 +12,12 @@ static void __attribute__ ((constructor)) trapfpe(void)
 #endif
 
 #define AXISYMMETRIC
-//#define USE_PHASE_VEL_VOF
-//#define VARIABLE
+#define USE_PHASE_VEL_VOF
+#define VARIABLE
 //#define TEST_VARIABLE
 //#define INVERTED
 //#define USE_PHASE_VEL_EFD
-//#define USE_SOLID
+#define USE_SOLID
 //#define SETUP_ONLY
 #define USE_BOTTOM_DIRICHLET
 
@@ -62,8 +62,14 @@ int main(int argc, char ** argv) {
   twall += 273.15;
 
   /* n-heptane */
-  const real tsat0 = 98.4+273.15;
   const real twall0 = twall;
+
+  const real tsat0red = twall0-2.6;
+#ifdef VARIABLE
+  const real tsat0 = 98.4+273.15;
+#else
+  const real tsat0 = tsat0red;
+#endif
 
 /******************************************************************************/
 /* ------------ values to be directly rescaled */
@@ -109,8 +115,8 @@ int main(int argc, char ** argv) {
   const real cfl_limit = 0.1;
 
   /* under-relaxation */
-  //const real ur = 0.001;
   const real ur = 0.01;
+  //const real ur =1;// 0.01;
 
 /* ------------ optional simulation settings */
 
@@ -123,8 +129,8 @@ int main(int argc, char ** argv) {
 
   /* vof */
   const CurvMethod curv_method = CurvMethod::HF();
-  //const CurvMethod wall_curv_method = CurvMethod::HFnormalXZ();
-  const CurvMethod wall_curv_method = CurvMethod::HFparallelXZ();
+  const CurvMethod wall_curv_method = CurvMethod::HFnormalXZ();
+  //const CurvMethod wall_curv_method = CurvMethod::HFparallelXZ();
   const TopoMethod topo_method = TopoMethod::Hybrid();
 
   const bool detachment_model = false;
@@ -169,11 +175,6 @@ int main(int argc, char ** argv) {
   const real cpsol = 921.096*rhosol;
   const real lambdasol = 205.;
 
-  /* natural convection BL thickness */
-  real ztconst = xmult*7.14*
-                 std::pow(mug*lambdag/cpg/rhog/gravity/(twall0-tout)/betag,1./3.);
-  boil::oout<<"BL thickness: "<<ztconst<<boil::endl;
-
 /******************************************************************************/
 /* ------------ domain dimensions */
   const int NX1  = 20*gLevel;
@@ -189,7 +190,7 @@ int main(int argc, char ** argv) {
 #else
   const int NZ1 = NZ;
 #endif
-  
+
 /******************************************************************************/
 /* ------------ calculated values */
   const real DX0 = LX1/real(NX1);
@@ -202,6 +203,12 @@ int main(int argc, char ** argv) {
   /* heater power */
   real qsrc=qflux/fabs(LZ0);  // [W/m3]
   boil::oout<<"#qsrc= "<<qsrc<<" qflux= "<<qflux<<"\n";
+
+  /* natural convection BL thickness */
+  //real ztconst = xmult*7.14*
+  //               std::pow(mug*lambdag/cpg/rhog/gravity/(twall0-tout)/betag,1./3.);
+  real ztconst = LZ1/3.; 
+  boil::oout<<"BL thickness: "<<ztconst<<boil::endl;
 
 /******************************************************************************/
 /* ------------- setup finished */
@@ -292,22 +299,24 @@ int main(int argc, char ** argv) {
 
   /* should avoid spurious flows from the outlet */
   c.bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
-  c.bc().add( BndCnd( Dir::imax(), BndType::neumann() ) );
   c.bc().add( BndCnd( Dir::kmin(), BndType::wall() ) );
 #ifdef INVERTED
+  c.bc().add( BndCnd( Dir::imax(), BndType::dirichlet(), 1.0 ) );
   c.bc().add( BndCnd( Dir::kmax(), BndType::dirichlet(), 1.0 ) );
 #else
+  c.bc().add( BndCnd( Dir::imax(), BndType::dirichlet(), 0.0 ) );
   c.bc().add( BndCnd( Dir::kmax(), BndType::dirichlet(), 0.0 ) );
 #endif
   c.bc().add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
   c.bc().add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
 
   eps.bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
-  eps.bc().add( BndCnd( Dir::imax(), BndType::neumann() ) );
   eps.bc().add( BndCnd( Dir::kmin(), BndType::wall() ) );
 #ifndef TEST_VARIABLE
+  eps.bc().add( BndCnd( Dir::imax(), BndType::dirichlet(), 1.0 ) );
   eps.bc().add( BndCnd( Dir::kmax(), BndType::dirichlet(), 1.0 ) );
 #else
+  eps.bc().add( BndCnd( Dir::imax(), BndType::neumann() ) );
   eps.bc().add( BndCnd( Dir::kmax(), BndType::neumann() ) );
 #endif
   eps.bc().add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
@@ -367,7 +376,7 @@ int main(int argc, char ** argv) {
                 / (2.0*boil::pi*mixed.sigma()->value()),0.5);
   boil::oout<<"main:dxmin= "<<dxmin<<" "<<boil::cart.iam()<<" "<<dt<<"\n";
   Times time(ndt, dt);
-  time.set_coef_dec(0.75);
+  time.set_coef_dec(0.1);
   time.set_dt(dt*initdtcoef);
 
   /*-----------------+
@@ -435,7 +444,7 @@ int main(int argc, char ** argv) {
 #ifndef VARIABLE
   TIF tsat(tsat0);
 #else
-  Clapeyron tsat(tsat0,conc.topo.adens,eps,Mv,latent);
+  Clapeyron tsat(tsat0,conc.topo,eps,Mv,latent);
   tsat.set_ur(ur);
 #endif
 
@@ -599,7 +608,7 @@ int main(int argc, char ** argv) {
     tpr.exchange_all();
 #ifdef VARIABLE
     for_avijk(c,i,j,k) {
-      (tsat.tif)[i][j][k] = twall0;
+      (tsat.tif)[i][j][k] = tsat0red;
     }
 #endif
 
@@ -610,7 +619,7 @@ int main(int argc, char ** argv) {
   #else
       if(conc.color()[i][j][k]<1.0) {
   #endif
-        eps[i][j][k] = tsat.epsilon(twall0-0.5);
+        eps[i][j][k] = tsat.epsilon(tsat0red);
       } else {
         real dist = pow(c.xc(i)-xcent,2.0)
   #ifndef AXISYMMETRIC
@@ -620,9 +629,9 @@ int main(int argc, char ** argv) {
         
         dist = sqrt(dist);
   #ifndef TEST_VARIABLE
-        eps[i][j][k] = pow(tsat.epsilon(twall0-0.5),R0/dist);
+        eps[i][j][k] = pow(tsat.epsilon(tsat0red),R0/dist);
   #else
-        eps[i][j][k] = tsat.epsilon(twall0-0.5);
+        eps[i][j][k] = tsat.epsilon(tsat0red);
   #endif
       }
     }
@@ -690,7 +699,7 @@ int main(int argc, char ** argv) {
     /*------------------------+
     |  solve energy equation  |
     +------------------------*/
-    //enthFD.tint_field(); /* called in discretize */
+    tsat.tint_field(); 
     enthFD.discretize();
     enthFD.new_time_step();
     enthFD.solve(ResRat(1e-16),"Enthalpy");
@@ -817,6 +826,9 @@ int main(int argc, char ** argv) {
 
     int ncell(0);
     real tgamma(0.), tgamma2(0.);
+    real tgammamin(boil::unreal);
+    real tgammamax(-boil::unreal);
+    int imin(boil::unint),imax(boil::unint),kmin(boil::unint),kmax(boil::unint);
     real egamma(0.), egamma2(0.);
     real mgamma(0.), mgamma2(0.);
     real weight(0.);
@@ -840,6 +852,17 @@ int main(int argc, char ** argv) {
          mgamma  += m1*wt;
          mgamma2 += m2*wt;
 
+         if(tgammamin>t1) {
+           tgammamin = t1;
+           imin = i;
+           kmin = k;
+         }
+         if(tgammamax<t1) {
+           tgammamax = t1;
+           imax = i;
+           kmax = k;
+         }
+
          weight += wt;
          ncell++;
       }
@@ -853,6 +876,13 @@ int main(int argc, char ** argv) {
     boil::cart.sum_real(&mgamma2);
     boil::cart.sum_real(&weight );
     boil::cart.sum_int(&ncell);
+
+    boil::cart.max_real(&tgammamax);
+    boil::cart.min_real(&tgammamin);
+    boil::cart.min_int(&imin);
+    boil::cart.min_int(&kmin);
+    boil::cart.min_int(&imax);
+    boil::cart.min_int(&kmax);
 
     tgamma  /= weight;
     tgamma2 /= weight;
@@ -872,6 +902,10 @@ int main(int argc, char ** argv) {
               <<weight<<" "<<ncell
               <<boil::endl;
 
+    boil::oout<<"intgamma: "<<time.current_time()<<" "
+              <<tgammamax<<" "<<imax<<" "<<kmax<<" | "
+              <<tgammamin<<" "<<imin<<" "<<kmin<<" | "
+              <<boil::endl;
 
     bool otpcond;
     if(use_t_per_plot) 

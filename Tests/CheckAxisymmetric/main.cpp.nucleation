@@ -182,7 +182,7 @@ int main(int argc, char ** argv) {
   //const bool multigrid_stop_if_diverging = false;
 
   const int multigrid_min_cycles = 3;
-  const int multigrid_max_cycles = 10+gLevel*scaling_factor/120;
+  const int multigrid_max_cycles = 20;//10+gLevel*scaling_factor/120;
 
   /* vof */
   const CurvMethod curv_method = CurvMethod::HF();
@@ -317,7 +317,6 @@ int main(int argc, char ** argv) {
 /* ------------ domain dimensions */
   const int NX1  = 25*gLevel;
   const int NX2  =  7*gLevel;
-  const int NZ1 = 64*gLevel;
 
 #if CASE == 1
   real LX1 = 0.1e-3;
@@ -343,6 +342,8 @@ int main(int argc, char ** argv) {
   const int NZ0 = std::max(4,scaling_factor*gLevel*5/12); /* DZ is uniform */
   real LZ0 = -100e-6;
 #endif
+
+  const int NZ1 = 64*gLevel-NZ0;
 
   LX1 *= xmult;
   LX2 *= xmult;
@@ -922,7 +923,7 @@ int main(int argc, char ** argv) {
     ns.solve(ResRat(1e-14));
 
     p = 0.0;
-    if (multigrid.vcycle(ResRat(1e-6))) OMS(converged);
+    if (multigrid.fcycle(ResRat(1e-5))) OMS(converged);
     //pr.solve(ResRat(1e-6));
     p.exchange();
     ns.project(p);

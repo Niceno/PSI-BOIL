@@ -252,7 +252,7 @@ int main(int argc, char * argv[]) {
 #endif
   AC multigrid( &pr );
   multigrid.stop_if_diverging(true);
-  multigrid.min_cycles(4);
+  multigrid.min_cycles(1);
 
   conc.init();
   c.exchange_all();
@@ -280,7 +280,7 @@ int main(int argc, char * argv[]) {
     +------------------------*/
     enthFD.discretize();
     enthFD.new_time_step();
-    enthFD.solve(ResRat(1e-4));
+    enthFD.solve(ResRat(1e-7));
 
     /*---------------+
     |  phase change  |
@@ -301,10 +301,10 @@ int main(int argc, char * argv[]) {
 	xyz[m][i][j][k]=0.0;
 
     ns.grad(press);
-    ns.solve(ResRat(0.001));
+    ns.solve(ResRat(1e-7));
 
     p = 0.0;
-    if (multigrid.vcycle(ResRat(5e-7))) OMS(converged);
+    if (multigrid.wcycle(ResRat(1e-7))) OMS(converged);
     p.exchange();
     ns.project(p);
     press += p;
@@ -319,7 +319,7 @@ int main(int argc, char * argv[]) {
 #ifndef USE_VOF
     conc.advance();
 #else
-    conc.advance_with_extrapolation(true,ResRat(1e-4),uvw,f,
+    conc.advance_with_extrapolation(true,ResRat(1e-7),uvw,f,
                                     &liquid,&uvw_1);
 #endif
  

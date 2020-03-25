@@ -16,19 +16,26 @@ TIF::TIF(const real Tref) {
 }
 
 /* initialises tif scalars */
-TIF::TIF(const real Tref, const Scalar & s) :
-  tif(*s.domain()),
-  tifold(*s.domain()) {
+TIF::TIF(const real Tref, const Topology & topo) :
+  tif(*topo.adens->domain()),
+  tifold(*topo.adens->domain()),
+  iflag(topo.iflag),
+  tempflag(*topo.adens->domain()),
+  tempflag2(*topo.adens->domain()),
+  stmp(*topo.adens->domain())
+{
   tr = Tref;
   variable_tif = false;
 
-  /* unused within constant model */
   tmin = -boil::unreal;
   tmax = boil::unreal;
   weaklim = false;
   store_tif = false;
   factor = 0.05;
 
-  tif    = s.shape(); 
-  tifold = s.shape();
+  tif    = (*topo.adens).shape(); 
+  tifold = (*topo.adens).shape();
+  tempflag  = (*topo.adens).shape();
+  tempflag2 = (*topo.adens).shape();
+  stmp = (*topo.adens).shape();
 }

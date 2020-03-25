@@ -905,7 +905,7 @@ int main(int argc, char ** argv) {
     /*------------------------+
     |  solve energy equation  |
     +------------------------*/
-    //enthFD.tint_field(); /* called in discretize */
+    tsat.tint_field(); 
     enthFD.discretize();
     enthFD.new_time_step();
     enthFD.solve(ResRat(1e-16),"Enthalpy");

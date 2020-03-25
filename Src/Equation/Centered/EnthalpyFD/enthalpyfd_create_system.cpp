@@ -9,8 +9,6 @@
 *******************************************************************************/
 void EnthalpyFD::create_system(const Scalar * diff_eddy) {
 
-  tifmodel.tint_field(); 
-
   /*-----------------------------+ 
   |  create system in the core,  |
   |  correct at the boundaries.  |

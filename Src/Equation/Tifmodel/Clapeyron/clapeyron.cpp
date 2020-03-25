@@ -4,16 +4,16 @@
 *  Constructors
 *******************************************************************************/
 Clapeyron::Clapeyron(const real Tref, 
-                     const Scalar * ADENS,
+                     const Topology & TOPO,
                      const Scalar & EPS,
                      /* the following should be changed later on to matter */
                      const real MM,
                      const real LATENT,
                      const real LATENT_SLP) :
-  TIF(Tref,*ADENS),
+  TIF(Tref,TOPO),
   eps(&EPS)
 {
-  adens = ADENS;
+  adens = TOPO.adens;
 
   latent_cst = LATENT;
   latent_slp = LATENT_SLP;
@@ -28,5 +28,5 @@ Clapeyron::Clapeyron(const real Tref,
 
   variable_tif = true;
   
-  tint_field();
+  //tint_field();
 }

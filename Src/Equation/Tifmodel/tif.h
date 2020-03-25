@@ -2,8 +2,11 @@
 #define TIF_H
 
 #include "../../Field/Scalar/scalar.h"
+#include "../../Field/ScalarInt/scalarint.h"
+#include "../Topology/topology.h"
 #include "../../Matter/matter.h"
 #include "../../Global/global_realistic.h"
+#include "../../Plot/plot.h"
 
 ///////////////////////////////////
 //                               //
@@ -13,7 +16,7 @@
 class TIF {
   public:
     TIF(const real tref); 
-    TIF(const real tref, const Scalar & s); 
+    TIF(const real tref, const Topology & topo); 
     ~TIF() {}
 
     void init() {
@@ -63,11 +66,12 @@ class TIF {
     real tr;
 
     const Scalar * adens;
+    ScalarInt iflag, tempflag, tempflag2;
+    Scalar stmp;
 
     virtual void model() {};
     void extend_tint();
 
-    bool Vicinity(const int i, const int j, const int k);
     bool Interface(const int i, const int j, const int k);
     inline real underrelaxation(const real tintnew, const real tifold);
 };

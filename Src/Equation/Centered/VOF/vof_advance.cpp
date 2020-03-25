@@ -124,6 +124,9 @@ void VOF::advance_geometric(Scalar & scp) {
     stmp[i][j][k] = scp[i][j][k] * dV(i,j,k);
   }
 
+  for_m(m)
+    vflow(m) = 0.;
+
   /* advance in x-direction */
   if(ifull)
     advance_x(scp);

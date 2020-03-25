@@ -5,14 +5,14 @@
 *******************************************************************************/
 Schrage::Schrage(const real Tref, 
                  Matter * FLU,
-                 const Scalar * ADENS,
+                 const Topology & TOPO,
                  const Scalar & MFLX,
                  const Scalar * PRES) :
-  TIF(Tref,*ADENS),
+  TIF(Tref,TOPO),
   flu(FLU),
   mflx(&MFLX)
 {
-  adens = ADENS;
+  adens = TOPO.adens;
   dpres = PRES;
 
   rhol = fluid()->rho(1);
@@ -25,5 +25,5 @@ Schrage::Schrage(const real Tref,
 
   variable_tif = true;
   
-  tint_field();
+  //tint_field();
 }

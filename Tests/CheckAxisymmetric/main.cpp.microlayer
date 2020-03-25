@@ -108,13 +108,13 @@ int main(int argc, char ** argv) {
   //const bool multigrid_stop_if_diverging = true;
   const bool multigrid_stop_if_diverging = false;
 
-  const int multigrid_min_cycles = 10;
+  const int multigrid_min_cycles = 3;
   const int multigrid_max_cycles = 10+2*gLevel;
 
   /* vof */
   const CurvMethod curv_method = CurvMethod::HF();
-  //const CurvMethod wall_curv_method = CurvMethod::HFnormalXZ();
-  const CurvMethod wall_curv_method = CurvMethod::HFmixedXZ();
+  const CurvMethod wall_curv_method = CurvMethod::HFnormalXZ();
+  //const CurvMethod wall_curv_method = CurvMethod::HFmixedXZ();
   const int Nfilm_crit = 4;
   const TopoMethod topo_method = TopoMethod::Hybrid();
 
@@ -703,7 +703,7 @@ int main(int argc, char ** argv) {
     ns.solve(ResRat(1e-14));
 
     p = 0.0;
-    if (multigrid.vcycle(ResRat(5e-5))) OMS(converged);
+    if (multigrid.wcycle(ResRat(5e-5))) OMS(converged);
     //pr.solve(ResRat(1e-6));
     p.exchange();
     ns.project(p);
