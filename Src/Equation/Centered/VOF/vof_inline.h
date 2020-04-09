@@ -144,6 +144,14 @@ void set_wall_curv_method(const CurvMethod wcm,
                 <<boil::endl;
       exit(0);
     }
+  } else {
+    if(sig!=Sign::undefined()) {
+      if(sig==Sign::pos()) {
+        mult_wall =  1;
+      } else {
+        mult_wall = -1;
+      }
+    }
   }
   if(wcm==CurvMethod::HFmixedXZ()) {
     if       (nfilm_crit>0) {
