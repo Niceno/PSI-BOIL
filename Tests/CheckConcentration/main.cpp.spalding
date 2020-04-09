@@ -184,13 +184,16 @@ int main(int argc, char ** argv) {
   const real cfl_limit = 0.1;
   const real init_dt_coef = 1e-6;
 
+  /* simple algorithm */
+  const int mSimple = 1;
+
 /* ------------ optional simulation settings */
 
   /* multigrid */
   const bool multigrid_stop_if_diverging = true;
   //const bool multigrid_stop_if_diverging = false;
 
-  const int multigrid_min_cycles = 3;
+  const int multigrid_min_cycles = 1;
   const int multigrid_max_cycles = 20;
 
   /* vof */
@@ -203,7 +206,7 @@ int main(int argc, char ** argv) {
   const int niter_pressure_extrap = 1000;
 
   /* tifmodel */
-  const real ur = 0.05;
+  const real ur = 0.01;
 
 /******************************************************************************/
 /* ------------ material properties */
@@ -442,6 +445,8 @@ int main(int argc, char ** argv) {
   Scalar mdot(d), mflx(d);         // phase-change rate
 
   Scalar eps(d), mdot_eps(d);      /* NG concentration */
+  Scalar cold(d);
+  Vector uvw_old(d);
 
   /*-----------------------------+ 
   |  insert boundary conditions  |
@@ -480,6 +485,7 @@ int main(int argc, char ** argv) {
 #endif
     uvw_1(m)=uvw(m).shape();
     uvw_2(m)=uvw(m).shape();
+    uvw_old(m)=uvw(m).shape();
   }
 
 #if CASE == 1
@@ -517,6 +523,7 @@ int main(int argc, char ** argv) {
   press=c.shape();
   p=c.shape();
   kappa=c.shape();
+  cold=c.shape();
 
   f = p.shape();
   mdot = p.shape();
@@ -678,7 +685,10 @@ int main(int argc, char ** argv) {
   /* momentum equation */
   Momentum ns( uvw, xyz, time, solver, &mixed);
   ns.diffusion_set (TimeScheme::backward_euler());
-  ns.convection_set(TimeScheme::forward_euler());
+  if(mSimple==1)
+    ns.convection_set(TimeScheme::forward_euler());
+  else
+    ns.convection_set(TimeScheme::backward_euler()); //ns.convection is mandatory
 
   /* pressure solver */
   Pressure pr(p, f, uvw, time, solver, &mixed);
@@ -703,7 +713,7 @@ int main(int argc, char ** argv) {
 #ifdef STANDARD
   TIF tsat(Tref);
 #else
-  Clapeyron tsat(Tref,conc.topo.adens,eps,mmassv,latent);
+  Clapeyron tsat(Tref,conc.topo,eps,mmassv,latent);
   tsat.set_ur(ur);
 #endif
 #if CASE > 1
@@ -916,63 +926,88 @@ int main(int argc, char ** argv) {
     pc.update();
     ns.vol_phase_change(&f);
 
-    /* reset body force */
-    for_m(m)
-      for_avmijk(xyz,m,i,j,k)
-        xyz[m][i][j][k]=0.0;
-
 #ifndef STATIC
-    /* surface tension */
-    conc.tension(&xyz, mixed,conc.color());
+    /* update phase-change */
+    conc.advance_phase_change(c);
 #endif
 
-    /*--------------------------+
-    |  solve momentum equation  |
-    +--------------------------*/
-    /* essential for moving front */
-    ns.discretize();
-    pr.discretize();
-    pr.coarsen();
+    /* store */
+    cold = c;
+    for_m(m)
+      uvw_old(m) = uvw(m);
 
-    /* momentum */
-    ns.new_time_step();
-
-    ns.grad(press);
-    ns.solve(ResRat(1e-14));
-
-    p = 0.0;
-    if (multigrid.vcycle(ResRat(1e-6))) OMS(converged);
-    p.exchange();
-    ns.project(p);
-    press += p;
-
-    /* shift pressure */
-    real pmin=1.0e+300;
-    for_vijk(press,i,j,k){
-      if(d.ibody().on(i,j,k)){
-        if(pmin>press[i][j][k]) pmin=press[i][j][k];
-      }
-    }
-    boil::cart.min_real(&pmin);
-
-    for_vijk(press,i,j,k){
-      if(d.ibody().on(i,j,k)){
-        press[i][j][k] -= pmin;
-      } else {
-        press[i][j][k] = 0.0;
-      }
-    }
-    press.bnd_update();
-    press.exchange_all();
-
-    ns.cfl_max();
+    /**** simple ****/
+    for(int mloop=0; mloop<mSimple; mloop++) {
+      
+      /* reset body force */
+      for_m(m)
+        for_avmijk(xyz,m,i,j,k)
+          xyz[m][i][j][k]=0.0;
 
 #ifndef STATIC
-    /*-----------------------+
-    |  solve color equation  |
-    +-----------------------*/
-    conc.advance_with_extrapolation(true,ResRat(1e-9),uvw,f,
-                                    &liquid,&uvw_1);
+      /* calculate int geometry */
+      conc.reconstruct_geometry(cold);
+
+      /* surface tension */
+      conc.tension(&xyz, mixed,conc.color());
+#endif
+
+      /*--------------------------+
+      |  solve momentum equation  |
+      +--------------------------*/
+      /* essential for moving front */
+      ns.discretize();
+      pr.discretize();
+      pr.coarsen();
+
+      /* momentum */
+      ns.new_time_step(uvw_old);
+      if(mSimple>1)
+        ns.convection();
+
+      ns.grad(press);
+      ns.solve(ResRat(1e-14));
+
+      p = 0.0;
+      if (multigrid.fcycle(ResRat(1e-4))) OMS(converged);
+      p.exchange();
+      ns.project(p);
+      press += p;
+
+
+      /* shift pressure */
+      real pmin=1.0e+300;
+      for_vijk(press,i,j,k){
+        if(d.ibody().on(i,j,k)){
+          if(pmin>press[i][j][k]) pmin=press[i][j][k];
+        }
+      }
+      boil::cart.min_real(&pmin);
+
+      for_vijk(press,i,j,k){
+        if(d.ibody().on(i,j,k)){
+          press[i][j][k] -= pmin;
+        } else {
+          press[i][j][k] = 0.0;
+        }
+      }
+      press.bnd_update();
+      press.exchange_all();
+
+      ns.cfl_max();
+
+#ifndef STATIC
+      /*-----------------------+
+      |  solve color equation  |
+      +-----------------------*/
+      conc.extrapolate_velocity(conc.color(),f,&liquid,uvw,uvw_1,ResRat(1e-9),Sign::pos(),true);
+      conc.advance_geometric(cold);
+#endif
+    }
+
+#ifndef STATIC
+    conc.ancillary();
+    conc.totalvol();
 #endif
 
     /*-------------------------+

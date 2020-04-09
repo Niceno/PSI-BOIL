@@ -100,8 +100,8 @@ int main(int argc, char ** argv) {
   const int n_per_plot = ndt/100;
 
   /* dt settings */
-  const real surftens_dt_coef = 5.;
-  //const real surftens_dt_coef = 10.;
+  //const real surftens_dt_coef = 5.;
+  const real surftens_dt_coef = 10.;
   const real initdtcoef = 1./10.;
 
   /* cfl with and without interfaces */
@@ -113,7 +113,7 @@ int main(int argc, char ** argv) {
   const bool multigrid_stop_if_diverging = true;
   //const bool multigrid_stop_if_diverging = false;
 
-  const int multigrid_min_cycles = 5;
+  const int multigrid_min_cycles = 3;
   const int multigrid_max_cycles = 20;//10+2*gLevel;
 
   /* vof */
@@ -723,7 +723,7 @@ int main(int argc, char ** argv) {
     ns.solve(ResRat(1e-14));
 
     p = 0.0;
-    if (multigrid.vcycle(ResRat(1e-6))) OMS(converged);
+    if (multigrid.fcycle(ResRat(1e-4))) OMS(converged);
     //pr.solve(ResRat(1e-6),"Pressure");
     p.exchange();
     ns.project(p);
@@ -805,7 +805,7 @@ int main(int argc, char ** argv) {
     conc.color_minmax();
 
     /* front */
-    conc.front_minmax( Range<real>(0,LX3) ,Range<real>(0,LX3)
+    conc.front_minmax( Range<real>(0,LX1) ,Range<real>(0,LX1)
                       ,Range<real>(0, LZ1));
 
     time.control_dt(ns.cfl_max(), cfl_with, dt);

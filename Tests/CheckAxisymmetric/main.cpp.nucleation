@@ -191,7 +191,7 @@ int main(int argc, char ** argv) {
   const TopoMethod topo_method = TopoMethod::Hybrid();
 
 #ifdef MULTI_BUBBLES
-  const bool detachment_model = true;
+  const bool detachment_model = false;//true;
 #else
   const bool detachment_model = false;
 #endif
@@ -343,7 +343,11 @@ int main(int argc, char ** argv) {
   real LZ0 = -100e-6;
 #endif
 
+#ifdef MULTI_BUBBLES
   const int NZ1 = 64*gLevel-NZ0;
+#else
+  const int NZ1 = 32*gLevel-NZ0;
+#endif
 
   LX1 *= xmult;
   LX2 *= xmult;
@@ -906,6 +910,8 @@ int main(int argc, char ** argv) {
     }
 
     /* surface tension */
+    if(wall_curv_method==CurvMethod::HFnormalXZ())
+      conc.output_cangle_2d(Comp::i(),Comp::k(),Sign::neg());
     conc.tension(&xyz, mixed,conc.color());
 
     /*--------------------------+
