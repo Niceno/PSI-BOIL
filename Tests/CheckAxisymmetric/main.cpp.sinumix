@@ -118,8 +118,8 @@ int main(int argc, char ** argv) {
 
   /* vof */
   const CurvMethod curv_method = CurvMethod::HF();
-  //const CurvMethod wall_curv_method = CurvMethod::HFnormalXZ();
-  const CurvMethod wall_curv_method = CurvMethod::HFmixedXZ();
+  const CurvMethod wall_curv_method = CurvMethod::HFnormalXZ();
+  //const CurvMethod wall_curv_method = CurvMethod::HFmixedXZ();
   const int Nfilm_crit = 4;
   const TopoMethod topo_method = TopoMethod::Hybrid();
 
@@ -349,11 +349,13 @@ int main(int argc, char ** argv) {
   vapor  .cp    (cpv);  // J/m3
   vapor  .lambda(lambdav);
   vapor  .mmass (Mv);
+  vapor  .beta  (betav);
   liquid.mu    (mul);
   liquid.rho   (rhol);
   liquid.cp    (cpl);   // J/m3
   liquid.lambda(lambdal);
   liquid.mmass (Mv);
+  liquid.beta  (betal);
 
   /* heater */
   heater.rho    (rhosol);
@@ -722,8 +724,15 @@ int main(int argc, char ** argv) {
     ns.grad(press);
     ns.solve(ResRat(1e-14));
 
+    const int niter = 50;
+    MaxIter mm = MaxIter(niter);
+    std::array<MaxIter,3> mi = {mm,mm,mm};
+
+    ResRat rr = ResRat(1e-4);
+
     p = 0.0;
-    if (multigrid.fcycle(ResRat(1e-4))) OMS(converged);
+    if (multigrid.cycle(Cycle::none(),Cycle::F(),rr,mi)) OMS(converged)
+    //if (multigrid.wcycle(ResRat(1e-4))) OMS(converged);
     //pr.solve(ResRat(1e-6),"Pressure");
     p.exchange();
     ns.project(p);

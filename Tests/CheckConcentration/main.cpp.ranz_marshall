@@ -3,7 +3,7 @@
 #include <iostream>
 #include <fenv.h>
 #define _GNU_SOURCE 1
-#define METHOD 2
+#define METHOD 1
 /* 0: static simulation
    1: moving frame
    2: free fall */
@@ -23,7 +23,7 @@ int main(int argc, char * argv[]) {
 
   if(argc<=6){
     boil::oout<<"Six command line arguments required!"<<"\n";
-    boil::oout<<"./Boil wmin gridlevel diameter[mm] NZmult"<<boil::endl;
+    boil::oout<<"./Boil wmin gridlevel diameter[mm] wvel tinf[degC] NZmult"<<boil::endl;
     boil::oout<<"(wmin::wall time in minute)"<<"\n";
     exit(0);
   }
@@ -58,7 +58,7 @@ int main(int argc, char * argv[]) {
 /* ------------ numerical simulation settings */
 
   /* total number of steps */
-  const int ndt = 10000*gLevel*3;
+  const int ndt = 10000*gLevel*6;
 
   /* steps per backup */
   const int n_per_backup = ndt/5;
@@ -98,7 +98,7 @@ int main(int argc, char * argv[]) {
   const real ur = 0.01;
 
   /* velocity underrelaxation */
-  const real underrelax = 5e-3;
+  const real underrelax = 5e-0;
 
 /******************************************************************************/
 /* ------------ material properties */
@@ -192,8 +192,11 @@ int main(int argc, char * argv[]) {
   +----------*/
   Grid1D gx( Range<real>(0.0,LX), NX, Periodic::no(),
              BndGrid::symmetry(), BndGrid::wall() );
-#if METHOD < 2
+#if METHOD == 0
   Grid1D gz( Range<real>(-LZ/2.,LZ/2.), NZ, Periodic::no(),
+             BndGrid::wall(), BndGrid::wall() );
+#elif METHOD == 1
+  Grid1D gz( Range<real>(-LZ+1.5*diameter,1.5*diameter), NZ, Periodic::no(),
              BndGrid::wall(), BndGrid::wall() );
 #else
   Grid1D gz( Range<real>(-LZ+diameter,diameter), NZ, Periodic::no(),
@@ -521,10 +524,10 @@ int main(int argc, char * argv[]) {
 
     boil::oout <<"Relative-vel= "<<time.current_time()<<" "<< wv << " "<< wvel<< boil::endl;
 #if METHOD == 1
-    wvel += underrelax*wv;
-    for_m(m) {
-      uvw.bc(m).modify( BndCnd( Dir::kmax(), BndType::inlet(), 0., 0., -wvel ) );
-    }
+    //wvel += underrelax*wv;
+    //for_m(m) {
+    //  uvw.bc(m).modify( BndCnd( Dir::kmax(), BndType::inlet(), 0., 0., -wvel ) );
+    //}
     for_vmijk(uvw,m,i,j,k)
       uvw[m][i][j][k] -= underrelax*wv; 
     uvw.exchange_all();
