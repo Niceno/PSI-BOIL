@@ -153,10 +153,10 @@ int main(int argc, char ** argv) {
 
 #ifdef USE_CONVECTIVE_BL
   const real betal = 7.52e-4;
-  const real betag = 1./tsat0_K; /* ideal gas approximation */
+  const real betav = 1./tsat0_K; /* ideal gas approximation */
 #else
   const real betal = 0.0;
-  const real betag = 0.0;
+  const real betav = 0.0;
 #endif
 
   /* heater */
