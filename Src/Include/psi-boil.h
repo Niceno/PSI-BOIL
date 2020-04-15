@@ -14,6 +14,7 @@
 #include "../Equation/Centered/EnthalpyFD/EnthalpyFDaxisym/enthalpyfdaxisym.h"
 #include "../Equation/Centered/PhaseChange/phasechange.h"
 #include "../Equation/Centered/PhaseChangeVOF/phasechangevof.h"
+#include "../Equation/Centered/PhaseChange4/phasechange4.h"
 #include "../Equation/Centered/CIPCSL2/cipcsl2.h"
 #include "../Equation/Centered/VOF/VOFaxisym/vofaxisym.h"
 #include "../Equation/Centered/Distance/distance.h"

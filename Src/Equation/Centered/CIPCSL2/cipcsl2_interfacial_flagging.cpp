@@ -100,7 +100,7 @@ bool CIPCSL2::Interface(const Sign dir, const Comp m,
   return false;
 }
 
-bool VOF::Interface(const int i, const int j, const int k) {
+bool CIPCSL2::Interface(const int i, const int j, const int k) {
   if(adens[i][j][k]>boil::pico) {
     return true;
   }

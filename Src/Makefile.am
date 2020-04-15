@@ -19,6 +19,7 @@ SUBDIRS = Equation/Staggered/Momentum                              \
           Equation/Centered/Pressure                               \
           Equation/Centered/PhaseChange                            \
           Equation/Centered/PhaseChangeVOF                         \
+          Equation/Centered/PhaseChange4                           \
           Equation/Centered/CIPCSL2                                \
           Equation/Centered/VOF/VOFaxisym                          \
           Equation/Centered/VOF                                    \
@@ -81,6 +82,7 @@ LDADD = Equation/Staggered/Momentum/libMomentum.a                             \
         Equation/Centered/Pressure/libPressure.a                              \
         Equation/Centered/PhaseChange/libPhaseChange.a                        \
         Equation/Centered/PhaseChangeVOF/libPhaseChangeVOF.a                  \
+        Equation/Centered/PhaseChange4/libPhaseChange4.a                      \
         Equation/Centered/CIPCSL2/libCipcsl2.a                                \
         Equation/Centered/VOF/VOFaxisym/libVOFaxisym.a                        \
         Equation/Centered/VOF/libVof.a                                        \

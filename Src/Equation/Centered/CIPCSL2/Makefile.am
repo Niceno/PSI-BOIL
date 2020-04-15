@@ -48,6 +48,7 @@ libCipcsl2_a_SOURCES = cipcsl2.h                        \
                        cipcsl2_insert_bc_gradphic.cpp   \
                        cipcsl2_insert_bc_kappa.cpp      \
                        cipcsl2_insert_bc_norm.cpp       \
+                       cipcsl2_interfacial_flagging.cpp \
                        cipcsl2_load.cpp                 \
                        cipcsl2_normalize.cpp            \
                        cipcsl2_plotTEC.cpp              \
