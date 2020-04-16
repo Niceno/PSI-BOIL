@@ -35,11 +35,25 @@ class PhaseChange4 : public Centered {
     void initialize();
     void finalize();
 
+    real lambda(const int i, const int j, const int k,
+                const Scalar * diff_eddy = NULL) const;
+    real lambda_inv(const int i, const int j, const int k,
+                    const Scalar * diff_eddy = NULL) const;
+
     inline real get_turbP() const { return turbP; }
     inline void set_turbP(const real a) {
       turbP = a;
       boil::oout<<"PhaseChange4::turbP= "<<turbP<<"\n";
     }
+ 
+    inline bool get_accuracy_flag() const { return use_second_order_accuracy; }
+    inline void set_second_order_accuracy(const bool flag) {
+      use_second_order_accuracy = flag;
+      boil::oout<<"PhaseChange4::use_second_order_accuracy= "
+                <<use_second_order_accuracy<<"\n";
+    }
+    
+    Vector & node_tmp() {return bndtpr;}
 
     /* testing */
     bool test_differences(const int count);
@@ -48,6 +62,16 @@ class PhaseChange4 : public Centered {
     real evaluate_polynomial(const int order,
                              const std::vector<real> & coefficients,
                              const real x);
+    real evaluate_polynomial_derivative(const int order,
+                             const std::vector<real> & coefficients,
+                             const real x);
+    void request_gradient(const int i, const int j, const int k,
+                          std::vector<real> & tv,
+                          std::vector<real> & tl) {
+      tv = {txv[i][j][k],tyv[i][j][k],tzv[i][j][k],tnv[i][j][k]};
+      tl = {txl[i][j][k],tyl[i][j][k],tzl[i][j][k],tnl[i][j][k]};
+      return;
+    }
 
 
   private:
@@ -90,11 +114,6 @@ class PhaseChange4 : public Centered {
     real temperature_node(real len_s, real lam_s, real tmp_s,
                           real len_f, real lam_f, real tmp_f);
  
-    real lambda(const int i, const int j, const int k,
-                const Scalar * diff_eddy = NULL) const;
-    real lambda_inv(const int i, const int j, const int k,
-                    const Scalar * diff_eddy = NULL) const;
-
     real gradt1D(const bool is_solid, const Comp & m,
                  const int i, const int j, const int k);
 
@@ -142,6 +161,8 @@ class PhaseChange4 : public Centered {
     real turbP;
     real epsl; 
     real smdot_pos, smdot_neg;
+    
+    bool use_second_order_accuracy;
 };	
 
 #endif

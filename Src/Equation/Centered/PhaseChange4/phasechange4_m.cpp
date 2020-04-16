@@ -15,7 +15,7 @@ void PhaseChange4::m() {
 
 #if 0
       if(i==3&&j==3&&k==3) {
-      boil::aout<<"PCV_m: "<<i<<" "<<j<<" "<<k<<" | "<<phi.xc(i)<<" | "<<clr[i][j][k]<<" "<<adens[i][j][k]<<" "<<fs[Comp::k()][i][j][k]<<" "<<fs[Comp::k()][i+1][j][k]<<" | "<<tpr[i][j][k]<<" "<<tpr[i][j][k-1]<<" "<<tpr[i][j][k+1]<<" | "<<tpr[i-1][j][k]<<" "<<tpr[i+1][j][k]<<" | "<<qv<<" "<<ql<<" "<<qv+ql<<" | "<<tzv[i][j][k]<<" "<<nx[i][j][k]<<" "<<nz[i][j][k]<<boil::endl;
+      boil::aout<<"PC4_m: "<<i<<" "<<j<<" "<<k<<" | "<<phi.xc(i)<<" | "<<clr[i][j][k]<<" "<<adens[i][j][k]<<" "<<fs[Comp::k()][i][j][k]<<" "<<fs[Comp::k()][i+1][j][k]<<" | "<<tpr[i][j][k]<<" "<<tpr[i][j][k-1]<<" "<<tpr[i][j][k+1]<<" | "<<tpr[i-1][j][k]<<" "<<tpr[i+1][j][k]<<" | "<<qv<<" "<<ql<<" "<<qv+ql<<" | "<<tzv[i][j][k]<<" "<<nx[i][j][k]<<" "<<nz[i][j][k]<<boil::endl;
       }
 #endif
     } else {

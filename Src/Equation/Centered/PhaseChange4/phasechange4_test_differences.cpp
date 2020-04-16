@@ -97,3 +97,16 @@ real PhaseChange4::evaluate_polynomial(const int order,
 
   return val;
 }
+
+/******************************************************************************/
+real PhaseChange4::evaluate_polynomial_derivative(const int order,
+                                       const std::vector<real> & coefficients,
+                                       const real x) {
+/******************************************************************************/
+  real val(0.);
+  for(int i(1); i<=order; ++i) {
+    val += real(i)*coefficients[i]*pow(x,real(i-1)); 
+  }
+
+  return val;
+}

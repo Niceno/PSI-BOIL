@@ -56,7 +56,11 @@ real PhaseChange4::gradt1D(const bool is_solid, const Comp & m,
   add_point(i+ii0,j+jj0,k+kk0, i+ii1,j+jj1,k+kk1,
             Sign::pos(), m, is_solid, eend, stencil, values);
   e_idx = stencil.size()-1;
-  
+
+  /*** terminate if second-order accuracy is desired ***/
+  if(use_second_order_accuracy)
+    return second_order_difference(stencil,values);
+   
   /*** if termination flags did not fire, add further points ***/
 
   /* west-west */
@@ -89,8 +93,7 @@ real PhaseChange4::gradt1D(const bool is_solid, const Comp & m,
 
   /* full stencil = 5 points */
   if(stencil.size()==5) {
-    //return fourth_order_difference(stencil,values);
-    return second_order_difference(stencil,values);
+    return fourth_order_difference(stencil,values);
 
   /* minimal stencil = 3 points */
   } else if(stencil.size()==3) {
@@ -102,8 +105,7 @@ real PhaseChange4::gradt1D(const bool is_solid, const Comp & m,
     /* can we extend to 5? */
     if(wend&&eend) {
       /* no */
-      //return third_order_difference(stencil,values);
-      return second_order_difference(stencil,values);
+      return third_order_difference(stencil,values);
 
     /* yes */
     } else {
@@ -115,8 +117,8 @@ real PhaseChange4::gradt1D(const bool is_solid, const Comp & m,
       if(wend) {
 
         /* east-east-east */
-        *idx0 = +1;
-        *idx1 = +2;
+        *idx0 = +2;
+        *idx1 = +3;
 
         add_point(i+ii0,j+jj0,k+kk0, i+ii1,j+jj1,k+kk1,
                   Sign::pos(), m, is_solid, eend, stencil, values);
@@ -128,8 +130,8 @@ real PhaseChange4::gradt1D(const bool is_solid, const Comp & m,
       } else {
 
         /* west-west-west */
-        *idx0 = -1;
-        *idx1 = -2;
+        *idx0 = -2;
+        *idx1 = -3;
 
         add_point(i+ii0,j+jj0,k+kk0, i+ii1,j+jj1,k+kk1,
                   Sign::neg(), m, is_solid, wend, stencil, values);
@@ -139,8 +141,7 @@ real PhaseChange4::gradt1D(const bool is_solid, const Comp & m,
 
       }
 
-      //return fourth_order_difference(stencil,values);
-      return second_order_difference(stencil,values);
+      return fourth_order_difference(stencil,values);
 
     }
 

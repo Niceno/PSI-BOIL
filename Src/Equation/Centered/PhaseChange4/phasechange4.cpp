@@ -89,6 +89,9 @@ PhaseChange4::PhaseChange4(const Scalar & MDOT,
   /* this should be consistent with enthalpy class */
   //epsl = 5.0e-2;
   epsl = 1.0e-2;
+
+  /* accuracy order */
+  use_second_order_accuracy = false;
 }	
 
 /******************************************************************************/

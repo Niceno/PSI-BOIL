@@ -8,12 +8,19 @@ void PhaseChange4::calculate_node_temperature(const Scalar * diff_eddy) {
   for_m(m)
     bndtpr(m) = boil::unreal;
 
-  for_ijk(i,j,k) {
+  /*--------------+
+  | immersed body |
+  +--------------*/
+  for(int cc=0; cc<dom->ibody().nccells(); cc++) {
+    int i,j,k;
+    /* cell[i][j][k] is wall adjacent cell in fluid domain */
+    dom->ibody().ijk(cc,&i,&j,&k);
 
     Comp m = Comp::i();
 
     /* west is in wall */
     if(dom->ibody().off(i-1,j,k)) {
+
       real lam_1 = lambda(i,j,k,diff_eddy);
       real lam_2 = lambda(i-1,j,k,diff_eddy);
 
