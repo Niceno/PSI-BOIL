@@ -1,6 +1,4 @@
 #include "phasechange4.h"
-//#define DEBUG
-using namespace std;
 
 /******************************************************************************/
 void PhaseChange4::update(const Scalar * diff_eddy) {
@@ -15,7 +13,7 @@ void PhaseChange4::update(const Scalar * diff_eddy) {
   /*----------------------+
   |  calculate mass flux  |
   +----------------------*/
-  cal_massflux(diff_eddy);
+  mass_flux(diff_eddy);
 
   /*------------------------+
   |  calculate mass source  |

@@ -1,6 +1,5 @@
 #include "phasechange4.h"
 //#define DEBUG
-using namespace std;
 
 /******************************************************************************/
 void PhaseChange4::finalize() {

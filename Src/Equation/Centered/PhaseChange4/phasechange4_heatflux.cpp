@@ -1,21 +1,22 @@
 #include "phasechange4.h"
 
 /******************************************************************************/
-void PhaseChange4::gradt(const Scalar * diff_eddy) {
+void PhaseChange4::heat_flux(const Scalar * diff_eddy) {
 /***************************************************************************//**
-*  \brief Calculate grad(tpr) considering free surface position.
+*  \brief Calculate heat flux in cells.
 *******************************************************************************/
 
+  /* these are heat flux */
   txl = tyl = tzl = 0.;
   txv = tyv = tzv = 0.;
   tnl = tnv = 0.;
 
   /* calculate temperature at solid-fluid boundaries */
   if(solid())
-    calculate_node_temperature();
+    calculate_node_temperature(diff_eddy);
 
-  /* calculate grad(tpr) */
-  cal_gradt();
+  /* calculate heat flux */
+  cal_hf(diff_eddy);
 
   txl.bnd_update();
   tyl.bnd_update();
@@ -37,13 +38,14 @@ void PhaseChange4::gradt(const Scalar * diff_eddy) {
   exit(0);
 #endif
 
-  /* extrapolate grad(tpr) */
+  /* extrapolate heat flux */
   topo->extrapolate(txv,Sign::pos());
   topo->extrapolate(tyv,Sign::pos());
   topo->extrapolate(tzv,Sign::pos());
   topo->extrapolate(txl,Sign::neg());
   topo->extrapolate(tyl,Sign::neg());
   topo->extrapolate(tzl,Sign::neg());
+
   /* calculate the normal component */
   for_aijk(i,j,k) {
     tnv[i][j][k] = txv[i][j][k]*nx[i][j][k]

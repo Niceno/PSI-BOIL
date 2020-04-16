@@ -31,7 +31,7 @@ class PhaseChange4 : public Centered {
     ~PhaseChange4();
     void update(const Scalar * diff_eddy = NULL);
 
-    void cal_massflux(const Scalar * diff_eddy = NULL);
+    void mass_flux(const Scalar * diff_eddy = NULL);
     void initialize();
     void finalize();
 
@@ -41,16 +41,25 @@ class PhaseChange4 : public Centered {
       boil::oout<<"PhaseChange4::turbP= "<<turbP<<"\n";
     }
 
+    /* testing */
+    bool test_differences(const int count);
+    bool test_differences(const std::vector<real> & stencil,
+                          const std::vector<real> & coefficients);
+    real evaluate_polynomial(const int order,
+                             const std::vector<real> & coefficients,
+                             const real x);
+
+
   private:
     bool interface(const Sign dir, const Comp m,
                    const int i, const int j, const int k);
     bool interface(const int i, const int j, const int k);
-    void m(const Scalar * diff_eddy = NULL);
+    void m();
     real mdot_cut(real m, real c, real & mcut);
     void mdot();
 
-    void gradt(const Scalar * diff_eddy = NULL);
-    void cal_gradt();
+    void heat_flux(const Scalar * diff_eddy = NULL);
+    void cal_hf(const Scalar * diff_eddy = NULL);
     void calculate_node_temperature(const Scalar * diff_eddy = NULL);
 
     void sources_vfs();
@@ -102,6 +111,13 @@ class PhaseChange4 : public Centered {
                        const int i, const int j, const int k);
     bool edge(const Sign dir, const Comp & m,
               const int i, const int j, const int k);
+
+    real second_order_difference(const std::vector<real> & stencil,
+                                const std::vector<real> & values);
+    real third_order_difference(const std::vector<real> & stencil,
+                                const std::vector<real> & values);
+    real fourth_order_difference(const std::vector<real> & stencil,
+                                 const std::vector<real> & values);
 
     ScalarInt tempflag,iflag;
     Scalar txv, tyv, tzv;

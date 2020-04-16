@@ -1,22 +1,16 @@
 #include "phasechange4.h"
 
 /******************************************************************************/
-void PhaseChange4::m(const Scalar * diff_eddy) {
+void PhaseChange4::m() {
 /***************************************************************************//**
 *  \brief calculate M, usually in unit kg/m2s.
 *         M = (qflux_liquid + qflux_vapor) / latent
 *******************************************************************************/
 
-  for_ijk(i,j,k){
-    if(interface(i,j,k)){
-      real lv = lambdav;
-      real ll = lambdal;
-      if (diff_eddy) {
-        lv += (*diff_eddy)[i][j][k]*cpv/rhov/turbP;
-        ll += (*diff_eddy)[i][j][k]*cpl/rhol/turbP;
-      }
-      real qv = -lv*tnv[i][j][k];
-      real ql =  ll*tnl[i][j][k];
+  for_ijk(i,j,k) {
+    if(interface(i,j,k)) {
+      real qv = -tnv[i][j][k];
+      real ql =  tnl[i][j][k];
       M[i][j][k] = (qv + ql) / fluid()->latent(i,j,k);
 
 #if 0

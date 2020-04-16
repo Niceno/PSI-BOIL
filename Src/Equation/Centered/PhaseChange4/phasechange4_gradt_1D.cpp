@@ -89,11 +89,12 @@ real PhaseChange4::gradt1D(const bool is_solid, const Comp & m,
 
   /* full stencil = 5 points */
   if(stencil.size()==5) {
-    return 0.0;//fourth_order_derivative(stencil,values);
+    //return fourth_order_difference(stencil,values);
+    return second_order_difference(stencil,values);
 
   /* minimal stencil = 3 points */
   } else if(stencil.size()==3) {
-    return 0.0;//second_order_derivative(stencil,values);
+    return second_order_difference(stencil,values);
 
   /* intermediate value = 4 points */
   } else if(stencil.size()==4) {
@@ -101,7 +102,8 @@ real PhaseChange4::gradt1D(const bool is_solid, const Comp & m,
     /* can we extend to 5? */
     if(wend&&eend) {
       /* no */
-      return 0.0;//third_order_derivative(stencil,values);
+      //return third_order_difference(stencil,values);
+      return second_order_difference(stencil,values);
 
     /* yes */
     } else {
@@ -137,7 +139,8 @@ real PhaseChange4::gradt1D(const bool is_solid, const Comp & m,
 
       }
 
-      return 0.0;//fourth_order_derivative(stencil,values);
+      //return fourth_order_difference(stencil,values);
+      return second_order_difference(stencil,values);
 
     }
 

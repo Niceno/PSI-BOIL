@@ -17,7 +17,8 @@ void PhaseChange4::add_point(const int i0, const int j0, const int k0,
     terminate = true; 
 
     real tgamma;
-    real dist_int = distance_int(dir,m,i0,j0,k0,tgamma);
+    real dist_int = std::max(epsl*distance_center(dir,m,i0,j0,k0),
+                            distance_int(dir,m,i0,j0,k0,tgamma));
 
     /* directional choice */
     if(dir>0) {

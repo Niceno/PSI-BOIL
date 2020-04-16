@@ -86,6 +86,7 @@ PhaseChange4::PhaseChange4(const Scalar & MDOT,
   clrsurf = 0.5;
   turbP = 0.9;
 
+  /* this should be consistent with enthalpy class */
   //epsl = 5.0e-2;
   epsl = 1.0e-2;
 }	

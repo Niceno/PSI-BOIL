@@ -12,7 +12,7 @@ void PhaseChangeVOF::gradt(const Scalar * diff_eddy) {
   /* achieved by switching to upwind/downwind differencing */
   /* it is also possible to use purely upw/dwnw through the upwind_flag */
   /* this is however not recommended <- lower precision */
-  calculate_node_temperature();
+  calculate_node_temperature(diff_eddy);
 
   /* calculate grad(tpr) in fluid */
   cal_gradt_fluid(diff_eddy);

@@ -1,0 +1,130 @@
+#include "Include/psi-boil.h"
+#include <fstream>
+#include <iostream>
+#include <fenv.h>
+#define _GNU_SOURCE 1
+#if 1
+static void __attribute__ ((constructor)) trapfpe(void)
+{
+  /* Enable some exceptions. At startup all exceptions are masked. */
+  feenableexcept(FE_INVALID|FE_DIVBYZERO|FE_OVERFLOW);
+}
+#endif
+
+/******************************************************************************/
+int main(int argc, char ** argv) {
+
+  boil::timer.start();
+
+  const int tsat0 = 5.;
+  const real lambdav = 0.0534;
+  const real lambdal = 0.6097;
+  const real latent=1865.02*1000.0;
+  const real lambdasol = 90.9;
+
+  const int NX1  = 5;
+  real LX1 = 0.1e-3;
+
+  /*--------------------------------+
+  |  choose the output file format  |
+  +--------------------------------*/
+  boil::plot = new PlotTEC();
+
+  /*----------+
+  |  grid(s)  |
+  +----------*/
+  Grid1D gx1( Range<real>(0.0,LX1), NX1, Periodic::no() );
+
+  /*---------+
+  |  domain  |
+  +---------*/
+  Body floor("floor.stl");
+  Domain d(gx1, gx1, gx1);
+
+  /*------------------+
+  |  define unknowns  |
+  +------------------*/
+  Vector uvw(d);           // vel
+  Scalar f  (d); // pressure
+  Scalar c  (d), g  (d), kappa(d); // concentration
+  Scalar tpr(d), q  (d);           // temperature
+  Scalar mdot(d), mflx(d);         // phase-change rate
+
+  /*-----------------------------+ 
+  |  insert boundary conditions  |
+  +-----------------------------*/
+  for_m(m) {
+    uvw.bc(m).add( BndCnd( Dir::imin(), BndType::wall() ) );
+    uvw.bc(m).add( BndCnd( Dir::imax(), BndType::wall() ) );
+    uvw.bc(m).add( BndCnd( Dir::kmin(), BndType::wall() ) );
+    uvw.bc(m).add( BndCnd( Dir::kmax(), BndType::wall() ) );
+    uvw.bc(m).add( BndCnd( Dir::jmin(), BndType::wall() ) );
+    uvw.bc(m).add( BndCnd( Dir::jmax(), BndType::wall() ) );
+  }
+
+  c.bc().add( BndCnd( Dir::imin(), BndType::neumann() ) );
+  c.bc().add( BndCnd( Dir::imax(), BndType::neumann() ) );
+  c.bc().add( BndCnd( Dir::kmin(), BndType::neumann() ) );
+  c.bc().add( BndCnd( Dir::kmax(), BndType::neumann() ) );
+  c.bc().add( BndCnd( Dir::jmin(), BndType::neumann() ) );
+  c.bc().add( BndCnd( Dir::jmax(), BndType::neumann() ) );
+
+  /* copy b.c. from p */
+  f = c.shape();
+  mdot = c.shape();
+  mflx = c.shape();
+  q = c.shape();
+  kappa = c.shape();
+  g = c.shape();
+
+  tpr.bc().add( BndCnd( Dir::imin(), BndType::neumann() ) );
+  tpr.bc().add( BndCnd( Dir::imax(), BndType::neumann() ) );
+  tpr.bc().add( BndCnd( Dir::kmin(), BndType::neumann() ) );
+  tpr.bc().add( BndCnd( Dir::kmax(), BndType::neumann() ) );
+  tpr.bc().add( BndCnd( Dir::jmin(), BndType::neumann() ) );
+  tpr.bc().add( BndCnd( Dir::jmax(), BndType::neumann() ) );
+
+  /*----------------------+
+  |  physical properties  |
+  +----------------------*/
+  Matter vapor(d), liquid(d), heater(d);
+  vapor  .lambda(lambdav);
+  liquid.lambda(lambdal);
+
+  /* nickel */
+  heater.lambda (lambdasol);
+
+  Matter * zero = &vapor;
+  Matter * one = &liquid;
+  Matter mixed(*one,*zero, &c);
+  mixed.latent(latent);
+
+  /*-------------------+
+  |  time-integration  |
+  +-------------------*/
+  Times time(10,1.0);
+
+  /*-----------------+
+  |  define solvers  |
+  +-----------------*/
+  Krylov * solverCGic = new CG(d, Prec::ic2());
+  Krylov * solver = solverCGic;
+
+  /* color function */
+  VOF conc(c, g, kappa, uvw, time, solver);
+
+  /* enthalpy equation */
+  TIF tsat(tsat0);
+
+  /* phase change */
+  PhaseChange4 pc(mdot, mflx, tpr, q, c, g, f, uvw, conc.topo,
+                  tsat, time, &mixed);
+
+  /* test differences */
+  pc.test_differences(100);
+
+  boil::oout << "finished" << boil::endl;
+  boil::timer.stop();
+  boil::timer.report();
+
+}
