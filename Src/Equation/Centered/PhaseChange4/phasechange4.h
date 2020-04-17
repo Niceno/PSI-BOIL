@@ -84,6 +84,7 @@ class PhaseChange4 : public Centered {
 
     void heat_flux(const Scalar * diff_eddy = NULL);
     void cal_hf(const Scalar * diff_eddy = NULL);
+    void insert_bc_hf(const Scalar * diff_eddy);
     void calculate_node_temperature(const Scalar * diff_eddy = NULL);
 
     void sources_vfs();

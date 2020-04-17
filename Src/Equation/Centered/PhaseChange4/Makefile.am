@@ -10,6 +10,7 @@ libPhaseChange4_a_SOURCES = phasechange4.h                           \
                             phasechange4_gradt_1D.cpp                \
                             phasechange4_heatflux.cpp                \
                             phasechange4_initialize.cpp              \
+                            phasechange4_insert_bc_hf.cpp            \
                             phasechange4_interface.cpp               \
                             phasechange4_lambda.cpp                  \
                             phasechange4_m.cpp                       \

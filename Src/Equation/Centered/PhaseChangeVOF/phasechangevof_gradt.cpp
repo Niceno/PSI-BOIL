@@ -61,13 +61,14 @@ void PhaseChangeVOF::gradt(const Scalar * diff_eddy) {
   extrapolate(tnv, 1);
   extrapolate(tnl,-1);
 #else
-  /* extrapolate grad(tpr) */
-  topo->extrapolate(txv,Sign::pos());
-  topo->extrapolate(tyv,Sign::pos());
-  topo->extrapolate(tzv,Sign::pos());
-  topo->extrapolate(txl,Sign::neg());
-  topo->extrapolate(tyl,Sign::neg());
-  topo->extrapolate(tzl,Sign::neg());
+  /* extrapolate grad(tpr), values in brackets indicate
+     iflag values for extrapolated cells */
+  topo->extrapolate(txv,Sign::pos(),{1,2});
+  topo->extrapolate(tyv,Sign::pos(),{1,2});
+  topo->extrapolate(tzv,Sign::pos(),{1,2});
+  topo->extrapolate(txl,Sign::neg(),{-1,-2});
+  topo->extrapolate(tyl,Sign::neg(),{-1,-2});
+  topo->extrapolate(tzl,Sign::neg(),{-1,-2});
   /* calculate the normal component */
   for_aijk(i,j,k) {
     tnv[i][j][k] = txv[i][j][k]*nx[i][j][k]

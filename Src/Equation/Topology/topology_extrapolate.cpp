@@ -1,12 +1,14 @@
 #include "topology.h"
 
 /******************************************************************************/
-void Topology::extrapolate(Scalar & sca, const Sign iext) {
-  extrapolate(sca,iext,*iflag);
+void Topology::extrapolate(Scalar & sca, const Sign iext, 
+                           const std::set<int> & testset) {
+  extrapolate(sca,iext,testset,*iflag);
 }
 
 /******************************************************************************/
 void Topology::extrapolate(Scalar & sca, const Sign iext,
+                           const std::set<int> & testset, 
                            const ScalarInt & eflag) {
 /***************************************************************************//**
 *  \brief advect scalar variable sca in normal direction.
@@ -20,26 +22,20 @@ void Topology::extrapolate(Scalar & sca, const Sign iext,
   |  cell which will be extrapolated:                 stmp=0  |
   |  cell which will not be extrapolated (constant):  stmp=1  |
   +----------------------------------------------------------*/
-  if(iext>0){                  // extrapolate from vapor to liquid
-    for_avijk(sca,i,j,k){
-      int flagval = eflag[i][j][k];
-      if(flagval == 1 || flagval == 2){   // liquid cell next to interface
-        stmp[i][j][k]=0;
-      } else {                 // otherwise
-        stmp[i][j][k]=1;
-      }
-      if(sca.domain()->ibody().off(i,j,k))stmp[i][j][k]=1; // fix value in solid
+  for_avijk(sca,i,j,k){
+    int flagval = eflag[i][j][k];
+    /* testset defines, which values of eflag mark cells to be extrapolated,
+       the if-condition below is STL-standard way to check for being in set,
+       equivalent to C++20 testset.contains(flagval) */
+    if(testset.find(flagval) != testset.end()) {
+      stmp[i][j][k] = 0; 
+    /* otherwise */
+    } else {
+      stmp[i][j][k] = 1;
     }
-  } else {                     // extrapolate from liquid to vapor
-    for_avijk(sca,i,j,k){
-      int flagval = eflag[i][j][k];
-      if(flagval == -1 || flagval == -2){  // vapor cell next to interface
-        stmp[i][j][k]=0;
-      } else {                 // otherwise
-        stmp[i][j][k]=1;
-      }
-      if(sca.domain()->ibody().off(i,j,k))stmp[i][j][k]=1; // fix value in solid
-    }
+    /* solid is always fixed */
+    if(sca.domain()->ibody().off(i,j,k))
+      stmp[i][j][k] = 1;
   }
 
 #if 0

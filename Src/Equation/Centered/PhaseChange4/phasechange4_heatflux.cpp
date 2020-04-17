@@ -25,6 +25,9 @@ void PhaseChange4::heat_flux(const Scalar * diff_eddy) {
   tyv.bnd_update();
   tzv.bnd_update();
 
+  /* insert special boundary conditions */
+  insert_bc_hf(diff_eddy);
+
   txl.exchange_all();
   tyl.exchange_all();
   tzl.exchange_all();
@@ -38,13 +41,16 @@ void PhaseChange4::heat_flux(const Scalar * diff_eddy) {
   exit(0);
 #endif
 
-  /* extrapolate heat flux */
-  topo->extrapolate(txv,Sign::pos());
-  topo->extrapolate(tyv,Sign::pos());
-  topo->extrapolate(tzv,Sign::pos());
-  topo->extrapolate(txl,Sign::neg());
-  topo->extrapolate(tyl,Sign::neg());
-  topo->extrapolate(tzl,Sign::neg());
+#if 1
+  /* extrapolate heat flux, values in brackets indicate
+     iflag values for extrapolated cells */
+  topo->extrapolate(txv,Sign::pos(),{1,2});
+  topo->extrapolate(tyv,Sign::pos(),{1,2});
+  topo->extrapolate(tzv,Sign::pos(),{1,2});
+  topo->extrapolate(txl,Sign::neg(),{-1,-2});
+  topo->extrapolate(tyl,Sign::neg(),{-1,-2});
+  topo->extrapolate(tzl,Sign::neg(),{-1,-2});
+#endif
 
   /* calculate the normal component */
   for_aijk(i,j,k) {

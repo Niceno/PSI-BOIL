@@ -10,7 +10,7 @@ void CIPCSL2::insert_bc_alp(const Scalar & val) {
 *           2nd: phi.exchange();
 *******************************************************************************/
 
-  int i,j,k;
+  //int i,j,k;
 
   for( int b=0; b<val.bc().count(); b++ ) {
 
@@ -19,6 +19,7 @@ void CIPCSL2::insert_bc_alp(const Scalar & val) {
     if( val.bc().type(b) == BndType::neumann()
       ||val.bc().type(b) == BndType::symmetry()
       ||val.bc().type(b) == BndType::wall()
+      ||val.bc().type(b) == BndType::pseudo()
       ||val.bc().type(b) == BndType::dirichlet()
       ||val.bc().type(b) == BndType::inlet()
       ||val.bc().type(b) == BndType::outlet()
@@ -37,7 +38,7 @@ void CIPCSL2::insert_bc_alp(const Scalar & val) {
         if(d == Dir::jmin()) jof++; if(d == Dir::jmax()) jof--;
         if(d == Dir::kmin()) kof++; if(d == Dir::kmax()) kof--;
 
-        for_vijk( val.bc().at(b), i,j,k )
+        for_vijk( val.bc().at(b), i,j,k ) {
           if (i<=si()-2) continue;
           if (i>=ei()+2) continue;
           if (j<=sj()-2) continue;
@@ -45,7 +46,11 @@ void CIPCSL2::insert_bc_alp(const Scalar & val) {
           if (k<=sk()-2) continue;
           if (k>=ek()+2) continue;
           val[i][j][k]=val[i+iof][j+jof][k+kof];
-      }
-    }
-  }
+        }
+
+      } /* dir not undefined */
+    } /* bc type */
+  } /* bc count */
+
+  return;
 }

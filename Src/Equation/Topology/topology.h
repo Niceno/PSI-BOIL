@@ -6,6 +6,7 @@
 #include "../../Field/ScalarInt/scalarint.h"
 #include "../../Field/Vector/vector.h"
 #include "../../Domain/domain.h"
+#include <set>
 
 ////////////////
 //            //
@@ -38,8 +39,9 @@ class Topology {
     
     ~Topology() {};
 
-    void extrapolate(Scalar & sca, const Sign iext);
-    void extrapolate(Scalar & sca, const Sign iext, const ScalarInt & eflag);
+    void extrapolate(Scalar & sca, const Sign iext, const std::set<int> & testset);
+    void extrapolate(Scalar & sca, const Sign iext, const std::set<int> & testset,
+                     const ScalarInt & eflag);
     
     inline int get_extrapolation_iters() const { return mmax_ext; }
     inline real get_extrapolation_tol() const  { return tol_ext; }
