@@ -1,5 +1,4 @@
 #include "phasechangevof.h"
-using namespace std;
 
 /******************************************************************************/
 void PhaseChangeVOF::insert_bc_gradt_at_walls(const Scalar * diff_eddy) {
@@ -8,52 +7,54 @@ void PhaseChangeVOF::insert_bc_gradt_at_walls(const Scalar * diff_eddy) {
 *         N.B. fluid values are also updated but will be overwritten during
 *         extrapolation
 *******************************************************************************/
-  for(int b = 0; b < clr.bc().count(); b++) {
+  for(int b = 0; b < tpr.bc().count(); b++) {
 
-    if(clr.bc().type_decomp(b))
+    if(tpr.bc().type_decomp(b))
       continue;
 
-    if(clr.bc().type(b) == BndType::wall()) {
+    if(tpr.bc().type(b) == BndType::dirichlet()) {
 
       Dir d = clr.bc().direction(b);
       if(d != Dir::undefined()) {
         Comp mcomp;
-        int dir(0), ofx(0), ofy(0), ofz(0);
+        int ofx(0), ofy(0), ofz(0);
+        Sign sig;
         if (d == Dir::imin()) {
           mcomp = Comp::i();
-          dir = -1;
+          sig = Sign::neg();
           ofx = +1;
         } else if (d == Dir::imax()) {
           mcomp = Comp::i();
-          dir = +1;
+          sig = Sign::pos();
           ofx = -1;
         } else if (d == Dir::jmin()) {
           mcomp = Comp::j();
-          dir = -1;
+          sig = Sign::neg();
           ofy = +1;
         } else if (d == Dir::jmax()) {
           mcomp = Comp::j();
-          dir = +1;
+          sig = Sign::pos();
           ofy = -1;
         } else if (d == Dir::kmin()) {
           mcomp = Comp::k();
-          dir = -1;
+          sig = Sign::neg();
           ofz = +1;
         } else if (d == Dir::kmax()) {
           mcomp = Comp::k();
-          dir = +1;
+          sig = Sign::pos();
           ofz = -1;
         } else {
           continue;
         }
 
-        for_vijk( clr.bc().at(b), i,j,k ) {
+        for_vijk( tpr.bc().at(b), i,j,k ) {
           int ii = i+ofx;
           int jj = j+ofy;
           int kk = k+ofz;
           
           /* is there an interface between cell centre and wall? */
-          if(Interface(dir,mcomp,ii,jj,kk)) {
+          if(Interface(sig,mcomp,ii,jj,kk)) {
+
             /* wall temperature */
             real tw = tpr[i][j][k];
             /* interface temperature and distance wall-interface */
@@ -62,38 +63,39 @@ void PhaseChangeVOF::insert_bc_gradt_at_walls(const Scalar * diff_eddy) {
             /* the temperature gradient for inverse phase is set 
              * extrapolation overwrites them though */
             if       (mcomp==Comp::i()) {
-              dist = distance_x(ii,jj,kk,dir,ti);
-              dist = clr.dxc(ii)/2.0 - dist;
+              dist = distance_x(ii,jj,kk,sig,ti);
+              dist = distance_center(sig,mcomp,ii,jj,kk) - dist;
               if(clr[ii][jj][kk]>=clrsurf) {
-                txv[ii][jj][kk] = (tw-ti)/dist * real(dir);
-                txv[i ][j ][k ] = (tw-ti)/dist * real(dir);
+                txv[ii][jj][kk] = (tw-ti)/dist * real(sig);
+                txv[i ][j ][k ] = (tw-ti)/dist * real(sig);
               } else {
-                txl[ii][jj][kk] = (tw-ti)/dist * real(dir);
-                txl[i ][j ][k ] = (tw-ti)/dist * real(dir);
+                txl[ii][jj][kk] = (tw-ti)/dist * real(sig);
+                txl[i ][j ][k ] = (tw-ti)/dist * real(sig);
               }
             } else if(mcomp==Comp::j()) {             
-              dist = distance_y(ii,jj,kk,dir,ti);
-              dist = clr.dyc(jj)/2.0 - dist;
+              dist = distance_y(ii,jj,kk,sig,ti);
+              dist = distance_center(sig,mcomp,ii,jj,kk) - dist;
               if(clr[ii][jj][kk]>=clrsurf) {
-                tyv[ii][jj][kk] = (tw-ti)/dist * real(dir);
-                tyv[i ][j ][k ] = (tw-ti)/dist * real(dir);
+                tyv[ii][jj][kk] = (tw-ti)/dist * real(sig);
+                tyv[i ][j ][k ] = (tw-ti)/dist * real(sig);
               } else {
-                tyl[ii][jj][kk] = (tw-ti)/dist * real(dir);
-                tyl[i ][j ][k ] = (tw-ti)/dist * real(dir);
+                tyl[ii][jj][kk] = (tw-ti)/dist * real(sig);
+                tyl[i ][j ][k ] = (tw-ti)/dist * real(sig);
               }
             } else {
-              dist = distance_z(ii,jj,kk,dir,ti);
-              dist = clr.dzc(kk)/2.0 - dist;
+              dist = distance_z(ii,jj,kk,sig,ti);
+              dist = distance_center(sig,mcomp,ii,jj,kk) - dist;
               if(clr[ii][jj][kk]>=clrsurf) {
-                tzv[ii][jj][kk] = (tw-ti)/dist * real(dir);
-                tzv[i ][j ][k ] = (tw-ti)/dist * real(dir);
+                tzv[ii][jj][kk] = (tw-ti)/dist * real(sig);
+                tzv[i ][j ][k ] = (tw-ti)/dist * real(sig);
               } else {
-                tzl[ii][jj][kk] = (tw-ti)/dist * real(dir);
-                tzl[i ][j ][k ] = (tw-ti)/dist * real(dir);
+                tzl[ii][jj][kk] = (tw-ti)/dist * real(sig);
+                tzl[i ][j ][k ] = (tw-ti)/dist * real(sig);
               }
             }
-          }
-        }
+
+          } /* there is interface */
+        } /* ijk */
 
       } /* dir not undefined */
     } /* is wall? */

@@ -8,10 +8,10 @@ bool PhaseChange4::edge(const Sign dir, const Comp & m,
 
   if       (m==Comp::i()) {
     if( (i==si()&&dir<0&&!tpr.bc().type(Dir::imin(),BndType::periodic())
-                      &&!tpr.bc().type_decomp(Dir::imin()))
+                       &&!tpr.bc().type_decomp(Dir::imin()))
       ||
         (i==ei()&&dir>0&&!tpr.bc().type(Dir::imax(),BndType::periodic())
-                      &&!tpr.bc().type_decomp(Dir::imax())) )
+                       &&!tpr.bc().type_decomp(Dir::imax())) )
       return true;
 
   } else if(m==Comp::j()) {

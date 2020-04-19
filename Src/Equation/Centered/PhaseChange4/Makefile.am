@@ -1,5 +1,6 @@
 noinst_LIBRARIES = libPhaseChange4.a
 libPhaseChange4_a_SOURCES = phasechange4.h                           \
+                            phasechange4_inline.h                    \
                             phasechange4.cpp                         \
                             phasechange4_add_point.cpp               \
                             phasechange4_cal_hf.cpp                  \

@@ -90,8 +90,11 @@ PhaseChange4::PhaseChange4(const Scalar & MDOT,
   //epsl = 5.0e-2;
   epsl = 1.0e-2;
 
-  /* accuracy order */
+  /* flags */
   use_second_order_accuracy = false;
+  use_unconditional_extrapolation = false;
+  discard_points_near_interface = false;
+
 }	
 
 /******************************************************************************/

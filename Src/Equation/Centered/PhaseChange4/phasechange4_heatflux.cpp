@@ -44,12 +44,21 @@ void PhaseChange4::heat_flux(const Scalar * diff_eddy) {
 #if 1
   /* extrapolate heat flux, values in brackets indicate
      iflag values for extrapolated cells */
-  topo->extrapolate(txv,Sign::pos(),{1,2});
-  topo->extrapolate(tyv,Sign::pos(),{1,2});
-  topo->extrapolate(tzv,Sign::pos(),{1,2});
-  topo->extrapolate(txl,Sign::neg(),{-1,-2});
-  topo->extrapolate(tyl,Sign::neg(),{-1,-2});
-  topo->extrapolate(tzl,Sign::neg(),{-1,-2});
+
+  std::set<int> pos_ext = {1,2};
+  std::set<int> neg_ext = {-1,-2};
+
+  if(use_unconditional_extrapolation) {
+    pos_ext = {-1,1,2};
+    neg_ext = {1,-1,-2};
+  }
+
+  topo->extrapolate(txv,Sign::pos(),pos_ext);
+  topo->extrapolate(tyv,Sign::pos(),pos_ext);
+  topo->extrapolate(tzv,Sign::pos(),pos_ext);
+  topo->extrapolate(txl,Sign::neg(),neg_ext);
+  topo->extrapolate(tyl,Sign::neg(),neg_ext);
+  topo->extrapolate(tzl,Sign::neg(),neg_ext);
 #endif
 
   /* calculate the normal component */

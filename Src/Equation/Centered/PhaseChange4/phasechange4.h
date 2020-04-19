@@ -2,6 +2,7 @@
 #define PHASECHANGE4_H
 
 #include <cmath>
+#include <set>
 #include "../centered.h"
 #include "../../../Parallel/communicator.h"
 #include "../../../Timer/timer.h"
@@ -40,19 +41,8 @@ class PhaseChange4 : public Centered {
     real lambda_inv(const int i, const int j, const int k,
                     const Scalar * diff_eddy = NULL) const;
 
-    inline real get_turbP() const { return turbP; }
-    inline void set_turbP(const real a) {
-      turbP = a;
-      boil::oout<<"PhaseChange4::turbP= "<<turbP<<"\n";
-    }
- 
-    inline bool get_accuracy_flag() const { return use_second_order_accuracy; }
-    inline void set_second_order_accuracy(const bool flag) {
-      use_second_order_accuracy = flag;
-      boil::oout<<"PhaseChange4::use_second_order_accuracy= "
-                <<use_second_order_accuracy<<"\n";
-    }
-    
+#include "phasechange4_inline.h"
+
     Vector & node_tmp() {return bndtpr;}
 
     /* testing */
@@ -118,7 +108,7 @@ class PhaseChange4 : public Centered {
     real gradt1D(const bool is_solid, const Comp & m,
                  const int i, const int j, const int k);
 
-    void add_point(const int i0, const int j0, const int k0,
+    bool add_point(const int i0, const int j0, const int k0,
                    const int i1, const int j1, const int k1,
                    const Sign dir, const Comp & m,
                    const bool is_solid, bool & terminate,
@@ -132,12 +122,19 @@ class PhaseChange4 : public Centered {
     bool edge(const Sign dir, const Comp & m,
               const int i, const int j, const int k);
 
-    real second_order_difference(const std::vector<real> & stencil,
+    real zeroth_order_difference(const std::vector<real> & stencil,
+                                 const std::vector<real> & values);
+    real first_order_difference(const std::vector<real> & stencil,
                                 const std::vector<real> & values);
+    real second_order_difference(const std::vector<real> & stencil,
+                                 const std::vector<real> & values);
     real third_order_difference(const std::vector<real> & stencil,
                                 const std::vector<real> & values);
     real fourth_order_difference(const std::vector<real> & stencil,
                                  const std::vector<real> & values);
+    real nth_order_difference(const std::vector<real> & stencil,
+                              const std::vector<real> & values,
+                              const int order);
 
     ScalarInt tempflag,iflag;
     Scalar txv, tyv, tzv;
@@ -163,7 +160,9 @@ class PhaseChange4 : public Centered {
     real epsl; 
     real smdot_pos, smdot_neg;
     
-    bool use_second_order_accuracy;
+    bool use_second_order_accuracy, 
+         use_unconditional_extrapolation,
+         discard_points_near_interface;
 };	
 
 #endif

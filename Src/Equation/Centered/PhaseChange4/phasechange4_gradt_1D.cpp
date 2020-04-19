@@ -12,7 +12,9 @@ real PhaseChange4::gradt1D(const bool is_solid, const Comp & m,
   std::vector<real> values;
 
   /* reference indices */
-  int c_idx(-1), w_idx(-1), e_idx(-1), ww_idx(-1), ee_idx(-1);
+  int c_idx(-1), w_idx(-1), e_idx(-1), 
+                 ww_idx(-1), ee_idx(-1),
+                 www_idx(-1), eee_idx(-1);
 
   /* add zeroth point */
   stencil.push_back(0);
@@ -39,28 +41,32 @@ real PhaseChange4::gradt1D(const bool is_solid, const Comp & m,
   /* set-up termination flags */
   bool wend(false), eend(false);
 
+  /* prepare possible discarding set */
+  bool discard_center(false);
+  std::set<int> discard_set = {};
+
   /*** add first and second point: always possible ***/
   
   /* west */
   *idx0 = 0;
   *idx1 = -1;
 
-  add_point(i+ii0,j+jj0,k+kk0, i+ii1,j+jj1,k+kk1,
-            Sign::neg(), m, is_solid, wend, stencil, values);
+  discard_center |= add_point(i+ii0,j+jj0,k+kk0, i+ii1,j+jj1,k+kk1,
+                              Sign::neg(), m, is_solid, wend, stencil, values);
   w_idx = stencil.size()-1;
 
   /* east */
   *idx0 = 0;
   *idx1 = +1;
 
-  add_point(i+ii0,j+jj0,k+kk0, i+ii1,j+jj1,k+kk1,
-            Sign::pos(), m, is_solid, eend, stencil, values);
+  discard_center |= add_point(i+ii0,j+jj0,k+kk0, i+ii1,j+jj1,k+kk1,
+                              Sign::pos(), m, is_solid, eend, stencil, values);
   e_idx = stencil.size()-1;
 
-  /*** terminate if second-order accuracy is desired ***/
-  if(use_second_order_accuracy)
-    return second_order_difference(stencil,values);
-   
+  /* check for discarding */
+  if(discard_center)
+    discard_set.insert(c_idx);
+
   /*** if termination flags did not fire, add further points ***/
 
   /* west-west */
@@ -68,8 +74,11 @@ real PhaseChange4::gradt1D(const bool is_solid, const Comp & m,
     *idx0 = -1;
     *idx1 = -2;
   
-    add_point(i+ii0,j+jj0,k+kk0, i+ii1,j+jj1,k+kk1,
-              Sign::neg(), m, is_solid, wend, stencil, values);
+    /* w-w point possibly marks w point for discard */
+    if(add_point(i+ii0,j+jj0,k+kk0, i+ii1,j+jj1,k+kk1,
+                 Sign::neg(), m, is_solid, wend, stencil, values))
+      discard_set.insert(w_idx);
+
     ww_idx = stencil.size()-1;
 
     /* correct distance */
@@ -81,77 +90,88 @@ real PhaseChange4::gradt1D(const bool is_solid, const Comp & m,
     *idx0 = +1;
     *idx1 = +2;
   
-    add_point(i+ii0,j+jj0,k+kk0, i+ii1,j+jj1,k+kk1,
-              Sign::pos(), m, is_solid, eend, stencil, values);
+    /* e-e point possibly marks e point for discard */
+    if(add_point(i+ii0,j+jj0,k+kk0, i+ii1,j+jj1,k+kk1,
+                 Sign::pos(), m, is_solid, eend, stencil, values))
+      discard_set.insert(e_idx);
+
     ee_idx = stencil.size()-1;
 
     /* correct distance */
     stencil[ee_idx] += stencil[e_idx];
   }
 
-  /*** check the stencil size ***/
+  /*** if termination flags did not fire, add further points ***/
 
-  /* full stencil = 5 points */
-  if(stencil.size()==5) {
-    return fourth_order_difference(stencil,values);
+  /* west-west-west */
+  if(!wend) {
+    *idx0 = -2;
+    *idx1 = -3;
 
-  /* minimal stencil = 3 points */
-  } else if(stencil.size()==3) {
-    return second_order_difference(stencil,values);
+    /* w-w-w point possibly marks w-w point for discard */
+    if(add_point(i+ii0,j+jj0,k+kk0, i+ii1,j+jj1,k+kk1,
+                 Sign::neg(), m, is_solid, wend, stencil, values))
+      discard_set.insert(ww_idx);
 
-  /* intermediate value = 4 points */
-  } else if(stencil.size()==4) {
+    www_idx = stencil.size()-1;
 
-    /* can we extend to 5? */
-    if(wend&&eend) {
-      /* no */
-      return third_order_difference(stencil,values);
-
-    /* yes */
-    } else {
-  
-      /* catastrophic error */
-      assert(wend!=eend);
-
-      /* we can go further east */
-      if(wend) {
-
-        /* east-east-east */
-        *idx0 = +2;
-        *idx1 = +3;
-
-        add_point(i+ii0,j+jj0,k+kk0, i+ii1,j+jj1,k+kk1,
-                  Sign::pos(), m, is_solid, eend, stencil, values);
-
-        /* correct distance */
-        stencil.back() += stencil[ee_idx];
-
-      /* we can go further west */
-      } else {
-
-        /* west-west-west */
-        *idx0 = -2;
-        *idx1 = -3;
-
-        add_point(i+ii0,j+jj0,k+kk0, i+ii1,j+jj1,k+kk1,
-                  Sign::neg(), m, is_solid, wend, stencil, values);
-
-        /* correct distance */
-        stencil.back() += stencil[ww_idx];
-
-      }
-
-      return fourth_order_difference(stencil,values);
-
-    }
-
-  /* catastrophic error */
-  } else {
-    boil::aout<<"PC4:gradt1D Inconsistent stencil size! Exiting."
-              <<boil::endl;
-    exit(0);
+    /* correct distance */
+    stencil[www_idx] += stencil[ww_idx];
   }
 
-  return 0.0;
-}
+  /* east-east-east */
+  if(!eend) {
+    *idx0 = +2;
+    *idx1 = +3;
 
+    /* e-e-e point possibly marks e-e point for discard */
+    if(add_point(i+ii0,j+jj0,k+kk0, i+ii1,j+jj1,k+kk1,
+                 Sign::pos(), m, is_solid, eend, stencil, values))
+      discard_set.insert(ee_idx);
+
+    eee_idx = stencil.size()-1;
+
+    /* correct distance */
+    stencil[eee_idx] += stencil[ee_idx];
+  }
+
+  /*** the stencil is now 3-7 points, ordered by importance ***/
+  
+  /*** do we want to discard points too close to an interface? ***/
+  if(discard_points_near_interface == true) {
+    /* A set is in ascending order as per STL and we can remove elements by
+       using reverse iteration */
+    for(auto rit = discard_set.rbegin(); rit != discard_set.rend(); rit++) {
+      stencil.erase( stencil.begin() + (*rit) );
+      values.erase( values.begin() + (*rit) );
+    }
+  }
+
+  /*** the stencil is now 2-7 points, ordered by importance ***/
+  int diff_req = stencil.size()-1;
+
+  /* differences are implemented up to fourth-order */
+  int diff_max = 4;
+  /* is second-order accuracy desired? */
+  if(use_second_order_accuracy)
+    diff_max = 2;
+
+#if 0
+  //if(m==Comp::i()&& (iflag[i][j][k]==1||iflag[i][j][k]==2) ) {
+  if( (i==5&&k==28) || (i==28&&k==5) || (i==10&&k==27) || (i==27&&k==10) ) {
+    boil::oout<<"gradt1D: "<<i<<" "<<k<<" "<<m<<" "<<iflag[i][j][k]<<" |";
+    for(auto s : stencil) 
+      boil::oout<<" "<<s;
+    boil::oout<<" |";
+    for(auto v : values) 
+      boil::oout<<" "<<v;
+    boil::oout<<" | "
+              <<nth_order_difference(stencil,values,std::min(diff_max,diff_req))
+              <<boil::endl;
+  }
+#endif
+
+  return nth_order_difference(stencil,values,
+                              std::min(diff_max,diff_req));
+
+}

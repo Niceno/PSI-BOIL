@@ -66,7 +66,7 @@ void PhaseChange4::insert_bc_hf(const Scalar * diff_eddy) {
              * extrapolation overwrites them though */
             if       (mcomp==Comp::i()) {
               dist = distance_int_x(sig,ii,jj,kk,ti);
-              dist = clr.dxc(ii)/2.0 - dist;
+              dist = distance_center(sig,mcomp,ii,jj,kk) - dist;
               if(clr[ii][jj][kk]>=clrsurf) {
                 txv[ii][jj][kk] = lmb*(tw-ti)/dist * real(sig);
                 txv[i ][j ][k ] = lmb*(tw-ti)/dist * real(sig);
@@ -76,7 +76,7 @@ void PhaseChange4::insert_bc_hf(const Scalar * diff_eddy) {
               }
             } else if(mcomp==Comp::j()) {             
               dist = distance_int_y(sig,ii,jj,kk,ti);
-              dist = clr.dyc(jj)/2.0 - dist;
+              dist = distance_center(sig,mcomp,ii,jj,kk) - dist;
               if(clr[ii][jj][kk]>=clrsurf) {
                 tyv[ii][jj][kk] = lmb*(tw-ti)/dist * real(sig);
                 tyv[i ][j ][k ] = lmb*(tw-ti)/dist * real(sig);
@@ -86,7 +86,7 @@ void PhaseChange4::insert_bc_hf(const Scalar * diff_eddy) {
               }
             } else {
               dist = distance_int_z(sig,ii,jj,kk,ti);
-              dist = clr.dzc(kk)/2.0 - dist;
+              dist = distance_center(sig,mcomp,ii,jj,kk) - dist;
               if(clr[ii][jj][kk]>=clrsurf) {
                 tzv[ii][jj][kk] = lmb*(tw-ti)/dist * real(sig);
                 tzv[i ][j ][k ] = lmb*(tw-ti)/dist * real(sig);

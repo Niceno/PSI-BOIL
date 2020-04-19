@@ -1,14 +1,15 @@
 #include "phasechange4.h"
 
 /******************************************************************************/
-void PhaseChange4::add_point(const int i0, const int j0, const int k0,
+bool PhaseChange4::add_point(const int i0, const int j0, const int k0,
                              const int i1, const int j1, const int k1,
                              const Sign dir, const Comp & m,
                              const bool is_solid, bool & terminate,
                              std::vector<real> & stencil,
                              std::vector<real> & values) {
 /***************************************************************************//**
-*  \brief Add a point to a stencil.
+*  \brief Add a point to a stencil. Output: if the previous point should be 
+*         discarded since the interface is too close to it.
 *******************************************************************************/
 
   /* is there an interface? */
@@ -18,7 +19,7 @@ void PhaseChange4::add_point(const int i0, const int j0, const int k0,
 
     real tgamma;
     real dist_int = std::max(epsl*distance_center(dir,m,i0,j0,k0),
-                            distance_int(dir,m,i0,j0,k0,tgamma));
+                             distance_int(dir,m,i0,j0,k0,tgamma));
 
     /* directional choice */
     if(dir>0) {
@@ -27,6 +28,11 @@ void PhaseChange4::add_point(const int i0, const int j0, const int k0,
       stencil.push_back(-dist_int);
     }
     values.push_back(tgamma);
+
+    /* should the previous point be discarded? */
+    if(dist_int<distance_face(dir,m,i0,j0,k0)) {
+      return true;
+    }
 
   /* are we at a solid-fluid boundary? */
   } else if(is_solid!=dom->ibody().off(i1,j1,k1)) {
@@ -60,6 +66,6 @@ void PhaseChange4::add_point(const int i0, const int j0, const int k0,
 
   }
 
-  return;
+  return false;
 }
 

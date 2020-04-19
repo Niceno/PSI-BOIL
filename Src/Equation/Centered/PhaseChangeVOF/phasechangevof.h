@@ -59,6 +59,15 @@ class PhaseChangeVOF : public Centered {
                 <<"\n";
     }
 
+    void request_gradient(const int i, const int j, const int k,
+                          std::vector<real> & tv,
+                          std::vector<real> & tl) {
+      tv = {txv[i][j][k],tyv[i][j][k],tzv[i][j][k],tnv[i][j][k]};
+      tl = {txl[i][j][k],tyl[i][j][k],tzl[i][j][k],tnl[i][j][k]};
+      return;
+    }
+
+
   private:
     bool Interface(const int dir, const Comp m,
                    const int i, const int j, const int k);
@@ -100,6 +109,9 @@ class PhaseChangeVOF : public Centered {
     void sources_vfs();
     void sources_fext();
     void sources_sum();
+
+    real distance_center(const Sign sig, const Comp & m,
+                         const int i, const int j, const int k);
 
     real distance(const int i, const int j, const int k,
                   const int dir, const Comp m, real & tint);

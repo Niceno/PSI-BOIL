@@ -46,6 +46,14 @@ bool PhaseChange4::test_differences(const std::vector<real> & stencil,
     boil::oout<<c<<" ";
   boil::oout<<boil::endl;
 
+  /* first-order */
+  real derivative_1st = coefficients[1];
+  real difference_1st = first_order_difference(stencil,
+                        {evaluate_polynomial(1,coefficients,stencil[0]),
+                         evaluate_polynomial(1,coefficients,stencil[1])});
+
+  flag = flag & fabs(derivative_1st-difference_1st)<boil::nano;
+  boil::oout<<derivative_1st<<" "<<difference_1st<<" "<<flag<<boil::endl;
 
   /* second-order */
   real derivative_2nd = coefficients[1];
