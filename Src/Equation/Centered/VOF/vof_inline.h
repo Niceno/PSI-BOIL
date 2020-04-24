@@ -1,10 +1,10 @@
 /* getter for front_minmax */
-inline real get_xminft() { return(xminft);};
-inline real get_xmaxft() { return(xmaxft);};
-inline real get_yminft() { return(yminft);};
-inline real get_ymaxft() { return(ymaxft);};
-inline real get_zminft() { return(zminft);};
-inline real get_zmaxft() { return(zmaxft);};
+inline real get_xminft() const { return(xminft);};
+inline real get_xmaxft() const { return(xmaxft);};
+inline real get_yminft() const { return(yminft);};
+inline real get_ymaxft() const { return(ymaxft);};
+inline real get_zminft() const { return(zminft);};
+inline real get_zmaxft() const { return(zmaxft);};
 
 /* getter and setter for wall value tolerance */
 inline real get_tol_wall() { return tol_wall; }

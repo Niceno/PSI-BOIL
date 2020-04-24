@@ -1,6 +1,8 @@
 #include "changeproc.h"
-using namespace std;
 
+/* important: does not work with custom domain decomposition!! */
+/* important: factor and decomp must be consistent with the distribute
+              member function of Domain class!! */
 
 void factor(int n, int * factor, int * number);
 void decomp(int * id, const int i1, const int i2, const int i3, const int i4 );
@@ -13,75 +15,79 @@ void nucleation( const char *nm, const int nic, const int njc, const int nkc
              , const int ts, const int np, const int np_new);
 
 /******************************************************************************/
-main(int argc, char * argv[]) {
+int main(int argc, char * argv[]) {
 
-  cout<<"# Cange number of processors.\n";
+  std::cout<<"#### Change number of processors. ####\n\n";
+
+  std::cout<<"### Reading input deck. ####\n";
+
+  std::ifstream input_deck("input.txt");
+  std::istream * inp = &std::cin;
+
+  if(input_deck.is_open()) {
+    inp  = &input_deck;
+  } else {
+    std::cout<<"# Input file *input.txt* not found. "
+             <<"Defaulting to standard input.\n";
+  }
 
   int nic, njc, nkc, ts, np, np_new;
 
-  //cout<<"# Enter nicell, njcell, nkcell.\n";
-  //cin>>nic>>njc>>nkc;
-  //cout<<"# nicell= "<<nic<<" njcell= "<<njc<<" nkcell= "<<nkc<<"\n";
-  nic = 128;
-  njc = 4;
-  nkc = 128;
+  std::cout<<"# Enter nicell, njcell, nkcell.\n";
+  *inp>>nic>>njc>>nkc;
+  std::cout<<"# nicell= "<<nic<<" njcell= "<<njc<<" nkcell= "<<nkc<<"\n";
 
-  //cout<<"# Enter time step.\n";
-  //cin>>ts;
-  //cout<<"# time step= "<<ts<<"\n";
+  std::cout<<"# Enter current np (No. processors).\n";
+  *inp>>np;
+  std::cout<<"# np= "<<np<<"\n";
 
-  //cout<<"# Enter current np (No. processors).\n";
-  //cin>>np;
-  //cout<<"# np= "<<np<<"\n";
-  np = 64;
+  std::cout<<"# Enter new np (No. processors).\n";
+  *inp>>np_new;
+  std::cout<<"# np_new= "<<np_new<<"\n";
 
-  //cout<<"# Enter new np (No. processors).\n";
-  //cin>>np_new;
-  //cout<<"# np_new= "<<np_new<<"\n";
-  np_new = 1;
-
-  cout<<"# Enter file name. (Example: press)\n";
-  cout<<"# In case of CIPCSL2, type object name (without -f, -sigx, etc.)\n";
-  string ss;
-  cin>>ss;
+  std::cout<<"# Enter file name. (Example: press)\n";
+  std::cout<<"# In case of CIPCSL2, type object name (without -f, -sigx, etc.)\n";
+  std::string ss;
+  *inp>>ss;
   const char *nm = ss.c_str();
+  std::cout<<"# filename= "<<ss<<"\n";
 
   /* file type */
   int itype;
-  cout<<"# Enter file type.  0:Scalar, 1:Vector, 2:CIPCSL2, 3:Nucleation\n";
-  cin>>itype;
-  cout<<"# file type = "<<itype<<"\n";
+  std::cout<<"# Enter file type.  0:Scalar, 1:Vector, 2:CIPCSL2, 3:Nucleation\n";
+  *inp>>itype;
+  std::cout<<"# file type = "<<itype<<"\n";
 
   int ts_s, ts_e, ts_i;
-  cout<<"# Enter start, end & interval of time step.\n";
-  cin>>ts_s>>ts_e>>ts_i;
-  cout<<"# time step= "<<ts_s<<" "<<ts_e<<" "<<ts_i<<"\n";
+  std::cout<<"# Enter start, end & interval of time step.\n";
+  *inp>>ts_s>>ts_e>>ts_i;
+  std::cout<<"# time step= "<<ts_s<<" "<<ts_e<<" "<<ts_i<<"\n";
 
-  //while (true) {
+  std::cout<<"### Input deck built successfully. ###\n";
+
   for (int ts = ts_s; ts <= ts_e; ts +=ts_i) {
 
-    /* file name */
-    //cout<<"# Enter file name. (Example: press)\n";
-    //cout<<"# In case of CIPCSL2, type object name (without -f, -sigx, etc.)\n";
-    //string ss;
-    //cin>>ss;
-    //const char *nm = ss.c_str();
-    //string nmstr="nucl";
-    //const char *nm=nmstr.c_str();
+    std::cout<<"\n## processing time step "<<ts<<std::endl;
 
-    /* file type */
-    //int itype;
-    //cout<<"# Enter file type.  0:Scalar, 1:Vector, 2:CIPCSL2, 3:Nucleation\n";
-    //cin>>itype;
-    //cout<<"# file type = "<<itype<<"\n";
+    std::string str_tmp;
 
-    string str_tmp;
+    switch(itype) {
 
-    if (itype==0) { 
+      case 0 :
         scalar( nm, nic, njc, nkc, ts, np, np_new,0,0,0 );
-    } else if (itype==1) {
+        break;
+      case 1 :
+        std::cout<<"Vectors currently unsupported (due to buffer extension). "
+                 <<"Exiting."<<std::endl;
+        exit(0);
+
         vector_treat( nm, nic, njc, nkc, ts, np, np_new );
-     } else if (itype==2) {
+        break;
+      case 2 :
+        std::cout<<"CIPCSL2 currently unsupported (due to buffer extension). "
+                 <<"Exiting."<<std::endl;
+        exit(0);
+
         /* clr: cell center */
         str_tmp = nm;
         str_tmp += "-phi";
@@ -110,27 +116,30 @@ main(int argc, char * argv[]) {
         str_tmp = nm;
         str_tmp += "-face";
         vector_treat ( str_tmp.c_str(), nic, njc, nkc, ts, np, np_new );
-     } else if (itype==3) {
+
+        break;
+      case 3 :
         nucleation ( nm, nic, njc, nkc, ts, np, np_new );
+        break;
+      default :
+        std::cout<<" Unrecognized file type. Exiting."<<std::endl;
+        exit(0);
     }
 
-    //int ians;
-    //cout<<"# continue? 1(yes) or 0(no).\n";
-    //cin>>ians;
-    //if (ians!=1) break;
   }
 
-  exit(0);
+  return 0;
 
 }
+
 /*****************************************************************************/
 void scalar( const char *nm, const int nic, const int njc, const int nkc
              , const int ts, const int np, const int np_new
              , const int ii, const int jj, const int kk){
     /* allocate */
-    int ni = nic+2;
-    int nj = njc+2;
-    int nk = nkc+2;
+    int ni = nic+2*boil::BW;
+    int nj = njc+2*boil::BW;
+    int nk = nkc+2*boil::BW;
     real *** q;
     alloc3d( &q, ni+ii, nj+jj, nk+kk );
 
@@ -142,7 +151,7 @@ void scalar( const char *nm, const int nic, const int njc, const int nkc
     std::string name;
     /* get decomposed size */
     name = name_file(nm, ".bck", ts, 0); 
-    ifstream in(name.c_str(), std::ios::binary);
+    std::ifstream in(name.c_str(), std::ios::binary);
 
     /* stop if file is not present */
     if( in.rdstate() != 0 ) {
@@ -162,9 +171,9 @@ void scalar( const char *nm, const int nic, const int njc, const int nkc
     real *** val;
     alloc3d( &val, ni_dec, nj_dec, nk_dec );
 
-    int nic_dec = ni_dec-2-ii;
-    int njc_dec = nj_dec-2-jj;
-    int nkc_dec = nk_dec-2-kk;
+    int nic_dec = ni_dec-2*boil::BW-ii;
+    int njc_dec = nj_dec-2*boil::BW-jj;
+    int nkc_dec = nk_dec-2*boil::BW-kk;
     std::cout<<"# nic_dec, njc_dec, nkc_dec= "
              <<nic_dec<<" "<<njc_dec<<" "<<nkc_dec<<"\n";
 
@@ -184,13 +193,13 @@ void scalar( const char *nm, const int nic, const int njc, const int nkc
                   / real(nk_block) + 1;
       int k_block = real(iproc + 1 - (i_block-1)*(nj_block*nk_block)
                         -(j_block-1)*nk_block); 
-      //cout<<"iproc= "<<iproc<<" "<<i_block<<" "<<j_block<<" "<<k_block<<"\n";
+      std::cout<<"iproc= "<<iproc<<" "<<i_block<<" "<<j_block<<" "<<k_block<<"\n";
 
       /* file name */
       name = name_file(nm, ".bck", ts, iproc);
 
       /* open a file */
-      ifstream in(name.c_str(), std::ios::binary);
+      std::ifstream in(name.c_str(), std::ios::binary);
 
       /* stop if file is not present */
       if( in.rdstate() != 0 ) {
@@ -211,14 +220,11 @@ void scalar( const char *nm, const int nic, const int njc, const int nkc
       int ist = (i_block-1) * nic_dec;
       int jst = (j_block-1) * njc_dec;
       int kst = (k_block-1) * nkc_dec;
-      //cout<<"ist,jst,kst = "<<ist<<" "<<jst<<" "<<kst<<"\n";
+      //std::cout<<"ist,jst,kst = "<<ist<<" "<<jst<<" "<<kst<<"\n";
       int imax=0; 
       int jmax=0; 
       int kmax=0; 
-      //for(int i=0; i<ni_dec; i++)
-      //  for(int j=0; j<nj_dec; j++)
-      //    for(int k=0; k<nk_dec; k++) {
-      int istl=1; int jstl=1; int kstl=1;
+      int istl=boil::BW; int jstl=boil::BW; int kstl=boil::BW;
       if (i_block==1) istl=0;
       if (j_block==1) jstl=0;
       if (k_block==1) kstl=0;
@@ -230,7 +236,7 @@ void scalar( const char *nm, const int nic, const int njc, const int nkc
             if(jst+j>jmax) jmax=jst+j;
             if(kst+k>kmax) kmax=kst+k;
           }
-      //cout<<"imax, jmax, kmax= "<<imax<<" "<<jmax<<" "<<kmax<<"\n";
+      //std::cout<<"imax, jmax, kmax= "<<imax<<" "<<jmax<<" "<<kmax<<"\n";
 
     }
 
@@ -243,7 +249,7 @@ void scalar( const char *nm, const int nic, const int njc, const int nkc
       for(int j=0; j<nj; j++)
         for(int k=0; k<nk; k++) {
           if(q[i][j][k]>1.0e+299) {
-            cout<<"Error! q is not imported.\n";
+            std::cout<<"Error! q is not imported.\n";
             exit(0);
           }
         }
@@ -260,7 +266,7 @@ void scalar( const char *nm, const int nic, const int njc, const int nkc
       int nk_out=nk+kk;
 
       /* open a file */
-      ofstream out(name.c_str(), std::ios::binary);
+      std::ofstream out(name.c_str(), std::ios::binary);
 
       out.write(reinterpret_cast<const char *> (&ni_out), sizeof(int));
       out.write(reinterpret_cast<const char *> (&nj_out), sizeof(int));
@@ -274,15 +280,15 @@ void scalar( const char *nm, const int nic, const int njc, const int nkc
       +------------*/
       int * dims = new int[3];
       decomp(dims, np_new, nic, njc, nkc);
-      cout<<"# dims[]= "<<dims[0]<<" "<<dims[1]<<" "<<dims[2]<<"\n";
+      std::cout<<"# dims[]= "<<dims[0]<<" "<<dims[1]<<" "<<dims[2]<<"\n";
       int nic_dec_new=nic/dims[0];
       int njc_dec_new=njc/dims[1];
       int nkc_dec_new=nkc/dims[2];
-      cout<<"# nic_dec_new= "<<nic_dec_new<<" "<<njc_dec_new<<" "
+      std::cout<<"# nic_dec_new= "<<nic_dec_new<<" "<<njc_dec_new<<" "
           <<nkc_dec_new<<"\n";
-      int ni_dec_new = nic_dec_new + 2 +ii;
-      int nj_dec_new = njc_dec_new + 2 +jj;
-      int nk_dec_new = nkc_dec_new + 2 +kk;
+      int ni_dec_new = nic_dec_new + 2*boil::BW +ii;
+      int nj_dec_new = njc_dec_new + 2*boil::BW +jj;
+      int nk_dec_new = nkc_dec_new + 2*boil::BW +kk;
 
       /*---------+
       |  output  |
@@ -307,12 +313,13 @@ void scalar( const char *nm, const int nic, const int njc, const int nkc
                     / real(nk_block_new) + 1;
         int k_block = real(iproc + 1 - (i_block-1)*(nj_block_new*nk_block_new)
                           -(j_block-1)*nk_block_new); 
+        std::cout<<"iproc= "<<iproc<<" "<<i_block<<" "<<j_block<<" "<<k_block<<"\n";
 
         /* copy q to val_new */
         int ist = (i_block-1) * nic_dec_new;
         int jst = (j_block-1) * njc_dec_new;
         int kst = (k_block-1) * nkc_dec_new;
-        //cout<<"ist,jst,kst = "<<ist<<" "<<jst<<" "<<kst<<"\n";
+        //std::cout<<"ist,jst,kst = "<<ist<<" "<<jst<<" "<<kst<<"\n";
         int imax=0; 
         int jmax=0; 
         int kmax=0; 
@@ -324,22 +331,22 @@ void scalar( const char *nm, const int nic, const int njc, const int nkc
               if(jst+j>jmax) jmax=jst+j;
               if(kst+k>kmax) kmax=kst+k;
             }
-        //cout<<"imax= "<<imax<<" "<<jmax<<" "<<kmax<<"\n";
+        //std::cout<<"imax= "<<imax<<" "<<jmax<<" "<<kmax<<"\n";
 
         /* file name */
         name = name_file(nm, ".bck2", ts, iproc);
 
         /* open a file */
-        ofstream out(name.c_str(), std::ios::binary);
+        std::ofstream out(name.c_str(), std::ios::binary);
 
         /* write val_new */
-        cout<<"# output: "<<name<<"\n";
+        std::cout<<"# output: "<<name<<"\n";
         out.write(reinterpret_cast<char *> (&ni_dec_new), sizeof(int));
         out.write(reinterpret_cast<char *> (&nj_dec_new), sizeof(int));
         out.write(reinterpret_cast<char *> (&nk_dec_new), sizeof(int));
         out.write(reinterpret_cast<char *> (val_new[0][0]),
                                 ni_dec_new*nj_dec_new*nk_dec_new*sizeof(real));
-   }
+      }
 
       /*-------------+
       |  deallocate  |
@@ -386,7 +393,7 @@ void vector_treat( const char *nm, const int nic, const int njc, const int nkc
     std::string name;
     /* get decomposed size */
     name = name_file(nm, ".bck", ts, 0);
-    ifstream in(name.c_str(), std::ios::binary);
+    std::ifstream in(name.c_str(), std::ios::binary);
 
     /* stop if file is not present */
     if( in.rdstate() != 0 ) {
@@ -400,7 +407,7 @@ void vector_treat( const char *nm, const int nic, const int njc, const int nkc
       in.read(reinterpret_cast<char *> (&ni_dec[m]), sizeof(int));
       in.read(reinterpret_cast<char *> (&nj_dec[m]), sizeof(int));
       in.read(reinterpret_cast<char *> (&nk_dec[m]), sizeof(int));
-      cout<<"ni_dec= "<<ni_dec[m]<<" "<<nj_dec[m]<<" "<<nk_dec[m]<<"\n";
+      std::cout<<"ni_dec= "<<ni_dec[m]<<" "<<nj_dec[m]<<" "<<nk_dec[m]<<"\n";
     }
 
     /* allocate decomposed array */
@@ -412,12 +419,12 @@ void vector_treat( const char *nm, const int nic, const int njc, const int nkc
     int nic_dec=ni_dec[0]-3;
     int njc_dec=nj_dec[0]-2;
     int nkc_dec=nk_dec[0]-2;
-    cout<<"nic= "<<nic<<" "<<njc<<" "<<nkc<<"\n";
+    std::cout<<"nic= "<<nic<<" "<<njc<<" "<<nkc<<"\n";
 
     int ni_block = nic/nic_dec;
     int nj_block = njc/njc_dec;
     int nk_block = nkc/nkc_dec;
-    cout<<"# ni_block, nj_block, nk_block= "
+    std::cout<<"# ni_block, nj_block, nk_block= "
         <<ni_block<<" "<<nj_block<<" "<<nk_block<<"\n";
 
     /*----------+
@@ -431,13 +438,13 @@ void vector_treat( const char *nm, const int nic, const int njc, const int nkc
                   / real(nk_block) + 1;
       int k_block = real(iproc + 1 - (i_block-1)*(nj_block*nk_block)
                         -(j_block-1)*nk_block);
-      //cout<<"iproc= "<<iproc<<" "<<i_block<<" "<<j_block<<" "<<k_block<<"\n";
+      //std::cout<<"iproc= "<<iproc<<" "<<i_block<<" "<<j_block<<" "<<k_block<<"\n";
 
       /* file name */
       name = name_file(nm, ".bck", ts, iproc);
 
       /* open a file */
-      ifstream in(name.c_str(), std::ios::binary);
+      std::ifstream in(name.c_str(), std::ios::binary);
 
       /* stop if file is not present */
       if( in.rdstate() != 0 ) {
@@ -451,7 +458,7 @@ void vector_treat( const char *nm, const int nic, const int njc, const int nkc
         in.read(reinterpret_cast<char *> (&ni_tmp[m]), sizeof(int));
         in.read(reinterpret_cast<char *> (&nj_tmp[m]), sizeof(int));
         in.read(reinterpret_cast<char *> (&nk_tmp[m]), sizeof(int));
-        //cout<<"ni_tmp= "<<ni_tmp[m]<<" "<<nj_tmp[m]<<" "<<nk_tmp[m]<<"\n";
+        //std::cout<<"ni_tmp= "<<ni_tmp[m]<<" "<<nj_tmp[m]<<" "<<nk_tmp[m]<<"\n";
       }
       in.read(reinterpret_cast<char *> (u_dec[0][0]),
             ni_dec[0]*nj_dec[0]*nk_dec[0] * sizeof(real));
@@ -464,7 +471,7 @@ void vector_treat( const char *nm, const int nic, const int njc, const int nkc
       int ist = (i_block-1) * nic_dec;
       int jst = (j_block-1) * njc_dec;
       int kst = (k_block-1) * nkc_dec;
-      //cout<<"ist,jst,kst = "<<ist<<" "<<jst<<" "<<kst<<"\n";
+      //std::cout<<"ist,jst,kst = "<<ist<<" "<<jst<<" "<<kst<<"\n";
 
       int imax=0;
       int jmax=0;
@@ -477,7 +484,7 @@ void vector_treat( const char *nm, const int nic, const int njc, const int nkc
             if(jst+j>jmax) jmax=jst+j;
             if(kst+k>kmax) kmax=kst+k;
           }
-      //cout<<"imax, jmax, kmax= "<<imax<<" "<<jmax<<" "<<kmax<<"\n";
+      //std::cout<<"imax, jmax, kmax= "<<imax<<" "<<jmax<<" "<<kmax<<"\n";
 
       imax=0;
       jmax=0;
@@ -490,7 +497,7 @@ void vector_treat( const char *nm, const int nic, const int njc, const int nkc
             if(jst+j>jmax) jmax=jst+j;
             if(kst+k>kmax) kmax=kst+k;
           }
-      //cout<<"imax, jmax, kmax= "<<imax<<" "<<jmax<<" "<<kmax<<"\n";
+      //std::cout<<"imax, jmax, kmax= "<<imax<<" "<<jmax<<" "<<kmax<<"\n";
 
       imax=0;
       jmax=0;
@@ -503,7 +510,7 @@ void vector_treat( const char *nm, const int nic, const int njc, const int nkc
             if(jst+j>jmax) jmax=jst+j;
             if(kst+k>kmax) kmax=kst+k;
           }
-      //cout<<"imax, jmax, kmax= "<<imax<<" "<<jmax<<" "<<kmax<<"\n";
+      //std::cout<<"imax, jmax, kmax= "<<imax<<" "<<jmax<<" "<<kmax<<"\n";
     }
     /*-------------+
     |  deallocate  |
@@ -520,7 +527,7 @@ void vector_treat( const char *nm, const int nic, const int njc, const int nkc
       name = name_file(nm, ".bck2", ts, 0);
 
       /* open a file */
-      ofstream out(name.c_str(), std::ios::binary);
+      std::ofstream out(name.c_str(), std::ios::binary);
       for(int m=0; m<3; m++) {
         out.write(reinterpret_cast<char *> (&ni[m]), sizeof(int));
         out.write(reinterpret_cast<char *> (&nj[m]), sizeof(int));
@@ -540,7 +547,7 @@ void vector_treat( const char *nm, const int nic, const int njc, const int nkc
       +------------*/
       int * dims = new int[3];
       decomp(dims, np_new, nic, njc, nkc);
-      cout<<"# dims[]= "<<dims[0]<<" "<<dims[1]<<" "<<dims[2]<<"\n";
+      std::cout<<"# dims[]= "<<dims[0]<<" "<<dims[1]<<" "<<dims[2]<<"\n";
       int ni_block_new = dims[0];
       int nj_block_new = dims[1];
       int nk_block_new = dims[2];
@@ -550,7 +557,7 @@ void vector_treat( const char *nm, const int nic, const int njc, const int nkc
       int nic_dec_new=nic/dims[0];
       int njc_dec_new=njc/dims[1];
       int nkc_dec_new=nkc/dims[2];
-      cout<<"# nic_dec_new= "<<nic_dec_new<<" "<<njc_dec_new<<" "
+      std::cout<<"# nic_dec_new= "<<nic_dec_new<<" "<<njc_dec_new<<" "
           <<nkc_dec_new<<"\n";
   
       int ni_dec_new[3], nj_dec_new[3], nk_dec_new[3];
@@ -585,13 +592,13 @@ void vector_treat( const char *nm, const int nic, const int njc, const int nkc
                     / real(nk_block_new) + 1;
         int k_block = real(iproc + 1 - (i_block-1)*(nj_block_new*nk_block_new)
                           -(j_block-1)*nk_block_new);
-        //cout<<"iproc= "<<iproc<<" "<<i_block<<" "<<j_block<<" "<<k_block<<"\n";
+        //std::cout<<"iproc= "<<iproc<<" "<<i_block<<" "<<j_block<<" "<<k_block<<"\n";
   
         /* copy q to val_new */
         int ist = (i_block-1) * nic_dec_new;
         int jst = (j_block-1) * njc_dec_new;
         int kst = (k_block-1) * nkc_dec_new;
-        //cout<<"ist= "<<ist<<" "<<jst<<" "<<kst<<"\n";
+        //std::cout<<"ist= "<<ist<<" "<<jst<<" "<<kst<<"\n";
   
         for(int i=0; i<ni_dec_new[0]; i++)
           for(int j=0; j<nj_dec_new[0]; j++)
@@ -613,10 +620,10 @@ void vector_treat( const char *nm, const int nic, const int njc, const int nkc
         name = name_file(nm, ".bck2", ts, iproc);
   
         /* open a file */
-        ofstream out(name.c_str(), std::ios::binary);
+        std::ofstream out(name.c_str(), std::ios::binary);
   
         /* write val_new */
-        cout<<"# output: "<<name<<"\n";
+        std::cout<<"# output: "<<name<<"\n";
         for(int m=0; m<3; m++) {
           out.write(reinterpret_cast<char *> (&ni_dec_new[m]), sizeof(int));
           out.write(reinterpret_cast<char *> (&nj_dec_new[m]), sizeof(int));
@@ -651,10 +658,10 @@ void nucleation( const char *nm, const int nic, const int njc, const int nkc
   std::string f_source = name_file(nm, ".bck", ts, 0);
 
   for (int iproc = 0; iproc < np_new; iproc++) {
-    string f_dest = name_file(nm, ".bck2", ts, iproc);
-    cout<<"# output: "<<f_dest<<"\n";
-    ifstream in (f_source.c_str(), ios::binary);
-    ofstream out(f_dest.c_str(),   ios::binary);
+    std::string f_dest = name_file(nm, ".bck2", ts, iproc);
+    std::cout<<"# output: "<<f_dest<<"\n";
+    std::ifstream in (f_source.c_str(), std::ios::binary);
+    std::ofstream out(f_dest.c_str(),   std::ios::binary);
 
     if(in.is_open() && out.is_open()) {
       while(!in.eof()) {
@@ -743,6 +750,3 @@ void decomp(int * dis, const int np_new
     assert(done);
   }
 }
-/*-----------------------------------------------------------------------------+
- '$Id: main.cpp,v 1.3 2015/03/13 14:12:27 sato Exp $'/
-+-----------------------------------------------------------------------------*/

@@ -29,7 +29,7 @@ AC::AC(Centered * cen, Linear * sol) {
     }
   }
 
-  /* is there a distinct solver at finest level? */
+  /* is there a distinct solver at coarsest level? */
   if(sol!=NULL) {
     solver = sol;
   } else {

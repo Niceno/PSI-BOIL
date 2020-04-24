@@ -68,6 +68,7 @@ SUBDIRS = Equation/Staggered/Momentum                              \
 
 LDADD = Equation/Staggered/Momentum/libMomentum.a                             \
         Equation/Staggered/libStaggered.a                                     \
+        Custom/libCustom.a                                                    \
         Solver/Additive/libAdditive.a                                         \
         Solver/Linear/Gauss/libGauss.a                                        \
         Solver/Linear/Iterative/libIterative.a                                \
@@ -107,7 +108,6 @@ LDADD = Equation/Staggered/Momentum/libMomentum.a                             \
         Plot/libPlot.a                                                        \
         Plot/TEC/libPlotTEC.a                                                 \
         Plot/VTK/libPlotVTK.a                                                 \
-        Custom/libCustom.a                                                    \
         Domain/libDomain.a                                                    \
         Domain/Axisymmetric/libAxisymmetric.a                                 \
         Body/libBody.a                                                        \

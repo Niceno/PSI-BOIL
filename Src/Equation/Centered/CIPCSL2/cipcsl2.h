@@ -86,9 +86,9 @@ class CIPCSL2 : public Centered {
                      , Range<real> zr );
     void init();
     void update_node(Scalar & g);
-    void save(char *, const int);
-    void load(char *, const int);
-    void rm(char *, const int);
+    void save(const char *, const int);
+    void load(const char *, const int);
+    void rm(const char *, const int);
     void range(){
       boil::oout<<"Range of color function: "<<clr.min()<<" "<<clr.max()<<"\n";
     }

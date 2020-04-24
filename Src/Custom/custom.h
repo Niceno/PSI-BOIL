@@ -2,8 +2,12 @@
 #define CUSTOM_H
 
 #include "../Field/Scalar/scalar.h"
+#include "../Field/Vector/vector.h"
+#include "../Equation/Centered/CIPCSL2/cipcsl2.h"
+#include "../Equation/Nucleation/nucleation.h"
 #include "../Matter/matter.h"
 #include <vector>
+#include <iomanip>
 
 ////////////////////////
 //                    //
@@ -11,6 +15,51 @@
 //                    //
 ////////////////////////
 namespace boil {
+
+  /* cell-center velocities */
+  void cell_center_velocities(const Vector & uvw,
+                              Scalar & u, Scalar & v, Scalar & w);
+
+  /* staggered velocities */
+  void staggered_velocities(const Scalar & u, const Scalar & v, const Scalar & w,
+                            Vector & uvw);
+  /* backup io */
+  std::string save_backup(const int ts, const bool irregular,
+                   const Times & time,
+                   const std::vector<Scalar*> & scalars,
+                   const std::vector<std::string> & scalar_names,
+                   const std::vector<Vector*> & vectors = {},
+                   const std::vector<std::string> & vector_names = {},
+                   const std::vector<Nucleation*> & nucls = {},
+                   const std::vector<std::string> & nucl_names = {},
+                   const std::vector<CIPCSL2*> & cipcsl2s = {},
+                   const std::vector<std::string> & cipcsl2_names = {});
+
+  bool load_backup(const std::string & fname,
+                   int & ts, Times & time,
+                   const std::vector<Scalar*> & scalars,
+                   const std::vector<std::string> & scalar_names,
+                   const std::vector<Vector*> & vectors = {},
+                   const std::vector<std::string> & vector_names = {},
+                   const std::vector<Nucleation*> & nucls = {},
+                   const std::vector<std::string> & nucl_names = {},
+                   const std::vector<CIPCSL2*> & cipcsl2s = {},
+                   const std::vector<std::string> & cipcsl2_names = {});
+
+  void rm_backup(const int ts,
+                 const std::vector<Scalar*> & scalars,
+                 const std::vector<std::string> & scalar_names,
+                 const std::vector<Vector*> & vectors = {},
+                 const std::vector<std::string> & vector_names = {},
+                 const std::vector<Nucleation*> & nucls = {},
+                 const std::vector<std::string> & nucl_names = {},
+                 const std::vector<CIPCSL2*> & cipcsl2s = {},
+                 const std::vector<std::string> & cipcsl2_names = {});
+
+  /* irun test and set */
+  void test_irun(const std::string & testfile = "run.txt");
+  void set_irun(const int val, const std::string & testfile = "run.txt");
+
   /* natural convection boundary layer thickness */
   real convective_boundary_layer_thickness(const Matter & mat,
                                            const real deltat);

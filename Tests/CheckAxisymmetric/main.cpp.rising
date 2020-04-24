@@ -200,9 +200,9 @@ int main(int argc, char * argv[]) {
   Pressure pr(p, f, uvw, time, solver, &mixed);
   AC multigrid( &pr );
 
-  multigrid.min_cycles(5);  
+  multigrid.min_cycles(1);  
   multigrid.max_cycles(10);
-  multigrid.stop_if_diverging(true);
+  multigrid.stop_if_diverging(false);
 
   VOFaxisym conc(c, g, kappa, uvw, time, solver);
   //conc.set_reconstruction_parameters(1e-5,conc.get_reconstruction_maxiter());
@@ -348,7 +348,7 @@ int main(int argc, char * argv[]) {
     ns.solve(ResRat(1e-6));
 
     p = 0.0;
-    multigrid.vcycle(ResRat(1e-6));
+    multigrid.fcycle(ResRat(1e-4));
     ns.project(p);
     press += p;    // p_n+1 = p_n + dp
     press.exchange();
