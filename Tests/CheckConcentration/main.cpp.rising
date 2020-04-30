@@ -1,0 +1,713 @@
+#include "Include/psi-boil.h"
+#include <fstream>
+#include <iostream>
+#include <fenv.h>
+#define _GNU_SOURCE 1
+#if 1
+static void __attribute__ ((constructor)) trapfpe(void)
+{
+  /* Enable some exceptions. At startup all exceptions are masked. */
+  feenableexcept(FE_INVALID|FE_DIVBYZERO|FE_OVERFLOW);
+}
+#endif
+
+#define AXISYM
+#define USE_PHASE_VEL_VOF
+//#define SETUP_ONLY
+#define VARIABLE
+
+/******************************************************************************/
+int main(int argc, char ** argv) {
+
+  boil::timer.start();
+
+  if(argc<3){
+    boil::oout<<"Two command line arguments required!"<<"\n";
+    boil::oout<<"./Boil wmin glevel"<<"\n";
+
+    exit(0);
+  }
+
+/******************************************************************************/
+/* ------------ input from command line */
+  int wmin=atoi(argv[1]);
+  boil::oout<<"wmin= "<<wmin<<"\n";
+
+  const int gLevel = atoi(argv[2]); /* domain dimensions */ 
+  boil::oout<<"glevel= "<<gLevel<<"\n";
+
+/******************************************************************************/
+/* ------------ boundary or initial conditions */
+  const real tsat0 = 273.15+47.585;
+  const real tout = tsat0-5.4; /* subcooling */
+  const real gravity = boil::g;
+
+  /* average values of the two cases */
+  const real eps0 = 0.029e-2;
+  const real R0 = 1.4e-3;
+
+/******************************************************************************/
+/* ------------ numerical simulation settings */
+
+  /* total number of steps */
+  const int ndt = 35000*gLevel; /* inconsequential */
+
+  /* steps per backup */
+  const int n_per_backup= 5000;
+
+  /* plotting each t_per_plot seconds */
+  const real t_per_plot = 0.01;
+
+  /* dt settings */
+  const real surftens_dt_coef = 10.;
+  const real initdtcoef = 1e-4;
+
+  /* cfl limit */
+  const real cfl_limit = 0.05;
+
+/* ------------ optional simulation settings */
+
+  /* multigrid */
+  const bool multigrid_stop_if_diverging = true;
+  //const bool multigrid_stop_if_diverging = false;
+
+  const int multigrid_min_cycles = 1;
+  const int multigrid_max_cycles = 20;
+
+  /* vof */
+  const CurvMethod curv_method = CurvMethod::HF();
+  const TopoMethod topo_method = TopoMethod::Hybrid();
+  const CurvMethod wall_curv_method = CurvMethod::none();
+
+  const bool use_fs_interp = false;
+  const bool store_pressure_extrap = true;
+  const int niter_pressure_extrap = 1000;
+
+  /* enthalpy fd */
+  const bool no_solid_acceleration = false;
+
+  /* phase change - 4 version */
+  const bool use_second_order_accuracy = true;
+  const bool discard_points_near_interface = true;
+  const bool use_unconditional_extrapolation = false;
+
+  /* under-relaxation */
+  const real ur = 0.01;
+
+/******************************************************************************/
+/* ------------ material properties */
+  /* from NIST webbook (R113) */
+  const real Mv = 187.376e-3;
+  const real Mn = 28.9647e-3;
+#if 0
+  /* gas modelled as dry air */
+  const real mug = 1.962e-5;
+  const real rhog = 1.086;
+  const real cpg = 1.0063e3*rhog;
+  const real lambdag = 2.816e-2;
+#else
+  /* R-113 vapour */
+  const real mug = 1.0279e-5;
+  const real rhog = 7.4244;
+  const real cpg = 0.69143e3*rhog;
+  const real lambdag = 0.0095063;
+#endif
+  /* FSG correlation */
+  const real Sig_v = 138.9;//15.9*2. + 21.0*3. + 14.7*3.;
+  const real Sig_n = 19.7;
+  //const real diffcoef = 1.01325/sqrt(10.)*sqrt(1./Mv+1./Mn)*pow(tsat0,1.75)
+  //                     /101325./pow( pow(Sigv,1./3.) + pow(Sign,1./3.), 2.0 );
+  real diffcoef = 0.00143*pow(tsat0,1.75)/sqrt(2./(1e-3/Mv+1e-3/Mn))
+                 /1./pow( pow(Sig_v,1./3.) + pow(Sig_n,1./3.), 2.0 );
+  diffcoef *= 1e-4;
+  boil::oout<<"diffcoef= "<<diffcoef<<boil::endl;
+
+  const real mul = 0.00049040;
+  const real rhol = 1508.2;
+  const real cpl = 0.94037e3*rhol;
+  const real lambdal = 0.063655;
+
+  const real sig = 0.014698;
+  const real latent=146.7e3; /* https://www.researchgate.net/figure/Physical-properties-of-R113-and-its-vapor-R113v_tbl2_318547375 */
+
+  const real betal = 0.;
+  const real betag = 0.;//1./tsat0; /* ideal gas approximation */
+
+/******************************************************************************/
+/* ------------ domain dimensions */
+  const real LX = 5e-3;
+
+  const int NX = 16*gLevel;
+  const int NZ = 16*NX;
+
+  const real DX = real(LX/real(NX));
+  boil::oout<<"dx= "<<DX<<"\n";
+
+  const real LZ = real(NZ)*DX;
+
+/******************************************************************************/
+/* ------------- setup finished */
+/******************************************************************************/
+/* below this line, NO VALUES AND SETTINGS CAN BE ENTERED! */
+/******************************************************************************/
+
+  /*--------------------------------+
+  |  choose the output file format  |
+  +--------------------------------*/
+  boil::plot = new PlotTEC();
+
+  /*----------+
+  |  grid(s)  |
+  +----------*/
+  Grid1D gx ( Range<real>(0.0, LX), NX, Periodic::no(),
+              BndGrid::symmetry(), BndGrid::wall() );
+  Grid1D gz ( Range<real>(0.0,LZ) ,NZ ,Periodic::no() );
+
+  /*---------+
+  |  domain  |
+  +---------*/
+#ifdef AXISYM
+  Axisymmetric d(gx, gz, DX);
+#else
+  Domain d(gx, gx, gz);
+#endif
+  const real dxmin = d.dxyz_min();
+
+  /*------------------+
+  |  define unknowns  |
+  +------------------*/
+  Vector uvw(d), xyz(d);           // vel
+  Vector uvw_1(d), uvw_2(d);       // phasic vel
+  Scalar p  (d), f  (d), press(d); // pressure
+  Scalar c  (d), g  (d), kappa(d); // concentration
+  Scalar tpr(d), q  (d);           // temperature
+  Scalar mdot(d), mflx(d);         // phase-change rate
+
+  Scalar eps(d), mdot_eps(d);      /* NG concentration */
+
+  /*-----------------------------+ 
+  |  insert boundary conditions  |
+  +-----------------------------*/
+  for_m(m) {
+    uvw.bc(m).add( BndCnd( Dir::imin(), BndType::symmetry() ) );
+    uvw.bc(m).add( BndCnd( Dir::imax(), BndType::wall() ) );
+    uvw.bc(m).add( BndCnd( Dir::kmin(), BndType::wall() ) );
+    uvw.bc(m).add( BndCnd( Dir::kmax(), BndType::outlet() ) );
+#ifdef AXISYM
+    uvw.bc(m).add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
+    uvw.bc(m).add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
+#else
+    uvw.bc(m).add( BndCnd( Dir::jmin(), BndType::symmetry() ) );
+    uvw.bc(m).add( BndCnd( Dir::jmax(), BndType::wall() ) );
+#endif
+    uvw_1(m)=uvw(m).shape();
+    uvw_2(m)=uvw(m).shape();
+  }
+
+  p.bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
+  p.bc().add( BndCnd( Dir::imax(), BndType::neumann() ) );
+  p.bc().add( BndCnd( Dir::kmin(), BndType::neumann() ) );
+  p.bc().add( BndCnd( Dir::kmax(), BndType::neumann() ) );
+#ifdef AXISYM
+  p.bc().add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
+  p.bc().add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
+#else
+  p.bc().add( BndCnd( Dir::jmin(), BndType::symmetry() ) );
+  p.bc().add( BndCnd( Dir::jmax(), BndType::neumann() ) );
+#endif
+
+  /* copy b.c. from p */
+  press = p.shape();
+  f = p.shape();
+  mdot = p.shape();
+  mflx = p.shape();
+  q = p.shape();
+  g = p.shape();
+  kappa = p.shape();
+
+  eps = p.shape();
+  mdot_eps = p.shape();
+
+  c.bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
+  c.bc().add( BndCnd( Dir::imax(), BndType::wall() ) );
+  c.bc().add( BndCnd( Dir::kmin(), BndType::wall() ) );
+  //c.bc().add( BndCnd( Dir::kmin(), BndType::dirichlet(), 1.0 ) );
+  c.bc().add( BndCnd( Dir::kmax(), BndType::outlet() ) );
+#ifdef AXISYM
+  c.bc().add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
+  c.bc().add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
+#else
+  c.bc().add( BndCnd( Dir::jmin(), BndType::symmetry() ) );
+  c.bc().add( BndCnd( Dir::jmax(), BndType::wall() ) );
+#endif
+
+  tpr.bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
+  tpr.bc().add( BndCnd( Dir::imax(), BndType::dirichlet(), tout ) );
+  tpr.bc().add( BndCnd( Dir::kmin(), BndType::dirichlet(), tout ) );
+  tpr.bc().add( BndCnd( Dir::kmax(), BndType::dirichlet(), tout ) );
+#ifdef AXISYM
+  tpr.bc().add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
+  tpr.bc().add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
+#else
+  tpr.bc().add( BndCnd( Dir::jmin(), BndType::symmetry() ) );
+  tpr.bc().add( BndCnd( Dir::jmax(), BndType::dirichlet(), tout ) );
+#endif
+
+  /*----------------------+
+  |  physical properties  |
+  +----------------------*/
+  Matter gas(d), liquid(d);
+  gas  .mu    (mug);
+  gas  .rho   (rhog);
+  gas  .cp    (cpg);  // J/m3
+  gas  .lambda(lambdag);
+  gas.mmass    (Mv);
+  gas.gamma    (diffcoef*rhog);
+  gas.beta     (betag);
+  liquid.mu    (mul);
+  liquid.rho   (rhol);
+  liquid.cp    (cpl);   // J/m3
+  liquid.lambda(lambdal);
+  liquid.beta  (betal);
+
+  Matter mixed(liquid, gas, & c);
+  mixed.sigma(sig);
+  mixed.latent(latent);
+
+  Matter * zero = &gas;
+  Matter * one = &liquid;
+
+  /*-------------------+
+  |  time-integration  |
+  +-------------------*/
+  const real dt = surftens_dt_coef
+                * pow(gas.rho()->value()*pow(dxmin,3.0)
+                / (2.0*boil::pi*mixed.sigma()->value()),0.5);
+
+  boil::oout<<"main:dxmin= "<<dxmin<<" "<<boil::cart.iam()<<" "<<dt<<"\n";
+  boil::oout<<"main:nparams= "<<t_per_plot<<" "<<n_per_backup<<"\n";
+  Times time(ndt, dt);
+  time.set_coef_dec(0.75);
+  time.set_dt(dt*initdtcoef);
+
+  /*-----------------+
+  |  define solvers  |
+  +-----------------*/
+  Krylov * solverCGic = new CG(d, Prec::ic2());
+  Krylov * solverCGdi = new CG(d, Prec::di());
+  Krylov * solverBICG = new BiCGS(d, Prec::di());
+
+  Krylov * solver = solverCGic;
+
+  /*-------------------+
+  |  define equations  |
+  +-------------------*/
+  /* momentum equation */
+  Momentum ns( uvw, xyz, time, solver, &mixed);
+  ns.convection_set(TimeScheme::forward_euler());
+  ns.diffusion_set(TimeScheme::backward_euler());
+
+  /* pressure solver */
+  Pressure pr(p, f, uvw, time, solver, &mixed);
+  AC multigrid( &pr );
+  multigrid.stop_if_diverging(multigrid_stop_if_diverging);
+  multigrid.min_cycles(multigrid_min_cycles);
+  multigrid.max_cycles(multigrid_max_cycles);
+
+  /* color function */
+#ifdef USE_PHASE_VEL_VOF
+  Vector & uvwvof = uvw_1;
+#else
+  Vector & uvwvof = uvw;
+#endif
+#ifndef AXISYM
+  VOF conc(c, g, kappa, uvwvof, time, solver);
+#else
+  VOFaxisym conc(c, g, kappa, uvwvof, time, solver);
+#endif
+  conc.set_curv_method(curv_method);
+  conc.set_topo_method(topo_method);
+  conc.set_wall_curv_method(wall_curv_method);
+  conc.set_use_interp(use_fs_interp);
+  conc.set_pressure_extrapolation_parameters(store_pressure_extrap,niter_pressure_extrap);
+
+  /* enthalpy equation */
+#ifndef VARIABLE
+  TIF tsat(tsat0);
+#else
+  Clapeyron tsat(tsat0,conc.topo,eps,Mv,latent);
+  tsat.set_ur(ur);
+  boil::oout<<"tsat0= "<<tsat0<<" "<<tsat.temperature(eps0)<<boil::endl;
+#endif
+
+  Vector & uvwenth1 = uvw;
+  Vector & uvwenth2 = uvw;
+#ifndef AXISYM
+  EnthalpyFD enthFD      (tpr, q, uvw, uvwenth1, uvwenth2, time, solver  , &mixed,
+                          conc.topo, tsat);
+#else
+  EnthalpyFDaxisym enthFD(tpr, q, uvw, uvwenth1, uvwenth2, time, solver  , &mixed,
+                          conc.topo, tsat);
+#endif
+  enthFD.convection_set(TimeScheme::forward_euler());
+  enthFD.diffusion_set(TimeScheme::backward_euler());
+
+  enthFD.set_no_solid_acceleration(no_solid_acceleration);
+
+  /* phase change */
+  PhaseChange4 pc(mdot, mflx, tpr, q, c, g, f, uvw, conc.topo,
+                  tsat, time, &mixed);
+  pc.set_second_order_accuracy(use_second_order_accuracy);
+  pc.set_discard_points_near_interface(discard_points_near_interface);
+  pc.set_unconditional_extrapolation(use_unconditional_extrapolation);
+
+  /* ng transport */
+  ConcentrationTP ngtransp(eps,mdot_eps,uvw,
+                           c,conc.flow(),conc.heaviside(),&(conc.topo),
+                           time, solverCGdi, &gas);
+
+  /*-------------------+
+  |  check if restart  |
+  +-------------------*/
+  boil::test_irun();
+  boil::set_irun(1);
+
+  int ts;
+  /* load variables */
+  std::vector<Scalar*> load_scalars = { &press, &c, &tpr, &eps };
+  std::vector<std::string> load_scalar_names = { "press", "c", "tpr", "eps" };
+#ifdef VARIABLE
+  load_scalars.push_back(&(tsat.tif));
+  load_scalar_names.push_back("tif");
+#endif
+  std::vector<Vector*> load_vectors = { &uvw };
+  std::vector<std::string> load_vector_names = { "uvw" };
+
+  if(boil::load_backup("time.txt",ts,time,
+                       load_scalars, load_scalar_names,
+                       load_vectors, load_vector_names)) {
+    conc.init();
+  } else {
+    boil::oout << "######################" << boil::endl;
+    boil::oout << "#                    #" << boil::endl;
+    boil::oout << "# START FROM SCRATCH #" << boil::endl;
+    boil::oout << "#                    #" << boil::endl;
+    boil::oout << "######################" << boil::endl;
+
+    /*--------------------+
+    |  initial condition  |
+    +--------------------*/
+    const real xcent=0.0;
+    const real ycent=0.0;
+    const real zcent=LX;
+
+#ifdef AXISYM
+    boil::setup_circle_xz(conc.color(), R0, xcent, zcent);
+    conc.color().bnd_update();
+    conc.color().exchange_all();
+    conc.color_to_vf(conc.color(),c);
+#else
+    boil::setup_sphere(conc.color(), R0, xcent, ycent, zcent);
+    conc.color().bnd_update();
+    conc.color().exchange_all();
+#endif
+    for_vijk(c,i,j,k)
+      c[i][j][k] = 1.0-c[i][j][k];
+
+    c.bnd_update();
+    c.exchange_all();
+    conc.init();
+    conc.totalvol();
+
+    tpr = tout;
+
+    eps = eps0;
+
+    for_vijk(c,i,j,k) {
+      if(conc.color()[i][j][k]<1.0) {
+#ifdef VARIABLE
+        tpr[i][j][k] = tsat.temperature(eps0);
+#else
+        tpr[i][j][k] = tsat0;
+#endif
+      }
+    }
+    tpr.bnd_update();
+    tpr.exchange_all();
+
+#ifdef VARIABLE
+    tsat.tif = tsat.temperature(eps0);
+    tsat.init();
+#endif
+
+    boil::plot->plot(uvw,c,tpr,eps,press,mdot,"uvw-c-tpr-eps-press-mdot",0); 
+  }
+
+  /* set iint */
+  int iint = int(time.current_time()/t_per_plot) + 1;
+  boil::oout<<"iint= "<<iint<<"\n";
+
+  /*------------+
+  |  time loop  |
+  +------------*/
+#ifndef SETUP_ONLY
+  for(time.start(); time.end(); time.increase()) {
+
+    /* temperature field */
+    tsat.tint_field();
+
+    /*---------------+
+    |  phase change  |
+    +---------------*/
+    pc.update();
+    ns.vol_phase_change(&f);
+
+    /* reset body force */
+    for_m(m)
+      for_avmijk(xyz,m,i,j,k)
+        xyz[m][i][j][k]=0.0;
+
+    /* surface tension */
+    conc.tension(&xyz, mixed,conc.color());
+    
+    /* gravity force */
+    Comp m = Comp::w();
+    for_avmijk(xyz,m,i,j,k) {
+      xyz[m][i][j][k] += -gravity * xyz.dV(m,i,j,k) * mixed.rho(m,i,j,k);
+    }
+
+    /*--------------------------+
+    |  solve momentum equation  |
+    +--------------------------*/
+    /* essential for moving front */
+    ns.discretize();
+    pr.discretize();
+    pr.coarsen();
+
+    /* momentum */
+    ns.new_time_step();
+
+    ns.grad(press);
+    ns.solve(ResRat(1e-14));
+
+    const int niter = 50;
+    MaxIter mm = MaxIter(niter);
+    std::array<MaxIter,3> mi = {mm,mm,mm};
+
+    ResRat rr = ResRat(1e-5);
+
+    p = 0.;
+    if(multigrid.cycle(Cycle::F(),Cycle::F(),rr,mi)) OMS(converged);
+    p.exchange();
+    ns.project(p);
+    press += p;
+
+    /* shift pressure */
+    real pmin=1.0e+300;
+    for_vijk(press,i,j,k){
+      if(d.ibody().on(i,j,k)){
+        if(pmin>press[i][j][k]) pmin=press[i][j][k];
+      }
+    }
+    boil::cart.min_real(&pmin);
+
+    for_vijk(press,i,j,k){
+      if(d.ibody().on(i,j,k)){
+        press[i][j][k] -= pmin;
+      } else {
+        press[i][j][k] = 0.0;
+      }
+    }
+    press.bnd_update();
+    press.exchange_all();
+
+    ns.cfl_max();
+
+    /*---------------------------+
+    |  solve transport equation  |
+    +---------------------------*/
+#ifdef USE_PHASE_VEL_VOF
+    conc.advance_with_extrapolation(true,ResRat(1e-9),uvw,f,
+                                    one,&uvw_1);
+#else
+    conc.advance();
+#endif
+    conc.totalvol();
+
+    /*------------------------+
+    |  solve energy equation  |
+    +------------------------*/
+    enthFD.discretize();
+    enthFD.new_time_step();
+    enthFD.solve(ResRat(1e-16),"enthFD");
+
+    /*-------------------------+
+    |  solve species equation  |
+    +-------------------------*/
+    ngtransp.discretize();
+    ngtransp.new_time_step();
+    ngtransp.solve(ResRat(1e-14),"Concentration");
+    ngtransp.extrapolate();
+    eps.bnd_update();
+    eps.exchange_all();
+
+    /*-------------+
+    |  dt control  |
+    +-------------*/
+    /* minimum color function */
+    conc.color_minmax();
+
+    /* front */
+    conc.front_minmax();
+
+    time.control_dt(ns.cfl_max(),cfl_limit,dt);
+
+    /*--------------+
+    |  output data  |
+    +--------------*/
+
+    /* interfacial characteristics */
+    int ncell(0);
+    real tgamma(0.), tgamma2(0.);
+    real tgammamin(boil::unreal);
+    real tgammamax(-boil::unreal);
+    int imin(boil::unint),imax(boil::unint),kmin(boil::unint),kmax(boil::unint);
+    real egamma(0.), egamma2(0.);
+    real mgamma(0.), mgamma2(0.);
+    real weight(0.);
+    for_vijk(c,i,j,k) {
+      if((*conc.topo.adens)[i][j][k]>boil::atto) {
+         real t1 = tsat.Tint(i,j,k);
+         real t2 = t1*t1;
+
+         real e1 = eps[i][j][k];
+         real e2 = e1*e1;
+
+         real m1 = mflx[i][j][k];
+         real m2 = m1*m1;
+
+         real wt = (*conc.topo.adens)[i][j][k]*c.dV(i,j,k);
+
+         tgamma  += t1*wt;
+         tgamma2 += t2*wt;
+         egamma  += e1*wt;
+         egamma2 += e2*wt;
+         mgamma  += m1*wt;
+         mgamma2 += m2*wt;
+
+         if(tgammamin>t1) {
+           tgammamin = t1;
+           imin = i;
+           kmin = k;
+         }
+         if(tgammamax<t1) {
+           tgammamax = t1;
+           imax = i;
+           kmax = k;
+         }
+
+         weight += wt;
+         ncell++;
+      }
+    }
+
+    boil::cart.sum_real(&tgamma );
+    boil::cart.sum_real(&tgamma2);
+    boil::cart.sum_real(&egamma );
+    boil::cart.sum_real(&egamma2);
+    boil::cart.sum_real(&mgamma );
+    boil::cart.sum_real(&mgamma2);
+    boil::cart.sum_real(&weight );
+    boil::cart.sum_int(&ncell);
+
+    boil::cart.max_real(&tgammamax);
+    boil::cart.min_real(&tgammamin);
+    boil::cart.min_int(&imin);
+    boil::cart.min_int(&kmin);
+    boil::cart.min_int(&imax);
+    boil::cart.min_int(&kmax);
+
+    tgamma  /= weight;
+    tgamma2 /= weight;
+    egamma  /= weight;
+    egamma2 /= weight;
+    mgamma  /= weight;
+    mgamma2 /= weight;
+
+    real tstd = sqrt(std::max(0.0,tgamma2-tgamma*tgamma));
+    real estd = sqrt(std::max(0.0,egamma2-egamma*egamma));
+    real mstd = sqrt(std::max(0.0,mgamma2-mgamma*mgamma));
+
+    boil::oout<<"interface: "<<time.current_time()<<" "
+              <<tgamma<<" "<<tstd<<" "
+              <<egamma<<" "<<estd<<" "
+              <<mgamma<<" "<<mstd<<" "
+              <<weight<<" "<<ncell
+              <<boil::endl;
+
+    boil::oout<<"intgamma: "<<time.current_time()<<" "
+              <<tgammamax<<" "<<imax<<" "<<kmax<<" | "
+              <<tgammamin<<" "<<imin<<" "<<kmin<<" | "
+              <<boil::endl;
+
+    /* velocity & NG */
+    real vol(0.), wv(0.), epstot(0.);
+    m = Comp::w();
+    for_vijk(c,i,j,k) {
+      real vf = 1.-std::min(1.0,std::max(0.0,c[i][j][k]));
+      if(vf>boil::pico) {
+        epstot += vf*c.dV(i,j,k)*eps[i][j][k];
+      }
+      vf *= c.dV(i,j,k);
+      vol += vf;
+      wv += vf*0.5*(uvw[m][i][j][k+1]+uvw[m][i][j][k]);
+    }
+    boil::cart.sum_real(&vol);
+    boil::cart.sum_real(&wv);
+    boil::cart.sum_real(&epstot);
+    wv /= vol;
+    real avgng = epstot/vol;
+
+    boil::oout <<"bubble= "<<time.current_time()<<" "<< wv <<" "<<epstot<<" "<<avgng<<boil::endl;
+
+    if((time.current_time()) / (t_per_plot) >= real(iint) || time.current_step()==1 ) {
+      boil::plot->plot(uvw,c,tpr,eps,press,mdot,"uvw-c-tpr-eps-press-mdot",iint);
+      iint++;
+    }
+
+    /*--------------+
+    |  backup data  |
+    +--------------*/
+    if(time.current_step() % n_per_backup == 0) {
+      boil::save_backup(time.current_step(), 0, time,
+                        load_scalars, load_scalar_names,
+                        load_vectors, load_vector_names);
+    }
+
+    if( boil::timer.current_min() > wmin-12.0
+      || time.current_step()==time.total_steps()
+      || conc.get_zmaxft()>=LZ*0.95 ) {
+      boil::save_backup(time.current_step(), 1, time,
+                        load_scalars, load_scalar_names,
+                        load_vectors, load_vector_names);
+      boil::rm_backup(time.current_step(),
+                      load_scalars, load_scalar_names,
+                      load_vectors, load_vector_names);
+      boil::plot->plot(uvw,c,tpr,eps,press,mdot,
+                      "uvw-c-tpr-eps-press-mdot",time.current_step());
+
+      if(boil::timer.current_min() > wmin-12.0) {
+        boil::set_irun(0);
+      }
+      break;
+    }
+
+  }
+#endif
+
+  boil::oout << "finished" << boil::endl;
+
+  boil::timer.stop();
+  boil::timer.report();
+
+}	

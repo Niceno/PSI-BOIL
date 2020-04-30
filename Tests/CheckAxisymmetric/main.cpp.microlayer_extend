@@ -35,7 +35,7 @@ void restrictXZ(const Scalar & fine, Scalar & coarse, const int NZ0);
   Grid1D gz0_coarse( Range<real>(2*LZ0, 0.0), NZ0, Periodic::no() );
   Grid1D gzf_coarse( Range<real>(0.0, 2*LZ1), NZ1, Periodic::no() );
 
-  Grid1D gz_coarse(gz0_fine, gzf_fine, Periodic::no());
+  Grid1D gz_coarse(gz0_coarse, gzf_coarse, Periodic::no());
 
 
   /*---------+
@@ -173,7 +173,7 @@ void restrictXZ(const Scalar & fine, Scalar & coarse, const int NZ0);
   /* top temperature boundary */
   real ttop = tout;
   if(LZ1<ztconst) {
-    ttop = twall0 + (twall0-tout)*LZ1/ztconst;
+    ttop = twall0 + (tout-twall0)*LZ1/ztconst;
   }
   tpr_fine.bc().add( BndCnd( Dir::kmax(), BndType::dirichlet(),ttop) );
 
@@ -213,14 +213,109 @@ void restrictXZ(const Scalar & fine, Scalar & coarse, const int NZ0);
   restrictXZ(w_fine,w_coarse,n0);
 
   /***************** complement *****************/
+
+  /* in x-direction */
+  for_vijk(c_coarse,i,j,k) {
+    /* establish coordinate correspondence */
+    const int b = boil::BW-1;
+    int ihat = i-b;
+    int khat = k-b;
+
+    if(ihat>NX1/2) {
+      c_coarse[i][j][k] = 1.0;
+      /* linear drop-off */
+      press_coarse[i][j][k] = press_coarse[NX1/2+b][j][k]
+                            *(1.0-(c_coarse.xc(i)-LX1)/LX1);
+
+      /* constant extension */
+      tpr_coarse[i][j][k] = tpr_coarse[NX1/2+b][j][k];
+      /* u, v, w zero (wall in x-dir) */
+    }
+    /* special treatment of temperature in solid */
+    if(khat<=NZ0/2) {
+      tpr_coarse[i][j][k] = twall;
+    }
+  }
+
+  /* in z-direction */
+  for_vijk(c_coarse,i,j,k) {
+    /* establish coordinate correspondence */
+    const int b = boil::BW-1;
+    int ihat = i-b;
+    int khat = k-b;
+
+    if(khat>NZ1/2+NZ0) {
+      c_coarse[i][j][k] = 1.0;
+
+      /* linear drop-off */
+      press_coarse[i][j][k] = press_coarse[i][j][NZ1/2+NZ0+b]
+                            *(1.0-(c_coarse.zc(k)-LZ1)/LZ1);
+
+      /* temperature boundary layer */
+      if(c_coarse.zc(k)<ztconst) {
+        tpr_coarse[i][j][k] = twall0 + (tout-twall0)*c_coarse.zc(k)/ztconst;
+      } else {
+        tpr_coarse[i][j][k] = tout;
+      }
+      /* w prolongated in z-dir */
+      w_coarse[i][j][k] = w_coarse[i][j][NZ1/2+NZ0+b];
+
+    }
+  }
+
+  /* in xz-direction */
+  for_vijk(c_coarse,i,j,k) {
+    /* establish coordinate correspondence */
+    const int b = boil::BW-1;
+    int ihat = i-b;
+    int khat = k-b;
+
+    if(ihat>NX1/2&&khat>NZ1/2+NZ0) {
+      c_coarse[i][j][k] = 1.0;
+
+      /* linear interpolation */
+      press_coarse[i][j][k] = (
+                                press_coarse[i][j][NZ1/2+NZ0+b]
+                              *1./(c_coarse.zc(k)-c_coarse.zc(NZ1/2+NZ0+b))
+                              + press_coarse[NX1/2+b][j][k]
+                              *1./(c_coarse.xc(i)-c_coarse.xc(NX1/2+b))
+                              )/
+                              (
+                               1./(c_coarse.zc(k)-c_coarse.zc(NZ1/2+NZ0+b))
+                              +1./(c_coarse.xc(i)-c_coarse.xc(NX1/2+b))
+                              );
+    }
+  }
   
   /***************** staggered velocity *****************/
+  /* (for plotting and backup only) */
   boil::staggered_velocities(u_coarse,v_coarse,w_coarse,uvw_coarse);
 
+  /***************** cleanup *****************/
+  c_coarse.bnd_update();
+  tpr_coarse.bnd_update();
+  press_coarse.bnd_update();
+
+  c_coarse.exchange_all();
+  tpr_coarse.exchange_all();
+  press_coarse.exchange_all();
+  uvw_coarse.exchange_all();
+
   /***************** save variables *****************/
+#if 1
   boil::save_backup(ts, 1, time,
-                    { &press_coarse, &c_coarse, &tpr_coarse }, { "press", "c", "tpr" },
-                    { &uvw_coarse }, { "uvw_coarse" });
+                    { &press_coarse, &c_coarse, &tpr_coarse, &u_coarse, &v_coarse, &w_coarse }, 
+                    { "press", "c", "tpr", "u", "v", "w" },
+                    { &uvw_coarse }, { "uvw" });
+#endif
+#if 1
+  boil::plot->plot(uvw_coarse,c_coarse,tpr_coarse,press_coarse
+                 ,"uvw-c-tpr-press",ts);
+#else
+  boil::plot->plot(uvw_fine,c_fine,tpr_fine,press_fine
+                 ,"uvw-c-tpr-press",ts);
+#endif
+  
 
   boil::oout << "finished" << boil::endl;
   boil::timer.stop();
@@ -245,7 +340,11 @@ void restrictXZ(const Scalar & fine, Scalar & coarse, const int NZ0) {
 
   *******************************************************************************/
 
+  int imax = coarse.ei();
+  int kmax = coarse.ek();
+
   for_vijk(coarse,i,j,k) {
+  
     /* establish coordinate correspondence */
     const int b = boil::BW-1;
     int ihat = i-b;
@@ -286,7 +385,7 @@ void restrictXZ(const Scalar & fine, Scalar & coarse, const int NZ0) {
     }
 
     /* avoid out-of-scope indices */
-    if(i_y>i||k_y>k)
+    if(i_y>imax||k_y>kmax)
       continue;
 
     coarse[i][j][k] = fine[i_x][j_x][k_x]*fine.dV(i_x,j_x,k_x)
