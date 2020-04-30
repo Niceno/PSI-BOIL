@@ -7,6 +7,7 @@ libCustom_a_SOURCES = custom.h                            \
                       custom_interpolate_velocity.cpp     \
                       custom_irun.cpp                     \
                       custom_output_profile.cpp           \
+                      custom_output_wall_heat_transfer.cpp\
                       custom_restrict.cpp                 \
                       custom_scalar_error.cpp             \
                       custom_setup_circle.cpp             \

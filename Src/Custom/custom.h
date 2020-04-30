@@ -72,8 +72,12 @@ namespace boil {
   void droplet_parameters_3D(const real cang, real & volume,
                              real & radius, real & zcent, const real chord);
 
-  /* output scalar profile */
+  /* output scalar profile and wall heat transfer characteristics */
   void output_profile_xz(const Scalar & c, std::ostream & otp, const int NZ);
+  void output_wall_heat_transfer_xz(const Scalar & tpr,
+                                    const Vector & bndtpr,
+                                    const real lambdas,
+                                    std::ostream & otp, const int NX);
 
   /* scalar error */
   real l2_scalar_error(const Scalar & sca, const Scalar & scb);

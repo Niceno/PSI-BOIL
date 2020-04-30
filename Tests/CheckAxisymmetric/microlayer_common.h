@@ -1,9 +1,19 @@
 //#define USE_PHASE_VEL_EFD
 #define USE_SOLID
-//#define SETUP_ONLY
-#define USE_BOTTOM_DIRICHLET
+#define SETUP_ONLY
 #define USE_BIG
 #define USE_PC4
+#define CASE 1
+/*  0: Toulouse-like
+    1: Duan [MIT] (2013)
+ */
+
+#if CASE == 0
+  #define USE_BOTTOM_DIRICHLET
+#endif
+#ifndef USE_SOLID
+  #define USE_BOTTOM_DIRICHLET
+#endif
 
 /******************************************************************************/
 int main(int argc, char ** argv) {
@@ -56,7 +66,11 @@ int main(int argc, char ** argv) {
   real gravity = boil::g; /* m/s2 */
   real R = boil::R;
   
-  real qflux=0.0;
+#if CASE == 1
+  real qflux=28.7e3;
+#else
+  real qflux=0.;
+#endif
   real seedper = 1e-5; /* s */
 
   /* rescaling */
@@ -74,7 +88,7 @@ int main(int argc, char ** argv) {
   const int ndt = 10e6; /* inconsequential */
 
   /* total time */
-  const real tend = 0.3e-3 * tmult;
+  const real tend = 1e-3 * tmult;
 
   /* steps per backup */
   const int n_per_backup = 10000;
@@ -82,7 +96,7 @@ int main(int argc, char ** argv) {
   /* if yes, plotting each t_per_plot seconds. Else, each n_per_plot steps */
   const bool use_t_per_plot = true;
   const real t_per_plot = tend/100.;
-  const int n_per_plot = ndt/100;
+  const int n_per_plot = ndt/200;
 
   /* dt settings */
   const real surftens_dt_coef = 10.;
@@ -101,8 +115,18 @@ int main(int argc, char ** argv) {
   const bool multigrid_stop_if_diverging = true;
   //const bool multigrid_stop_if_diverging = false;
 
-  const int multigrid_min_cycles = 3;
+  const int multigrid_min_cycles = 1;
   const int multigrid_max_cycles = 10+2*gLevel;
+
+  const int multigrid_niter = 50;
+  MaxIter multigrid_mm = MaxIter(multigrid_niter);
+  std::array<MaxIter,3> multigrid_mi = {multigrid_mm,multigrid_mm,multigrid_mm};
+
+  ResRat multigrid_rr = ResRat(5e-5);
+
+  const Cycle multigrid_cycle0 = Cycle::F();
+  const Cycle multigrid_cycle1 = Cycle::F();
+
 
   /* vof */
   const CurvMethod curv_method = CurvMethod::HF();
@@ -144,49 +168,70 @@ int main(int argc, char ** argv) {
   const real betav = 1./tsat0_K; /* ideal gas approximation */
 
   /* heater */
-  /* CaF2 */
-  const real rhosol = 3180.0;
-  const real cpsol = 854*rhosol;
-  const real lambdasol = 9.71;
+  /* sapphire */
+  const real rhosol = 3980.0;
+  const real cpsol = 750*rhosol;
+  const real lambdasol = 35.;
 
   const real Jal = cpl*(twall-tsat0)/(latent*rhov);
   boil::oout << "Jal= "<<Jal<<boil::endl;
 
 /******************************************************************************/
 /* ------------ domain dimensions */
-  real LX1 = 0.5e-3 * gStage;
-  const int NX1 = 512*gLevel;
+  real L0 = 0.25e-3 * gStage;
+  const int N0 = 512*gLevel;
 
+  const int ARx = 2;
+  const int NX1 = ARx*N0;
+  real LX1 = real(ARx)*L0;
+#if CASE == 0
+  const int ARz = 3;
   /* in experiment, ITO: 700 nm, CaF2: 10 mm;
      here, CaF2: 4*DX0 */
   const int NZ0 = 4;
+#elif CASE == 1
+  const int ARz = 3;
+#endif
 
   LX1 *= xmult;
 
 /******************************************************************************/
 /* ------------ calculated values */
   const real DX0 = LX1/real(NX1);
-  boil::oout<<"DX: "<<DX0<<boil::endl;
-
+  boil::oout<<"DX= "<<DX0<<boil::endl;
   const real DZ0 = DX0;
+
+#if CASE == 1
+  /* in experiment, ITO: 700 nm, sapphire: 250 um;
+     here, sapphire: ~100 um; note: proc and solid boundary mustnt overlap! */
+  const int NZ0 = N0/(gStage*5);
+  /* should be 0.7 um */
+  const int NZheat = std::ceil(0.7e-6/DZ0);
+  const real LZ0 = -DZ0*NZ0;
+  const real LZheat = -NZheat*DZ0;
+  boil::oout<<"NZheat= "<<NZ0<<" "<<NZheat<<" "<<LZheat<<boil::endl;
+#else
+  const real LZ0 = -DZ0*NZ0;
+  const real LZheat = LZ0;
+#endif
+
   int NZ(0);
 #ifdef USE_SOLID
-  const int NZ1 = NX1 - NZ0;
+  const int NZ1 = ARz*N0 - NZ0;
   NZ += NZ0+NZ1;
 #else
-  const int NZ1 = NX1;
+  const int NZ1 = ARz*N01;
   NZ += NZ1;
 #endif
 
-  const real LZ0 = -DX0*NZ0;
-  const real LZ1 = DX0*NZ1;
+  const real LZ1 = DZ0*NZ1;
 
   /* other parameters */
   const real zplant= LZ1/18.; // when bottom of bubble reaches zplant, next seed is set
   const real zmax=0.9*LZ1; /* only liquid beyond 0.9*LZ1 */
 
   /* heater power */
-  real qsrc=qflux/fabs(LZ0);  // [W/m3]
+  real qsrc=qflux/fabs(LZheat);  // [W/m3]
   boil::oout<<"#qsrc= "<<qsrc<<" qflux= "<<qflux<<"\n";
 
 /******************************************************************************/

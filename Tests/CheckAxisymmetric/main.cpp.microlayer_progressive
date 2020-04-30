@@ -99,6 +99,7 @@ static void __attribute__ ((constructor)) trapfpe(void)
 #else
   tpr.bc().add( BndCnd( Dir::kmin(), BndType::neumann() ) );
 #endif
+  /* see below */
   //tpr.bc().add( BndCnd( Dir::kmax(), BndType::dirichlet(),tout) );
   tpr.bc().add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
   tpr.bc().add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
@@ -120,7 +121,7 @@ static void __attribute__ ((constructor)) trapfpe(void)
   liquid.mmass (Mv);
   liquid.beta  (betal);
 
-  /* CaF2 */
+  /* solid */
   heater.rho    (rhosol);
   heater.cp     (cpsol);
   heater.lambda (lambdasol);
@@ -138,8 +139,12 @@ static void __attribute__ ((constructor)) trapfpe(void)
   heater.rescale(xmult,tmult,mmult);
   
   /* natural convection BL thickness */
+#if CASE == 0
   real ztconst = boil::convective_boundary_layer_thickness(liquid,
                                                            twall0-tout);
+#elif CASE == 1
+  real ztconst = 1e-3;
+#endif
   boil::oout<<"BL thickness: "<<ztconst<<boil::endl;
 
   /* top temperature boundary */
@@ -355,15 +360,25 @@ static void __attribute__ ((constructor)) trapfpe(void)
                     ,"uvw-c-tpr-curv-mdot-press",0);
     
     std::fstream output;
-    std::stringstream ss;
-    ss <<"profile-"<<0<<".txt";
-    output.open(ss.str(), std::ios::out);
+    std::stringstream ssp;
+    ssp <<"profile-"<<0<<".txt";
+    output.open(ssp.str(), std::ios::out);
     for_avijk(c,i,j,k) {
       auxscalar[i][j][k] = 1.0-std::max(0.0,std::min(1.0,conc.color()[i][j][k]));
     }
     boil::output_profile_xz(auxscalar,output,NZ);
     boil::cart.barrier();
     output.close();
+
+#if 0//def USE_SOLID
+    std::stringstream ssb;
+    ssb <<"bndtpr-"<<0<<".txt";
+    output.open(ssb.str(), std::ios::out);
+    boil::output_wall_heat_transfer_xz(tpr,pc.node_tmp(),
+                                       heater.lambda()->value(),output,NX1);
+    boil::cart.barrier();
+    output.close();
+#endif
   }
 
   /* set iint */
@@ -382,22 +397,19 @@ static void __attribute__ ((constructor)) trapfpe(void)
 
   /* the loaded velocity will not be divergence-free after extending */
   if(time.current_time()>0) {
+    /* cell-center velocities */
+    Scalar u(d), v(d), w(d);
     if(boil::load_backup("time-extend.txt",ts,time,
                          {&u,&v,&w}, {"u","v","w"})) {
-      /* cell-center velocities */
-      Scalar u(d), v(d), w(d);
       boil::staggered_velocities(u,v,w,uvw);
 
       pc.update();
 
-      const int niter = 50;
-      MaxIter mm = MaxIter(niter);
-      std::array<MaxIter,3> mi = {mm,mm,mm};
-
-      ResRat rr = ResRat(5e-5);
-
       p = 0.0;
-      if (multigrid.cycle(Cycle::none(),Cycle::F(),rr,mi)) OMS(converged);
+      if(multigrid.cycle(multigrid_cycle0,
+                         multigrid_cycle1,
+                         multigrid_rr,multigrid_mi))
+        OMS(converged);
 
       p.exchange();
       ns.project(p);
@@ -405,15 +417,16 @@ static void __attribute__ ((constructor)) trapfpe(void)
 
       /* shift pressure */
       real pmin=1.0e+300;
-      for_vijk(press,i,j,k){
-        if(d.ibody().on(i,j,k)){
-          if(pmin>press[i][j][k]) pmin=press[i][j][k];
+      for_vijk(press,i,j,k) {
+        if(d.ibody().on(i,j,k)) {
+          if(pmin>press[i][j][k])
+            pmin=press[i][j][k];
         }
       }
       boil::cart.min_real(&pmin);
 
-      for_vijk(press,i,j,k){
-        if(d.ibody().on(i,j,k)){
+      for_vijk(press,i,j,k) {
+        if(d.ibody().on(i,j,k)) {
           press[i][j][k] -= pmin;
         } else {
           press[i][j][k] = 0.0;
@@ -422,6 +435,7 @@ static void __attribute__ ((constructor)) trapfpe(void)
   
       press.bnd_update();
       press.exchange_all();
+    }
   }
  
   /*------------+
@@ -438,9 +452,9 @@ static void __attribute__ ((constructor)) trapfpe(void)
         xyz[m][i][j][k]=0.0;
 
     q=0.0;
-    for_vk(tpr,k){
-      if((tpr.zc(k)<0.0)){
-        for_vij(tpr,i,j){
+    for_vk(tpr,k) {
+      if(tpr.zc(k)<0.0&&tpr.zc(k)>LZheat) {
+        for_vij(tpr,i,j) {
           q[i][j][k]=qsrc*tpr.dV(i,j,k);
         }
       }
@@ -457,7 +471,7 @@ static void __attribute__ ((constructor)) trapfpe(void)
     +--------------------------*/
     /* gravity force */
     Comp m = Comp::w();
-    for_vmijk(xyz,m,i,j,k){
+    for_vmijk(xyz,m,i,j,k) {
       real phil=std::max(0.0,std::min(1.0,c[i][j][k]));
       real phiv=1.0-phil;
       real deltmp=tpr[i][j][k]-tsat0;
@@ -470,7 +484,7 @@ static void __attribute__ ((constructor)) trapfpe(void)
     }
 
     /* surface tension */
-    conc.tension(&xyz, mixed,conc.color());
+    conc.tension(&xyz,mixed,conc.color());
 
     /*--------------------------+
     |  solve momentum equation  |
@@ -486,16 +500,11 @@ static void __attribute__ ((constructor)) trapfpe(void)
     ns.grad(press);
     ns.solve(ResRat(1e-14));
 
-    const int niter = 50;
-    MaxIter mm = MaxIter(niter);
-    std::array<MaxIter,3> mi = {mm,mm,mm};
-
-    ResRat rr = ResRat(5e-5);
-
     p = 0.0;
-    if (multigrid.cycle(Cycle::none(),Cycle::F(),rr,mi)) OMS(converged);
-    //if (multigrid.wcycle(ResRat(1e-4))) OMS(converged);
-    //    //pr.solve(ResRat(1e-6),"Pressure");
+    if(multigrid.cycle(multigrid_cycle0,
+                       multigrid_cycle1,
+                       multigrid_rr,multigrid_mi))
+      OMS(converged);
 
     p.exchange();
     ns.project(p);
@@ -503,15 +512,16 @@ static void __attribute__ ((constructor)) trapfpe(void)
 
     /* shift pressure */
     real pmin=1.0e+300;
-    for_vijk(press,i,j,k){
-      if(d.ibody().on(i,j,k)){
-        if(pmin>press[i][j][k]) pmin=press[i][j][k];
+    for_vijk(press,i,j,k) {
+      if(d.ibody().on(i,j,k)) {
+        if(pmin>press[i][j][k])
+          pmin=press[i][j][k];
       }
     }
     boil::cart.min_real(&pmin);
 
-    for_vijk(press,i,j,k){
-      if(d.ibody().on(i,j,k)){
+    for_vijk(press,i,j,k) {
+      if(d.ibody().on(i,j,k)) {
         press[i][j][k] -= pmin;
       } else {
         press[i][j][k] = 0.0;
@@ -562,15 +572,16 @@ static void __attribute__ ((constructor)) trapfpe(void)
     conc.color_minmax();
 
     /* front */
-    conc.front_minmax( Range<real>(0,LX1) ,Range<real>(0,LX1)
-                      ,Range<real>(0, LZ1));
+    conc.front_minmax(Range<real>(0   ,LX1),
+                      Range<real>(-LX1,LX1),
+                      Range<real>(0   ,LZ1));
 
     time.control_dt(ns.cfl_max(), cfl_with, dt);
 
     /*---------------------+
     |  stopping criterion  |
     +---------------------*/
-    if(conc.get_xmaxft()>0.75*LX1 || conc.get_zmaxft()>0.75*LZ1) {
+    if(conc.get_xmaxft()>0.8*LX1 || conc.get_zmaxft()>0.8*LZ1) {
       boil::save_backup(time.current_step(), 1, time,
                         load_scalars, load_scalar_names,
                         load_vectors, load_vector_names,
@@ -604,28 +615,38 @@ static void __attribute__ ((constructor)) trapfpe(void)
       boil::plot->plot(uvw,c,tpr,kappa,mdot,press
                       ,"uvw-c-tpr-curv-mdot-press",iint);
       std::fstream output;
-      std::stringstream ss;
-      ss <<"profile-"<<iint<<".txt";
-      output.open(ss.str(), std::ios::out);
+      std::stringstream ssp;
+      ssp <<"profile-"<<iint<<".txt";
+      output.open(ssp.str(), std::ios::out);
       for_avijk(c,i,j,k) {
         auxscalar[i][j][k] = 1.0-std::max(0.0,std::min(1.0,conc.color()[i][j][k]));
       }
       boil::output_profile_xz(auxscalar,output,NZ);
       boil::cart.barrier();
       output.close();
+
+#ifdef USE_SOLID
+      std::stringstream ssb;
+      ssb <<"bndtpr-"<<iint<<".txt";
+      output.open(ssb.str(), std::ios::out);
+      boil::output_wall_heat_transfer_xz(tpr,pc.node_tmp(),
+                                         heater.lambda()->value(),output,NX1);
+      boil::cart.barrier();
+      output.close();
+#endif
     }
 
     /*--------------+
     |  backup data  |
     +--------------*/
-    if((time.current_step()) % n_per_backup == 0 ) {
+    if(time.current_step() % n_per_backup == 0) {
       boil::save_backup(time.current_step(), 0, time,
                         load_scalars, load_scalar_names,
                         load_vectors, load_vector_names,
                         load_nucls, load_nucl_names);
     }
     
-    if( boil::timer.current_min() > (wmin-30.0)
+    if(  boil::timer.current_min() > (wmin-30.0)
       || time.current_step()==time.total_steps()
       || time.current_time()>tend) {
       boil::save_backup(time.current_step(), 1, time,
@@ -644,10 +665,10 @@ static void __attribute__ ((constructor)) trapfpe(void)
       }
       break;
     }
-  }
-#endif
+  } /* time loop */
+#endif /* setup only */
 
-  boil::oout << "finished" << boil::endl;
+  boil::oout << "Finished." << boil::endl;
   boil::timer.stop();
   boil::timer.report();
 
