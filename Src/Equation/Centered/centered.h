@@ -165,15 +165,15 @@ class Centered : public Equation {
     inline real dSz(const Sign sig, const int i, const int j, const int k) const
       {return phi.dSz(sig,i,j,k);}
 
-    virtual void create_system_innertial(const Property * f_prop,  
+    void create_system_innertial(const Property * f_prop,  
                                  const Property * s_prop = NULL);
-    virtual void create_system_diffusive(const Property * f_prop, 
+    void create_system_diffusive(const Property * f_prop, 
                                  const Property * s_prop = NULL,
                                  const Scalar * diff_eddy = NULL);
-    virtual void create_system_bnd(const Property * f_prop = NULL);
+    void create_system_bnd(const Property * f_prop = NULL);
 
-    virtual void convection(Scalar * conv, const Property * prop); 
-    virtual void new_time_step(const Property * f_prop,
+    void convection(Scalar * conv, const Property * prop); 
+    void new_time_step(const Property * f_prop,
                        const Property * s_prop = NULL);
 
     Scalar phi;                    // can't be inherited if protected !?!?!?
