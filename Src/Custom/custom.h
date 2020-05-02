@@ -73,7 +73,8 @@ namespace boil {
                              real & radius, real & zcent, const real chord);
 
   /* output scalar profile and wall heat transfer characteristics */
-  void output_profile_xz(const Scalar & c, std::ostream & otp, const int NZ);
+  void output_profile_xz(const Scalar & c, std::ostream & otp, 
+                         const Range<int> RZ);
   void output_wall_heat_transfer_xz(const Scalar & tpr,
                                     const Vector & bndtpr,
                                     const real lambdas,

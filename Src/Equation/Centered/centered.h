@@ -93,87 +93,87 @@ class Centered : public Equation {
     ~Centered() {};
 	  
     //! Cell volume.
-    real dV(const int i, const int j, const int k) const 
+    inline real dV(const int i, const int j, const int k) const 
      {return phi.dV(i,j,k);}
 
-    void discretize(const Scalar * diff_eddy = NULL) {};
+    virtual void discretize(const Scalar * diff_eddy = NULL) {};
 
     //! Start a new time step.
-    void new_time_step();
+    virtual void new_time_step();
 
     //! Advance in time for purely explicit schemes.
-    void advance();
+    virtual void advance();
 
     //! Solvers discretized system of equaions.
-    void solve(const ResRat & fact, const char * name = NULL); 
+    virtual void solve(const ResRat & fact, const char * name = NULL); 
     virtual real update_rhs();
 
-    void diffusion();
-    void convection();
+    virtual void diffusion();
+    virtual void convection();
 
     void save(const char *, const int = -1);
     void load(const char *, const int = -1);
 
     //! Pointer to coarser level of the variable.
-    Centered * coarser() const {return crsr;}
+    inline Centered * coarser() const {return crsr;}
 
     //! Defines the variable at coarser levels. (Needed for AC).
     void  coarsen();     
 
-    const Scalar & val() const {return phi;}
+    inline const Scalar & val() const {return phi;}
 
   friend class AC;
 
   protected:
-    int si() const {return phi.si();}
-    int sj() const {return phi.sj();}
-    int sk() const {return phi.sk();}
-    int ei() const {return phi.ei();}
-    int ej() const {return phi.ej();}
-    int ek() const {return phi.ek();}
+    inline int si() const {return phi.si();}
+    inline int sj() const {return phi.sj();}
+    inline int sk() const {return phi.sk();}
+    inline int ei() const {return phi.ei();}
+    inline int ej() const {return phi.ej();}
+    inline int ek() const {return phi.ek();}
 
     //! Constructor for coarser levels. 
     Centered(const Centered * fin, const Domain *, 
              BndCnd & ubc, Linear * sm);  
 
-    int ni() const {return phi.ni();} 
-    int nj() const {return phi.nj();} 
-    int nk() const {return phi.nk();} 
+    inline int ni() const {return phi.ni();} 
+    inline int nj() const {return phi.nj();} 
+    inline int nk() const {return phi.nk();} 
 
     /* connection dimensions needed for discretization.
        keep i,j,k here instead of x,y,z to be more general. */
-    real dxw(const int i) const {return phi.dxw(i);}
-    real dxe(const int i) const {return phi.dxe(i);}
-    real dys(const int i) const {return phi.dys(i);}
-    real dyn(const int i) const {return phi.dyn(i);}
-    real dzb(const int i) const {return phi.dzb(i);}
-    real dzt(const int i) const {return phi.dzt(i);}
+    inline real dxw(const int i) const {return phi.dxw(i);}
+    inline real dxe(const int i) const {return phi.dxe(i);}
+    inline real dys(const int i) const {return phi.dys(i);}
+    inline real dyn(const int i) const {return phi.dyn(i);}
+    inline real dzb(const int i) const {return phi.dzb(i);}
+    inline real dzt(const int i) const {return phi.dzt(i);}
 
     /* needed for discretization.
        avoid dxc, dyc and dzc here, use dSx, dSy, dSz and dV instead. */
-    real dSx(const int i, const int j, const int k) const 
+    inline real dSx(const int i, const int j, const int k) const 
       {return phi.dSx(i,j,k);}
-    real dSy(const int i, const int j, const int k) const 
+    inline real dSy(const int i, const int j, const int k) const 
       {return phi.dSy(i,j,k);}
-    real dSz(const int i, const int j, const int k) const 
+    inline real dSz(const int i, const int j, const int k) const 
       {return phi.dSz(i,j,k);}
 
-    real dSx(const Sign sig, const int i, const int j, const int k) const
+    inline real dSx(const Sign sig, const int i, const int j, const int k) const
       {return phi.dSx(sig,i,j,k);}
-    real dSy(const Sign sig, const int i, const int j, const int k) const
+    inline real dSy(const Sign sig, const int i, const int j, const int k) const
       {return phi.dSy(sig,i,j,k);}
-    real dSz(const Sign sig, const int i, const int j, const int k) const
+    inline real dSz(const Sign sig, const int i, const int j, const int k) const
       {return phi.dSz(sig,i,j,k);}
 
-    void create_system_innertial(const Property * f_prop,  
+    virtual void create_system_innertial(const Property * f_prop,  
                                  const Property * s_prop = NULL);
-    void create_system_diffusive(const Property * f_prop, 
+    virtual void create_system_diffusive(const Property * f_prop, 
                                  const Property * s_prop = NULL,
                                  const Scalar * diff_eddy = NULL);
-    void create_system_bnd(const Property * f_prop = NULL);
+    virtual void create_system_bnd(const Property * f_prop = NULL);
 
-    void convection(Scalar * conv, const Property * prop); 
-    void new_time_step(const Property * f_prop,
+    virtual void convection(Scalar * conv, const Property * prop); 
+    virtual void new_time_step(const Property * f_prop,
                        const Property * s_prop = NULL);
 
     Scalar phi;                    // can't be inherited if protected !?!?!?

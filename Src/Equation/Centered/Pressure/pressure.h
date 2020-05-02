@@ -50,7 +50,7 @@ class Pressure : public Centered {
     ~Pressure();
 	  
     //! Discretize the system of equations. 
-    void discretize(); 
+    void discretize(const Scalar * diff_eddy = NULL); 
 
     //! Computes right hand side (velocity diverence) for pressure equation.
     real update_rhs();

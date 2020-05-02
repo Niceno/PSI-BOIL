@@ -1,6 +1,6 @@
 //#define USE_PHASE_VEL_EFD
 #define USE_SOLID
-#define SETUP_ONLY
+//#define SETUP_ONLY
 #define USE_BIG
 #define USE_PC4
 #define CASE 1
@@ -220,7 +220,7 @@ int main(int argc, char ** argv) {
   const int NZ1 = ARz*N0 - NZ0;
   NZ += NZ0+NZ1;
 #else
-  const int NZ1 = ARz*N01;
+  const int NZ1 = ARz*N0;
   NZ += NZ1;
 #endif
 

@@ -679,7 +679,7 @@ int main(int argc, char ** argv) {
     for_avijk(c,i,j,k) {
       auxscalar[i][j][k] = 1.0-std::max(0.0,std::min(1.0,conc.color()[i][j][k]));
     }
-    boil::output_profile_xz(auxscalar,output,NZ);
+    boil::output_profile_xz(auxscalar,output,Range<int>(NZ0+1,NZ));
     boil::cart.barrier();
     output.close();
   }
@@ -870,7 +870,7 @@ int main(int argc, char ** argv) {
       for_avijk(c,i,j,k) {
         auxscalar[i][j][k] = 1.0-std::max(0.0,std::min(1.0,conc.color()[i][j][k]));
       }
-      boil::output_profile_xz(auxscalar,output,NZ);
+      boil::output_profile_xz(auxscalar,output,Range<int>(NZ0+1,NZ));
       boil::cart.barrier();
       output.close();
     }

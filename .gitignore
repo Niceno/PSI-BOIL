@@ -16,6 +16,7 @@ config.status
 configure
 stamp-h1
 Src/Parallel/mpi_macros.h
+Src/Utilities/ChangeProc/ChangeProc
 **/*.o
 **/Boil
 Src/main.cpp*
