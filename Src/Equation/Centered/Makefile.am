@@ -1,7 +1,6 @@
 noinst_LIBRARIES = libCentered.a
 libCentered_a_SOURCES = centered.h                    \
                         centered.cpp                  \
-                        centered_advance.cpp          \
                         centered_coarsen.cpp          \
                         centered_convection.cpp       \
                         centered_diffusion.cpp        \

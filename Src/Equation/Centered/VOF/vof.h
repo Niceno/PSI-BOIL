@@ -33,7 +33,7 @@ class VOF : public Centered {
         Vector * bndclr = NULL);
     ~VOF();
 
-    void new_time_step(){};
+    void new_time_step(const Scalar * diff_eddy = NULL){};
     void forward(Scalar & scp);
 
     void advance(const bool anci = true);

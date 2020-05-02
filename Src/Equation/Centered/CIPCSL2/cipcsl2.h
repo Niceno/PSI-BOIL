@@ -68,7 +68,7 @@ class CIPCSL2 : public Centered {
             Linear * S);
     ~CIPCSL2();
 
-    void new_time_step(){};
+    void new_time_step(const Scalar * diff_eddy = NULL){};
     void advance();
     void bdcond(const Scalar & sca);
     void curvature();

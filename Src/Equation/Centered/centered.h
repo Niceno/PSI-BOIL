@@ -99,10 +99,7 @@ class Centered : public Equation {
     virtual void discretize(const Scalar * diff_eddy = NULL) {};
 
     //! Start a new time step.
-    virtual void new_time_step();
-
-    //! Advance in time for purely explicit schemes.
-    virtual void advance();
+    virtual void new_time_step(const Scalar * diff_eddy = NULL);
 
     //! Solvers discretized system of equaions.
     virtual void solve(const ResRat & fact, const char * name = NULL); 
@@ -174,7 +171,8 @@ class Centered : public Equation {
 
     void convection(Scalar * conv, const Property * prop); 
     void new_time_step(const Property * f_prop,
-                       const Property * s_prop = NULL);
+                       const Property * s_prop = NULL,
+                       const Scalar * diff_eddy = NULL);
 
     Scalar phi;                    // can't be inherited if protected !?!?!?
     Scalar fold, fnew, fext, fbnd; // source
