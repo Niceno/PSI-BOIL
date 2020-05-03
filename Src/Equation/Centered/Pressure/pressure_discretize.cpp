@@ -7,8 +7,6 @@
 *  (density), a specialized function is written here. 
 *
 *  The only thing useful from the parent is handling of boundary conditions.
-* 
-*  Argument does nothing, it exists to properly virtualize the parent function.
 *******************************************************************************/
 void Pressure::discretize(const Scalar * diff_eddy) {
 
@@ -61,15 +59,12 @@ void Pressure::discretize(const Scalar * diff_eddy) {
   /*----------------------+
   |  central coefficient  |
   +----------------------*/
-  for_ijk(i,j,k) A.c[i][j][k] = A.w[i][j][k] + A.e[i][j][k] 
+  /* since solid and fluid cells are blended during coarsening,
+     it is necessary for the central coefficient to maintain
+     magnitude negligible wrt fluid ones (comment 1/2) */
+  for_ijk(i,j,k) A.c[i][j][k] = A.w[i][j][k] + A.e[i][j][k]
                               + A.s[i][j][k] + A.n[i][j][k]
                               + A.b[i][j][k] + A.t[i][j][k];
-
-  /*------------------------+
-  |  boundaries correction  |
-  +------------------------*/
-  /* 19-11-28: moved here to allow other bcs than zero-Neumann */
-  Centered::create_system_bnd();
 
   /*-------------------------------+
   |  a "touch" from immersed body  |
@@ -77,6 +72,7 @@ void Pressure::discretize(const Scalar * diff_eddy) {
   if(dom->ibody().nccells() > 0) {
     for(int cc=0; cc<dom->ibody().nccells(); cc++) {
       int i,j,k;
+      /* i,j,k is cell adjacent to solid */
       dom->ibody().ijk(cc,&i,&j,&k); // OPR(i); OPR(j); OPR(k);
 
       /* both cells in fluid, but partially in solid */
@@ -93,6 +89,7 @@ void Pressure::discretize(const Scalar * diff_eddy) {
          (there seems to be too many checks, each
           face is checked twice, but it is needed) */
       if( dom->ibody().off_p(i,j,k) ) {
+        /* I really doubt this does anything (isnt ijk in fluid??) - Lubomir */
         A.w[i][j][k] = 0.0; A.e[i-1][j][k] = 0.0;
         A.e[i][j][k] = 0.0; A.w[i+1][j][k] = 0.0;
         A.s[i][j][k] = 0.0; A.n[i][j-1][k] = 0.0; 
@@ -109,29 +106,45 @@ void Pressure::discretize(const Scalar * diff_eddy) {
       if(dom->ibody().off_p(i,j,k+1)) {A.t[i][j][k] = 0.0; A.b[i][j][k+1] = 0.0;}
     }
 
-#if 0 /* since solid and fluid cells are blended during coarsening,
-         it is necessary for the central coefficient to maintain
-         magnitude comparable with fluid ones */
-    for_ijk(i,j,k) { 
-      if( dom->ibody().off_p(i,j,k) ) {
-        //A.c[i][j][k]  = 1.0;
-        A.c[i][j][k]  = boil::pico;
-        A.ci[i][j][k] = 1.0;
-      } else {
-        A.ci[i][j][k] = 1.0 / A.c[i][j][k];
-      }
-    }
-  } /* is there an immersed body */
-  else {
-    for_ijk(i,j,k)
-      A.ci[i][j][k] = 1.0 / A.c[i][j][k];
-  }
-# else
+    /*----------------------+
+    |  central coefficient  | -> correction for fluid cells 
+    +----------------------*/
+    for_ijk(i,j,k) 
+      /* not off = on or cut */
+      if(!dom->ibody().off_p(i,j,k))
+        A.c[i][j][k] = A.w[i][j][k] + A.e[i][j][k] 
+                     + A.s[i][j][k] + A.n[i][j][k]
+                     + A.b[i][j][k] + A.t[i][j][k];
+
   } /* is there an immersed body */
 
-  for_ijk(i,j,k)
-    A.ci[i][j][k] = 1.0 / A.c[i][j][k];
-#endif 
+  /*------------------------+
+  |  boundaries correction  |
+  +------------------------*/
+  /* 19-11-28: moved here to allow other bcs than zero-Neumann */
+  Centered::create_system_bnd();
+
+  for_ijk(i,j,k) A.ci[i][j][k] = 1.0 / A.c[i][j][k];
+
+  /*-------------------------------+
+  |  a "touch" from immersed body  | -> this should be necessary only for A.c 
+  +-------------------------------*/
+  if(dom->ibody().nccells() > 0) 
+    for_ijk(i,j,k) 
+      if( dom->ibody().off_p(i,j,k) ) {
+        /* since solid and fluid cells are blended during coarsening,
+           it is necessary for the central coefficient to maintain
+           magnitude negligible wrt fluid ones (comment 2/2) */
+        A.c[i][j][k]  *= boil::pico;
+        //A.c[i][j][k]  = boil::pico;
+        //A.ci[i][j][k] = 1.0;
+        A.w[i][j][k]  = 0.0;
+        A.e[i][j][k]  = 0.0;
+        A.s[i][j][k]  = 0.0;
+        A.n[i][j][k]  = 0.0;
+        A.b[i][j][k]  = 0.0;
+        A.t[i][j][k]  = 0.0;
+    }
 
   boil::timer.stop("pressure discretize");
 }

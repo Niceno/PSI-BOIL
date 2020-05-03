@@ -134,7 +134,6 @@ void AC::restriction(const Centered & h, Centered & H) const {
       }
     }
 
-#if 0 /* this does not appear to do anything useful ?! - Lubomir */
   /*----------------------------------------------------+ 
   |  r.h.s. normalization.                              |
   + - - - - - - - - - - - - - - - - - - - - - - - - - - +
@@ -159,6 +158,5 @@ void AC::restriction(const Centered & h, Centered & H) const {
     for(int j=H.sj(); j<=H.ej(); j++)
       for(int k=H.sk(); k<=H.ek(); k++)
         H.fnew[i][j][k] -= sum;
-#endif
 
 }
