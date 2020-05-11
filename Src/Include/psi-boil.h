@@ -26,6 +26,7 @@
 #include "../Equation/Heaviside/MarchingCubes/marching_cubes.h"
 #include "../Equation/Heaviside/MarchingSquares/MSaxisym/ms_axisym.h"
 #include "../Equation/Heaviside/MarchingSquares/marching_squares.h"
+#include "../Equation/Tifmodel/Antoine/antoine.h"
 #include "../Equation/Tifmodel/Clapeyron/clapeyron.h"
 #include "../Equation/Tifmodel/Schrage/schrage.h"
 #include "../Equation/Topology/topology.h"

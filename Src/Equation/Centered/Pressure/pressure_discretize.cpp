@@ -127,7 +127,7 @@ void Pressure::discretize(const Scalar * diff_eddy) {
   for_ijk(i,j,k) A.ci[i][j][k] = 1.0 / A.c[i][j][k];
 
   /*-------------------------------+
-  |  a "touch" from immersed body  | -> this should be necessary only for A.c 
+  |  a "touch" from immersed body  |
   +-------------------------------*/
   if(dom->ibody().nccells() > 0) 
     for_ijk(i,j,k) 

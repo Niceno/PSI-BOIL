@@ -32,6 +32,7 @@ SUBDIRS = Equation/Staggered/Momentum                              \
           Equation/Heaviside/MarchingSquares                       \
           Equation/Heaviside                                       \
           Equation/Nucleation                                      \
+          Equation/Tifmodel/Antoine                                \
           Equation/Tifmodel/Clapeyron                              \
           Equation/Tifmodel/Schrage                                \
           Equation/Tifmodel                                        \
@@ -96,6 +97,7 @@ LDADD = Equation/Staggered/Momentum/libMomentum.a                             \
 	Equation/Heaviside/MarchingSquares/libMarchingSquares.a               \
 	Equation/Heaviside/libHeaviside.a                                     \
 	Equation/Nucleation/libNucleation.a                                   \
+        Equation/Tifmodel/Antoine/libAntoine.a                            \
         Equation/Tifmodel/Clapeyron/libClapeyron.a                            \
         Equation/Tifmodel/Schrage/libSchrage.a                                \
         Equation/Tifmodel/libTif.a                                            \

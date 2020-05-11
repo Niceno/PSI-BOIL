@@ -15,6 +15,7 @@ static void __attribute__ ((constructor)) trapfpe(void)
 #define USE_PHASE_VEL_VOF
 //#define SETUP_ONLY
 #define VARIABLE
+//#define MOVING_FRAME
 
 /******************************************************************************/
 int main(int argc, char ** argv) {
@@ -43,7 +44,7 @@ int main(int argc, char ** argv) {
   const real gravity = boil::g;
 
   /* average values of the two cases */
-  const real eps0 = 0.029e-2;
+  const real eps0 = 0.029e-2 * 7.4244/1.086;
   const real R0 = 1.4e-3;
 
 /******************************************************************************/
@@ -51,6 +52,9 @@ int main(int argc, char ** argv) {
 
   /* total number of steps */
   const int ndt = 35000*gLevel; /* inconsequential */
+
+  /* total time */
+  const real tend = 0.5;
 
   /* steps per backup */
   const int n_per_backup= 5000;
@@ -94,6 +98,10 @@ int main(int argc, char ** argv) {
   /* under-relaxation */
   const real ur = 0.01;
 
+  /* moving-frame */
+  const real ur_vel = 0.1;
+  real wvel = 0.0;
+
 /******************************************************************************/
 /* ------------ material properties */
   /* from NIST webbook (R113) */
@@ -127,7 +135,7 @@ int main(int argc, char ** argv) {
   const real cpl = 0.94037e3*rhol;
   const real lambdal = 0.063655;
 
-  const real sig = 0.014698;
+  real sig = 0.014698;
   const real latent=146.7e3; /* https://www.researchgate.net/figure/Physical-properties-of-R113-and-its-vapor-R113v_tbl2_318547375 */
 
   const real betal = 0.;
@@ -138,12 +146,23 @@ int main(int argc, char ** argv) {
   const real LX = 5e-3;
 
   const int NX = 16*gLevel;
+#ifdef MOVING_FRAME
+  const int NZ = 3*NX;
+#else
   const int NZ = 16*NX;
+#endif
 
   const real DX = real(LX/real(NX));
   boil::oout<<"dx= "<<DX<<"\n";
 
   const real LZ = real(NZ)*DX;
+
+#ifdef MOVING_FRAME
+  /* color upkeep */
+  const real zmax = 0.9*LZ/2.;
+#else
+  const real zmax = LZ;
+#endif
 
 /******************************************************************************/
 /* ------------- setup finished */
@@ -161,7 +180,11 @@ int main(int argc, char ** argv) {
   +----------*/
   Grid1D gx ( Range<real>(0.0, LX), NX, Periodic::no(),
               BndGrid::symmetry(), BndGrid::wall() );
+#ifdef MOVING_FRAME
+  Grid1D gz ( Range<real>(-LZ/2.,LZ/2.), NZ ,Periodic::no() );
+#else
   Grid1D gz ( Range<real>(0.0,LZ) ,NZ ,Periodic::no() );
+#endif
 
   /*---------+
   |  domain  |
@@ -190,9 +213,15 @@ int main(int argc, char ** argv) {
   +-----------------------------*/
   for_m(m) {
     uvw.bc(m).add( BndCnd( Dir::imin(), BndType::symmetry() ) );
+#ifdef MOVING_FRAME
+    uvw.bc(m).add( BndCnd( Dir::imax(), BndType::neumann() ) );
+    uvw.bc(m).add( BndCnd( Dir::kmin(), BndType::outlet() ) );
+    uvw.bc(m).add( BndCnd( Dir::kmax(), BndType::inlet(), 0., 0., -wvel ));
+#else
     uvw.bc(m).add( BndCnd( Dir::imax(), BndType::wall() ) );
     uvw.bc(m).add( BndCnd( Dir::kmin(), BndType::wall() ) );
     uvw.bc(m).add( BndCnd( Dir::kmax(), BndType::outlet() ) );
+#endif
 #ifdef AXISYM
     uvw.bc(m).add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
     uvw.bc(m).add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
@@ -230,9 +259,14 @@ int main(int argc, char ** argv) {
 
   c.bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
   c.bc().add( BndCnd( Dir::imax(), BndType::wall() ) );
+#ifdef MOVING_FRAME
+  c.bc().add( BndCnd( Dir::kmin(), BndType::outlet() ) );
+  c.bc().add( BndCnd( Dir::kmax(), BndType::dirichlet(),1.0 ) );
+#else
   c.bc().add( BndCnd( Dir::kmin(), BndType::wall() ) );
   //c.bc().add( BndCnd( Dir::kmin(), BndType::dirichlet(), 1.0 ) );
   c.bc().add( BndCnd( Dir::kmax(), BndType::outlet() ) );
+#endif
 #ifdef AXISYM
   c.bc().add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
   c.bc().add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
@@ -243,7 +277,11 @@ int main(int argc, char ** argv) {
 
   tpr.bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
   tpr.bc().add( BndCnd( Dir::imax(), BndType::dirichlet(), tout ) );
+#ifdef MOVING_FRAME
+  tpr.bc().add( BndCnd( Dir::kmin(), BndType::outlet() ) );
+#else
   tpr.bc().add( BndCnd( Dir::kmin(), BndType::dirichlet(), tout ) );
+#endif
   tpr.bc().add( BndCnd( Dir::kmax(), BndType::dirichlet(), tout ) );
 #ifdef AXISYM
   tpr.bc().add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
@@ -335,9 +373,19 @@ int main(int argc, char ** argv) {
 #ifndef VARIABLE
   TIF tsat(tsat0);
 #else
-  Clapeyron tsat(tsat0,conc.topo,eps,Mv,latent);
+  Antoine tsat(tsat0,conc.topo,eps,6.88,1099.9,227.5);
+  Clapeyron tsat_clap(tsat0,conc.topo,eps,Mv,latent);
   tsat.set_ur(ur);
-  boil::oout<<"tsat0= "<<tsat0<<" "<<tsat.temperature(eps0)<<boil::endl;
+  real epsinf = tsat.epsilon(tout);
+  real epsinf_clap = tsat_clap.epsilon(tout);
+  real epstest = tsat.epsilon(tsat0);
+  real volrat = eps0/epsinf;
+  real volrat_clap = eps0/epsinf_clap;
+  real radrat = pow(volrat,1./3.);
+  real radrat_clap = pow(volrat_clap,1./3.);
+  boil::oout<<"anto= "<<tsat0<<" "<<tsat.temperature(eps0)<<" "<<epsinf<<" "<<volrat<<" "<<radrat<<" "<<radrat*R0<<" | "<<epstest<<boil::endl;
+  boil::oout<<"clap= "<<tsat0<<" "<<tsat_clap.temperature(eps0)<<" "<<epsinf_clap<<" "<<volrat_clap<<" "<<radrat_clap<<" "<<radrat_clap*R0<<boil::endl;
+  //exit(0);
 #endif
 
   Vector & uvwenth1 = uvw;
@@ -399,7 +447,11 @@ int main(int argc, char ** argv) {
     +--------------------*/
     const real xcent=0.0;
     const real ycent=0.0;
+#ifdef MOVING_FRAME
+    const real zcent=0.0*R0;
+#else
     const real zcent=LX;
+#endif
 
 #ifdef AXISYM
     boil::setup_circle_xz(conc.color(), R0, xcent, zcent);
@@ -447,11 +499,50 @@ int main(int argc, char ** argv) {
   int iint = int(time.current_time()/t_per_plot) + 1;
   boil::oout<<"iint= "<<iint<<"\n";
 
+  real zpos(0.0);
   /*------------+
   |  time loop  |
   +------------*/
 #ifndef SETUP_ONLY
   for(time.start(); time.end(); time.increase()) {
+
+  #if 0
+    /* modify surface tension */
+    sig = 0.014698  *std::min(1.0,time.current_time()/0.1)
+        + 5*0.014698*std::max(0.0,1.-time.current_time()/0.1);
+    mixed.sigma(sig);
+    boil::oout<<"main::sig= "<<time.current_time()<<" "<<mixed.sigma()->value()<<boil::endl;
+  #endif
+
+    /* velocity & NG */
+    real vol(0.), wv(0.), epstot(0.);
+    Comp m = Comp::w();
+    for_vijk(c,i,j,k) {
+      real vf = 1.-std::min(1.0,std::max(0.0,c[i][j][k]));
+      if(vf>boil::pico) {
+        epstot += vf*c.dV(i,j,k)*eps[i][j][k];
+      }
+      vf *= c.dV(i,j,k);
+      vol += vf;
+      wv += vf*0.5*(uvw[m][i][j][k+1]+uvw[m][i][j][k]);
+    }
+    boil::cart.sum_real(&vol);
+    boil::cart.sum_real(&wv);
+    boil::cart.sum_real(&epstot);
+    wv /= vol;
+    real avgng = epstot/vol;
+    zpos += (wvel+wv)*time.dt();
+
+    boil::oout <<"bubble= "<<time.current_time()<<" "<< wv <<" "<<wvel<<" "<<zpos<<" "<<epstot<<" "<<avgng<<boil::endl;
+#ifdef MOVING_FRAME
+    wvel += ur_vel*wv;
+    for_m(m) {
+      uvw.bc(m).modify( BndCnd( Dir::kmax(), BndType::inlet(), 0., 0., -wvel ) );
+    }
+    for_vmijk(uvw,m,i,j,k)
+      uvw[m][i][j][k] -= ur_vel*wv;
+    uvw.exchange_all();
+#endif    
 
     /* temperature field */
     tsat.tint_field();
@@ -471,9 +562,11 @@ int main(int argc, char ** argv) {
     conc.tension(&xyz, mixed,conc.color());
     
     /* gravity force */
-    Comp m = Comp::w();
     for_avmijk(xyz,m,i,j,k) {
       xyz[m][i][j][k] += -gravity * xyz.dV(m,i,j,k) * mixed.rho(m,i,j,k);
+#ifdef MOVING_FRAME
+      xyz[m][i][j][k] += ur_vel*wv*xyz.dV(m,i,j,k)*mixed.rho(m,i,j,k)*time.dti();
+#endif
     }
 
     /*--------------------------+
@@ -527,11 +620,23 @@ int main(int argc, char ** argv) {
     |  solve transport equation  |
     +---------------------------*/
 #ifdef USE_PHASE_VEL_VOF
-    conc.advance_with_extrapolation(true,ResRat(1e-9),uvw,f,
+    conc.advance_with_extrapolation(false,ResRat(1e-9),uvw,f,
                                     one,&uvw_1);
 #else
-    conc.advance();
+    conc.advance(false);
 #endif
+
+    for_avk(c,k) {
+      if(c.zc(k)>=zmax) {
+        for_avij(c,i,j) {
+          c[i][j][k]= 1.0;
+        }
+      }
+    }
+
+    c.bnd_update();
+    c.exchange_all();
+    conc.ancillary();
     conc.totalvol();
 
     /*------------------------+
@@ -650,26 +755,6 @@ int main(int argc, char ** argv) {
               <<tgammamin<<" "<<imin<<" "<<kmin<<" | "
               <<boil::endl;
 
-    /* velocity & NG */
-    real vol(0.), wv(0.), epstot(0.);
-    m = Comp::w();
-    for_vijk(c,i,j,k) {
-      real vf = 1.-std::min(1.0,std::max(0.0,c[i][j][k]));
-      if(vf>boil::pico) {
-        epstot += vf*c.dV(i,j,k)*eps[i][j][k];
-      }
-      vf *= c.dV(i,j,k);
-      vol += vf;
-      wv += vf*0.5*(uvw[m][i][j][k+1]+uvw[m][i][j][k]);
-    }
-    boil::cart.sum_real(&vol);
-    boil::cart.sum_real(&wv);
-    boil::cart.sum_real(&epstot);
-    wv /= vol;
-    real avgng = epstot/vol;
-
-    boil::oout <<"bubble= "<<time.current_time()<<" "<< wv <<" "<<epstot<<" "<<avgng<<boil::endl;
-
     if((time.current_time()) / (t_per_plot) >= real(iint) || time.current_step()==1 ) {
       boil::plot->plot(uvw,c,tpr,eps,press,mdot,"uvw-c-tpr-eps-press-mdot",iint);
       iint++;
@@ -686,6 +771,7 @@ int main(int argc, char ** argv) {
 
     if( boil::timer.current_min() > wmin-12.0
       || time.current_step()==time.total_steps()
+      || time.current_time()>tend
       || conc.get_zmaxft()>=LZ*0.95 ) {
       boil::save_backup(time.current_step(), 1, time,
                         load_scalars, load_scalar_names,
