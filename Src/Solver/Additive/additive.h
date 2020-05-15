@@ -84,7 +84,7 @@ class AC {
 
   private:
     //! Computes residual of the linear system. 
-    real residual(Centered & h) const;
+    real residual(Centered & h, real * linf = NULL) const;
 
     //! Restriction. Meaning from finer to coarser grid.
     void restriction(const Centered & h, Centered & H) const;
@@ -92,7 +92,10 @@ class AC {
     //! Interpolation, Meaning from coarser to finer grid.
     void interpolation(const Centered & H, Centered & h) const;
 
-    //! Creates coarser discretized system
+    //! Coarsens immersed body flag.
+    void coarsen_flag(const Centered & h, Centered & H) const; 
+
+    //! Creates coarser discretized system.
     void coarsen_system(const Centered & h, Centered & H) const; 
 
     //! Individual components of a cycle

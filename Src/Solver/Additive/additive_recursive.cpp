@@ -147,10 +147,6 @@ void AC::full_cycle(const int l, const Cycle & cyc,
       call_solver(l,MaxIter(20 * (l+1)),ResRat(0.01),ResTol(boil::pico));
     }
 
-    /* prolongate to a finer level */
-    if(l > 0)
-      interpolation(*L[l], *L[l-1]);
-
   } else {
     /* solve 'precisely' at the coarsest level */
     call_solver(l,MaxIter(40 * (l+1)),ResRat(0.001),ResTol(boil::femto));

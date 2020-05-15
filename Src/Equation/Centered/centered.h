@@ -81,13 +81,17 @@ class Centered : public Equation {
              Linear * sm = NULL) 
      : Equation(d, &t, flu, sol, sm), phi(&s), A(phi), fext(&g), u(v), 
                     fold(*d), fnew(*d), fbnd(*d), 
+                    aflag(*d),
                     cold(*d), cnew(*d), buff(*d), 
                     res(*d), 
                     fnr(NULL), crsr(NULL) {
                       fext=phi.shape();
                       fold=phi.shape();  fnew=phi.shape();  fbnd=phi.shape();
+                      aflag = phi.shape();
                       cold=phi.shape();  cnew=phi.shape();  buff=phi.shape();
                       res =phi.shape();
+
+                      set_active_flag(aflag);
                     }
 
     ~Centered() {};
@@ -118,6 +122,8 @@ class Centered : public Equation {
     void  coarsen();     
 
     inline const Scalar & val() const {return phi;}
+
+    void set_active_flag(ScalarInt & activeflag);
 
   friend class AC;
 
@@ -176,6 +182,7 @@ class Centered : public Equation {
 
     Scalar phi;                    // can't be inherited if protected !?!?!?
     Scalar fold, fnew, fext, fbnd; // source
+    ScalarInt aflag;           // used in additive
     Matrix A;                      // matrix
     Scalar res;                
 

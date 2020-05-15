@@ -29,6 +29,8 @@ AC::AC(Centered * cen, Linear * sol) {
     }
   }
 
+  boil::oout << "Number of cycling levels: " << nlevels << boil::endl;
+
   /* is there a distinct solver at coarsest level? */
   if(sol!=NULL) {
     solver = sol;
@@ -36,5 +38,8 @@ AC::AC(Centered * cen, Linear * sol) {
     solver = L[0] -> solver;
   }
 
-  boil::oout << "Number of cycling levels: " << nlevels << boil::endl;
+  /* coarsen the active flag */
+  for(int l=1; l<nlevels; l++)
+    coarsen_flag(*L[l-1], *L[l]); // finer, coarser
+  
 }

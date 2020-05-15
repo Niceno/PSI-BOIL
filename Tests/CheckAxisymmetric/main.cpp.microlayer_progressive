@@ -653,7 +653,7 @@ static void __attribute__ ((constructor)) trapfpe(void)
                         load_scalars, load_scalar_names,
                         load_vectors, load_vector_names,
                         load_nucls, load_nucl_names);
-      boil::rm_backup(time.current_step(),
+      boil::rm_backup(ts,
                       load_scalars, load_scalar_names,
                       load_vectors, load_vector_names,
                       load_nucls, load_nucl_names);

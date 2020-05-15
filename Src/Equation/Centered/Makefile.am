@@ -4,6 +4,7 @@ libCentered_a_SOURCES = centered.h                    \
                         centered_coarsen.cpp          \
                         centered_convection.cpp       \
                         centered_diffusion.cpp        \
+                        centered_set_active_flag.cpp  \
                         centered_load.cpp             \
                         centered_new_time_step.cpp    \
                         centered_save.cpp             \

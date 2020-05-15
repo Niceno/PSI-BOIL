@@ -63,7 +63,7 @@ int main(int argc, char ** argv) {
   const real t_per_plot = 0.01;
 
   /* dt settings */
-  const real surftens_dt_coef = 10.;
+  const real surftens_dt_coef = 5.;
   const real initdtcoef = 1e-4;
 
   /* cfl limit */

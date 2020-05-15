@@ -138,6 +138,7 @@ void Pressure::discretize(const Scalar * diff_eddy) {
         A.c[i][j][k]  *= boil::pico;
         //A.c[i][j][k]  = boil::pico;
         //A.ci[i][j][k] = 1.0;
+        //A.c[i][j][k]  = 1.0;
         A.w[i][j][k]  = 0.0;
         A.e[i][j][k]  = 0.0;
         A.s[i][j][k]  = 0.0;

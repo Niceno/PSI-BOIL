@@ -27,7 +27,8 @@ bool AC::init_cycles(real & res_0, int * ncyc) {
   /*-------------------+
   |  initial residual  |
   +-------------------*/ 
-  res_0 = residual(*L[0]);
+  real reslinf_0;
+  res_0 = residual(*L[0],&reslinf_0);
   L[0]->fold = L[0]->phi; /* store "good" solution */
   if((res_0 < targ_res_val && min_cyc==0) || res_0==0.0) {
     boil::oout << "Converged in 0 cycles!" << boil::endl;
@@ -35,7 +36,7 @@ bool AC::init_cycles(real & res_0, int * ncyc) {
     return true;
   }
   
-  boil::oout << "Initial res = " << res_0 << boil::endl;
+  boil::oout << "Initial res = " << res_0 <<" ; "<<reslinf_0<< boil::endl;
 
   return false;
 }
@@ -44,9 +45,11 @@ bool AC::init_cycles(real & res_0, int * ncyc) {
 int AC::converged(const ResRat & factor, const int & cycle, 
                   const real & res_0, const real & res0,
                   int * ncyc) {
-  real res1 = residual(*L[0]);
+  real reslinf1;
+  real res1 = residual(*L[0],&reslinf1);
 
-  boil::oout << "Cycle " << cycle << "; res = " << res1 << boil::endl;
+  boil::oout << "Cycle " << cycle << "; res = " << res1 <<" ; "
+             << reslinf1<< boil::endl;
 
   if( (res1/res_0 < factor || res1 < targ_res_val) && cycle >= min_cyc ) {
     if(cycle > 1)
