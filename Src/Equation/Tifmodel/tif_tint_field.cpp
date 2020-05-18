@@ -21,7 +21,7 @@ void TIF::tint_field(const bool newstep) {
 
     if(weaklim) {
       for_vijk(tif,i,j,k) {
-        if(Interface(i,j,k)) {
+        if(topo->interface(i,j,k)) {
           tif[i][j][k] = std::min(tmax,
                                   std::max(tmin,tif[i][j][k])
                                   );
@@ -36,7 +36,7 @@ void TIF::tint_field(const bool newstep) {
     if(store_tif) {
       if(factor < 1.00) {
         for_vijk(tif,i,j,k) {
-          if(Interface(i,j,k)) {
+          if(topo->interface(i,j,k)) {
             real tintnew = tif[i][j][k];
             tif[i][j][k] = underrelaxation(tintnew,tifold[i][j][k]);
           }

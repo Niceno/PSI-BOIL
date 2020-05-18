@@ -1,7 +1,6 @@
 #include "enthalpyfd.h"
 #define VERSION_STABLE
 #define USE_PHASIC_VELOCITIES
-using namespace std;
 
 /***************************************************************************//**
 *  \brief Interface for calling convection for new time step \f$\{C\}^{N}\f$.
@@ -66,7 +65,7 @@ void EnthalpyFD::convection(Scalar * conv) {
       //  u  //
       /////////
 #ifdef USE_PHASIC_VELOCITIES
-    if(clrold[i][j][k]>=clrsurf) {
+    if(topo->above_interface_old(i,j,k)) {
       umf = (*uliq)[Comp::u()][i]  [j][k];  // u @ imin
       upf = (*uliq)[Comp::u()][i+1][j][k];  // u @ imax
     } else {
@@ -99,7 +98,7 @@ void EnthalpyFD::convection(Scalar * conv) {
       //  v  //
       /////////
 #ifdef USE_PHASIC_VELOCITIES
-    if(clrold[i][j][k]>=clrsurf) {
+    if(topo->above_interface_old(i,j,k)) {
       vmf = (*uliq)[Comp::v()][i][j]  [k];  // v @ jmin
       vpf = (*uliq)[Comp::v()][i][j+1][k];  // v @ jmax
     } else {
@@ -132,7 +131,7 @@ void EnthalpyFD::convection(Scalar * conv) {
       //  w  //
       /////////
 #ifdef USE_PHASIC_VELOCITIES
-    if(clrold[i][j][k]>=clrsurf) {
+    if(topo->above_interface_old(i,j,k)) {
       wmf = (*uliq)[Comp::w()][i][j][k];    // w @ kmin
       wpf = (*uliq)[Comp::w()][i][j][k+1];  // w @ kmax
     } else {
@@ -195,10 +194,11 @@ void EnthalpyFD::convection(Scalar * conv) {
 #else
   #ifdef USE_PHASIC_VELOCITIES
     real divu;
-    if(clrold[i][j][k]>=clrsurf)
+    if(topo->above_interface_old(i,j,k)) {
       divu = uliq->outflow(i,j,k);
-    else
+    } else {
       divu = ugas->outflow(i,j,k);
+    }
   #else
     real divu = u->outflow(i,j,k);
   #endif
@@ -223,7 +223,7 @@ void EnthalpyFD::convection(Scalar * conv) {
       iumf=iupf=ivmf=ivpf=iwmf=iwpf=0;
 
 #ifdef USE_PHASIC_VELOCITIES
-      if(clrold[i][j][k]>=clrsurf) {
+      if(topo->above_interface_old(i,j,k)) {
         // u
         umf = (*uliq)[Comp::u()][i]  [j][k];
         upf = (*uliq)[Comp::u()][i+1][j][k];
@@ -263,9 +263,9 @@ void EnthalpyFD::convection(Scalar * conv) {
 #endif
 
       // dtdxm
-      if(Interface_old(-1,Comp::i(),i,j,k)) {
+      if(interface_old(Sign::neg(),Comp::i(),i,j,k)) {
         real dxm, ts;
-        dxm = max(epsl*dxw(i),distance_x(i,j,k,-1,ts,true));
+        dxm = distance_int_x_old(Sign::neg(),i,j,k,ts);
         dtdxm = (phi[i][j][k]-ts)/dxm;
 #ifndef VERSION_STABLE
         umf = upf;
@@ -279,9 +279,9 @@ void EnthalpyFD::convection(Scalar * conv) {
       }
 
       // dtdxp
-      if(Interface_old(+1,Comp::i(),i,j,k)) {
+      if(interface_old(Sign::pos(),Comp::i(),i,j,k)) {
         real dxp, ts;
-        dxp = max(epsl*dxe(i),distance_x(i,j,k,+1,ts,true));
+        dxp = distance_int_x_old(Sign::pos(),i,j,k,ts);
         dtdxp = (ts-phi[i][j][k])/dxp;
 #ifndef VERSION_STABLE
         upf = umf;
@@ -295,9 +295,9 @@ void EnthalpyFD::convection(Scalar * conv) {
       }
 
       // dtdym
-      if(Interface_old(-1,Comp::j(),i,j,k)) {
+      if(interface_old(Sign::neg(),Comp::j(),i,j,k)) {
         real dym, ts;
-        dym = max(epsl*dys(j),distance_y(i,j,k,-1,ts,true));
+        dym = distance_int_y_old(Sign::neg(),i,j,k,ts);
         dtdym = (phi[i][j][k]-ts)/dym;
 #ifndef VERSION_STABLE
         vmf = vpf;
@@ -311,9 +311,9 @@ void EnthalpyFD::convection(Scalar * conv) {
       }
 
       // dtdyp
-      if(Interface_old(+1,Comp::j(),i,j,k)) {
+      if(interface_old(Sign::pos(),Comp::j(),i,j,k)) {
         real dyp, ts;
-        dyp = max(epsl*dyn(j),distance_y(i,j,k,+1,ts,true));
+        dyp = distance_int_y_old(Sign::pos(),i,j,k,ts);
         dtdyp = (ts-phi[i][j][k])/dyp;
 #ifndef VERSION_STABLE
         vpf = vmf;
@@ -327,9 +327,9 @@ void EnthalpyFD::convection(Scalar * conv) {
       }
 
       // dtdzm
-      if(Interface_old(-1,Comp::k(),i,j,k)) {
+      if(interface_old(Sign::neg(),Comp::k(),i,j,k)) {
         real dzm, ts;
-        dzm = max(epsl*dzb(k),distance_z(i,j,k,-1,ts,true));
+        dzm = distance_int_z_old(Sign::neg(),i,j,k,ts);
         dtdzm = (phi[i][j][k]-ts)/dzm;
 #ifndef VERSION_STABLE
         wmf = wpf;
@@ -343,9 +343,9 @@ void EnthalpyFD::convection(Scalar * conv) {
       }
 
       // dtdzp
-      if(Interface_old(+1,Comp::k(),i,j,k)) {
+      if(interface_old(Sign::pos(),Comp::k(),i,j,k)) {
         real dzp, ts;
-        dzp = max(epsl*dzt(k),distance_z(i,j,k,+1,ts,true));
+        dzp = distance_int_z_old(Sign::pos(),i,j,k,ts);
         dtdzp = (ts-phi[i][j][k])/dzp;
 #ifndef VERSION_STABLE
         wpf = wmf;
@@ -399,7 +399,7 @@ void EnthalpyFD::convection(Scalar * conv) {
 
   for_ijk(i,j,k) {
     real r,c;
-    if(clrold[i][j][k]>=clrsurf){
+    if(topo->above_interface_old(i,j,k)) {
       c = cpl;
     } else {
       c = cpv;

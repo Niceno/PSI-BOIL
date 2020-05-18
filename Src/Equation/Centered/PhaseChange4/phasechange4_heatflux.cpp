@@ -36,8 +36,8 @@ void PhaseChange4::heat_flux(const Scalar * diff_eddy) {
   tzv.exchange_all();
 
 #if 0
-  boil::plot->plot(clr,txv,tyv,tzv,"clr-txv-tyv-tzv",time->current_step());
-  boil::plot->plot(clr,txl,tyl,tzl,"clr-txl-tyl-tzl",time->current_step());
+  boil::plot->plot(*(topo->clr),txv,tyv,tzv,"clr-txv-tyv-tzv",time->current_step());
+  boil::plot->plot(*(topo->clr),txl,tyl,tzl,"clr-txl-tyl-tzl",time->current_step());
   exit(0);
 #endif
 
@@ -72,9 +72,9 @@ void PhaseChange4::heat_flux(const Scalar * diff_eddy) {
   }
   
 #if 0
-  boil::plot->plot(clr,txv,tyv,tzv,"clr-txv-tyv-tzv",time->current_step());
-  boil::plot->plot(clr,txl,tyl,tzl,"clr-txl-tyl-tzl",time->current_step());
-  boil::plot->plot(clr,tnl,tnv,"clr-tnl-tnv",time->current_step());
+  boil::plot->plot(*(topo->clr),txv,tyv,tzv,"clr-txv-tyv-tzv",time->current_step());
+  boil::plot->plot(*(topo->clr),txl,tyl,tzl,"clr-txl-tyl-tzl",time->current_step());
+  boil::plot->plot(*(topo->clr),tnl,tnv,"clr-tnl-tnv",time->current_step());
   exit(0);
 #endif
 

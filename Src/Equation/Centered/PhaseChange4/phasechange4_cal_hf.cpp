@@ -21,7 +21,7 @@ void PhaseChange4::cal_hf(const Scalar * diff_eddy) {
       tzv[i][j][k] = tzl[i][j][k] = lmb*gtz;
     } else {
       /* vapor */
-      if(clr[i][j][k]<clrsurf) {
+      if(!topo->above_interface(i,j,k)) {
         txv[i][j][k] = lmb*gtx;
         tyv[i][j][k] = lmb*gty;
         tzv[i][j][k] = lmb*gtz;

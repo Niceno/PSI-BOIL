@@ -136,7 +136,7 @@ class PhaseChange4 : public Centered {
     Scalar tnv, tnl;
 
     Scalar tpr, tprs, vf, vfs;
-    Scalar clr,adens;
+    Scalar adens;
     Scalar nx;
     Scalar ny;
     Scalar nz;
@@ -148,9 +148,7 @@ class PhaseChange4 : public Centered {
     Topology * topo;
  
     real rhol, rhov, lambdal, lambdav, cpl, cpv;
-    real clrsurf;
     real turbP;
-    real epsl; 
     real smdot_pos, smdot_neg;
     
     bool use_second_order_accuracy, 

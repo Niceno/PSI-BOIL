@@ -14,7 +14,7 @@ void PhaseChange4::insert_bc_hf(const Scalar * diff_eddy) {
 
     if(tpr.bc().type(b) == BndType::dirichlet()) {
 
-      Dir d = clr.bc().direction(b);
+      Dir d = phi.bc().direction(b);
       if(d != Dir::undefined()) {
         Comp mcomp;
         int ofx(0), ofy(0), ofz(0);
@@ -67,7 +67,7 @@ void PhaseChange4::insert_bc_hf(const Scalar * diff_eddy) {
             if       (mcomp==Comp::i()) {
               dist = distance_int_x(sig,ii,jj,kk,ti);
               dist = distance_center(sig,mcomp,ii,jj,kk) - dist;
-              if(clr[ii][jj][kk]>=clrsurf) {
+              if(topo->above_interface(ii,jj,kk)) {
                 txv[ii][jj][kk] = lmb*(tw-ti)/dist * real(sig);
                 txv[i ][j ][k ] = lmb*(tw-ti)/dist * real(sig);
               } else {
@@ -77,7 +77,7 @@ void PhaseChange4::insert_bc_hf(const Scalar * diff_eddy) {
             } else if(mcomp==Comp::j()) {             
               dist = distance_int_y(sig,ii,jj,kk,ti);
               dist = distance_center(sig,mcomp,ii,jj,kk) - dist;
-              if(clr[ii][jj][kk]>=clrsurf) {
+              if(topo->above_interface(ii,jj,kk)) {
                 tyv[ii][jj][kk] = lmb*(tw-ti)/dist * real(sig);
                 tyv[i ][j ][k ] = lmb*(tw-ti)/dist * real(sig);
               } else {
@@ -87,7 +87,7 @@ void PhaseChange4::insert_bc_hf(const Scalar * diff_eddy) {
             } else {
               dist = distance_int_z(sig,ii,jj,kk,ti);
               dist = distance_center(sig,mcomp,ii,jj,kk) - dist;
-              if(clr[ii][jj][kk]>=clrsurf) {
+              if(topo->above_interface(ii,jj,kk)) {
                 tzv[ii][jj][kk] = lmb*(tw-ti)/dist * real(sig);
                 tzv[i ][j ][k ] = lmb*(tw-ti)/dist * real(sig);
               } else {

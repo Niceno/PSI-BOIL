@@ -44,7 +44,7 @@ void EnthalpyFD::diffusion_fd(const Scalar * diff_eddy) {
     +------------------------*/
     for_ijk(i,j,k){
       real lc, cp_mass;
-      if((*clr)[i][j][k]>=clrsurf){
+      if(topo->above_interface(i,j,k)) {
         lc = lambdal;
         cp_mass = cpl/rhol;
       } else {
@@ -58,18 +58,18 @@ void EnthalpyFD::diffusion_fd(const Scalar * diff_eddy) {
       const real pc = phi[i][j][k];
       real xm,xp,pm,pp,aflagm,aflagp;
       aflagm=aflagp=0.0;
-      if(!Interface(-1,Comp::i(),i,j,k)){
+      if(!interface(Sign::neg(),Comp::i(),i,j,k)){
         xm=phi.dxw(i);
         pm=phi[i-1][j][k];
       } else {
-        xm = std::max(epsl*phi.dxw(i),distance_x(i,j,k,-1,pm));
+        xm = distance_int_x(Sign::neg(),i,j,k,pm);
         aflagm=1.0;
       }
-      if(!Interface(+1,Comp::i(),i,j,k)){
+      if(!interface(Sign::pos(),Comp::i(),i,j,k)){
         xp=phi.dxe(i);
         pp=phi[i+1][j][k];
       } else {
-        xp = std::max(epsl*phi.dxe(i),distance_x(i,j,k,+1,pp));
+        xp = distance_int_x(Sign::pos(),i,j,k,pp);
         aflagp=1.0;
       }
       real cxm = coef_x_m(xm,xp,phi.xc(i));
@@ -91,7 +91,7 @@ void EnthalpyFD::diffusion_fd(const Scalar * diff_eddy) {
     +------------------------*/
     for_ijk(i,j,k){
       real lc,cp_mass;
-      if((*clr)[i][j][k]>=clrsurf){
+      if(topo->above_interface(i,j,k)) {
         lc = lambdal;
         cp_mass = cpl/rhol;
       } else {
@@ -105,18 +105,18 @@ void EnthalpyFD::diffusion_fd(const Scalar * diff_eddy) {
       const real pc = phi[i][j][k];
       real ym,yp,pm,pp,aflagm,aflagp;
       aflagm=aflagp=0.0;
-      if(!Interface(-1,Comp::j(),i,j,k)){
+      if(!interface(Sign::neg(),Comp::j(),i,j,k)){
         ym=phi.dys(j);
         pm=phi[i][j-1][k];
       } else {
-        ym = std::max(epsl*phi.dys(j),distance_y(i,j,k,-1,pm));
+        ym = distance_int_y(Sign::neg(),i,j,k,pm);
         aflagm=1.0;
       }
-      if(!Interface(+1,Comp::j(),i,j,k)){
+      if(!interface(Sign::pos(),Comp::j(),i,j,k)){
         yp=phi.dyn(j);
         pp=phi[i][j+1][k];
       } else {
-        yp = std::max(epsl*phi.dyn(j),distance_y(i,j,k,+1,pp));
+        yp = distance_int_y(Sign::pos(),i,j,k,pp);
         aflagp=1.0;
       }
       real cym = coef_y_m(ym,yp,phi.yc(j));
@@ -137,7 +137,7 @@ void EnthalpyFD::diffusion_fd(const Scalar * diff_eddy) {
     +------------------------*/
     for_ijk(i,j,k){
       real lc,cp_mass;
-      if((*clr)[i][j][k]>=clrsurf){
+      if(topo->above_interface(i,j,k)) {
         lc = lambdal;
         cp_mass = cpl/rhol;
       } else {
@@ -151,18 +151,18 @@ void EnthalpyFD::diffusion_fd(const Scalar * diff_eddy) {
       const real pc = phi[i][j][k];
       real zm,zp,pm,pp,aflagm,aflagp;
       aflagm=aflagp=0.0;
-      if(!Interface(-1,Comp::k(),i,j,k)){
+      if(!interface(Sign::neg(),Comp::k(),i,j,k)){
         zm=phi.dzb(k);
         pm=phi[i][j][k-1];
       } else {
-        zm = std::max(epsl*phi.dzb(k),distance_z(i,j,k,-1,pm));
+        zm = distance_int_z(Sign::neg(),i,j,k,pm);
         aflagm=1.0;
       }
-      if(!Interface(+1,Comp::k(),i,j,k)){
+      if(!interface(Sign::pos(),Comp::k(),i,j,k)){
         zp=phi.dzt(k);
         pp=phi[i][j][k+1];
       } else {
-        zp = std::max(epsl*phi.dzt(k),distance_z(i,j,k,+1,pp));
+        zp = distance_int_z(Sign::pos(),i,j,k,pp);
         aflagp=1.0;
       }
       real czm = coef_z_m(zm,zp,phi.zc(k));

@@ -12,7 +12,7 @@
 class Clapeyron : public TIF {
   public:
     Clapeyron(const real tref,
-              const Topology * topo,
+              Topology * topo,
               const Scalar & eps,
               const real mv,
               const real latent,

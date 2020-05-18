@@ -7,7 +7,7 @@
 ******************************************************************************/
 void Schrage::mass_src_effect() {
   for_vijk(tif,i,j,k) {
-    if(Interface(i,j,k)) {
+    if(topo->interface(i,j,k)) {
       tif[i][j][k] += mflx[i][j][k]*mresis;
     }
   }

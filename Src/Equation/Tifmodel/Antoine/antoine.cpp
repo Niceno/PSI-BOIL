@@ -4,7 +4,7 @@
 *  Constructors
 *******************************************************************************/
 Antoine::Antoine(const real Tref, 
-                 const Topology * TOPO,
+                 Topology * TOPO,
                  const Scalar & EPS,
                  const real a,
                  const real b,
@@ -12,8 +12,6 @@ Antoine::Antoine(const real Tref,
   TIF(Tref,TOPO),
   eps(&EPS)
 {
-  adens = TOPO->adens;
-
   A = a;
   B = b;
   C = c;

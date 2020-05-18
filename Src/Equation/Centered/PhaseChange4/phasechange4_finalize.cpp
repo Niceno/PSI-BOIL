@@ -5,13 +5,13 @@
 void PhaseChange4::finalize() {
 
 #ifdef DEBUG
-  boil::plot->plot(clr, tpr, phi, "clr-tpr-m",  time->current_step());
+  boil::plot->plot(*(topo->clr), tpr, phi, "clr-tpr-m",  time->current_step());
 #endif
 
   /* calculate mdot */
   mdot();
 #ifdef DEBUG
-  boil::plot->plot(clr, tpr, phi, "clr-tpr-mdot",  time->current_step());
+  boil::plot->plot(*(topo->clr), tpr, phi, "clr-tpr-mdot",  time->current_step());
 #endif
 
   /* calculate source terms */
@@ -23,7 +23,7 @@ void PhaseChange4::finalize() {
             <<" smdot_neg= "<<smdot_neg<<"\n";
 
 #ifdef DEBUG
-  boil::plot->plot(clr, tprs, vfs, "clr-tprs-vfs",  time->current_step());
+  boil::plot->plot(*(topo->clr), tprs, vfs, "clr-tprs-vfs",  time->current_step());
   std::cout<<"pc.update:end "<<boil::cart.iam()<<"\n";
   exit(0);
 #endif

@@ -16,7 +16,7 @@
 class TIF {
   public:
     TIF(const real tref); 
-    TIF(const real tref, const Topology * topo); 
+    TIF(const real tref, Topology * topo); 
     ~TIF() {}
 
     void init() {
@@ -65,14 +65,13 @@ class TIF {
     bool store_tif,variable_tif;
     real tr;
 
-    const Scalar * adens;
+    Topology * topo;
     ScalarInt iflag, tempflag, tempflag2;
     Scalar stmp;
 
     virtual void model() {};
     void extend_tint();
 
-    bool Interface(const int i, const int j, const int k);
     inline real underrelaxation(const real tintnew, const real tifold);
 };
 

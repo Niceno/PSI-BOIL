@@ -19,7 +19,8 @@ class Topology {
   public:
     Topology(Scalar * VF, Scalar * CLR,
              Scalar * NX, Scalar * NY, Scalar * NZ, 
-             Scalar * ADENS, Vector * FS, ScalarInt * IFLAG);
+             Scalar * ADENS, Vector * FS, ScalarInt * IFLAG,
+             const real clrsurf);
     
     ~Topology() {};
 
@@ -67,6 +68,33 @@ class Topology {
     Sign distance1D_int_z(const int i, const int j, const int k,
                           const Sign dir, real & dist) const;
 
+    /* old distance to interface */
+    real distance_int_old(const Sign dir, const Comp & m,
+                          const int i, const int j, const int k,
+                          Sign & cell_marker) const;
+
+    real distance_int_x_old(const Sign dir,
+                            const int i, const int j, const int k,
+                            Sign & cell_marker) const;
+    real distance_int_y_old(const Sign dir,
+                            const int i, const int j, const int k,
+                            Sign & cell_marker) const;
+    real distance_int_z_old(const Sign dir,
+                            const int i, const int j, const int k,
+                            Sign & cell_marker) const;
+
+    Sign distance1D_int_x_old(const int i, const int j, const int k,
+                              const Sign dir, real & dist) const;
+    Sign distance1D_int_y_old(const int i, const int j, const int k,
+                              const Sign dir, real & dist) const;
+    Sign distance1D_int_z_old(const int i, const int j, const int k,
+                              const Sign dir, real & dist) const;
+
+    inline bool above_interface(const int i, const int j, const int k)
+      const { return (*clr)[i][j][k]>=clrsurf; }
+    inline bool above_interface_old(const int i, const int j, const int k)
+      const { return clrold[i][j][k]>=clrsurf; }
+
     /* current variables */
     Scalar * vf;
     Scalar * clr;
@@ -84,7 +112,8 @@ class Topology {
 
   private:
     int mmax_ext;
-    real tol_ext;
+    real tol_ext, close_to_cc;
+    real clrsurf;
     
     ScalarInt stmp;
     Scalar delta, stmp2;

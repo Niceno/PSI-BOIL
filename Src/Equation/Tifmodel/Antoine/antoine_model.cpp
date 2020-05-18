@@ -6,7 +6,7 @@
 void Antoine::model() {
   for_vijk(tif,i,j,k) {
     tif[i][j][k] = tr;
-    if(Interface(i,j,k)) {
+    if(topo->interface(i,j,k)) {
       tif[i][j][k] = value(i,j,k);
     }
   }

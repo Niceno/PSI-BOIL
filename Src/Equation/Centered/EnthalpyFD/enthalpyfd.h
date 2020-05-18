@@ -135,19 +135,16 @@ class EnthalpyFD : public Centered {
                 , const real edm, const real edc, const real edp
                 , const int i, const int j, const int k, const Comp m);
 
-    const Scalar * clr;
-    real rhol,rhov,cpl,cpv,lambdal,lambdav,clrsurf,epsl;
-    bool store_clrold;
-    Scalar clrold;
+    real rhol,rhov,cpl,cpv,lambdal,lambdav,epsl;
     Scalar ftif,ftifold; /* tbr */
     ScalarInt iflag,iflagold;
     real turbP; /* turbulent Prandtl number */
     bool laminar;
 
-    Vector fs, fsold;
     const Vector * uliq, * ugas;
 
     TIF & tifmodel;  
+    Topology * topo;
 
     virtual real coef_x_m(const real dxm, const real dxp, const real x0);
     virtual real coef_x_p(const real dxm, const real dxp, const real x0);
@@ -156,9 +153,9 @@ class EnthalpyFD : public Centered {
     virtual real coef_z_m(const real dxm, const real dxp, const real x0);
     virtual real coef_z_p(const real dxm, const real dxp, const real x0);
 
-    bool Interface(const int dir, const Comp m,
+    bool interface(const Sign dir, const Comp m,
                    const int i, const int j, const int k);
-    bool Interface_old(const int dir, const Comp m,
+    bool interface_old(const Sign dir, const Comp m,
                        const int i, const int j, const int k);
 
     real Tint(const int dir, const Comp &mcomp, const real frac,
@@ -168,27 +165,33 @@ class EnthalpyFD : public Centered {
     real Tint(const int i, const int j, const int k);
     real Tint_old(const int i, const int j, const int k);
 
-    real distance_x(const int i, const int j, const int k,
-                    const int dir, real & tint,
-                    const bool old = false);
-    real distance_y(const int i, const int j, const int k,
-                    const int dir, real & tint,
-                    const bool old = false);
-    real distance_z(const int i, const int j, const int k,
-                    const int dir, real & tint,
-                    const bool old = false);
-    bool distance1D_x(const int i, const int j, const int k,
-                      const int dir, real & tint, real & dist);
-    bool distance1D_y(const int i, const int j, const int k,
-                      const int dir, real & tint, real & dist);
-    bool distance1D_z(const int i, const int j, const int k,
-                      const int dir, real & tint, real & dist);
-    bool distance1D_xold(const int i, const int j, const int k,
-                         const int dir, real & tint, real & dist);
-    bool distance1D_yold(const int i, const int j, const int k,
-                         const int dir, real & tint, real & dist);
-    bool distance1D_zold(const int i, const int j, const int k,
-                         const int dir, real & tint, real & dist);
+    /* new distances */
+    real distance_int(const Sign dir, const Comp & m,
+                      const int i, const int j, const int k,
+                      real & tint);
+    real distance_int_x(const Sign dir,
+                        const int i, const int j, const int k,
+                        real & tint);
+    real distance_int_y(const Sign dir,
+                        const int i, const int j, const int k,
+                        real & tint);
+    real distance_int_z(const Sign dir,
+                        const int i, const int j, const int k,
+                        real & tint);
+
+    /* old distances */
+    real distance_int_old(const Sign dir, const Comp & m,
+                          const int i, const int j, const int k,
+                          real & tint);
+    real distance_int_x_old(const Sign dir,
+                            const int i, const int j, const int k,
+                            real & tint);
+    real distance_int_y_old(const Sign dir,
+                            const int i, const int j, const int k,
+                            real & tint);
+    real distance_int_z_old(const Sign dir,
+                            const int i, const int j, const int k,
+                            real & tint);
 
     real temperature_node(real len_s, real lam_s, real tmp_s
                         , real len_f, real lam_f, real tmp_f);

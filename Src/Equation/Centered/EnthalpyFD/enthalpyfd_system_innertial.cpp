@@ -16,7 +16,7 @@ void EnthalpyFD::create_system_innertial() {
 
     for_ijk(i,j,k){
       real r,c;
-      if((*clr)[i][j][k]>=clrsurf){
+      if(topo->above_interface(i,j,k)) {
         c = cpl;
       } else {
         c = cpv;
@@ -30,7 +30,7 @@ void EnthalpyFD::create_system_innertial() {
     for_ijk(i,j,k) {
       const real fV = dom->ibody().fV(i,j,k); /* fraction in fluid */
       real c=cpl;
-      if((*clr)[i][j][k]<clrsurf){
+      if(!topo->above_interface(i,j,k)) {
         c = cpv;
       }
 

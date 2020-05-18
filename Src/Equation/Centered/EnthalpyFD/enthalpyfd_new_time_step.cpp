@@ -8,9 +8,8 @@
 *
 *  Old convective and old diffusive terms are added by calling: 
 *  \code convection(&cold) \endcode and \code diffusion() \endcode 
-*  respectivelly.
+*  respectively.
 *
-*  clrold: color function in previous time step
 *******************************************************************************/
 void EnthalpyFD::new_time_step(const Scalar * diff_eddy) {
 
@@ -32,21 +31,6 @@ void EnthalpyFD::new_time_step(const Scalar * diff_eddy) {
     exit(0);
   }
 
-  /* initial time step or restart */
-  if(!store_clrold){
-    boil::oout<<"EnthalpyFD::new_time_step()  initialize clrold"<<"\n";
-    for_aijk(i,j,k){
-      clrold[i][j][k] = (*clr)[i][j][k];
-    }
-    for_aijk(i,j,k){
-      iflagold[i][j][k] = iflag[i][j][k];
-    }
-    for_m(m)
-      for_avmijk(fsold,m,i,j,k)
-        fsold[m][i][j][k] = fs[m][i][j][k];
-    store_clrold = true;
-  }
-
   /*---------------------------+
   |  fold = rho * cp * T / dt  |
   +---------------------------*/
@@ -57,7 +41,7 @@ void EnthalpyFD::new_time_step(const Scalar * diff_eddy) {
   if( !solid() ) 
     for_ijk(i,j,k) {
       real c,r;
-      if (clrold[i][j][k]>=clrsurf) {
+      if(topo->above_interface_old(i,j,k)) {
         c = cpl;
       } else {
         c = cpv;
@@ -70,7 +54,7 @@ void EnthalpyFD::new_time_step(const Scalar * diff_eddy) {
       const real fV = dom->ibody().fV(i,j,k);
       const real cs = solid()->cp (i,j,k);
       real cf = cpl;
-      if(clrold[i][j][k]<clrsurf){
+      if(!topo->above_interface_old(i,j,k)) {
         cf = cpv;
       }
 
@@ -92,7 +76,7 @@ void EnthalpyFD::new_time_step(const Scalar * diff_eddy) {
   for_ijk(i,j,k){
     if(dom->ibody().on(i,j,k)){
       real c;
-      if(clrold[i][j][k]>=clrsurf){
+      if(topo->above_interface_old(i,j,k)) {
         c = cpl;
       } else {
         c = cpv;
@@ -100,8 +84,8 @@ void EnthalpyFD::new_time_step(const Scalar * diff_eddy) {
       real t_new = fold[i][j][k] / (c * dV(i,j,k)) / dti;
 
 #if 1
-      /* phase change */
-      if( ((*clr)[i][j][k]-clrsurf)*(clrold[i][j][k]-clrsurf) < 0.0){
+      /* phase change: xor indicates change of phase */
+      if(topo->above_interface_old(i,j,k) ^ topo->above_interface(i,j,k)) {
         if( (phi[i][j][k]-tifmodel.Tint(i,j,k))*(t_new-tifmodel.Tint(i,j,k))<=0.0 ){
           t_new = tifmodel.Tint(i,j,k);     /* crude code */
         }
@@ -116,7 +100,7 @@ void EnthalpyFD::new_time_step(const Scalar * diff_eddy) {
 #endif
 
       phi [i][j][k] = t_new;
-      if((*clr)[i][j][k]>=clrsurf){
+      if(topo->above_interface(i,j,k)) {
         c = cpl;
       } else {
         c = cpv;
@@ -126,17 +110,6 @@ void EnthalpyFD::new_time_step(const Scalar * diff_eddy) {
   }
   phi.bnd_update();
   phi.exchange();
-
-  /* store clrold */
-  for_aijk(i,j,k){
-    clrold[i][j][k] = (*clr)[i][j][k];
-  }
-  for_aijk(i,j,k){
-    iflagold[i][j][k] = iflag[i][j][k];
-  }
-  for_m(m)
-    for_avmijk(fsold,m,i,j,k)
-      fsold[m][i][j][k] = fs[m][i][j][k];
 
   /*---------------------------------------+
   |  fold = fold + D                       |

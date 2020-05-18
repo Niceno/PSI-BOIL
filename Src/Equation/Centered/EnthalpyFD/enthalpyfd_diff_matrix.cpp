@@ -96,18 +96,13 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
 #endif
     } else if(onm && ofp){
       /* f-s-s */
-      if(Interface(-1,m,i,j,k)) {
+      if(interface(Sign::neg(),m,i,j,k)) {
         /* removed from system matrix */
         aflagm = 0.0;
         /* dxm,fdm are corrected to account for interface position */
         /* tm is changed to the saturation temperature */
         fdm *= dxm;
-        if(m==Comp::i()) 
-          dxm = std::max(epsl*dxm,distance_x(i,j,k,-1,tm));
-        else if(m==Comp::j())
-          dxm = std::max(epsl*dxm,distance_y(i,j,k,-1,tm));
-        else
-          dxm = std::max(epsl*dxm,distance_z(i,j,k,-1,tm));
+        dxm = distance_int(Sign::neg(),m,i,j,k,tm);
         fdm /= dxm; 
         fdm = max(fdm,epsl);
         /* dxm is corrected */
@@ -140,18 +135,13 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
 #endif
     } else if(ofm && onp){
       /* s-s-f */
-      if(Interface(+1,m,i,j,k)) {
+      if(interface(Sign::pos(),m,i,j,k)) {
         /* removed from system matrix */
         aflagp = 0.0;
         /* dxp,fdp are corrected to account for interface position */
         /* tp is changed to the saturation temperature */
         fdp *= dxp;
-        if(m==Comp::i()) 
-          dxp = std::max(epsl*dxp,distance_x(i,j,k,+1,tp));
-        else if(m==Comp::j())
-          dxp = std::max(epsl*dxp,distance_y(i,j,k,+1,tp));
-        else
-          dxp = std::max(epsl*dxp,distance_z(i,j,k,+1,tp));
+        dxp = distance_int(Sign::pos(),m,i,j,k,tp);
         fdp /= dxp; 
         fdp = max(fdp,epsl);
         /* dxp is corrected */
@@ -199,29 +189,19 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
 
     if(onm && onp){
       /* f-f-f */
-      if(!Interface(-1,m,i,j,k)){
+      if(!interface(Sign::neg(),m,i,j,k)){
         dxm=dxm;
       } else {
-        if(m==Comp::i())
-          dxm = std::max(epsl*dxm,distance_x(i,j,k,-1,tm));
-        else if(m==Comp::j())
-          dxm = std::max(epsl*dxm,distance_y(i,j,k,-1,tm));
-        else
-          dxm = std::max(epsl*dxm,distance_z(i,j,k,-1,tm));
+        dxm = distance_int(Sign::neg(),m,i,j,k,tm);
         aflagm=0.0;
 #ifdef DEBUG
 	std::cout<<"aflagm=0.0: " <<i<<" "<<j<<" "<<k<<" "<<clc<<"\n";
 #endif
       }
-      if(!Interface(+1,m,i,j,k)){
+      if(!interface(Sign::pos(),m,i,j,k)){
         dxp=dxp;
       } else {
-        if(m==Comp::i())
-          dxp = std::max(epsl*dxp,distance_x(i,j,k,+1,tp));
-        else if(m==Comp::j())
-          dxp = std::max(epsl*dxp,distance_y(i,j,k,+1,tp));
-        else
-          dxp = std::max(epsl*dxp,distance_z(i,j,k,+1,tp));
+        dxp = distance_int(Sign::pos(),m,i,j,k,tp);
         aflagp=0.0;
 #ifdef DEBUG
 	std::cout<<"aflagp=0.0: " <<i<<" "<<j<<" "<<k<<" "<<clc<<"\n";
@@ -251,28 +231,18 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
 #endif
     } else if(ofm && onp){ 
       /* s-f-f */
-      if(!Interface(+1,m,i,j,k)){
+      if(!interface(Sign::pos(),m,i,j,k)){
         dxp=dxp;
       } else {
-        if(m==Comp::i())
-          dxp = std::max(epsl*dxp,distance_x(i,j,k,+1,tp));
-        else if(m==Comp::j())
-          dxp = std::max(epsl*dxp,distance_y(i,j,k,+1,tp));
-        else
-          dxp = std::max(epsl*dxp,distance_z(i,j,k,+1,tp));
+        dxp = distance_int(Sign::pos(),m,i,j,k,tp);
         aflagp=0.0;
       }
-      if(Interface(-1,m,i,j,k)) {
+      if(interface(Sign::neg(),m,i,j,k)) {
         /* removed from system matrix */
         aflagm = 0.0;
         /* dxm is corrected to account for interface position */
         /* tm is changed to the saturation temperature */
-        if(m==Comp::i()) 
-          dxm = std::max(epsl*dxm,distance_x(i,j,k,-1,tm));
-        else if(m==Comp::j())
-          dxm = std::max(epsl*dxm,distance_y(i,j,k,-1,tm));
-        else
-          dxm = std::max(epsl*dxm,distance_z(i,j,k,-1,tm));
+        dxm = distance_int(Sign::neg(),m,i,j,k,tm);
         /* FDM */
         am = lc * vol * (this->*coef_m)(dxm,dxp,x0);
         ap = lc * vol * (this->*coef_p)(dxm,dxp,x0);
@@ -307,28 +277,18 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
 #endif
     } else if(onm && ofp){
       /* f-f-s */
-      if(!Interface(-1,m,i,j,k)){
+      if(!interface(Sign::neg(),m,i,j,k)){
         dxm=dxm;
       } else {
-        if(m==Comp::i())
-          dxm = std::max(epsl*dxm,distance_x(i,j,k,-1,tm));
-        else if(m==Comp::j())
-          dxm = std::max(epsl*dxm,distance_y(i,j,k,-1,tm));
-        else
-          dxm = std::max(epsl*dxm,distance_z(i,j,k,-1,tm));
+        dxm = distance_int(Sign::neg(),m,i,j,k,tm);
         aflagm=0.0;
       }
-      if(Interface(+1,m,i,j,k)) {
+      if(interface(Sign::pos(),m,i,j,k)) {
         /* removed from system matrix */
         aflagp = 0.0;
         /* dxp is corrected to account for interface position */
         /* tp is changed to the saturation temperature */
-        if(m==Comp::i())
-          dxp = std::max(epsl*dxp,distance_x(i,j,k,+1,tp));
-        else if(m==Comp::j())
-          dxp = std::max(epsl*dxp,distance_y(i,j,k,+1,tp));
-        else
-          dxp = std::max(epsl*dxp,distance_z(i,j,k,+1,tp));
+        dxp = distance_int(Sign::pos(),m,i,j,k,tp);
         /* FDM */
         am = lc * vol * (this->*coef_m)(dxm,dxp,x0);
         ap = lc * vol * (this->*coef_p)(dxm,dxp,x0);

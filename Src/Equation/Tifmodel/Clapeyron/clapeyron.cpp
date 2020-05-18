@@ -4,7 +4,7 @@
 *  Constructors
 *******************************************************************************/
 Clapeyron::Clapeyron(const real Tref, 
-                     const Topology * TOPO,
+                     Topology * TOPO,
                      const Scalar & EPS,
                      /* the following should be changed later on to matter */
                      const real MM,
@@ -13,8 +13,6 @@ Clapeyron::Clapeyron(const real Tref,
   TIF(Tref,TOPO),
   eps(&EPS)
 {
-  adens = TOPO->adens;
-
   latent_cst = LATENT;
   latent_slp = LATENT_SLP;
   Rm = boil::R/MM;

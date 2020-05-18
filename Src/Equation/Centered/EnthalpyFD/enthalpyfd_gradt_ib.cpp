@@ -22,7 +22,7 @@ real EnthalpyFD::gradt_ib(const int dir, const Comp & mcomp,
   tmp_f = phi[i][j][k];
 
   /* assuming zero eddy viscosity in the boundary cell...*/
-  if((*clr)[i][j][k]>=clrsurf){
+  if(topo->above_interface(i,j,k)) {
     lam_f = lambdal;
   } else {
     lam_f = lambdav;

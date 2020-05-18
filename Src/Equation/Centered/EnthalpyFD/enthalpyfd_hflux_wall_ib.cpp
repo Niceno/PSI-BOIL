@@ -23,7 +23,7 @@ real EnthalpyFD::hflux_wall_ib(const Scalar * diff_eddy) {
 
     tf = phi[i][j][k];
     real cp_mass;
-    if ((*clr)[i][j][k]<clrsurf) {
+    if(!topo->above_interface(i,j,k)) {
       lf = lambdav;
       cp_mass = cpv/rhov;
     } else {
@@ -43,10 +43,10 @@ real EnthalpyFD::hflux_wall_ib(const Scalar * diff_eddy) {
       real dxs = (1.0-fd)*phi.dxw(i);
       real dxf = fd*phi.dxw(i);
       area = phi.dSx(Sign::neg(),i,j,k);
-      if(Interface(-1,Comp::i(),i,j,k)) {
-        dxf = 0.5*phi.dxc(i) - distance_x(i,j,k,-1,tf);
+      if(interface(Sign::neg(),Comp::i(),i,j,k)) {
+        dxf = 0.5*phi.dxc(i) - distance_int_x(Sign::neg(),i,j,k,tf);
         /* inversion of lambda */
-        if((*clr)[i][j][k]<clrsurf) {
+        if(!topo->above_interface(i,j,k)) {
           lf = lambdal;
           cp_mass = cpl/rhol;
         } else {
@@ -70,10 +70,10 @@ real EnthalpyFD::hflux_wall_ib(const Scalar * diff_eddy) {
       real dxs = (1.0-fd)*phi.dxe(i);
       real dxf = fd*phi.dxe(i);
       area = phi.dSx(Sign::pos(),i,j,k);
-      if(Interface(+1,Comp::i(),i,j,k)) {
-        dxf = 0.5*phi.dxc(i) - distance_x(i,j,k,+1,tf);
+      if(interface(Sign::pos(),Comp::i(),i,j,k)) {
+        dxf = 0.5*phi.dxc(i) - distance_int_x(Sign::pos(),i,j,k,tf);
         /* inversion of lambda */
-        if((*clr)[i][j][k]<clrsurf) {
+        if(!topo->above_interface(i,j,k)) {
           lf = lambdal;
           cp_mass = cpl/rhol;
         } else {
@@ -97,10 +97,10 @@ real EnthalpyFD::hflux_wall_ib(const Scalar * diff_eddy) {
       real dys = (1.0-fd)*phi.dys(j);
       real dyf = fd*phi.dys(j);
       area = phi.dSy(Sign::neg(),i,j,k);
-      if(Interface(-1,Comp::j(),i,j,k)) {
-        dyf = 0.5*phi.dyc(j) - distance_y(i,j,k,-1,tf);
+      if(interface(Sign::neg(),Comp::j(),i,j,k)) {
+        dyf = 0.5*phi.dyc(j) - distance_int_y(Sign::neg(),i,j,k,tf);
         /* inversion of lambda */
-        if((*clr)[i][j][k]<clrsurf) {
+        if(!topo->above_interface(i,j,k)) {
           lf = lambdal;
           cp_mass = cpl/rhol;
         } else {
@@ -124,10 +124,10 @@ real EnthalpyFD::hflux_wall_ib(const Scalar * diff_eddy) {
       real dys = (1.0-fd)*phi.dyn(j);
       real dyf = fd*phi.dyn(j);
       area = phi.dSy(Sign::pos(),i,j,k);
-      if(Interface(+1,Comp::j(),i,j,k)) {
-        dyf = 0.5*phi.dyc(j) - distance_y(i,j,k,+1,tf);
+      if(interface(Sign::pos(),Comp::j(),i,j,k)) {
+        dyf = 0.5*phi.dyc(j) - distance_int_y(Sign::pos(),i,j,k,tf);
         /* inversion of lambda */
-        if((*clr)[i][j][k]<clrsurf) {
+        if(!topo->above_interface(i,j,k)) {
           lf = lambdal;
           cp_mass = cpl/rhol;
         } else {
@@ -151,10 +151,10 @@ real EnthalpyFD::hflux_wall_ib(const Scalar * diff_eddy) {
       real dzs = (1.0-fd)*phi.dzb(k);
       real dzf = fd*phi.dzb(k);
       area = phi.dSz(Sign::neg(),i,j,k);
-      if(Interface(-1,Comp::k(),i,j,k)) {
-        dzf = 0.5*phi.dzc(k) - distance_z(i,j,k,-1,tf);
+      if(interface(Sign::neg(),Comp::k(),i,j,k)) {
+        dzf = 0.5*phi.dzc(k) - distance_int_z(Sign::neg(),i,j,k,tf);
         /* inversion of lambda */
-        if((*clr)[i][j][k]<clrsurf) {
+        if(!topo->above_interface(i,j,k)) {
           lf = lambdal;
           cp_mass = cpl/rhol;
         } else {
@@ -178,10 +178,10 @@ real EnthalpyFD::hflux_wall_ib(const Scalar * diff_eddy) {
       real dzs = (1.0-fd)*phi.dzt(k);
       real dzf = fd*phi.dzt(k);
       area = phi.dSz(Sign::pos(),i,j,k);
-      if(Interface(+1,Comp::k(),i,j,k)) {
-        dzf = 0.5*phi.dzc(k) - distance_z(i,j,k,+1,tf);
+      if(interface(Sign::pos(),Comp::k(),i,j,k)) {
+        dzf = 0.5*phi.dzc(k) - distance_int_z(Sign::pos(),i,j,k,tf);
         /* inversion of lambda */
-        if((*clr)[i][j][k]<clrsurf) {
+        if(!topo->above_interface(i,j,k)) {
           lf = lambdal;
           cp_mass = cpl/rhol;
         } else {

@@ -7,7 +7,7 @@ real PhaseChange4::lambda(const int i, const int j, const int k,
   if(dom->ibody().off(i,j,k)) {
     lam = solid()->lambda(i,j,k);
   } else {
-    if(clr[i][j][k]<clrsurf) {
+    if(!topo->above_interface(i,j,k)) {
       lam=lambdav;
       if(diff_eddy) lam += (*diff_eddy)[i][j][k]*cpv/rhov/turbP;
     } else {
@@ -27,7 +27,7 @@ real PhaseChange4::lambda_inv(const int i, const int j, const int k,
     lam = solid()->lambda(i,j,k);
   } else {
     /* note the inversion! */
-    if(clr[i][j][k]<clrsurf) {
+    if(!topo->above_interface(i,j,k)) {
       lam=lambdal;
       if(diff_eddy) lam += (*diff_eddy)[i][j][k]*cpl/rhol/turbP;
     } else {

@@ -2,7 +2,8 @@
 
 Topology::Topology(Scalar * VF, Scalar * CLR,
                    Scalar * NX, Scalar * NY, Scalar * NZ, 
-                   Scalar * ADENS, Vector * FS, ScalarInt * IFLAG) :
+                   Scalar * ADENS, Vector * FS, ScalarInt * IFLAG,
+                   const real CLRSURF) :
   vf(VF),
   clr(CLR),
   nx(NX),
@@ -17,7 +18,8 @@ Topology::Topology(Scalar * VF, Scalar * CLR,
   iflagold(*IFLAG->domain()),
   clrold(*CLR->domain()), 
   vfold(*VF->domain()),
-  fsold(*FS->domain()) {
+  fsold(*FS->domain()),
+  clrsurf(CLRSURF) {
 
   stmp  = NX->shape();
   stmp2 = NX->shape();
@@ -32,4 +34,5 @@ Topology::Topology(Scalar * VF, Scalar * CLR,
 
   mmax_ext = 100;
   tol_ext = 1e-7; 
+  close_to_cc = 1.0e-2;
 }

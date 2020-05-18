@@ -13,7 +13,7 @@ class Schrage : public TIF {
   public:
     Schrage(const real tref, 
             Matter * flu,
-            const Topology * topo,
+            Topology * topo,
             const Scalar & mflx,
             const Scalar * pres = NULL);
     ~Schrage() {}

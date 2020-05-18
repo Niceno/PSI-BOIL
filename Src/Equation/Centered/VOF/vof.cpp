@@ -62,7 +62,8 @@ VOF::VOF(const Scalar & PHI,
   tempflag  = phi.shape();
   tempflag2 = phi.shape();
   
-  topo = new Topology(&phi,&color(),&mx,&my,&mz,&adens,&fs,&iflag);
+  phisurf=0.5;
+  topo = new Topology(&phi,&color(),&mx,&my,&mz,&adens,&fs,&iflag,phisurf);
 
   /* dangerous: needs to be overridden in derived class!!! */
   topo->clr = &color();
@@ -137,7 +138,6 @@ VOF::VOF(const Scalar & PHI,
   ww=1.0*dxmin;
 
   epsnorm=1.0e-12;
-  phisurf=0.5;
   tol_wall = 0.01; /* tolerance 0.99 \approx 1.0 near walls */
   cangle=90.0/180.0*boil::pi;
   mult_wall = 1.;

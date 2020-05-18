@@ -21,7 +21,6 @@ PhaseChange4::PhaseChange4(const Scalar & MDOT,
   Centered( MDOT.domain(), MDOT, VS, & U, T, f, s, NULL ),
   tpr(&TPR),
   tprs(&TPRS),
-  clr(TOPO->clr),
   vf(&VF),
   vfs(&VFS),
   M(&MFLX),
@@ -82,12 +81,7 @@ PhaseChange4::PhaseChange4(const Scalar & MDOT,
   cpv = fluid()->cp(0);
 
   /* set constants */
-  clrsurf = 0.5;
   turbP = 0.9;
-
-  /* this should be consistent with enthalpy class */
-  //epsl = 5.0e-2;
-  epsl = 1.0e-2;
 
   /* flags */
   use_second_order_accuracy = true;

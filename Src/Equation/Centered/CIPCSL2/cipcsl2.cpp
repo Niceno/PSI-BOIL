@@ -61,9 +61,6 @@ CIPCSL2::CIPCSL2(const Scalar & PHI,
   }
   assert(PHI.domain() == F.domain());
 
-  /* runtime polymorphism */
-  heavi = new MarchingCubes(&phi,NULL,&adens);
-  topo = new Topology(&phi,&phi,&nx,&ny,&nz,&adens,&fs,&intflag);
 
   /* set constants */
   pi = acos(-1.0);
@@ -73,6 +70,10 @@ CIPCSL2::CIPCSL2(const Scalar & PHI,
   dxmin = dom->dxyz_min();
   ww=1.0*dxmin; // default value for ww
   tol_wall = 0.01;
+
+  /* runtime polymorphism */
+  heavi = new MarchingCubes(&phi,NULL,&adens);
+  topo = new Topology(&phi,&phi,&nx,&ny,&nz,&adens,&fs,&intflag,phisurf);
 
   epsnorm=1.0e-12;
   eps_clr = 1.0e-4; // epsilon for color function

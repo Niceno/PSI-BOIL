@@ -12,20 +12,18 @@ EnthalpyFD::EnthalpyFD(const Scalar & PHI,
                        Times & T,
                        Linear * S,
                        Matter * f,
-                       Topology * topo,
+                       Topology * TOPO,
                        TIF & tintmodel,
                        Matter * s) :
 /*---------------------+ 
 |  initialize parent   |
 +---------------------*/
   Centered( PHI.domain(), PHI, F, & U, T, f, s, S ),
-  clrold (  *PHI.domain()),
   ftif   (  *PHI.domain()),
   ftifold(  *PHI.domain()),
-  fs(topo->fs),
-  iflag(topo->iflag),
-  iflagold  (*PHI  .domain()),
-  fsold(  *U  .domain()),
+  topo(TOPO),
+  iflag(TOPO->iflag),
+  iflagold(&(TOPO->iflagold)),
   uliq(&Uliq),
   ugas(&Ugas),
   tifmodel(tintmodel)
@@ -36,14 +34,9 @@ EnthalpyFD::EnthalpyFD(const Scalar & PHI,
   cpv  = fluid()->cp(0),
   lambdal = fluid()->lambda(1),
   lambdav = fluid()->lambda(0),
-  clr = topo->clr;
-  clrsurf = 0.5;
-  clrold = (*clr).shape();
-  iflagold  = (*clr).shape();
-  store_clrold = false;
   assert(PHI.domain() == F.domain());
   assert(PHI.domain() == U.domain());
-  epsl=1.0e-2;
+  epsl=1.0e-2; /* this appears in diff_matrix but should not play a role */
   turbP=0.9;
   laminar=true;
 
