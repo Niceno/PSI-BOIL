@@ -15,7 +15,9 @@ Pressure::Pressure(const Scalar & PHI,
 
   diffusion_set(TimeScheme::backward_euler());
 
-  discretize();
+  /* to avoid problems in the child */
+  //discretize();
+  discretize_pressure();
 }	
 
 /******************************************************************************/

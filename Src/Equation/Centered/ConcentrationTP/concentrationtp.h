@@ -51,7 +51,6 @@ class ConcentrationTP : public Centered {
     ConcentrationTP(const Scalar & phi,
                     const Scalar & f,
                     const Vector & u,
-                    const Scalar & color, 
                     const Vector & flxclr,
                     Heaviside * heavi,
                     Topology * topo,
@@ -83,19 +82,6 @@ class ConcentrationTP : public Centered {
     void compute_udiff_div(Scalar & p, const Property * mu_fluid,
                            const Vector & udiff);
 
-    void init_color(const Scalar &clro) {
-      for_aijk(i,j,k) clrold[i][j][k] = clro[i][j][k];
-      store_clrold = true;
-      boil::oout << "ConcentrationTP::initialize clrold\n";
-    }
-
-    void store() {
-      /* store clrold */
-      for_aijk(i,j,k){
-        clrold[i][j][k] = (*clr)[i][j][k];
-      }
-    }
-
   protected:
     void create_system_innertial();
     void create_system_diffusive(const Scalar * diff_eddy = NULL);
@@ -110,16 +96,14 @@ class ConcentrationTP : public Centered {
     /* extrapolation */
     void extrapolation_flag();
 
-    const Scalar * clr;
+    Scalar clr, clrold;
     Heaviside * heavi;
     Topology * topo;
-    Scalar clrold;
     ScalarInt eflag;
     const Vector * colorflow;
     const Property * rho_dif;
     const Property * dcoef;
 
-    bool store_clrold;
     real turbS; /* turbulent schmidt number */
     bool laminar;
     const Sign sig;

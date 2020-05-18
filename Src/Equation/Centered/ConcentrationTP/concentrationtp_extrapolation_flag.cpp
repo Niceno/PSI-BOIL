@@ -12,7 +12,7 @@ void ConcentrationTP::extrapolation_flag() {
 *         ibody  cell = -1000
 *******************************************************************************/
 
-  for_avijk((*clr),i,j,k) {
+  for_avijk(clr,i,j,k) {
     if((*topo->iflag)[i][j][k]>0){
       eflag[i][j][k]=3;
     } else {
@@ -26,11 +26,11 @@ void ConcentrationTP::extrapolation_flag() {
       eflag[i][j][k]=-1000;
   }
 
-  //boil::plot->plot((*clr),eflag, "clr-eflag", time->current_step());
+  //boil::plot->plot(clr,eflag, "clr-eflag", time->current_step());
 
   /* i-direction */
-  for(int i=(*clr).si()-1; i<=(*clr).ei(); i++){
-    for_vjk((*clr),j,k){
+  for(int i=clr.si()-1; i<=clr.ei(); i++){
+    for_vjk(clr,j,k){
       bool eflagc  = eflag[i  ][j][k];
       bool eflagp  = eflag[i+1][j][k];      
       if(eflagc ^ eflagp && (eflagc+eflagp)>-500) {
@@ -43,8 +43,8 @@ void ConcentrationTP::extrapolation_flag() {
     }
   }
   /* j-direction */
-  for(int j=(*clr).sj()-1; j<=(*clr).ej(); j++){
-    for_vik((*clr),i,k){
+  for(int j=clr.sj()-1; j<=clr.ej(); j++){
+    for_vik(clr,i,k){
       bool eflagc  = eflag[i][j  ][k];
       bool eflagp  = eflag[i][j+1][k]; 
       if(eflagc ^ eflagp && (eflagc+eflagp)>-500) {
@@ -57,8 +57,8 @@ void ConcentrationTP::extrapolation_flag() {
     }
   }
   /* k-direction */
-  for(int k=(*clr).sk()-1; k<=(*clr).ek(); k++){
-    for_vij((*clr),i,j){
+  for(int k=clr.sk()-1; k<=clr.ek(); k++){
+    for_vij(clr,i,j){
       bool eflagc  = eflag[i][j][k  ];
       bool eflagp  = eflag[i][j][k+1];
       if(eflagc ^ eflagp && (eflagc+eflagp)>-500) {
@@ -75,7 +75,7 @@ void ConcentrationTP::extrapolation_flag() {
 
 #if 0
   if(time->current_step() > 0) {
-    boil::plot->plot((*clr),eflag, "clr-eflag", time->current_step());
+    boil::plot->plot(clr,eflag, "clr-eflag", time->current_step());
     exit(0);
   }
 #endif

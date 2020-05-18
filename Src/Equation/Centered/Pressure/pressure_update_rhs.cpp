@@ -13,7 +13,7 @@
 *  external), here it assembles only one contribution: divergence of the
 *  velocity field.
 *******************************************************************************/
-real Pressure::update_rhs() {
+real Pressure::update_rhs_pressure() {
 
   //u->exchange();
   

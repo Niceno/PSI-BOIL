@@ -149,14 +149,14 @@ void Topology::extrapolate(Scalar & sca, const Sign iext,
   
     if(errnorm<tol_ext) {
       converged = true;
-      //boil::oout<<"Topology::ext_grad converged after "<<mstep<<" steps, final rel. error: "<<errnorm<<"\n";
+      //boil::oout<<"Topology::extrapolate converged after "<<mstep<<" steps, final rel. error: "<<errnorm<<"\n";
       break;
     }
 
   }
 
   if(!converged)
-    boil::oout<<"Topology::ext_grad did not converge after "<<mmax_ext<<" steps! \n";
+    boil::oout<<"Topology::extrapolate did not converge after "<<mmax_ext<<" steps! \n";
 
   return;
 }

@@ -30,6 +30,7 @@ AC_OUTPUT(Makefile                                                      \
           Src/Equation/Centered/EnthalpyFD/Makefile                     \
           Src/Equation/Centered/Concentration/Makefile                  \
           Src/Equation/Centered/ConcentrationTP/Makefile                \
+          Src/Equation/Centered/Pressure/CavityPressure/Makefile        \
           Src/Equation/Centered/Pressure/Makefile                       \
           Src/Equation/Centered/PhaseChange/Makefile                    \
           Src/Equation/Centered/PhaseChangeVOF/Makefile                 \

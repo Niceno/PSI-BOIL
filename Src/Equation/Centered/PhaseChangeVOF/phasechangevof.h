@@ -22,7 +22,7 @@ class PhaseChangeVOF : public Centered {
                    const Scalar & vfs,
                    const Scalar & vs,
                    const Vector & u, 
-                   Topology & topo,
+                   Topology * topo,
                    const TIF & tifmodel,
                    Times & t,
                    Matter * flu,

@@ -68,7 +68,11 @@ class CIPCSL2 : public Centered {
             Linear * S);
     ~CIPCSL2();
 
-    void new_time_step(const Scalar * diff_eddy = NULL){};
+    void new_time_step(const Scalar * diff_eddy = NULL){
+     if(!is_initialized)
+        init();
+      topo->new_time_step(); 
+    };
     void advance();
     void bdcond(const Scalar & sca);
     void curvature();
@@ -178,7 +182,7 @@ class CIPCSL2 : public Centered {
     real maxval() {return maxclr;}
     void color_minmax(); 
 
-    Topology topo;
+    Topology * topo;
     void ancillary();
     Heaviside * heaviside() { return heavi; }
 
@@ -286,5 +290,6 @@ class CIPCSL2 : public Centered {
     real cangle;
     real minclr, maxclr;
     bool localSharpen, use_dist_for_kappa;
+    bool is_initialized;
 };
 #endif

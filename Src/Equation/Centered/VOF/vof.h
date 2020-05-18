@@ -33,7 +33,11 @@ class VOF : public Centered {
         Vector * bndclr = NULL);
     ~VOF();
 
-    void new_time_step(const Scalar * diff_eddy = NULL){};
+    void new_time_step(const Scalar * diff_eddy = NULL) {
+      if(!is_initialized)
+        init();
+      topo->new_time_step(); 
+    };
     void forward(Scalar & scp);
 
     void advance(const bool anci = true);
@@ -76,7 +80,7 @@ class VOF : public Centered {
                      , Range<real> yr
                      , Range<real> zr );
 
-    void init(){ ancillary(); };
+    void init(){ ancillary(); is_initialized = true; };
 
     void extrapolate_velocity(const Scalar & scp, const Scalar & fext,
                               const Matter * fluid, const Vector & umixed, 
@@ -95,7 +99,7 @@ class VOF : public Centered {
 #include "vof_inline.h"
 
     Vector * bndclr;
-    Topology topo;
+    Topology * topo;
 
     Scalar nalpha;
     Scalar nx,ny,nz;/* normal to interface */
@@ -317,6 +321,7 @@ class VOF : public Centered {
     bool iminc, imaxc, jminc, jmaxc, kminc, kmaxc; // true = cut-stencil
     bool ifull, jfull, kfull; // true = not a dummy direction
     bool limit_color, use_interp, store_pressure_extrap;
+    bool is_initialized;
     real minclr, maxclr;
 
     Heaviside * heavi;

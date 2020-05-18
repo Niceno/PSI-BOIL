@@ -31,9 +31,9 @@ CIPCSL2::CIPCSL2(const Scalar & PHI,
   sxyz  ( *U.domain() ),
   fs    ( *U.domain() ),
   adens ( *PHI.domain() ),
-  kappa ( &K ),
+  kappa ( &K )
   //heavi(&phi, NULL, &adens),
-  topo(&phi,&nx,&ny,&nz,&adens,&fs,&intflag)
+  //topo(&phi,&phi,&nx,&ny,&nz,&adens,&fs,&intflag)
 
 /*------------------------------------------------------+
 |  this constructor is called only at the finest level  |
@@ -63,6 +63,7 @@ CIPCSL2::CIPCSL2(const Scalar & PHI,
 
   /* runtime polymorphism */
   heavi = new MarchingCubes(&phi,NULL,&adens);
+  topo = new Topology(&phi,&phi,&nx,&ny,&nz,&adens,&fs,&intflag);
 
   /* set constants */
   pi = acos(-1.0);
@@ -101,6 +102,9 @@ CIPCSL2::CIPCSL2(const Scalar & PHI,
 #ifdef DEBUG
   std::cout<<"cipcsl2:discretize \n";
 #endif
+
+  /* set in init() */
+  is_initialized = false;
 
   init();
 #ifdef DEBUG

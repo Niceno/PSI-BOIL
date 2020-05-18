@@ -48,16 +48,26 @@ class Pressure : public Centered {
              Linear * sm,
              Matter * mat);
     ~Pressure();
+
+    /* Written like this to allow child to call parent discretize kernel */
 	  
     //! Discretize the system of equations. 
-    void discretize(const Scalar * diff_eddy = NULL); 
+    virtual void discretize(const Scalar * diff_eddy = NULL) {
+      discretize_pressure(diff_eddy);
+    }
 
     //! Computes right hand side (velocity diverence) for pressure equation.
-    real update_rhs();
+    virtual real update_rhs() {
+      return update_rhs_pressure();
+    }
  
     // ghost fluid method
     void ghost(const Scalar & c, const Scalar & k);
   protected:
+     
+    void discretize_pressure(const Scalar * diff_eddy = NULL);
+    real update_rhs_pressure();
+
 };	
 
 #endif

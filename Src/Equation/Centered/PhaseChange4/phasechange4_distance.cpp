@@ -2,7 +2,7 @@
 
 /******************************************************************************/
 real PhaseChange4::distance_center(const Sign sig, const Comp & m,
-                                 const int i, const int j, const int k) {
+                                   const int i, const int j, const int k) {
 /***************************************************************************//*** 
 *  \brief calculate distance to neighboring cell center  
 *******************************************************************************/
@@ -74,157 +74,43 @@ real PhaseChange4::distance_int(const Sign dir, const Comp & m,
 real PhaseChange4::distance_int_x(const Sign dir, 
                                   const int i, const int j, const int k,
                                   real & tint) {
-  real dist;
-
-  if(distance1D_int_x(i,j,k,dir,tint,dist)) {
-    return dist;
-  }
-
-  boil::aout<<"PhaseChange4::int_dist_x: Error! Flag inconsistent w/ vol. fraction!\n";
-  boil::aout<<"new "<<i<<" "<<j<<" "<<k<<" "<<dir<<" "
-            <<iflag[i][j][k]<<" "<<iflag[i+dir][j][k]<<" "
-            <<(clr)[i][j][k]<<" "<<(clr)[i+dir][j][k]<<boil::endl;
-  exit(0);
- 
-  return 0.0;
-}
-
-bool PhaseChange4::distance1D_int_x(const int i, const int j, const int k,
-                                    const Sign dir, real & tint, real & dist) {
-  real centrex = phi.xc(i);
-  if(dir>0) {
-    real edgex= centrex+0.5*phi.dxc(i);
-    real intx = (fs)[Comp::i()][i+1][j][k];
-    real offx = phi.xc(i+1);
-    if(intx>=centrex&&intx<=edgex) {
-      tint = Tint(i,j,k);
-      dist = intx-centrex;
-      return true;
-    } else if(intx>=edgex&&intx<=offx) {
-      tint = Tint(i+1,j,k);
-      dist = intx-centrex;
-      return true;
-    }
+  Sign cell_marker;
+  real dist = topo->distance_int_x(dir,i,j,k,cell_marker);
+  if(cell_marker < 0) {
+    tint = Tint(i,j,k);
   } else {
-    real edgex= centrex-0.5*phi.dxc(i);
-    real intx = (fs)[Comp::i()][i  ][j][k];
-    real offx = phi.xc(i-1);
-    if(intx<=centrex&&intx>=edgex) {
-      tint = Tint(i,j,k);
-      dist = centrex-intx;
-      return true;
-    } else if(intx>=offx&&intx<=edgex) {
-      tint = Tint(i-1,j,k);
-      dist = centrex-intx;
-      return true;
-    } 
+    tint = Tint(i+int(dir),j,k);
   }
- 
-  return false;
+
+  return dist;
 }
 
 /* y-direction */
 real PhaseChange4::distance_int_y(const Sign dir, 
                                   const int i, const int j, const int k,
                                   real & tint) {
-  real dist;
-
-  if(distance1D_int_y(i,j,k,dir,tint,dist)) {
-    return dist;
-  }
-
-  boil::aout<<"PhaseChange4::int_dist_y: Error! Flag inconsistent w/ vol. fraction!\n";
-  boil::aout<<"new "<<i<<" "<<j<<" "<<k<<" "<<dir<<" "
-            <<iflag[i][j][k]<<" "<<iflag[i][j+dir][k]<<" "
-            <<(clr)[i][j][k]<<" "<<(clr)[i][j+dir][k]<<boil::endl;
-  exit(0);
- 
-  return 0.0;
-}
-
-bool PhaseChange4::distance1D_int_y(const int i, const int j, const int k,
-                                    const Sign dir, real & tint, real & dist) {
-  real centrey = phi.yc(j);
-  if(dir>0) {
-    real edgey= centrey+0.5*phi.dyc(j);
-    real inty = (fs)[Comp::j()][i][j+1][k];
-    real offy = phi.yc(j+1);
-    if(inty>=centrey&&inty<=edgey) {
-      tint = Tint(i,j,k);
-      dist = inty-centrey;
-      return true;
-    } else if(inty>=edgey&&inty<=offy) {
-      tint = Tint(i,j+1,k);
-      dist = inty-centrey;
-      return true;
-    }
+  Sign cell_marker;
+  real dist = topo->distance_int_y(dir,i,j,k,cell_marker);
+  if(cell_marker < 0) {
+    tint = Tint(i,j,k);
   } else {
-    real edgey= centrey-0.5*phi.dyc(j);
-    real inty = (fs)[Comp::j()][i][j  ][k];
-    real offy = phi.yc(j-1);
-    if(inty<=centrey&&inty>=edgey) {
-      tint = Tint(i,j,k);
-      dist = centrey-inty;
-      return true;
-    } else if(inty>=offy&&inty<=edgey) {
-      tint = Tint(i,j-1,k);
-      dist = centrey-inty;
-      return true;
-    } 
+    tint = Tint(i,j+int(dir),k);
   }
- 
-  return false;
+
+  return dist;
 }
 
 /* z-direction */
 real PhaseChange4::distance_int_z(const Sign dir, 
                                   const int i, const int j, const int k,
                                   real & tint) {
-  real dist;
-
-  if(distance1D_int_z(i,j,k,dir,tint,dist)) {
-    return dist;
-  }
-
-  boil::aout<<"PhaseChange4::int_dist_z: Error! Flag inconsistent w/ vol. fraction!\n";
-  boil::aout<<"new "<<i<<" "<<j<<" "<<k<<" "<<dir<<" "
-            <<iflag[i][j][k]<<" "<<iflag[i][j][k+dir]<<" "
-            <<(clr)[i][j][k]<<" "<<(clr)[i][j][k+dir]<<boil::endl;
-  exit(0);
- 
-  return 0.0;
-}
-
-bool PhaseChange4::distance1D_int_z(const int i, const int j, const int k,
-                                    const Sign dir, real & tint, real & dist) {
-  real centrez = phi.zc(k);
-  if(dir>0) {
-    real edgez= centrez+0.5*phi.dzc(k);
-    real intz = (fs)[Comp::k()][i][j][k+1];
-    real offz = phi.zc(k+1);
-    if(intz>=centrez&&intz<=edgez) {
-      tint = Tint(i,j,k);
-      dist = intz-centrez;
-      return true;
-    } else if(intz>=edgez&&intz<=offz) {
-      tint = Tint(i,j,k+1);
-      dist = intz-centrez;
-      return true;
-    }
+  Sign cell_marker;
+  real dist = topo->distance_int_z(dir,i,j,k,cell_marker);
+  if(cell_marker < 0) {
+    tint = Tint(i,j,k);
   } else {
-    real edgez= centrez-0.5*phi.dzc(k);
-    real intz = (fs)[Comp::k()][i][j][k  ];
-    real offz = phi.zc(k-1);
-    if(intz<=centrez&&intz>=edgez) {
-      tint = Tint(i,j,k);
-      dist = centrez-intz;
-      return true;
-    } else if(intz>=offz&&intz<=edgez) {
-      tint = Tint(i,j,k-1);
-      dist = centrez-intz;
-      return true;
-    } 
+    tint = Tint(i,j,k+int(dir));
   }
- 
-  return false;
+
+  return dist;
 }

@@ -32,7 +32,7 @@ VOF::VOF(const Scalar & PHI,
   tempflag(*PHI.domain() ),
   tempflag2(*PHI.domain() ),
   adens(*PHI.domain() ),
-  topo(&color(),&mx,&my,&mz,&adens,&fs,&iflag),
+  //topo(&phi,&color(),&mx,&my,&mz,&adens,&fs,&iflag),
   norm_method_advance(NormMethod::Mixed()),
   norm_method_curvature(NormMethod::Young()),
   mcomp_for_elvira(Comp::undefined()), /* undefined for 3D */
@@ -61,9 +61,11 @@ VOF::VOF(const Scalar & PHI,
   pold_pos  = phi.shape();
   tempflag  = phi.shape();
   tempflag2 = phi.shape();
+  
+  topo = new Topology(&phi,&color(),&mx,&my,&mz,&adens,&fs,&iflag);
 
   /* dangerous: needs to be overridden in derived class!!! */
-  topo.clr = &color();
+  topo->clr = &color();
 
   for( int b=0; b<phi.bc().count(); b++ ) {
     if(    phi.bc().type(b) == BndType::dirichlet()
@@ -124,6 +126,9 @@ VOF::VOF(const Scalar & PHI,
     else
       heavi = new MarchingCubes(&color(),NULL,&adens);
   }
+
+  /* set in init() */
+  is_initialized = false;
 
   /* set parameters */
   //dxmin=std::min(phi.dxc(3),std::min(phi.dyc(3),phi.dzc(3)));

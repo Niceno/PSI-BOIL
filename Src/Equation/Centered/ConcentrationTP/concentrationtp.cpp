@@ -7,7 +7,6 @@
 ConcentrationTP::ConcentrationTP(const Scalar & PHI,
                                  const Scalar & F,
                                  const Vector & U,
-                                 const Scalar & COLOR, 
                                  const Vector & FLUXCLR, 
                                  Heaviside * HEAVI,
                                  Topology * TOPO,
@@ -20,8 +19,10 @@ ConcentrationTP::ConcentrationTP(const Scalar & PHI,
 |  initialize parent   |
 +---------------------*/
   Centered( PHI.domain(), PHI, F, & U, T, f, NULL, S ), /* NULL is for solid */
+  /* color is actually volume fraction */
+  clr(TOPO->vf),
+  clrold(&(TOPO->vfold)),
   eflag ( *PHI.domain()),
-  clrold( *COLOR.domain()),
   colorflow(&FLUXCLR),
   heavi(HEAVI),
   topo(TOPO),
@@ -30,14 +31,10 @@ ConcentrationTP::ConcentrationTP(const Scalar & PHI,
   rho_dif = (f->rho());     /* pointer at property */
   dcoef   = (f->gamma());   /* pointer at property */
 
-  clr     = &COLOR;
   eflag   = phi.shape();
-  clrold  = (*clr).shape();
-  store_clrold = false;
  
   assert(PHI.domain() == F.domain());
   assert(PHI.domain() == U.domain());
-  assert(PHI.domain() == COLOR.domain());
   turbS = 0.7;
   laminar = true;
 

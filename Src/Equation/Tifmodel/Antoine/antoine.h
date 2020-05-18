@@ -13,7 +13,7 @@
 class Antoine : public TIF {
   public:
     Antoine(const real tref,
-            const Topology & topo,
+            const Topology * topo,
             const Scalar & eps,
             const real A,
             const real B,

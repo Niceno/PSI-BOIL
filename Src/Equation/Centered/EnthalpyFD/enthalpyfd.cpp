@@ -12,7 +12,7 @@ EnthalpyFD::EnthalpyFD(const Scalar & PHI,
                        Times & T,
                        Linear * S,
                        Matter * f,
-                       Topology & topo,
+                       Topology * topo,
                        TIF & tintmodel,
                        Matter * s) :
 /*---------------------+ 
@@ -22,8 +22,8 @@ EnthalpyFD::EnthalpyFD(const Scalar & PHI,
   clrold (  *PHI.domain()),
   ftif   (  *PHI.domain()),
   ftifold(  *PHI.domain()),
-  fs(topo.fs),
-  iflag(topo.iflag),
+  fs(topo->fs),
+  iflag(topo->iflag),
   iflagold  (*PHI  .domain()),
   fsold(  *U  .domain()),
   uliq(&Uliq),
@@ -36,7 +36,7 @@ EnthalpyFD::EnthalpyFD(const Scalar & PHI,
   cpv  = fluid()->cp(0),
   lambdal = fluid()->lambda(1),
   lambdav = fluid()->lambda(0),
-  clr = topo.clr;
+  clr = topo->clr;
   clrsurf = 0.5;
   clrold = (*clr).shape();
   iflagold  = (*clr).shape();

@@ -59,7 +59,7 @@ class EnthalpyFD : public Centered {
                Times & t,
                Linear * sm,
                Matter * flu,
-               Topology & topo,
+               Topology * topo,
                TIF & tifmodel,
                Matter * sol = NULL);
 
@@ -70,7 +70,7 @@ class EnthalpyFD : public Centered {
                Times & t,
                Linear * sm,
                Matter * flu,
-               Topology & topo,
+               Topology * topo,
                TIF & tifmodel,
                Matter * sol = NULL) :
       EnthalpyFD(phi,f,umixed,umixed,umixed,t,sm,flu,topo,tifmodel,sol) {};

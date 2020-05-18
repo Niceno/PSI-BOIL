@@ -9,7 +9,7 @@ PhaseChange4::PhaseChange4(const Scalar & MDOT,
                                const Scalar & VFS,
                                const Scalar & VS,
                                const Vector & U, 
-                               Topology & TOPO,
+                               Topology * TOPO,
                                const TIF & TIFMODEL,
                                Times & T, 
                                Matter * f,
@@ -21,17 +21,16 @@ PhaseChange4::PhaseChange4(const Scalar & MDOT,
   Centered( MDOT.domain(), MDOT, VS, & U, T, f, s, NULL ),
   tpr(&TPR),
   tprs(&TPRS),
-  clr(TOPO.clr),
+  clr(TOPO->clr),
   vf(&VF),
   vfs(&VFS),
   M(&MFLX),
-  topo(&TOPO),
-  nx(TOPO.nx), /* these are aliases for easier use */
-  ny(TOPO.ny),
-  nz(TOPO.nz),
-  fs(TOPO.fs),
-  adens(TOPO.adens),
-  iflag(TOPO.iflag),
+  topo(TOPO),
+  nx(TOPO->nx), /* these are aliases for easier use */
+  ny(TOPO->ny),
+  nz(TOPO->nz),
+  adens(TOPO->adens),
+  iflag(TOPO->iflag),
   bndtpr  ( *U   .domain() ),
   txv     ( *MDOT.domain()),
   tyv     ( *MDOT.domain()),
@@ -91,9 +90,9 @@ PhaseChange4::PhaseChange4(const Scalar & MDOT,
   epsl = 1.0e-2;
 
   /* flags */
-  use_second_order_accuracy = false;
+  use_second_order_accuracy = true;
   use_unconditional_extrapolation = false;
-  discard_points_near_interface = false;
+  discard_points_near_interface = true;
 
 }	
 

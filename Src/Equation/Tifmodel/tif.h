@@ -16,7 +16,7 @@
 class TIF {
   public:
     TIF(const real tref); 
-    TIF(const real tref, const Topology & topo); 
+    TIF(const real tref, const Topology * topo); 
     ~TIF() {}
 
     void init() {

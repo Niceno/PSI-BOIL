@@ -16,6 +16,7 @@ SUBDIRS = Equation/Staggered/Momentum                              \
           Equation/Centered/EnthalpyFD                             \
           Equation/Centered/Concentration                          \
           Equation/Centered/ConcentrationTP                        \
+          Equation/Centered/Pressure/CavityPressure                \
           Equation/Centered/Pressure                               \
           Equation/Centered/PhaseChange                            \
           Equation/Centered/PhaseChangeVOF                         \
@@ -81,6 +82,7 @@ LDADD = Equation/Staggered/Momentum/libMomentum.a                             \
         Equation/Centered/EnthalpyFD/libEnthalpyFD.a                          \
         Equation/Centered/Concentration/libConcentration.a                    \
         Equation/Centered/ConcentrationTP/libConcentrationTP.a                \
+        Equation/Centered/Pressure/CavityPressure/libCavityPressure.a         \
         Equation/Centered/Pressure/libPressure.a                              \
         Equation/Centered/PhaseChange/libPhaseChange.a                        \
         Equation/Centered/PhaseChangeVOF/libPhaseChangeVOF.a                  \

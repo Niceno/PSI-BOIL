@@ -56,7 +56,7 @@ void VOF::ancillary(Scalar & scp) {
       exit(0);
     }
 
-    heavi->topology(topo,tol_wall,use_interp,use_subgrid);
+    heavi->topology(*topo,tol_wall,use_interp,use_subgrid);
   } else {
     boil::oout<<"VOF::ancillary: Topology calculation method not set properly!"
               <<" Exiting."<<boil::endl;

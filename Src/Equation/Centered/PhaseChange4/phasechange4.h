@@ -22,7 +22,7 @@ class PhaseChange4 : public Centered {
                  const Scalar & vfs,
                  const Scalar & vs,
                  const Vector & u, 
-                 Topology & topo,
+                 Topology * topo,
                  const TIF & tifmodel,
                  Times & t,
                  Matter * flu,
@@ -93,12 +93,6 @@ class PhaseChange4 : public Centered {
     real distance_int_z(const Sign dir,
                         const int i, const int j, const int k,
                         real & tint);
-    bool distance1D_int_x(const int i, const int j, const int k,
-                          const Sign dir, real & tint, real & dist);
-    bool distance1D_int_y(const int i, const int j, const int k,
-                          const Sign dir, real & tint, real & dist);
-    bool distance1D_int_z(const int i, const int j, const int k,
-                          const Sign dir, real & tint, real & dist);
  
     real Tint(const int i, const int j, const int k);
 
@@ -146,7 +140,6 @@ class PhaseChange4 : public Centered {
     Scalar nx;
     Scalar ny;
     Scalar nz;
-    Vector fs;
     Vector bndtpr;
     Scalar M;
 

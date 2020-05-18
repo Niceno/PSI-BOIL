@@ -18,7 +18,7 @@ class EnthalpyFDaxisym : public EnthalpyFD {
                      Times & t,
                      Linear * sm,
                      Matter * flu,
-                     Topology & topo,
+                     Topology * topo,
                      TIF & tifmodel,
                      Matter * sol = NULL) :
     EnthalpyFD(phi,f,u,uliq,ugas,t,sm,flu,topo,tifmodel,sol) {
@@ -36,7 +36,7 @@ class EnthalpyFDaxisym : public EnthalpyFD {
                      Times & t,
                      Linear * sm,
                      Matter * flu,
-                     Topology & topo,
+                     Topology * topo,
                      TIF & tifmodel,
                      Matter * sol = NULL) :
     EnthalpyFDaxisym(phi,f,u,u,u,t,sm,flu,topo,tifmodel,sol) {};

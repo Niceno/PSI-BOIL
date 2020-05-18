@@ -40,7 +40,7 @@ class VOFaxisym : public VOF {
        reconstruction_maxiter = 5;
 
        /* correction */
-       topo.clr = &color();
+       topo->clr = &color();
 
        Heaviside * htmp = new MSaxisym(&color(),NULL,&adens);
        delete heavi;

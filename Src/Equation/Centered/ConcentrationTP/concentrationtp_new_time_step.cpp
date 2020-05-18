@@ -34,20 +34,13 @@ void ConcentrationTP::new_time_step(const Scalar * diff_eddy) {
     exit(0);
   }
 
-  /* initial time step or restart */
-  if(!store_clrold) {
-    boil::oout<<"ConcentrationTP::new_time_step()  initialize clrold"<<"\n";
-    for_aijk(i,j,k){
-      clrold[i][j][k] = (*clr)[i][j][k];
-    }
-    store_clrold = true;
-  }
-
   /*------------------------------+
   |  fold = vol * rho * eps / dt  |
   +-------------------------------*/
   for_ijk(i,j,k) {
-    real col_new = (*clr)[i][j][k];
+    //real col_new = std::min(1.0,std::max(0.0,clr[i][j][k]));
+    //real col_old = std::min(1.0,std::max(0.0,clrold[i][j][k]));
+    real col_new = clr[i][j][k];
     real col_old = clrold[i][j][k];
     real r = rho_dif->value(i,j,k);
 
@@ -75,11 +68,6 @@ void ConcentrationTP::new_time_step(const Scalar * diff_eddy) {
 
   phi.bnd_update();
   phi.exchange();
-
-  /* store clrold */
-  for_aijk(i,j,k){
-    clrold[i][j][k] = (*clr)[i][j][k];
-  }
 
   boil::timer.stop("concentrationtp new time step");
 }
