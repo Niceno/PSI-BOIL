@@ -23,6 +23,7 @@ void Centered::solve(const ResRat & fact, const char * name) {
   /* solve */
   update_rhs();
   solver->solve(A, phi, fnew, MaxIter(20), name, fact);
+  phi.bnd_update();
 
   /* stop the timing */
   if( name ) 

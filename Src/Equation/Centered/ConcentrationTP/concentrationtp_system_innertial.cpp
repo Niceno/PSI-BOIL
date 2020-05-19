@@ -12,8 +12,8 @@ void ConcentrationTP::create_system_innertial() {
 
   for_ijk(i,j,k) {
     real r = rho_dif->value(i,j,k);
-    //real col_new = std::min(1.0,std::max(0.0,clr[i][j][k]));
-    real col_new = clr[i][j][k];
+    real col_new = std::min(1.0,std::max(0.0,clr[i][j][k]));
+    //real col_new = clr[i][j][k];
 
     if(sig==Sign::neg()) col_new = 1.-col_new;
  

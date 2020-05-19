@@ -1,34 +1,35 @@
 #include "cavitypressure.h"
 
 /***************************************************************************//**
-*  Discretization near the phasic interface.
+*  Discretization of system matrix.
 *  Inherits structure from EnthalpyFD.
 *******************************************************************************/
 void CavityPressure::diff_matrix(const int i, const int j, const int k) {
 
   /* reset */
-  A.c[i][j][k] = 0.0;
-#if 0
+  A.c[i][j][k]  = 0.0;
 
   /* auxilliary parameters */
   const real mult = phi.dV(i,j,k)/fluid()->rho(i,j,k);
-  real xm,xp,aflagm,aflagp;
-  aflagm=aflagp=1.0;
+  real xm,xp;
+  real pm,pp;
+  int aflagm,aflagp;
+  aflagm=aflagp=1;
 
   /* coefficients in i direction (w and e) */
   if(!interface(Sign::neg(),Comp::i(),i,j,k)) {
     xm = phi.dxw(i);
+    pm = phi[i-1][j][k];
   } else {
-    real ps;
-    xm = std::max(epsl*phi.dxw(i),distance_int_x(Sign::neg(),i,j,k,ps));
-    aflagm=0.0;
+    xm = distance_int_x(Sign::neg(),i,j,k,pm);
+    aflagm=0;
   }
   if(!interface(Sign::pos(),Comp::i(),i,j,k)){
-    xp=phi.dxe(i);
+    xp = phi.dxe(i);
+    pp = phi[i+1][j][k];
   } else {
-    real ps;
-    xp = std::max(epsl*phi.dxe(i),distance_int_x(Sign::pos(),i,j,k,ps));
-    aflagp=0.0;
+    xp = distance_int_x(Sign::pos(),i,j,k,pp);
+    aflagp=0;
   }
   real cxm = coef_x_m(xm,xp,phi.xc(i));
   real cxp = coef_x_p(xm,xp,phi.xc(i));
@@ -37,23 +38,27 @@ void CavityPressure::diff_matrix(const int i, const int j, const int k) {
   A.c[i][j][k] += mult * (cxm+cxp);
   A.e[i][j][k] =  mult * cxp * aflagp;
 
+  /* explicit term */
+  fold[i][j][k] += mult*cxm*(1-aflagm)*pm
+                 + mult*cxp*(1-aflagp)*pp;
+
   /* coefficients in j direction (s and n) */
   real ym,yp;
-  aflagm=aflagp=1.0;
+  aflagm=aflagp=1;
 
   if(!interface(Sign::neg(),Comp::j(),i,j,k)){
-    ym=phi.dys(j);
+    ym = phi.dys(j);
+    pm = phi[i][j-1][k];
   } else {
-    real ps;
-    ym = std::max(epsl*phi.dys(j),distance_int_y(Sign::neg(),i,j,k,ps));
-    aflagm=0.0;
+    ym = distance_int_y(Sign::neg(),i,j,k,pm);
+    aflagm=0;
   }
   if(!interface(Sign::pos(),Comp::j(),i,j,k)){
-    yp=phi.dyn(j);
+    yp = phi.dyn(j);
+    pp = phi[i][j+1][k];
   } else {
-    real ps;
-    yp = std::max(epsl*phi.dyn(j),distance_int_y(Sign::pos(),i,j,k,ps));
-    aflagp=0.0;
+    yp = distance_int_y(Sign::pos(),i,j,k,pp);
+    aflagp=0;
   }
   real cym = coef_y_m(ym,yp,phi.yc(j));
   real cyp = coef_y_p(ym,yp,phi.yc(j));
@@ -62,23 +67,27 @@ void CavityPressure::diff_matrix(const int i, const int j, const int k) {
   A.c[i][j][k] += mult * (cym+cyp);
   A.n[i][j][k] =  mult * cyp * aflagp;
 
+  /* explicit term */
+  fold[i][j][k] += mult*cym*(1-aflagm)*pm
+                 + mult*cyp*(1-aflagp)*pp;
+
   /* coefficients in k direction (b and t) */
   real zm,zp;
-  aflagm=aflagp=1.0;
+  aflagm=aflagp=1;
 
   if(!interface(Sign::neg(),Comp::k(),i,j,k)){
-    zm=phi.dzb(k);
+    zm = phi.dzb(k);
+    pm = phi[i][j][k-1];
   } else {
-    real ps;
-    zm = std::max(epsl*phi.dzb(k),distance_int_z(Sign::neg(),i,j,k,ps));
-    aflagm=0.0;
+    zm = distance_int_z(Sign::neg(),i,j,k,pm);
+    aflagm=0;
   }
   if(!interface(Sign::pos(),Comp::k(),i,j,k)){
-    zp=phi.dzt(k);
+    zp = phi.dzt(k);
+    pp = phi[i][j][k+1];
   } else {
-    real ps;
-    zp = std::max(epsl*phi.dzt(k),distance_int_z(Sign::pos(),i,j,k,ps));
-    aflagp=0.0;
+    zp = distance_int_z(Sign::pos(),i,j,k,pp);
+    aflagp=0;
   }
   real czm = coef_z_m(zm,zp,phi.zc(k));
   real czp = coef_z_p(zm,zp,phi.zc(k));
@@ -87,6 +96,9 @@ void CavityPressure::diff_matrix(const int i, const int j, const int k) {
   A.c[i][j][k] += mult * (czm+czp);
   A.t[i][j][k] =  mult * czp * aflagp;
 
-#endif
+  /* explicit term */
+  fold[i][j][k] += mult*czm*(1-aflagm)*pm
+                 + mult*czp*(1-aflagp)*pp;
+
   return;
 }

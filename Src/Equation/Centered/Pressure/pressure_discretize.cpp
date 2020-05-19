@@ -8,7 +8,7 @@
 *
 *  The only thing useful from the parent is handling of boundary conditions.
 *******************************************************************************/
-void Pressure::discretize_pressure(const Scalar * diff_eddy) {
+void Pressure::discretize(const Scalar * diff_eddy) {
 
   boil::timer.start("pressure discretize");
 

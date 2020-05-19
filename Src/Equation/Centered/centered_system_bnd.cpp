@@ -9,6 +9,7 @@ void Centered::create_system_bnd(const Property * f_prop) {
   |  initialize, that is quite important  |
   +--------------------------------------*/
   fbnd = 0.0;
+  phi.bnd_update();
 
   /*----------------------+ 
   |  symmetry and outlet  |

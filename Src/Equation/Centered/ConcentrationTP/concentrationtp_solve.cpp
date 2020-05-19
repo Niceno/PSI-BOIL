@@ -30,6 +30,7 @@ void ConcentrationTP::solve(const ResRat & fact, const char * name) {
   }
 
   solver->solve(A, phi, fnew, MaxIter(20), name, fact);
+  phi.bnd_update();
 
   /* stop the timing */
   if( name ) 

@@ -16,7 +16,8 @@ SUBDIRS = Equation/Staggered/Momentum                              \
           Equation/Centered/EnthalpyFD                             \
           Equation/Centered/Concentration                          \
           Equation/Centered/ConcentrationTP                        \
-          Equation/Centered/Pressure/CavityPressure                \
+          Equation/Centered/CavityPressure/CPaxisym                \
+          Equation/Centered/CavityPressure                         \
           Equation/Centered/Pressure                               \
           Equation/Centered/PhaseChange                            \
           Equation/Centered/PhaseChangeVOF                         \
@@ -82,7 +83,8 @@ LDADD = Equation/Staggered/Momentum/libMomentum.a                             \
         Equation/Centered/EnthalpyFD/libEnthalpyFD.a                          \
         Equation/Centered/Concentration/libConcentration.a                    \
         Equation/Centered/ConcentrationTP/libConcentrationTP.a                \
-        Equation/Centered/Pressure/CavityPressure/libCavityPressure.a         \
+        Equation/Centered/CavityPressure/CPaxisym/libCPaxisym.a               \
+        Equation/Centered/CavityPressure/libCavityPressure.a                  \
         Equation/Centered/Pressure/libPressure.a                              \
         Equation/Centered/PhaseChange/libPhaseChange.a                        \
         Equation/Centered/PhaseChangeVOF/libPhaseChangeVOF.a                  \
@@ -99,7 +101,7 @@ LDADD = Equation/Staggered/Momentum/libMomentum.a                             \
 	Equation/Heaviside/MarchingSquares/libMarchingSquares.a               \
 	Equation/Heaviside/libHeaviside.a                                     \
 	Equation/Nucleation/libNucleation.a                                   \
-        Equation/Tifmodel/Antoine/libAntoine.a                            \
+        Equation/Tifmodel/Antoine/libAntoine.a                                \
         Equation/Tifmodel/Clapeyron/libClapeyron.a                            \
         Equation/Tifmodel/Schrage/libSchrage.a                                \
         Equation/Tifmodel/libTif.a                                            \

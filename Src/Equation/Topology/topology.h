@@ -94,6 +94,10 @@ class Topology {
       const { return (*clr)[i][j][k]>=clrsurf; }
     inline bool above_interface_old(const int i, const int j, const int k)
       const { return clrold[i][j][k]>=clrsurf; }
+    inline bool under_interface(const int i, const int j, const int k)
+      const { return (*clr)[i][j][k]<clrsurf; }
+    inline bool under_interface_old(const int i, const int j, const int k)
+      const { return clrold[i][j][k]<clrsurf; }
 
     /* current variables */
     Scalar * vf;

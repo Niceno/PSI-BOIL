@@ -7,33 +7,37 @@ CavityPressure::CavityPressure(const Scalar & PHI,
                                Times & T,
                                Linear * sm,
                                Matter * liq,
-                               Topology & topo,
+                               Topology * TOPO,
                                const real TENS,
                                const Scalar & CURV,
                                Sign SIG) :
-  Pressure(PHI,F,U,T,sm,liq),
-  fs(topo.fs),
-  iflag(topo.iflag),
+  /* call parent's constructor. NULL is for solid */
+  Centered( PHI.domain(), PHI, F, & U, T, liq, NULL, sm ),
+  topo(TOPO),
+  fs(TOPO->fs),
+  iflag(TOPO->iflag),
   sig(SIG),
   tens(TENS),
-  clr(topo.clr),
   kappa(CURV)
 {
+  assert(PHI.domain() == F.domain());
+  assert(PHI.domain() == sm->domain());
+
   cavity_pressure = 0.0;
 
-  clrsurf = 0.5;
   /* the in_gas function is initialized using a lambda expression */
   /* clr = 1 is liquid */
   if(SIG>0) {
-    in_gas = [this](const real c) { return c<clrsurf; };
+    in_gas = [this](const int i, const int j, const int k)
+                   { return topo->under_interface(i,j,k); };
   /* clr = 0 is liquid */
   } else {
-    in_gas = [this](const real c) { return c>clrsurf; }; 
+    in_gas = [this](const int i, const int j, const int k)
+                   { return topo->above_interface(i,j,k); };
   }
 
-  /* to overwrite the default discretization imposed by parent constructor */
+  phi.bnd_update();
   discretize();
-
 }	
 
 /******************************************************************************/

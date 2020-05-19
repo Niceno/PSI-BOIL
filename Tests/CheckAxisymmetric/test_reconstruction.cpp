@@ -18,7 +18,7 @@ void test_reconstruction_circle_xz(VOF & conc, Scalar & c, Scalar & ctest,
   real err_c_l1(0.0),  err_c_linf(0.0);
   int cnt(0);
   for_vijk(ctest,i,j,k) {
-    if((*conc.topo.adens)[i][j][k]>boil::pico) {
+    if((*conc.topo->adens)[i][j][k]>boil::pico) {
       cnt++;
       real theta = atan(fabs((ctest.zc(k)-zcent)/(ctest.xc(i)-xcent+boil::atto)));
       real nxtest = cos(theta);
@@ -116,7 +116,7 @@ void test_reconstruction_triangle_xz(VOF & conc, Scalar & c, Scalar & ctest,
   real err_c_l1(0.0),  err_c_linf(0.0);
   int cnt(0);
   for_vijk(ctest,i,j,k) {
-    if(*conc.topo.adens[i][j][k]>boil::pico&&i>boil::BW&&k>boil::BW) {
+    if(*conc.topo->adens[i][j][k]>boil::pico&&i>boil::BW&&k>boil::BW) {
       cnt++;
       real nxtest = mx;
       real nztest = mz;
@@ -167,7 +167,7 @@ void test_reconstruction_triangle_xz(VOF & conc, Scalar & c, Scalar & ctest,
   int knt(0);
   for_vijk(ctest,i,j,k) {
     real kap = kappa[i][j][k];
-    if(boil::realistic(kap)&&i>boil::BW+3&&k>boil::BW+3&&*conc.topo.adens[i][j][k]>boil::pico) {
+    if(boil::realistic(kap)&&i>boil::BW+3&&k>boil::BW+3&&*conc.topo->adens[i][j][k]>boil::pico) {
       knt++;
       real kappa_real = 0.0;
       if(inverted)
@@ -214,7 +214,7 @@ void test_reconstruction_sphere(bool partial,
   real err_c_l1(0.0),  err_c_linf(0.0);
   int cnt(0);
   for_vijk(ctest,i,j,k) {
-    if((*conc.topo.adens)[i][j][k]>boil::pico) {
+    if((*conc.topo->adens)[i][j][k]>boil::pico) {
       cnt++;
 
       /* surface normal to a sphere
@@ -340,7 +340,7 @@ void test_reconstruction_cone(const int NX, const int NZ,
   real err_c_l1(0.0),  err_c_linf(0.0);
   int cnt(0);
   for_vijk(ctest,i,j,k) {
-    if(*conc.topo.adens[i][j][k]>boil::pico&&i>boil::BW&&k>boil::BW) {
+    if(*conc.topo->adens[i][j][k]>boil::pico&&i>boil::BW&&k>boil::BW) {
       cnt++;
       real nxtest = mx;
       real nztest = mz;
@@ -472,7 +472,7 @@ void test_reconstruction_doughnut(bool partial_major, bool partial_minor,
   real err_c_l1(0.0),  err_c_linf(0.0);
   int cnt(0);
   for_vijk(ctest,i,j,k) {
-    if(*conc.topo.adens[i][j][k]>boil::pico) {
+    if(*conc.topo->adens[i][j][k]>boil::pico) {
       cnt++;
       real theta = atan(fabs((ctest.zc(k)-zcent)/(ctest.xc(i)-xcent+boil::atto)));
       real nxtest = cos(theta);

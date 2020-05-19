@@ -1,9 +1,9 @@
 #include "cavitypressure.h"
 
 /***************************************************************************//**
-*  Corrects for the inactive gas cells. 
+ *  Returns interface pressure modelled by the cavity 
 *******************************************************************************/
-real CavityPressure::update_rhs() {
-
-  return Pressure::update_rhs_pressure();
+real CavityPressure::Pint(const int i, const int j, const int k) {
+  return 1000.0;
 }
+     

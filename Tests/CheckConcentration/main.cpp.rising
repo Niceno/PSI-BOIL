@@ -63,7 +63,7 @@ int main(int argc, char ** argv) {
   const real t_per_plot = 0.01;
 
   /* dt settings */
-  const real surftens_dt_coef = 5.;
+  const real surftens_dt_coef = 10.;
   const real initdtcoef = 1e-4;
 
   /* cfl limit */
@@ -411,7 +411,7 @@ int main(int argc, char ** argv) {
 
   /* ng transport */
   ConcentrationTP ngtransp(eps,mdot_eps,uvw,
-                           c,conc.flow(),conc.heaviside(),&(conc.topo),
+                           conc.flow(),conc.heaviside(),conc.topo,
                            time, solverCGdi, &gas);
 
   /*-------------------+
@@ -498,6 +498,11 @@ int main(int argc, char ** argv) {
   /* set iint */
   int iint = int(time.current_time()/t_per_plot) + 1;
   boil::oout<<"iint= "<<iint<<"\n";
+  
+  /*----------------+
+  |  topology init  |
+  +----------------*/
+  conc.new_time_step();
 
   real zpos(0.0);
   /*------------+
@@ -590,7 +595,7 @@ int main(int argc, char ** argv) {
     ResRat rr = ResRat(1e-5);
 
     p = 0.;
-    if(multigrid.cycle(Cycle::F(),Cycle::F(),rr,mi)) OMS(converged);
+    if(multigrid.cycle(Cycle::Z(),Cycle::F(),rr,mi)) OMS(converged);
     p.exchange();
     ns.project(p);
     press += p;
@@ -619,6 +624,7 @@ int main(int argc, char ** argv) {
     /*---------------------------+
     |  solve transport equation  |
     +---------------------------*/
+    conc.new_time_step();
 #ifdef USE_PHASE_VEL_VOF
     conc.advance_with_extrapolation(false,ResRat(1e-9),uvw,f,
                                     one,&uvw_1);
@@ -681,7 +687,8 @@ int main(int argc, char ** argv) {
     real mgamma(0.), mgamma2(0.);
     real weight(0.);
     for_vijk(c,i,j,k) {
-      if((*conc.topo.adens)[i][j][k]>boil::atto) {
+      //if((*conc.topo.adens)[i][j][k]>boil::atto) {
+      if(conc.topo->interface(i,j,k)) {
          real t1 = tsat.Tint(i,j,k);
          real t2 = t1*t1;
 
@@ -691,7 +698,8 @@ int main(int argc, char ** argv) {
          real m1 = mflx[i][j][k];
          real m2 = m1*m1;
 
-         real wt = (*conc.topo.adens)[i][j][k]*c.dV(i,j,k);
+         //real wt = (*conc.topo.adens)[i][j][k]*c.dV(i,j,k);
+         real wt = (*conc.topo->adens)[i][j][k]*c.dV(i,j,k);
 
          tgamma  += t1*wt;
          tgamma2 += t2*wt;

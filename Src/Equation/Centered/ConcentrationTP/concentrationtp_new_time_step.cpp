@@ -38,10 +38,10 @@ void ConcentrationTP::new_time_step(const Scalar * diff_eddy) {
   |  fold = vol * rho * eps / dt  |
   +-------------------------------*/
   for_ijk(i,j,k) {
-    //real col_new = std::min(1.0,std::max(0.0,clr[i][j][k]));
-    //real col_old = std::min(1.0,std::max(0.0,clrold[i][j][k]));
-    real col_new = clr[i][j][k];
-    real col_old = clrold[i][j][k];
+    real col_new = std::min(1.0,std::max(0.0,clr[i][j][k]));
+    real col_old = std::min(1.0,std::max(0.0,clrold[i][j][k]));
+    //real col_new = clr[i][j][k];
+    //real col_old = clrold[i][j][k];
     real r = rho_dif->value(i,j,k);
 
     if(sig==Sign::neg()) col_old = 1.-col_old;

@@ -13,7 +13,7 @@
 *  external), here it assembles only one contribution: divergence of the
 *  velocity field.
 *******************************************************************************/
-real Pressure::update_rhs_pressure() {
+real Pressure::update_rhs() {
 
   //u->exchange();
   
@@ -125,11 +125,11 @@ real Pressure::update_rhs_pressure() {
   //debug: if( time->current_step() % 100 == 0 ) 
   //debug: boil::plot->plot(fnew, "p-fnew", time->current_step());
 
-  /*-----------------------+ 
-  |  add external sources  |
-  +-----------------------*/
+  /*--------------------------------------------+ 
+  |  add external sources and boundary effects  |
+  +--------------------------------------------*/
   for_ijk(i,j,k) {
-    fnew[i][j][k] += fext[i][j][k];
+    fnew[i][j][k] += fext[i][j][k] + fbnd[i][j][k];
   }
 
   return err;

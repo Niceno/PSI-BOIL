@@ -268,6 +268,7 @@ int main(int argc, char * argv[]) {
   conc.reconstruct_geometry();
   conc.test_reconstruction(conc.color(),c);
 #endif
+  conc.new_time_step();
   conc.totalvol();
 
   std::vector<real> nl1, nli, kl1, kli;
@@ -282,6 +283,7 @@ int main(int argc, char * argv[]) {
     for_m(m)
       uvw_old(m) = uvw(m);
     // store color function
+    conc.new_time_step();
     cold = c;
 #ifdef USE_BNDCLR
     for_m(m)
@@ -362,7 +364,11 @@ int main(int argc, char * argv[]) {
     /* curvature */
     NormMethod nm = NormMethod::ElviraXZ();
     nmv.push_back(nm);
+#ifndef USE_CARTESIAN
     test_reconstruction_sphere(partial,conc,conc.color(),cold,kappa,inverted,radius,0.,0.,0.,nm,nl1,nli,kl1,kli);
+#else
+    test_reconstruction_circle_xz(conc,c,cold,kappa,inverted,radius,0.,0.,nm,nl1,nli,kl1,kli);
+#endif
     boil::oout<<"main::curv: "<<time.current_time()<<" "<<kl1[time.current_step()-1]<<" "<<kli[time.current_step()-1]<<boil::endl;
 
     if(time.current_step() % nint == 0 || time.current_step()==1 ) {
