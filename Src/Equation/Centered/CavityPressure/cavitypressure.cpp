@@ -8,7 +8,7 @@ CavityPressure::CavityPressure(const Scalar & PHI,
                                Linear * sm,
                                Matter * liq,
                                Topology * TOPO,
-                               const real TENS,
+                               const Property * TENS,
                                const Scalar & CURV,
                                Sign SIG) :
   /* call parent's constructor. NULL is for solid */
@@ -17,8 +17,8 @@ CavityPressure::CavityPressure(const Scalar & PHI,
   fs(TOPO->fs),
   iflag(TOPO->iflag),
   sig(SIG),
-  tens(TENS),
-  kappa(CURV)
+  sigma(TENS),
+  kappa(&CURV)
 {
   assert(PHI.domain() == F.domain());
   assert(PHI.domain() == sm->domain());

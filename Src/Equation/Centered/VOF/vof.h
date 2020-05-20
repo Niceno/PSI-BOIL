@@ -56,6 +56,19 @@ class VOF : public Centered {
                                     const Matter * fluid_2 = NULL,
                                     Vector * uvw_2 = NULL);
 
+    void advance_with_extrapolation(const bool anci, const ResRat & resrat,
+                                    const Vector & umixed,
+                                    const Matter * fluid_1, Vector * uvw_1,
+                                    const Matter * fluid_2 = NULL,
+                                    Vector * uvw_2 = NULL);
+
+    void advance_with_extrapolation(Scalar & sca,
+                                    const bool anci, const ResRat & resrat,
+                                    const Vector & umixed,
+                                    const Matter * fluid_1, Vector * uvw_1,
+                                    const Matter * fluid_2 = NULL,
+                                    Vector * uvw_2 = NULL);
+
     void advance_phase_change(Scalar & scp);
     void advance_geometric(Scalar & scp);
     
@@ -84,6 +97,10 @@ class VOF : public Centered {
 
     void extrapolate_velocity(const Scalar & scp, const Scalar & fext,
                               const Matter * fluid, const Vector & umixed, 
+                              Vector & unew, const ResRat & resrat,
+                              const Sign & sig, const bool flagging);
+    void extrapolate_velocity(const Scalar & scp,
+                              const Matter * fluid, const Vector & umixed,
                               Vector & unew, const ResRat & resrat,
                               const Sign & sig, const bool flagging);
 
@@ -117,6 +134,8 @@ class VOF : public Centered {
                   const Scalar & b, Scalar & x, Scalar & xold,
                   const bool init_guess, const int niter,
                   const ResRat & resrat);
+    void ev_calculate_source(const ScalarInt & pflag, const Vector & u,
+                             Scalar & fext);
     void ev_project(const ScalarInt & pflag, const Matter * fluid,
                     const Scalar & frc, Vector & u);
     void ev_complement(const ScalarInt & pflag, const Scalar & scp,
@@ -309,7 +328,7 @@ class VOF : public Centered {
     Scalar adens;
     Scalar mx,my,mz;/* normal to interface, in real space */
 
-    Matter jelly;   /* virtual fluid for level set transport */
+    Matter jelly;   /* virtual fluid needed by parent constructor */
     real xminft,xmaxft,yminft,ymaxft,zminft,zmaxft; /* xyz min&max of front */
     real theta;
     real epsnorm;

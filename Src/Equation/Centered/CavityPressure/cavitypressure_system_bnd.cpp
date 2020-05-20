@@ -117,7 +117,6 @@ void CavityPressure::create_system_bnd() {
           if(valid_cell(ei(),j,k)&&!interface(Sign::pos(),Comp::i(),ei(),j,k)) {
             const real value = phi[ei()+1][j][k];
             fbnd[ei()][j][k] += value * A.e[ei()][j][k];
-            boil::oout<<k<<" "<<value<<" "<<fbnd[ei()][j][k]<<" "<<A.e[ei()][j][k]<<boil::endl;
             A.e[ei()][j][k]  = 0.0;
           }
          }

@@ -94,6 +94,7 @@ class Momentum : public Staggered {
     void load(const char *, const int = -1);
 
     void outlet();
+    void pressure_outlet(const Scalar & frc);
 
     Matrix * A[3];
 

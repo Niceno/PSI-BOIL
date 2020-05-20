@@ -16,6 +16,7 @@ libMomentum_a_SOURCES = momentum.h                               \
                         momentum_outlet.cpp                      \
                         momentum_vol_phase_change.cpp            \
                         momentum_volf_bct.cpp                    \
+                        momentum_pressure_outlet.cpp             \
                         momentum_project.cpp                     \
                         momentum_project_ghost.cpp               \
                         momentum_save.cpp                        \

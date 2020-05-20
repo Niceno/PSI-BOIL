@@ -4,6 +4,18 @@
  *  Returns interface pressure modelled by the cavity 
 *******************************************************************************/
 real CavityPressure::Pint(const int i, const int j, const int k) {
-  return 1000.0;
+  /* in psi-boil, bubbles have negative curvature:
+   *           pl = pg + sigma*kappa;
+   * multiplication by sig guarantees correct value under inversion. 
+   * (this is normally handled by the normal vector inversion) */
+  //return sig*sigma->value(i,j,k)*kappa[i][j][k]+cavity_pressure;
+  /* in this implementation, we neglect surface tension for cavity */
+  return cavity_pressure;
 }
-     
+
+/***************************************************************************//**
+ *  Returns pressure modelled by the cavity 
+*******************************************************************************/
+real CavityPressure::Pcavity(const int i, const int j, const int k) {
+  return cavity_pressure;
+}

@@ -15,7 +15,8 @@ real CavityPressure::update_rhs() {
     if(in_gas(i,j,k)) {
       //fnew[i][j][k] = 0.0;
       /* maybe helps with convergence? */
-      fnew[i][j][k] = A.c[i][j][k]*Pint(i,j,k);
+      //fnew[i][j][k] = A.c[i][j][k]*Pint(i,j,k);
+      fnew[i][j][k] = A.c[i][j][k]*Pcavity(i,j,k);
     } else if(dom->ibody().off_p(i,j,k)) {
       fnew[i][j][k] = 0.0;
     } else {
