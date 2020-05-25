@@ -146,6 +146,7 @@ void Momentum::project_ghost(const Scalar & frc,
         }
       }
   }
-  insert_bc();
+
+  u.bnd_update_nooutlet();
   u.exchange_all();
 }

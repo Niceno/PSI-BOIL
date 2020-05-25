@@ -12,27 +12,48 @@ static void __attribute__ ((constructor)) trapfpe(void)
 #endif
 
 #define SYM
-//#define FS_TEST
-#define USE_PHASE_VEL_VOF
-//#define USE_PHASE_VEL_EFD
-#define USE_PC4
-//#define USE_SECOND_ORDER
-#define USE_UNCOND_EXTRP
-#define DISCARD_POINTS
+//#define USE_PHASE_CHANGE
+#define USE_CAVITY
 #define CASE 1
 /* case 1 = axisymmetric
         2 = cartesian 2D
         3 = cartesian 3D
 */
+#define VARIANT 2
+/* variant 1 = polynomial expansion
+           2 = linear
+           3 = isentropic
+           4 = isentropic with external oscillations
+*/
+
+const real R0 = 50e-6;
+const real dR = 25e-6;
+const real per = 0.5*R0;
+#if VARIANT > 1
+  const real pinf = 1e5;
+  const real p0 = 2e5;
+  const real A = 0;
+#else
+  const real pinf = 0.0;
+  const real t0 = 10e-6;
+  const real A = R0/t0/t0;
+#endif
+
+void update_pressure_bc(Scalar & p, const real t,
+                        const real r0, const real rm, const real rmm,
+                        const real d0, const real dm, const real dmm,
+                        const real rhol, const real ps, const real pinf);
+void update_pressure_bc_linear(Scalar & p, const real t, const real r0,
+                        const real rhol, const real ps, const real pinf);
 
 /******************************************************************************/
 int main(int argc, char ** argv) {
 
   boil::timer.start();
 
-  if(argc<3){
-    boil::oout<<"Two command line arguments required!"<<"\n";
-    boil::oout<<"./Boil wmin glevel"<<"\n";
+  if(argc<4){
+    boil::oout<<"Three command line arguments required!"<<"\n";
+    boil::oout<<"./Boil wmin glevel gstage"<<"\n";
 
     exit(0);
   }
@@ -45,6 +66,9 @@ int main(int argc, char ** argv) {
   const int gLevel = atoi(argv[2]); /* domain dimensions */ 
   boil::oout<<"glevel= "<<gLevel<<"\n";
 
+  const int gStage = atoi(argv[3]); /* domain dimensions */ 
+  boil::oout<<"gstage= "<<gStage<<"\n";
+
 /******************************************************************************/
 /* ------------ rescaling factors */
   const real xmult = 1e0;
@@ -55,13 +79,13 @@ int main(int argc, char ** argv) {
 /* ------------ boundary or initial conditions */
   const real tsat0 = 373.15;
   const real tout = tsat0+1.25;
+  const real isent_kappa = 1.4;
 
 /******************************************************************************/
 /* ------------ numerical simulation settings */
 
   /* total time */
-  //const real tend = 0.003;
-  const real tend = 0.0012*1.25; /* 12247 for level 2 */
+  const real tend = 4.*per;
 
   /* number of backup points */
   const int n_bck = 2;
@@ -78,10 +102,10 @@ int main(int argc, char ** argv) {
 /* ------------ optional simulation settings */
 
   /* multigrid */
-  //const bool multigrid_stop_if_diverging = true;
-  const bool multigrid_stop_if_diverging = false;
+  const bool multigrid_stop_if_diverging = true;
+  //const bool multigrid_stop_if_diverging = false;
 
-  const int multigrid_min_cycles = 6;
+  const int multigrid_min_cycles = 1;
   const int multigrid_max_cycles = 20;
 
   /* vof */
@@ -91,11 +115,11 @@ int main(int argc, char ** argv) {
 
   const bool use_fs_interp = false;
   const bool store_pressure_extrap = true;
-  const int niter_pressure_extrap = 1000;
+  const int niter_pressure_extrap = 5000;
 
   /* enthalpy fd */
-  //const bool no_solid_acceleration = true;
-  const bool no_solid_acceleration = false;
+  const bool no_solid_acceleration = true;
+  //const bool no_solid_acceleration = false;
 
 /******************************************************************************/
 /* ------------ material properties */
@@ -114,18 +138,40 @@ int main(int argc, char ** argv) {
 
 /******************************************************************************/
 /* ------------ domain dimensions */
-  const int NX = 24*gLevel;
+  const int NX = 24*gLevel*gStage;
 #ifdef SYM
-  const int NZ = 24*gLevel;
+  const int NZ = 24*gLevel*gStage;
 #else
-  const int NZ = 48*gLevel;
+  const int NZ = 48*gLevel*gStage;
 #endif
 
-  const real LX = 187.5e-6;
+  const real radius=R0;
+  const real LX = 6*radius*gStage;
   const real LZ = LX;
 
   const real DX = LX/real(NX);
-  const real radius=50.0e-6;
+
+  real polar = 1.0;
+  real azimuth = 1.0;
+#ifdef SYM
+  polar = 0.5;
+#endif
+
+#if CASE == 1
+  const real V0 = 2./3.*azimuth*polar*radius*radius*radius;
+#elif CASE == 2
+  #ifdef SYM 
+  polar = 0.25;
+  #endif
+  const real V0 = DX *boil::pi*polar*radius*radius;
+#else
+  azimuth = 2.*boil::pi;
+  #ifdef SYM
+  azimuth = boil::pi/2.;
+  #endif
+  const real V0 = 2./3.*azimuth*polar*radius*radius*radius;
+#endif
+  boil::oout<<"V0= "<<V0<<" "<<A<<boil::endl;
 
 /******************************************************************************/
 /* ------------- setup finished */
@@ -141,11 +187,16 @@ int main(int argc, char ** argv) {
   /*----------+
   |  grid(s)  |
   +----------*/
-  Grid1D gx( Range<real>(0.0,LX), NX, Periodic::no(), BndGrid::symmetry(), BndGrid::wall() );
+  Grid1D gx( Range<real>(0.0,LX), NX, Periodic::no(),
+             //BndGrid::symmetry(), BndGrid::wall() );
+             BndGrid::symmetry(), BndGrid::extrapolate() );
 #ifndef SYM
-  Grid1D gz( Range<real>(-LZ,LZ), NZ, Periodic::no() );
+  Grid1D gz( Range<real>(-LZ,LZ), NZ, Periodic::no(), 
+             BndGrid::extrapolate(), BndGrid::extrapolate() );
 #else
-  Grid1D gz( Range<real>(0.0,LZ), NZ, Periodic::no(), BndGrid::symmetry(), BndGrid::wall() );
+  Grid1D gz( Range<real>(0.0,LZ), NZ, Periodic::no(), 
+             //BndGrid::symmetry(), BndGrid::wall() );
+             BndGrid::symmetry(), BndGrid::extrapolate() );
 #endif
 
   /*---------+
@@ -171,6 +222,9 @@ int main(int argc, char ** argv) {
   Scalar tpr(d), q  (d);           // temperature
   Scalar mdot(d), mflx(d);         // phase-change rate
 
+  Scalar p_cav(d), f_cav(d);       // cavity-pressure
+  Vector uvw_cav(d);               // cavity-velocity
+  ScalarInt h_cav(d);              // indicator function
 
   /*-----------------------------+ 
   |  insert boundary conditions  |
@@ -209,6 +263,7 @@ int main(int argc, char ** argv) {
 #endif
     uvw_1(m)=uvw(m).shape();
     uvw_2(m)=uvw(m).shape();
+    uvw_cav(m)=uvw(m).shape();
   }
 
 #if CASE == 1
@@ -243,7 +298,6 @@ int main(int argc, char ** argv) {
   #endif
 #endif
 
-  press=c.shape();
   p=c.shape();
   kappa=c.shape();
 
@@ -252,6 +306,9 @@ int main(int argc, char ** argv) {
   mflx = p.shape();
   q = p.shape();
   g = c.shape();
+
+  f_cav = f.shape();
+  h_cav = c.shape();
 
 #if CASE == 1
   tpr.bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
@@ -285,6 +342,44 @@ int main(int argc, char ** argv) {
   #endif
 #endif
 
+#if CASE == 1
+  p_cav.bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
+  p_cav.bc().add( BndCnd( Dir::imax(), BndType::dirichlet(), pinf ) );
+#else
+  #ifdef SYM
+  p_cav.bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
+  p_cav.bc().add( BndCnd( Dir::imax(), BndType::dirichlet(), pinf ) );
+  #else
+  p_cav.bc().add( BndCnd( Dir::imin(), BndType::dirichlet(), pinf ) );
+  p_cav.bc().add( BndCnd( Dir::imax(), BndType::dirichlet(), pinf ) );
+  #endif
+#endif
+#ifdef SYM
+  p_cav.bc().add( BndCnd( Dir::kmin(), BndType::symmetry() ) );
+  p_cav.bc().add( BndCnd( Dir::kmax(), BndType::dirichlet(), pinf ) );
+#else
+  p_cav.bc().add( BndCnd( Dir::kmin(), BndType::dirichlet(), pinf ) );
+  p_cav.bc().add( BndCnd( Dir::kmax(), BndType::dirichlet(), pinf ) );
+#endif
+#if CASE < 3
+  p_cav.bc().add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
+  p_cav.bc().add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
+#else
+  #ifdef SYM
+  p_cav.bc().add( BndCnd( Dir::jmin(), BndType::symmetry() ) );
+  p_cav.bc().add( BndCnd( Dir::jmax(), BndType::dirichlet(), pinf ) );
+  #else
+  p_cav.bc().add( BndCnd( Dir::jmin(), BndType::dirichlet(), pinf ) );
+  p_cav.bc().add( BndCnd( Dir::jmax(), BndType::dirichlet(), pinf ) );
+  #endif
+#endif
+
+#ifdef USE_CAVITY
+  press=p_cav.shape();
+#else
+  press=c.shape();
+#endif
+
   /*----------------------+
   |  physical properties  |
   +----------------------*/
@@ -314,7 +409,6 @@ int main(int argc, char ** argv) {
   boil::oout<<"main:dxmin= "<<dxmin<<" "<<boil::cart.iam()<<" "<<dt<<"\n";
   boil::oout<<"main:nparams= "<<n_per_plot<<" "<<n_per_backup<<"\n";
   Times time(ndt, dt);
-  time.print_time(false);
   time.set_coef_dec(0.75);
   time.set_dt(dt);
 
@@ -343,11 +437,7 @@ int main(int argc, char ** argv) {
   multigrid.max_cycles(multigrid_max_cycles);
 
   /* color function */
-#ifdef USE_PHASE_VEL_VOF
   Vector & uvwvof = uvw_1;
-#else
-  Vector & uvwvof = uvw;
-#endif
 #if CASE > 1
   VOF conc(c, g, kappa, uvwvof, time, solver);
 #else
@@ -361,19 +451,8 @@ int main(int argc, char ** argv) {
 
   /* enthalpy equation */
   TIF tsat(tsat0);
-#ifdef USE_PHASE_VEL_VOF
-  #ifdef USE_PHASE_VEL_EFD
-  Vector & uvwenth1 = uvw_1;
-  Vector & uvwenth2 = uvw_2;
-  //Vector & uvwenth2 = uvw;
-  #else
   Vector & uvwenth1 = uvw;
   Vector & uvwenth2 = uvw;
-  #endif
-#else
-  Vector & uvwenth1 = uvw;
-  Vector & uvwenth2 = uvw;
-#endif
 
 #if CASE > 1
   EnthalpyFD enthFD      (tpr, q, uvw, uvwenth1, uvwenth2, time, solver  , &mixed,
@@ -388,23 +467,28 @@ int main(int argc, char ** argv) {
   enthFD.set_no_solid_acceleration(no_solid_acceleration);
 
   /* phase change */
-#ifndef USE_PC4
-  PhaseChangeVOF pc(mdot, mflx, tpr, q, c, g , f , uvw, conc.topo,
-                    tsat, time, &mixed);
-#else
-  PhaseChange4   pc(mdot, mflx, tpr, q, c, g , f , uvw, conc.topo,
-                    tsat, time, &mixed);
-  #ifdef USE_SECOND_ORDER
+  PhaseChange4 pc(mdot, mflx, tpr, q, c, g , f , uvw, conc.topo,
+                  tsat, time, &mixed);
   pc.set_second_order_accuracy(true);
-  #endif
-  #ifdef USE_UNCOND_EXTRP
-  pc.set_unconditional_extrapolation(true);
-  #endif
-  #ifdef DISCARD_POINTS
+  pc.set_unconditional_extrapolation(false);
   pc.set_discard_points_near_interface(true);
-  #endif
+
+  /* cavity pressure */
+#if CASE > 1
+  CavityPressure capr(press, f_cav, uvw_cav, time, solver, &liquid,
+                      conc.topo,mixed.sigma(),kappa);
+#else
+  CPaxisym       capr(press, f_cav, uvw_cav, time, solver, &liquid,
+                      conc.topo,mixed.sigma(),kappa);
+#endif
+#if VARIANT > 1
+  capr.set_cavity_pressure(p0);
 #endif
 
+  AC multigrid_cavity( &capr );
+  multigrid_cavity.stop_if_diverging(multigrid_stop_if_diverging);
+  multigrid_cavity.min_cycles(multigrid_min_cycles);
+  multigrid_cavity.max_cycles(multigrid_max_cycles);
 
   /*-------------------+
   |  check if restart  |
@@ -518,50 +602,82 @@ int main(int argc, char ** argv) {
   int iint = 1;
   boil::oout<<"iint= "<<iint<<"\n";
 
-#ifdef FS_TEST
-  #if 0
-  Comp mcomp = Comp::i();
-  #else
-  Comp mcomp = Comp::k();
-  #endif
-  for_vmijk((*conc.topo.fs),mcomp,i,j,k) {
-    real val = (*conc.topo.fs)[mcomp][i][j][k];
-  #if 0
-    real pos = (*conc.topo.fs).zc(mcomp,k);
-    real sig = 1.;
-  #else
-    real pos  = (*conc.topo.fs).xc(mcomp,i);
-    real pos2 = (*conc.topo.fs).zc(mcomp,k);
-    real sig = (pos2>0.)-(pos2<0.);
-  #endif
-    if(boil::realistic(val)) {
-      boil::oout<<i<<" "<<j<<" "<<k<<" "<<val<<" "<<sig*sqrt(radius*radius-pos*pos)
-                <<" | "<<val/sig/sqrt(radius*radius-pos*pos)-1.
-                <<boil::endl;
-    } 
-  }
-
-  exit(0);
-#endif
-
   /*------------+
   |  time loop  |
   +------------*/
+  real r_0, r_m, r_mm;
+  r_0 = r_m = r_mm = R0;
+  real dt_0, dt_m, dt_mm;
+  dt_0 = dt_m = dt_mm = time.dt();
   for(time.start(); time.end(); time.increase()) {
 
-    boil::oout << "########################" << boil::endl;
-    boil::oout << "# TIME:      " << time.current_time() << boil::endl;
-    boil::oout << "# DT:        " << time.dt() << boil::endl;
-    boil::oout << "# TIME STEP: " << time.current_step()
-               << "/"             << time.total_steps() << boil::endl;
-    boil::oout << "# WTIME:     " << boil::timer.current_min() << boil::endl;
-    boil::oout << "########################" << boil::endl;
-
+    f = 0.0;
     /*---------------+
     |  phase change  |
     +---------------*/
+#ifdef USE_PHASE_CHANGE
     pc.update();
+
+    /* add to volumetric source */
     ns.vol_phase_change(&f);
+#endif
+
+    const int niter = 50;
+    MaxIter mm = MaxIter(niter);
+    std::array<MaxIter,3> mi = {mm,mm,mm};
+
+    ResRat rr = ResRat(1e-6);
+
+    /*---------+
+    |  cavity  |
+    +---------*/
+#ifdef USE_CAVITY
+    /* step one: reset outflow velocity */
+    for_m(m)
+      for_avmijk(xyz,m,i,j,k)
+        uvw_cav[m][i][j][k]=0.0;
+
+    /* step two: label cells */
+    for_vijk(h_cav,i,j,k)
+      h_cav[i][j][k] = conc.heaviside()->status(i,j,k);
+
+    /* step two: calculate volume of gas (this to avoid spurious source in liquid bulk) */
+    real V_cavity(0.0);
+    for_vijk(h_cav,i,j,k)
+      if(h_cav[i][j][k]==0||h_cav[i][j][k]==-1)
+        V_cavity += (1.0-std::min(1.0,std::max(0.0,c[i][j][k])))*c.dV(i,j,k);
+
+    boil::cart.sum_real(&V_cavity);
+    r_0 = std::pow(1.5*V_cavity/azimuth/polar,1./3.);
+  #if VARIANT > 2
+    const real cavity_pressure_new = p0*std::pow(V0/V_cavity,isent_kappa);
+    capr.set_cavity_pressure(cavity_pressure_new);
+  #elif VARIANT == 1
+    capr.set_cavity_pressure(rhol*(2.*A*R0+8.*A*(r_0-R0)));
+  #endif
+    /* step three: solve cavity pressure */
+
+    press = pinf;
+  #if VARIANT == 3
+    r_mm = r_m;
+    r_m = r_0;
+    dt_mm = dt_m;
+    dt_m = dt_0;
+    dt_0 = time.dt();
+    update_pressure_bc(press,time.current_time(),
+                       r_0,r_m,r_mm,0.,dt_m,dt_mm,
+                       rhol,cavity_pressure_new,pinf);
+  #elif 0// VARIANT == 2
+    update_pressure_bc_linear(press,time.current_time(),r_0,
+                              rhol,p0,pinf);
+  #endif
+    press.bnd_update();
+    capr.discretize();
+    capr.coarsen();
+    //if (multigrid_cavity.fcycle(ResRat(5e-5))) OMS(converged);
+    if (multigrid_cavity.cycle(Cycle::none(),Cycle::F(),ResRat(5e-5),mi)) OMS(converged);
+    press.exchange();
+#endif
 
     /* reset body force */
     for_m(m)
@@ -576,8 +692,6 @@ int main(int argc, char ** argv) {
     +--------------------------*/
     /* essential for moving front */
     ns.discretize();
-    pr.discretize();
-    pr.coarsen();
 
     /* momentum */
     ns.new_time_step();
@@ -585,13 +699,40 @@ int main(int argc, char ** argv) {
     ns.grad(press);
     ns.solve(ResRat(1e-14));
 
+#ifdef USE_CAVITY
+    /* step four: correct boundaries for velocity */
+    ns.vanishing_derivative_outlet(uvw);
+
+    /* step fve: calculate outlet */
+    real outflow = -uvw.bnd_flow(BndType::outlet()); /* m3/s */
+
+    boil::oout<<"Cavity= "<<time.current_time()<<" "<<V_cavity
+#if VARIANT == 3
+                          <<" "<<cavity_pressure_new
+#endif
+                          <<" "<<outflow<<boil::endl;
+
+    /* step five: distribute source */
+    for_vijk(f,i,j,k) {
+      if(h_cav[i][j][k]==0||h_cav[i][j][k]==-1) {
+         f[i][j][k] += time.dti() * (1.0-std::min(1.0,std::max(0.0,c[i][j][k])))
+                                  * c.dV(i,j,k)/V_cavity * outflow;
+      }
+    }
+    f.exchange();
+#endif
+
     p = 0.0;
-    if (multigrid.vcycle(ResRat(1e-6))) OMS(converged);
-    //pr.solve(ResRat(1e-6));
+    p.bnd_update();
+    pr.discretize();
+    pr.coarsen();
+
+    if (multigrid.cycle(Cycle::none(),Cycle::F(),rr,mi)) OMS(converged);
     p.exchange();
     ns.project(p);
     press += p;
 
+#ifndef USE_CAVITY
     /* shift pressure */
     real pmin=1.0e+300;
     for_vijk(press,i,j,k){
@@ -610,6 +751,7 @@ int main(int argc, char ** argv) {
     }
     press.bnd_update();
     press.exchange_all();
+#endif
 
     ns.cfl_max();
 
@@ -617,16 +759,7 @@ int main(int argc, char ** argv) {
     |  solve transport equation  |
     +---------------------------*/
     conc.new_time_step();
-    conc.advance_phase_change(c);
-    conc.reconstruct_geometry(c);
-    conc.interfacial_flagging(conc.color());
-#ifdef USE_PHASE_VEL_VOF
-    conc.extrapolate_velocity(conc.color(),f,&liquid,uvw,uvw_1,ResRat(1e-4),Sign::pos(),true);
-  #ifdef USE_PHASE_VEL_EFD
-    conc.extrapolate_velocity(conc.color(),f,&vapor,uvw,uvw_2,ResRat(1e-4),Sign::neg(),false);
-  #endif
-#endif
-    conc.advance_geometric(c);
+    conc.advance_with_extrapolation(true,ResRat(1e-8),uvw,&liquid,&uvw_1);
     conc.ancillary();
     conc.totalvol();
 
@@ -712,3 +845,110 @@ int main(int argc, char ** argv) {
   boil::timer.report();
 
 }	
+
+/******************************************************************************/
+void update_pressure_bc(Scalar & p, const real t,
+                        const real r0, const real rm, const real rmm,
+                        const real d0, const real dm, const real dmm,
+                        const real rhol, const real ps, const real pinf) {
+
+  /* first derivative */
+  std::vector<real> stencil, values;
+  stencil.push_back(0.);
+  stencil.push_back(-dm);
+  stencil.push_back(-dmm-dm);
+  values.push_back(r0);
+  values.push_back(rm);
+  values.push_back(rmm);
+
+  real c0 = -1./stencil[1] - 1./stencil[2];
+  real c1 = -stencil[2]/(stencil[1]*(stencil[1]-stencil[2]));
+  real c2 =  stencil[1]/(stencil[2]*(stencil[1]-stencil[2]));
+
+  real first_derivative = c0*values[0]+c1*values[1]+c2*values[2];
+
+  /* second derivative */
+  c0 = 2./(stencil[1]*stencil[2]);
+  c1 = 2./(stencil[1]*(stencil[1]-stencil[2]));
+  c2 = -2./(stencil[2]*(stencil[1]-stencil[2]));
+
+  real second_derivative = c0*values[0]+c1*values[1]+c2*values[2];
+
+  real R_val = r0;
+  real Rdot_val = first_derivative;
+  real Rddt_val = second_derivative;
+
+  boil::oout<<"pbnd_updateR= "<<t<<" "<<R_val<<" "<<Rdot_val<<" "<<Rddt_val<<boil::endl;
+
+  real C4 = -rhol*std::pow(Rdot_val,2.)*std::pow(R_val,4.)/2.;
+  real C1 = -rhol*(-1.)*(Rddt_val*std::pow(R_val,2.)+2*R_val*std::pow(Rdot_val,2.));
+  //real C0 = pcav-rhol*(Rddt_val*R_val + 1.5*std::pow(Rdot_val,2.));
+  real C0 = pinf;
+
+  std::ostringstream streamC4, streamC1, streamC0;
+  streamC4 << C4;
+  streamC1 << C1;
+  streamC0 << C0;
+  std::string STR_C4 = streamC4.str();
+  std::string STR_C1 = streamC1.str();
+  std::string STR_C0 = streamC0.str();
+
+  boil::oout<<"pbnd_updateC= "<<t<<" "<<C4<<" "<<C1<<" "<<C0<<boil::endl;
+
+  std::string r1 = "(x*x+y*y+z*z)^0.5";
+  std::string r4 = "(x*x+y*y+z*z)^2";
+
+  std::string eq = STR_C4+"/"+r4+"+"+STR_C1
+                 + "/"+r1+"+"+STR_C0;
+  boil::oout<<eq<<"\n";
+
+  char *eqp = new char[eq.length()+1];
+  std::strcpy(eqp, eq.c_str());
+
+  p.bc().modify( BndCnd( Dir::imax(), BndType::dirichlet(), eqp) );
+  p.bc().modify( BndCnd( Dir::kmax(), BndType::dirichlet(), eqp) );
+  p.bnd_update();
+
+  return;
+}
+
+/******************************************************************************/
+void update_pressure_bc_linear(Scalar & p, const real t, const real r0,
+                               const real rhol, const real ps, const real pinf) {
+
+  real R_val = r0;
+  real Rdot_val = sqrt(2./3.*(ps-pinf)/rhol);
+  real Rddt_val = 0.0;
+
+  boil::oout<<"pbnd_updateR= "<<t<<" "<<R_val<<" "<<Rdot_val<<" "<<Rddt_val<<boil::endl;
+
+  real C4 = -rhol*std::pow(Rdot_val,2.)*std::pow(R_val,4.)/2.;
+  real C1 = -rhol*(-1.)*(Rddt_val*std::pow(R_val,2.)+2*R_val*std::pow(Rdot_val,2.));
+  real C0 = pinf;
+
+  std::ostringstream streamC4, streamC1, streamC0;
+  streamC4 << C4;
+  streamC1 << C1;
+  streamC0 << C0;
+  std::string STR_C4 = streamC4.str();
+  std::string STR_C1 = streamC1.str();
+  std::string STR_C0 = streamC0.str();
+
+  boil::oout<<"pbnd_updateC= "<<t<<" "<<C4<<" "<<C1<<" "<<C0<<boil::endl;
+
+  std::string r1 = "(x*x+y*y+z*z)^0.5";
+  std::string r4 = "(x*x+y*y+z*z)^2";
+
+  std::string eq = STR_C4+"/"+r4+"+"+STR_C1
+                 + "/"+r1+"+"+STR_C0;
+  boil::oout<<eq<<"\n";
+
+  char *eqp = new char[eq.length()+1];
+  std::strcpy(eqp, eq.c_str());
+
+  p.bc().modify( BndCnd( Dir::imax(), BndType::dirichlet(), eqp) );
+  p.bc().modify( BndCnd( Dir::kmax(), BndType::dirichlet(), eqp) );
+  p.bnd_update();
+
+  return;
+}

@@ -1,10 +1,10 @@
-#include "momentum.h"
+#include "vector.h"
 
 /******************************************************************************/
-real Momentum::volf_bct(const BndType & bc_type,
-                        real * Ax, real * Ay, real * Az) const {
+real Vector::bnd_flow(const BndType & bc_type,
+                      real * Ax, real * Ay, real * Az) const {
 /*----------------------------------------------------------+ 
-|  computes volume flux [m^3/s] at specified b.c. type      |
+|  computes flow [units * m^2] at specified b.c. type       |
 +- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -+
 |  no density is used - the flow is incompressible          |
 +----------------------------------------------------------*/
@@ -20,11 +20,11 @@ real Momentum::volf_bct(const BndType & bc_type,
   |  through all boundaries  |
   +-------------------------*/
   for_m(m)
-  for( int b=0; b<u.bc(m).count(); b++ ) {
+  for( int b=0; b<bc(m).count(); b++ ) {
 
-    if( u.bc(m).type(b) == bc_type ) {
+    if( bc(m).type(b) == bc_type ) {
 
-      Dir d = u.bc(m).direction(b);
+      Dir d = bc(m).direction(b);
 
       /*------------------------------+
       |  through velocity components  |
@@ -42,29 +42,29 @@ real Momentum::volf_bct(const BndType & bc_type,
 
         if( imin || imax ) {
 
-          if(imin && dom->coord(Comp::i())==0) {
+          if(imin && domain()->coord(Comp::i())==0) {
             const int i=si(m);
-            for_vjk(u.bc(m).at(b),j,k) {
-              if( dom->ibody().on(m, i, j, k) ) {
+            for_vjk(bc(m).at(b),j,k) {
+              if( domain()->ibody().on(m, i, j, k) ) {
                 //a_x = dSx(m,i,j,k); 
-                a_x = dom->dSx(Sign::neg(),i-1,j,k); 
-                a_x *= dom->ibody().fSw(m,i,j,k);              
-                volf_x += a_x * u[m][i-1][j][k];
+                a_x = domain()->dSx(Sign::neg(),i,j,k); 
+                a_x *= domain()->ibody().fSw(m,i,j,k);              
+                volf_x += a_x * vec[m][i-1][j][k];
                 A_x    += a_x;
               }
             }
             //std::cout<<"volf_bct imin"<<A_x<<"\n";
           }
-          if(imax && dom->coord(Comp::i())==dom->dim(Comp::i())-1) {
+          if(imax && domain()->coord(Comp::i())==domain()->dim(Comp::i())-1) {
             const int i=ei(m);
-            for_vjk(u.bc(m).at(b),j,k) {
-              if( dom->ibody().on(m, i, j, k) ) {
+            for_vjk(bc(m).at(b),j,k) {
+              if( domain()->ibody().on(m, i, j, k) ) {
                 //a_x = dSx(m,i,j,k); 
-                a_x = dom->dSx(Sign::pos(),i+1,j,k); 
-                a_x *= dom->ibody().fSe(m,i,j,k);              
-                volf_x -= a_x * u[m][i+1][j][k];
+                a_x = domain()->dSx(Sign::pos(),i,j,k); 
+                a_x *= domain()->ibody().fSe(m,i,j,k);              
+                volf_x -= a_x * vec[m][i+1][j][k];
                 A_x    += a_x;
-                //boil::oout<<i<<" "<<j<<" "<<k<<" "<<a_x<<" "<<u[m][i+1][j][k]<<boil::endl;
+                //boil::oout<<i<<" "<<j<<" "<<k<<" "<<a_x<<" "<<vec[m][i+1][j][k]<<boil::endl;
               }
             }
             //std::cout<<"volf_bct imax"<<A_x<<"\n";
@@ -98,27 +98,27 @@ real Momentum::volf_bct(const BndType & bc_type,
   
         if( jmin || jmax ) {
 
-          if(jmin && dom->coord(Comp::j())==0) {
+          if(jmin && domain()->coord(Comp::j())==0) {
             const int j=sj(m);
-            for_vik(u.bc(m).at(b),i,k) {
-              if( dom->ibody().on(m, i, j, k) ) {
+            for_vik(bc(m).at(b),i,k) {
+              if( domain()->ibody().on(m, i, j, k) ) {
                 //a_y = dSy(m,i,j,k); 
-                a_y = dom->dSy(Sign::neg(),i,j-1,k);
-                a_y *= dom->ibody().fSs(m,i,j,k);
-                volf_y += a_y * u[m][i][j-1][k];
+                a_y = domain()->dSy(Sign::neg(),i,j,k);
+                a_y *= domain()->ibody().fSs(m,i,j,k);
+                volf_y += a_y * vec[m][i][j-1][k];
                 A_y    += a_y;
               }
             }
             //std::cout<<"volf_bct jmin"<<A_y<<"\n";
           }
-          if(jmax && dom->coord(Comp::j())==dom->dim(Comp::j())-1) {
+          if(jmax && domain()->coord(Comp::j())==domain()->dim(Comp::j())-1) {
             const int j=ej(m);
-            for_vik(u.bc(m).at(b),i,k) {
-              if( dom->ibody().on(m, i, j, k) ) {
+            for_vik(bc(m).at(b),i,k) {
+              if( domain()->ibody().on(m, i, j, k) ) {
                 //a_y = dSy(m,i,j,k); 
-                a_y = dom->dSy(Sign::pos(),i,j+1,k);
-                a_y *= dom->ibody().fSn(m,i,j,k);
-                volf_y -= a_y * u[m][i][j+1][k];
+                a_y = domain()->dSy(Sign::pos(),i,j,k);
+                a_y *= domain()->ibody().fSn(m,i,j,k);
+                volf_y -= a_y * vec[m][i][j+1][k];
                 A_y    += a_y;
               }
             }
@@ -152,28 +152,28 @@ real Momentum::volf_bct(const BndType & bc_type,
   
         if( kmin || kmax ) {
 
-          if(kmin && dom->coord(Comp::k())==0) {
+          if(kmin && domain()->coord(Comp::k())==0) {
             const int k=sk(m);
-            for_vij(u.bc(m).at(b),i,j) {
-              if( dom->ibody().on(m, i, j, k) ) {
+            for_vij(bc(m).at(b),i,j) {
+              if( domain()->ibody().on(m, i, j, k) ) {
                 //a_z = dSz(m,i,j,k); 
-                a_z = dom->dSz(Sign::neg(),i,j,k-1);
-                a_z *= dom->ibody().fSb(m,i,j,k);              
-                volf_z += a_z * u[m][i][j][k-1];
-                //volf_z += a_z * u[m][i][j][k+1];
+                a_z = domain()->dSz(Sign::neg(),i,j,k);
+                a_z *= domain()->ibody().fSb(m,i,j,k);              
+                volf_z += a_z * vec[m][i][j][k-1];
+                //volf_z += a_z * vec[m][i][j][k+1];
                 A_z    += a_z;
               }
             }
           }
-          if(kmax && dom->coord(Comp::k())==dom->dim(Comp::k())-1) {
+          if(kmax && domain()->coord(Comp::k())==domain()->dim(Comp::k())-1) {
             const int k=ek(m);
-            for_vij(u.bc(m).at(b),i,j) {
-              if( dom->ibody().on(m, i, j, k) ) {
+            for_vij(bc(m).at(b),i,j) {
+              if( domain()->ibody().on(m, i, j, k) ) {
                 //a_z = dSz(m,i,j,k); 
-                a_z = dom->dSz(Sign::pos(),i,j,k+1);
-                a_z *= dom->ibody().fSt(m,i,j,k);              
-                volf_z -= a_z * u[m][i][j][k+1];
-                //volf_z -= a_z * u[m][i][j][k-1];
+                a_z = domain()->dSz(Sign::pos(),i,j,k);
+                a_z *= domain()->ibody().fSt(m,i,j,k);              
+                volf_z -= a_z * vec[m][i][j][k+1];
+                //volf_z -= a_z * vec[m][i][j][k-1];
                 A_z    += a_z;
               }
             }

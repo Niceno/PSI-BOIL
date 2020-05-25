@@ -74,7 +74,6 @@ class Momentum : public Staggered {
       create_system(mu_eddy);
       boil::timer.stop("momentum discretize");
     }
-    void insert_bc();
 
     real cfl_max() const;
     void solve(const ResRat & fact);
@@ -83,6 +82,7 @@ class Momentum : public Staggered {
     void get_eps(Scalar * src);
     void get_q(Scalar * src);
     void project(const Scalar & frc);
+    void project(const Scalar & frc, Vector & veloc);
     void project_ghost(const Scalar & frc, const Scalar & c, const Scalar & k);
     void new_time_step();
     void new_time_step(Vector & v);
@@ -95,16 +95,19 @@ class Momentum : public Staggered {
 
     void outlet();
     void pressure_outlet(const Scalar & frc);
+    void pressure_outlet(const Scalar & frc, Vector & veloc);
+
+    void vanishing_derivative_outlet(Vector & veloc);
 
     Matrix * A[3];
 
   private:
     
     void create_system(const Scalar * mu_eddy);
+
     void extrapolate_outlet_velocity(const real ubo, const real ratio);
+    void convective_outlet(Vector & veloc, const real ubo);
     void scale_outlet_velocity(const real ubo, const real ratio);
-    real volf_bct(const BndType & bc_type, 
-                  real * Ax=NULL, real * Ay=NULL, real * Az=NULL) const;
 
     void convection(Vector * conv);
     void diffusion();

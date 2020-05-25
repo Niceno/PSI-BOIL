@@ -26,8 +26,8 @@ void Momentum::scale_outlet_velocity(const real ubo, const real ratio) {
   #endif
 #endif
 
-  const real volf_in  = volf_bct( BndType::inlet() )
-                      + volf_bct( BndType::insert() )
+  const real volf_in  = u.bnd_flow( BndType::inlet() )
+                      + u.bnd_flow( BndType::insert() )
                       + v_phase_change;
 
   /*---------------------------------------------+

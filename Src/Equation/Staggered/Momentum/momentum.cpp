@@ -32,7 +32,7 @@ Momentum::Momentum(const Vector & U,
 
   boil::oout<<"Momentum-full: "<<ifull<<" "<<jfull<<" "<<kfull<<boil::endl;
 
-  insert_bc();
+  u.bnd_update_nooutlet();
 
   discretize();
 

@@ -11,7 +11,7 @@ static void __attribute__ ((constructor)) trapfpe(void)
 }
 #endif
 
-//#define AXISYM
+#define AXISYM
 #define USE_PHASE_VEL_VOF
 //#define USE_PHASE_VEL_EFD
 
@@ -62,10 +62,10 @@ int main(int argc, char ** argv) {
 /* ------------ optional simulation settings */
 
   /* multigrid */
-  //const bool multigrid_stop_if_diverging = true;
-  const bool multigrid_stop_if_diverging = false;
+  const bool multigrid_stop_if_diverging = true;
+  //const bool multigrid_stop_if_diverging = false;
 
-  const int multigrid_min_cycles = 10;
+  const int multigrid_min_cycles = 1;
   const int multigrid_max_cycles = 20;
 
   /* vof */
@@ -321,8 +321,11 @@ int main(int argc, char ** argv) {
   enthFD.set_no_solid_acceleration(no_solid_acceleration);
 
   /* phase change */
-  PhaseChangeVOF pc(mdot, mflx, tpr, q, c, g, f, uvw, conc.topo,
-                    tsat, time, &mixed);
+  PhaseChange4 pc(mdot, mflx, tpr, q, c, g, f, uvw, conc.topo,
+                  tsat, time, &mixed);
+  pc.set_second_order_accuracy(true);
+  pc.set_discard_points_near_interface(false);
+  pc.set_unconditional_extrapolation(false);
 
   /*-------------------+
   |  check if restart  |
@@ -479,7 +482,7 @@ int main(int argc, char ** argv) {
     ns.solve(ResRat(1e-14));
 
     p = 0.0;
-    if (multigrid.vcycle(ResRat(1e-6))) OMS(converged);
+    if (multigrid.fcycle(ResRat(1e-6))) OMS(converged);
     //pr.solve(ResRat(1e-6));
     p.exchange();
     ns.project(p);

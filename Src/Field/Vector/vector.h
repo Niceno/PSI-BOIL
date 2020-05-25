@@ -245,6 +245,13 @@ class Vector {
     void copy(const Vector & other, const real &, const Dir &, const real &);
     void copy(const Vector & other, const real &, const real &, const Dir &);
 
+    /* calculate flow through boundary */
+    real bnd_flow(const BndType & bc_type,
+                  real * Ax = NULL, real * Ay = NULL, real * Az = NULL) const; 
+
+    /* bnd update */
+    void bnd_update_nooutlet();
+
   private:
     void     coordinate();
 

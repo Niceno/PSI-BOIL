@@ -9,6 +9,7 @@
 #include <fenv.h>
 #define INVERTED
 #define _GNU_SOURCE 1
+#define MORTON_EOTVOS
 //#define MOVING_FRAME
 #if 1
 static void __attribute__ ((constructor)) trapfpe(void)
@@ -23,9 +24,15 @@ int main(int argc, char * argv[]) {
 
   boil::timer.start();
 
+#ifdef MORTON_EOTVOS
+  if(argc<=6){
+    boil::oout<<"Six command line arguments required!"<<"\n";
+    boil::oout<<"./Boil wmin diameter gridlevel NZmult Mo Eo"<<boil::endl;
+#else
   if(argc<=4){
-    boil::oout<<"Three command line arguments required!"<<"\n";
-    boil::oout<<"./Boil wmin diameter gridlevel"<<boil::endl;
+    boil::oout<<"Four command line arguments required!"<<"\n";
+    boil::oout<<"./Boil wmin diameter gridlevel NZmult"<<boil::endl;
+#endif
     boil::oout<<"(wmin::wall time in minute)"<<"\n";
     exit(0);
   }
@@ -46,6 +53,14 @@ int main(int argc, char * argv[]) {
   boil::oout<<"Nzmult= "<<NZmult<<"\n";
   real wvel = 0.;
 
+#ifdef MORTON_EOTVOS
+  const real Mo = atof(argv[5]);
+  boil::oout<<"Mo= "<<Mo<<"\n";
+
+  const real Eo = atof(argv[6]);
+  boil::oout<<"Eo= "<<Eo<<"\n";
+#endif
+
   const real radius = .5*diameter;
   const int NcellsPerRadius = 11*gLevel;
   const int NXmult = 5;
@@ -62,14 +77,23 @@ int main(int argc, char * argv[]) {
   const real LZ = real(NZ)*DX; 
 
   const real gravity = 9.81;
-
-  const real rhol = 0.9982e3;
-  const real mul = 8.9e-4;
-
   const real sigma = 0.072;
 
   const real rhog = 1.204;
   const real mug = 18.5e-6;
+
+#ifdef MORTON_EOTVOS
+  const real rhol = sigma*Eo/gravity/diameter/diameter;
+  boil::oout<<"rhol= "<<rhol<<" "<<rhol/rhog<<boil::endl;
+
+  const real mul = std::pow(Mo*rhol*sigma*sigma*sigma/gravity,0.25);
+  boil::oout<<"mul= "<<mul<<" "<<mul/mug<<boil::endl;
+  boil::oout<<"test= "<<gravity*diameter*diameter*rhol/sigma
+            <<" "<<gravity*std::pow(mul,4.)/rhol/std::pow(sigma,3.)<<"\n";
+#else
+  const real rhol = 0.9982e3;
+  const real mul = 8.9e-4;
+#endif
 
   const real xcent = 0.0;
   const real zcent = 0.0;
@@ -430,9 +454,9 @@ int main(int argc, char * argv[]) {
     /*---------+
     |  exit ?  |
     +---------*/
-    if(conc.get_zmaxft()>=LZ*0.95){
+    if(conc.get_zmaxft()>=(LZ-diameter)*0.95){
        std::cout<<"Bubble reaches to the top boundary. Exit."<<boil::endl;
-       exit(0);
+       break;//exit(0);
     }
   }
   boil::oout << "Finished." << boil::endl;

@@ -87,7 +87,7 @@ void Momentum::solve(const ResRat & factor) {
     }
   }
 
-  insert_bc();
+  u.bnd_update_nooutlet();
   u.exchange_all();
 
   boil::timer.stop("momentum solver");
