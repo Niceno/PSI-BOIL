@@ -91,7 +91,7 @@ int main(int argc, char ** argv) {
   const real tend = 1e-3 * tmult;
 
   /* steps per backup */
-  const int n_per_backup = 10000;
+  const int n_per_backup = 5000;
 
   /* if yes, plotting each t_per_plot seconds. Else, each n_per_plot steps */
   const bool use_t_per_plot = true;
@@ -124,7 +124,7 @@ int main(int argc, char ** argv) {
 
   ResRat multigrid_rr = ResRat(5e-5);
 
-  const Cycle multigrid_cycle0 = Cycle::F();
+  const Cycle multigrid_cycle0 = Cycle::Z();
   const Cycle multigrid_cycle1 = Cycle::F();
 
 
@@ -203,8 +203,8 @@ int main(int argc, char ** argv) {
 
 #if CASE == 1
   /* in experiment, ITO: 700 nm, sapphire: 250 um;
-     here, sapphire: ~100 um; note: proc and solid boundary mustnt overlap! */
-  const int NZ0 = N0/(gStage*5);
+     here, sapphire: ~150 um; note: proc and solid boundary mustnt overlap! */
+  const int NZ0 = N0/gStage-3*gLevel;
   /* should be 0.7 um */
   const int NZheat = std::ceil(0.7e-6/DZ0);
   const real LZ0 = -DZ0*NZ0;

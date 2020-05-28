@@ -484,6 +484,8 @@ static void __attribute__ ((constructor)) trapfpe(void)
     }
 
     /* surface tension */
+    if(wall_curv_method==CurvMethod::HFnormalXZ())
+      conc.output_cangle_2d(Comp::i(),Comp::k(),Sign::neg());
     conc.tension(&xyz,mixed,conc.color());
 
     /*--------------------------+

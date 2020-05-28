@@ -5,7 +5,7 @@ void Momentum::new_time_step() {
   new_time_step(u);
 }
 
-void Momentum::new_time_step(Vector & vec) {
+void Momentum::new_time_step(const Vector & vec) {
   /*------------+
   |      dV  n  |
   |  f = -- u   |

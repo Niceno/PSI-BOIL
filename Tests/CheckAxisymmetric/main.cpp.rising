@@ -9,7 +9,8 @@
 #include <fenv.h>
 #define INVERTED
 #define _GNU_SOURCE 1
-#define MORTON_EOTVOS
+//#define MORTON_EOTVOS
+#define WATER_GLYCERIN
 //#define MOVING_FRAME
 #if 1
 static void __attribute__ ((constructor)) trapfpe(void)
@@ -28,6 +29,10 @@ int main(int argc, char * argv[]) {
   if(argc<=6){
     boil::oout<<"Six command line arguments required!"<<"\n";
     boil::oout<<"./Boil wmin diameter gridlevel NZmult Mo Eo"<<boil::endl;
+#elif defined WATER_GLYCERIN
+  if(argc<=7){
+    boil::oout<<"Seven command line arguments required!"<<"\n";
+    boil::oout<<"./Boil wmin diameter gridlevel NZmult rho mu sig"<<boil::endl;
 #else
   if(argc<=4){
     boil::oout<<"Four command line arguments required!"<<"\n";
@@ -59,6 +64,15 @@ int main(int argc, char * argv[]) {
 
   const real Eo = atof(argv[6]);
   boil::oout<<"Eo= "<<Eo<<"\n";
+#elif defined WATER_GLYCERIN
+  const real rhol = atof(argv[5]);
+  boil::oout<<"rhol= "<<rhol<<"\n";
+
+  const real mul = atof(argv[6]);
+  boil::oout<<"mul= "<<mul<<"\n";
+
+  const real sigma = atof(argv[7]);
+  boil::oout<<"sigma= "<<sigma<<"\n";
 #endif
 
   const real radius = .5*diameter;
@@ -77,23 +91,25 @@ int main(int argc, char * argv[]) {
   const real LZ = real(NZ)*DX; 
 
   const real gravity = 9.81;
-  const real sigma = 0.072;
 
   const real rhog = 1.204;
   const real mug = 18.5e-6;
 
 #ifdef MORTON_EOTVOS
-  const real rhol = sigma*Eo/gravity/diameter/diameter;
-  boil::oout<<"rhol= "<<rhol<<" "<<rhol/rhog<<boil::endl;
+  const real rhol = 1.35e3; 
+  const real sigma = rhol/(Eo/gravity/diameter/diameter);
+  boil::oout<<"sigma= "<<sigma<<" "<<boil::endl;
 
   const real mul = std::pow(Mo*rhol*sigma*sigma*sigma/gravity,0.25);
   boil::oout<<"mul= "<<mul<<" "<<mul/mug<<boil::endl;
-  boil::oout<<"test= "<<gravity*diameter*diameter*rhol/sigma
-            <<" "<<gravity*std::pow(mul,4.)/rhol/std::pow(sigma,3.)<<"\n";
+#elif defined WATER_GLYCERIN
 #else
+  const real sigma = 0.072;
   const real rhol = 0.9982e3;
   const real mul = 8.9e-4;
 #endif
+  boil::oout<<"numbers= "<<gravity*diameter*diameter*rhol/sigma
+            <<" "<<gravity*std::pow(mul,4.)/rhol/std::pow(sigma,3.)<<"\n";
 
   const real xcent = 0.0;
   const real zcent = 0.0;

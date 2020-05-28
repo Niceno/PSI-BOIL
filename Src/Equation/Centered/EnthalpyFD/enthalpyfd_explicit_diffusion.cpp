@@ -29,7 +29,7 @@ using namespace std;
 *  stipulated in main program. Obviously, these concerns are important for 
 *  non-implicit time stepping schemes only.
 *******************************************************************************/
-void EnthalpyFD::diffusion_fd(const Scalar * diff_eddy) {
+void EnthalpyFD::explicit_diffusion(const Scalar * diff_eddy) {
 
   phi.exchange();
 

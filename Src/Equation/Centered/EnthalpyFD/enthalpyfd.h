@@ -79,6 +79,8 @@ class EnthalpyFD : public Centered {
     ~EnthalpyFD();
 
     void new_time_step(const Scalar * diff_eddy = NULL);
+    void convective_time_step();
+    void explicit_diffusion(const Scalar * diff_eddy = NULL);
     void solve(const ResRat & fact, const char * name = NULL);
     void solve_sor(const int & it, const real & r, const char * name = NULL);
 
@@ -119,7 +121,6 @@ class EnthalpyFD : public Centered {
     void create_system_bnd();
     real update_rhs();
     void convection(Scalar * sca);
-    void diffusion_fd(const Scalar * diff_eddy = NULL);
     void diff_matrix(real & am, real & ac, real & ap
                 , real & tm, real & tc, real & tp
                 , real & aflagm, real & aflagp
