@@ -654,6 +654,7 @@ std::ostream & operator << (std::ostream &ost, const BndType & bt) {
     case( 7): ost << "symmetry ";   break;
     case( 8): ost << "insert ";     break;
     case( 9): ost << "convective "; break;
+    case(10): ost << "pseudo ";     break;
   }
     
   return ost;

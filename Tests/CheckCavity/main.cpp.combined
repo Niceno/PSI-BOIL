@@ -12,16 +12,24 @@ static void __attribute__ ((constructor)) trapfpe(void)
 #endif
 
 #define SYM
-#define CASE 1
-/* case 1 = axisymmetric
-        2 = cartesian 2D
-        3 = cartesian 3D
+#define CASE 2
+/* case 0 = axisymmetric 2D
+        1 = axisymmetric 3D
+        2 = cartesian 1D
+        3 = cartesian 2D
+        4 = cartesian 3D
 */
 
 const real R0 = 10.27e-6;
 const real pinf = 1.013e5;
 const real sigmm = 0.0583;
+#if CASE == 0 or CASE == 3
+const real p0 = 0.1127e6 - sigmm/R0;
+#elif CASE == 1 or CASE == 4
 const real p0 = 0.1127e6 - 2*sigmm/R0;
+#else
+const real p0 = 0.1127e6;
+#endif
 
 real phase_change_evaluation(Scalar & tpr, const Scalar & clr,
                              TIF & tsat, EnthalpyFD & enthFD,
@@ -68,7 +76,7 @@ real regula_falsi_kernel(real & tm, real & tp, real & vpcm, real & vpcp,
 int main(int argc, char ** argv) {
 
   boil::timer.start();
-  
+
   if(argc<4){
     boil::oout<<"Three command line arguments required!"<<"\n";
     boil::oout<<"./Boil wmin glevel gstage"<<"\n";
@@ -174,9 +182,13 @@ int main(int argc, char ** argv) {
   polar = 0.5;
 #endif
 
-#if CASE == 1
+#if CASE == 0
+  const real V0 = DX*0.5*azimuth*radius*radius;
+#elif CASE == 1
   const real V0 = 2./3.*azimuth*polar*radius*radius*radius;
 #elif CASE == 2
+  const real V0 = DX*DX*radius;
+#elif CASE == 3
   #ifdef SYM 
   polar = 0.25;
   #endif
@@ -188,8 +200,8 @@ int main(int argc, char ** argv) {
   #endif
   const real V0 = 2./3.*azimuth*polar*radius*radius*radius;
 #endif
-  boil::oout<<"p0= "<<p0<<" "<<p0-pinf<<boil::endl;
   boil::oout<<"V0= "<<V0<<" "<<boil::endl;
+  boil::oout<<"p0= "<<p0<<" "<<p0-pinf<<boil::endl;
   boil::oout<<"cpl= "<<cpl<<" "<<cpl/rhol<<boil::endl;
 
 /******************************************************************************/
@@ -221,9 +233,15 @@ int main(int argc, char ** argv) {
   /*---------+
   |  domain  |
   +---------*/
-#if CASE == 1
+#if CASE == 0
+  Grid1D gzz(DX);
+  Axisymmetric d(gx, gzz, DX);
+#elif CASE == 1
   Axisymmetric d(gx, gz, DX);
 #elif CASE == 2
+  Grid1D gy(DX);
+  Domain d(gz,gy,gy);
+#elif CASE == 3
   Grid1D gy(DX);
   Domain d(gz,gy,gz);
 #else
@@ -251,7 +269,7 @@ int main(int argc, char ** argv) {
   |  insert boundary conditions  |
   +-----------------------------*/
   for_m(m) {
-#if CASE == 1
+#if CASE < 2
     uvw.bc(m).add( BndCnd( Dir::imin(), BndType::symmetry() ) );
     uvw.bc(m).add( BndCnd( Dir::imax(), BndType::outlet() ) );
 #else
@@ -263,14 +281,19 @@ int main(int argc, char ** argv) {
     uvw.bc(m).add( BndCnd( Dir::imax(), BndType::outlet() ) );
   #endif
 #endif
-#ifdef SYM
+#if CASE == 0 or CASE == 2
+    uvw.bc(m).add( BndCnd( Dir::kmin(), BndType::pseudo() ) );
+    uvw.bc(m).add( BndCnd( Dir::kmax(), BndType::pseudo() ) );
+#else
+  #ifdef SYM
     uvw.bc(m).add( BndCnd( Dir::kmin(), BndType::symmetry() ) );
     uvw.bc(m).add( BndCnd( Dir::kmax(), BndType::outlet() ) );
-#else
+  #else
     uvw.bc(m).add( BndCnd( Dir::kmin(), BndType::outlet() ) );
     uvw.bc(m).add( BndCnd( Dir::kmax(), BndType::outlet() ) );
+  #endif
 #endif
-#if CASE < 3
+#if CASE < 4
     uvw.bc(m).add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
     uvw.bc(m).add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
 #else 
@@ -288,7 +311,7 @@ int main(int argc, char ** argv) {
     uvw_old(m)=uvw(m).shape();
   }
 
-#if CASE == 1
+#if CASE < 2
   c.bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
   c.bc().add( BndCnd( Dir::imax(), BndType::outlet() ) );
 #else
@@ -300,14 +323,19 @@ int main(int argc, char ** argv) {
   c.bc().add( BndCnd( Dir::imax(), BndType::outlet() ) );
   #endif
 #endif
-#ifdef SYM
+#if CASE == 0 or CASE == 2
+  c.bc().add( BndCnd( Dir::kmin(), BndType::pseudo() ) );
+  c.bc().add( BndCnd( Dir::kmax(), BndType::pseudo() ) );
+#else
+  #ifdef SYM
   c.bc().add( BndCnd( Dir::kmin(), BndType::symmetry() ) );
   c.bc().add( BndCnd( Dir::kmax(), BndType::outlet() ) );
-#else
+  #else
   c.bc().add( BndCnd( Dir::kmin(), BndType::outlet() ) );
   c.bc().add( BndCnd( Dir::kmax(), BndType::outlet() ) );
+  #endif
 #endif
-#if CASE < 3
+#if CASE < 4
   c.bc().add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
   c.bc().add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
 #else
@@ -332,7 +360,7 @@ int main(int argc, char ** argv) {
   f_cav = f.shape();
   h_cav = c.shape();
 
-#if CASE == 1
+#if CASE < 2
   tpr.bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
   tpr.bc().add( BndCnd( Dir::imax(), BndType::dirichlet(), tout ) );
 #else
@@ -344,16 +372,21 @@ int main(int argc, char ** argv) {
   tpr.bc().add( BndCnd( Dir::imax(), BndType::dirichlet(), tout ) );
   #endif
 #endif
-#ifdef SYM
+#if CASE == 0 or CASE == 2
+  tpr.bc().add( BndCnd( Dir::kmin(), BndType::pseudo() ) );
+  tpr.bc().add( BndCnd( Dir::kmax(), BndType::pseudo() ) );
+#else
+  #ifdef SYM
   tpr.bc().add( BndCnd( Dir::kmin(), BndType::symmetry() ) );
   tpr.bc().add( BndCnd( Dir::kmax(), BndType::dirichlet(), tout ) );
-#else
+  #else
   tpr.bc().add( BndCnd( Dir::kmin(), BndType::dirichlet(), tout ) );
   tpr.bc().add( BndCnd( Dir::kmax(), BndType::dirichlet(), tout ) );
+  #endif
 #endif
-#if CASE < 3
+#if CASE < 4
   tpr.bc().add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
-  tpr.bc().add( BndCnd( Dir::jmax(), BndType::pseudo() ) ); 
+  tpr.bc().add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
 #else
   #ifdef SYM
   tpr.bc().add( BndCnd( Dir::jmin(), BndType::symmetry() ) );
@@ -364,7 +397,7 @@ int main(int argc, char ** argv) {
   #endif
 #endif
 
-#if CASE == 1
+#if CASE < 2
   p_cav.bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
   p_cav.bc().add( BndCnd( Dir::imax(), BndType::dirichlet(), pinf ) );
 #else
@@ -376,14 +409,19 @@ int main(int argc, char ** argv) {
   p_cav.bc().add( BndCnd( Dir::imax(), BndType::dirichlet(), pinf ) );
   #endif
 #endif
-#ifdef SYM
+#if CASE == 0 or CASE == 2
+  p_cav.bc().add( BndCnd( Dir::kmin(), BndType::pseudo() ) );
+  p_cav.bc().add( BndCnd( Dir::kmax(), BndType::pseudo() ) );
+#else
+  #ifdef SYM
   p_cav.bc().add( BndCnd( Dir::kmin(), BndType::symmetry() ) );
   p_cav.bc().add( BndCnd( Dir::kmax(), BndType::dirichlet(), pinf ) );
-#else
+  #else
   p_cav.bc().add( BndCnd( Dir::kmin(), BndType::dirichlet(), pinf ) );
   p_cav.bc().add( BndCnd( Dir::kmax(), BndType::dirichlet(), pinf ) );
+  #endif
 #endif
-#if CASE < 3
+#if CASE < 4
   p_cav.bc().add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
   p_cav.bc().add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
 #else
@@ -396,11 +434,7 @@ int main(int argc, char ** argv) {
   #endif
 #endif
 
-#ifdef USE_CAVITY
   press=p_cav.shape();
-#else
-  press=c.shape();
-#endif
 
   /*----------------------+
   |  physical properties  |
@@ -452,7 +486,11 @@ int main(int argc, char ** argv) {
   ns.diffusion_set(TimeScheme::backward_euler());
 
   /* pressure solver */
+#if CASE == 0 or CASE == 2
+  Pressure pr(p, f, uvw, time, solverCGdi, &mixed);
+#else
   Pressure pr(p, f, uvw, time, solver, &mixed);
+#endif
   AC multigrid( &pr );
   multigrid.stop_if_diverging(multigrid_stop_if_diverging);
   multigrid.min_cycles(multigrid_min_cycles);
@@ -510,7 +548,7 @@ int main(int argc, char ** argv) {
   AC multigrid_cavity( &capr );
   multigrid_cavity.stop_if_diverging(multigrid_stop_if_diverging);
   multigrid_cavity.min_cycles(1);
-  multigrid_cavity.max_cycles(3);
+  multigrid_cavity.max_cycles(1);
 
   /*-------------------+
   |  check if restart  |
@@ -569,17 +607,14 @@ int main(int argc, char ** argv) {
     const real xcent=0.0;
     const real ycent=0.0;
     const real zcent=0.0;
-
-#if CASE < 3
+#if CASE < 4
     boil::setup_circle_xz(conc.color(), radius, xcent, zcent);
 #else
     boil::setup_sphere(conc.color(), radius, xcent, ycent, zcent);
 #endif
     conc.color().bnd_update();
     conc.color().exchange_all();
-#if CASE == 1
     conc.color_to_vf(conc.color(),c);
-#endif
     for_vijk(c,i,j,k)
       c[i][j][k] = 1.0-c[i][j][k];
 
@@ -647,7 +682,7 @@ int main(int argc, char ** argv) {
                                   pinf, r_0, tsat0);
 
     eps_calc = fabs(vpc_old/vpc_cav_old);
-    boil::oout<<"####begin= "<<time.current_time();
+    boil::oout<<"@@@@begin= "<<time.current_time();
     std::cout<< std::setprecision(16);
     boil::oout<<" "<<t_old<<" ";
     std::cout<< std::setprecision(8);
@@ -681,8 +716,8 @@ int main(int argc, char ** argv) {
 
       /* find root */
       int niter(0);
-      eps_calc = std::max(fabs(vpc_old),fabs(vpc_new))/std::min(fabs(vpc_cav_old),fabs(vpc_cav_new));
-      boil::oout<<"####brackets= "<<time.current_time()<<" "<<niter<<" ";
+      eps_calc = std::min(fabs(vpc_old/vpc_cav_old),fabs(vpc_new/vpc_cav_new));
+      boil::oout<<"@@@@brackets= "<<time.current_time()<<" "<<niter<<" ";
       std::cout<< std::setprecision(16);
       boil::oout<<t_old<<" "<<t_new<<" ";
       std::cout<< std::setprecision(8);
@@ -703,7 +738,7 @@ int main(int argc, char ** argv) {
                                        pinf, r_0, tsat0);
 
         niter++;
-        boil::oout<<"#######vpc= "<<time.current_time()<<" "<<niter;
+        boil::oout<<"@@@@vpc= "<<time.current_time()<<" "<<niter;
         std::cout<< std::setprecision(16);
         boil::oout<<" "<<t_old<<" "<<t_new<<" ";
         std::cout<< std::setprecision(8);
@@ -712,14 +747,17 @@ int main(int argc, char ** argv) {
                   <<" | "<<vpc_new<<" "<<vpc_cav_new<<" "<<vpc_tpr_new<<boil::endl;
 
       }
+      t_old = fabs(vpc_old/std::min(fabs(vpc_tpr_old),fabs(vpc_cav_old)))
+            > fabs(vpc_new/std::min(fabs(vpc_tpr_new),fabs(vpc_cav_new)))
+            ? t_new : t_old;
 
       t_slp = (t_old-t_oold)/time.dt();
     } 
 
     /* proceed with the rest of the time step */
     phase_change_evaluation(tpr,conc.color(),
-                                      tsat,enthFD,
-                                      pc,f,std::min(t_old,t_new))*time.dt();
+                            tsat,enthFD,
+                            pc,f,t_old)*time.dt();
  
     ns.vol_phase_change(&f);
     ns.new_time_step(uvw_old);
@@ -810,7 +848,6 @@ int main(int argc, char ** argv) {
       boil::timer.stop();
       boil::timer.report();
       uvw  .rm("uvw", ts);
-      press.rm("press", ts);
       c .rm("c", ts);
       tpr  .rm("tpr", ts);
 
@@ -883,7 +920,13 @@ real cavity_evaluation(Vector & uvw, const Vector & uvw_old, Vector & uvw_cav,
 
   /* linearized clausius-clapeyron */
   real pcc = mixed.rho(0)*mixed.latent()->value()*(tval-tsat0)/(tsat0+373.15)
+#if CASE == 0 or CASE == 3
+           - mixed.sigma()->value()/R;
+#elif CASE == 1 or CASE == 4
            - 2.*mixed.sigma()->value()/R;
+#else
+           ;
+#endif
   capr.set_cavity_pressure(pcc+pinf);
 
   /* step three: solve cavity pressure */
@@ -994,7 +1037,7 @@ real regula_falsi_kernel(real & tm, real & tp, real & vpcm, real & vpcp,
     vpcp = vpc_next;
   }
 
-  real eps_calc = std::max(fabs(vpcm/std::min(fabs(vpc_tpr_m),fabs(vpc_cav_m)))
+  real eps_calc = std::min(fabs(vpcm/std::min(fabs(vpc_tpr_m),fabs(vpc_cav_m)))
                           ,fabs(vpcp/std::min(fabs(vpc_tpr_p),fabs(vpc_cav_p))));
 
   return eps_calc;
