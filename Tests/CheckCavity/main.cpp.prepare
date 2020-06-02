@@ -31,46 +31,12 @@ const real p0 = 0.1127e6 - 2*sigmm/R0;
 const real p0 = 0.1127e6;
 #endif
 
-real phase_change_evaluation(Scalar & tpr, const Scalar & clr,
-                             TIF & tsat, EnthalpyFD & enthFD,
-                             PhaseChange4 & pc, Scalar & f,
-                             const real tval);
-
 real cavity_evaluation(Vector & uvw, const Vector & uvw_old, Vector & uvw_cav,
                        Vector & xyz, ScalarInt & h_cav, Scalar & press,
                        VOF & conc, CavityPressure & capr, AC & multigrid_cavity,
                        Momentum & ns, Matter & mixed,
                        const real pinf, const real R,
                        const real tsat0, const real tval);
-
-real evaluate_point(const real tval,
-                    real & vpc_tpr, real & vpc_cav,
-                    const Times & time,
-                    Vector & uvw, const Vector & uvw_old, Vector & uvw_cav,
-                    Vector & xyz,
-                    Scalar & tpr, Scalar & f, Scalar & press,
-                    ScalarInt & h_cav,
-                    TIF & tsat, EnthalpyFD & enthFD, PhaseChange4 & pc,
-                    VOF & conc, CavityPressure & capr,
-                    AC & multigrid_cavity, Momentum & ns,
-                    Matter & mixed,
-                    const real pinf, const real r_0,
-                    const real tsat0);
-
-real regula_falsi_kernel(real & tm, real & tp, real & vpcm, real & vpcp,
-                         real & vpc_tpr_m, real & vpc_tpr_p,
-                         real & vpc_cav_m, real & vpc_cav_p,
-                         const Times & time,
-                         Vector & uvw, const Vector & uvw_old, Vector & uvw_cav,
-                         Vector & xyz,
-                         Scalar & tpr, Scalar & f, Scalar & press,
-                         ScalarInt & h_cav,
-                         TIF & tsat, EnthalpyFD & enthFD, PhaseChange4 & pc,
-                         VOF & conc, CavityPressure & capr,
-                         AC & multigrid_cavity, Momentum & ns,
-                         Matter & mixed,
-                         const real pinf, const real r_0,
-                         const real tsat0);
 
 /******************************************************************************/
 int main(int argc, char ** argv) {
@@ -638,14 +604,8 @@ int main(int argc, char ** argv) {
   /*------------+
   |  time loop  |
   +------------*/
-#if 1
-  real t_new(tout), t_old(tout), t_oold(tout), t_slp(boil::unreal);
   for(time.start(); time.end(); time.increase()) {
 
-    /* store old temperature */
-    t_oold = t_old;
-    t_old = std::max(t_old,t_new);
-    
     /* relative error */
     real eps_rel = 0.01;
     real eps_calc = 1.0;
@@ -657,10 +617,6 @@ int main(int argc, char ** argv) {
     for_m(m)
       uvw_old(m) = uvw(m);
 
-    /* solve convective heat transfer */
-    enthFD.discretize();
-    enthFD.convective_time_step();
-
     /* radius */
     real V_cavity = 0.0;
     for_vijk(h_cav,i,j,k)
@@ -670,101 +626,28 @@ int main(int argc, char ** argv) {
     boil::cart.sum_real(&V_cavity);
     real r_0 = std::pow(1.5*V_cavity/azimuth/polar,1./3.);
 
-    /* test old value */
-    real vpc_tpr_old,vpc_cav_old;
-    real vpc_old = evaluate_point(t_old,
-                                  vpc_tpr_old, vpc_cav_old,
-                                  time,
-                                  uvw, uvw_old, uvw_cav, xyz,
-                                  tpr, f, press,
-                                  h_cav,
-                                  tsat, enthFD, pc, conc, capr,
-                                  multigrid_cavity, ns,
-                                  mixed,
-                                  pinf, r_0, tsat0);
+    /* source */
+    real vpc_cav = cavity_evaluation(uvw,uvw_old,uvw_cav,xyz,
+                                     h_cav,press,
+                                     conc,capr,multigrid_cavity,ns,
+                                     mixed,
+                                     pinf,r_0,
+                                     tsat0,tout);
 
-    eps_calc = fabs(vpc_old/vpc_cav_old);
-    boil::oout<<"@@@@begin= "<<time.current_time();
-    std::cout<< std::setprecision(16);
-    boil::oout<<" "<<t_old<<" ";
-    std::cout<< std::setprecision(8);
-    boil::oout<<vpc_old<<" "<<vpc_cav_old<<" "<<vpc_tpr_old<<" "<<eps_calc<<boil::endl;
-    if(eps_calc>=eps_rel) {
-
-      /* find bounds */
-      real mult = vpc_old > 0. ? -1. : +1.;
-      real delta_t;
-      //if(boil::realistic(t_slp)) {
-      //  delta_t = t_slp * time.dt();
-      //} else {
-        delta_t = 0.01;
-      //} 
-    
-      t_new = t_old;
-      real vpc_tpr_new, vpc_cav_new, vpc_new;
-      do {
-        t_new = std::max(tsat0,std::min(tout,t_new + mult * delta_t));
-        vpc_new = evaluate_point(t_new,
-                                 vpc_tpr_new, vpc_cav_new,
-                                 time,
-                                 uvw, uvw_old, uvw_cav, xyz,
-                                 tpr, f, press,
-                                 h_cav,
-                                 tsat, enthFD, pc, conc, capr,
-                                 multigrid_cavity, ns,
-                                 mixed,
-                                 pinf, r_0, tsat0);
-      } while(vpc_new*vpc_old>0.0);
-
-      /* find root */
-      int niter(0);
-      eps_calc = std::min(fabs(vpc_old/vpc_cav_old),fabs(vpc_new/vpc_cav_new));
-      boil::oout<<"@@@@brackets= "<<time.current_time()<<" "<<niter<<" ";
-      std::cout<< std::setprecision(16);
-      boil::oout<<t_old<<" "<<t_new<<" ";
-      std::cout<< std::setprecision(8);
-      boil::oout<<eps_calc
-                <<" | "<<vpc_old<<" "<<vpc_cav_old<<" "<<vpc_tpr_old
-                <<" | "<<vpc_new<<" "<<vpc_cav_new<<" "<<vpc_tpr_new<<boil::endl;
-
-      while(eps_calc>eps_rel&&fabs(t_old-t_new)>1e-6) {
-        eps_calc = regula_falsi_kernel(t_old, t_new, vpc_old, vpc_new,
-                                       vpc_tpr_old, vpc_tpr_new, vpc_cav_old, vpc_cav_new,
-                                       time,
-                                       uvw, uvw_old, uvw_cav, xyz,
-                                       tpr, f, press,
-                                       h_cav,
-                                       tsat, enthFD, pc, conc, capr,
-                                       multigrid_cavity, ns,
-                                       mixed,
-                                       pinf, r_0, tsat0);
-
-        niter++;
-        boil::oout<<"@@@@vpc= "<<time.current_time()<<" "<<niter;
-        std::cout<< std::setprecision(16);
-        boil::oout<<" "<<t_old<<" "<<t_new<<" ";
-        std::cout<< std::setprecision(8);
-        boil::oout<<eps_calc
-                  <<" | "<<vpc_old<<" "<<vpc_cav_old<<" "<<vpc_tpr_old
-                  <<" | "<<vpc_new<<" "<<vpc_cav_new<<" "<<vpc_tpr_new<<boil::endl;
-
+    /* distribute source */
+    for_vijk(f,i,j,k) {
+      if(h_cav[i][j][k]==0||h_cav[i][j][k]==-1) {
+         f[i][j][k] += time.dti() * (1.0-std::min(1.0,std::max(0.0,c[i][j][k])))
+                                  * c.dV(i,j,k)/V_cavity * vpc_cav;
       }
-      t_old = fabs(vpc_old/std::min(fabs(vpc_tpr_old),fabs(vpc_cav_old)))
-            > fabs(vpc_new/std::min(fabs(vpc_tpr_new),fabs(vpc_cav_new)))
-            ? t_new : t_old;
-
-      t_slp = (t_old-t_oold)/time.dt();
-    } 
+    }
+    f.exchange();
 
     /* proceed with the rest of the time step */
-    phase_change_evaluation(tpr,conc.color(),
-                            tsat,enthFD,
-                            pc,f,t_old)*time.dt();
- 
     ns.vol_phase_change(&f);
     ns.new_time_step(uvw_old);
     ns.solve(ResRat(1e-14));
-    
+
     const int niter = 50;
     MaxIter mm = MaxIter(niter);
     std::array<MaxIter,3> mi = {mm,mm,mm};
@@ -798,8 +681,6 @@ int main(int argc, char ** argv) {
     conc.front_minmax();
 
     time.control_dt(ns.cfl_max(),cfl_limit,dt);
-
-    //exit(0);
 
     /*--------------+
     |  output data  |
@@ -856,7 +737,6 @@ int main(int argc, char ** argv) {
       break;
     }
   }
-#endif
 
   boil::oout << "finished" << boil::endl;
 
@@ -864,35 +744,6 @@ int main(int argc, char ** argv) {
   boil::timer.report();
 
 }	
-
-/******************************************************************************/
-real phase_change_evaluation(Scalar & tpr, const Scalar & clr,
-                             TIF & tsat, EnthalpyFD & enthFD,
-                             PhaseChange4 & pc, Scalar & f, const real tval) {
-
-  for_vijk(tpr,i,j,k) {
-    if(clr[i][j][k]<0.5) {
-      tpr[i][j][k] = tval;
-    }
-  }
-  tpr.bnd_update();
-  tpr.exchange();
-
-  tsat.set_tref(tval);
-
-  enthFD.explicit_diffusion();
-  enthFD.solve(ResRat(1e-16),"enthFD");
-
-  f = 0.0;
-  pc.update();
-  real vpc_tpr=0.0;
-  for_vijk(f,i,j,k)
-    vpc_tpr+=f[i][j][k];
-
-  boil::cart.sum_real(&vpc_tpr);
-
-  return vpc_tpr;
-}
 
 /******************************************************************************/
 real cavity_evaluation(Vector & uvw, const Vector & uvw_old, Vector & uvw_cav,
@@ -964,83 +815,4 @@ real cavity_evaluation(Vector & uvw, const Vector & uvw_old, Vector & uvw_cav,
 
   /* step five: calculate outlet */
   return -uvw.bnd_flow(BndType::outlet()); /* m3/s */
-}
-
-
-/******************************************************************************/
-real evaluate_point(const real tval,
-                    real & vpc_tpr, real & vpc_cav,
-                    const Times & time,
-                    Vector & uvw, const Vector & uvw_old, Vector & uvw_cav,
-                    Vector & xyz,
-                    Scalar & tpr, Scalar & f, Scalar & press,
-                    ScalarInt & h_cav,
-                    TIF & tsat, EnthalpyFD & enthFD, PhaseChange4 & pc,
-                    VOF & conc, CavityPressure & capr,
-                    AC & multigrid_cavity, Momentum & ns,
-                    Matter & mixed,
-                    const real pinf, const real r_0,
-                    const real tsat0) {
-
-  vpc_tpr = phase_change_evaluation(tpr,conc.color(),
-                                    tsat,enthFD,
-                                    pc,f,tval)*time.dt();
-
-  vpc_cav = cavity_evaluation(uvw,uvw_old,uvw_cav,xyz,
-                              h_cav,press,
-                              conc,capr,multigrid_cavity,ns,
-                              mixed,
-                              pinf,r_0,
-                              tsat0,tval);
-
-  return vpc_cav-vpc_tpr;
-}
-
-/******************************************************************************/
-real regula_falsi_kernel(real & tm, real & tp, real & vpcm, real & vpcp,
-                         real & vpc_tpr_m, real & vpc_tpr_p,
-                         real & vpc_cav_m, real & vpc_cav_p,
-                         const Times & time,
-                         Vector & uvw, const Vector & uvw_old, Vector & uvw_cav,
-                         Vector & xyz,
-                         Scalar & tpr, Scalar & f, Scalar & press,
-                         ScalarInt & h_cav,
-                         TIF & tsat, EnthalpyFD & enthFD, PhaseChange4 & pc,
-                         VOF & conc, CavityPressure & capr, 
-                         AC & multigrid_cavity, Momentum & ns,
-                         Matter & mixed,
-                         const real pinf, const real r_0,
-                         const real tsat0) {
-
-  /* regula falsi */
-  real t_next = (tm*vpcp-tp*vpcm)/(vpcp-vpcm);
-
-  real vpc_tpr_next,vpc_cav_next;
-  real vpc_next = evaluate_point(t_next,
-                                 vpc_tpr_next, vpc_cav_next,
-                                 time,
-                                 uvw, uvw_old, uvw_cav, xyz,
-                                 tpr, f, press,
-                                 h_cav,
-                                 tsat, enthFD, pc, conc, capr,
-                                 multigrid_cavity, ns,
-                                 mixed,
-                                 pinf, r_0, tsat0);
-
-  if(vpc_next*vpcm>0.) {
-    tm = t_next;
-    vpc_tpr_m = vpc_tpr_next;
-    vpc_cav_m = vpc_cav_next;
-    vpcm = vpc_next;
-  } else {
-    tp = t_next;
-    vpc_tpr_p = vpc_tpr_next;
-    vpc_cav_p = vpc_cav_next;
-    vpcp = vpc_next;
-  }
-
-  real eps_calc = std::min(fabs(vpcm/std::min(fabs(vpc_tpr_m),fabs(vpc_cav_m)))
-                          ,fabs(vpcp/std::min(fabs(vpc_tpr_p),fabs(vpc_cav_p))));
-
-  return eps_calc;
 }
