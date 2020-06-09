@@ -3,42 +3,45 @@
 /***************************************************************************//**
 *  nucleation site model
 *******************************************************************************/
-Nucleation::Nucleation ( Scalar * c, Scalar *tp, Scalar *qs,
-                     const Times * t, Scalar & DM,
-                     Matter *f, const real rs, const real dm,
-                     const real ca, const Sign SIG ) :
-  dmicro(&DM),
+Nucleation::Nucleation ( Topology * TOPO, Heaviside * HEAVI,
+                         const Scalar * TPR,
+                         const Times * t, 
+                         Matter * f, const real rs, 
+                         Scalar * QSRC, const Sign SIG) :
+  topo(TOPO),
+  heavi(HEAVI),
   flu(f),
   sig(SIG)
 {
-  clr=c;
-  tpr=tp;
-  qsrc=qs;
+  vf = TOPO->vf;
+  clr= TOPO->clr;
+  tpr=TPR;
+  qsrc=QSRC;
   time=t;
   rseed=rs;
-  dmicro_min = dm;
-  cang = ca;
 
-  /* default value */
-  dmicro = boil::exa;
+  if(sig==Sign::pos()) {
+    rhol = fluid()->rho(1);
+    rhov = fluid()->rho(0);
+    lambdal = fluid()->lambda(1);
+    lambdav = fluid()->lambda(0);
+    mmass = fluid()->mmass(0);
+  } else {
+    rhol = fluid()->rho(0);
+    rhov = fluid()->rho(1);
+    lambdal = fluid()->lambda(0);
+    lambdav = fluid()->lambda(1);
+    mmass = fluid()->mmass(1);
+  }
+  latent = fluid()->latent()->value();
+
+  rcut = 4.*rseed;
   seed_period = 0.01;
   period_cut_replant = 0.0001;
-  dxmin       = c->domain()->dxyz_min();
-  zbtm        = 0.0;
-  store_dSprev = false;
-  slope = 4.46e-3;  // Utaka's coefficient for water
-  exp_slope = 1.0;
-  boil::oout<<"Nucleation:slope= "<<slope<<"\n";
-  rmax = 1.0e+300;
+  dxmin = clr->domain()->dxyz_min();
+  eps = 1.5*dxmin;
   bzoning = false;
-
-  /* allocate */
-  const int n = boil::maxi(clr->ni(),clr->nj(),clr->nk());
-  dSprev = new real*[n];
-  for (int i=0; i<n; i++) {
-    dSprev[i] = new real[n];
-  }
-
+  zbtm = 0.0;
 }
 
 /******************************************************************************/

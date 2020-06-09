@@ -90,14 +90,32 @@ class Topology {
     Sign distance1D_int_z_old(const int i, const int j, const int k,
                               const Sign dir, real & dist) const;
 
+    inline bool above_interface(const real c)
+      const { return c>=clrsurf; }
+    inline bool below_interface(const real c)
+      const { return c<clrsurf; }
     inline bool above_interface(const int i, const int j, const int k)
       const { return (*clr)[i][j][k]>=clrsurf; }
     inline bool above_interface_old(const int i, const int j, const int k)
       const { return clrold[i][j][k]>=clrsurf; }
-    inline bool under_interface(const int i, const int j, const int k)
+    inline bool below_interface(const int i, const int j, const int k)
       const { return (*clr)[i][j][k]<clrsurf; }
-    inline bool under_interface_old(const int i, const int j, const int k)
+    inline bool below_interface_old(const int i, const int j, const int k)
       const { return clrold[i][j][k]<clrsurf; }
+
+    /* front functions */
+    void front_minmax();
+    void front_minmax( Range<real> xr
+                     , Range<real> yr
+                     , Range<real> zr );
+
+    /* getter for front_minmax */
+    inline real get_xminft() const { return(xminft);};
+    inline real get_xmaxft() const { return(xmaxft);};
+    inline real get_yminft() const { return(yminft);};
+    inline real get_ymaxft() const { return(ymaxft);};
+    inline real get_zminft() const { return(zminft);};
+    inline real get_zmaxft() const { return(zmaxft);};
 
     /* current variables */
     Scalar * vf;
@@ -115,9 +133,12 @@ class Topology {
     Vector fsold;
 
   private:
+    real frontPosition(const int i, const int j, const int k, const Comp m);
+
     int mmax_ext;
     real tol_ext, close_to_cc;
     real clrsurf;
+    real xminft,xmaxft,yminft,ymaxft,zminft,zmaxft; /* xyz min&max of front */
     
     ScalarInt stmp;
     Scalar delta, stmp2;

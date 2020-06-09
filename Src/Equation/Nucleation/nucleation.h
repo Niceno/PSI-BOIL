@@ -4,8 +4,11 @@
 #include "../../Parallel/mpi_macros.h"
 #include "../../Field/Scalar/scalar.h"
 #include "../../Global/global_constants.h"
+#include "../../Global/global_realistic.h"
 #include "../../SimulationTime/simulation_time.h"
 #include "../../Matter/matter.h"
+#include "../Topology/topology.h"
+#include "../Heaviside/heaviside.h"
 #include "site.h"
 
 /////////////
@@ -16,11 +19,14 @@
 class Nucleation {
 
   public:
-    Nucleation ( Scalar * c, Scalar * tpr, Scalar * qsrc,
-                 const Times * t, Scalar & dmicro,
-                 Matter * f, const real rs, const real dm, 
-                 const real ca, const Sign sig = Sign::pos() );
-    /* sign positive -> liquid = 1, works for plant/replant */
+    Nucleation ( Topology * topo,
+                 Heaviside * heavi,
+                 const Scalar * tpr,
+                 const Times * t,
+                 Matter * f, const real rs,
+                 Scalar * qsrc = NULL, 
+                 const Sign sig = Sign::pos() );
+    /* sign positive -> liquid = 1 */
     ~Nucleation();
 
     void save(const char *, const int);
@@ -29,68 +35,73 @@ class Nucleation {
     void save(std::ofstream &);
     void load(std::ifstream &);
 
-    int  size() const { return  sites.size(); }
-    int dsize() const { return dsites.size(); }
+    inline int  size() const { return  sites.size(); }
+    inline int dsize() const { return dsites.size(); }
 
     void plant();
     void replant();
     void cutneck(const real r);
     void add(const Site & s);
     void st_active();
-    real area_vapor(const int i, const int j, const int k, const Dir d);
 
     real clr_site  (const int i);
     real tpr_site  (const int i);
-    real dmicro0(const int i, const int j, const int k );
 
-    void set_seed_period(real r){ seed_period=r; };
-    real get_seed_period(){ return (seed_period); };
+    real distance_from_site(const int i, const int j, const int k) const;
 
-    void set_slope(real r){ slope=r; 
-           boil::oout<<"nucleation:slope is modfied to "<<r<<"\n";};
-    void set_slope(real r1, real r2) { slope=r1;
-           exp_slope=r2;
-           boil::oout<<"nucleation:slope is modfied to "<<r1<<"*r^"<<r2<<"\n";};
-    real get_slope(){ return (slope); };
-    real get_exp_slope(){ return (exp_slope); };
+    //real area_vapor(const Dir d,
+    //                const int i, const int j, const int k) const;
+    real area_vapor(const Sign sig, const Comp & mcomp,
+                    const int i, const int j, const int k) const;
 
-    void set_rmax(real r){ rmax = r;
-            boil::oout<<"nucleation:rmax is modified to "<<r<<"\n";};
-    real get_rmax(){ return rmax;};
+    inline void set_seed_period(real r){ seed_period=r; };
+    inline real get_seed_period() const { return (seed_period); };
 
+    inline void set_cutneck_mult(real cm){ rcut = rseed*cm; };
+    inline real get_cutneck_mult() const { return rcut; };
 
-    real cangle() {return cang;};
-    real sigma()  {return sgm;}
+    bool in_vapor(const int i, const int j, const int k) const;
+    bool in_vapor(const real c) const;
 
     std::vector<Site> sites, dsites;
-    Scalar dmicro;
-    real ** dSprev;
-    bool store_dSprev;
-    real dmicro_min;
 
     const Matter * fluid() const {return flu;}
+    const Topology * topology() const {return topo;}
 
   protected:
     void set_range(std::vector<Site> & s);
-    real zftmin    (Range<real> xr, Range<real> yr, Range<real> zr);
+
     real area_vapor_sum(Range<real> xr, Range<real> yr, Range<real> zr);
+
     void zoning();
 
-    Scalar * clr;
-    Scalar * tpr;
+    void dummy_add(const Site & s){ dsites.push_back(s); 
+                              set_range(dsites);};
+    real stratified_sphere(const int i, const int j, const int k,
+                        const real xcent, const real ycent, const real zcent);
+
+    virtual void upkeep_after_seeding() {};
+    void plant_site(const int ns, const bool seed_source = true);
+    void plant_dummy_site(const int nsd);
+
+    Topology * topo;
+    Heaviside * heavi;
+
+    Scalar * vf;
+    const Scalar * clr;
+    const Scalar * tpr;
     Scalar * qsrc;
     Matter * flu;
     const Times * time;
-    real seed_period; //active_tpr, zplant;
-    real period_cut_replant;  // period of preventing replant after cutneck
-    real dxmin, zbtm;
-    real cang, sgm;  // contact angle, surface tension coefficient
 
-  private:
-    void dummy_add(const Site & s){ dsites.push_back(s); 
-                              set_range(dsites);};
-    real slope, exp_slope, rseed;
-    real rmax;
+    real seed_period;
+    real period_cut_replant;  // period of preventing replant after cutneck
+    real dxmin, eps;
+    real zbtm;
+
+    real rhol, rhov, lambdal, lambdav, latent, mmass;
+
+    real rseed, rcut;
     bool bzoning;
     std::vector<int> id_nearRegion, idd_nearRegion;
     Sign sig;

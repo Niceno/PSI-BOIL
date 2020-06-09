@@ -9,11 +9,10 @@ void Nucleation::cutneck (const real area_neck) {
   for(int ns=0; ns<size(); ns++){
     bool bneck=false;
     real a_vapor=0.0;
-    real range = 4.0*rseed;
     if( time->current_time() > (sites[ns].time_seed() + seed_period) ) {
       a_vapor
-	= area_vapor_sum( Range<real>(sites[ns].x()-range, sites[ns].x()+range)
-                        , Range<real>(sites[ns].y()-range, sites[ns].y()+range)
+	= area_vapor_sum( Range<real>(sites[ns].x()-rcut, sites[ns].x()+rcut)
+                        , Range<real>(sites[ns].y()-rcut, sites[ns].y()+rcut)
                         , Range<real>(zbtm, zbtm+dxmin));
 
       /*--------------------------------------------------------+
@@ -47,11 +46,10 @@ void Nucleation::cutneck (const real area_neck) {
   /* cut neck */
   for(int ns=0; ns<size(); ns++){
     if( sites[ns].neck() ){
-      real range = 4.0*rseed;
-      real xfirst = sites[ns].x() - range;
-      real xlast  = sites[ns].x() + range;
-      real yfirst = sites[ns].y() - range;
-      real ylast  = sites[ns].y() + range;
+      real xfirst = sites[ns].x() - rcut;
+      real xlast  = sites[ns].x() + rcut;
+      real yfirst = sites[ns].y() - rcut;
+      real ylast  = sites[ns].y() + rcut;
       real zfirst = zbtm;
       real zlast  = zbtm+dxmin;
       for (int i=(*clr).si(); i<=(*clr).ei(); i++) {
@@ -63,7 +61,7 @@ void Nucleation::cutneck (const real area_neck) {
 	  for (int k=(*clr).sk(); k<=(*clr).ek(); k++) {
             if ((*clr).zc(k)<zfirst) continue;
             if ((*clr).zc(k)>zlast ) continue;
-            (*clr)[i][j][k]=1.0;
+            (*vf)[i][j][k]= (sig>0) ? 1.0 : 0.0;
 	    //std::cout<<i<<" "<<j<<" "<<k<<"\n";
           }
         }
@@ -74,11 +72,10 @@ void Nucleation::cutneck (const real area_neck) {
   /* dummy sites */
   for(int nsd=0; nsd<dsize(); nsd++){
     if( dsites[nsd].neck() ){
-      real range = 4.0*rseed;
-      real xfirst = dsites[nsd].x() - range;
-      real xlast  = dsites[nsd].x() + range;
-      real yfirst = dsites[nsd].y() - range;
-      real ylast  = dsites[nsd].y() + range;
+      real xfirst = dsites[nsd].x() - rcut;
+      real xlast  = dsites[nsd].x() + rcut;
+      real yfirst = dsites[nsd].y() - rcut;
+      real ylast  = dsites[nsd].y() + rcut;
       real zfirst = zbtm;
       real zlast  = zbtm+dxmin;
       for (int i=(*clr).si(); i<=(*clr).ei(); i++) {
@@ -90,7 +87,7 @@ void Nucleation::cutneck (const real area_neck) {
           for (int k=(*clr).sk(); k<=(*clr).ek(); k++) {
             if ((*clr).zc(k)<zfirst) continue;
             if ((*clr).zc(k)>zlast ) continue;
-            (*clr)[i][j][k]=1.0;
+            (*vf)[i][j][k]= (sig>0) ? 1.0 : 0.0;
           }
         }
       }

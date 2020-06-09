@@ -1,18 +1,14 @@
 #include "nucleation.h"
-//#define DEBUG
-using namespace std;
 
 /******************************************************************************/
-real Nucleation::dmicro0(const int i, const int j, const int k ) {
+real Nucleation::distance_from_site(const int i, const int j, const int k)
+                                                                         const {
 /***************************************************************************//**
-*  \brief calculate initial thickness of micro layer
+*  \brief calculate distance from nucleation site
 *  crude code: assume k-plane
 *******************************************************************************/
-#ifdef DEBUG
-  std::cout<<"pc.dmicro0: "<<boil::cart.iam()<<"\n";
-#endif
 
-  real rl=boil::exa;
+  real rl = boil::unreal;
 
   /* genuine sites */
   //for (int ns=0; ns < size(); ns++){
@@ -21,7 +17,7 @@ real Nucleation::dmicro0(const int i, const int j, const int k ) {
     if (sites[ns].active()) {
       real r = sqrt( pow(clr->xc(i)-sites[ns].x(),2.0)
                    + pow(clr->yc(j)-sites[ns].y(),2.0) );
-      rl = min(rl,r);
+      rl = std::min(rl,r);
     }
   }
 
@@ -32,21 +28,9 @@ real Nucleation::dmicro0(const int i, const int j, const int k ) {
     if (dsites[nsd].active()) {
       real r = sqrt( pow(clr->xc(i)-dsites[nsd].x(),2.0)
                    + pow(clr->yc(j)-dsites[nsd].y(),2.0) );
-      rl = min(rl,r);
+      rl = std::min(rl,r);
     }
   }
 
-  //real coef = 4.46e-3;  // Utaka's coefficient for water
-
-  real d_return;
-  if (rl==boil::exa) {
-    d_return = boil::exa;
-  } else if (rl < rmax) {
-    //d_return = max(slope * rl, dmicro_min);
-    d_return = max(slope * pow(rl, exp_slope), dmicro_min);
-  } else {
-    d_return = boil::exa;
-  }
-
-  return d_return;
+  return rl;
 }

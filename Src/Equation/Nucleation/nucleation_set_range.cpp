@@ -5,14 +5,14 @@
 *******************************************************************************/
 void Nucleation::set_range(std::vector<Site> & s) {
 
-  real eps = rseed + dxmin * 1.5;
+  real rng = rseed + eps;
   int ns=s.size()-1;
-  real xs = s[ns].x()-eps;
-  real xe = s[ns].x()+eps;
-  real ys = s[ns].y()-eps;
-  real ye = s[ns].y()+eps;
-  real zs = s[ns].z()-eps;
-  real ze = s[ns].z()+eps;
+  real xs = s[ns].x()-rng;
+  real xe = s[ns].x()+rng;
+  real ys = s[ns].y()-rng;
+  real ye = s[ns].y()+rng;
+  real zs = s[ns].z()-rng;
+  real ze = s[ns].z()+rng;
   //std::cout<<ns<<" "<<xs<<" "<<xe<<" "<<ys<<" "<<ye<<" "<<zs<<" "<<ze<<"\n";
 
   int ic = clr->aim(s[ns].x(), boil::pico);
@@ -38,4 +38,6 @@ void Nucleation::set_range(std::vector<Site> & s) {
   s[ns].set_je(je);
   s[ns].set_ks(ks);
   s[ns].set_ke(ke);
+
+  return;
 }

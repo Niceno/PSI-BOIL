@@ -19,15 +19,22 @@ class Schrage : public TIF {
     ~Schrage() {}
 
     inline real get_mass_resistance() { return mresis; }
-    inline void set_mass_resistance(const real mresisnew) {
-      mresis = mresisnew;
-      boil::oout<<"Schrage: Mass transfer resistance= "<<mresisnew<<boil::endl;
+    inline real get_heat_resistance() { return hresis; }
+    inline void set_heat_resistance(const real resisnew) {
+      hresis = resisnew;
+      mresis = hresis*latent;
+      boil::oout<<"Schrage: Transfer resistance= "<<hresis
+                <<" "<<mresis<<boil::endl;
     }
 
     const Matter * fluid() const {return flu;}
 
+    static real calculate_heat_transfer_resistance(
+                                          const real tr, const real rhov,
+                                          const real mmass, const real latent);
+
   protected:
-    real mresis, rhol;
+    real mresis, hresis, latent, rhol;
     Matter * flu;
 
     const Scalar mflx;

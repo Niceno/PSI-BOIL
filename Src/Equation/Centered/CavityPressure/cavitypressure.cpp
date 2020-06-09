@@ -29,7 +29,7 @@ CavityPressure::CavityPressure(const Scalar & PHI,
   /* clr = 1 is liquid */
   if(SIG>0) {
     in_gas = [this](const int i, const int j, const int k)
-                   { return topo->under_interface(i,j,k); };
+                   { return topo->below_interface(i,j,k); };
   /* clr = 0 is liquid */
   } else {
     in_gas = [this](const int i, const int j, const int k)

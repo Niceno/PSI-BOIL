@@ -33,8 +33,6 @@ AC_OUTPUT(Makefile                                                             \
           Src/Equation/Centered/CavityPressure/CPaxisym/Makefile               \
           Src/Equation/Centered/CavityPressure/Makefile                        \
           Src/Equation/Centered/Pressure/Makefile                              \
-          Src/Equation/Centered/PhaseChange/Makefile                           \
-          Src/Equation/Centered/PhaseChangeVOF/Makefile                        \
           Src/Equation/Centered/PhaseChange4/Makefile                          \
           Src/Equation/Centered/CIPCSL2/Makefile                               \
           Src/Equation/Centered/VOF/VOFaxisym/Makefile                         \
@@ -49,6 +47,7 @@ AC_OUTPUT(Makefile                                                             \
           Src/Equation/Heaviside/MarchingSquares/MSaxisym/Makefile             \
           Src/Equation/Heaviside/MarchingSquares/Makefile                      \
           Src/Equation/Heaviside/Makefile                                      \
+          Src/Equation/Nucleation/Microlayer/Makefile                          \
           Src/Equation/Nucleation/Makefile                                     \
           Src/Equation/Tifmodel/Antoine/Makefile                               \
           Src/Equation/Tifmodel/Clapeyron/Makefile                             \

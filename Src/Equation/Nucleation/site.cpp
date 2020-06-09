@@ -13,8 +13,8 @@ Site::Site (const real x, const real y, const real z,
   }
   set_active_tpr(t);
   set_zplant(zpl);
-  tseed=-boil::exa;
-  tcutneck=-boil::exa;
+  tseed=-boil::unreal;
+  tcutneck=-boil::unreal;
   bseed_prev = false;
   bneck_prev = false;
   req_seed   =true;  // request from site for replant

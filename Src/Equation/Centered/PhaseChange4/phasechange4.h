@@ -35,6 +35,7 @@ class PhaseChange4 : public Centered {
     void mass_flux(const Scalar * diff_eddy = NULL);
     void initialize();
     void finalize();
+    inline void sources() { sources_vfs(); sources_fext(); sources_sum(); }
 
     real lambda(const int i, const int j, const int k,
                 const Scalar * diff_eddy = NULL) const;

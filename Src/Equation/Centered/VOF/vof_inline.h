@@ -1,11 +1,3 @@
-/* getter for front_minmax */
-inline real get_xminft() const { return(xminft);};
-inline real get_xmaxft() const { return(xmaxft);};
-inline real get_yminft() const { return(yminft);};
-inline real get_ymaxft() const { return(ymaxft);};
-inline real get_zminft() const { return(zminft);};
-inline real get_zmaxft() const { return(zmaxft);};
-
 /* getter and setter for wall value tolerance */
 inline real get_tol_wall() { return tol_wall; }
 inline void set_tol_wall(real tolnew) {

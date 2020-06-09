@@ -19,8 +19,6 @@ SUBDIRS = Equation/Staggered/Momentum                              \
           Equation/Centered/CavityPressure/CPaxisym                \
           Equation/Centered/CavityPressure                         \
           Equation/Centered/Pressure                               \
-          Equation/Centered/PhaseChange                            \
-          Equation/Centered/PhaseChangeVOF                         \
           Equation/Centered/PhaseChange4                           \
           Equation/Centered/CIPCSL2                                \
           Equation/Centered/VOF/VOFaxisym                          \
@@ -33,6 +31,7 @@ SUBDIRS = Equation/Staggered/Momentum                              \
           Equation/Heaviside/MarchingSquares/MSaxisym              \
           Equation/Heaviside/MarchingSquares                       \
           Equation/Heaviside                                       \
+          Equation/Nucleation/Microlayer                           \
           Equation/Nucleation                                      \
           Equation/Tifmodel/Antoine                                \
           Equation/Tifmodel/Clapeyron                              \
@@ -86,8 +85,6 @@ LDADD = Equation/Staggered/Momentum/libMomentum.a                             \
         Equation/Centered/CavityPressure/CPaxisym/libCPaxisym.a               \
         Equation/Centered/CavityPressure/libCavityPressure.a                  \
         Equation/Centered/Pressure/libPressure.a                              \
-        Equation/Centered/PhaseChange/libPhaseChange.a                        \
-        Equation/Centered/PhaseChangeVOF/libPhaseChangeVOF.a                  \
         Equation/Centered/PhaseChange4/libPhaseChange4.a                      \
         Equation/Centered/CIPCSL2/libCipcsl2.a                                \
         Equation/Centered/VOF/VOFaxisym/libVOFaxisym.a                        \
@@ -100,6 +97,7 @@ LDADD = Equation/Staggered/Momentum/libMomentum.a                             \
 	Equation/Heaviside/MarchingSquares/MSaxisym/libMSaxisym.a             \
 	Equation/Heaviside/MarchingSquares/libMarchingSquares.a               \
 	Equation/Heaviside/libHeaviside.a                                     \
+        Equation/Nucleation/Microlayer/libMicrolayer.a                        \
 	Equation/Nucleation/libNucleation.a                                   \
         Equation/Tifmodel/Antoine/libAntoine.a                                \
         Equation/Tifmodel/Clapeyron/libClapeyron.a                            \

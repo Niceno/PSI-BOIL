@@ -317,7 +317,6 @@ class VOF : public Centered {
 
     real alpha_val(const real c, const real nnx, const real nny, const real nnz);
     real fs_val(const Comp m, const int i, const int j, const int k);
-    real frontPosition(const int i, const int j, const int k, const Comp m);
 
     Scalar kappa;        /* curvature */
     Scalar stmp, stmp2;
@@ -329,7 +328,6 @@ class VOF : public Centered {
     Scalar mx,my,mz;/* normal to interface, in real space */
 
     Matter jelly;   /* virtual fluid needed by parent constructor */
-    real xminft,xmaxft,yminft,ymaxft,zminft,zmaxft; /* xyz min&max of front */
     real theta;
     real epsnorm;
     real phisurf;

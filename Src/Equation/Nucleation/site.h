@@ -4,6 +4,7 @@
 #include <vector>
 #include "../../Global/global_precision.h"
 #include "../../Global/global_constants.h"
+#include "../../Global/global_realistic.h"
 
 ////////////
 //        //
@@ -17,19 +18,19 @@ class Site {
        , const real t1, const real t2);
     ~Site();
 
-    real x() {return xsite;};
-    real y() {return ysite;};
-    real z() {return zsite;};
-    int ic() {return icent;}
-    int jc() {return jcent;}
-    int kc() {return kcent;}
+    inline real x() const {return xsite;};
+    inline real y() const {return ysite;};
+    inline real z() const {return zsite;};
+    inline int ic() const {return icent;}
+    inline int jc() const {return jcent;}
+    inline int kc() const {return kcent;}
 
-    int is() {return ist;};
-    int ie() {return ied;};
-    int js() {return jst;};
-    int je() {return jed;};
-    int ks() {return kst;};
-    int ke() {return ked;};
+    inline int is() const {return ist;};
+    inline int ie() const {return ied;};
+    inline int js() const {return jst;};
+    inline int je() const {return jed;};
+    inline int ks() const {return kst;};
+    inline int ke() const {return ked;};
 
     void set_x (real r){xsite=r;};
     void set_y (real r){ysite=r;};
@@ -92,7 +93,7 @@ class Site {
 
     /* active: nucleation site is active or not */
     void set_active(const bool b) {act=b;}
-    bool active() {return act;}
+    bool active() const {return act;}
 
     /* qsink: add heat sink to qsrc */
     void set_qsink(const bool b) {bqsink=b;}

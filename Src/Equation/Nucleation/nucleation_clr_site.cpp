@@ -1,13 +1,12 @@
 #include "nucleation.h"
-using namespace std;
 
 /******************************************************************************/
 real Nucleation::clr_site(const int ns ) {
 /***************************************************************************//**
-*  \brief calculate average temperature of nucleation site
+*  \brief obtain color at nucleation site
 *******************************************************************************/
 
-  real clr_seed = -boil::exa;
+  real clr_seed = -boil::unreal;
   real xs = sites[ns].x();
   real ys = sites[ns].y();
   real zs = sites[ns].z();
@@ -19,7 +18,7 @@ real Nucleation::clr_site(const int ns ) {
   }
   boil::cart.max_real(&clr_seed);
 
-  if(clr_seed<=-boil::exa) {
+  if(!boil::realistic(clr_seed)) {
     boil::oout<<"nucleation:clr_site: Error!!! Cannot find seed point!\n";
     exit(0);
   }

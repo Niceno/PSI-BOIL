@@ -15,9 +15,7 @@ void PhaseChange4::finalize() {
 #endif
 
   /* calculate source terms */
-  sources_vfs();
-  sources_fext();
-  sources_sum();
+  sources();
   boil::oout<<"phasechange4_update: time= "<<time->current_time()
             <<" smdot_pos= "<<smdot_pos
             <<" smdot_neg= "<<smdot_neg<<"\n";
