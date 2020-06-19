@@ -19,7 +19,8 @@ class Microlayer : public Nucleation {
                 Heaviside * heavi,
                 const TIF & tifmodel,
                 const Times * t,
-                Matter * f, const real rs, const real dm,
+                Matter * f, const real rs, 
+                const real dmin, const real dmax = boil::unreal,
                 Matter * s = NULL,
                 Scalar * qsrc = NULL,
                 const Sign sig = Sign::pos() );
@@ -67,7 +68,7 @@ class Microlayer : public Nucleation {
     real hresis;
     real slope, exp_slope;
     real rmax;
-    real dmicro_min;
+    real dmicro_min, dmicro_max;
     
     bool str_dSprev;
 

@@ -11,7 +11,8 @@ Microlayer::Microlayer( Scalar & DM,
                         Heaviside * heavi,
                         const TIF & TIFMODEL,
                         const Times * t,
-                        Matter * f, const real rs, const real dm,
+                        Matter * f, const real rs,
+                        const real dmin, const real dmax,
                         Matter * s,
                         Scalar * qsrc,
                         const Sign sig ) :
@@ -25,7 +26,8 @@ Microlayer::Microlayer( Scalar & DM,
   tprs = TPRS;
   tifmodel = &TIFMODEL;
 
-  dmicro_min = dm;
+  dmicro_min = dmin;
+  dmicro_max = dmax;
   dom = dmicro.domain();
 
   dSprev = dmicro.shape();

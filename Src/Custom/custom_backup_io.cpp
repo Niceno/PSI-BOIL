@@ -10,7 +10,8 @@ namespace boil {
                    const std::vector<Nucleation*> & nucls,
                    const std::vector<std::string> & nucl_names,
                    const std::vector<CIPCSL2*> & cipcsl2s,
-                   const std::vector<std::string> & cipcsl2_names) {
+                   const std::vector<std::string> & cipcsl2_names,
+                   const std::vector<real*> & store_values) {
     /* file name */
     std::stringstream ss;
     if(!irregular) {
@@ -48,6 +49,10 @@ namespace boil {
       output << time.current_step() << boil::endl;
       output << time.current_time()+time.dt() << boil::endl;
       output << time.dt() << boil::endl;
+
+      /* save tracked values */
+      for(auto val : store_values)
+        output << *val << boil::endl;
       output.close();
     }
 
@@ -63,7 +68,8 @@ namespace boil {
                    const std::vector<Nucleation*> & nucls,
                    const std::vector<std::string> & nucl_names,
                    const std::vector<CIPCSL2*> & cipcsl2s,
-                   const std::vector<std::string> & cipcsl2_names) {
+                   const std::vector<std::string> & cipcsl2_names,
+                   const std::vector<real*> & store_values) {
     ts = 0;
     std::fstream input;
     input.open(fname,std::ios::in);
@@ -78,6 +84,11 @@ namespace boil {
       time.first_step(ts);
       time.current_time(t);
       time.set_dt(dtf);
+
+      /* load tracked values */
+      //if(store_values != NULL)
+        for(auto val : store_values)
+          input >> *val;
 
       /* load scalars */
       for(int i(0); i<scalars.size(); ++i) {

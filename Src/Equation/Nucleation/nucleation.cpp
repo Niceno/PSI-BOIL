@@ -46,6 +46,9 @@ Nucleation::Nucleation ( Topology * TOPO, Heaviside * HEAVI,
   eps = 1.5*dxmin;
   bzoning = false;
   zbtm = 0.0;
+
+  limit_zoning = true;
+  zoning_limit_multiplier = 0.2;
 }
 
 /******************************************************************************/

@@ -33,7 +33,8 @@ namespace boil {
                    const std::vector<Nucleation*> & nucls = {},
                    const std::vector<std::string> & nucl_names = {},
                    const std::vector<CIPCSL2*> & cipcsl2s = {},
-                   const std::vector<std::string> & cipcsl2_names = {});
+                   const std::vector<std::string> & cipcsl2_names = {},
+                   const std::vector<real*> & store_values = {});
 
   bool load_backup(const std::string & fname,
                    int & ts, Times & time,
@@ -44,7 +45,8 @@ namespace boil {
                    const std::vector<Nucleation*> & nucls = {},
                    const std::vector<std::string> & nucl_names = {},
                    const std::vector<CIPCSL2*> & cipcsl2s = {},
-                   const std::vector<std::string> & cipcsl2_names = {});
+                   const std::vector<std::string> & cipcsl2_names = {},
+                   const std::vector<real*> & store_values = {});
 
   void rm_backup(const int ts,
                  const std::vector<Scalar*> & scalars,

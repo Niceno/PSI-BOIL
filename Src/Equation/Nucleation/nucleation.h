@@ -62,6 +62,15 @@ class Nucleation {
     inline void set_cutneck_mult(real cm){ rcut = rseed*cm; };
     inline real get_cutneck_mult() const { return rcut; };
 
+    inline void set_zoning_limiting(bool zl, real zlmult = 0.0) {
+      limit_zoning = zl;
+      zoning_limit_multiplier = zlmult;
+    }
+    inline bool get_zoning_limiting(real & zlmult) const {
+      zlmult = zoning_limit_multiplier;
+      return limit_zoning;
+    }
+
     bool in_vapor(const int i, const int j, const int k) const;
     bool in_vapor(const real c) const;
 
@@ -106,6 +115,9 @@ class Nucleation {
     bool bzoning;
     std::vector<int> id_nearRegion, idd_nearRegion;
     Sign matter_sig;
+
+    bool limit_zoning;
+    real zoning_limit_multiplier;
 };
 
 #endif

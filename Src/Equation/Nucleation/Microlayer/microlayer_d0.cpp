@@ -16,7 +16,8 @@ real Microlayer::d0(const int i, const int j, const int k) {
   if(!boil::realistic(rl)) {
     d_return = boil::unreal;
   } else if(rl < rmax) {
-    d_return = std::max(slope * std::pow(rl, exp_slope), dmicro_min);
+    d_return = std::min(dmicro_max,
+                        std::max(slope * std::pow(rl, exp_slope), dmicro_min));
   } else {
     d_return = boil::unreal;
   }
