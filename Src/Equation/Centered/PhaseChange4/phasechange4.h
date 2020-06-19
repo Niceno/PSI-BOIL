@@ -27,7 +27,7 @@ class PhaseChange4 : public Centered {
                  Times & t,
                  Matter * flu,
                  Matter * sol = NULL,
-                 Sign sig = Sign::pos());
+                 Sign matter_sig = Sign::pos());
  
     ~PhaseChange4();
     void update(const Scalar * diff_eddy = NULL);
@@ -71,6 +71,7 @@ class PhaseChange4 : public Centered {
     bool interface(const int i, const int j, const int k);
     void m();
     real mdot_cut(real m, real c, real & mcut);
+    real vfs_cut(real vfsval, real vfval);
     void mdot();
 
     void heat_flux(const Scalar * diff_eddy = NULL);
@@ -145,7 +146,7 @@ class PhaseChange4 : public Centered {
     Scalar M;
 
     const TIF & tifmodel;
-    const Sign sig; /* pos: liquid is phi=1 and vice versa */
+    const Sign matter_sig; /* pos: liquid is phi=1 and vice versa */
     Topology * topo;
  
     real rhol, rhov, lambdal, lambdav, cpl, cpv;

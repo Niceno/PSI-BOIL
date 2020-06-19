@@ -68,7 +68,7 @@ void ConcentrationTP::convection(Scalar * conv) {
     umf = (*u)[mcomp][i  ][j][k];  /* u @ imin */
     upf = (*u)[mcomp][i+1][j][k];  /* u @ imax */
 
-    if(sig==Sign::neg()) {
+    if(matter_sig==Sign::neg()) {
       /* liquid flux */
       flxm = (*colorflow)[mcomp][i  ][j][k]*time->dti();
       flxp = (*colorflow)[mcomp][i+1][j][k]*time->dti();
@@ -111,7 +111,7 @@ void ConcentrationTP::convection(Scalar * conv) {
     vmf = (*u)[mcomp][i][j  ][k];  /* v @ jmin */
     vpf = (*u)[mcomp][i][j+1][k];  /* v @ jmax */
 
-    if(sig==Sign::neg()) {
+    if(matter_sig==Sign::neg()) {
       /* liquid flux */
       flxm = (*colorflow)[mcomp][i][j  ][k]*time->dti();
       flxp = (*colorflow)[mcomp][i][j+1][k]*time->dti();
@@ -155,7 +155,7 @@ void ConcentrationTP::convection(Scalar * conv) {
     wmf = (*u)[mcomp][i][j][k  ];  /* w @ kmin */
     wpf = (*u)[mcomp][i][j][k+1];  /* w @ kmax */
 
-    if(sig==Sign::neg()) {
+    if(matter_sig==Sign::neg()) {
       /* liquid flux */
       flxm = (*colorflow)[mcomp][i][j][k  ]*time->dti();
       flxp = (*colorflow)[mcomp][i][j][k+1]*time->dti();

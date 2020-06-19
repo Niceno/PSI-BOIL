@@ -43,8 +43,16 @@ real EnthalpyFD::hflux_wall(const Scalar & val, const Dir din
             real area = fabs(iof)*val.dSx(sig,i,j,k)
                       + fabs(jof)*val.dSy(sig,i,j,k)
                       + fabs(kof)*val.dSz(sig,i,j,k);
+            real alen = fabs(val.xc(i)-val.xc(i+iof))
+                      + fabs(val.yc(j)-val.yc(j+jof))
+                      + fabs(val.zc(k)-val.zc(k+kof));
+
             areaw += area;
-            if(!interface(sig,mcomp,i+iof,j+jof,k+kof)) {
+            if       (dom->ibody().off(i,j,k)) {
+              real lc = solid()->lambda(i,j,k);
+              hflux += lc*(val[i][j][k]-val[i+iof][j+jof][k+kof])/alen*area;
+
+            } else if(!interface(sig,mcomp,i+iof,j+jof,k+kof)) {
               real lc=lambdav;
               real cp_mass = cpv/rhov;
               if(topo->above_interface(i+of,j+of,k+of)) {
@@ -54,11 +62,9 @@ real EnthalpyFD::hflux_wall(const Scalar & val, const Dir din
               if(diff_eddy){
                 lc += (*diff_eddy)[i][j][k]*cp_mass/turbP;
               }
-              real alen = fabs(val.xc(i)-val.xc(i+iof))
-                        + fabs(val.yc(j)-val.yc(j+jof))
-                        + fabs(val.zc(k)-val.zc(k+kof));
               hflux += lc*(val[i][j][k]-val[i+iof][j+jof][k+kof])/alen*area;
-	          } else {
+
+	    } else {
               real lc=lambdal;
               real cp_mass = cpl/rhol;
               if(topo->above_interface(i+of,j+of,k+of)) {
@@ -68,7 +74,7 @@ real EnthalpyFD::hflux_wall(const Scalar & val, const Dir din
               if(diff_eddy){
                 lc += (*diff_eddy)[i][j][k]*cp_mass/turbP;
               }
-              real ts,alen;
+              real ts;
               if       (mcomp==Comp::i()) {
                 alen = fabs(val.xc(i)-val.xc(i+iof))
                      - distance_int_x(sig,i+iof,j+jof,k+kof,ts);
@@ -80,11 +86,11 @@ real EnthalpyFD::hflux_wall(const Scalar & val, const Dir din
                      - distance_int_z(sig,i+iof,j+jof,k+kof,ts);
               }
               hflux += lc*(val[i][j][k]-ts)/alen*area;
-            }
-          }
-        }
-      }
-    }
+            } /* interface */
+          } /* vijk */
+        } /* d == din */
+      } /* d != undefined */
+    } /* bc == dirichlet */
   }
   boil::cart.sum_real(&hflux);
   boil::cart.sum_real(&areaw);

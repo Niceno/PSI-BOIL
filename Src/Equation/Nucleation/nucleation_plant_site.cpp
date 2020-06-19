@@ -21,7 +21,7 @@ void Nucleation::plant_site(const int ns, const bool seed_source) {
           real cseed = stratified_sphere(i,j,k,
                                          xcent,ycent,zcent);
 
-          if(sig==Sign::pos()) {
+          if(matter_sig==Sign::pos()) {
             (*vf)[i][j][k]=std::min((*vf)[i][j][k],cseed);
           } else {
             (*vf)[i][j][k]=1.0-std::min(1.0-(*vf)[i][j][k],cseed);
@@ -43,7 +43,7 @@ void Nucleation::plant_site(const int ns, const bool seed_source) {
   if(qsrc&&seed_source) {
 
     real rhov;
-    if(sig==Sign::pos()) {
+    if(matter_sig==Sign::pos()) {
       rhov = fluid()->rho(0);
     } else {
       rhov = fluid()->rho(1);
@@ -59,7 +59,7 @@ void Nucleation::plant_site(const int ns, const bool seed_source) {
 
         real cseed = stratified_sphere(i,j,k,
                                        xcent,ycent,zcent);
-        if(sig==Sign::neg()) {
+        if(matter_sig==Sign::neg()) {
           cseed = 1.-cseed;
         }
         if (clr->domain()->ibody().off(i,j,k-1)) {
@@ -92,7 +92,7 @@ void Nucleation::plant_dummy_site(const int nsd) {
         real cseed = stratified_sphere(i,j,k,
                                        xcent,ycent,zcent);
 
-        if(sig==Sign::pos()) {
+        if(matter_sig==Sign::pos()) {
           (*vf)[i][j][k]=std::min((*vf)[i][j][k],cseed);
         } else {
           (*vf)[i][j][k]=1.0-std::min(1.0-(*vf)[i][j][k],cseed);

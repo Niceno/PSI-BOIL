@@ -106,6 +106,6 @@ class ConcentrationTP : public Centered {
 
     real turbS; /* turbulent schmidt number */
     bool laminar;
-    const Sign sig;
+    const Sign matter_sig;
 };	
 #endif

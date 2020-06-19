@@ -40,8 +40,8 @@ void Nucleation::plant () {
 
   st_active();
 
-  /* used by microlayer */
-  upkeep_after_seeding();
+  /* used by microlayer: first, update at walls must be called */
+  //upkeep_after_seeding();
 
   return;
 }

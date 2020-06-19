@@ -26,7 +26,7 @@ ConcentrationTP::ConcentrationTP(const Scalar & PHI,
   colorflow(&FLUXCLR),
   heavi(HEAVI),
   topo(TOPO),
-  sig(SIG)
+  matter_sig(SIG)
 {
   rho_dif = (f->rho());     /* pointer at property */
   dcoef   = (f->gamma());   /* pointer at property */

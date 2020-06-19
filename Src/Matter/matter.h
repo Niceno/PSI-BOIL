@@ -21,9 +21,9 @@ class Matter {
   public:
 /*  Matter() do not use this one, dangerous */        
 
-    Matter(const Domain & d);
+    Matter(const Domain & d, const char * nm = NULL);
 
-    Matter(const Domain & d, const char * nm);
+    //Matter(const Domain & d, const char * nm);
 
     Matter(const Matter & a, 
            const Matter & b, 
@@ -210,6 +210,8 @@ class Matter {
     Property * molm;
     Property * tens;
     Property * heat;
+
+    Property * dens_o_visc;
 
     const Domain * dom;
 

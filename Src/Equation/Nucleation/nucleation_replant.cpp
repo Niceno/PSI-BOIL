@@ -14,21 +14,24 @@ void Nucleation::replant () {
   +-----------------*/
 
   real t_current = time->current_time();
+  real front_array[6];
 
   for(int ns=0; ns<size(); ns++){
 
     bool bseed=false;              // bseed=true, if replant.
     real tpr_seed = tpr_site(ns);  // seed temperature
     real clr_seed = clr_site(ns);  // color function at seed point
-
+    real zft;
+    
     bool bheight = false;          // bheight=true, if zplant is satisfied.
     if(sites[ns].zplant()<0.0) {   // crude code
       bheight = true;
     } else {
       topo->front_minmax(Range<real>(sites[ns].x()-dxmin,sites[ns].x()+dxmin),
                          Range<real>(sites[ns].y()-dxmin,sites[ns].y()+dxmin),
-                         Range<real>(-boil::unreal,boil::unreal));
-      real zft = topo->get_zminft();
+                         Range<real>(-boil::unreal,boil::unreal),
+                         front_array);
+      zft = front_array[4]; /* not optimal solution!!! */
 
       if(zft>sites[ns].zplant()){
         bheight=true;
@@ -126,8 +129,8 @@ void Nucleation::replant () {
 
   st_active();
 
-  /* used by microlayer */
-  upkeep_after_seeding();
+  /* used by microlayer: first, update at walls must be called */
+  //upkeep_after_seeding();
 
   return;
 }

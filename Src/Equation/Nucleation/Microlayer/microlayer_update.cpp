@@ -1,7 +1,8 @@
 #include "microlayer.h"
 
 /******************************************************************************/
-void Microlayer::update(real & smdot_pos_macro_overwrite,
+void Microlayer::update(real & smdot_micro,
+                        real & smdot_pos_macro_overwrite,
                         real & smdot_neg_macro_overwrite) {
 /***************************************************************************//**
 *  \brief update microlayer thickness and heat source
@@ -13,7 +14,11 @@ void Microlayer::update(real & smdot_pos_macro_overwrite,
 
   const real dt = time->dt();
 
+  /* reset heat sink */
+  //*tprs = 0.0;
+
   /* initialize sum variables */
+  smdot_micro = 0.0;
   smdot_pos_macro_overwrite = 0.0;
   smdot_neg_macro_overwrite = 0.0;
   for(int i=0; i<=6; i++){
@@ -97,7 +102,7 @@ void Microlayer::update(real & smdot_pos_macro_overwrite,
 
           real area_vap = area_vapor(sig,mcomp,ii,jj,kk);
 
-          area_l[ndir] += area - area_vap ;
+          area_l[ndir] += area - area_vap;
           area_v[ndir] += area_vap;
 
           if(in_vapor(ii,jj,kk)) {
@@ -213,8 +218,8 @@ void Microlayer::update(real & smdot_pos_macro_overwrite,
     if (area_vap == 0.0) {
     } else {//if ( approx (area_vap, area, area*boil::micro)) 
 
-      if ( dmicro[i][j][k] <= dmicro_min+boil::pico // depleted
-        || !boil::realistic(dmicro[i][j][k])) {     // full vapor
+      if ( dmicro[i][j][k] <= dmicro_min*(1.+boil::pico) // depleted
+        || !boil::realistic(dmicro[i][j][k])) {          // full vapor
       } else {
 
         /* micro layer exists */
@@ -236,18 +241,28 @@ void Microlayer::update(real & smdot_pos_macro_overwrite,
           smdot_neg_macro_overwrite += (*mdot)[i][j][k]*vol;
         }
 
-        /* overwrite phi */
-        (*mdot)[i][j][k] = - rhol * (dmicro_new - dmicro[i][j][k])
-                       / dt * area_vap / vol;
-        //tprs[i+iof][j+jof][k+kof]  -= vol*(*mdot)[i][j][k]*latent;
-        //tprs[i][j][k] -= cpv *(tpr[i][j][k]-tsat)*(1.0/rhov-1.0/rhol)
-        //                 *(*mdot)[i][j][k]*vol;
+        /* overwrite mdot */
+        real mdot_micro = - rhol * (dmicro_new - dmicro[i][j][k])
+                          / dt * area_vap / vol;
+        (*mdot)[i][j][k] += mdot_micro;
+        smdot_micro += mdot_micro*vol;
+
+        /* enthalpy clean-up: sink due to microlayer */
+        (*tprs)[i+iof][j+jof][k+kof] += -vol*mdot_micro*latent;
+        if(in_vapor(i,j,k)) {
+          /* additional effect due to heat-up in vapour */
+          (*tprs)[i][j][k] -= cpv *((*tpr)[i][j][k]-tifmodel->Tint(i,j,k))
+                              //*(1.0/rhov-1.0/rhol)*mdot_micro*vol;
+                              *1.0/rhov*mdot_micro*vol;
+        }
+
+        /* microlayer thickness changes */
         dmicro[i][j][k]=dmicro_new;
 
         /* heat flux */
-        // it doesn't take into account max(dmicro_new, nucl->dmicro_min)
+        // it doesn't take into account max(dmicro_new, dmicro_min)
         hflux_micro[ndir] += qtmp*area_vap;
-        // it does take into account max(dmicro_new, nucl->dmicro_min)
+        // it does take into account max(dmicro_new, dmicro_min)
         //hflux_micro[ndir] += (*mdot)[i][j][k] * vol * latent;
 
       } /* not zero microlayer thickness */
@@ -266,22 +281,25 @@ void Microlayer::update(real & smdot_pos_macro_overwrite,
   boil::plot->plot(dmicro, *tpr, *mdot, "dmicro-tpr-mdot",  time->current_step());
 #endif
 
+  boil::cart.sum_real(&smdot_micro);
   boil::cart.sum_real(&smdot_pos_macro_overwrite);
   boil::cart.sum_real(&smdot_neg_macro_overwrite);
 
   boil::oout<<"micro_overwrite: time= "<<time->current_time()
+            <<" smdot_micro= "<<smdot_micro
             <<" smdot_pos_overwrite= "<<smdot_pos_macro_overwrite
             <<" smdot_neg_overwrite= "<<smdot_neg_macro_overwrite
             <<"\n";
 
 
 #ifdef DEBUG
-  boil::plot->plot(*topo->clr, nucl->dmicro, phi, dmicros, 
-                  "clr-dmicro-mdot-dmicros",  time->current_step());
+  boil::plot->plot(*topo->clr, dmicro, *mdot, 
+                   "clr-dmicro-mdot",  time->current_step());
   exit(0);
 #endif
 
   /* store area of vapor to dSprev */
   store_dSprev();
 
+  return;
 }

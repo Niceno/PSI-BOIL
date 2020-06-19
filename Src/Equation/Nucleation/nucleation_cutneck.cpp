@@ -61,7 +61,7 @@ void Nucleation::cutneck (const real area_neck) {
 	  for (int k=(*clr).sk(); k<=(*clr).ek(); k++) {
             if ((*clr).zc(k)<zfirst) continue;
             if ((*clr).zc(k)>zlast ) continue;
-            (*vf)[i][j][k]= (sig>0) ? 1.0 : 0.0;
+            (*vf)[i][j][k]= (matter_sig>0) ? 1.0 : 0.0;
 	    //std::cout<<i<<" "<<j<<" "<<k<<"\n";
           }
         }
@@ -87,7 +87,7 @@ void Nucleation::cutneck (const real area_neck) {
           for (int k=(*clr).sk(); k<=(*clr).ek(); k++) {
             if ((*clr).zc(k)<zfirst) continue;
             if ((*clr).zc(k)>zlast ) continue;
-            (*vf)[i][j][k]= (sig>0) ? 1.0 : 0.0;
+            (*vf)[i][j][k]= (matter_sig>0) ? 1.0 : 0.0;
           }
         }
       }

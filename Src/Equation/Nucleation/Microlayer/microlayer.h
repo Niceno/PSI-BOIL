@@ -13,7 +13,7 @@ class Microlayer : public Nucleation {
   public:
     Microlayer( Scalar & dmicro,
                 Scalar * mdot,
-                Scalar * vfs,
+                Scalar * tprs,
                 const Scalar * tpr,
                 Topology * topo,
                 Heaviside * heavi,
@@ -25,19 +25,23 @@ class Microlayer : public Nucleation {
                 const Sign sig = Sign::pos() );
     ~Microlayer() {}
 
-    void update(real & smdot_pos_macro_overwrite,
+    virtual void init() { dmicro = boil::unreal; }
+
+    void update(real & smdot_micro,
+                real & smdot_pos_macro_overwrite,
                 real & smdot_neg_macro_overwrite);
+    virtual void upkeep_after_seeding();
 
     inline void set_slope(real r){ slope=r;
-           boil::oout<<"microlayer:slope is modfied to "<<r<<"\n";};
+           boil::oout<<"Microlayer:slope is modified to "<<r<<"\n";};
     inline void set_slope(real r1, real r2) { slope=r1;
            exp_slope=r2;
-           boil::oout<<"microlayer:slope is modfied to "<<r1<<"*r^"<<r2<<"\n";};
+           boil::oout<<"Microlayer:slope is modified to "<<r1<<"*r^"<<r2<<"\n";};
     inline real get_slope() const { return (slope); };
     inline real get_exp_slope() const { return (exp_slope); };
 
     inline void set_rmax(real r){ rmax = r;
-            boil::oout<<"microlayer:rmax is modified to "<<r<<"\n";};
+            boil::oout<<"Microlayer:rmax is modified to "<<r<<"\n";};
     inline real get_rmax() const { return rmax;};
 
     /* heat flux */
@@ -51,12 +55,11 @@ class Microlayer : public Nucleation {
   protected:
     void area_effect();
     void store_dSprev();
-    virtual void upkeep_after_seeding();
     real d0(const int i, const int j, const int k);
 
     Scalar dmicro;
     Scalar dSprev;
-    Scalar * mdot, * vfs;
+    Scalar * mdot, * tprs;
     const Domain * dom;
     const TIF * tifmodel;
     Matter * sld;

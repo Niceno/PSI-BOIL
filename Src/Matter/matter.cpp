@@ -1,46 +1,34 @@
 #include "matter.h"
 
 /*============================================================================*/
-Matter::Matter(const Domain & d) {
-
-  dom = & d;
-
-  nam = "";
-
-  mixt = false;
-
-  dens = new Property("density");
-  visc = new Property("viscosity");
-  capa = new Property("capacity");
-  cond = new Property("conductivity");
-  diff = new Property("diffusivity");
-  texp = new Property("t_expansion");
-  molm = new Property("molar_mass");
-  tens = NULL;
-  heat = NULL;
-}
-
-/*============================================================================*/
 Matter::Matter(const Domain & d, const char * nm) {
 
   dom = & d;
-
-  nam = nm;
-
   mixt = false;
 
-  assert(nam.length() > 0);
+  std::string sumnam;
+  if(nm == NULL) {
+    nam = "";
+    sumnam = nam;
+  } else {
+    nam = nm;
+    assert(nam.length() > 0);
+    sumnam = nam + ".";
+  }
 
   std::string prname; 
-  prname = nam + "." + "density";      dens = new Property(prname.c_str());
-  prname = nam + "." + "viscosity";    visc = new Property(prname.c_str());
-  prname = nam + "." + "capacity";     capa = new Property(prname.c_str());
-  prname = nam + "." + "conductivity"; cond = new Property(prname.c_str());
-  prname = nam + "." + "diffusivity";  diff = new Property(prname.c_str());
-  prname = nam + "." + "t_expansion";  texp = new Property(prname.c_str());
-  prname = nam + "." + "molar_mass";   molm = new Property(prname.c_str());
-                                       tens = NULL;
-                                       heat = NULL;
+  prname = sumnam + "density";      dens = new Property(prname.c_str());
+  prname = sumnam + "viscosity";    visc = new Property(prname.c_str());
+  prname = sumnam + "capacity";     capa = new Property(prname.c_str());
+  prname = sumnam + "conductivity"; cond = new Property(prname.c_str());
+  prname = sumnam + "diffusivity";  diff = new Property(prname.c_str());
+  prname = sumnam + "t_expansion";  texp = new Property(prname.c_str());
+  prname = sumnam + "molar_mass";   molm = new Property(prname.c_str());
+  tens = NULL;
+  heat = NULL;
+
+  /* density over viscosity */
+  dens_o_visc = new PropertyDiv(dens,visc);
 }
 
 /*============================================================================*/
@@ -79,7 +67,6 @@ Matter::Matter(const Matter & a,
     exit(0);
   }
   dens = new PropertyMix(a.dens, b.dens, ca, cda, cdb);
-  visc = new PropertyMix(a.visc, b.visc, ca, cda, cdb);
   capa = new PropertyMix(a.capa, b.capa, ca, cda, cdb);
   cond = new PropertyMix(a.cond, b.cond, ca, cda, cdb);
   diff = new PropertyMix(a.diff, b.diff, ca, cda, cdb);
@@ -87,6 +74,15 @@ Matter::Matter(const Matter & a,
   molm = new PropertyMix(a.molm, b.molm, ca, cda, cdb);
   tens = new Property("surface-tension");
   heat = new Property("latent-heat");
+
+#if 1
+  visc = new PropertyMix(a.visc, b.visc, ca, cda, cdb);
+#else /* force balance according to Prosperetti, 2002 */
+  assert(a.dens_o_visc != NULL);
+  assert(b.dens_o_visc != NULL);
+  dens_o_visc = new PropertyMix(a.dens_o_visc,b.dens_o_visc,ca,cda,cdb);
+  visc = new PropertyDiv(dens,dens_o_visc);
+#endif
 
   if( a.nam.length() > 0 && b.nam.length() > 0 )
     nam = a.nam + "-" + b.nam;
@@ -131,7 +127,6 @@ Matter::Matter(const Matter & a,
     exit(0);
   }
   dens = new PropertyMix(a.dens, b.dens, ca, bdca, cda, cdb);
-  visc = new PropertyMix(a.visc, b.visc, ca, bdca, cda, cdb);
   capa = new PropertyMix(a.capa, b.capa, ca, bdca, cda, cdb);
   cond = new PropertyMix(a.cond, b.cond, ca, bdca, cda, cdb);
   diff = new PropertyMix(a.diff, b.diff, ca, bdca, cda, cdb);
@@ -139,6 +134,15 @@ Matter::Matter(const Matter & a,
   molm = new PropertyMix(a.molm, b.molm, ca, bdca, cda, cdb);
   tens = new Property("surface-tension");
   heat = new Property("latent-heat");
+
+#if 1
+  visc = new PropertyMix(a.visc, b.visc, ca, cda, cdb);
+#else /* force balance according to Prosperetti, 2002 */
+  assert(a.dens_o_visc != NULL);
+  assert(b.dens_o_visc != NULL);
+  dens_o_visc = new PropertyMix(a.dens_o_visc,b.dens_o_visc,ca,bdca,cda,cdb);
+  visc = new PropertyDiv(dens,dens_o_visc);
+#endif
 
   if( a.nam.length() > 0 && b.nam.length() > 0 )
     nam = a.nam + "-" + b.nam;

@@ -60,27 +60,39 @@ void Microlayer::area_effect() {
 
     /* include vapor */
     real a_vapor=area_vapor(sig,mcomp,i,j,k);
-    if ( a_vapor > 0.0) {
+    if(a_vapor > 0.0) {
 
       /* initialize */
-      if (!boil::realistic(dmicro[i][j][k])) {
+      if(!boil::realistic(dmicro[i][j][k])) {
         dmicro[i][j][k] = d0(i,j,k);
       }
 
+      real area = dmicro.dSz(sig,i,j,k);
+
+      /* finalize to prevent microlayer regeneration */
+      if( (dmicro[i][j][k]<=dmicro_min*(1.+boil::pico)) &&
+          (approx(a_vapor, area, area*boil::micro))
+        ) {
+        dmicro[i][j][k] = 0.0;
+      }
+
       /* interface cell */
-      if (dSprev[i][j][k] < dmicro.dSz(sig,i,j,k)) {
+      if(dSprev[i][j][k] < area) {
         real s_prev = dSprev[i][j][k];
         real s_now  = a_vapor;
-        if ( (s_now > s_prev) &&
-             (dmicro[i][j][k] > dmicro_min+boil::pico) &&
-             boil::realistic(dmicro[i][j][k])
-           ) {
+        if( (s_now > s_prev) &&
+            //(dmicro[i][j][k] > dmicro_min*(1.+boil::pico)) &&
+            (dmicro[i][j][k] > 0.0) &&
+            boil::realistic(dmicro[i][j][k])
+          ) {
           real d_new = ( dmicro[i][j][k] * s_prev
                        + d0(i,j,k) * (s_now - s_prev) )/s_now;
           dmicro[i][j][k] = std::max(d_new, dmicro_min);
         }
       }
-    } /* area vapor > 0.0 */
+    } else {
+      dmicro[i][j][k] = boil::unreal;
+    }/* area vapor ? 0.0 */
   } /* ibody cells */
 
   return;

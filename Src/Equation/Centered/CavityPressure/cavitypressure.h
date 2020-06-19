@@ -82,7 +82,7 @@ class CavityPressure : public Centered {
     ScalarInt iflag;
     Vector fs;
     Scalar kappa;
-    const Sign sig; /* pos: liquid is phi=1 and vice versa */
+    const Sign matter_sig; /* pos: liquid is phi=1 and vice versa */
 
     const Property * sigma;
     real cavity_pressure;

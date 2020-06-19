@@ -31,7 +31,7 @@ void ConcentrationTP::create_system_diffusive(const Scalar * diff_eddy) {
               (*diff_eddy)[i+1][j][k] )/(2.0*turbS);
     } 
 
-    if(sig==Sign::neg()) {
+    if(matter_sig==Sign::neg()) {
       clrm = 1.-clrm;
       clrp = 1.-clrp;
     }
@@ -68,7 +68,7 @@ void ConcentrationTP::create_system_diffusive(const Scalar * diff_eddy) {
               (*diff_eddy)[i][j+1][k] )/(2.0*turbS);
     } 
 
-    if(sig==Sign::neg()) {
+    if(matter_sig==Sign::neg()) {
       clrm = 1.-clrm;
       clrp = 1.-clrp;
     }
@@ -105,7 +105,7 @@ void ConcentrationTP::create_system_diffusive(const Scalar * diff_eddy) {
               (*diff_eddy)[i][j][k+1] )/(2.0*turbS);
     } 
 
-    if(sig==Sign::neg()) {
+    if(matter_sig==Sign::neg()) {
       clrm = 1.-clrm;
       clrp = 1.-clrp;
     }

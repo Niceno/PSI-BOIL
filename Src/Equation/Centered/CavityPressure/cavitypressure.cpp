@@ -16,7 +16,7 @@ CavityPressure::CavityPressure(const Scalar & PHI,
   topo(TOPO),
   fs(TOPO->fs),
   iflag(TOPO->iflag),
-  sig(SIG),
+  matter_sig(SIG),
   sigma(TENS),
   kappa(&CURV)
 {

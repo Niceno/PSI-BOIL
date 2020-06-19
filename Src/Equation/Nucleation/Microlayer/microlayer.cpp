@@ -5,7 +5,7 @@
 *******************************************************************************/
 Microlayer::Microlayer( Scalar & DM,
                         Scalar * MDOT,
-                        Scalar * VFS,
+                        Scalar * TPRS,
                         const Scalar * tpr,
                         Topology * topo,
                         Heaviside * heavi,
@@ -22,7 +22,7 @@ Microlayer::Microlayer( Scalar & DM,
 {
 
   mdot = MDOT;
-  vfs = VFS;
+  tprs = TPRS;
   tifmodel = &TIFMODEL;
 
   dmicro_min = dm;

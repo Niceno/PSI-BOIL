@@ -104,10 +104,11 @@ class Topology {
       const { return clrold[i][j][k]<clrsurf; }
 
     /* front functions */
-    void front_minmax();
-    void front_minmax( Range<real> xr
-                     , Range<real> yr
-                     , Range<real> zr );
+    void front_minmax(real * store_arr = NULL);
+    void front_minmax(Range<real> xr,
+                      Range<real> yr,
+                      Range<real> zr,
+                      real * store_arr = NULL);
 
     /* getter for front_minmax */
     inline real get_xminft() const { return(xminft);};

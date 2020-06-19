@@ -1,24 +1,26 @@
 #include "topology.h"
 
 /******************************************************************************/
-void Topology::front_minmax() {
+void Topology::front_minmax(real * store_arr) {
   front_minmax(Range<real>(-boil::exa, boil::exa),
                Range<real>(-boil::exa, boil::exa),
-               Range<real>(-boil::exa, boil::exa) );
+               Range<real>(-boil::exa, boil::exa),
+               store_arr);
 }
 
 /******************************************************************************/
 void Topology::front_minmax(Range<real> xr,
                             Range<real> yr,
-                            Range<real> zr ) {
+                            Range<real> zr,
+                            real * store_arr) {
 /***************************************************************************//**
 *  \brief Detect maximum and minimum of free surface position.
-*         results: xminft,xmaxft,yminft,ymaxft,zminft,zmaxft
+*         results: xminft_tmp,xmaxft_tmp,yminft_tmp,ymaxft_tmp,zminft_tmp,zmaxft_tmp
 *******************************************************************************/
 
-   xminft=boil::exa; xmaxft=-boil::exa;
-   yminft=boil::exa; ymaxft=-boil::exa;
-   zminft=boil::exa; zmaxft=-boil::exa;
+   real xminft_tmp=boil::exa; real xmaxft_tmp=-boil::exa;
+   real yminft_tmp=boil::exa; real ymaxft_tmp=-boil::exa;
+   real zminft_tmp=boil::exa; real zmaxft_tmp=-boil::exa;
    bool frontExist=false;
 
    real xfront, yfront, zfront;
@@ -43,12 +45,12 @@ void Topology::front_minmax(Range<real> xr,
            xfront=frontPosition(i,j,k,Comp::i());
            yfront=(*clr).yc(j);
            zfront=(*clr).zc(k);
-           if(xfront<xminft) xminft=xfront;
-           if(xfront>xmaxft) xmaxft=xfront;
-           if(yfront<yminft) yminft=yfront;
-           if(yfront>ymaxft) ymaxft=yfront;
-           if(zfront<zminft) zminft=zfront;
-           if(zfront>zmaxft) zmaxft=zfront;
+           if(xfront<xminft_tmp) xminft_tmp=xfront;
+           if(xfront>xmaxft_tmp) xmaxft_tmp=xfront;
+           if(yfront<yminft_tmp) yminft_tmp=yfront;
+           if(yfront>ymaxft_tmp) ymaxft_tmp=yfront;
+           if(zfront<zminft_tmp) zminft_tmp=zfront;
+           if(zfront>zmaxft_tmp) zmaxft_tmp=zfront;
          }
        }  /* k */
      }  /* j */
@@ -73,12 +75,12 @@ void Topology::front_minmax(Range<real> xr,
            xfront=(*clr).xc(i);
            yfront=frontPosition(i,j,k,Comp::j());
            zfront=(*clr).zc(k);
-           if(xfront<xminft) xminft=xfront;
-           if(xfront>xmaxft) xmaxft=xfront;
-           if(yfront<yminft) yminft=yfront;
-           if(yfront>ymaxft) ymaxft=yfront;
-           if(zfront<zminft) zminft=zfront;
-           if(zfront>zmaxft) zmaxft=zfront;
+           if(xfront<xminft_tmp) xminft_tmp=xfront;
+           if(xfront>xmaxft_tmp) xmaxft_tmp=xfront;
+           if(yfront<yminft_tmp) yminft_tmp=yfront;
+           if(yfront>ymaxft_tmp) ymaxft_tmp=yfront;
+           if(zfront<zminft_tmp) zminft_tmp=zfront;
+           if(zfront>zmaxft_tmp) zmaxft_tmp=zfront;
          } 
        } /* k */
      } /* j */
@@ -103,23 +105,39 @@ void Topology::front_minmax(Range<real> xr,
            xfront=(*clr).xc(i);
            yfront=(*clr).yc(j);
            zfront=frontPosition(i,j,k,Comp::k());
-           if(xfront<xminft) xminft=xfront;
-           if(xfront>xmaxft) xmaxft=xfront;
-           if(yfront<yminft) yminft=yfront;
-           if(yfront>ymaxft) ymaxft=yfront;
-           if(zfront<zminft) zminft=zfront;
-           if(zfront>zmaxft) zmaxft=zfront;
+           if(xfront<xminft_tmp) xminft_tmp=xfront;
+           if(xfront>xmaxft_tmp) xmaxft_tmp=xfront;
+           if(yfront<yminft_tmp) yminft_tmp=yfront;
+           if(yfront>ymaxft_tmp) ymaxft_tmp=yfront;
+           if(zfront<zminft_tmp) zminft_tmp=zfront;
+           if(zfront>zmaxft_tmp) zmaxft_tmp=zfront;
          }
        } /* k */
      } /* j */
    } /* i */
 
-   boil::cart.min_real(&xminft);
-   boil::cart.max_real(&xmaxft);
-   boil::cart.min_real(&yminft);
-   boil::cart.max_real(&ymaxft);
-   boil::cart.min_real(&zminft);
-   boil::cart.max_real(&zmaxft);
+   boil::cart.min_real(&xminft_tmp);
+   boil::cart.max_real(&xmaxft_tmp);
+   boil::cart.min_real(&yminft_tmp);
+   boil::cart.max_real(&ymaxft_tmp);
+   boil::cart.min_real(&zminft_tmp);
+   boil::cart.max_real(&zmaxft_tmp);
+
+   if(store_arr) {
+     store_arr[0] = xminft_tmp;
+     store_arr[1] = xmaxft_tmp;
+     store_arr[2] = yminft_tmp;
+     store_arr[3] = ymaxft_tmp;
+     store_arr[4] = zminft_tmp;
+     store_arr[5] = zmaxft_tmp;
+   } else {
+     xminft = xminft_tmp;
+     xmaxft = xmaxft_tmp;
+     yminft = yminft_tmp;
+     ymaxft = ymaxft_tmp;
+     zminft = zminft_tmp;
+     zmaxft = zmaxft_tmp;
+   }
 
    return;
 }

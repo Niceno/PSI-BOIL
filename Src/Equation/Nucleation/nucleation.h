@@ -40,9 +40,11 @@ class Nucleation {
 
     void plant();
     void replant();
+    virtual void init() {}
     void cutneck(const real r);
     void add(const Site & s);
     void st_active();
+    virtual void upkeep_after_seeding() {};
 
     real clr_site  (const int i);
     real tpr_site  (const int i);
@@ -80,7 +82,6 @@ class Nucleation {
     real stratified_sphere(const int i, const int j, const int k,
                         const real xcent, const real ycent, const real zcent);
 
-    virtual void upkeep_after_seeding() {};
     void plant_site(const int ns, const bool seed_source = true);
     void plant_dummy_site(const int nsd);
 
@@ -99,12 +100,12 @@ class Nucleation {
     real dxmin, eps;
     real zbtm;
 
-    real rhol, rhov, lambdal, lambdav, latent, mmass;
+    real rhol, rhov, lambdal, lambdav, cpl, cpv, latent, mmass;
 
     real rseed, rcut;
     bool bzoning;
     std::vector<int> id_nearRegion, idd_nearRegion;
-    Sign sig;
+    Sign matter_sig;
 };
 
 #endif

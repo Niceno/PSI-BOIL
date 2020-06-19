@@ -41,7 +41,7 @@ PhaseChange4::PhaseChange4(const Scalar & MDOT,
   tnv     ( *MDOT.domain()),
   tempflag( *MDOT.domain()),
   tifmodel(TIFMODEL),
-  sig(SIG)
+  matter_sig(SIG)
 {
   txv      = MDOT.shape();
   tyv      = MDOT.shape();

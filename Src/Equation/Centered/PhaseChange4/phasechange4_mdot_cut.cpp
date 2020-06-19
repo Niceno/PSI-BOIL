@@ -17,3 +17,19 @@ real PhaseChange4::mdot_cut(real mdotval, real vfval, real & mcut) {
   }
   return mdotc;
 }
+
+/******************************************************************************/
+real PhaseChange4::vfs_cut(real vfsval, real vfval) {
+/***************************************************************************//**
+*  \brief Cut off vfs to prevent over/undershoots of vf
+*******************************************************************************/
+  real dt=time->dt();
+  real vfc = std::min(1.0,std::max(0.0,vfval));
+  real vfsc;
+  if(vfsval<=0.0) {
+    vfsc = -std::min(-vfsval,vfc/dt);
+  } else {
+    vfsc = std::min(vfsval,(1.0-vfc)/dt);
+  }
+  return vfsc;
+}
