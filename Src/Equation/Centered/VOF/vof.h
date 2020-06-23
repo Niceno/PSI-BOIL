@@ -113,6 +113,13 @@ class VOF : public Centered {
     void output_cangle_2d(const Comp ctangential, const Comp cnormal,
                           const Sign sig);
 
+    /* only for comparison purposes!!! */
+    void cal_adens_geom(Scalar & adensgeom, const Scalar & sca,
+                        const bool use_vicinity = true);
+    void cal_adens_gradclr(Scalar & adensgeom, const Scalar & sca);
+    void cal_adens_gradclr_2phi(Scalar & adensgeom, const Scalar & sca);
+    void cal_adens_gradclr_6phi(Scalar & adensgeom, const Scalar & sca);
+
 #include "vof_inline.h"
 
     Vector * bndclr;

@@ -53,10 +53,12 @@ class Microlayer : public Nucleation {
 
     inline const Matter * solid() const {return sld;}
 
+    /* initial thickness */
+    real d0(const int i, const int j, const int k);
+
   protected:
     void area_effect();
     void store_dSprev();
-    real d0(const int i, const int j, const int k);
 
     Scalar dmicro;
     Scalar dSprev;

@@ -1,15 +1,15 @@
 // https://stackoverflow.com/questions/622287/area-of-intersection-between-circle-and-rectangle
 #include "custom.h"
 
-real setup_section(real h, real r = 1) // returns the positive root of intersection of line y = h with circle centered at the origin and radius r
+real setup_section(real h, real r) // returns the positive root of intersection of line y = h with circle centered at the origin and radius r
 {
     assert(r >= 0); // assume r is positive, leads to some simplifications in the formula below (can factor out r from the square root)
     return (h < r)? sqrt(r * r - h * h) : 0; // http://www.wolframalpha.com/input/?i=r+*+sin%28acos%28x+%2F+r%29%29+%3D+h
 }
 
-real setup_g(real x, real h, real r = 1) // indefinite integral of circle segment
+real setup_g(real x, real h, real r) // indefinite integral of circle segment
 {
-    return .5f * (sqrt(1 - x * x / (r * r)) * x * r + r * r * asin(x / r) - 2 * h * x); // http://www.wolframalpha.com/input/?i=r+*+sin%28acos%28x+%2F+r%29%29+-+h
+    return .5 * (sqrt(1 - x * x / (r * r)) * x * r + r * r * asin(x / r) - 2 * h * x); // http://www.wolframalpha.com/input/?i=r+*+sin%28acos%28x+%2F+r%29%29+-+h
 }
 
 real setup_area(real x0, real x1, real h, real r) // area of intersection of an infinitely tall box with left edge at x0, right edge at x1, bottom edge at h and top edge at infinity, with circle centered at the origin with radius r
@@ -50,6 +50,8 @@ namespace boil {
     for_vijk(c,i,j,k) {
       c[i][j][k] = setup_area(c.xn(i),c.xn(i+1),c.zn(k),c.zn(k+1), xcent, zcent, radius);
       c[i][j][k] /= c.dxc(i)*c.dzc(k);
+      if(approx(c[i][j][k],1.0,boil::pico))
+        c[i][j][k]=1.0;
     }
 
     c.exchange_all();
