@@ -21,17 +21,18 @@ static void __attribute__ ((constructor)) trapfpe(void)
 */
 
 const real R0 = 10.27e-6;
-const real pinf = 1.013e5;
+const real pinf = 0.0;
 const real sigmm = 0.0583;
 #if CASE == 0 or CASE == 3
-const real p0 = 0.1127e6 - sigmm/R0;
+const real p0 = 0.1127e6 - 0./R0 - 1.013e5;
 #elif CASE == 1 or CASE == 4
-const real p0 = 0.1127e6 - 2*sigmm/R0;
+const real p0 = 0.1127e6 - 0./R0 - 1.013e5;
 #else
-const real p0 = 0.1127e6;
+const real p0 = 0.1127e6 - 1.013e5;
 #endif
 
-real phase_change_evaluation(Scalar & tpr, const Scalar & clr,
+real phase_change_evaluation(Scalar & tpr, const Scalar & tpr_old,
+                             const Scalar & clr,
                              TIF & tsat, EnthalpyFD & enthFD,
                              PhaseChange4 & pc, Scalar & f,
                              const real tval);
@@ -48,7 +49,8 @@ real evaluate_point(const real tval,
                     const Times & time,
                     Vector & uvw, const Vector & uvw_old, Vector & uvw_cav,
                     Vector & xyz,
-                    Scalar & tpr, Scalar & f, Scalar & press,
+                    Scalar & tpr, const Scalar & tpr_old,
+                    Scalar & f, Scalar & press,
                     ScalarInt & h_cav,
                     TIF & tsat, EnthalpyFD & enthFD, PhaseChange4 & pc,
                     VOF & conc, CavityPressure & capr,
@@ -63,7 +65,8 @@ real regula_falsi_kernel(real & tm, real & tp, real & vpcm, real & vpcp,
                          const Times & time,
                          Vector & uvw, const Vector & uvw_old, Vector & uvw_cav,
                          Vector & xyz,
-                         Scalar & tpr, Scalar & f, Scalar & press,
+                         Scalar & tpr, const Scalar & tpr_old,
+                         Scalar & f, Scalar & press,
                          ScalarInt & h_cav,
                          TIF & tsat, EnthalpyFD & enthFD, PhaseChange4 & pc,
                          VOF & conc, CavityPressure & capr,
@@ -266,6 +269,7 @@ int main(int argc, char ** argv) {
   Vector uvw_cav(d);               // cavity-velocity
   ScalarInt h_cav(d);              // indicator function
   
+  Scalar tpr_old(d);               // stored temperature
   Vector uvw_old(d);               // stored velocity
 
   /*-----------------------------+ 
@@ -399,6 +403,8 @@ int main(int argc, char ** argv) {
   tpr.bc().add( BndCnd( Dir::jmax(), BndType::dirichlet(), tout ) );
   #endif
 #endif
+
+  tpr_old = tpr.shape();
 
 #if CASE < 2
   p_cav.bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
@@ -647,7 +653,7 @@ int main(int argc, char ** argv) {
     t_old = std::max(t_old,t_new);
     
     /* relative error */
-    real eps_rel = 0.01;
+    real eps_rel = 1e-6;
     real eps_calc = 1.0;
 
     /* update geometry */
@@ -657,9 +663,8 @@ int main(int argc, char ** argv) {
     for_m(m)
       uvw_old(m) = uvw(m);
 
-    /* solve convective heat transfer */
-    enthFD.discretize();
-    enthFD.convective_time_step();
+    /* store temperature */
+    tpr_old = tpr;
 
     /* radius */
     real V_cavity = 0.0;
@@ -676,7 +681,7 @@ int main(int argc, char ** argv) {
                                   vpc_tpr_old, vpc_cav_old,
                                   time,
                                   uvw, uvw_old, uvw_cav, xyz,
-                                  tpr, f, press,
+                                  tpr, tpr_old, f, press,
                                   h_cav,
                                   tsat, enthFD, pc, conc, capr,
                                   multigrid_cavity, ns,
@@ -708,7 +713,7 @@ int main(int argc, char ** argv) {
                                  vpc_tpr_new, vpc_cav_new,
                                  time,
                                  uvw, uvw_old, uvw_cav, xyz,
-                                 tpr, f, press,
+                                 tpr, tpr_old, f, press,
                                  h_cav,
                                  tsat, enthFD, pc, conc, capr,
                                  multigrid_cavity, ns,
@@ -732,7 +737,7 @@ int main(int argc, char ** argv) {
                                        vpc_tpr_old, vpc_tpr_new, vpc_cav_old, vpc_cav_new,
                                        time,
                                        uvw, uvw_old, uvw_cav, xyz,
-                                       tpr, f, press,
+                                       tpr, tpr_old, f, press,
                                        h_cav,
                                        tsat, enthFD, pc, conc, capr,
                                        multigrid_cavity, ns,
@@ -756,15 +761,38 @@ int main(int argc, char ** argv) {
       t_slp = (t_old-t_oold)/time.dt();
     } 
 
+    /* reset velocity */
+    for_m(m)
+      uvw(m) = uvw_old(m);
+
     /* proceed with the rest of the time step */
-    phase_change_evaluation(tpr,conc.color(),
+    phase_change_evaluation(tpr,tpr_old,conc.color(),
                             tsat,enthFD,
                             pc,f,t_old)*time.dt();
  
     ns.vol_phase_change(&f);
+
+    /*--------------------------+
+    |  solve momentum equation  |
+    +--------------------------*/
+
+    /* reset body force */
+    for_m(m)
+      for_avmijk(xyz,m,i,j,k)
+        xyz[m][i][j][k]=0.0;
+
+    /* surface tension */
+    conc.tension(&xyz, mixed,conc.color());
+
+    /* essential for moving front */
+    ns.discretize();
+
+    /* momentum */
     ns.new_time_step(uvw_old);
+
+    ns.grad(press);
     ns.solve(ResRat(1e-14));
-    
+
     const int niter = 50;
     MaxIter mm = MaxIter(niter);
     std::array<MaxIter,3> mi = {mm,mm,mm};
@@ -866,9 +894,12 @@ int main(int argc, char ** argv) {
 }	
 
 /******************************************************************************/
-real phase_change_evaluation(Scalar & tpr, const Scalar & clr,
+real phase_change_evaluation(Scalar & tpr, const Scalar & tpr_old,
+                             const Scalar & clr,
                              TIF & tsat, EnthalpyFD & enthFD,
                              PhaseChange4 & pc, Scalar & f, const real tval) {
+
+  tpr = tpr_old;
 
   for_vijk(tpr,i,j,k) {
     if(clr[i][j][k]<0.5) {
@@ -880,7 +911,8 @@ real phase_change_evaluation(Scalar & tpr, const Scalar & clr,
 
   tsat.set_tref(tval);
 
-  enthFD.explicit_diffusion();
+  enthFD.discretize();
+  enthFD.new_time_step();
   enthFD.solve(ResRat(1e-16),"enthFD");
 
   f = 0.0;
@@ -922,10 +954,14 @@ real cavity_evaluation(Vector & uvw, const Vector & uvw_old, Vector & uvw_cav,
 
   /* linearized clausius-clapeyron */
   real pcc = mixed.rho(0)*mixed.latent()->value()*(tval-tsat0)/(tsat0+373.15)
-#if CASE == 0 or CASE == 3
+#if 1
+  #if CASE == 0 or CASE == 3
            - mixed.sigma()->value()/R;
-#elif CASE == 1 or CASE == 4
+  #elif CASE == 1 or CASE == 4
            - 2.*mixed.sigma()->value()/R;
+  #else
+           ;
+  #endif
 #else
            ;
 #endif
@@ -973,7 +1009,8 @@ real evaluate_point(const real tval,
                     const Times & time,
                     Vector & uvw, const Vector & uvw_old, Vector & uvw_cav,
                     Vector & xyz,
-                    Scalar & tpr, Scalar & f, Scalar & press,
+                    Scalar & tpr, const Scalar & tpr_old,
+                    Scalar & f, Scalar & press,
                     ScalarInt & h_cav,
                     TIF & tsat, EnthalpyFD & enthFD, PhaseChange4 & pc,
                     VOF & conc, CavityPressure & capr,
@@ -982,7 +1019,10 @@ real evaluate_point(const real tval,
                     const real pinf, const real r_0,
                     const real tsat0) {
 
-  vpc_tpr = phase_change_evaluation(tpr,conc.color(),
+  for_m(m)
+    uvw(m) = uvw_old(m);
+
+  vpc_tpr = phase_change_evaluation(tpr,tpr_old,conc.color(),
                                     tsat,enthFD,
                                     pc,f,tval)*time.dt();
 
@@ -1003,7 +1043,8 @@ real regula_falsi_kernel(real & tm, real & tp, real & vpcm, real & vpcp,
                          const Times & time,
                          Vector & uvw, const Vector & uvw_old, Vector & uvw_cav,
                          Vector & xyz,
-                         Scalar & tpr, Scalar & f, Scalar & press,
+                         Scalar & tpr, const Scalar & tpr_old, 
+                         Scalar & f, Scalar & press,
                          ScalarInt & h_cav,
                          TIF & tsat, EnthalpyFD & enthFD, PhaseChange4 & pc,
                          VOF & conc, CavityPressure & capr, 
@@ -1020,7 +1061,7 @@ real regula_falsi_kernel(real & tm, real & tp, real & vpcm, real & vpcp,
                                  vpc_tpr_next, vpc_cav_next,
                                  time,
                                  uvw, uvw_old, uvw_cav, xyz,
-                                 tpr, f, press,
+                                 tpr, tpr_old, f, press,
                                  h_cav,
                                  tsat, enthFD, pc, conc, capr,
                                  multigrid_cavity, ns,

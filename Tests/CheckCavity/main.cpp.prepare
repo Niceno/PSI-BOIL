@@ -635,6 +635,7 @@ int main(int argc, char ** argv) {
                                      tsat0,tout);
 
     /* distribute source */
+    f = 0.0;
     for_vijk(f,i,j,k) {
       if(h_cav[i][j][k]==0||h_cav[i][j][k]==-1) {
          f[i][j][k] += time.dti() * (1.0-std::min(1.0,std::max(0.0,c[i][j][k])))
@@ -644,9 +645,11 @@ int main(int argc, char ** argv) {
     f.exchange();
 
     /* proceed with the rest of the time step */
-    ns.vol_phase_change(&f);
-    ns.new_time_step(uvw_old);
-    ns.solve(ResRat(1e-14));
+    //ns.vol_phase_change(&f);
+    //ns.new_time_step(uvw_old);
+    //ns.solve(ResRat(1e-14));
+    boil::oout<<"Cavity= "<<time.current_time()<<" "<<V_cavity
+                          <<" "<<vpc_cav<<boil::endl;
 
     const int niter = 50;
     MaxIter mm = MaxIter(niter);
