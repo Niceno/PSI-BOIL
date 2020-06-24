@@ -118,7 +118,7 @@ int main(int argc, char ** argv) {
   const int multigrid_min_cycles = 1;
   const int multigrid_max_cycles = 10+2*gLevel;
 
-  const int multigrid_niter = 50;
+  const int multigrid_niter = 30;
   MaxIter multigrid_mm = MaxIter(multigrid_niter);
   std::array<MaxIter,3> multigrid_mi = {multigrid_mm,multigrid_mm,multigrid_mm};
 
@@ -203,7 +203,8 @@ int main(int argc, char ** argv) {
 
 #if CASE == 1
   /* in experiment, ITO: 700 nm, sapphire: 250 um;
-     here, sapphire: ~150 um; note: proc and solid boundary mustnt overlap! */
+     here, sapphire: ~100 um; note: proc and solid boundary mustnt overlap! */
+  //const int NZ0 = N0/(gStage*5);
   const int NZ0 = N0/gStage-3*gLevel;
   /* should be 0.7 um */
   const int NZheat = std::ceil(0.7e-6/DZ0);

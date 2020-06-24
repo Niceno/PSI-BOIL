@@ -13,6 +13,15 @@ static void __attribute__ ((constructor)) trapfpe(void)
 
 #include "microlayer_common.h"
 
+  const real expvel = sqrt(boil::pi/7.*rhov*latent/rhol*deltat/tsat0_K);
+  boil::oout<<"Expvel= "<<expvel<<boil::endl;
+
+/******************************************************************************/
+/* ------------- setup finished */
+/******************************************************************************/
+/* below this line, NO VALUES AND SETTINGS CAN BE ENTERED! */
+/******************************************************************************/
+
   /*--------------------------------+
   |  choose the output file format  |
   +--------------------------------*/
@@ -94,13 +103,8 @@ static void __attribute__ ((constructor)) trapfpe(void)
 
   tpr.bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
   tpr.bc().add( BndCnd( Dir::imax(), BndType::neumann() ) );
-#ifdef USE_BOTTOM_DIRICHLET
-  tpr.bc().add( BndCnd( Dir::kmin(), BndType::dirichlet(), twall ) );
-#else
   tpr.bc().add( BndCnd( Dir::kmin(), BndType::neumann() ) );
-#endif
-  /* see below */
-  //tpr.bc().add( BndCnd( Dir::kmax(), BndType::dirichlet(),tout) );
+  tpr.bc().add( BndCnd( Dir::kmax(), BndType::neumann() ) );
   tpr.bc().add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
   tpr.bc().add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
 
@@ -113,13 +117,11 @@ static void __attribute__ ((constructor)) trapfpe(void)
   vapor  .cp    (cpv);  // J/m3
   vapor  .lambda(lambdav);
   vapor  .mmass (Mv);
-  vapor  .beta  (betav);
   liquid.mu    (mul);
   liquid.rho   (rhol);
   liquid.cp    (cpl);   // J/m3
   liquid.lambda(lambdal);
   liquid.mmass (Mv);
-  liquid.beta  (betal);
 
   /* solid */
   heater.rho    (rhosol);
@@ -138,22 +140,6 @@ static void __attribute__ ((constructor)) trapfpe(void)
   mixed.rescale(xmult,tmult,mmult);
   heater.rescale(xmult,tmult,mmult);
   
-  /* natural convection BL thickness */
-#if CASE == 0
-  real ztconst = boil::convective_boundary_layer_thickness(liquid,
-                                                           twall0-tout);
-#elif CASE == 1
-  real ztconst = 1e-3;
-#endif
-  boil::oout<<"BL thickness: "<<ztconst<<boil::endl;
-
-  /* top temperature boundary */
-  real ttop = tout;
-  if(LZ1<ztconst) {
-    ttop = twall0 + (tout-twall0)*LZ1/ztconst;
-  }
-  tpr.bc().add( BndCnd( Dir::kmax(), BndType::dirichlet(),ttop) );
-
   /*-------------------+
   |  time-integration  |
   +-------------------*/
@@ -211,50 +197,6 @@ static void __attribute__ ((constructor)) trapfpe(void)
     conc.set_wall_curv_method(wall_curv_method,Sign::neg(),cangle,Nfilm_crit);
   }
   
-  /* enthalpy equation */
-  TIF tsat(tsat0);
-
-#ifdef USE_PHASE_VEL_EFD
-  Vector & uvwenth1 = uvw_1;
-  Vector & uvwenth2 = uvw_2;
-  //Vector & uvwenth2 = uvw;
-#else
-  Vector & uvwenth1 = uvw;
-  Vector & uvwenth2 = uvw;
-#endif
-
-#if defined USE_SOLID && !defined USE_BIG 
-  /* nucleation site */
-  real rseed = 2.0*dxmin;
-  Nucleation nucl( &c, &tpr, &q, &time, auxscalar, &mixed, rseed
-                 , 0.0e-10, conc.get_cangle());
-  /* useless microlayer parameter */
-  nucl.set_slope(1.0*4.46e-3);
-  nucl.set_seed_period(seedper);
-#endif
-
-  Matter * sld = NULL;
-#ifdef USE_SOLID
-  sld = &heater;
-#endif
-  EnthalpyFDaxisym enthFD(tpr, q, uvw, uvwenth1, uvwenth2, time, solver  , &mixed,
-                          conc.topo, tsat,sld);
-  enthFD.convection_set(TimeScheme::forward_euler());
-  enthFD.diffusion_set(TimeScheme::backward_euler());
-
-  /* phase change */
-#ifndef USE_PC4
-  PhaseChangeVOF pc(mdot, mflx, tpr, q, c, g, f, uvw, conc.topo,
-                    tsat, time, &mixed, sld);
-  pc.set_near_wall_modelling(near_wall_modelling);
-#else
-  PhaseChange4 pc(mdot, mflx, tpr, q, c, g, f, uvw, conc.topo,
-                  tsat, time, &mixed, sld);
-  pc.set_second_order_accuracy(use_second_order_accuracy);
-  pc.set_discard_points_near_interface(discard_points_near_interface);
-  pc.set_unconditional_extrapolation(use_unconditional_extrapolation);
-#endif
-
   /*-------------------+
   |  check if restart  |
   +-------------------*/
@@ -263,38 +205,19 @@ static void __attribute__ ((constructor)) trapfpe(void)
 
   int ts;
   /* load variables */
-  std::vector<Scalar*> load_scalars = { &press, &c, &tpr };
-  std::vector<std::string> load_scalar_names = { "press", "c", "tpr" };
-#ifdef VARIABLE
-  load_scalars.push_back(&(tsat.tif));
-  load_scalar_names.push_back("tif");
-#endif
+  std::vector<Scalar*> load_scalars = { &press, &c };
+  std::vector<std::string> load_scalar_names = { "press", "c" };
  
   std::vector<Vector*> load_vectors = { &uvw };
   std::vector<std::string> load_vector_names = { "uvw" };
 
   std::vector<Nucleation*> load_nucls = {};
   std::vector<std::string> load_nucl_names = {};
-#if defined USE_SOLID && !defined USE_BIG
-  load_nucls.push_back(&nucl);
-  load_nucl_names.push_back("nucl");
-#endif
 
   if(boil::load_backup("time.txt",ts,time,
                        load_scalars, load_scalar_names,
                        load_vectors, load_vector_names,
                        load_nucls, load_nucl_names)) {
-#if defined USE_SOLID && !defined USE_BIG
-    /* set allow_replant */
-    if( ns.cfl_max()<=cfl_with && time.dt()<=dt) {
-      boil::oout<<"Restart: Allow replant.\n";
-      for(int nsd=0; nsd<nucl.size(); nsd++){
-        nucl.sites[nsd].set_allow_replant(true);
-      }
-    } else {
-      boil::oout<<"Restart: Deny replant for this step.\n";
-    }
-#endif
     conc.init();
   } else {
     boil::oout << "######################" << boil::endl;
@@ -325,16 +248,16 @@ static void __attribute__ ((constructor)) trapfpe(void)
     const real xcent = 0.0;
     const real V0 = 4./3.*boil::pi*R0*R0*R0;
     boil::droplet_parameters_3D(180.-cangle,V0,radius,zcent,chord);
-    auxscalar = 0.0;
+    conc.color() = 0.0;
 
-    boil::setup_circle_xz(auxscalar,radius,xcent,zcent);
-    for_avijk(auxscalar,i,j,k)
-      auxscalar[i][j][k] = 1. - auxscalar[i][j][k];
+    boil::setup_circle_xz(conc.color(),radius,xcent,zcent);
+    for_avijk(conc.color(),i,j,k)
+      conc.color()[i][j][k] = 1. - conc.color()[i][j][k];
 
-    auxscalar.bnd_update();
-    auxscalar.exchange_all();
+    conc.color().bnd_update();
+    conc.color().exchange_all();
 
-    conc.color_to_vf(auxscalar,c);
+    conc.color_to_vf(conc.color(),c);
     conc.reconstruct_geometry();
     conc.test_reconstruction(conc.color(),c);
 #endif
@@ -342,22 +265,8 @@ static void __attribute__ ((constructor)) trapfpe(void)
     c.exchange_all();
     conc.init();
 
-    for_vijk(c,i,j,k) {
-      if(tpr.zc(k)<0.0) {
-        tpr[i][j][k] = twall0 + tpr.zc(k)/LZ0 * (twall-twall0);
-      } else if(conc.color()[i][j][k]<0.5) {
-        tpr[i][j][k] = tsat0;
-      } else if(tpr.zc(k)<=ztconst) {
-        tpr[i][j][k] = twall0 + (tout-twall0)/ztconst * tpr.zc(k);
-      } else {
-        tpr[i][j][k] = tout;
-      }
-    }
-    tpr.bnd_update();
-    tpr.exchange_all();
-
-    boil::plot->plot(uvw,c,tpr,kappa,mdot,press
-                    ,"uvw-c-tpr-curv-mdot-press",0);
+    boil::plot->plot(uvw,c,kappa,press
+                    ,"uvw-c-curv-press",0);
     
     std::fstream output;
     std::stringstream ssp;
@@ -369,16 +278,6 @@ static void __attribute__ ((constructor)) trapfpe(void)
     boil::output_profile_xz(auxscalar,output,Range<int>(NZ0+1,NZ));
     boil::cart.barrier();
     output.close();
-
-#if 0//def USE_SOLID
-    std::stringstream ssb;
-    ssb <<"bndtpr-"<<0<<".txt";
-    output.open(ssb.str(), std::ios::out);
-    boil::output_wall_heat_transfer_xz(tpr,pc.node_tmp(),
-                                       heater.lambda()->value(),output,NX1);
-    boil::cart.barrier();
-    output.close();
-#endif
   }
 
   /* set iint */
@@ -402,8 +301,6 @@ static void __attribute__ ((constructor)) trapfpe(void)
     if(boil::load_backup("time-extend.txt",ts,time,
                          {&u,&v,&w}, {"u","v","w"})) {
       boil::staggered_velocities(u,v,w,uvw);
-
-      pc.update();
 
       p = 0.0;
       if(multigrid.cycle(multigrid_cycle0,
@@ -454,19 +351,38 @@ static void __attribute__ ((constructor)) trapfpe(void)
       for_avmijk(xyz,m,i,j,k)
         xyz[m][i][j][k]=0.0;
 
-    q=0.0;
-    for_vk(tpr,k) {
-      if(tpr.zc(k)<0.0&&tpr.zc(k)>LZheat) {
-        for_vij(tpr,i,j) {
-          q[i][j][k]=qsrc*tpr.dV(i,j,k);
-        }
-      }
-    }
-
     /*---------------+
     |  phase change  |
     +---------------*/
-    pc.update();
+    /* step one: reset auxscalar */
+    auxscalar = 0.;
+
+    /* step two: label cells */
+    for_vijk(auxscalar,i,j,k)
+      auxscalar[i][j][k] = conc.heaviside()->status(i,j,k);
+
+    /* step two: calculate volume of gas (this to avoid spurious source in liquid bulk) */
+    real vapsum(0.0);
+    for_vijk(auxscalar,i,j,k)
+      if(auxscalar[i][j][k]==0||auxscalar[i][j][k]==-1)
+        vapsum += (1.0-std::min(1.0,std::max(0.0,c[i][j][k])))*c.dV(i,j,k);
+
+    boil::cart.sum_real(&vapsum);
+
+    /* step four: set outlet */
+    real A = 1.0;
+    real tot_vpc = 2.*A*expvel*std::pow(1.5/1.0*vapsum,2./3.);
+
+    /* step five: distribute source */
+    f = 0.0;
+    for_vijk(f,i,j,k) {
+      if(auxscalar[i][j][k]==0||auxscalar[i][j][k]==-1) {
+         f[i][j][k] += time.dti() * (1.0-std::min(1.0,std::max(0.0,c[i][j][k])))
+                                  * c.dV(i,j,k)/vapsum * tot_vpc;
+      }
+    }
+    f.exchange();
+
     ns.vol_phase_change(&f);
 
     /*--------------------------+
@@ -475,15 +391,8 @@ static void __attribute__ ((constructor)) trapfpe(void)
     /* gravity force */
     Comp m = Comp::w();
     for_vmijk(xyz,m,i,j,k) {
-      real phil=std::max(0.0,std::min(1.0,c[i][j][k]));
-      real phiv=1.0-phil;
-      real deltmp=tpr[i][j][k]-tsat0;
-      real rhomix = phil*boil::rho(liquid.rho()->value(),
-                                   liquid.beta()->value(),deltmp)
-                  + phiv*boil::rho(vapor.rho()->value(),
-                                   vapor.beta()->value(),deltmp);
       if(d.ibody().on(m,i,j,k))
-        xyz[m][i][j][k] += -gravity * xyz.dV(m,i,j,k) * rhomix;
+        xyz[m][i][j][k] += -gravity * xyz.dV(m,i,j,k) * mixed.rho(m,i,j,k);
     }
 
     /* surface tension */
@@ -541,14 +450,8 @@ static void __attribute__ ((constructor)) trapfpe(void)
     /*---------------------------+
     |  solve transport equation  |
     +---------------------------*/
-#ifdef USE_PHASE_VEL_EFD
-    conc.advance_with_extrapolation(false,ResRat(1e-6),uvw,f,
-                                    one,&uvw_1,
-                                    zero,&uvw_2);
-#else
-    conc.advance_with_extrapolation(false,ResRat(1e-6),uvw,f,
+    conc.advance_with_extrapolation(false,ResRat(1e-6),uvw,
                                     one,&uvw_1);
-#endif
 
     for_avk(c,k) {
       if(c.zc(k)>=(zmax-c.dzc(k))) {
@@ -561,14 +464,6 @@ static void __attribute__ ((constructor)) trapfpe(void)
     c.bnd_update();
     c.exchange_all();
     conc.ancillary();
-    conc.totalvol();
-
-    /*------------------------+
-    |  solve energy equation  |
-    +------------------------*/
-    enthFD.discretize();
-    enthFD.new_time_step();
-    enthFD.solve(ResRat(1e-16),"enthFD");
 
     /*-------------+
     |  dt control  |
@@ -580,6 +475,8 @@ static void __attribute__ ((constructor)) trapfpe(void)
     conc.front_minmax(Range<real>(0   ,LX1),
                       Range<real>(-LX1,LX1),
                       Range<real>(0   ,LZ1));
+
+    conc.totalvol();
 
     time.control_dt(ns.cfl_max(), cfl_with, dt);
 
@@ -595,8 +492,8 @@ static void __attribute__ ((constructor)) trapfpe(void)
                       load_scalars, load_scalar_names,
                       load_vectors, load_vector_names,
                       load_nucls, load_nucl_names);
-      boil::plot->plot(uvw,c,tpr,kappa,mdot,press
-                      ,"uvw-c-tpr-curv-mdot-press",time.current_step());
+      boil::plot->plot(uvw,c,kappa,press
+                      ,"uvw-c-curv-press",time.current_step());
 
       /* cell-center velocities */
       Scalar u(d), v(d), w(d);
@@ -617,8 +514,8 @@ static void __attribute__ ((constructor)) trapfpe(void)
       otpcond = time.current_step() / n_per_plot >= real(iint);
     if(otpcond) {
       iint++;
-      boil::plot->plot(uvw,c,tpr,kappa,mdot,press
-                      ,"uvw-c-tpr-curv-mdot-press",iint);
+      boil::plot->plot(uvw,c,kappa,press
+                      ,"uvw-c-curv-press",iint);
       std::fstream output;
       std::stringstream ssp;
       ssp <<"profile-"<<iint<<".txt";
@@ -629,16 +526,6 @@ static void __attribute__ ((constructor)) trapfpe(void)
       boil::output_profile_xz(auxscalar,output,Range<int>(NZ0+1,NZ));
       boil::cart.barrier();
       output.close();
-
-#ifdef USE_SOLID
-      std::stringstream ssb;
-      ssb <<"bndtpr-"<<iint<<".txt";
-      output.open(ssb.str(), std::ios::out);
-      boil::output_wall_heat_transfer_xz(tpr,pc.node_tmp(),
-                                         heater.lambda()->value(),output,NX1);
-      boil::cart.barrier();
-      output.close();
-#endif
     }
 
     /*--------------+
@@ -662,8 +549,8 @@ static void __attribute__ ((constructor)) trapfpe(void)
                       load_scalars, load_scalar_names,
                       load_vectors, load_vector_names,
                       load_nucls, load_nucl_names);
-      boil::plot->plot(uvw,c,tpr,kappa,mdot,press
-                      ,"uvw-c-tpr-curv-mdot-press",time.current_step());
+      boil::plot->plot(uvw,c,kappa,press
+                      ,"uvw-c-curv-press",time.current_step());
 
       if(time.current_time()<tend) {
         boil::set_irun(0);
@@ -678,6 +565,3 @@ static void __attribute__ ((constructor)) trapfpe(void)
   boil::timer.report();
 
 }
-
-
-
