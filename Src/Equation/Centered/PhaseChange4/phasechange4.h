@@ -98,8 +98,11 @@ class PhaseChange4 : public Centered {
  
     real Tint(const int i, const int j, const int k);
 
-    real temperature_node(real len_s, real lam_s, real tmp_s,
-                          real len_f, real lam_f, real tmp_f);
+    inline real temperature_node(const real len_s, const real lam_s, 
+                                 const real tmp_s, const real len_f,
+                                 const real lam_f, const real tmp_f) const;
+    inline real temperature_node(const real R_s, const real tmp_s,
+                                 const real R_f, const real tmp_f) const;
  
     real gradt1D(const bool is_solid, const Comp & m,
                  const int i, const int j, const int k);
@@ -150,6 +153,7 @@ class PhaseChange4 : public Centered {
     Topology * topo;
  
     real rhol, rhov, lambdal, lambdav, cpl, cpv;
+    real near_wall_resist; /* interfacial resistance near walls */
     real turbP;
     real smdot_pos, smdot_neg;
     

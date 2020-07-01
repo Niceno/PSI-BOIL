@@ -110,6 +110,17 @@ class EnthalpyFD : public Centered {
                 <<accelerated_no_solid<<"\n";
     }
 
+    inline real get_near_wall_interfacial_resistance() const {
+      return near_wall_resist;
+    }
+
+    inline void set_near_wall_interfacial_resistance(const real nwir) {
+      near_wall_resist = nwir;
+      boil::oout<<"EnthalpyFD:near_wall_interfacial_resistance= "
+                <<nwir<<boil::endl;
+      boil::oout<<"-- only use this if you know what you are doing!\n";
+    }
+
     void convection();
 
   protected:
@@ -136,16 +147,8 @@ class EnthalpyFD : public Centered {
                 , const real edm, const real edc, const real edp
                 , const int i, const int j, const int k, const Comp m);
 
-    real rhol,rhov,cpl,cpv,lambdal,lambdav,epsl;
-    Scalar ftif,ftifold; /* tbr */
-    ScalarInt iflag,iflagold;
-    real turbP; /* turbulent Prandtl number */
-    bool laminar;
-
-    const Vector * uliq, * ugas;
-
-    TIF & tifmodel;  
-    Topology * topo;
+    inline real resistance_multiplier(const real dx1, const real dx2,
+                                      const real l1, const real l2) const;
 
     virtual real coef_x_m(const real dxm, const real dxp, const real x0);
     virtual real coef_x_p(const real dxm, const real dxp, const real x0);
@@ -207,5 +210,16 @@ class EnthalpyFD : public Centered {
     /* faster diffusion matrix and ftif construction */
     bool accelerated_no_solid;
 
+    const Vector * uliq, * ugas;
+
+    TIF & tifmodel;  
+    Topology * topo;
+
+    real rhol,rhov,cpl,cpv,lambdal,lambdav,epsl;
+    real near_wall_resist; /* interfacial resistance near walls */
+    Scalar ftif,ftifold; /* tbr */
+    ScalarInt iflag,iflagold;
+    real turbP; /* turbulent Prandtl number */
+    bool laminar;
 };	
 #endif

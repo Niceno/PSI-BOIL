@@ -28,3 +28,14 @@
       boil::oout<<"PhaseChange4::discard_points_near_interface= "
                 <<discard_points_near_interface<<"\n";
     }
+
+    inline real get_near_wall_interfacial_resistance() const {
+      return near_wall_resist;
+    }
+
+    inline void set_near_wall_interfacial_resistance(const real nwir) {
+      near_wall_resist = nwir;
+      boil::oout<<"PhaseChange4:near_wall_interfacial_resistance= "
+                <<nwir<<boil::endl;
+      boil::oout<<"-- only use this if you know what you are doing!\n";
+    }

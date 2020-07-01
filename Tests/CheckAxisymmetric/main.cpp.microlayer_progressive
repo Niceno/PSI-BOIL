@@ -241,6 +241,8 @@ static void __attribute__ ((constructor)) trapfpe(void)
                           conc.topo, tsat,sld);
   enthFD.convection_set(TimeScheme::forward_euler());
   enthFD.diffusion_set(TimeScheme::backward_euler());
+  enthFD.set_near_wall_interfacial_resistance(
+      Schrage::calculate_heat_transfer_resistance(tsat0_K,rhov,Mv,latent) );
 
   /* phase change */
 #ifndef USE_PC4
@@ -253,6 +255,8 @@ static void __attribute__ ((constructor)) trapfpe(void)
   pc.set_second_order_accuracy(use_second_order_accuracy);
   pc.set_discard_points_near_interface(discard_points_near_interface);
   pc.set_unconditional_extrapolation(use_unconditional_extrapolation);
+  pc.set_near_wall_interfacial_resistance(
+      Schrage::calculate_heat_transfer_resistance(tsat0_K,rhov,Mv,latent) );
 #endif
 
   /*-------------------+

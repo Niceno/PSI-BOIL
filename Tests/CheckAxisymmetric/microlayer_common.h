@@ -171,9 +171,11 @@ int main(int argc, char ** argv) {
   const real betav = 1./tsat0_K; /* ideal gas approximation */
 
   boil::oout<<"properties at pressure "<<prs<<boil::endl;
-  boil::oout<<Mv<<" "<<muv<<" "<<rhov<<" "<<cpv/rhov<<" "<<lambdav<<boil::endl;
-  boil::oout<<Mv<<" "<<mul<<" "<<rhol<<" "<<cpl/rhol<<" "<<lambdal<<boil::endl;
-  boil::oout<<tsat0_K<<" "<<sig<<" "<<latent<<" "<<betal<<" "<<betav<<boil::endl;
+  boil::oout<<"vapprop= "<<Mv<<" "<<muv<<" "<<rhov<<" "
+                         <<cpv/rhov<<" "<<lambdav<<" "<<betav<<boil::endl;
+  boil::oout<<"liqprop= "<<Mv<<" "<<mul<<" "<<rhol<<" "
+                         <<cpl/rhol<<" "<<lambdal<<" "<<betal<<boil::endl;
+  boil::oout<<"twoprop= "<<tsat0_K<<" "<<sig<<" "<<latent<<boil::endl;
 
   /* heater */
   /* sapphire */

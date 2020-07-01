@@ -1,5 +1,4 @@
 #include "enthalpyfd.h"
-using namespace std;
 
 //#define DEBUG
 //#define USE_FDM_SOLID
@@ -95,6 +94,9 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
       std::cout<<"s-s-s: "<<i<<" "<<j<<" "<<k<<"\n";
 #endif
     } else if(onm && ofp){
+
+      real fact;
+
       /* f-s-s */
       if(interface(Sign::neg(),m,i,j,k)) {
         /* removed from system matrix */
@@ -103,8 +105,9 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
         /* tm is changed to the saturation temperature */
         fdm *= dxm;
         dxm = distance_int(Sign::neg(),m,i,j,k,tm);
+        real dxfull = dxm;
         fdm /= dxm; 
-        fdm = max(fdm,epsl);
+        fdm = std::max(fdm,epsl);
         /* dxm is corrected */
         dxm = dxm * fdm;
         /* lambdaf is inverted */
@@ -113,20 +116,21 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
         } else {
           lm = lambdal + edm*cpl/rhol/turbP;
         }
+        fact = resistance_multiplier(dxm,dxfull-dxm,lc,lm);
       } else {
-        fdm = max(fdm,epsl);
+        fdm = std::max(fdm,epsl);
         dxm = dxm * fdm;
+        fact = fdm*lm/(fdm*lm+(1.0-fdm)*lc);
       }
+
 #ifdef USE_FDM_SOLID
       /* FDM */
-      am = lc*vol*(this->*coef_m)(dxm,dxp,x0)*fdm*lm/(fdm*lm+(1.0-fdm)*lc);
+      am = lc*vol*(this->*coef_m)(dxm,dxp,x0)*fact;
       ap = lc*vol*(this->*coef_p)(dxm,dxp,x0);
-      //ac = lc*vol*((this->*coef_m)(dxm,dxp,x0)+(this->*coef_p)(dxm,dxp,x0))
-      //   - lc*vol*(this->*coef_m)(dxm,dxp,x0)*(1.0-fdm)*lc/(fdm*lm+(1.0-fdm)*lc);
       ac = am + ap;
 #else
       /* FVM */
-      am = lc * aream / dxm * fdm*lm/((1.0-fdm)*lc+fdm*lm);
+      am = lc * aream / dxm * fact;
       ap = 0.5 * (lc + lp) * areap / dxp;
       ac = am + ap;
 #endif
@@ -134,6 +138,9 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
       std::cout<<"f-s-s: "<<i<<" "<<j<<" "<<k<<" "<<am-ac+ap<<"\n";
 #endif
     } else if(ofm && onp){
+
+      real fact;
+
       /* s-s-f */
       if(interface(Sign::pos(),m,i,j,k)) {
         /* removed from system matrix */
@@ -142,8 +149,9 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
         /* tp is changed to the saturation temperature */
         fdp *= dxp;
         dxp = distance_int(Sign::pos(),m,i,j,k,tp);
+        real dxfull = dxp;
         fdp /= dxp; 
-        fdp = max(fdp,epsl);
+        fdp = std::max(fdp,epsl);
         /* dxp is corrected */
         dxp = dxp * fdp;
         /* lambdaf is inverted */
@@ -152,21 +160,26 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
         } else {
           lp = lambdal + edp*cpl/rhol/turbP;
         }
+        fact = resistance_multiplier(dxp,dxfull-dxp,lc,lp);
+#ifdef DEBUG
+        boil::oout<<"fact: "<<i<<" "<<j<<" "<<k<<" "
+                  << fact<<" "<<fdp*lp/((1.0-fdp)*lc+fdp*lp)<<boil::endl;
+#endif
       } else {
-        fdp = max(fdp,epsl);
+        fdp = std::max(fdp,epsl);
         dxp = dxp * fdp;
+        fact = fdp*lp/((1.0-fdp)*lc+fdp*lp);
       }
+
 #ifdef USE_FDM_SOLID
       /* FDM */
       am = lc*vol*(this->*coef_m)(dxm,dxp,x0);
-      ap = lc*vol*(this->*coef_p)(dxm,dxp,x0)*fdp*lp/((1.0-fdp)*lc+fdp*lp);
-      //ac = lc*vol*((this->*coef_m)(dxm,dxp,x0)+(this->*coef_p)(dxm,dxp,x0))
-      //   - lc*vol*(this->*coef_p)(dxm,dxp,x0)*(1.0-fdp)*lc/((1.0-fdp)*lc+fdp*lp);
+      ap = lc*vol*(this->*coef_p)(dxm,dxp,x0)*fact;
       ac = am + ap;
 #else
       /* FVM */
       am = 0.5 * (lc + lm) * aream / dxm;
-      ap = lc * areap / dxp * fdp*lp/((1.0-fdp)*lc+fdp*lp);
+      ap = lc * areap / dxp * fact;
       ac = am + ap;
 #endif
 #ifdef DEBUG
@@ -248,7 +261,7 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
         ap = lc * vol * (this->*coef_p)(dxm,dxp,x0);
         ac = am + ap;
       } else {
-        fdm = max(fdm,epsl);
+        fdm = std::max(fdm,epsl);
         dxm = dxm * fdm;
 #ifdef USE_FDM_FLUID /* now, finite difference is applied always, as in system_diffusive */
         /* FDM */
@@ -294,7 +307,7 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
         ap = lc * vol * (this->*coef_p)(dxm,dxp,x0);
         ac = am + ap;
       } else {
-        fdp = max(fdp,epsl);
+        fdp = std::max(fdp,epsl);
         dxp = dxp * fdp;
 #ifdef USE_FDM_FLUID /* now, finite difference is applied always, as in system_diffusive */
         /* FDM */
@@ -334,4 +347,12 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
 #endif
 
   return;
+}
+
+/***************************************************************************//**
+* Effect of flux continuity 
+*******************************************************************************/
+inline real EnthalpyFD::resistance_multiplier(const real dx1, const real dx2,
+                                              const real l1, const real l2) const {
+  return dx1/l1 / (dx1/l1 + dx2/l2 + near_wall_resist);
 }

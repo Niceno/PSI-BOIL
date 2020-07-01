@@ -39,6 +39,7 @@ EnthalpyFD::EnthalpyFD(const Scalar & PHI,
   epsl=1.0e-2; /* this appears in diff_matrix but should not play a role */
   turbP=0.9;
   laminar=true;
+  near_wall_resist = 0.0;
 
   /* see header for explanation */
   if(solid()) {

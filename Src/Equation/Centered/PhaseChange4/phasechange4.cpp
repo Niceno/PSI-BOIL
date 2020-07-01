@@ -82,6 +82,7 @@ PhaseChange4::PhaseChange4(const Scalar & MDOT,
 
   /* set constants */
   turbP = 0.9;
+  near_wall_resist = 0.0;
 
   /* flags */
   use_second_order_accuracy = true;
