@@ -342,6 +342,7 @@ int main(int argc, char * argv[]) {
     conc.advance();
     //boil::oout<<"Main: "<<c[21+boil::BW-1][boil::BW][31+boil::BW-1]<<boil::endl;
     conc.totalvol();
+    conc.front_minmax();
 
     if(time.current_step() % nint == 0) {
       boil::plot->plot(uvw, c, "uvw-c",  time.current_step());

@@ -20,9 +20,9 @@ int main(int argc, char ** argv) {
 
   boil::timer.start();
 
-  if(argc<6){
-    boil::oout<<"Five command line arguments required!"<<"\n";
-    boil::oout<<"./Boil wmin glevel gstage cangle deltat"<<"\n";
+  if(argc<7){
+    boil::oout<<"Six command line arguments required!"<<"\n";
+    boil::oout<<"./Boil wmin glevel gstage cangle deltat pressure[bar]"<<"\n";
 
     exit(0);
   }
@@ -44,6 +44,9 @@ int main(int argc, char ** argv) {
   const real deltat = atof(argv[5]); /* superheat */
   boil::oout<<"deltat= "<<deltat<<"\n";
 
+  const real prs = 101325.*atof(argv[6]); /* pressure */
+  boil::oout<<"pressure= "<<prs<<"\n";
+
 /******************************************************************************/
 /* ------------ rescaling factors */
   const real xmult = 1e0;
@@ -56,7 +59,7 @@ int main(int argc, char ** argv) {
   const real tout = tsat0;
 
   const real twall = tsat0 + deltat;
-  const real tsat0_K = 373.12;
+  const real tsat0_K = IF97::Tsat97(prs);
 
   const real twall0 = twall;
   const real tseed = twall0-0.001;
@@ -150,22 +153,27 @@ int main(int argc, char ** argv) {
 
 /******************************************************************************/
 /* ------------ material properties */
-  const real Mv = 18.015e-3;
-  const real muv = 1.228e-5;
-  const real rhov = 0.5974;
-  const real cpv = 2034*rhov;
-  const real lambdav = 0.024;
+  const real Mv = IF97::get_MW();
+  const real muv = IF97::viscvap_p(prs);
+  const real rhov = IF97::rhovap_p(prs);
+  const real cpv = IF97::cpvap_p(prs)*rhov;
+  const real lambdav = IF97::tcondvap_p(prs);
 
-  const real mul = 2.82e-4;
-  const real rhol = 958;
-  const real cpl = 4216*rhol;
-  const real lambdal = 0.677;
+  const real mul = IF97::viscliq_p(prs);
+  const real rhol = IF97::rholiq_p(prs);
+  const real cpl = IF97::cpliq_p(prs)*rhol;
+  const real lambdal = IF97::tcondliq_p(prs);
 
-  const real sig = 0.058;
-  const real latent=2256e3;
+  const real sig = IF97::sigma97(tsat0_K);
+  const real latent=IF97::hvap_p(prs)-IF97::hliq_p(prs);
 
-  const real betal = 7.52e-4;
+  const real betal = (7.03+(tsat0_K-273.15-100.)/160.*(22.1-7.03))*1e-4; /* roughly */
   const real betav = 1./tsat0_K; /* ideal gas approximation */
+
+  boil::oout<<"properties at pressure "<<prs<<boil::endl;
+  boil::oout<<Mv<<" "<<muv<<" "<<rhov<<" "<<cpv/rhov<<" "<<lambdav<<boil::endl;
+  boil::oout<<Mv<<" "<<mul<<" "<<rhol<<" "<<cpl/rhol<<" "<<lambdal<<boil::endl;
+  boil::oout<<tsat0_K<<" "<<sig<<" "<<latent<<" "<<betal<<" "<<betav<<boil::endl;
 
   /* heater */
   /* sapphire */

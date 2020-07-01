@@ -75,7 +75,7 @@ Matter::Matter(const Matter & a,
   tens = new Property("surface-tension");
   heat = new Property("latent-heat");
 
-#if 1
+#if 0
   visc = new PropertyMix(a.visc, b.visc, ca, cda, cdb);
 #else /* force balance according to Prosperetti, 2002 */
   assert(a.dens_o_visc != NULL);

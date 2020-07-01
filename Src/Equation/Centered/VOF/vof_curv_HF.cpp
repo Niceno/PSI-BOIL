@@ -408,6 +408,8 @@ void VOF::curv_HF() {
     insert_bc_curv_HFparallel(phi,Comp::i(),Comp::k(),Sign::neg());
   } else if(wall_curv_method==CurvMethod::HFnormalXZ()) {
     insert_bc_curv_HFnormal(phi,Comp::i(),Comp::k(),Sign::neg());
+  } else if(wall_curv_method==CurvMethod::HFnormalZ()) {
+    insert_bc_curv_HFnormal(phi,Comp::k(),Sign::neg());
   } else if(wall_curv_method==CurvMethod::none()) {
   } else {
     /* default */
@@ -494,7 +496,6 @@ void VOF::curv_HF_kernel(arr3D & stencil, const arr3D & gridstencil,
 
   const int & mof = hf_set.mof;
   const int & nof = hf_set.nof;
-  const real & theta_crit = hf_set.theta_crit;
 
   /* color is inverted if normal vector points in negative dir */
   real mult(1.0);
@@ -567,50 +568,68 @@ void VOF::curv_HF_kernel(arr3D & stencil, const arr3D & gridstencil,
 
   if(nhc_limit<nhc && nhc<=(nhc_limit+1.0)) {
 
-    real theta = acos(mult*max_n);
-    real g = 0.0;
-    if(theta < theta_crit) { /* Eq. (6) Lopez (2009) Comp Methods Appl */
-      g = 0.2;
-    }
+    kap = calculate_curvature_HF(hmm, hmc, hmp,
+                                 hcm, hcc, hcp,
+                                 hpm, hpc, hpp,
+                                 d1m, d1c, d1p,
+                                 d2m, d2c, d2p,
+                                 truedir1, truedir2,
+                                 mult, max_n); 
 
-#ifndef LOPEZ_SMOOTHING
-    real h_1  = truedir1*(hpc-hmc)/(d1m+d1p);
-    real h_11 = truedir1*2.*(d1p*hmc+d1m*hpc-(d1p+d1m)*hcc)/d1p/d1m/(d1p+d1m);
-    real h_2  = truedir2*(hcp-hcm)/(d2m+d2p);
-    real h_22 = truedir2*2.*(d2p*hcm+d2m*hcp-(d2p+d2m)*hcc)/d2p/d2m/(d2p+d2m);
-#else /* Lopez correction */
-    real h_1  = truedir1*(g*(hpm-hmm)+(hpc-hmc)+g*(hpp-hmp))/(d1m+d1p)/(1.+2.*g);
-    real h_11 = truedir1*4.*(
-                  g*(hmm+hpm-2.*hcm)
-                 +  (hmc+hpc-2.*hcc)
-                 +g*(hmp+hpp-2.*hcp)
-                )/(d1p+d1m)/(d1p+d1m)/(1.+2.*g);
-    
-    real h_2  = truedir2*(g*(hmp-hmm)+(hcp-hcm)+g*(hpp-hpm))/(d2m+d2p)/(1.+2.*g);
-    real h_22 = truedir2*2.*(
-                  g*(d2p*hpm+d2m*hpp-(d2p+d2m)*hpc)
-                 +  (d2p*hcm+d2m*hcp-(d2p+d2m)*hcc)
-                 +g*(d2p*hmm+d2m*hmp-(d2p+d2m)*hmc)
-                )/d2p/d2m/(d2p+d2m)/(1.+2.*g);
-#endif
-    real h_12 = truedir1*truedir2*(hpp-hpm-hmp+hmm)/(d1p+d1m)/(d2p+d2m);
-    
 #if 0
     boil::oout<<i<<" "<<j<<" "<<k<<" | "
               <<hmm<<" "<<hcm<<" "<<hpm<<" | "
               <<hmc<<" "<<hcc<<" "<<hpc<<" "
               <<hmp<<" "<<hcp<<" "<<hpp<<" "
-              <<h_1<<" "<<h_2<<" "<<h_11<<" "<<h_22<<" "<<h_12
+              //<<h_1<<" "<<h_2<<" "<<h_11<<" "<<h_22<<" "<<h_12
               <<boil::endl;
 #endif
-
-    /* under this convention, bubbles have negative curvature */
-    kap = -mult
-        * (h_11 + h_22 + h_11*h_2*h_2 + h_22*h_1*h_1 - 2.0*h_12*h_1*h_2)
-        / pow(1.+h_1*h_1 + h_2*h_2,1.5);
   } else {
     flag = 0;
   }
 
   return;
+} 
+
+real VOF::calculate_curvature_HF(
+                               const real hmm, const real hmc, const real hmp,
+                               const real hcm, const real hcc, const real hcp,
+                               const real hpm, const real hpc, const real hpp,
+                               const real d1m, const real d1c, const real d1p,
+                               const real d2m, const real d2c, const real d2p,
+                               const bool truedir1, const bool truedir2,
+                               const real mult, const real max_n) {
+  const real & theta_crit = hf_set.theta_crit;
+  real theta = acos(mult*max_n);
+  real g = 0.0;
+  if(theta < theta_crit) { /* Eq. (6) Lopez (2009) Comp Methods Appl */
+    g = 0.2;
+  }
+
+#ifndef LOPEZ_SMOOTHING
+  real h_1  = truedir1*(hpc-hmc)/(d1m+d1p);
+  real h_11 = truedir1*2.*(d1p*hmc+d1m*hpc-(d1p+d1m)*hcc)/d1p/d1m/(d1p+d1m);
+  real h_2  = truedir2*(hcp-hcm)/(d2m+d2p);
+  real h_22 = truedir2*2.*(d2p*hcm+d2m*hcp-(d2p+d2m)*hcc)/d2p/d2m/(d2p+d2m);
+#else /* Lopez correction */
+  real h_1  = truedir1*(g*(hpm-hmm)+(hpc-hmc)+g*(hpp-hmp))/(d1m+d1p)/(1.+2.*g);
+  real h_11 = truedir1*4.*(
+                g*(hmm+hpm-2.*hcm)
+               +  (hmc+hpc-2.*hcc)
+               +g*(hmp+hpp-2.*hcp)
+              )/(d1p+d1m)/(d1p+d1m)/(1.+2.*g);
+    
+  real h_2  = truedir2*(g*(hmp-hmm)+(hcp-hcm)+g*(hpp-hpm))/(d2m+d2p)/(1.+2.*g);
+  real h_22 = truedir2*2.*(
+                g*(d2p*hpm+d2m*hpp-(d2p+d2m)*hpc)
+               +  (d2p*hcm+d2m*hcp-(d2p+d2m)*hcc)
+               +g*(d2p*hmm+d2m*hmp-(d2p+d2m)*hmc)
+              )/d2p/d2m/(d2p+d2m)/(1.+2.*g);
+#endif
+  real h_12 = truedir1*truedir2*(hpp-hpm-hmp+hmm)/(d1p+d1m)/(d2p+d2m);
+    
+  /* under this convention, bubbles have negative curvature */
+  return -mult
+         * (h_11 + h_22 + h_11*h_2*h_2 + h_22*h_1*h_1 - 2.0*h_12*h_1*h_2)
+         / pow(1.+h_1*h_1 + h_2*h_2,1.5);
 } 

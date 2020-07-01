@@ -59,6 +59,8 @@ class CurvMethod {
     static const CurvMethod HFparallelXZ() {return CurvMethod( 3);}
     static const CurvMethod HFnormalXZ()   {return CurvMethod( 4);}
     static const CurvMethod HFmixedXZ()    {return CurvMethod( 5);}
+    /* 3D methods, Z = wall normal dir */
+    static const CurvMethod HFnormalZ()    {return CurvMethod( 6);}
 
     //! Prints the components name.
     friend std::ostream & operator << (std::ostream & ost, const CurvMethod & com) {
@@ -70,6 +72,7 @@ class CurvMethod {
         case( 3): ost << "HFparallelXZ"; break;
         case( 4): ost << "HFnormalXZ"; break;
         case( 5): ost << "HFmixedXZ"; break;
+        case( 6): ost << "HFnormalZ"; break;
       }
 
       return ost;

@@ -46,6 +46,7 @@ SUBDIRS = Equation/Staggered/Momentum                              \
           Plot                                                     \
           Plot/TEC                                                 \
           Plot/VTK                                                 \
+          Custom/IF97                                              \
           Custom                                                   \
           Domain/Axisymmetric                                      \
           Domain                                                   \
@@ -70,6 +71,7 @@ SUBDIRS = Equation/Staggered/Momentum                              \
 
 LDADD = Equation/Staggered/Momentum/libMomentum.a                             \
         Equation/Staggered/libStaggered.a                                     \
+        Custom/IF97/libIF97.a                                                 \
         Custom/libCustom.a                                                    \
         Solver/Additive/libAdditive.a                                         \
         Solver/Linear/Gauss/libGauss.a                                        \

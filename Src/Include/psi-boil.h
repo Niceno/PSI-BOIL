@@ -8,6 +8,7 @@
 #include "../Ravioli/column.h"
 #include "../Ravioli/buffers.h"
 #include "../Custom/custom.h"
+#include "../Custom/IF97/if97.h"
 #include "../Domain/Axisymmetric/axisymmetric.h"
 #include "../Equation/Staggered/Momentum/momentum.h"
 #include "../Equation/Centered/Enthalpy/enthalpy.h"

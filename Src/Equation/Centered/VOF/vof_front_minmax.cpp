@@ -2,7 +2,11 @@
 
 /******************************************************************************/
 void VOF::front_minmax() {
-  topo->front_minmax();
+  front_minmax(Range<real>(-boil::exa, boil::exa),
+               Range<real>(-boil::exa, boil::exa),
+               Range<real>(-boil::exa, boil::exa));
+
+  return;
 }
 
 /******************************************************************************/

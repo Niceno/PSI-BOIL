@@ -155,6 +155,8 @@ class VOF : public Centered {
     bool Interface(const int i, const int j, const int k);
 
     void insert_bc_curv_divnorm();
+
+    /* 2D-variants */
     void insert_bc_curv_HFnormal(const Scalar & scp,
                                  const Comp ctangential, const Comp cnormal,
                                  const Sign sig, 
@@ -166,6 +168,7 @@ class VOF : public Centered {
     void insert_bc_curv_HFmixed(const Scalar & scp,
                                 const Comp ctangential, const Comp cnormal,
                                 const Sign sig);
+
     virtual real wall_curv_HFnormal_kernel(const real x0, const real hm,
                                            const real hc, const real hp,
                                            const real dm,
@@ -179,6 +182,19 @@ class VOF : public Centered {
                                              const real dm,
                                              const real dc, const real dp,
                                              const real mult);
+
+    /* 3D-variant */
+    void insert_bc_curv_HFnormal(const Scalar & scp,
+                                 const Comp cnormal,
+                                 const Sign sig);
+
+    real wall_curv_HFnormal_kernel(arr2D & heights,
+                                   const arr2D & distances,
+                                   const std::vector<real> & dx,
+                                   const std::vector<real> & dy,
+                                   const bool truedir1, const bool truedir2,
+                                   const real mult, const real max_n,
+                                   const real cang);
     
     void flood(Scalar & scp,const real mult);
     void output_cangle_2d(const Scalar & scp,
@@ -212,6 +228,13 @@ class VOF : public Centered {
                         const bool truedir1, const bool truedir2,
                         real & kap, int & flag);
                         //const int i, const int j, const int k);
+    real calculate_curvature_HF(const real hmm, const real hmc, const real hmp,
+                                const real hcm, const real hcc, const real hcp,
+                                const real hpm, const real hpc, const real hpp,
+                                const real d1m, const real d1c, const real d1p,
+                                const real d2m, const real d2c, const real d2p,
+                                const bool truedir1, const bool truedir2,
+                                const real mult, const real max_n);
 
     virtual void norm(const Scalar & color, const NormMethod & nm,
                       const bool extalp);
