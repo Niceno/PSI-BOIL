@@ -143,13 +143,13 @@ int main(int argc, char ** argv) {
 
 /******************************************************************************/
 /* ------------ domain dimensions */
-  const real LX = 5e-3;
+  const real LX = 10e-3;
 
   const int NX = 16*gLevel;
 #ifdef MOVING_FRAME
   const int NZ = 3*NX;
 #else
-  const int NZ = 16*NX;
+  const int NZ = 16*NX/2;
 #endif
 
   const real DX = real(LX/real(NX));
@@ -780,7 +780,7 @@ int main(int argc, char ** argv) {
     if( boil::timer.current_min() > wmin-12.0
       || time.current_step()==time.total_steps()
       || time.current_time()>tend
-      || conc.get_zmaxft()>=LZ*0.95 ) {
+      || conc.topo->get_zmaxft()>=LZ*0.95 ) {
       boil::save_backup(time.current_step(), 1, time,
                         load_scalars, load_scalar_names,
                         load_vectors, load_vector_names);

@@ -97,9 +97,10 @@ class ConcentrationTP : public Centered {
     void extrapolation_flag();
 
     Scalar clr, clrold;
+    Scalar stmp;
     Heaviside * heavi;
     Topology * topo;
-    ScalarInt eflag;
+    ScalarInt eflag, eflag2;
     const Vector * colorflow;
     const Property * rho_dif;
     const Property * dcoef;

@@ -22,7 +22,9 @@ ConcentrationTP::ConcentrationTP(const Scalar & PHI,
   /* color is actually volume fraction */
   clr(TOPO->vf),
   clrold(&(TOPO->vfold)),
+  stmp  ( *PHI.domain()),
   eflag ( *PHI.domain()),
+  eflag2( *PHI.domain()),
   colorflow(&FLUXCLR),
   heavi(HEAVI),
   topo(TOPO),
@@ -31,12 +33,29 @@ ConcentrationTP::ConcentrationTP(const Scalar & PHI,
   rho_dif = (f->rho());     /* pointer at property */
   dcoef   = (f->gamma());   /* pointer at property */
 
+  stmp    = phi.shape();
   eflag   = phi.shape();
+  eflag2  = phi.shape();
  
   assert(PHI.domain() == F.domain());
   assert(PHI.domain() == U.domain());
   turbS = 0.7;
   laminar = true;
+
+  for( int b=0; b<phi.bc().count(); b++ ) {
+    if(    phi.bc().type(b) == BndType::dirichlet()
+        || phi.bc().type(b) == BndType::inlet()
+        || phi.bc().type(b) == BndType::outlet()
+        || phi.bc().type(b) == BndType::insert()
+        || phi.bc().type(b) == BndType::convective()
+       ) {
+       eflag.bc().type(b) = BndType::neumann();
+       eflag2.bc().type(b) = BndType::neumann();
+       boil::oout << "Adjusting b.c.s for flags at " << b
+                  << boil::endl;
+    }
+  }
+
 
   phi.bnd_update();
   /* must be called before discretization because of
