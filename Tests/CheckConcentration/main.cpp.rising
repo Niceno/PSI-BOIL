@@ -450,7 +450,7 @@ int main(int argc, char ** argv) {
 #ifdef MOVING_FRAME
     const real zcent=0.0*R0;
 #else
-    const real zcent=LX;
+    const real zcent=0.5*LX;
 #endif
 
 #ifdef AXISYM

@@ -56,13 +56,20 @@ int main(int argc, char ** argv) {
 /******************************************************************************/
 /* ------------ boundary or initial conditions */
   const real tsat0 = 0.0;
-  const real tout = tsat0;
 
   const real twall = tsat0 + deltat;
   const real tsat0_K = IF97::Tsat97(prs);
 
   const real twall0 = twall;
   const real tseed = twall0-0.001;
+
+#if CASE == 0
+  #if 0
+  const real tout = tsat0;
+  #else
+  const real tout = twall0;//tsat0;
+  #endif
+#endif
 
 /******************************************************************************/
 /* ------------ values to be directly rescaled */
@@ -170,21 +177,24 @@ int main(int argc, char ** argv) {
   const real betal = (7.03+(tsat0_K-273.15-100.)/160.*(22.1-7.03))*1e-4; /* roughly */
   const real betav = 1./tsat0_K; /* ideal gas approximation */
 
+  const real alpl = lambdal/cpl;
+  const real alpv = lambdav/cpv;
+
   boil::oout<<"properties at pressure "<<prs<<boil::endl;
   boil::oout<<"vapprop= "<<Mv<<" "<<muv<<" "<<rhov<<" "
-                         <<cpv/rhov<<" "<<lambdav<<" "<<betav<<boil::endl;
+                         <<cpv/rhov<<" "<<lambdav<<" "<<betav<<" "<<alpv<<boil::endl;
   boil::oout<<"liqprop= "<<Mv<<" "<<mul<<" "<<rhol<<" "
-                         <<cpl/rhol<<" "<<lambdal<<" "<<betal<<boil::endl;
+                         <<cpl/rhol<<" "<<lambdal<<" "<<betal<<" "<<alpl<<boil::endl;
   boil::oout<<"twoprop= "<<tsat0_K<<" "<<sig<<" "<<latent<<boil::endl;
+
+  const real Jal = cpl*(twall-tsat0)/(latent*rhov);
+  boil::oout << "Jal= "<<Jal<<boil::endl;
 
   /* heater */
   /* sapphire */
   const real rhosol = 3980.0;
   const real cpsol = 750*rhosol;
   const real lambdasol = 35.;
-
-  const real Jal = cpl*(twall-tsat0)/(latent*rhov);
-  boil::oout << "Jal= "<<Jal<<boil::endl;
 
 /******************************************************************************/
 /* ------------ domain dimensions */
@@ -210,6 +220,9 @@ int main(int argc, char ** argv) {
   const real DX0 = LX1/real(NX1);
   boil::oout<<"DX= "<<DX0<<boil::endl;
   const real DZ0 = DX0;
+
+  const real correl_reduc = 9.*boil::pi/8.*mul*alpl/sig*Jal*Jal/(R0mult*DX0);
+  boil::oout<<"correl: theta^3/lnS= "<<correl_reduc<<" rad^3"<<boil::endl;
 
 #if CASE == 1
   /* in experiment, ITO: 700 nm, sapphire: 250 um;

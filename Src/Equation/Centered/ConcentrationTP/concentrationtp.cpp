@@ -34,8 +34,10 @@ ConcentrationTP::ConcentrationTP(const Scalar & PHI,
   dcoef   = (f->gamma());   /* pointer at property */
 
   stmp    = phi.shape();
-  eflag   = phi.shape();
-  eflag2  = phi.shape();
+  //eflag   = phi.shape(); /* don't use, BndCnd would be the same pointer! */
+  //eflag2  = phi.shape();
+  eflag.copy_shape(phi.shape());
+  eflag2.copy_shape(phi.shape());
  
   assert(PHI.domain() == F.domain());
   assert(PHI.domain() == U.domain());
@@ -55,7 +57,6 @@ ConcentrationTP::ConcentrationTP(const Scalar & PHI,
                   << boil::endl;
     }
   }
-
 
   phi.bnd_update();
   /* must be called before discretization because of

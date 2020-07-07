@@ -43,6 +43,7 @@ PhaseChange4::PhaseChange4(const Scalar & MDOT,
   tifmodel(TIFMODEL),
   matter_sig(SIG)
 {
+#if 0 /* don't use this, it creates BndCnd pointers */
   txv      = MDOT.shape();
   tyv      = MDOT.shape();
   tzv      = MDOT.shape();
@@ -51,6 +52,16 @@ PhaseChange4::PhaseChange4(const Scalar & MDOT,
   tzl      = MDOT.shape();
   tnl      = MDOT.shape();
   tnv      = MDOT.shape();
+#else
+  txv.copy_shape(MDOT.shape());
+  tyv.copy_shape(MDOT.shape());
+  tzv.copy_shape(MDOT.shape());
+  txl.copy_shape(MDOT.shape());
+  tyl.copy_shape(MDOT.shape());
+  tzl.copy_shape(MDOT.shape());
+  tnl.copy_shape(MDOT.shape());
+  tnv.copy_shape(MDOT.shape());
+#endif
   tempflag = MDOT.shape();
   for_m(m) bndtpr(m) = U(m).shape(); /* a mistake? */
 

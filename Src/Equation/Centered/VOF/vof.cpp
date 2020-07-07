@@ -46,6 +46,7 @@ VOF::VOF(const Scalar & PHI,
 |  this constructor is called only at the finest level  |
 +------------------------------------------------------*/
 { 
+#if 0 /* don't use this, it creates BndCnd pointers */
   nx     = phi.shape();
   ny     = phi.shape();
   nz     = phi.shape();
@@ -61,6 +62,23 @@ VOF::VOF(const Scalar & PHI,
   pold_pos  = phi.shape();
   tempflag  = phi.shape();
   tempflag2 = phi.shape();
+#else
+  nx.copy_shape(phi.shape());
+  ny.copy_shape(phi.shape());
+  nz.copy_shape(phi.shape());
+  mx.copy_shape(phi.shape());
+  my.copy_shape(phi.shape());
+  mz.copy_shape(phi.shape());
+  nalpha.copy_shape(phi.shape());
+  stmp  .copy_shape(phi.shape());
+  stmp2 .copy_shape(phi.shape());
+  iflag .copy_shape(phi.shape());
+  adens .copy_shape(phi.shape());
+  pold_neg .copy_shape(phi.shape());
+  pold_pos .copy_shape(phi.shape());
+  tempflag .copy_shape(phi.shape());
+  tempflag2.copy_shape(phi.shape());
+#endif
   
   phisurf=0.5;
   topo = new Topology(&phi,&color(),&mx,&my,&mz,&adens,&fs,&iflag,phisurf);

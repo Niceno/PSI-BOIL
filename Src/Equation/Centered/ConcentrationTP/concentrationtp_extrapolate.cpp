@@ -10,7 +10,7 @@ void ConcentrationTP::extrapolate() {
   extrapolation_flag();
 
   /* extrapolate epsilon from vapor to liquid */
-#if 0
+#if 1
   topo->extrapolate(phi,-matter_sig,{-matter_sig},eflag);
 #else
   for_avijk(phi,i,j,k) {

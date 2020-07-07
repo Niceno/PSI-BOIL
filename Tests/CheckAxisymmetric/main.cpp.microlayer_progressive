@@ -140,8 +140,13 @@ static void __attribute__ ((constructor)) trapfpe(void)
   
   /* natural convection BL thickness */
 #if CASE == 0
-  real ztconst = boil::convective_boundary_layer_thickness(liquid,
-                                                           twall0-tout);
+  real ztconst;
+  if(twall0>tout) {
+     ztconst = boil::convective_boundary_layer_thickness(liquid,
+                                                         twall0-tout);
+  } else {
+     ztconst = LZ1;
+  }
 #elif CASE == 1
   real ztconst = 1e-3;
 #endif

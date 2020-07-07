@@ -172,6 +172,17 @@ class ScalarInt {
     void bnd_extract( const Dir d, int *** cp ) const;
     void bnd_insert ( const Dir d, int **  cp );
 
+    /* the same as below but bndcnds are copied */
+    ScalarInt & copy_shape(const Shape & a) {
+      n_x=a.n_i;n_y=a.n_j;n_z=a.n_k;  o_x=a.o_i;o_y=a.o_j;o_z=a.o_k;
+      s_x=a.s_i;s_y=a.s_j;s_z=a.s_k;  e_x=a.e_i;e_y=a.e_j;e_z=a.e_k;
+      dom=a.dm;
+      for(int b=0; b<a.bc->count(); b++)
+        bc().add(a.bc->at(b));
+
+      return *this;
+    }
+
     /* operators */
     ScalarInt & operator = (const Shape & a)
      {n_x=a.n_i;n_y=a.n_j;n_z=a.n_k;  o_x=a.o_i;o_y=a.o_j;o_z=a.o_k;
