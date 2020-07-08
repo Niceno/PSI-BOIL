@@ -11,7 +11,11 @@ static void __attribute__ ((constructor)) trapfpe(void)
 }
 #endif
 
-#define AXISYM
+//#define AXISYM
+//#define SYM
+#ifdef AXISYM
+  #define SYM
+#endif
 #define USE_PHASE_VEL_VOF
 //#define SETUP_ONLY
 #define VARIABLE
@@ -85,10 +89,10 @@ int main(int argc, char ** argv) {
 
   const bool use_fs_interp = false;
   const bool store_pressure_extrap = true;
-  const int niter_pressure_extrap = 1000;
+  const int niter_pressure_extrap = 3000;
 
   /* enthalpy fd */
-  const bool no_solid_acceleration = false;
+  const bool no_solid_acceleration = true;
 
   /* phase change - 4 version */
   const bool use_second_order_accuracy = true;
@@ -145,14 +149,25 @@ int main(int argc, char ** argv) {
 /* ------------ domain dimensions */
   const real LX = 10e-3;
 
+#if 0
   const int NX = 16*gLevel;
-#ifdef MOVING_FRAME
-  const int NZ = 3*NX;
 #else
-  const int NZ = 16*NX/2;
+  const int NX1 = 3*gLevel;
+  const real LX1 = 2.5e-3;
+
+  const int NX2 = 5*gLevel;
+  const real LX2 = 10e-3;
+ 
+  const int NX = NX1 + NX2;
 #endif
 
-  const real DX = real(LX/real(NX));
+#ifdef MOVING_FRAME
+  const int NZ = 2*NX;
+#else
+  const int NZ = 32*NX1;
+#endif
+
+  const real DX = real(LX1/real(NX1));
   boil::oout<<"dx= "<<DX<<"\n";
 
   const real LZ = real(NZ)*DX;
@@ -178,8 +193,31 @@ int main(int argc, char ** argv) {
   /*----------+
   |  grid(s)  |
   +----------*/
-  Grid1D gx ( Range<real>(0.0, LX), NX, Periodic::no(),
-              BndGrid::symmetry(), BndGrid::wall() );
+#ifdef SYM
+  Grid1D gx0( Range<real>(0.0, LX1), NX1, Periodic::no() );
+  Grid1D gx1( Range<real>(LX1, LX2)
+            , Range<real>(1.1*DX,3.5*DX)
+            , NX2, Periodic::no() );
+
+  //Grid1D gx ( Range<real>(0.0, LX), NX, Periodic::no(),
+  //            BndGrid::symmetry(), BndGrid::wall() );
+  Grid1D gx (gx0, gx1, Periodic::no(), BndGrid::symmetry(), BndGrid::wall());
+#else
+  Grid1D gxm1( Range<real>(-LX2, -LX1)
+            , Range<real>(3.5*DX,1.1*DX)
+            , NX2, Periodic::no() );
+  Grid1D gxm0( Range<real>(-LX1, 0.0), NX1, Periodic::no() );
+  Grid1D gxm (gxm1, gxm0, Periodic::no());
+
+  Grid1D gxp0( Range<real>(0.0, LX1), NX1, Periodic::no() );
+  Grid1D gxp1( Range<real>(LX1, LX2)
+            , Range<real>(1.1*DX,3.5*DX)
+            , NX2, Periodic::no() );
+  Grid1D gxp (gxp0, gxp1, Periodic::no());
+
+  Grid1D gx (gxm, gxp, Periodic::no());
+  //Grid1D gx ( Range<real>(-LX, LX), 2*NX, Periodic::no() );
+#endif
 #ifdef MOVING_FRAME
   Grid1D gz ( Range<real>(-LZ/2.,LZ/2.), NZ ,Periodic::no() );
 #else
@@ -212,7 +250,15 @@ int main(int argc, char ** argv) {
   |  insert boundary conditions  |
   +-----------------------------*/
   for_m(m) {
+#ifdef SYM
     uvw.bc(m).add( BndCnd( Dir::imin(), BndType::symmetry() ) );
+#else
+  #ifdef MOVING_FRAME
+    uvw.bc(m).add( BndCnd( Dir::imin(), BndType::neumann() ) );
+  #else
+    uvw.bc(m).add( BndCnd( Dir::imin(), BndType::wall() ) );
+  #endif
+#endif
 #ifdef MOVING_FRAME
     uvw.bc(m).add( BndCnd( Dir::imax(), BndType::neumann() ) );
     uvw.bc(m).add( BndCnd( Dir::kmin(), BndType::outlet() ) );
@@ -226,14 +272,26 @@ int main(int argc, char ** argv) {
     uvw.bc(m).add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
     uvw.bc(m).add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
 #else
+  #ifdef SYM
     uvw.bc(m).add( BndCnd( Dir::jmin(), BndType::symmetry() ) );
+  #else
+    #ifdef MOVING_FRAME
+    uvw.bc(m).add( BndCnd( Dir::jmin(), BndType::neumann() ) );
+    #else
+    uvw.bc(m).add( BndCnd( Dir::jmin(), BndType::wall() ) );
+    #endif
+  #endif
     uvw.bc(m).add( BndCnd( Dir::jmax(), BndType::wall() ) );
 #endif
     uvw_1(m)=uvw(m).shape();
     uvw_2(m)=uvw(m).shape();
   }
 
+#ifdef SYM
   p.bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
+#else
+  p.bc().add( BndCnd( Dir::imin(), BndType::neumann() ) );
+#endif
   p.bc().add( BndCnd( Dir::imax(), BndType::neumann() ) );
   p.bc().add( BndCnd( Dir::kmin(), BndType::neumann() ) );
   p.bc().add( BndCnd( Dir::kmax(), BndType::neumann() ) );
@@ -241,7 +299,11 @@ int main(int argc, char ** argv) {
   p.bc().add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
   p.bc().add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
 #else
+  #ifdef SYM
   p.bc().add( BndCnd( Dir::jmin(), BndType::symmetry() ) );
+  #else
+  p.bc().add( BndCnd( Dir::jmin(), BndType::neumann() ) );
+  #endif
   p.bc().add( BndCnd( Dir::jmax(), BndType::neumann() ) );
 #endif
 
@@ -257,7 +319,11 @@ int main(int argc, char ** argv) {
   eps = p.shape();
   mdot_eps = p.shape();
 
+#ifdef SYM
   c.bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
+#else
+  c.bc().add( BndCnd( Dir::imin(), BndType::wall() ) );
+#endif
   c.bc().add( BndCnd( Dir::imax(), BndType::wall() ) );
 #ifdef MOVING_FRAME
   c.bc().add( BndCnd( Dir::kmin(), BndType::outlet() ) );
@@ -271,11 +337,19 @@ int main(int argc, char ** argv) {
   c.bc().add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
   c.bc().add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
 #else
+  #ifdef SYM
   c.bc().add( BndCnd( Dir::jmin(), BndType::symmetry() ) );
+  #else
+  c.bc().add( BndCnd( Dir::jmin(), BndType::wall() ) );
+  #endif
   c.bc().add( BndCnd( Dir::jmax(), BndType::wall() ) );
 #endif
 
+#ifdef SYM
   tpr.bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
+#else
+  tpr.bc().add( BndCnd( Dir::imin(), BndType::dirichlet(), tout ) );
+#endif
   tpr.bc().add( BndCnd( Dir::imax(), BndType::dirichlet(), tout ) );
 #ifdef MOVING_FRAME
   tpr.bc().add( BndCnd( Dir::kmin(), BndType::outlet() ) );
@@ -287,7 +361,11 @@ int main(int argc, char ** argv) {
   tpr.bc().add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
   tpr.bc().add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
 #else
+  #ifdef SYM
   tpr.bc().add( BndCnd( Dir::jmin(), BndType::symmetry() ) );
+  #else
+  tpr.bc().add( BndCnd( Dir::jmin(), BndType::dirichlet(), tout ) );
+  #endif
   tpr.bc().add( BndCnd( Dir::jmax(), BndType::dirichlet(), tout ) );
 #endif
 
@@ -537,8 +615,24 @@ int main(int argc, char ** argv) {
     wv /= vol;
     real avgng = epstot/vol;
     zpos += (wvel+wv)*time.dt();
+  
+    real rad = vol;
+#ifndef AXISYMMETRIC
+  #ifdef SYM
+    rad *= 4.;
+  #endif
+#else
+    rad *= 2.*boil::pi;
+#endif
+    rad = pow(0.75*rad/boil::pi,1./3.);
+   
+#ifdef MOVING_FRAME
+    real Re = 2.*rad*rhol/mul*wv; 
+#else
+    real Re = 2.*rad*rhol/mul*(wv+wvel);
+#endif
 
-    boil::oout <<"bubble= "<<time.current_time()<<" "<< wv <<" "<<wvel<<" "<<zpos<<" "<<epstot<<" "<<avgng<<boil::endl;
+    boil::oout <<"bubble= "<<time.current_time()<<" "<< wv <<" "<<wvel<<" "<<zpos<<" "<<epstot<<" "<<avgng<<" "<<rad<<" "<<Re<<boil::endl;
 #ifdef MOVING_FRAME
     wvel += ur_vel*wv;
     for_m(m) {
@@ -784,7 +878,7 @@ int main(int argc, char ** argv) {
       boil::save_backup(time.current_step(), 1, time,
                         load_scalars, load_scalar_names,
                         load_vectors, load_vector_names);
-      boil::rm_backup(time.current_step(),
+      boil::rm_backup(ts,
                       load_scalars, load_scalar_names,
                       load_vectors, load_vector_names);
       boil::plot->plot(uvw,c,tpr,eps,press,mdot,
