@@ -214,8 +214,7 @@ class Scalar {
       n_x=a.n_i;n_y=a.n_j;n_z=a.n_k;  o_x=a.o_i;o_y=a.o_j;o_z=a.o_k;
       s_x=a.s_i;s_y=a.s_j;s_z=a.s_k;  e_x=a.e_i;e_y=a.e_j;e_z=a.e_k;
       dom=a.dm;
-      for(int b=0; b<a.bc->count(); b++)
-        bc().add(a.bc->at(b));
+      bc().replicate(*(a.bc));
 
       return *this;
     }
@@ -231,6 +230,7 @@ class Scalar {
     /* = */
     const Scalar & operator = (const Scalar & s) 
      {for_aijk(i,j,k) val[i][j][k]=s.val[i][j][k]; return *this;}
+
     const Scalar & operator = (const real & d) 
      {for_aijk(i,j,k) val[i][j][k]=d; return *this;}
     const Scalar & operator = (const char * c); 

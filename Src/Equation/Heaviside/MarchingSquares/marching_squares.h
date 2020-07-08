@@ -40,6 +40,11 @@ class MarchingSquares : public Heaviside {
     int extract_line_parameters(const std::vector<LINE> & lines,
                                 real & nx, real & ny, real & nalpha);
 
+    virtual real ratio(const real a1, const real a2,
+                       const real x1, const real x2) {
+      return a1/a2; 
+    }
+
     Scalar stmp;
     const Comp perpendicular;
     int ofx, ofy, ofz;

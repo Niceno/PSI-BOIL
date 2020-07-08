@@ -15,11 +15,6 @@ void ConcentrationTP::extrapolate() {
 #else
   for_avijk(phi,i,j,k) {
     if(matter_sig*eflag[i][j][k]<0) {
-    }
-  } 
-
-  for_avijk(phi,i,j,k) {
-    if(matter_sig*eflag[i][j][k]<0) {
       phi[i][j][k]=0.0;
       eflag2[i][j][k] = 0;
     } else {

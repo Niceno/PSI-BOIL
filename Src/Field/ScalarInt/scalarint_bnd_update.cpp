@@ -272,6 +272,8 @@ void ScalarInt::bnd_update() {
           kdir = true;
         }
 
+        //boil::oout<<"HERE in ScaInt "<<d<<" "<<ist<<" "<<ied<<" "<<iinc<<" "<<bc().at(b).si()<<boil::endl;
+
         /* used to be: for_vijk( bc().at(b), i,j,k ) */
         /* changes of _beg and _end only affect the direction in question */
         if(idir) {
@@ -283,7 +285,7 @@ void ScalarInt::bnd_update() {
                 val[i][j][k]=val[*iref][*jref][*kref];
 #if 0
                 if(d == Dir::imin()) {
-                  boil::oout<<"Scalar bnd "<<i<<" "<<j<<" "<<k<<" "<<val[i][j][k]<<" "<<val[*iref][*jref][*kref]<<" | "<<*iref<<" "<<*jref<<" "<<*kref<<boil::endl;
+                  boil::oout<<"Scalarint bnd "<<i<<" "<<j<<" "<<k<<" "<<val[i][j][k]<<" "<<val[*iref][*jref][*kref]<<" | "<<*iref<<" "<<*jref<<" "<<*kref<<boil::endl;
                 }
 #endif
               }

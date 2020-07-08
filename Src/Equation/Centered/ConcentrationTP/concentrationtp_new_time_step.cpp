@@ -34,12 +34,21 @@ void ConcentrationTP::new_time_step(const Scalar * diff_eddy) {
     exit(0);
   }
 
+  if(use_heaviside_instead_of_vf&&!store_vf) {
+    for_ijk(i,j,k) {
+      vfold[i][j][k] = vfval(i,j,k);
+    } 
+    store_vf = true;
+  }
+
   /*------------------------------+
   |  fold = vol * rho * eps / dt  |
   +-------------------------------*/
   for_ijk(i,j,k) {
-    real col_new = std::min(1.0,std::max(0.0,clr[i][j][k]));
-    real col_old = std::min(1.0,std::max(0.0,clrold[i][j][k]));
+    real col_new = vfval(i,j,k);
+    real col_old = vfvalold(i,j,k);
+    //real col_new = std::min(1.0,std::max(0.0,clr[i][j][k]));
+    //real col_old = std::min(1.0,std::max(0.0,clrold[i][j][k]));
     //real col_new = clr[i][j][k];
     //real col_old = clrold[i][j][k];
     real r = rho_dif->value(i,j,k);
@@ -60,14 +69,71 @@ void ConcentrationTP::new_time_step(const Scalar * diff_eddy) {
   /*-----------------------------------------------------------------------+
   |  fold = fold + C                                                       |
   |  Euler explicit 1st order for convection term                          |
+  |  Semi-lagrangian scheme: update convection term, separating diffusion  |
   +-----------------------------------------------------------------------*/
   convection(&cold);
   for_ijk(i,j,k) { /* conv_ts.Nm1() = 1.0 */
     fold[i][j][k] += conv_ts.Nm1() * cold[i][j][k];
   }
 
+#if 1
+  real dti = time->dti();
+
+  /* semi-lagrangian scheme */
+  for_ijk(i,j,k) {
+    real col_new = vfval(i,j,k);
+    if(matter_sig==Sign::neg()) {
+      col_new = 1.-col_new;
+    }
+    if(dom->ibody().on(i,j,k)&&heavi->status(i,j,k)!=-matter_sig
+       &&col_new>col_crit) {
+      real r = rho_dif->value(i,j,k);
+
+      /* gas diffusive innertial */
+      real Ac = dV(i,j,k) * dti * r * col_new;
+
+      if(dom->ibody().nccells() > 0) {
+        const real fV = dom->ibody().fV(i,j,k);
+        Ac *= fV;
+      }
+
+      phi[i][j][k] = fold[i][j][k] / Ac;
+    }
+  }
+
+  extrapolate();
+
+  for_ijk(i,j,k) {
+    real col_new = vfval(i,j,k);
+    if(matter_sig==Sign::neg()) {
+      col_new = 1.-col_new;
+    }
+    if(dom->ibody().on(i,j,k)&&heavi->status(i,j,k)!=-matter_sig
+       &&col_new>col_crit) {
+      real r = rho_dif->value(i,j,k);
+
+      /* gas diffusive innertial */
+      real Ac = dV(i,j,k) * dti * r * col_new;
+
+      if(dom->ibody().nccells() > 0) {
+        const real fV = dom->ibody().fV(i,j,k);
+        Ac *= fV;
+      }
+
+      fold[i][j][k] = Ac * phi[i][j][k];
+    }
+  }
+#endif
+
   phi.bnd_update();
   phi.exchange();
+
+  /* store vf */
+  if(use_heaviside_instead_of_vf) {
+    for_ijk(i,j,k) {
+      vfold[i][j][k] = vfval(i,j,k);
+    }
+  }
 
   boil::timer.stop("concentrationtp new time step");
 }

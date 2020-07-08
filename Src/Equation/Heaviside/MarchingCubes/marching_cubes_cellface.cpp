@@ -21,9 +21,12 @@ Heaviside::VAL2D MarchingCubes::cellface_covered(const Sign sig, const Comp & mc
   CELL2D face;
   int isum(0);
   real surf;
+  XY fcenter;
 
   if(mcomp == Comp::i()) {
     surf = (*clr).dSx(sig,i,j,k);
+    fcenter.x = clr->yc(j);
+    fcenter.y = clr->zc(k);
 #if 0
     int ii = i;
     if (sig == Sign::neg()) { ii -= 1; }
@@ -76,6 +79,8 @@ Heaviside::VAL2D MarchingCubes::cellface_covered(const Sign sig, const Comp & mc
 
   else if(mcomp == Comp::j()) {
     surf = (*clr).dSy(sig,i,j,k);
+    fcenter.x = clr->xc(i);
+    fcenter.y = clr->zc(k);
 #if 0
     int jj = j;
     if (sig == Sign::neg()) { jj -= 1; }
@@ -128,6 +133,8 @@ Heaviside::VAL2D MarchingCubes::cellface_covered(const Sign sig, const Comp & mc
 
   else if(mcomp == Comp::k()) {
     surf = (*clr).dSz(sig,i,j,k);
+    fcenter.x = clr->xc(i);
+    fcenter.y = clr->yc(j);
 #if 0
     int kk = k;
     if (sig == Sign::neg()) { kk -= 1; }
@@ -184,7 +191,8 @@ Heaviside::VAL2D MarchingCubes::cellface_covered(const Sign sig, const Comp & mc
     af = 1.0;
   } else if(isum > 0) {
     std::vector<LINE> lines; /* dummy */
-    af = 1.0-standing_square(face,clrsurf,surf,lines)/surf;
+    XY centroid; /* dummy */
+    af = 1.0-standing_square(face,clrsurf,surf,fcenter,lines,centroid)/surf;
   }
 
   VAL2D faceval;

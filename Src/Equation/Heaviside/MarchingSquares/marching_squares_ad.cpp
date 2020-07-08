@@ -37,7 +37,9 @@ real MarchingSquares::ad(const int i, const int j, const int k,
       exit(0);
     }
 
-    standing_square(grid,clrsurf,surf,lines);
+    XY centroid; /* dummy */
+    standing_square(grid,clrsurf,surf,{clr->xc(i),clr->zc(k)},
+                    lines,centroid);
 
     /* allow for virtual implementation */
     return line_density(lines,surf,clr->xc(i));

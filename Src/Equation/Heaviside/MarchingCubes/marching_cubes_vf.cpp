@@ -30,6 +30,8 @@ real MarchingCubes::vf(const int i, const int j, const int k) {
   vol += polygonise_volume(grid, clrsurf);
 
   std::vector<LINE> lines; /* dummy */
+  XY centroid; /* dummy */
+
   for(int m = 0; m != 6; m++) {
     /* x: y->x, z->y */
     if(m==0) { /* west */
@@ -47,7 +49,8 @@ real MarchingCubes::vf(const int i, const int j, const int k) {
       }
      
       vol += (-1.0) * grid.p[4].x 
-             * standing_square(face, clrsurf,clr->dSx(Sign::neg(),i,j,k),lines);
+             * standing_square(face, clrsurf,clr->dSx(Sign::neg(),i,j,k),
+                               {clr->yc(j),clr->zc(k)},lines,centroid);
     }
     else if(m==1) { /* east */
       CELL2D face;
@@ -64,7 +67,8 @@ real MarchingCubes::vf(const int i, const int j, const int k) {
       }
      
       vol += (+1.0) * grid.p[5].x
-             * standing_square(face, clrsurf,clr->dSx(Sign::pos(),i,j,k),lines);
+             * standing_square(face, clrsurf,clr->dSx(Sign::pos(),i,j,k),
+                               {clr->yc(j),clr->zc(k)},lines,centroid);
     }
     /* y: x->x, z->y */
     else if(m==2) { /* south */
@@ -82,7 +86,8 @@ real MarchingCubes::vf(const int i, const int j, const int k) {
       }
     
       vol += (-1.0) * grid.p[4].y
-             * standing_square(face, clrsurf,clr->dSy(Sign::neg(),i,j,k),lines);
+             * standing_square(face, clrsurf,clr->dSy(Sign::neg(),i,j,k),
+                               {clr->xc(i),clr->zc(k)},lines,centroid);
     }
     else if(m==3) { /* north */
       CELL2D face;
@@ -99,7 +104,8 @@ real MarchingCubes::vf(const int i, const int j, const int k) {
       }
      
       vol += (+1.0) * grid.p[7].y
-             * standing_square(face, clrsurf,clr->dSy(Sign::pos(),i,j,k),lines);
+             * standing_square(face, clrsurf,clr->dSy(Sign::pos(),i,j,k),
+                               {clr->xc(i),clr->zc(k)},lines,centroid);
     }
     /* z: x->x, y->y */
     else if(m==4) { /* bottom */
@@ -117,7 +123,8 @@ real MarchingCubes::vf(const int i, const int j, const int k) {
       }
      
       vol += (-1.0) * grid.p[3].z
-             * standing_square(face, clrsurf,clr->dSz(Sign::neg(),i,j,k),lines);
+             * standing_square(face, clrsurf,clr->dSz(Sign::neg(),i,j,k),
+                               {clr->xc(i),clr->yc(j)},lines,centroid);
     }
     else if(m==5) { /* top */
       CELL2D face;
@@ -134,7 +141,8 @@ real MarchingCubes::vf(const int i, const int j, const int k) {
       }
      
       vol += (+1.0) * grid.p[7].z
-             * standing_square(face, clrsurf,clr->dSy(Sign::pos(),i,j,k),lines);
+             * standing_square(face, clrsurf,clr->dSy(Sign::pos(),i,j,k),
+                               {clr->xc(i),clr->yc(j)},lines,centroid);
     }
   }
   vol = vol/3. /clr->dV(i,j,k);

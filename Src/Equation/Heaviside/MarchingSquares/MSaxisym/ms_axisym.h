@@ -18,6 +18,13 @@ class MSaxisym : public MarchingSquares {
   protected:
     virtual real line_density(const std::vector<LINE> & lines,
                               const real & surf, const real & com);
+
+    /* second theorem of pappus */
+    virtual real ratio(const real a1, const real a2,
+                       const real x1, const real x2) {
+      return a1/a2*x1/x2;
+    }
+
 };
 
 #endif

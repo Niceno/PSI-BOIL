@@ -1,6 +1,7 @@
 #ifndef CONCENTRATIONTP_H
 #define CONCENTRATIONTP_H
 
+#include <functional> /* std::function */
 #include "../centered.h"
 #include "../../../Parallel/communicator.h"
 #include "../../Heaviside/MarchingSquares/MSaxisym/ms_axisym.h"
@@ -46,6 +47,8 @@ class ConcentrationTP : public Centered {
         \param sm   - Linear solver. It acts as a solver, or as a
                       smoother for AC multigrid.
         \param flu  - Holds material properties of diffusing species.
+        \param critvf - minimal share of gas in cell for solving equation.
+        \param heavivf - decides if heaviside reconstruction is used as clr.
         \param sig  - decides if gas is color = 0 (Sign::neg()) or vice versa
     */
     ConcentrationTP(const Scalar & phi,
@@ -57,6 +60,8 @@ class ConcentrationTP : public Centered {
                     Times & t,
                     Linear * sm,
                     Matter * flu,
+                    const real critvf = 0.0,
+                    const bool heavivf = false,
                     const Sign sig = Sign::neg()); 
     ~ConcentrationTP();
 	  
@@ -97,7 +102,7 @@ class ConcentrationTP : public Centered {
     void extrapolation_flag();
 
     Scalar clr, clrold;
-    Scalar stmp;
+    Scalar vfold,stmp;
     Heaviside * heavi;
     Topology * topo;
     ScalarInt eflag, eflag2;
@@ -106,7 +111,13 @@ class ConcentrationTP : public Centered {
     const Property * dcoef;
 
     real turbS; /* turbulent schmidt number */
-    bool laminar;
+    real col_crit;
+    bool laminar, store_vf;
+    bool use_heaviside_instead_of_vf;
     const Sign matter_sig;
+
+    /* volume fraction value: initialized as a lambda in constructor */
+    std::function<real(const int,const int,const int)> vfval;
+    std::function<real(const int,const int,const int)> vfvalold;
 };	
 #endif

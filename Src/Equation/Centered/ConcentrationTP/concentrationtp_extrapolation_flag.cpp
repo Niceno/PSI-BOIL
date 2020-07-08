@@ -82,6 +82,15 @@ void ConcentrationTP::extrapolation_flag() {
     }
   }
 
+  /* critical correction */
+  for_vijk(phi,i,j,k) {
+    real col_new = vfval(i,j,k);
+    if(matter_sig==Sign::neg()) col_new = 1.-col_new;
+    if(dom->ibody().on(i,j,k)&&col_new<=col_crit
+       &&heavi->status(i,j,k)!=-matter_sig)
+      eflag[i][j][k]=-matter_sig;
+  } 
+
   eflag.bnd_update();
   eflag.exchange_all();
 
