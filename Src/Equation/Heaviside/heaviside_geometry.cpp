@@ -57,38 +57,23 @@ Heaviside::XYZ Heaviside::CrossProduct(const XYZ & p1, const XYZ & p2) {
 }
 
 /***************************************************************************//**
-*  \brief Shoelace formula (areapos is the centroid coords times area)
+*  \brief Shoelace formula
 *******************************************************************************/
 
-real Heaviside::Shoelace(const XY & v1, const XY & v2, const XY & v3,
-                         XY & areapos) {
+real Heaviside::Shoelace(const XY & v1, const XY & v2, const XY & v3) {
   real area(0.0);
 
   area = (v1.x * v2.y - v2.x * v1.y)
        + (v2.x * v3.y - v3.x * v2.y)
        + (v3.x * v1.y - v1.x * v3.y);
 
-  areapos.x = (v1.x * v2.y - v2.x * v1.y)*(v1.x+v2.x)
-            + (v2.x * v3.y - v3.x * v2.y)*(v2.x+v3.x)
-            + (v3.x * v1.y - v1.x * v3.y)*(v3.x+v1.x);
-
-  areapos.y = (v1.x * v2.y - v2.x * v1.y)*(v1.y+v2.y)
-            + (v2.x * v3.y - v3.x * v2.y)*(v2.y+v3.y)
-            + (v3.x * v1.y - v1.x * v3.y)*(v3.y+v1.y);
-
-  areapos.x /= 3.*area;
-  areapos.y /= 3.*area;
-
   area = 0.5 * fabs(area);
-
-  areapos.x *= area;
-  areapos.y *= area;
 
   return(area);
 }
 
 real Heaviside::Shoelace(const XY & v1, const XY & v2, const XY & v3,
-                         const XY & v4, XY & areapos) {
+                         const XY & v4) {
   real area(0.0);
 
   area = (v1.x * v2.y - v2.x * v1.y)
@@ -96,29 +81,13 @@ real Heaviside::Shoelace(const XY & v1, const XY & v2, const XY & v3,
        + (v3.x * v4.y - v4.x * v3.y)
        + (v4.x * v1.y - v1.x * v4.y);
 
-  areapos.x = (v1.x * v2.y - v2.x * v1.y)*(v1.x+v2.x)
-            + (v2.x * v3.y - v3.x * v2.y)*(v2.x+v3.x)
-            + (v3.x * v4.y - v4.x * v3.y)*(v3.x+v4.x)
-            + (v4.x * v1.y - v1.x * v4.y)*(v4.x+v1.x);
-
-  areapos.y = (v1.x * v2.y - v2.x * v1.y)*(v1.y+v2.y)
-            + (v2.x * v3.y - v3.x * v2.y)*(v2.y+v3.y)
-            + (v3.x * v4.y - v4.x * v3.y)*(v3.y+v4.y)
-            + (v4.x * v1.y - v1.x * v4.y)*(v4.y+v1.y);
-
-  areapos.x /= 3.*area;
-  areapos.y /= 3.*area;
-
   area = 0.5 * fabs(area);
-
-  areapos.x *= area;
-  areapos.y *= area;
 
   return(area);
 }
 
 real Heaviside::Shoelace(const XY & v1, const XY & v2, const XY & v3,
-                         const XY & v4, const XY & v5, XY & areapos) {
+                         const XY & v4, const XY & v5) {
   real area(0.0);
 
   area = (v1.x * v2.y - v2.x * v1.y)
@@ -127,25 +96,7 @@ real Heaviside::Shoelace(const XY & v1, const XY & v2, const XY & v3,
        + (v4.x * v5.y - v5.x * v4.y)
        + (v5.x * v1.y - v1.x * v5.y);
 
-  areapos.x = (v1.x * v2.y - v2.x * v1.y)*(v1.x+v2.x)
-            + (v2.x * v3.y - v3.x * v2.y)*(v2.x+v3.x)
-            + (v3.x * v4.y - v4.x * v3.y)*(v3.x+v4.x)
-            + (v4.x * v5.y - v5.x * v4.y)*(v4.x+v5.x)
-            + (v5.x * v1.y - v1.x * v5.y)*(v5.x+v1.x);
-
-  areapos.y = (v1.x * v2.y - v2.x * v1.y)*(v1.y+v2.y)
-            + (v2.x * v3.y - v3.x * v2.y)*(v2.y+v3.y)
-            + (v3.x * v4.y - v4.x * v3.y)*(v3.y+v4.y)
-            + (v4.x * v5.y - v5.x * v4.y)*(v4.y+v5.y)
-            + (v5.x * v1.y - v1.x * v5.y)*(v5.y+v1.y);
-
-  areapos.x /= 3.*area;
-  areapos.y /= 3.*area;
-
   area = 0.5 * fabs(area);
-  
-  areapos.x *= area;
-  areapos.y *= area;
 
   return(area);
 }

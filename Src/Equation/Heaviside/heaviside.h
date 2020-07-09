@@ -76,20 +76,18 @@ class Heaviside { /* this class is an abstract class! */
     XYZ CrossProduct(const XYZ & p1, const XYZ & p2);
 
     /* shoelace */
+    real Shoelace(const XY & v1, const XY & v2, const XY & v3);
     real Shoelace(const XY & v1, const XY & v2, const XY & v3,
-                  XY & areapos);
+                  const XY & v4);
     real Shoelace(const XY & v1, const XY & v2, const XY & v3,
-                  const XY & v4, XY & areapos);
-    real Shoelace(const XY & v1, const XY & v2, const XY & v3,
-                  const XY & v4, const XY & v5, XY & areapos);
+                  const XY & v4, const XY & v5);
 
     /* surface divergence */ 
     real triangle_surface_divergence(const TRIANGLE & t);
 
     /* main body of marching squares */
     real standing_square(const CELL2D & grid, const real & isolevel,
-                         const real & totarea, const XY & cellcentroid,
-                         std::vector<LINE> & lines, XY & centroid);
+                         const real & totarea, std::vector<LINE> & lines);
   
     void cal_fs_geom(const Scalar & scp, 
                      const Scalar & nx, const Scalar & ny,

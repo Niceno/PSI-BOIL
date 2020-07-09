@@ -76,7 +76,7 @@ void ConcentrationTP::new_time_step(const Scalar * diff_eddy) {
     fold[i][j][k] += conv_ts.Nm1() * cold[i][j][k];
   }
 
-#if 1
+#if 0
   real dti = time->dti();
 
   /* semi-lagrangian scheme */

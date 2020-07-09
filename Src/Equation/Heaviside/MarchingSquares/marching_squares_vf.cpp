@@ -32,12 +32,8 @@ real MarchingSquares::vf(const int i, const int j, const int k) {
     }
 
     std::vector<LINE> lines; /* dummy */
-    XY centroid;
-    real are = standing_square(grid,clrsurf,surf,
-                               {clr->xc(i),clr->zc(k)},
-                               lines,centroid);
     /* whole function above evaluates area *below* IS! */
-    af = 1.0-ratio(are,surf,centroid.x,clr->xc(i));
+    af = 1.0-standing_square(grid,clrsurf,surf,lines)/surf;
   }
 
   return af;

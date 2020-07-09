@@ -114,24 +114,6 @@
         return(pv);
       }
 
-      /* multiplication by number */
-      XY operator *(const real & a) const {
-        XY pv;
-        pv.x = x*a;
-        pv.y = y*a;
-
-        return(pv);
-      }
-
-      /* division by number */
-      XY operator /(const real & a) const {
-        XY pv;
-        pv.x = x/a;
-        pv.y = y/a;
-
-        return(pv);
-      }
-
       /* dot product */
       inline real operator *(const XY & p2) const {
         return x*p2.x + y*p2.y; 
