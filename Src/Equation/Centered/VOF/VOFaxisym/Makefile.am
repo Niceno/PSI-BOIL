@@ -1,5 +1,6 @@
 noinst_LIBRARIES = libVOFaxisym.a
 libVOFaxisym_a_SOURCES = vofaxisym.h                              \
+                         vofaxisym.cpp                            \
                          vofaxisym_advance_x.cpp                  \
                          vofaxisym_advance_z.cpp                  \
                          vofaxisym_alp.cpp                        \

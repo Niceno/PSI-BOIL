@@ -55,7 +55,9 @@ void ConcentrationTP::discretize(const Scalar * diff_eddy) {
     if(dom->ibody().on(i,j,k)) {
       real col_new = vfval(i,j,k);
       if(matter_sig==Sign::neg()) col_new = 1.-col_new;
-      if(heavi->status(i,j,k)==-matter_sig||col_new<=col_crit) {
+      if(  heavi->status(i,j,k)==-matter_sig
+        // ||col_new<=col_crit
+        ) {
         A.c[i][j][k]  = 1.0;
         A.w[i][j][k]  = 0.0;
         A.e[i][j][k]  = 0.0;

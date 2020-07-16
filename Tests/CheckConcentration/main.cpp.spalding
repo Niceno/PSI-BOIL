@@ -11,11 +11,11 @@ static void __attribute__ ((constructor)) trapfpe(void)
 }
 #endif
 
+//#define STANDARD
 #define SYM
 //#define SETUP_ONLY
 //#define STATIC
 #define RADIAL
-#define ANALYTIC
 #define CASE 1
 /* case 1 = axisymmetric
         2 = cartesian 2D
@@ -29,13 +29,7 @@ int main(int argc, char ** argv) {
 
   if(argc<5){
     boil::oout<<"Four command line arguments required!"<<"\n";
-#ifndef ANALYTIC
-    boil::oout<<"./Boil wmin gLevel tinf[case] humidity[case]"<<"\n";
-    boil::oout<<"Temperatures: 10-40-70-95 [degC]\n";
-    boil::oout<<"Humidities: 10-30-50 [%]"<<boil::endl;
-#else
     boil::oout<<"./Boil wmin gLevel tinf[C] einf[%]"<<"\n";
-#endif
     exit(0);
   }
 
@@ -55,127 +49,31 @@ int main(int argc, char ** argv) {
 
 /******************************************************************************/
 /* ------------ boundary or initial conditions */
-  const real Tref  = 273.15+99.97; /* tsat at 1 atm */
-  const real radius = 128e-6;
+  const real Tref  = 273.15+100.; /* tsat at 1 atm */
+  const real radius = 1e-3;
 
   real Tinf = 273.15;
-#ifndef ANALYTIC
-  switch(tcase) {
-    case 10 : Tinf += real(tcase); break;
-    case 40 : Tinf += real(tcase); break;
-    case 70 : Tinf += real(tcase); break;
-    case 95 : Tinf += real(tcase); break;
-    default : 
-      boil::oout<<"Invalid Tinf selected. Exiting."<<boil::endl;
-      exit(0);
-  }
-#else
   Tinf += tcase;
-#endif
 
   real epsinf;
-#ifndef ANALYTIC
-  real epswb, Twb;
-
-  switch (tcase*100+ecase) {
-    case 1010 :
-      epsinf = 0.9988;
-      epswb  = 0.9932;
-      Twb    = 274.6133;
-      break;
-
-    case 1030 :
-      epsinf = 0.9964;
-      epswb  = 0.9921;
-      Twb    = 276.7108;
-      break;
-
-    case 1050 :
-      epsinf = 0.9939;
-      epswb  = 0.9909;
-      Twb    = 278.6863;
-      break;
-
-    case 4010 :
-      epsinf = 0.9927;
-      epswb  = 0.9785;
-      Twb    = 291.7161;
-      break;
-
-    case 4030 :
-      epsinf = 0.9781;
-      epswb  = 0.9680;
-      Twb    = 298.2436;
-      break;
-
-    case 4050 :
-      epsinf = 0.9636;
-      epswb  = 0.9566;
-      Twb    = 303.4553;
-      break;
-
-    case 7010 :
-      epsinf = 0.9692;
-      epswb  = 0.9456;
-      Twb    = 307.4614;
-      break;
-
-    case 7030 :
-      epsinf = 0.9076;
-      epswb  = 0.8920;
-      Twb    = 320.4203;
-      break;
- 
-    case 7050 :
-      epsinf = 0.8460;
-      epswb  = 0.8355;
-      Twb    = 329.0291;
-      break;
-
-    case 9510 :
-      epsinf = 0.9165;
-      epswb  = 0.8863;
-      Twb    = 321.4453;
-      break;
-
-    case 9530 :
-      epsinf = 0.7495;
-      epswb  = 0.7315;
-      Twb    = 339.7568;
-      break;
-
-    case 9550 :
-      epsinf = 0.5824;
-      epswb  = 0.5715;
-      Twb    = 350.7870;
-      break;
-
-    default :
-      boil::oout<<"Invalid Tinf-humidity combination selected. Exiting."
-                <<boil::endl;
-      exit(0);
-  }
-#else
   epsinf = 0.01*ecase;
-#endif
-
 
 /******************************************************************************/
 /* ------------ numerical simulation settings */
 
 #ifndef STATIC
   /* total number of steps */
-  const int ndt = 10000*gLevel*3;
+  const int ndt = 1e7;
 #else
   /* total number of steps */
   const int ndt = 10000*gLevel;
 #endif
 
   /* steps per backup */
-  const int n_per_backup = ndt/5;
+  const int n_per_backup = 1e5;
 
-  /* steps per plot */
-  const int n_per_plot = ndt/100;
+  /* time per plot */
+  const real t_per_plot = 1.0;
 
   /* surface tension multiplier */
   const real surftens_dt_coef = 10.;
@@ -208,6 +106,11 @@ int main(int argc, char ** argv) {
   /* tifmodel */
   const real ur = 0.01;
 
+  /* phase change - 4 version */
+  const bool use_second_order_accuracy = true;
+  const bool discard_points_near_interface = true;
+  const bool use_unconditional_extrapolation = false;
+
 /******************************************************************************/
 /* ------------ material properties */
   real muv, lambdav;
@@ -215,74 +118,19 @@ int main(int argc, char ** argv) {
   real Kpg;
   real diffcoef;
 
-#ifndef ANALYTIC
-  /* reference property points are different for the tcases,
-     vapour mu, lambda: at saturation pressure corresponding to WBT
-     diffcoef: obtained through rescaling from 25 degC     */
-  switch(tcase) {
-    case 10 :
-      muv = 9.3958e-6;
-      lambdav = 17.474e-3;
-      /* 2 degC, 1 atm */
-      mun = 1.7599e-5;
-      rhon = 1.2589;
-      lambdan = 2.46e-2;
-      diffcoef = 2.2828e-5;
-      /* for comparison with analytic solution */
-      Kpg = 1.0087e3;
-      break;
-    case 40 : 
-      muv = 1.0129e-5;
-      lambdav = 0.019168;
-      /* ~50 degC, 1 atm */
-      mun = 1.8872e-5;
-      rhon = 1.1495;
-      lambdan = 0.0266;
-      diffcoef = 2.6611e-5;
-      /* for comparison with analytic solution */
-      Kpg = 1.0216e3;
-      break;
-    case 70 : 
-      muv = 0.010964e-3;
-      lambdav = 21.264e-3;
-      /* ~64 degC, 1 atm */
-      mun = 2.0104e-5;
-      rhon = 1.0568;
-      lambdan = 0.0286;
-      diffcoef = 3.0668e-5;
-      /* for comparison with analytic solution */
-      Kpg = 1.1897e3;
-      break;
-    case 95 : 
-      muv = 0.000011715;
-      lambdav = 23.371e-3;
-      /* 77 degC, 1 atm */
-      mun = 2.1108e-5;
-      rhon = 0.9892;
-      lambdan = 0.0302;
-      diffcoef = 3.4287e-5;
-      /* for comparison with analytic solution */
-      Kpg = 1.0692e3;
-      break;
-    default :
-      boil::oout<<"Invalid Tinf selected. Exiting."<<boil::endl;
-      exit(0);
-  }
-#else
-  muv = 0.010964e-3;
-  lambdav = 21.264e-3;
-  /* ~64 degC, 1 atm */
-  mun = 2.0104e-5;
-  rhon = 1.0568;
-  lambdan = 0.0286;
-  diffcoef = 3.0668e-5;
-  Kpg = 1.1897e3;
-#endif
+  muv = 1e-5;
+  lambdav = 1e-1;
+  mun = 1e-5;
+  rhon = 1.;
+  lambdan = 1e-1;
+  diffcoef = 5e-5;
+  Kpg = 1e3;
 
-  const real mmassv = 18.015e-3; /* water vapour */
-  const real mmassn = 28.971e-3; /* dry air */
+  const real mmassv = 30e-3; /* water vapour */
+  const real mmassn = 30e-3; /* dry air */
 
   const real Rmv = boil::R/mmassv;
+  boil::oout<<"Rmv= "<<Rmv<<boil::endl;
 
   /* IG scaling */
   const real rhov = rhon*mmassv/mmassn;
@@ -294,11 +142,7 @@ int main(int argc, char ** argv) {
      for simplicity, cst gas properties are assumed at lin mean concentration,
      moreover, linear mixing is used
   */
-#ifndef ANALYTIC
-  const real epsref = 0.5*(epsinf+epswb);
-#else
   const real epsref = epsinf;
-#endif
 
   const real mug  = mun *epsref+muv *(1.-epsref);
   const real rhog = rhon*epsref+rhov*(1.-epsref);
@@ -311,44 +155,40 @@ int main(int argc, char ** argv) {
      liquid properties should be inconsequential
      -> 50 degC, atmospheric pressure
   */
-  const real mul = 0.00033882;
-  const real rhol = 969.48;
-  const real cpl  = rhol*4.1997e3;
-  const real lambdal = 0.67210;
+  const real mul = 0.01;
+  const real rhol = 1000;
+  const real cpl  = rhol*4e3;
+  const real lambdal = 1.;
   const real mmassl  = mmassv;
 
 #ifndef STATIC
-  const real sig = 71.99e-3;
+  const real sig = 0.010;//71.99e-3;
 #else
   const real sig = 0.0;
 #endif
-
-  const real latent_cst = 3.146e6;
-  const real latent_slp = -2361.0;
-
-#ifndef ANALYTIC
-  /* for simplicity, cst latent heat at Twb assumed */
-  const real latent = latent_cst + latent_slp*Twb;
-#else
-  const real latent = latent_cst + latent_slp*Tinf;
-#endif
+  const real latent = 2e6;
 
   const real Le = diffcoef*rhog*Kpg/lambdag; /* Lewis number */
   boil::oout<< "Le = " << Le << boil::endl;
 
-#ifdef ANALYTIC
+#ifndef STATIC
+  /* Laplace number */
+  const real La = std::pow(rhol*std::pow(2.*radius,2.0)/mul,2.0) / (rhol*std::pow(2.*radius,3.0)/sig);
+  boil::oout<< "La = " << La << boil::endl;
+#endif
+
   auto epsfunc = [=](real T) {
     return 1.-exp(latent/Rmv*(1./Tref-1./T));
   };
 
   auto residual = [=](real T) {
     real E = epsfunc(T);
-    return T - Tinf + latent/Kpg*(1.-pow((epsinf-1.)/(E-1.),Le));
+    return T - (Tinf + latent/Kpg*(1.-std::pow(epsinf/E,Le)));
   };
 
   real Tt;
-  real T0 = 100.0;
-  real T1 = Tref;
+  real T0 = 200.0;
+  real T1 = 0.99*Tref;
   real rest;
   real res0 = residual(T0);
   real res1 = residual(T1);
@@ -379,16 +219,21 @@ int main(int argc, char ** argv) {
 
   const real Twb = Tt;
   const real epswb = epsfunc(Tt);
-#endif
+
+  auto taufunc = [=](real T) {
+    return latent + Kpg*(T-Twb);
+  };
 
   /* infinite boundary conditions */
-  const real keps = log(epswb/epsinf)*radius;
-  const real ktpr = log( latent / (latent + Kpg * (Twb-Tinf)) )*radius;
+  const real keps = -log(epswb/epsinf)*radius;
+  const real ktpr = -log( taufunc(Twb) / taufunc(Tinf) )*radius;
+
+  const real tauwb = taufunc(Twb);
+  const real tauinf = taufunc(Tinf);
+  const real Tinf_red = tauinf/Kpg;
+  const real Twb_red = -latent/Kpg+Twb;
 
   boil::oout<<"Coefficients: "<<keps<<" "<<ktpr<<boil::endl;
-
-  const real Twb_red  = Twb  + latent/Kpg;
-  const real Tinf_red = Tinf - Twb_red;
 
 /******************************************************************************/
 /* ------------ domain dimensions */
@@ -444,7 +289,7 @@ int main(int argc, char ** argv) {
   Scalar tpr(d), q  (d);           // temperature
   Scalar mdot(d), mflx(d);         // phase-change rate
 
-  Scalar eps(d), mdot_eps(d);      /* NG concentration */
+  Scalar eps(d), mdot_eps(d), vareps(d);      /* NG concentration */
   Scalar cold(d);
   Vector uvw_old(d);
 
@@ -546,7 +391,7 @@ int main(int argc, char ** argv) {
   std::string STR_eul  = std::to_string(exp(1.0));
 
   /* temperature */
-  std::string eq = (STR_Tinr+"*"+STR_eul+"^("+STR_ktpr+"/(x*x+y*y+z*z)^0.5)+"+STR_Twbr);
+  std::string eq = (STR_Tinr+"*"+STR_eul+"^(-"+STR_ktpr+"/(x*x+y*y+z*z)^0.5)+"+STR_Twbr);
   //std::string eq = (STR_Tinr+"*"+STR_eul+"^("+STR_ktpr+"/(x*x+z*z)^0.5)+"+STR_Twbr);
 
   boil::oout<<eq<<"\n";
@@ -554,7 +399,7 @@ int main(int argc, char ** argv) {
   char *eqTpr = new char[eq.length()+1];
   std::strcpy(eqTpr, eq.c_str());
 #else 
-  real eqTpr = Tinf_red*exp(ktpr/LX)+Twb_red;
+  real eqTpr = Tinf_red*exp(-ktpr/LX)+Twb_red;
   boil::oout<<"tpredge= "<<eqTpr<<boil::endl;
 #endif
 
@@ -591,14 +436,14 @@ int main(int argc, char ** argv) {
 #endif
 
   /* concentration */
-  eq = STR_epsinf+"*"+STR_eul+"^("+STR_keps+"/(x*x+y*y+z*z)^0.5)";
+  eq = STR_epsinf+"*"+STR_eul+"^(-"+STR_keps+"/(x*x+y*y+z*z)^0.5)";
 
   boil::oout<<eq<<"\n";
 #ifndef RADIAL
   char *eqEps = new char[eq.length()+1];
   std::strcpy(eqEps, eq.c_str());
 #else 
-  real eqEps = epsinf*exp(keps/LX);
+  real eqEps = epsinf*exp(-keps/LX);
   boil::oout<<"epsedge= "<<eqEps<<boil::endl;
 #endif
 
@@ -633,6 +478,7 @@ int main(int argc, char ** argv) {
   eps.bc().add( BndCnd( Dir::jmax(), BndType::dirichlet(), eqEps ) );
   #endif
 #endif
+  vareps = eps.shape();
 
   /*----------------------+
   |  physical properties  |
@@ -665,7 +511,7 @@ int main(int argc, char ** argv) {
 #endif
 
   boil::oout<<"main:dxmin= "<<dxmin<<" "<<boil::cart.iam()<<" "<<dt<<"\n";
-  boil::oout<<"main:nparams= "<<n_per_plot<<" "<<n_per_backup<<"\n";
+  boil::oout<<"main:nparams= "<<t_per_plot<<" "<<n_per_backup<<"\n";
   Times time(ndt, dt);
   time.set_coef_dec(0.75);
   time.set_dt(dt*init_dt_coef);
@@ -711,7 +557,9 @@ int main(int argc, char ** argv) {
 
   /* enthalpy equation */
 #ifdef STANDARD
-  TIF tsat(Tref);
+  //TIF tsat(Tref);
+  Clapeyron tsat(Tref,conc.topo,vareps,mmassv,latent);
+  tsat.set_ur(1.0);
 #else
   Clapeyron tsat(Tref,conc.topo,eps,mmassv,latent);
   tsat.set_ur(ur);
@@ -728,12 +576,16 @@ int main(int argc, char ** argv) {
   enthFD.diffusion_set (TimeScheme::backward_euler());
 
   /* phase change */
-  PhaseChangeVOF pc(mdot, mflx, tpr, q, c, g, f, uvw, conc.topo,
-                    tsat, time, &mixed);
+  PhaseChange4 pc(mdot, mflx, tpr, q, c, g, f, uvw, conc.topo,
+                  tsat, time, &mixed);
+  pc.set_second_order_accuracy(use_second_order_accuracy);
+  pc.set_discard_points_near_interface(discard_points_near_interface);
+  pc.set_unconditional_extrapolation(use_unconditional_extrapolation);
 
+  /* ng transport */
   ConcentrationTP ngtransp(eps,mdot_eps,uvw,
-                           c,conc.flow(),conc.heaviside(),&(conc.topo),
-                           time, solverCGdi, &gas);
+                           conc.flow(),conc.heaviside(),conc.topo,
+                           time, solverCGdi, &gas,0.01);
 
   /*---------------------------------------------------------------+
   |                     start computation                          |
@@ -742,30 +594,11 @@ int main(int argc, char ** argv) {
   /*-------------------+
   |  check if restart  |
   +-------------------*/
-  std::fstream input;
-  int irun = 0;
-  if(boil::cart.iam()==0){
-    input.open("run.txt", std::ios::in);
-    if( !input.fail() ) {
-      input >> irun;
-      boil::oout<<"read irun.  irun= "<<irun<<"\n";
-    }
-    input.close();
-  }
-  boil::cart.sum_int(&irun);
-  if (irun==1){
-    boil::oout<<"exit job due to irun=1"<<"\n";
-    exit(0);
-  }
-
-  if(boil::cart.iam()==0){
-    std::fstream output;
-    output.open("run.txt", std::ios::out);
-    output << 1 << boil::endl;
-    output.close();
-  }
+  boil::test_irun();
+  boil::set_irun(1);
 
   int ts=0;
+  std::fstream input;
   input.open("time.txt", std::ios::in);
   if( !input.fail() ) {
     real t,dtf;
@@ -785,6 +618,10 @@ int main(int argc, char ** argv) {
     time.set_dt(dtf);
 
     conc.init();
+    vareps = epswb;
+#ifdef STANDARD
+    tsat.init();
+#endif
   } else {
     boil::oout << "######################" << boil::endl;
     boil::oout << "#                    #" << boil::endl;
@@ -831,8 +668,8 @@ int main(int argc, char ** argv) {
         
         dist = sqrt(dist);
 
-        tpr[i][j][k] = Twb_red + Tinf_red*exp(ktpr/dist);
-        eps[i][j][k] = epsinf*exp(keps/dist);
+        tpr[i][j][k] = Twb_red + Tinf_red*exp(-ktpr/dist);
+        eps[i][j][k] = epsinf*exp(-keps/dist);
 
         //boil::oout<<dist<<" "<<tpr[i][j][k]<<" "<<eps[i][j][k]<<boil::endl;
       }
@@ -841,7 +678,6 @@ int main(int argc, char ** argv) {
     tpr.exchange_all();
     eps.bnd_update();
     eps.exchange_all();
-
 
 #if 0
     boil::oout<<c.ei()+1<<" "<<c.sk()<<" "<<tpr[c.ei()][boil::BW][c.sk()]<<" "<<tpr[c.ei()+1][boil::BW][c.sk()];
@@ -854,6 +690,7 @@ int main(int argc, char ** argv) {
     boil::oout<<boil::endl;
 #endif
 
+    vareps = epswb;
     tsat.init();
 
 #ifdef STANDARD
@@ -868,14 +705,14 @@ int main(int argc, char ** argv) {
 
   /* set iint */
   int iint, testint(1);
-  if(time.current_time()<time.dt()) {
-      iint = 0;
-  } else {
-    iint = time.current_step() / n_per_plot;
-  }
+  iint = int(time.current_time()/t_per_plot) + 1;
 
   boil::oout<<"iint= "<<iint<<"\n";
 
+  /* topology save */
+  conc.new_time_step();
+
+  vareps = epswb;
   /*------------+
   |  time loop  |
   +------------*/
@@ -891,7 +728,7 @@ int main(int argc, char ** argv) {
 #ifdef RADIAL
     real xcent, ycent, zcent;
     xcent = ycent = zcent = 0.;
-    for_vijk(c,i,j,k) {
+    for_avijk(c,i,j,k) {
       real dist = pow(c.xc(i)-xcent,2.0)
   #if CASE == 3
                  +pow(c.yc(j)-ycent,2.0)
@@ -912,13 +749,8 @@ int main(int argc, char ** argv) {
     eps.exchange_all();
 #endif
 
-    /*------------------------+
-    |  solve energy equation  |
-    +------------------------*/
+    /* temperature field */
     tsat.tint_field(); 
-    enthFD.discretize();
-    enthFD.new_time_step();
-    enthFD.solve(ResRat(1e-16),"Enthalpy");
 
     /*---------------+
     |  phase change  |
@@ -927,6 +759,9 @@ int main(int argc, char ** argv) {
     ns.vol_phase_change(&f);
 
 #ifndef STATIC
+    /* topo */
+    conc.new_time_step();
+
     /* update phase-change */
     conc.advance_phase_change(c);
 #endif
@@ -1010,6 +845,14 @@ int main(int argc, char ** argv) {
     conc.totalvol();
 #endif
 
+    /*------------------------+
+    |  solve energy equation  |
+    +------------------------*/
+    enthFD.discretize();
+    enthFD.new_time_step();
+    enthFD.solve(ResRat(1e-16),"Enthalpy");
+
+#if 1
     /*-------------------------+
     |  solve species equation  |
     +-------------------------*/
@@ -1019,6 +862,10 @@ int main(int argc, char ** argv) {
     ngtransp.extrapolate();
     eps.bnd_update();
     eps.exchange_all();
+#else
+    eps = epswb;
+#endif
+    
 
     /*-------------+
     |  dt control  |
@@ -1039,7 +886,8 @@ int main(int argc, char ** argv) {
     real mgamma(0.), mgamma2(0.);
     real weight(0.);
     for_vijk(c,i,j,k) {
-      if((*conc.topo.adens)[i][j][k]>boil::atto) {
+      //if((*conc.topo.adens)[i][j][k]>boil::atto) {
+      if(conc.topo->interface(i,j,k)) {
          real t1 = tsat.Tint(i,j,k);
          real t2 = t1*t1;
          
@@ -1049,7 +897,8 @@ int main(int argc, char ** argv) {
          real m1 = mflx[i][j][k];
          real m2 = m1*m1;
  
-         real wt = (*conc.topo.adens)[i][j][k]*c.dV(i,j,k);
+         //real wt = (*conc.topo.adens)[i][j][k]*c.dV(i,j,k);
+         real wt = (*conc.topo->adens)[i][j][k]*c.dV(i,j,k);
 
          tgamma  += t1*wt;        
          tgamma2 += t2*wt;        
@@ -1116,10 +965,10 @@ int main(int argc, char ** argv) {
               <<tgamma<<" "<<tstd<<" "
               <<egamma<<" "<<estd<<" "
               <<mgamma<<" "<<mstd<<" "
-              <<weight<<" "<<Sh1<<" "<<Sh2
+              <<weight<<" "<<Sh1<<" "<<Sh2<<" "<<rad
               <<boil::endl;
 
-    if(time.current_step() % n_per_plot == 0 || time.current_step()==1 ) {
+    if((time.current_time()) / (t_per_plot) >= real(iint) || time.current_step()==1 ) {
       iint++;
 #ifdef STANDARD
       boil::plot->plot(uvw,c,tpr,eps,mdot,
@@ -1171,8 +1020,9 @@ int main(int argc, char ** argv) {
         output.close();
       }
     }
-    if( boil::timer.current_min() > (wmin-30.0)
-      || time.current_step()==time.total_steps()) {
+    if( boil::timer.current_min() > (wmin-12.0)
+      || time.current_step()==time.total_steps()
+      || rad<0.8*radius) {
       uvw  .save("uvw",   time.current_step());
       press.save("press", time.current_step());
       c .save("c",  time.current_step());
@@ -1181,18 +1031,11 @@ int main(int argc, char ** argv) {
       (tsat.tif).save("tpr",   time.current_step());
 #endif
       eps       .save("eps",   time.current_step());
-      std::fstream output;
-      output << std::setprecision(16);
-      output.open("time.txt", std::ios::out);
-      output << time.current_step() << boil::endl;
-      output << time.current_time()+time.dt() << boil::endl;
-      output << time.dt() << boil::endl;
-      output.close();
-      output.open("run.txt", std::ios::out);
-      output << 0 << boil::endl;
-      output.close();
-      boil::timer.stop();
-      boil::timer.report();
+
+      if(boil::timer.current_min() > wmin-12.0) {
+        boil::set_irun(0);
+      }
+
       uvw  .rm("uvw", ts);
       press.rm("press", ts);
       c .rm("c", ts);
@@ -1201,7 +1044,7 @@ int main(int argc, char ** argv) {
       (tsat.tif).rm("tif",ts);
 #endif
       eps  .rm("eps", ts);
-      exit(0);
+      break;
     }
   }
 #endif
