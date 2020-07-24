@@ -56,7 +56,8 @@ namespace boil {
                  const std::vector<Nucleation*> & nucls = {},
                  const std::vector<std::string> & nucl_names = {},
                  const std::vector<CIPCSL2*> & cipcsl2s = {},
-                 const std::vector<std::string> & cipcsl2_names = {});
+                 const std::vector<std::string> & cipcsl2_names = {},
+                 const std::vector<real*> & values = {});
 
   /* irun test and set */
   void test_irun(const std::string & testfile = "run.txt");

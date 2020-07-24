@@ -124,7 +124,8 @@ namespace boil {
                  const std::vector<Nucleation*> & nucls,
                  const std::vector<std::string> & nucl_names,
                  const std::vector<CIPCSL2*> & cipcsl2s,
-                 const std::vector<std::string> & cipcsl2_names) {
+                 const std::vector<std::string> & cipcsl2_names,
+                 const std::vector<real*> & values) {
     /* rm scalars */
     for(int i(0); i<scalars.size(); ++i) {
        scalars[i]->rm(scalar_names[i].c_str(),ts);

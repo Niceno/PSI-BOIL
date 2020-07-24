@@ -31,6 +31,7 @@ SUBDIRS = Equation/Staggered/Momentum                              \
           Equation/Heaviside/MarchingSquares/MSaxisym              \
           Equation/Heaviside/MarchingSquares                       \
           Equation/Heaviside                                       \
+          Equation/IntegralPC                                      \
           Equation/Nucleation/Microlayer                           \
           Equation/Nucleation                                      \
           Equation/Tifmodel/Antoine                                \
@@ -69,16 +70,17 @@ SUBDIRS = Equation/Staggered/Momentum                              \
           Parallel                                                 \
           Template
 
-LDADD = Equation/Staggered/Momentum/libMomentum.a                             \
-        Equation/Staggered/libStaggered.a                                     \
-        Custom/IF97/libIF97.a                                                 \
+LDADD = Custom/IF97/libIF97.a                                                 \
         Custom/libCustom.a                                                    \
+        Equation/IntegralPC/libIntegralPC.a                                   \
         Solver/Additive/libAdditive.a                                         \
         Solver/Linear/Gauss/libGauss.a                                        \
         Solver/Linear/Iterative/libIterative.a                                \
         Solver/Linear/Krylov/libKrylov.a                                      \
         Solver/Linear/libLinear.a                                             \
         Solver/Preconditioner/libPreconditioner.a                             \
+        Equation/Staggered/Momentum/libMomentum.a                             \
+        Equation/Staggered/libStaggered.a                                     \
         Equation/Centered/Enthalpy/libEnthalpy.a                              \
         Equation/Centered/EnthalpyFD/EnthalpyFDaxisym/libEnthalpyFDaxisym.a   \
         Equation/Centered/EnthalpyFD/libEnthalpyFD.a                          \
