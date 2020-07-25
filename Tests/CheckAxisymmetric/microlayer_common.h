@@ -3,7 +3,7 @@
 //#define SETUP_ONLY
 #define USE_BIG
 #define USE_PC4
-#define CASE 1
+#define CASE 0
 /*  0: Toulouse-like
     1: Duan [MIT] (2013)
  */
@@ -69,6 +69,8 @@ int main(int argc, char ** argv) {
   #else
   const real tout = twall0;//tsat0;
   #endif
+#else
+  const real tout = tsat0;
 #endif
 
 /******************************************************************************/

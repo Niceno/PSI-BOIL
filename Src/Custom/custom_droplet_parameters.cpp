@@ -38,7 +38,7 @@ namespace boil {
       chord  = 2.*radius*sin(0.5*alpha);
     }
   
-    boil::oout<<"Custom::droplet_params: "<<cang<<" "<<volume<<" "<<radius<<" "<<zcent<<" "<<chord<<boil::endl;
+    boil::oout<<"Custom::droplet_params1: "<<cang<<" "<<volume<<" "<<radius<<" "<<zcent<<" "<<chord<<boil::endl;
 
     return;
   }
@@ -61,7 +61,30 @@ namespace boil {
       volume = (3.*nu*nu-nu*nu*nu)*pow(radius,3.)*boil::pi/3.;
     }
 
-    boil::oout<<"Custom::droplet_params: "<<cang<<" "<<volume<<" "<<radius<<" "<<zcent<<" "<<chord<<boil::endl;
+    boil::oout<<"Custom::droplet_params2: "<<cang<<" "<<volume<<" "<<radius<<" "<<zcent<<" "<<chord<<boil::endl;
+
+    return;
+  } 
+
+  void droplet_parameters_3D(const real cang, real & volume,
+                             const real radius, real & zcent, real & chord) {
+    real cangle = cang * boil::pi/180.;
+
+    if(cangle > 0.5*boil::pi) {
+      real alpha = 2.*(boil::pi-cangle);
+      real nu = 1. - cos(alpha/2.);
+      zcent  = radius*cos(0.5*alpha);
+      chord  = 2.*radius*sin(0.5*alpha);
+      volume = (4.+nu*nu*nu-3.*nu*nu)*pow(radius,3.)*boil::pi/3.;
+    } else {
+      real alpha = 2.*cangle;
+      real nu = 1. - cos(alpha/2.);
+      zcent  = -radius*cos(0.5*alpha);
+      chord  = 2.*radius*sin(0.5*alpha);
+      volume = (3.*nu*nu-nu*nu*nu)*pow(radius,3.)*boil::pi/3.;
+    }
+
+    boil::oout<<"Custom::droplet_params3: "<<cang<<" "<<volume<<" "<<radius<<" "<<zcent<<" "<<chord<<boil::endl;
 
     return;
   }

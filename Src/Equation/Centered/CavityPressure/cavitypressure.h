@@ -31,8 +31,8 @@ class CavityPressure : public Centered {
                    Linear * sm,
                    Matter * liq,
                    Topology * topo,
-                   const Property * tens,
-                   const Scalar & curv,
+                   const Property * tens = NULL,
+                   const Scalar * curv = NULL,
                    Sign sig = Sign::pos());
     ~CavityPressure();
 
@@ -69,7 +69,7 @@ class CavityPressure : public Centered {
                         real & tint);
 
     real Pint(const int i, const int j, const int k);
-    real Pcavity(const int i, const int j, const int k);
+    real Pcav(const int i, const int j, const int k);
 
     virtual real coef_x_m(const real dxm, const real dxp, const real x0);
     virtual real coef_x_p(const real dxm, const real dxp, const real x0);
@@ -81,11 +81,14 @@ class CavityPressure : public Centered {
     Topology * topo;
     ScalarInt iflag;
     Vector fs;
-    Scalar kappa;
+    const Scalar * kappa;
     const Sign matter_sig; /* pos: liquid is phi=1 and vice versa */
 
     const Property * sigma;
     real cavity_pressure;
+
+    /* Pint evaluator: initialized as a lambda in constructor */
+    std::function<real(const int,const int,const int)> Pint_wrapper;
 
     /* test for gas cells: initialized as a lambda in constructor */
     std::function<bool(const int,const int,const int)> in_gas;

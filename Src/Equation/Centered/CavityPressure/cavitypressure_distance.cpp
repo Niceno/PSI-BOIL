@@ -32,12 +32,12 @@ real CavityPressure::distance_int_x(const Sign dir,
   real dist = topo->distance_int_x(dir,i,j,k,cell_marker);
 #if 1
   if(cell_marker < 0) {
-    pint = Pint(i,j,k);
+    pint = Pint_wrapper(i,j,k);
   } else {
-    pint = Pint(i+int(dir),j,k);
+    pint = Pint_wrapper(i+int(dir),j,k);
   }
 #else
-  pint = 0.5*(Pint(i,j,k)+Pint(i+int(dir),j,k));
+  pint = 0.5*(Pint_wrapper(i,j,k)+Pint_wrapper(i+int(dir),j,k));
 #endif
 
   return dist;
@@ -51,12 +51,12 @@ real CavityPressure::distance_int_y(const Sign dir,
   real dist = topo->distance_int_y(dir,i,j,k,cell_marker);
 #if 1
   if(cell_marker < 0) {
-    pint = Pint(i,j,k);
+    pint = Pint_wrapper(i,j,k);
   } else {
-    pint = Pint(i,j+int(dir),k);
+    pint = Pint_wrapper(i,j+int(dir),k);
   }
 #else
-  pint = 0.5*(Pint(i,j,k)+Pint(i,j+int(dir),k));
+  pint = 0.5*(Pint_wrapper(i,j,k)+Pint_wrapper(i,j+int(dir),k));
 #endif
 
   return dist;
@@ -70,12 +70,12 @@ real CavityPressure::distance_int_z(const Sign dir,
   real dist = topo->distance_int_z(dir,i,j,k,cell_marker);
 #if 1
   if(cell_marker < 0) {
-    pint = Pint(i,j,k);
+    pint = Pint_wrapper(i,j,k);
   } else {
-    pint = Pint(i,j,k+int(dir));
+    pint = Pint_wrapper(i,j,k+int(dir));
   }
 #else
-  pint = 0.5*(Pint(i,j,k)+Pint(i,j,k+int(dir)));
+  pint = 0.5*(Pint_wrapper(i,j,k)+Pint_wrapper(i,j,k+int(dir)));
 #endif
 
   return dist;

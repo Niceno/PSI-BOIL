@@ -13,6 +13,7 @@ static void __attribute__ ((constructor)) trapfpe(void)
 
 //#define SETUP_ONLY
 #define SYM
+//#define LOCAL_SIGMA
 #define CASE 1
 /* case 0 = axisymmetric 2D
         1 = axisymmetric 3D
@@ -24,13 +25,6 @@ static void __attribute__ ((constructor)) trapfpe(void)
 const real R0 = 10.27e-6;
 const real pinf = 0.0;
 const real sigmm = 0.0583;
-#if CASE == 0 or CASE == 3
-const real p0 = 0.1127e6 - 0./R0 - 1.013e5;
-#elif CASE == 1 or CASE == 4
-const real p0 = 0.1127e6 - 0./R0 - 1.013e5;
-#else
-const real p0 = 0.1127e6 - 1.013e5;
-#endif
 
 /******************************************************************************/
 int main(int argc, char ** argv) {
@@ -164,7 +158,6 @@ int main(int argc, char ** argv) {
   const real V0 = 2./3.*azimuth*polar*radius*radius*radius;
 #endif
   boil::oout<<"V0= "<<V0<<" "<<boil::endl;
-  boil::oout<<"p0= "<<p0<<" "<<p0-pinf<<boil::endl;
   boil::oout<<"cpl= "<<cpl<<" "<<cpl/rhol<<boil::endl;
 
 /******************************************************************************/
@@ -497,12 +490,22 @@ int main(int argc, char ** argv) {
   pc.set_discard_points_near_interface(true);
 
   /* cavity pressure */
-#if CASE > 1
+#ifdef LOCAL_SIGMA
+  #if CASE > 1
   CavityPressure capr(press, f_cav, uvw_cav, time, solver, &liquid,
-                      conc.topo,mixed.sigma(),kappa);
-#else
+                      conc.topo,mixed.sigma(),&kappa);
+  #else
   CPaxisym       capr(press, f_cav, uvw_cav, time, solver, &liquid,
-                      conc.topo,mixed.sigma(),kappa);
+                      conc.topo,mixed.sigma(),&kappa);
+  #endif
+#else
+  #if CASE > 1
+  CavityPressure capr(press, f_cav, uvw_cav, time, solver, &liquid,
+                      conc.topo);
+  #else
+  CPaxisym       capr(press, f_cav, uvw_cav, time, solver, &liquid,
+                      conc.topo);
+  #endif
 #endif
 
   AC multigrid_cavity( &capr );
@@ -515,7 +518,7 @@ int main(int argc, char ** argv) {
   auto pmodel = [&](const real t) { 
 
     return mixed.rho(0)*mixed.latent()->value()*(t-tsat0)/(tsat0+373.15)
-#if 1
+#ifndef LOCAL_SIGMA
   #if CASE == 0 or CASE == 3
            - mixed.sigma()->value()/r_0;
   #elif CASE == 1 or CASE == 4
@@ -653,9 +656,9 @@ int main(int argc, char ** argv) {
     tgamma = ipc.solve(ResTol(1e-6),pinf,tprr);
     boil::oout<<"Temperature= "<<time.current_time()<<" "<<tgamma<<boil::endl;
 
-    /* correct liquid */
+    /* correct gas temperature */
     for_vijk(tpr,i,j,k) {
-      if(conc.color()[i][j][k]>0.5) {
+      if(conc.color()[i][j][k]<0.5) {
         tpr[i][j][k] = tgamma;
       }
     }

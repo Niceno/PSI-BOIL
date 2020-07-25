@@ -9,7 +9,7 @@ CavityPressure::CavityPressure(const Scalar & PHI,
                                Matter * liq,
                                Topology * TOPO,
                                const Property * TENS,
-                               const Scalar & CURV,
+                               const Scalar * CURV,
                                Sign SIG) :
   /* call parent's constructor. NULL is for solid */
   Centered( PHI.domain(), PHI, F, & U, T, liq, NULL, sm ),
@@ -18,12 +18,25 @@ CavityPressure::CavityPressure(const Scalar & PHI,
   iflag(TOPO->iflag),
   matter_sig(SIG),
   sigma(TENS),
-  kappa(&CURV)
+  kappa(CURV)
 {
   assert(PHI.domain() == F.domain());
   assert(PHI.domain() == sm->domain());
 
   cavity_pressure = 0.0;
+
+  /* both must be defined! */
+  if(sigma)
+    assert(kappa);
+
+  /* the Pint_wrapper function is initialized using a lambda expression */
+  if(kappa) {
+    Pint_wrapper = [this](const int i, const int j, const int k)
+                         { return Pint(i,j,k); };
+  } else {
+    Pint_wrapper = [this](const int i, const int j, const int k)
+                         { return Pcav(i,j,k); };
+  }
 
   /* the in_gas function is initialized using a lambda expression */
   /* clr = 1 is liquid */

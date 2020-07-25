@@ -17,8 +17,8 @@ class CPaxisym : public CavityPressure {
              Linear * sm,
              Matter * liq,
              Topology * topo,
-             const Property * tens,
-             const Scalar & curv,
+             const Property * tens = NULL,
+             const Scalar * curv = NULL,
              Sign sig = Sign::pos()) :
     CavityPressure(phi,f,v,t,sm,liq,topo,tens,curv,sig) {
 
