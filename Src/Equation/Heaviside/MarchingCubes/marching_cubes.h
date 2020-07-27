@@ -30,6 +30,9 @@ class MarchingCubes : public Heaviside {
     virtual real surface(const Sign sig, const Comp & mcomp,
                          const int i, const int j, const int k);
 
+    /* test approach for adens */
+    virtual void marker_gradient(Scalar & mga, const bool evalflag = true);
+
   protected:
     int construct_grid(const int i, const int j, const int k,
                        CELL3D & grid);

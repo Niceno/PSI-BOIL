@@ -54,6 +54,9 @@ class Heaviside { /* this class is an abstract class! */
     virtual real surface(const Sign sig, const Comp & mcomp,
                          const int i, const int j, const int k) = 0;
 
+    /* test approach for adens */
+    virtual void marker_gradient(Scalar & mga, const bool evalflag = true) {};
+
     virtual void topology(Topology & topo, const real tol_wall, 
                           const bool use_interp, const bool use_subgrid) = 0;
     void cal_fs_interp(const Scalar & scp,Vector & fs,

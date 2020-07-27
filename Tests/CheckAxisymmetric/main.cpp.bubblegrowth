@@ -15,10 +15,10 @@ static void __attribute__ ((constructor)) trapfpe(void)
 //#define FS_TEST
 #define USE_PHASE_VEL_VOF
 //#define USE_PHASE_VEL_EFD
-#define USE_PC4
-//#define USE_SECOND_ORDER
-#define USE_UNCOND_EXTRP
-#define DISCARD_POINTS
+#define USE_SECOND_ORDER
+//#define USE_UNCOND_EXTRP
+//#define DISCARD_POINTS
+#define USE_MG
 #define CASE 1
 /* case 1 = axisymmetric
         2 = cartesian 2D
@@ -388,23 +388,23 @@ int main(int argc, char ** argv) {
   enthFD.set_no_solid_acceleration(no_solid_acceleration);
 
   /* phase change */
-#ifndef USE_PC4
-  PhaseChangeVOF pc(mdot, mflx, tpr, q, c, g , f , uvw, conc.topo,
-                    tsat, time, &mixed);
-#else
-  PhaseChange4   pc(mdot, mflx, tpr, q, c, g , f , uvw, conc.topo,
-                    tsat, time, &mixed);
-  #ifdef USE_SECOND_ORDER
+  PhaseChange4 pc(mdot, mflx, tpr, q, c, g , f , uvw, conc.topo,
+                  tsat, time, &mixed);
+#ifdef USE_SECOND_ORDER
   pc.set_second_order_accuracy(true);
-  #endif
-  #ifdef USE_UNCOND_EXTRP
-  pc.set_unconditional_extrapolation(true);
-  #endif
-  #ifdef DISCARD_POINTS
-  pc.set_discard_points_near_interface(true);
-  #endif
+#else
+  pc.set_second_order_accuracy(false);
 #endif
-
+#ifdef USE_UNCOND_EXTRP
+  pc.set_unconditional_extrapolation(true);
+#else
+  pc.set_unconditional_extrapolation(false);
+#endif
+#ifdef DISCARD_POINTS
+  pc.set_discard_points_near_interface(true);
+#else
+  pc.set_discard_points_near_interface(false);
+#endif
 
   /*-------------------+
   |  check if restart  |
@@ -628,7 +628,24 @@ int main(int argc, char ** argv) {
 #endif
     conc.advance_geometric(c);
     conc.ancillary();
+#if CASE == 3
+  #ifdef USE_MG
+    conc.heaviside()->marker_gradient(*conc.topo->adens);
+  #endif
+#endif
     conc.totalvol();
+#if 0
+    real sum = 0.0;
+    int count = 0;
+    for_vijk(c,i,j,k) {
+      real sumplus = (*conc.topo->adens)[i][j][k]*(*conc.topo->adens).dV(i,j,k);
+      if(sumplus>0.0) count++;
+      sum += sumplus;
+    }
+    boil::cart.sum_real(&sum);
+    boil::cart.sum_int(&count);
+    boil::oout<<"Evaluate_adens "<<count<<" "<<sum<<" "<<4.*boil::pi*radius*radius/8.<<boil::endl;
+#endif
 
     /*------------------------+
     |  solve energy equation  |

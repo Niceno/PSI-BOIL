@@ -373,6 +373,69 @@ int main(int argc, char * argv[]) {
   evaluate_adens("GradA",gradAadens,sum,cnt);
   evaluate_adens("GradB",gradBadens,sum,cnt);
 
+  grad0adens = 0.;
+  for_vijk(c,i,j,k) {
+#ifdef TWOD
+    real net = conc.heaviside()->nodalvals[i+1][j][k+1] >= 0.5;
+    real nwt = conc.heaviside()->nodalvals[i  ][j][k+1] >= 0.5;
+    real neb = conc.heaviside()->nodalvals[i+1][j][k  ] >= 0.5;
+    real nwb = conc.heaviside()->nodalvals[i  ][j][k  ] >= 0.5;
+    real W = c[i][j][k]+c[i-1][j][k] >= 1.0;
+    real E = c[i][j][k]+c[i+1][j][k] >= 1.0;
+    real B = c[i][j][k]+c[i][j][k-1] >= 1.0;
+    real T = c[i][j][k]+c[i][j][k+1] >= 1.0;
+    grad0adens[i][j][k] = sqrt( pow((0.5*(E-W)+0.25*(net+neb-nwt-nwb))/c.dxc(i),2.0)
+                              + pow((0.5*(T-B)+0.25*(net+nwt-neb-nwb))/c.dzc(k),2.0) );
+#else
+    real W = c[i][j][k]+c[i-1][j][k] >= 1.0;
+    real E = c[i][j][k]+c[i+1][j][k] >= 1.0;
+    real S = c[i][j][k]+c[i][j-1][k] >= 1.0;
+    real N = c[i][j][k]+c[i][j+1][k] >= 1.0;
+    real B = c[i][j][k]+c[i][j][k-1] >= 1.0;
+    real T = c[i][j][k]+c[i][j][k+1] >= 1.0;
+
+    real nest = conc.heaviside()->nodalvals[i+1][j  ][k+1] >= 0.5;
+    real nwst = conc.heaviside()->nodalvals[i  ][j  ][k+1] >= 0.5;
+    real nesb = conc.heaviside()->nodalvals[i+1][j  ][k  ] >= 0.5;
+    real nwsb = conc.heaviside()->nodalvals[i  ][j  ][k  ] >= 0.5;
+    real nent = conc.heaviside()->nodalvals[i+1][j+1][k+1] >= 0.5;
+    real nwnt = conc.heaviside()->nodalvals[i  ][j+1][k+1] >= 0.5;
+    real nenb = conc.heaviside()->nodalvals[i+1][j+1][k  ] >= 0.5;
+    real nwnb = conc.heaviside()->nodalvals[i  ][j+1][k  ] >= 0.5;
+
+    real WS = c[i][j][k]+c[i-1][j-1][k]+c[i-1][j][k]+c[i][j-1][k] >= 2.0;
+    real WN = c[i][j][k]+c[i-1][j+1][k]+c[i-1][j][k]+c[i][j+1][k] >= 2.0;
+    real ES = c[i][j][k]+c[i+1][j-1][k]+c[i+1][j][k]+c[i][j-1][k] >= 2.0;
+    real EN = c[i][j][k]+c[i+1][j+1][k]+c[i+1][j][k]+c[i][j+1][k] >= 2.0;
+    real WB = c[i][j][k]+c[i-1][j][k-1]+c[i-1][j][k]+c[i][j][k-1] >= 2.0;
+    real WT = c[i][j][k]+c[i-1][j][k+1]+c[i-1][j][k]+c[i][j][k+1] >= 2.0;
+    real EB = c[i][j][k]+c[i+1][j][k-1]+c[i+1][j][k]+c[i][j][k-1] >= 2.0;
+    real ET = c[i][j][k]+c[i+1][j][k+1]+c[i+1][j][k]+c[i][j][k+1] >= 2.0;
+    real SB = c[i][j][k]+c[i][j-1][k-1]+c[i][j-1][k]+c[i][j][k-1] >= 2.0;
+    real ST = c[i][j][k]+c[i][j-1][k+1]+c[i][j-1][k]+c[i][j][k+1] >= 2.0;
+    real NB = c[i][j][k]+c[i][j+1][k-1]+c[i][j+1][k]+c[i][j][k-1] >= 2.0;
+    real NT = c[i][j][k]+c[i][j+1][k+1]+c[i][j+1][k]+c[i][j][k+1] >= 2.0;
+
+    grad0adens[i][j][k] = sqrt( pow((0.25*(E-W)
+                               +0.0625*(nent+nenb+nest+nesb
+                                       -nwnt-nwnb-nwst-nwsb)
+                               +0.125*(ES+EN+EB+ET-WS-WN-WB-WT)
+                               )/c.dxc(i),2.0)
+                              + pow((0.25*(N-S)
+                               +0.0625*(nent+nenb+nwnt+nwnb
+                                       -nest-nesb-nwst-nwsb)
+                               +0.125*(WN+EN+NB+NT-WS-ES-SB-ST)
+                               )/c.dyc(j),2.0)
+                              + pow((0.25*(T-B)
+                               +0.0625*(nest+nwst+nent+nwnt
+                                       -nesb-nwsb-nenb-nwnb)
+                               +0.125*(WT+ET+ST+NT-WB-EB-SB-NB)
+                               )/c.dzc(k),2.0) );
+#endif
+
+  }
+  evaluate_adens("Grad0",grad0adens,sum,cnt);
+
   boil::plot->plot(uvw,c,stmp,*(conc.topo->adens),adensgeom,grad0adens, "uvw-c-marker-adens-adensgeom-adensgrad", 0);
  
 #if 1
@@ -390,8 +453,70 @@ int main(int argc, char * argv[]) {
     conc.cal_adens_geom(adensgeom,c,false);
     evaluate_adens("Geom",adensgeom,sum_AG,cnt_AG);
 
-    conc.cal_adens_geom(adensgeom,c);
-    evaluate_adens("Geom-ii",adensgeom,sum_AGvic,cnt_AGvic);
+    //conc.cal_adens_geom(adensgeom,c);
+    //evaluate_adens("Geom-ii",adensgeom,sum_AGvic,cnt_AGvic);
+
+    grad0adens = 0.;
+    for_vijk(c,i,j,k) {
+#ifdef TWOD
+      real net = conc.heaviside()->nodalvals[i+1][j][k+1] >= 0.5;
+      real nwt = conc.heaviside()->nodalvals[i  ][j][k+1] >= 0.5;
+      real neb = conc.heaviside()->nodalvals[i+1][j][k  ] >= 0.5;
+      real nwb = conc.heaviside()->nodalvals[i  ][j][k  ] >= 0.5;
+      real W = c[i][j][k]+c[i-1][j][k] >= 1.0;
+      real E = c[i][j][k]+c[i+1][j][k] >= 1.0;
+      real B = c[i][j][k]+c[i][j][k-1] >= 1.0;
+      real T = c[i][j][k]+c[i][j][k+1] >= 1.0;
+      grad0adens[i][j][k] = sqrt( pow((0.5*(E-W)+0.25*(net+neb-nwt-nwb))/c.dxc(i),2.0)
+                                + pow((0.5*(T-B)+0.25*(net+nwt-neb-nwb))/c.dzc(k),2.0) );
+#else
+    real W = c[i][j][k]+c[i-1][j][k] >= 1.0;
+    real E = c[i][j][k]+c[i+1][j][k] >= 1.0;
+    real S = c[i][j][k]+c[i][j-1][k] >= 1.0;
+    real N = c[i][j][k]+c[i][j+1][k] >= 1.0;
+    real B = c[i][j][k]+c[i][j][k-1] >= 1.0;
+    real T = c[i][j][k]+c[i][j][k+1] >= 1.0;
+
+    real nest = conc.heaviside()->nodalvals[i+1][j  ][k+1] >= 0.5;
+    real nwst = conc.heaviside()->nodalvals[i  ][j  ][k+1] >= 0.5;
+    real nesb = conc.heaviside()->nodalvals[i+1][j  ][k  ] >= 0.5;
+    real nwsb = conc.heaviside()->nodalvals[i  ][j  ][k  ] >= 0.5;
+    real nent = conc.heaviside()->nodalvals[i+1][j+1][k+1] >= 0.5;
+    real nwnt = conc.heaviside()->nodalvals[i  ][j+1][k+1] >= 0.5;
+    real nenb = conc.heaviside()->nodalvals[i+1][j+1][k  ] >= 0.5;
+    real nwnb = conc.heaviside()->nodalvals[i  ][j+1][k  ] >= 0.5;
+
+    real WS = c[i][j][k]+c[i-1][j-1][k]+c[i-1][j][k]+c[i][j-1][k] >= 2.0;
+    real WN = c[i][j][k]+c[i-1][j+1][k]+c[i-1][j][k]+c[i][j+1][k] >= 2.0;
+    real ES = c[i][j][k]+c[i+1][j-1][k]+c[i+1][j][k]+c[i][j-1][k] >= 2.0;
+    real EN = c[i][j][k]+c[i+1][j+1][k]+c[i+1][j][k]+c[i][j+1][k] >= 2.0;
+    real WB = c[i][j][k]+c[i-1][j][k-1]+c[i-1][j][k]+c[i][j][k-1] >= 2.0;
+    real WT = c[i][j][k]+c[i-1][j][k+1]+c[i-1][j][k]+c[i][j][k+1] >= 2.0;
+    real EB = c[i][j][k]+c[i+1][j][k-1]+c[i+1][j][k]+c[i][j][k-1] >= 2.0;
+    real ET = c[i][j][k]+c[i+1][j][k+1]+c[i+1][j][k]+c[i][j][k+1] >= 2.0;
+    real SB = c[i][j][k]+c[i][j-1][k-1]+c[i][j-1][k]+c[i][j][k-1] >= 2.0;
+    real ST = c[i][j][k]+c[i][j-1][k+1]+c[i][j-1][k]+c[i][j][k+1] >= 2.0;
+    real NB = c[i][j][k]+c[i][j+1][k-1]+c[i][j+1][k]+c[i][j][k-1] >= 2.0;
+    real NT = c[i][j][k]+c[i][j+1][k+1]+c[i][j+1][k]+c[i][j][k+1] >= 2.0;
+
+    grad0adens[i][j][k] = sqrt( pow((0.25*(E-W)
+                               +0.0625*(nent+nenb+nest+nesb
+                                       -nwnt-nwnb-nwst-nwsb)
+                               +0.125*(ES+EN+EB+ET-WS-WN-WB-WT)
+                               )/c.dxc(i),2.0)
+                              + pow((0.25*(N-S)
+                               +0.0625*(nent+nenb+nwnt+nwnb
+                                       -nest-nesb-nwst-nwsb)
+                               +0.125*(WN+EN+NB+NT-WS-ES-SB-ST)
+                               )/c.dyc(j),2.0)
+                              + pow((0.25*(T-B)
+                               +0.0625*(nest+nwst+nent+nwnt
+                                       -nesb-nwsb-nenb-nwnb)
+                               +0.125*(WT+ET+ST+NT-WB-EB-SB-NB)
+                               )/c.dzc(k),2.0) );
+#endif
+    }
+    evaluate_adens("Grad0",grad0adens,sum_AGvic,cnt_AGvic);
 
     boil::oout<<"evalAbs= "<<Realarea<<" "<<Realsum<<" | "
               <<sum_MC<<" "<<cnt_MC<<" | "
