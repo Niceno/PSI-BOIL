@@ -16,7 +16,7 @@ static void __attribute__ ((constructor)) trapfpe(void)
 //#define SETUP_ONLY
 //#define STATIC
 #define RADIAL
-#define CASE 1
+#define CASE 3
 /* case 1 = axisymmetric
         2 = cartesian 2D
         3 = cartesian 3D
@@ -70,7 +70,7 @@ int main(int argc, char ** argv) {
 #endif
 
   /* steps per backup */
-  const int n_per_backup = 1e5;
+  const int n_per_backup = 5e4;
 
   /* time per plot */
   const real t_per_plot = 1.0;
@@ -1032,6 +1032,13 @@ int main(int argc, char ** argv) {
 #endif
       eps       .save("eps",   time.current_step());
 
+      std::fstream output;
+      output.open("time.txt", std::ios::out);
+      output << time.current_step() << boil::endl;
+      output << time.current_time()+time.dt() << boil::endl;
+      output << time.dt() << boil::endl;
+      output.close();
+
       if(boil::timer.current_min() > wmin-12.0) {
         boil::set_irun(0);
       }
@@ -1044,6 +1051,8 @@ int main(int argc, char ** argv) {
       (tsat.tif).rm("tif",ts);
 #endif
       eps  .rm("eps", ts);
+      
+      boil::cart.barrier();
       break;
     }
   }

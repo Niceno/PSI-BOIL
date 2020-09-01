@@ -1,5 +1,7 @@
 #include "matter.h"
 
+//#define USE_PROSPERETTI
+
 /*============================================================================*/
 Matter::Matter(const Domain & d, const char * nm) {
 
@@ -75,7 +77,7 @@ Matter::Matter(const Matter & a,
   tens = new Property("surface-tension");
   heat = new Property("latent-heat");
 
-#if 0
+#ifndef USE_PROSPERETTI
   visc = new PropertyMix(a.visc, b.visc, ca, cda, cdb);
 #else /* force balance according to Prosperetti, 2002 */
   assert(a.dens_o_visc != NULL);

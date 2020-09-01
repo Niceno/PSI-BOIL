@@ -1,10 +1,14 @@
 #include "Include/psi-boil.h"
 
 #define USE_VOF
+//#define USE_FULL
 #define USE_PC4
-//#define USE_SECOND_ORDER
-#define USE_UNCOND_EXTRP
-#define DISCARD_POINTS
+#define USE_SECOND_ORDER
+#define USE_VOF_VEL
+//#define USE_UNCOND_EXTRP
+//#define DISCARD_POINTS
+
+const int NZ = 4;
 
 /******************************************************************************/
 int main(int argc, char * argv[]) {
@@ -32,6 +36,7 @@ int main(int argc, char * argv[]) {
   /* domain dimensions (given by problem) */
   const real LX = 8.0e-3;
   const real DX = LX/real(NX);
+  const real LZ = DX*real(NZ);
 
   const real xint = 0.002205323668813564;
   const real x0 = xint-1.01*DX;
@@ -56,7 +61,7 @@ int main(int argc, char * argv[]) {
   |  grid(s)  |
   +----------*/
   Grid1D gx( Range<real>(0.0*LX+x0,1.0*LX+x0), NX, Periodic::no() );
-#ifndef USE_VOF
+#ifdef USE_FULL
   Grid1D gz( Range<real>(0.0,LZ), NZ, Periodic::yes() );
 #else
   Grid1D gz(DX);
@@ -90,7 +95,7 @@ int main(int argc, char * argv[]) {
   for_m(m) {
     uvw.bc(m).add( BndCnd( Dir::imin(), BndType::wall() ) );
     uvw.bc(m).add( BndCnd( Dir::imax(), BndType::outlet() ) );
-#ifndef USE_VOF
+#ifdef USE_FULL
     uvw.bc(m).add( BndCnd( Dir::kmin(), BndType::periodic() ) );
     uvw.bc(m).add( BndCnd( Dir::kmax(), BndType::periodic() ) );
     uvw.bc(m).add( BndCnd( Dir::jmin(), BndType::periodic() ) );
@@ -106,7 +111,7 @@ int main(int argc, char * argv[]) {
 
   p.bc().add( BndCnd( Dir::imin(), BndType::neumann() ) );
   p.bc().add( BndCnd( Dir::imax(), BndType::outlet() ) );
-#ifndef USE_VOF
+#ifdef USE_FULL
   p.bc().add( BndCnd( Dir::kmin(), BndType::periodic() ) );
   p.bc().add( BndCnd( Dir::kmax(), BndType::periodic() ) );
   p.bc().add( BndCnd( Dir::jmin(), BndType::periodic() ) );
@@ -133,7 +138,7 @@ int main(int argc, char * argv[]) {
 
   tpr.bc().add( BndCnd( Dir::imin(), BndType::dirichlet(), Tsat ) );
   tpr.bc().add( BndCnd( Dir::imax(), BndType::dirichlet(), Tout ) );
-#ifndef USE_VOF
+#ifdef USE_FULL
   tpr.bc().add( BndCnd( Dir::kmin(), BndType::periodic() ) );
   tpr.bc().add( BndCnd( Dir::kmax(), BndType::periodic() ) );
   tpr.bc().add( BndCnd( Dir::jmin(), BndType::periodic() ) );
@@ -252,7 +257,11 @@ int main(int argc, char * argv[]) {
   conc.set_nredist(1);
   conc.set_itsharpen(4);
 #else 
+  #ifdef USE_VOF_VEL
   VOF conc  (c,  g, kappa, uvw_1, time, solver);
+  #else
+  VOF conc  (c,  g, kappa, uvw, time, solver);
+  #endif
 #endif
   AC multigrid( &pr );
   multigrid.stop_if_diverging(true);
@@ -277,17 +286,24 @@ int main(int argc, char * argv[]) {
                     tsat, time, &mixed);
   #ifdef USE_SECOND_ORDER
   pc.set_second_order_accuracy(true);
+  #else
+  pc.set_second_order_accuracy(false);
   #endif
   #ifdef USE_UNCOND_EXTRP
   pc.set_unconditional_extrapolation(true);
+  #else
+  pc.set_unconditional_extrapolation(false);
   #endif
   #ifdef DISCARD_POINTS
   pc.set_discard_points_near_interface(true);
+  #else
+  pc.set_discard_points_near_interface(false);
   #endif
 #endif
 
   boil::plot->plot(uvw, c, tpr, mdot, "uvw-c-tpr-mdot", 0);
 
+  conc.new_time_step();
   /*------------+
   |  time loop  |
   +------------*/
@@ -333,8 +349,11 @@ int main(int argc, char * argv[]) {
     /*---------------------------+
     |  solve transport equation  |
     +---------------------------*/
+    /* new time step */
+    conc.new_time_step();
+
     cold=c;
-#ifndef USE_VOF
+#ifndef USE_VOF_VEL
     conc.advance();
 #else
     conc.advance_with_extrapolation(true,ResRat(1e-7),uvw,f,
@@ -343,6 +362,8 @@ int main(int argc, char * argv[]) {
  
     conc.front_minmax();
     conc.totalvol();
+
+    boil::oout<<"xpos= "<<time.current_time()<<" "<<conc.topo->get_xmaxft()-x0<<" "<<(conc.topo->get_xmaxft()-x0)/DX<<boil::endl;
 
     for_avijk(c,i,j,k){
       step[i][j][k]=c[i][j][k];

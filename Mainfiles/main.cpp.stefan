@@ -2,9 +2,9 @@
 
 #define USE_VOF
 #define USE_PC4
-//#define USE_SECOND_ORDER
-#define USE_UNCOND_EXTRP
-#define DISCARD_POINTS
+#define USE_SECOND_ORDER
+//#define USE_UNCOND_EXTRP
+//#define DISCARD_POINTS
 
 /******************************************************************************/
 int main(int argc, char * argv[]) {
@@ -241,12 +241,18 @@ int main(int argc, char * argv[]) {
                     tsat, time, &mixed);
   #ifdef USE_SECOND_ORDER
   pc.set_second_order_accuracy(true);
+  #else
+  pc.set_second_order_accuracy(false);
   #endif
   #ifdef USE_UNCOND_EXTRP
   pc.set_unconditional_extrapolation(true);
+  #else
+  pc.set_unconditional_extrapolation(false);
   #endif
   #ifdef DISCARD_POINTS
   pc.set_discard_points_near_interface(true);
+  #else
+  pc.set_discard_points_near_interface(false);
   #endif
 #endif
 
@@ -256,6 +262,9 @@ int main(int argc, char * argv[]) {
   |  time loop  |
   +------------*/
   for(time.start(); time.end(); time.increase()) {
+
+    /* new time step */
+    conc.new_time_step();
 
     /*------------------------+
     |  solve energy equation  |
@@ -287,7 +296,7 @@ int main(int argc, char * argv[]) {
     ns.solve(ResRat(0.001));
 
     p = 0.0;
-    if (multigrid.vcycle(ResRat(5e-7))) OMS(converged);
+    if (multigrid.fcycle(ResRat(5e-7))) OMS(converged);
     p.exchange();
     ns.project(p);
     press += p;
