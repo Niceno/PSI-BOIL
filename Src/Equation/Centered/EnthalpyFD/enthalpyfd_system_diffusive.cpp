@@ -215,6 +215,7 @@ void EnthalpyFD::create_system_diffusive(const Scalar * diff_eddy) {
       real am, ac, ap;
       real tm, tc, tp;    // temperature-output
       real aflagm, aflagp;
+      real sourceterm; /* dummy */
       real pos0;
       coef_gen coef_m, coef_p;
 
@@ -254,6 +255,7 @@ void EnthalpyFD::create_system_diffusive(const Scalar * diff_eddy) {
       diff_matrix(am, ac, ap
                 , tm, tc, tp
                 , aflagm, aflagp
+                , sourceterm
                 , pos0, coef_m, coef_p
                 , vol, dSx(Sign::neg(),i,j,k), dSx(Sign::pos(),i,j,k)
                 , onm, onc, onp, ofm, ofc, ofp
@@ -302,6 +304,7 @@ void EnthalpyFD::create_system_diffusive(const Scalar * diff_eddy) {
       diff_matrix(am, ac, ap
                 , tm, tc, tp
                 , aflagm, aflagp
+                , sourceterm
                 , pos0, coef_m, coef_p
                 , vol, dSy(Sign::neg(),i,j,k), dSy(Sign::pos(),i,j,k)
                 , onm, onc, onp, ofm, ofc, ofp
@@ -350,6 +353,7 @@ void EnthalpyFD::create_system_diffusive(const Scalar * diff_eddy) {
       diff_matrix(am, ac, ap
                 , tm, tc, tp
                 , aflagm, aflagp
+                , sourceterm
                 , pos0, coef_m, coef_p
                 , vol, dSz(Sign::neg(),i,j,k), dSz(Sign::pos(),i,j,k)
                 , onm, onc, onp, ofm, ofc, ofp

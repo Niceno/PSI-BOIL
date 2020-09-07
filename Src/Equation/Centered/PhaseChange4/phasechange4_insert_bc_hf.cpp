@@ -68,31 +68,31 @@ void PhaseChange4::insert_bc_hf(const Scalar * diff_eddy) {
               dist = distance_int_x(sig,ii,jj,kk,ti);
               dist = distance_center(sig,mcomp,ii,jj,kk) - dist;
               if(topo->above_interface(ii,jj,kk)) {
-                txv[ii][jj][kk] = (tw-ti)/(dist/lmb+near_wall_resist)*real(sig);
-                txv[i ][j ][k ] = (tw-ti)/(dist/lmb+near_wall_resist)*real(sig);
+                txv[ii][jj][kk] = (tw-ti)/(dist/lmb+htwallmodel->near_wall_resist)*real(sig);
+                txv[i ][j ][k ] = (tw-ti)/(dist/lmb+htwallmodel->near_wall_resist)*real(sig);
               } else {
-                txl[ii][jj][kk] = (tw-ti)/(dist/lmb+near_wall_resist)*real(sig);
-                txl[i ][j ][k ] = (tw-ti)/(dist/lmb+near_wall_resist)*real(sig);
+                txl[ii][jj][kk] = (tw-ti)/(dist/lmb+htwallmodel->near_wall_resist)*real(sig);
+                txl[i ][j ][k ] = (tw-ti)/(dist/lmb+htwallmodel->near_wall_resist)*real(sig);
               }
             } else if(mcomp==Comp::j()) {             
               dist = distance_int_y(sig,ii,jj,kk,ti);
               dist = distance_center(sig,mcomp,ii,jj,kk) - dist;
               if(topo->above_interface(ii,jj,kk)) {
-                tyv[ii][jj][kk] = (tw-ti)/(dist/lmb+near_wall_resist)*real(sig);
-                tyv[i ][j ][k ] = (tw-ti)/(dist/lmb+near_wall_resist)*real(sig);
+                tyv[ii][jj][kk] = (tw-ti)/(dist/lmb+htwallmodel->near_wall_resist)*real(sig);
+                tyv[i ][j ][k ] = (tw-ti)/(dist/lmb+htwallmodel->near_wall_resist)*real(sig);
               } else {
-                tyl[ii][jj][kk] = (tw-ti)/(dist/lmb+near_wall_resist)*real(sig);
-                tyl[i ][j ][k ] = (tw-ti)/(dist/lmb+near_wall_resist)*real(sig);
+                tyl[ii][jj][kk] = (tw-ti)/(dist/lmb+htwallmodel->near_wall_resist)*real(sig);
+                tyl[i ][j ][k ] = (tw-ti)/(dist/lmb+htwallmodel->near_wall_resist)*real(sig);
               }
             } else {
               dist = distance_int_z(sig,ii,jj,kk,ti);
               dist = distance_center(sig,mcomp,ii,jj,kk) - dist;
               if(topo->above_interface(ii,jj,kk)) {
-                tzv[ii][jj][kk] = (tw-ti)/(dist/lmb+near_wall_resist)*real(sig);
-                tzv[i ][j ][k ] = (tw-ti)/(dist/lmb+near_wall_resist)*real(sig);
+                tzv[ii][jj][kk] = (tw-ti)/(dist/lmb+htwallmodel->near_wall_resist)*real(sig);
+                tzv[i ][j ][k ] = (tw-ti)/(dist/lmb+htwallmodel->near_wall_resist)*real(sig);
               } else {
-                tzl[ii][jj][kk] = (tw-ti)/(dist/lmb+near_wall_resist)*real(sig);
-                tzl[i ][j ][k ] = (tw-ti)/(dist/lmb+near_wall_resist)*real(sig);
+                tzl[ii][jj][kk] = (tw-ti)/(dist/lmb+htwallmodel->near_wall_resist)*real(sig);
+                tzl[i ][j ][k ] = (tw-ti)/(dist/lmb+htwallmodel->near_wall_resist)*real(sig);
               }
             }
 

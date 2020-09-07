@@ -43,6 +43,8 @@ real EnthalpyFD::hflux_wall_ib(const Scalar * diff_eddy) {
       real dxs = (1.0-fd)*phi.dxw(i);
       real dxf = fd*phi.dxw(i);
       area = phi.dSx(Sign::neg(),i,j,k);
+      real resistf = dxf/lf;
+      real resists = dxs/ls;
       if(interface(Sign::neg(),Comp::i(),i,j,k)) {
         dxf = 0.5*phi.dxc(i) - distance_int_x(Sign::neg(),i,j,k,tf);
         /* inversion of lambda */
@@ -56,8 +58,10 @@ real EnthalpyFD::hflux_wall_ib(const Scalar * diff_eddy) {
         if(diff_eddy){
           lf += (*diff_eddy)[i][j][k]*cp_mass/turbP;
         }
+        resistf = dxf/lf + htwallmodel.near_wall_resist;
       }
-      tw = temperature_node(dxs, ls, ts, dxf, lf, tf);
+      tw = htwallmodel.temperature_node(htwallmodel.dirac_wall_source,
+                                        resists, ts, resistf, tf);
       gradt = (ts-tw)/dxs;
       hflux += area*ls*gradt;
     }
@@ -70,6 +74,8 @@ real EnthalpyFD::hflux_wall_ib(const Scalar * diff_eddy) {
       real dxs = (1.0-fd)*phi.dxe(i);
       real dxf = fd*phi.dxe(i);
       area = phi.dSx(Sign::pos(),i,j,k);
+      real resistf = dxf/lf;
+      real resists = dxs/ls;
       if(interface(Sign::pos(),Comp::i(),i,j,k)) {
         dxf = 0.5*phi.dxc(i) - distance_int_x(Sign::pos(),i,j,k,tf);
         /* inversion of lambda */
@@ -83,8 +89,10 @@ real EnthalpyFD::hflux_wall_ib(const Scalar * diff_eddy) {
         if(diff_eddy){
           lf += (*diff_eddy)[i][j][k]*cp_mass/turbP;
         }
+        resistf = dxf/lf + htwallmodel.near_wall_resist;
       }
-      tw = temperature_node(dxs, ls, ts, dxf, lf, tf);
+      tw = htwallmodel.temperature_node(htwallmodel.dirac_wall_source,
+                                        resists, ts, resistf, tf);
       gradt = (ts-tw)/dxs;
       hflux += area*ls*gradt;
     }
@@ -97,6 +105,8 @@ real EnthalpyFD::hflux_wall_ib(const Scalar * diff_eddy) {
       real dys = (1.0-fd)*phi.dys(j);
       real dyf = fd*phi.dys(j);
       area = phi.dSy(Sign::neg(),i,j,k);
+      real resistf = dyf/lf;
+      real resists = dys/ls;
       if(interface(Sign::neg(),Comp::j(),i,j,k)) {
         dyf = 0.5*phi.dyc(j) - distance_int_y(Sign::neg(),i,j,k,tf);
         /* inversion of lambda */
@@ -110,8 +120,10 @@ real EnthalpyFD::hflux_wall_ib(const Scalar * diff_eddy) {
         if(diff_eddy){
           lf += (*diff_eddy)[i][j][k]*cp_mass/turbP;
         }
+        resistf = dyf/lf + htwallmodel.near_wall_resist;
       }
-      tw = temperature_node(dys, ls, ts, dyf, lf, tf);
+      tw = htwallmodel.temperature_node(htwallmodel.dirac_wall_source,
+                                        resists, ts, resistf, tf);
       gradt = (ts-tw)/dys;
       hflux += area*ls*gradt;
     }
@@ -124,6 +136,8 @@ real EnthalpyFD::hflux_wall_ib(const Scalar * diff_eddy) {
       real dys = (1.0-fd)*phi.dyn(j);
       real dyf = fd*phi.dyn(j);
       area = phi.dSy(Sign::pos(),i,j,k);
+      real resistf = dyf/lf;
+      real resists = dys/ls;
       if(interface(Sign::pos(),Comp::j(),i,j,k)) {
         dyf = 0.5*phi.dyc(j) - distance_int_y(Sign::pos(),i,j,k,tf);
         /* inversion of lambda */
@@ -137,8 +151,10 @@ real EnthalpyFD::hflux_wall_ib(const Scalar * diff_eddy) {
         if(diff_eddy){
           lf += (*diff_eddy)[i][j][k]*cp_mass/turbP;
         }
+        resistf = dyf/lf + htwallmodel.near_wall_resist;
       }
-      tw = temperature_node(dys, ls, ts, dyf, lf, tf);
+      tw = htwallmodel.temperature_node(htwallmodel.dirac_wall_source,
+                                        resists, ts, resistf, tf);
       gradt = (ts-tw)/dys;
       hflux += area*ls*gradt;
     }
@@ -151,6 +167,8 @@ real EnthalpyFD::hflux_wall_ib(const Scalar * diff_eddy) {
       real dzs = (1.0-fd)*phi.dzb(k);
       real dzf = fd*phi.dzb(k);
       area = phi.dSz(Sign::neg(),i,j,k);
+      real resistf = dzf/lf;
+      real resists = dzs/ls;
       if(interface(Sign::neg(),Comp::k(),i,j,k)) {
         dzf = 0.5*phi.dzc(k) - distance_int_z(Sign::neg(),i,j,k,tf);
         /* inversion of lambda */
@@ -164,8 +182,10 @@ real EnthalpyFD::hflux_wall_ib(const Scalar * diff_eddy) {
         if(diff_eddy){
           lf += (*diff_eddy)[i][j][k]*cp_mass/turbP;
         }
+        resistf = dzf/lf + htwallmodel.near_wall_resist;
       }
-      tw = temperature_node(dzs, ls, ts, dzf, lf, tf);
+      tw = htwallmodel.temperature_node(htwallmodel.dirac_wall_source,
+                                        resists, ts, resistf, tf);
       gradt = (ts-tw)/dzs;
       hflux += area*ls*gradt;
     }
@@ -178,6 +198,8 @@ real EnthalpyFD::hflux_wall_ib(const Scalar * diff_eddy) {
       real dzs = (1.0-fd)*phi.dzt(k);
       real dzf = fd*phi.dzt(k);
       area = phi.dSz(Sign::pos(),i,j,k);
+      real resistf = dzf/lf;
+      real resists = dzs/ls;
       if(interface(Sign::pos(),Comp::k(),i,j,k)) {
         dzf = 0.5*phi.dzc(k) - distance_int_z(Sign::pos(),i,j,k,tf);
         /* inversion of lambda */
@@ -191,8 +213,10 @@ real EnthalpyFD::hflux_wall_ib(const Scalar * diff_eddy) {
         if(diff_eddy){
           lf += (*diff_eddy)[i][j][k]*cp_mass/turbP;
         }
+        resistf = dzf/lf + htwallmodel.near_wall_resist;
       }
-      tw = temperature_node(dzs, ls, ts, dzf, lf, tf);
+      tw = htwallmodel.temperature_node(htwallmodel.dirac_wall_source,
+                                        resists, ts, resistf, tf);
       gradt = (ts-tw)/dzs;
       hflux += area*ls*gradt;
     }

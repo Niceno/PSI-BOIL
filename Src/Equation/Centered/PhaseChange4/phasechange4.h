@@ -9,6 +9,7 @@
 #include "../../../Global/global_realistic.h"
 #include "../../Tifmodel/tif.h"
 #include "../../Topology/topology.h"
+#include "../../../Ravioli/htwallmodel.h"
 
 #define IB
 
@@ -27,6 +28,7 @@ class PhaseChange4 : public Centered {
                  Times & t,
                  Matter * flu,
                  Matter * sol = NULL,
+                 HTWallModel * htwallmodel = NULL,
                  Sign matter_sig = Sign::pos());
  
     ~PhaseChange4();
@@ -77,6 +79,7 @@ class PhaseChange4 : public Centered {
     void heat_flux(const Scalar * diff_eddy = NULL);
     void cal_hf(const Scalar * diff_eddy = NULL);
     void insert_bc_hf(const Scalar * diff_eddy);
+    void dirac_source_terms();
     void calculate_node_temperature(const Scalar * diff_eddy = NULL);
 
     void sources_vfs();
@@ -97,12 +100,6 @@ class PhaseChange4 : public Centered {
                         real & tint);
  
     real Tint(const int i, const int j, const int k);
-
-    inline real temperature_node(const real len_s, const real lam_s, 
-                                 const real tmp_s, const real len_f,
-                                 const real lam_f, const real tmp_f) const;
-    inline real temperature_node(const real R_s, const real tmp_s,
-                                 const real R_f, const real tmp_f) const;
  
     real gradt1D(const bool is_solid, const Comp & m,
                  const int i, const int j, const int k);
@@ -151,12 +148,13 @@ class PhaseChange4 : public Centered {
     const TIF & tifmodel;
     const Sign matter_sig; /* pos: liquid is phi=1 and vice versa */
     Topology * topo;
+    HTWallModel * htwallmodel;
  
     real rhol, rhov, lambdal, lambdav, cpl, cpv;
-    real near_wall_resist; /* interfacial resistance near walls */
     real turbP;
     real smdot_pos, smdot_neg;
     
+    bool default_value_for_htwallmodel;
     bool use_second_order_accuracy, 
          use_unconditional_extrapolation,
          discard_points_near_interface;

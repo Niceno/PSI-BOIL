@@ -11,9 +11,10 @@ static void __attribute__ ((constructor)) trapfpe(void)
 }
 #endif
 
-#define AXISYM
+//#define AXISYM
 #define USE_PHASE_VEL_VOF
 //#define USE_PHASE_VEL_EFD
+#define USE_MG
 
 /******************************************************************************/
 int main(int argc, char ** argv) {
@@ -512,6 +513,7 @@ int main(int argc, char ** argv) {
     /*---------------------------+
     |  solve transport equation  |
     +---------------------------*/
+    conc.new_time_step();
     conc.advance_phase_change(c);
     conc.reconstruct_geometry(c);
     conc.interfacial_flagging(conc.color());
@@ -523,6 +525,9 @@ int main(int argc, char ** argv) {
 #endif
     conc.advance_geometric(c);
     conc.ancillary();
+#ifdef USE_MG
+    conc.heaviside()->marker_gradient(*conc.topo->adens);
+#endif
     conc.totalvol();
 
     /*------------------------+

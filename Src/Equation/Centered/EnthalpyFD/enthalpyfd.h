@@ -9,6 +9,7 @@
 #include "../../../Global/global_realistic.h"
 #include "../../Tifmodel/tif.h"
 #include "../../Topology/topology.h"
+#include "../../../Ravioli/htwallmodel.h"
 
 /***************************************************************************//**
 *  \brief Discretizes and solves enthalpy conservaion equation.
@@ -61,7 +62,8 @@ class EnthalpyFD : public Centered {
                Matter * flu,
                Topology * topo,
                TIF & tifmodel,
-               Matter * sol = NULL);
+               Matter * sol = NULL,
+               HTWallModel htwallmodel = HTWallModel::None());
 
     /* Delegating constructor */
     EnthalpyFD(const Scalar & phi,
@@ -72,8 +74,10 @@ class EnthalpyFD : public Centered {
                Matter * flu,
                Topology * topo,
                TIF & tifmodel,
-               Matter * sol = NULL) :
-      EnthalpyFD(phi,f,umixed,umixed,umixed,t,sm,flu,topo,tifmodel,sol) {};
+               Matter * sol = NULL,
+               HTWallModel htwallmodel = HTWallModel::None()) :
+    EnthalpyFD(phi,f,umixed,umixed,umixed,t,sm,flu,
+               topo,tifmodel,sol,htwallmodel) {};
 
 
     ~EnthalpyFD();
@@ -110,15 +114,8 @@ class EnthalpyFD : public Centered {
                 <<accelerated_no_solid<<"\n";
     }
 
-    inline real get_near_wall_interfacial_resistance() const {
-      return near_wall_resist;
-    }
-
-    inline void set_near_wall_interfacial_resistance(const real nwir) {
-      near_wall_resist = nwir;
-      boil::oout<<"EnthalpyFD:near_wall_interfacial_resistance= "
-                <<nwir<<boil::endl;
-      boil::oout<<"-- only use this if you know what you are doing!\n";
+    inline HTWallModel & heat_transfer_wall_model() {
+      return htwallmodel;
     }
 
     void convection();
@@ -135,6 +132,7 @@ class EnthalpyFD : public Centered {
     void diff_matrix(real & am, real & ac, real & ap
                 , real & tm, real & tc, real & tp
                 , real & aflagm, real & aflagp
+                , real & sourceterm
                 , const real x0, const coef_gen coef_m, const coef_gen coef_p
                 , const real vol, const real aream, const real areap
                 , const bool onm, const bool onc, const bool onp
@@ -148,7 +146,8 @@ class EnthalpyFD : public Centered {
                 , const int i, const int j, const int k, const Comp m);
 
     inline real resistance_multiplier(const real dx1, const real dx2,
-                                      const real l1, const real l2) const;
+                                      const real l1, const real l2,
+                                      const real resistplus = 0.0) const;
 
     virtual real coef_x_m(const real dxm, const real dxp, const real x0);
     virtual real coef_x_p(const real dxm, const real dxp, const real x0);
@@ -197,9 +196,6 @@ class EnthalpyFD : public Centered {
                             const int i, const int j, const int k,
                             real & tint);
 
-    real temperature_node(real len_s, real lam_s, real tmp_s
-                        , real len_f, real lam_f, real tmp_f);
-
     real gradt_ib(const int dir, const Comp & mcomp,
                   const int i, const int j, const int k);
 
@@ -214,10 +210,10 @@ class EnthalpyFD : public Centered {
 
     TIF & tifmodel;  
     Topology * topo;
+    HTWallModel htwallmodel;
 
     real rhol,rhov,cpl,cpv,lambdal,lambdav,epsl;
-    real near_wall_resist; /* interfacial resistance near walls */
-    Scalar ftif,ftifold; /* tbr */
+    Scalar ftif;
     ScalarInt iflag,iflagold;
     real turbP; /* turbulent Prandtl number */
     bool laminar;

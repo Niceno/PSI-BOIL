@@ -412,6 +412,71 @@ void VOF::update_at_walls(Scalar & scp) {
   /*--------------+
   | immersed body |
   +--------------*/
+#if 1
+  if(dom->ibody().nccells() > 0) {
+    for_ijk(i,j,k) {
+      if(dom->ibody().off(i,j,k)) {
+
+        /* west is in fluid domain */
+        if(dom->ibody().on(i-1,j,k)) {
+          int ofx(0), ofy(0), ofz(0);
+          real xpos(0.5), ypos(0.5), zpos(0.5);
+          ofx = -1;
+          xpos = 1.5;
+          scp[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp);
+        }
+
+        /* east is in fluid domain */
+        if(dom->ibody().on(i+1,j,k)) {
+          int ofx(0), ofy(0), ofz(0);
+          real xpos(0.5), ypos(0.5), zpos(0.5);
+          ofx = +1;
+          xpos = -0.5;
+          scp[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp);
+        }
+
+        /* south is in fluid domain */
+        if(dom->ibody().on(i,j-1,k)) {
+          int ofx(0), ofy(0), ofz(0);
+          real xpos(0.5), ypos(0.5), zpos(0.5);
+          ofy = -1;
+          ypos = 1.5;
+          scp[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp);
+        }
+
+        /* north is in fluid domain */
+        if(dom->ibody().on(i,j+1,k)) {
+          int ofx(0), ofy(0), ofz(0);
+          real xpos(0.5), ypos(0.5), zpos(0.5);
+          ofy = +1;
+          ypos = -0.5;
+          scp[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp);
+        }
+
+        /* bottom is in fluid domain */
+        if(dom->ibody().on(i,j,k-1)) {
+          int ofx(0), ofy(0), ofz(0);
+          real xpos(0.5), ypos(0.5), zpos(0.5);
+          ofz = -1;
+          zpos = 1.5;
+          scp[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp);
+        }
+
+        /* top is in fluid domain */
+        if(dom->ibody().on(i,j,k+1)) {
+          int ofx(0), ofy(0), ofz(0);
+          real xpos(0.5), ypos(0.5), zpos(0.5);
+          ofz = +1;
+          zpos = -0.5;
+          scp[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp);
+        }
+
+      } /* center off */
+    } /* ijk */
+  } /* ibody exists */
+
+#else /* this is an old version, which doesnt work if
+         processor boundary = solid-fluid boundary */
   for(int cc=0; cc<dom->ibody().nccells(); cc++) {
     int i,j,k;
     /* cell[i][j][k] is wall adjacent cell in fluid domain */
@@ -471,6 +536,7 @@ void VOF::update_at_walls(Scalar & scp) {
       scp[i][j][k+1] = extrapolate_v(i,j,k+1,ofx,ofy,ofz,xpos,ypos,zpos,scp);
     }
   }
+#endif
 
   scp.bnd_update_nowall();
   scp.exchange_all();

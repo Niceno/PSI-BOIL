@@ -14,19 +14,20 @@ EnthalpyFD::EnthalpyFD(const Scalar & PHI,
                        Matter * f,
                        Topology * TOPO,
                        TIF & tintmodel,
-                       Matter * s) :
+                       Matter * s,
+                       HTWallModel HTM) :
 /*---------------------+ 
 |  initialize parent   |
 +---------------------*/
   Centered( PHI.domain(), PHI, F, & U, T, f, s, S ),
   ftif   (  *PHI.domain()),
-  ftifold(  *PHI.domain()),
   topo(TOPO),
   iflag(TOPO->iflag),
   iflagold(&(TOPO->iflagold)),
   uliq(&Uliq),
   ugas(&Ugas),
-  tifmodel(tintmodel)
+  tifmodel(tintmodel),
+  htwallmodel(HTM)
 {
   rhol = fluid()->rho(1),
   rhov = fluid()->rho(0),
@@ -39,7 +40,6 @@ EnthalpyFD::EnthalpyFD(const Scalar & PHI,
   epsl=1.0e-2; /* this appears in diff_matrix but should not play a role */
   turbP=0.9;
   laminar=true;
-  near_wall_resist = 0.0;
 
   /* see header for explanation */
   if(solid()) {

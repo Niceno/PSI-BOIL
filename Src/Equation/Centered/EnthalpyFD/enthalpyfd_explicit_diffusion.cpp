@@ -83,7 +83,6 @@ void EnthalpyFD::explicit_diffusion(const Scalar * diff_eddy) {
       const real Awi = tscn * lc * vol * cxm * aflagm;
       const real Aei = tscn * lc * vol * cxp * aflagp;
       ftif[i][j][k] = Awi*pm + Aei*pp;
-      ftifold[i][j][k] = Awi*pm + Aei*pp;
     }
 
     /*------------------------+ 
@@ -129,7 +128,6 @@ void EnthalpyFD::explicit_diffusion(const Scalar * diff_eddy) {
       const real Asi = tscn * lc * vol * cym * aflagm;
       const real Ani = tscn * lc * vol * cyp * aflagp;
       ftif[i][j][k] += Asi*pm + Ani*pp;
-      ftifold[i][j][k] += Asi*pm + Ani*pp;
     }
 
     /*------------------------+ 
@@ -175,7 +173,6 @@ void EnthalpyFD::explicit_diffusion(const Scalar * diff_eddy) {
       const real Abi = tscn * lc * vol * czm * aflagm;
       const real Ati = tscn * lc * vol * czp * aflagp;
       ftif[i][j][k] += Abi*pm + Ati*pp;
-      ftifold[i][j][k] += Abi*pm + Ati*pp;
     }
     // need to add here immersed boundary without solid !!!
 
@@ -194,7 +191,6 @@ void EnthalpyFD::explicit_diffusion(const Scalar * diff_eddy) {
        conduction is allowed, this of course needs rewriting */
 
     ftif = 0.;
-    ftifold = 0.;
 
     for_m(m){
       int ii,jj,kk;
@@ -222,6 +218,7 @@ void EnthalpyFD::explicit_diffusion(const Scalar * diff_eddy) {
         real tm, tc, tp;
         real aflagm, aflagp;
         real aream, areap;
+        real sourceterm(0.0);
         real pos0;
         coef_gen coef_m, coef_p;
 
@@ -286,6 +283,7 @@ void EnthalpyFD::explicit_diffusion(const Scalar * diff_eddy) {
         diff_matrix(am, ac, ap
                   , tm, tc, tp
                   , aflagm, aflagp
+                  , sourceterm
                   , pos0, coef_m, coef_p
                   , vol, aream, areap
                   , onm, onc, onp, ofm, ofc, ofp
@@ -296,11 +294,11 @@ void EnthalpyFD::explicit_diffusion(const Scalar * diff_eddy) {
                   , edm, edc, edp
                   , i, j, k, m);
   
+        fold[i][j][k] += sourceterm;
         if(tsc!=0){
           fold[i][j][k] += tsc * (am*tm*aflagm - ac*tc + ap*tp*aflagp);
         }
         ftif[i][j][k] += tscn * (am*(1.0-aflagm)*tm+ap*(1.0-aflagp)*tp);
-        ftifold[i][j][k] += tscn * (am*(1.0-aflagm)*tm+ap*(1.0-aflagp)*tp);
       }
     }
   } /* solid conduction */

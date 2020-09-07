@@ -17,6 +17,7 @@ void PhaseChange4::heat_flux(const Scalar * diff_eddy) {
 
   /* calculate heat flux */
   cal_hf(diff_eddy);
+  dirac_source_terms(); /* source terms *in* the solid-fluid wall */
 
   txl.bnd_update();
   tyl.bnd_update();
@@ -26,7 +27,7 @@ void PhaseChange4::heat_flux(const Scalar * diff_eddy) {
   tzv.bnd_update();
 
   /* insert special boundary conditions */
-  insert_bc_hf(diff_eddy);
+  insert_bc_hf(diff_eddy); /* dirichlet */
 
   txl.exchange_all();
   tyl.exchange_all();

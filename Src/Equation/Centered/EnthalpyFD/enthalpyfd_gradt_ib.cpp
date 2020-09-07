@@ -45,7 +45,9 @@ real EnthalpyFD::gradt_ib(const int dir, const Comp & mcomp,
     tmp_s = phi[i][j][k+of];
   }
  
-  real tmp_node = temperature_node(len_s, lam_s, tmp_s, len_f, lam_f, tmp_f);
+  real tmp_node = htwallmodel.temperature_node(htwallmodel.dirac_wall_source,
+                                               len_s/lam_s, tmp_s, 
+                                               len_f/lam_f, tmp_f);
 
   if(dir<0) /* fluid is above */
     return (tmp_f-tmp_node)/len_f;

@@ -1,0 +1,361 @@
+#include "Include/psi-boil.h"
+#include <fstream>
+#include <iostream>
+#include <fenv.h>
+#include <random>
+#define _GNU_SOURCE 1
+#if 1
+static void __attribute__ ((constructor)) trapfpe(void)
+{
+  /* Enable some exceptions. At startup all exceptions are masked. */
+  feenableexcept(FE_INVALID|FE_DIVBYZERO|FE_OVERFLOW);
+}
+#endif
+
+#define CASE 0
+/* 0: x-dir, 1: y-dir, 2: z-dir */
+
+/******************************************************************************/
+int main(int argc, char ** argv) {
+
+ if(argc<5) {
+    boil::oout<<"Four command line arguments required!"<<"\n";
+    boil::oout<<"./Boil wmin qsource ssource intpos"<<"\n";
+
+    exit(0);
+  }
+
+/* ------------ input from command line */
+  int wmin=atoi(argv[1]);
+  boil::oout<<"wmin= "<<wmin<<"\n";
+
+  real qsource = atof(argv[2]); /* source in solid */
+  boil::oout<<"qsource= "<<qsource<<"\n";
+
+  const real ssource = atof(argv[3]); /* dirac source */
+  boil::oout<<"ssource= "<<ssource<<"\n";
+
+  real intpos = atof(argv[4]); /* fractional interfacial position */
+  boil::oout<<"intpos= "<<intpos<<"\n";
+
+  boil::timer.start();
+
+  const real tsat0 = 5.;
+  const real twall0 = tsat0;// 0.;
+  const real twall1 = twall0-10.;
+  const real rhov = 1.;
+  const real rhol = 1000.;
+  const real rhosol = 4000.;
+  const real lambdav = 0.5;
+  const real lambdal = 0.7;
+  const real latent=2000*1000.0;
+  const real lambdasol = 1.1;
+  const real cpl = 4000.;
+  const real cpv = 2000.;
+  const real cpsol = 1000.;
+
+  const int NX1 = 10;
+  real LX1 = 0.1e-3;
+  real DX1 = LX1/15.;
+
+  intpos *= LX1;
+  qsource /= LX1;
+
+  /*--------------------------------+
+  |  choose the output file format  |
+  +--------------------------------*/
+  boil::plot = new PlotTEC();
+
+  /*----------+
+  |  grid(s)  |
+  +----------*/
+  Grid1D gx1( Range<real>(0.0,LX1)
+            , Range<real>(3.0*DX1,1.0*DX1)
+            , NX1, Periodic::no() );
+  Grid1D gx2( Range<real>(-LX1,0.0)
+            , Range<real>(1.0*DX1,3.0*DX1)
+            , NX1, Periodic::no() );
+  Grid1D gx(gx2,gx1, Periodic::no());
+
+  /*---------+
+  |  domain  |
+  +---------*/
+  Comp m;
+#if CASE == 0
+  Body floor("floorx.stl");
+  m = Comp::i();
+  Domain d(gx , gx1, gx1, &floor);
+#elif CASE == 1
+  Body floor("floory.stl");
+  m = Comp::j();
+  Domain d(gx1, gx , gx1, &floor);
+#else
+  Body floor("floorz.stl");
+  m = Comp::k();
+  Domain d(gx1, gx1, gx , &floor);
+#endif
+
+  /*------------------+
+  |  define unknowns  |
+  +------------------*/
+  Vector uvw(d);           // vel
+  Scalar f  (d); // pressure
+  Scalar c  (d), g  (d), kappa(d); // concentration
+  Scalar tpr(d), tprold(d), q  (d);           // temperature
+  Scalar mdot(d), mflx(d);         // phase-change rate
+
+  /*-----------------------------+ 
+  |  insert boundary conditions  |
+  +-----------------------------*/
+  Dir d1(Dir::undefined()),d2(Dir::undefined()),d3(Dir::undefined()),
+      d4(Dir::undefined()),d5(Dir::undefined()),d6(Dir::undefined());
+#if CASE == 0
+  d1 = Dir::imin();
+  d2 = Dir::imax();
+  d3 = Dir::jmin();
+  d4 = Dir::jmax();
+  d5 = Dir::kmin();
+  d6 = Dir::kmax();
+#elif CASE == 1
+  d1 = Dir::jmin();
+  d2 = Dir::jmax();
+  d3 = Dir::imin();
+  d4 = Dir::imax();
+  d5 = Dir::kmin();
+  d6 = Dir::kmax();
+#else
+  d1 = Dir::kmin();
+  d2 = Dir::kmax();
+  d3 = Dir::imin();
+  d4 = Dir::imax();
+  d5 = Dir::jmin();
+  d6 = Dir::jmax();
+#endif 
+
+  for_m(m) {
+    uvw.bc(m).add( BndCnd( d1, BndType::wall() ) );
+    uvw.bc(m).add( BndCnd( d2, BndType::wall() ) );
+    uvw.bc(m).add( BndCnd( d3, BndType::wall() ) );
+    uvw.bc(m).add( BndCnd( d4, BndType::wall() ) );
+    uvw.bc(m).add( BndCnd( d5, BndType::wall() ) );
+    uvw.bc(m).add( BndCnd( d6, BndType::wall() ) );
+  }
+
+  c.bc().add( BndCnd( d1, BndType::neumann() ) );
+  c.bc().add( BndCnd( d2, BndType::neumann() ) );
+  c.bc().add( BndCnd( d3, BndType::neumann() ) );
+  c.bc().add( BndCnd( d4, BndType::neumann() ) );
+  c.bc().add( BndCnd( d5, BndType::neumann() ) );
+  c.bc().add( BndCnd( d6, BndType::neumann() ) );
+
+  /* copy b.c. from p */
+  f = c.shape();
+  q = c.shape();
+  kappa = c.shape();
+  g = c.shape();
+  mdot = g.shape();
+  mflx = g.shape();
+
+  tpr.bc().add( BndCnd( d1, BndType::dirichlet(), twall0 ) );
+  tpr.bc().add( BndCnd( d2, BndType::dirichlet(), twall1 ) );
+  tpr.bc().add( BndCnd( d3, BndType::neumann() ) );
+  tpr.bc().add( BndCnd( d4, BndType::neumann() ) );
+  tpr.bc().add( BndCnd( d5, BndType::neumann() ) );
+  tpr.bc().add( BndCnd( d6, BndType::neumann() ) );
+
+  tprold = tpr.shape();
+
+  /*----------------------+
+  |  physical properties  |
+  +----------------------*/
+  Matter vapor(d), liquid(d), heater(d);
+  vapor.lambda(lambdav);
+  vapor.rho(rhov);
+  vapor.cp(rhov*cpv);
+  liquid.lambda(lambdal);
+  liquid.rho(rhol);
+  liquid.cp(rhol*cpl);
+
+  /* nickel */
+  heater.lambda (lambdasol);
+  heater.rho (rhosol);
+  heater.cp(rhosol*cpsol);
+
+  Matter * zero = &vapor;
+  Matter * one = &liquid;
+  Matter mixed(*one,*zero, &c);
+  mixed.latent(latent);
+
+  /*-------------------+
+  |  time-integration  |
+  +-------------------*/
+  Times time(2e4*DX1,2.*DX1);
+
+  /*-----------------+
+  |  define solvers  |
+  +-----------------*/
+  Krylov * solverCGic = new CG(d, Prec::ic2());
+  Krylov * solverCGdi = new CG(d, Prec::di());
+  Krylov * solver = solverCGdi;
+
+  /* color function */
+  VOF conc(c, g, kappa, uvw, time, solver);
+
+  /* enthalpy equation */
+  TIF tsat(tsat0);
+
+#if 1
+  HTWallModel htwallmodel = HTWallModel::Full(DX1/lambdal,
+                                              ssource);
+#else
+  HTWallModel htwallmodel = HTWallModel::None();
+#endif
+  boil::oout<<"htwallmodel= "<<htwallmodel.near_wall_resist<<" "
+                             <<htwallmodel.dirac_wall_source<<boil::endl;
+
+  EnthalpyFD enthFD(tpr, q, uvw, time, solver  , &mixed,
+                    conc.topo, tsat,&heater,htwallmodel);
+
+  /* phase change */
+  PhaseChange4 pc(mdot, mflx, tpr, q, c, g, f, uvw, conc.topo,
+                  tsat, time, &mixed, &heater, &enthFD.heat_transfer_wall_model());
+
+  real rs = LX1/lambdasol;
+  real rf = intpos/lambdal;
+  if(intpos<0.5*3.0*DX1) {
+    rf += htwallmodel.near_wall_resist;
+  }
+  real tsol = (ssource + qsource*LX1/2. + twall0/rs + tsat0/rf)/(1./rs+1./rf);
+
+  for_vijk(tpr,i,j,k) {
+#if CASE == 0
+    real xc = c.xc(i);
+    real xm = c.xn(i);
+    real xp = c.xn(i+1);
+#elif CASE == 1
+    real xc = c.yc(j);
+    real xm = c.yn(j);
+    real xp = c.yn(j+1);
+#else
+    real xc = c.zc(k);
+    real xm = c.zn(k);
+    real xp = c.zn(k+1);
+#endif
+    if(xp<intpos) {
+      c[i][j][k] = 1.0;
+    } else if(xm>intpos) {
+      c[i][j][k] = 0.0;
+    } else {
+      c[i][j][k] = (intpos-xm)/(xp-xm);
+    }
+    if(xc>intpos) {
+      tpr[i][j][k] = tsat0 + (twall1-tsat0)/(LX1-intpos)*(xc-intpos);
+    } else if(xc>0.) {
+      tpr[i][j][k] = tsol + (tsat0-tsol)/intpos*xc;
+    } else {
+      tpr[i][j][k] = tsol + (twall0-tsol)*xc/(-LX1) - qsource/2./lambdasol*xc*(xc+LX1);
+    }
+  }
+
+  tpr.bnd_update();
+  tprold = tpr;
+
+  c.bnd_update();
+  conc.init();
+  conc.front_minmax();
+
+  tpr=0.;
+
+  boil::plot->plot(c,tpr,tprold,"c-tpr-tprref",0);
+
+  q=0.0;
+  for_vijk(tpr,i,j,k){
+    if(d.ibody().off(i,j,k)){
+      q[i][j][k]=qsource*tpr.dV(i,j,k);
+    }
+  }
+
+  /* loop */
+  for(time.start(); time.end(); time.increase()) {
+
+    /* new time step */
+    conc.new_time_step();
+
+#if 1
+    /*---------------------------+
+    |  solve transport equation  |
+    +---------------------------*/
+    enthFD.discretize();
+    enthFD.new_time_step();
+    enthFD.solve(ResRat(1e-16),"enthFD");
+
+    pc.update(); 
+#endif
+  }
+
+#if CASE == 0
+    int ii = NX1+boil::BW;
+    int iii = ii-1;
+    int jj = boil::BW;
+    int jjj = jj;
+    int kk = boil::BW;
+    int kkk = kk;
+    real xpos = tpr.xn(ii);
+    real dxm = 0.5*tpr.dxc(iii);
+    real dxp = 0.5*tpr.dxc(ii);
+#elif CASE == 1
+    int ii = boil::BW;
+    int iii = ii;
+    int jj = NX1+boil::BW;
+    int jjj = jj-1;
+    int kk = boil::BW;
+    int kkk = kk;
+    real xpos = tpr.yn(jj);
+    real dxm = 0.5*tpr.dyc(jjj);
+    real dxp = 0.5*tpr.dyc(jj);
+#else
+    int ii = boil::BW;
+    int iii = ii;
+    int jj = boil::BW;
+    int jjj = jj;
+    int kk = NX1+boil::BW;
+    int kkk = kk-1;
+    real xpos = tpr.zn(kk);
+    real dxm = 0.5*tpr.dzc(kkk);
+    real dxp = 0.5*tpr.dzc(kk);
+#endif
+
+#if CASE == 0
+  int j0 = jj;
+  int k0 = kk;
+  for_vi(tpr,i0) {
+    real x = c.xc(i0);
+    boil::oout<<i0;
+#elif CASE == 1
+  int i0 = ii;
+  int k0 = kk;
+  for_vj(tpr,j0) {
+    real x = c.yc(j0);
+    boil::oout<<j0;
+#else
+  int i0 = ii;
+  int j0 = jj;
+  for_vk(tpr,k0) {
+    real x = c.zc(k0);
+    boil::oout<<k0;
+#endif
+    boil::oout<<" "<<x<<" "<<c[i0][j0][k0]<<" "<<tpr[i0][j0][k0]<<" "<<tprold[i0][j0][k0]<<" | "
+              <<mflx[i0][j0][k0]*latent<<boil::endl;
+  }
+
+
+  boil::oout<<"pc= "<<(tsol-tsat0)/rf<<" "<<(twall1-tsat0)/(LX1-intpos)*lambdav
+                     <<" "<<(tsol-tsat0)/rf+(twall1-tsat0)/(LX1-intpos)*lambdav<<boil::endl;
+
+  boil::plot->plot(c,tpr,tprold,"c-tpr-tprref",1);
+
+  boil::oout << "finished" << boil::endl;
+  boil::timer.stop();
+  boil::timer.report();
+
+}

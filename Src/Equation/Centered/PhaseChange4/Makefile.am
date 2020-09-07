@@ -5,6 +5,7 @@ libPhaseChange4_a_SOURCES = phasechange4.h                           \
                             phasechange4_add_point.cpp               \
                             phasechange4_cal_hf.cpp                  \
                             phasechange4_differences.cpp             \
+			    phasechange4_dirac_source_terms.cpp      \
                             phasechange4_distance.cpp                \
                             phasechange4_edge.cpp                    \
                             phasechange4_finalize.cpp                \

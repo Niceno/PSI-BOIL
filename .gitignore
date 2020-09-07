@@ -17,6 +17,7 @@ configure
 stamp-h1
 Src/Parallel/mpi_macros.h
 Src/Utilities/ChangeProc/ChangeProc
+Src/Utilities/Gather/execs
 **/*.o
 **/Boil
 Src/main.cpp*

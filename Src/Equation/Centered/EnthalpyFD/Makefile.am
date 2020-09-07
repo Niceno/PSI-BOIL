@@ -19,7 +19,6 @@ libEnthalpyFD_a_SOURCES = enthalpyfd.h                        \
                           enthalpyfd_system_diffusive.cpp     \
                           enthalpyfd_system_innertial.cpp     \
                           enthalpyfd_tint_val.cpp             \
-                          enthalpyfd_temperature_node.cpp     \
                           enthalpyfd_update_rhs.cpp
 
 INCLUDE = -I@top_srcdir@/
