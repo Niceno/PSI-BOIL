@@ -112,6 +112,11 @@ class VOF : public Centered {
 
     void output_cangle_2d(const Comp ctangential, const Comp cnormal,
                           const Sign sig);
+   
+    real extract_cl_velocity_2d(const Comp ctangential, const Comp cnormal,
+                                const Sign sig,
+                                int * IG = NULL, int * PN = NULL,
+                                const Range<int> ridx = Range<int>(-1,-2));
 
     /* only for comparison purposes!!! */
     void cal_adens_geom(Scalar & adensgeom, const Scalar & sca,

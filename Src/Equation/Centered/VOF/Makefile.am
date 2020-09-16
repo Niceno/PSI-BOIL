@@ -24,6 +24,7 @@ libVof_a_SOURCES =      vof.h                              \
                         vof_ev_solve.cpp                   \
                         vof_ev_source.cpp                  \
                         vof_extract_alpha.cpp              \
+			vof_extract_cl_velocity.cpp        \
                         vof_extrapolate_velocity.cpp       \
                         vof_flood.cpp                      \
                         vof_forward.cpp                    \

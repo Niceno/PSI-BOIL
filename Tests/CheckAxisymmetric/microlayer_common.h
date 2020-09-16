@@ -223,7 +223,7 @@ int main(int argc, char ** argv) {
   boil::oout<<"DX= "<<DX0<<boil::endl;
   const real DZ0 = DX0;
 
-  const real correl_reduc = 9.*boil::pi/8.*mul*alpl/sig*Jal*Jal/(R0mult*DX0);
+  const real correl_reduc = 9.*boil::pi/2.*mul*alpl/sig*Jal*Jal/(R0mult*DX0);
   boil::oout<<"correl: theta^3/lnS= "<<correl_reduc<<" rad^3"<<boil::endl;
 
 #if CASE == 1

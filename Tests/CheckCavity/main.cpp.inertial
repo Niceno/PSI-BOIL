@@ -443,10 +443,10 @@ int main(int argc, char ** argv) {
   /* cavity pressure */
 #if CASE > 1
   CavityPressure capr(press, f_cav, uvw_cav, time, solver, &liquid,
-                      conc.topo,mixed.sigma(),kappa);
+                      conc.topo);//,mixed.sigma(),&kappa);
 #else
   CPaxisym       capr(press, f_cav, uvw_cav, time, solver, &liquid,
-                      conc.topo,mixed.sigma(),kappa);
+                      conc.topo);//,mixed.sigma(),&kappa);
 #endif
 #if VARIANT > 1
   capr.set_cavity_pressure(p0);
@@ -546,6 +546,9 @@ int main(int argc, char ** argv) {
 
     f = 0.0;
 
+    /* surface tension */
+    conc.tension(&xyz, mixed,conc.color());
+
     const int niter_1 = 300;
     const int niter_2 = 3000;
     MaxIter mm_1 = MaxIter(niter_1);
@@ -608,9 +611,6 @@ int main(int argc, char ** argv) {
     for_m(m)
       for_avmijk(xyz,m,i,j,k)
         xyz[m][i][j][k]=0.0;
-
-    /* surface tension */
-    conc.tension(&xyz, mixed,conc.color());
 
     /*--------------------------+
     |  solve momentum equation  |
