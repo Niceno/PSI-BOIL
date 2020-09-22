@@ -1,7 +1,7 @@
 #include "vof.h"
 
 real VOF::calc_alpha(const real v,
-                     const real vma, const real vmb, const real vmc) {
+                     const real vma, const real vmb, const real vmc) const {
 
   real w, v1, v3, vm1, vm2, vm3, vm12; 
   real a0, a1, a2, q0, sp, th;

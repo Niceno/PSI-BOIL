@@ -53,6 +53,7 @@ libVof_a_SOURCES =      vof.h                              \
                         vof_standardized_norm_vect.cpp     \
                         vof_tension.cpp                    \
                         vof_totalvol.cpp                   \
+			vof_translate_v.cpp                \
                         vof_true_norm_vect.cpp             \
                         vof_update_at_walls.cpp            \
                         vof_vf_limiter.cpp                 \

@@ -2,7 +2,7 @@
 
 #if 0 /* discarded due to the way elvira works */
 /******************************************************************************/
-real VOFaxisym::calc_v(const real alpha, const real vma, const real vmb, const real vmc) {
+real VOFaxisym::calc_v(const real alpha, const real vma, const real vmb, const real vmc) const {
 /***************************************************************************//**
  \brief Solve the point-forward 2D Cartesian problem, i.e. calculate phi(alp,n),
         this is a virtual function wrt 3D VOF calc_v; these two should basically

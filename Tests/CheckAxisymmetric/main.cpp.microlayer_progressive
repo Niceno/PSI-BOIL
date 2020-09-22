@@ -50,6 +50,7 @@ static void __attribute__ ((constructor)) trapfpe(void)
   Scalar mdot(d), mflx(d);         // phase-change rate
   Scalar auxscalar(d);             // micro-layer film thickness
   Scalar mu_t(d);                  // eddy viscosity
+  Scalar csol(d);                  // solid color
 
   /*-----------------------------+
   |  insert boundary conditions  |
@@ -83,6 +84,7 @@ static void __attribute__ ((constructor)) trapfpe(void)
   kappa = p.shape();
   g = p.shape();
   auxscalar = p.shape();
+  csol = p.shape();
 
   /* should avoid spurious flows from the outlet */
   c.bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
@@ -107,7 +109,7 @@ static void __attribute__ ((constructor)) trapfpe(void)
   /*----------------------+
   |  physical properties  |
   +----------------------*/
-  Matter vapor(d), liquid(d), heater(d);
+  Matter vapor(d), liquid(d);
   vapor  .mu    (muv);
   vapor  .rho   (rhov);
   vapor  .cp    (cpv);  // J/m3
@@ -122,9 +124,40 @@ static void __attribute__ ((constructor)) trapfpe(void)
   liquid.beta  (betal);
 
   /* solid */
+  csol = 0.0;
+#if CASE == 1
+  for_vijk(csol,i,j,k) {
+    if(csol.zn(k+1)<-itothick) {
+      csol[i][j][k] = 1.0;
+    } else if(csol.zn(k)<= -itothick) {
+      csol[i][j][k] = (itothick+csol.zn(k+1))/(-csol.zn(k)+csol.zn(k+1));
+    }
+  }
+
+  Matter sapphire(d);
+  sapphire.rho    (rhosol);
+  sapphire.cp     (cpsol);
+  sapphire.lambda (lambdasol);
+
+  Matter ito(d);
+  ito.rho    (rhoito);
+  ito.cp     (cpito);
+  ito.lambda (lambdaito);
+
+  Matter heater(sapphire,ito,&csol);
+  boil::plot->plot(csol,"csol",0);
+  for_vk(csol,k) {
+    int i(boil::BW), j(boil::BW);
+    boil::oout<<csol.zc(k)<<" "<<csol[boil::BW][boil::BW][k]<<" "<<heater.rho(i,j,k)<<" "<<heater.cp(i,j,k)<<" "<<heater.lambda(i,j,k)<<boil::endl;
+  }
+  exit(0);
+
+#else
+  Matter heater(d);
   heater.rho    (rhosol);
   heater.cp     (cpsol);
   heater.lambda (lambdasol);
+#endif
 
   Matter * zero = &vapor;
   Matter * one = &liquid;
@@ -243,11 +276,13 @@ static void __attribute__ ((constructor)) trapfpe(void)
   sld = &heater;
 #endif
   EnthalpyFDaxisym enthFD(tpr, q, uvw, uvwenth1, uvwenth2, time, solver  , &mixed,
-                          conc.topo, tsat,sld);
+                          conc.topo, tsat,sld, 
+                          HTWallModel::Resistance(
+                            Schrage::calculate_heat_transfer_resistance(tsat0_K,rhov,Mv,latent)
+                          )
+                         );
   enthFD.convection_set(TimeScheme::forward_euler());
   enthFD.diffusion_set(TimeScheme::backward_euler());
-  enthFD.set_near_wall_interfacial_resistance(
-      Schrage::calculate_heat_transfer_resistance(tsat0_K,rhov,Mv,latent) );
 
   /* phase change */
 #ifndef USE_PC4
@@ -256,12 +291,11 @@ static void __attribute__ ((constructor)) trapfpe(void)
   pc.set_near_wall_modelling(near_wall_modelling);
 #else
   PhaseChange4 pc(mdot, mflx, tpr, q, c, g, f, uvw, conc.topo,
-                  tsat, time, &mixed, sld);
+                  tsat, time, &mixed, sld,
+                  &enthFD.heat_transfer_wall_model());
   pc.set_second_order_accuracy(use_second_order_accuracy);
   pc.set_discard_points_near_interface(discard_points_near_interface);
   pc.set_unconditional_extrapolation(use_unconditional_extrapolation);
-  pc.set_near_wall_interfacial_resistance(
-      Schrage::calculate_heat_transfer_resistance(tsat0_K,rhov,Mv,latent) );
 #endif
 
   /*-------------------+

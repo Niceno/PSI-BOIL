@@ -110,6 +110,42 @@ namespace boil {
   }
 
   /******************************************************************************/
+  void restrictXZ_sum(const Scalar & fine, Scalar & coarse) {
+  /******************************************************************************/
+
+    for_vijk(coarse,i,j,k) {
+      /* establish coordinate correspondence */
+      const int b = boil::BW-1;
+      const int ihat = i-b;
+      const int khat = k-b;
+
+      const int i_y = 2*ihat + b;
+      const int j_y = j;
+      const int k_y = 2*khat + b;
+
+      const int i_x = 2*ihat-1 + b;
+      const int j_x = j;
+      const int k_x = 2*khat + b;
+
+      const int i_z = 2*ihat + b;
+      const int j_z = j;
+      const int k_z = 2*khat-1 + b;
+
+      const int i_q = 2*ihat-1 + b;
+      const int j_q = j;
+      const int k_q = 2*khat-1 + b;
+
+      coarse[i][j][k] = fine[i_x][j_x][k_x]
+                      + fine[i_y][j_y][k_y]
+                      + fine[i_z][j_z][k_z]
+                      + fine[i_q][j_q][k_q];
+    }
+    coarse.exchange_all();
+
+    return;
+  }
+
+  /******************************************************************************/
   void restrictXZ_vector_simple(const Vector & fine, Vector & coarse,
                                 const Scalar & fs, const Scalar & cs) {
   /******************************************************************************/

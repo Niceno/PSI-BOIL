@@ -80,7 +80,8 @@ class VOF : public Centered {
 
     /* mainly used in VOFaxisym */
     virtual void color_to_vf(Scalar & color, Scalar & vf,
-                             const bool extalp=true,const bool bdn=true) {
+                             const bool nvec=true,const bool extalp=true,
+                             const bool bdn=true) {
       vf = color;
       return;
     }
@@ -110,13 +111,19 @@ class VOF : public Centered {
 
     void interfacial_flagging(const Scalar & scp);
 
-    void output_cangle_2d(const Comp ctangential, const Comp cnormal,
+    real output_cangle_2d(const Comp ctangential, const Comp cnormal,
                           const Sign sig);
    
     real extract_cl_velocity_2d(const Comp ctangential, const Comp cnormal,
                                 const Sign sig,
                                 int * IG = NULL, int * PN = NULL,
                                 const Range<int> ridx = Range<int>(-1,-2));
+
+    real translate_v(const int i, const int j, const int k,
+                     const real dx, const real dy, const real dz,
+                     const real fx, const real fy, const real fz,
+                     real & nnx, real & nny, real & nnz, real & naa,
+                     const Scalar & scp) const;
 
     /* only for comparison purposes!!! */
     void cal_adens_geom(Scalar & adensgeom, const Scalar & sca,
@@ -291,8 +298,8 @@ class VOF : public Centered {
     real kappa_ave(const real r1, const real r2, const int i1, const int i2);
 
     /* at the moment, these are NOT overwritten in the derived class */
-    virtual real calc_v(const real r1, const real r2, const real r3, const real r4);
-    virtual real calc_alpha(const real r1, const real r2, const real r3, const real r4);
+    virtual real calc_v(const real r1, const real r2, const real r3, const real r4) const ;
+    virtual real calc_alpha(const real r1, const real r2, const real r3, const real r4) const;
     virtual real calc_flux(const real g, real c,
                            const real nx, const real ny, const real nz,
                            const real nalpha);
@@ -390,8 +397,8 @@ class VOF : public Centered {
     real cangle;
     real mult_wall;
 
-    inline real signum(const real a, const real b) { return a*((b>0.)-(b<0.)); }
-    inline int signum(const int a, const int b) { return a*((b>0)-(b<0)); }
+    inline real signum(const real a, const real b) const { return a*((b>0.)-(b<0.)); }
+    inline int signum(const int a, const int b) const { return a*((b>0)-(b<0)); }
 };	
 #endif
 

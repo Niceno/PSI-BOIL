@@ -4,6 +4,7 @@
 #include "../Field/Scalar/scalar.h"
 #include "../Field/Vector/vector.h"
 #include "../Equation/Centered/CIPCSL2/cipcsl2.h"
+#include "../Equation/Centered/VOF/vof.h"
 #include "../Equation/Nucleation/nucleation.h"
 #include "../Matter/matter.h"
 #include <vector>
@@ -118,10 +119,19 @@ namespace boil {
   /* restrict scalar */
   void restrictXZ(const Scalar & fine, Scalar & coarse);
   void restrictXZ_area(const Scalar & fine, Scalar & coarse);
+  void restrictXZ_sum(const Scalar & fine, Scalar & coarse);
 
   /* restrict vector */
   void restrictXZ_vector_simple(const Vector & fine, Vector & coarse,
                                 const Scalar & fs, const Scalar & cs);
+
+  /* prolongate plic */
+  void prolongate_vf_XZ(const Scalar & coarse, Scalar & fine, 
+                        const VOF & concc, VOF & concf);
+  inline real translate_v_coarse_to_fine(const int i_f, const int j_f, const int k_f,
+                                         const int i_c, const int j_c, const int k_c,
+                                         const Scalar & coarse, const Scalar & fine,
+                                         const VOF & concc, VOF & concf);
 
   /* material properties as functions of temperature */
   inline real rho(const real rho0, const real beta, const real deltat) {

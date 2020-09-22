@@ -22,9 +22,10 @@ real VOF::extract_cl_velocity_2d(const Comp ctangential, const Comp cnormal,
     ranged = true;
   }
 
-  real veloc(boil::unreal);
+  real veloc1(boil::unreal), veloc2(boil::unreal), veloc3(boil::unreal);
   int Iglob(boil::unint);
   int procnum(boil::unint);
+  int ifl(boil::unint);
 
   for_i(i) {
     int Iloc = phi.domain()->global_I(i)-boil::BW+1;
@@ -34,7 +35,10 @@ real VOF::extract_cl_velocity_2d(const Comp ctangential, const Comp cnormal,
           if(dom->ibody().off(i,j,k-1) || (k==sk() && kminw)) {
             if(abs(iflag[i][j][k])==1) {
               Iglob = Iloc;
-              veloc = 0.5*((*u)[Comp::u()][i][j][k]+(*u)[Comp::u()][i+1][j][k]);
+              veloc1 = (*u)[Comp::u()][i][j][k];
+              veloc2 = (*u)[Comp::u()][i+1][j][k];
+              veloc3 = (*u)[Comp::u()][i+2][j][k];
+              ifl = iflag[i][j][k];
             } /* at the interface */
           } /* next to wall */
         } /* ibody on */
@@ -50,10 +54,17 @@ real VOF::extract_cl_velocity_2d(const Comp ctangential, const Comp cnormal,
   if(Iglob==Iglob_temp) {
     procnum = boil::cart.iam();
   } else {
-    veloc = boil::unreal;
+    veloc1 = veloc2 = veloc3 = boil::unreal;
+    ifl = boil::unint;
   }
   boil::cart.min_int(&procnum);
-  boil::cart.min_real(&veloc);
+  boil::cart.min_int(&ifl);
+  boil::cart.min_real(&veloc1);
+  boil::cart.min_real(&veloc2);
+  boil::cart.min_real(&veloc3);
+
+  boil::oout<<"velextract= "<<time->current_time()<<" "<<ifl
+            <<" "<<veloc1<<" "<<veloc2<<" "<<veloc3<<boil::endl;
 
   /* return */
   if(boil::realistic(Iglob)) {
@@ -61,7 +72,7 @@ real VOF::extract_cl_velocity_2d(const Comp ctangential, const Comp cnormal,
       *IG = Iglob;
     if(PN)
       *PN = procnum;
-    return veloc;
+    return 0.5*(veloc1+veloc2);
   } else {
     if(IG)
       *IG = 0;

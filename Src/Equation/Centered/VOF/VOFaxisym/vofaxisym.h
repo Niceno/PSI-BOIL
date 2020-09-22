@@ -25,7 +25,8 @@ class VOFaxisym : public VOF {
     virtual void reconstruct_geometry();
     virtual void reconstruct_geometry(Scalar & scp);
     virtual void color_to_vf(Scalar & color, Scalar & vf,
-                             const bool extalp=true,const bool bdn=true);
+                             const bool nvec=true,const bool extalp=true,
+                             const bool bdn=true);
     void vf_to_color(const Scalar & vf, Scalar & color);
 
     //real calc_alpha_axisymmetric(const real nnx, const real v, const real eta0);
@@ -80,11 +81,11 @@ class VOFaxisym : public VOF {
                                              const real dc, const real dp,
                                              const real mult);
 
-    //virtual real calc_v(const real alpha, const real vma, const real vmb, const real vmc);
+    //virtual real calc_v(const real alpha, const real vma, const real vmb, const real vmc) const;
     real calc_v_axisymmetric(real nnx, real alp, real eta0, real & Kp);
     
     //virtual real calc_alpha(const real r1, const real r2,
-    //                        const real r3, const real r4);
+    //                        const real r3, const real r4) const;
     real calc_alpha_axisymmetric(const real nnx, const real v, const real eta0);
 
     real calc_flux_axisymmetric(const real g,

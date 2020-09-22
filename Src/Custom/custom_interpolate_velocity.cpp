@@ -37,8 +37,8 @@ namespace boil {
 
     real mult(0.);
     if(fluid.mixture()) {
-      const real rhov = fluid.rho(1);
-      const real rhol = fluid.rho(0);
+      const real rhov = fluid.rho(0);
+      const real rhol = fluid.rho(1);
       mult = 1./rhov-1./rhol;
     }
     
@@ -123,13 +123,11 @@ namespace boil {
       const real Q_b = 0.5*(Q_be+Q_te);
 
       /* step 6: calculate matrix coefficients */
-      m = Comp::u();
-      const real C_a = S_a/fluid.rho(m,i_y,j_y,k_y)/mdot.dxw(i_y);
-      const real C_c = S_c/fluid.rho(m,i_z,j_z,k_z)/mdot.dxw(i_z);
+      const real C_a = S_a/mdot.dxw(i_y);
+      const real C_c = S_c/mdot.dxw(i_z);
 
-      m = Comp::w();
-      const real C_d = S_d/fluid.rho(m,i_x,j_x,k_x)/mdot.dzb(k_x);
-      const real C_b = S_b/fluid.rho(m,i_y,j_y,k_y)/mdot.dzb(k_y);
+      const real C_d = S_d/mdot.dzb(k_x);
+      const real C_b = S_b/mdot.dzb(k_y);
 
       /* step 7: calculate source terms */
       const real F_x = mult*mdot[i_x][j_x][k_x]*mdot.dV(i_x,j_x,k_x);
@@ -176,7 +174,6 @@ namespace boil {
       fine[m][i_y][j_y][k_y+1] = u_te;
 
     } /* ijk */
-
   }
 
   /* the solution to the poisson equation was obtained with python sympy */

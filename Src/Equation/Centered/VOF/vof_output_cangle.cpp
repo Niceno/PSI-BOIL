@@ -1,7 +1,7 @@
 #include "vof.h"
 
 /******************************************************************************/
-void VOF::output_cangle_2d(const Comp ctangential, const Comp cnormal,
+real VOF::output_cangle_2d(const Comp ctangential, const Comp cnormal,
                            const Sign sig) {
 
   real h0(0.0), h1(0.0), h2(0.0);
@@ -13,7 +13,7 @@ void VOF::output_cangle_2d(const Comp ctangential, const Comp cnormal,
                    sig,ridx,h0,h1,h2,
                    dzzt0,dzzc0,dzzt1,dzzc1);
 
-  return;
+  return h0;
 
 }
 

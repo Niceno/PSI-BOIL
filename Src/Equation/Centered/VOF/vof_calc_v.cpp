@@ -1,6 +1,6 @@
 #include "vof.h"
 
-real VOF::calc_v(const real alpha, const real vma, const real vmb, const real vmc){
+real VOF::calc_v(const real alpha, const real vma, const real vmb, const real vmc) const {
 
   if(alpha<boil::pico)
     return 0.0;

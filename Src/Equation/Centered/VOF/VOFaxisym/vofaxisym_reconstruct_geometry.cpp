@@ -51,7 +51,7 @@ void VOFaxisym::reconstruct_geometry(Scalar & scp) {
     }
 
     /* color to vf contains calculations of normal vector and update at walls */
-    color_to_vf(axistmp,stmp2,true,true);
+    color_to_vf(axistmp,stmp2,true,true,true);
     /* calculate Linf error norm of reconstruction in phi-space */
   #if 0
     int imax,jmax,kmax;

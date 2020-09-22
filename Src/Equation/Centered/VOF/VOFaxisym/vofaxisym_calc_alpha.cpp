@@ -3,7 +3,7 @@
 #if 0 /* discarded due to the way elvira works */
 /******************************************************************************/
 real VOFaxisym::calc_alpha(const real v,
-                           const real vma, const real vmb, const real vmc) {
+                           const real vma, const real vmb, const real vmc)  const {
 /***************************************************************************//**
  \brief Solve the point-inverse 2D Cartesian problem, i.e. calculate alp(phi,n),
         this is a virtual function wrt 3D VOF calc_v; these two should basically

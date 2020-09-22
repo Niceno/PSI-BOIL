@@ -197,6 +197,10 @@ int main(int argc, char ** argv) {
   const real rhosol = 3980.0;
   const real cpsol = 750*rhosol;
   const real lambdasol = 35.;
+  /* ito */
+  const real rhoito = 7140;
+  const real cpito = 2.58e6;
+  const real lambdaito = 10.2;
 
 /******************************************************************************/
 /* ------------ domain dimensions */
@@ -227,12 +231,13 @@ int main(int argc, char ** argv) {
   boil::oout<<"correl: theta^3/lnS= "<<correl_reduc<<" rad^3"<<boil::endl;
 
 #if CASE == 1
+  const real itothick = 0.7e-6;
   /* in experiment, ITO: 700 nm, sapphire: 250 um;
      here, sapphire: ~100 um; note: proc and solid boundary mustnt overlap! */
   //const int NZ0 = N0/(gStage*5);
   const int NZ0 = N0/gStage-3*gLevel;
   /* should be 0.7 um */
-  const int NZheat = std::ceil(0.7e-6/DZ0);
+  const int NZheat = std::ceil(itothick/DZ0);
   const real LZ0 = -DZ0*NZ0;
   const real LZheat = -NZheat*DZ0;
   boil::oout<<"NZheat= "<<NZ0<<" "<<NZheat<<" "<<LZheat<<boil::endl;

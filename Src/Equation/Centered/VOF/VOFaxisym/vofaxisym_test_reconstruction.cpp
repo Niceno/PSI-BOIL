@@ -9,7 +9,7 @@ real VOFaxisym::test_reconstruction(const Scalar & color, const Scalar & vf) {
   axistmp=color;
 
   /* Ktmp, nx, ny, nz, nalpha are internally overwritten in this function! */
-  color_to_vf(axistmp,stmp2,true,true);
+  color_to_vf(axistmp,stmp2,true,true,true);
   /* true = extract alpha -> nalpha is overwritten
      true = boundary normal vector is iterated */
 
