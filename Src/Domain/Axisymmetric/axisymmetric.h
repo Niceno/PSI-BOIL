@@ -37,7 +37,7 @@ class Axisymmetric : public Domain {
 
     };
 
-    Axisymmetric(const Axisymmetric & fine_dom,
+    Axisymmetric(const Domain & fine_dom,
                  const Step cx, const Step cz,
                  Body * b = NULL,
                  const bool print_statistics = true) :
@@ -51,6 +51,7 @@ class Axisymmetric : public Domain {
         if(print_statistics)
           statistics();
       }
+      assert(fine_dom.is_axisymmetric());
 
     };
 
@@ -118,5 +119,4 @@ class Axisymmetric : public Domain {
     Grid1D ydummy; 	  
     real angle; /* angle of wedge. Do not change without modifying geometrical functions!*/
 };
-
 #endif

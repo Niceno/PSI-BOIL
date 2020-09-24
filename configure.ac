@@ -14,7 +14,9 @@ AC_OUTPUT(Makefile                                                             \
           Src/Domain/Makefile                                                  \
           Src/Domain/Axisymmetric/Makefile                                     \
           Src/Global/Makefile                                                  \
+          Src/Field/Scalar/TwoLevelScalar/Makefile                             \
           Src/Field/Scalar/Makefile                                            \
+          Src/Field/Vector/TwoLevelVector/Makefile                             \
           Src/Field/Vector/Makefile                                            \
           Src/Field/ScalarBool/Makefile                                        \
           Src/Field/VectorBool/Makefile                                        \

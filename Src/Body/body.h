@@ -220,6 +220,8 @@ class Body {
     Scalar * bdist;
     Scalar * ux, * uy, * uz;
 
+    std::string name;
+
   private:
 
     bool cross_seg_x(int index,

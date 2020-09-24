@@ -53,7 +53,9 @@ SUBDIRS = Equation/Staggered/Momentum                              \
           Domain                                                   \
           Body                                                     \
           Model                                                    \
+	  Field/Vector/TwoLevelVector                              \
           Field/Vector                                             \
+          Field/Scalar/TwoLevelScalar                              \
           Field/Scalar                                             \
           Field/ScalarBool                                         \
           Field/VectorBool                                         \
@@ -120,7 +122,9 @@ LDADD = Custom/IF97/libIF97.a                                                 \
         Domain/Axisymmetric/libAxisymmetric.a                                 \
         Body/libBody.a                                                        \
         Model/libModel.a                                                      \
+        Field/Vector/TwoLevelVector/libTwoLevelVector.a                       \
         Field/Vector/libVector.a                                              \
+        Field/Scalar/TwoLevelScalar/libTwoLevelScalar.a                       \
         Field/Scalar/libScalar.a                                              \
         Field/VectorBool/libVectorBool.a                                      \
         Field/ScalarBool/libScalarBool.a                                      \

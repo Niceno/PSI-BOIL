@@ -22,8 +22,11 @@ class Step {
       return ost;
     }
 
+    const Step & operator = (const Step & s)
+     {val = s.size(); return *this;}
+
   private:
-    const int val;
+    int val;
 };
 
 #endif

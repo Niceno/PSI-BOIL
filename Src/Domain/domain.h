@@ -17,6 +17,7 @@
 #include "../Ravioli/comp.h"
 #include "../Ravioli/sign.h"
 #include "../Ravioli/decompose.h"
+#include "../Ravioli/enumerate.h"
 #include "../Global/global_swap.h"
 
 //////////////
@@ -299,5 +300,4 @@ class Domain {
        decomposition can be achieved */
     static int factor_x, factor_y, factor_z;
 };	
-
 #endif

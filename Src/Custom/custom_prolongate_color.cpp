@@ -2,8 +2,7 @@
 
 namespace boil {
   /******************************************************************************/
-  void prolongate_vf_XZ(const Scalar & coarse, Scalar & fine, 
-                        const VOF & concc, VOF & concf) {
+  void prolongate_color_XZ(const VOF & concc, VOF & concf) {
   /***************************************************************************//**
    \brief Prolongate volume fraction geometrically from a coarse 2D grid 
           to a fine one.
@@ -18,6 +17,9 @@ namespace boil {
                        q - 2*i^-1 +b, j ,2*k^-1 +b
 
   *******************************************************************************/
+
+    Scalar & fine = concf.color();
+    const Scalar & coarse = concc.color();
 
     for_vijk(coarse,i,j,k) {
 

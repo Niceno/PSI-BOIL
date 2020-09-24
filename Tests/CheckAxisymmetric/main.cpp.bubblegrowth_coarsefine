@@ -155,187 +155,156 @@ int main(int argc, char ** argv) {
   |  domain  |
   +---------*/
 #if CASE == 1
-  Axisymmetric dfine(gx, gz, DX);
-  Axisymmetric d(dfine,Step(2),Step(2));
+  TwoLevelAxisymmetric d(gx,gz,DX);
 #elif CASE == 2
   Grid1D gy(DX);
-  Domain dfine(gz,gy,gz);
-  Domain d(dfine,Step(2),Step(1),Step(2));
+  TwoLevelDomain d(gz,gy,gz);
 #else
-  Domain dfine(gz,gz,gz);
-  Domain d(dfine,Step(2));
+  TwoLevelDomain d(gz,gz,gz);
 #endif
-  const real dxmin = d.dxyz_min();
+  const real dxmin = d.coarse().dxyz_min();
 
   /*------------------+
   |  define unknowns  |
   +------------------*/
-  Vector uvw(d), xyz(d);           // vel
-  Vector uvw_1(d);                 // phasic vel
-  Scalar p  (d), f  (d), press(d); // pressure
-  Scalar c  (d), g  (d), kappa(d); // concentration
+  Vector xyz(d.coarse());                    // force
+  Vector uvw_1(d.coarse());                  // phasic vel
+  Scalar p  (d.coarse()), press(d.coarse()); // pressure
 
   /* the following variables have to exist on the fine grid: */
-  Scalar tpr_f(dfine), q_f  (dfine);           // temperature
-  Scalar mdot_f(dfine), mflx_f(dfine);         // phase-change rate
+  Scalar tpr(d.fine()), q  (d.fine());       // temperature
+  Scalar mdot(d.fine()), mflx(d.fine());     // phase-change rate
 
-  Vector uvw_f(dfine);
-  Scalar c_f(dfine), g_f(dfine), kappa_f(dfine); // concentration
-  Scalar f_f(dfine);
+  /* the following variables have to exist on both levels: */
+  TwoLevelVector uvw(d);                     // velocity
+  TwoLevelScalar c(d), g(d), kappa(d);       // concentration
+  TwoLevelScalar f(d);                       // pressure src
 
   /*-----------------------------+ 
   |  insert boundary conditions  |
   +-----------------------------*/
-  for_m(m) {
+  for(auto l : uvw.levels) {
+    for_m(m) {
 #if CASE == 1
-    uvw.bc(m).add( BndCnd( Dir::imin(), BndType::symmetry() ) );
-    uvw.bc(m).add( BndCnd( Dir::imax(), BndType::outlet() ) );
-    uvw_f.bc(m).add( BndCnd( Dir::imin(), BndType::symmetry() ) );
-    uvw_f.bc(m).add( BndCnd( Dir::imax(), BndType::outlet() ) );
+      l->bc(m).add( BndCnd( Dir::imin(), BndType::symmetry() ) );
+      l->bc(m).add( BndCnd( Dir::imax(), BndType::outlet() ) );
 #else
   #ifdef SYM
-    uvw.bc(m).add( BndCnd( Dir::imin(), BndType::symmetry() ) );
-    uvw.bc(m).add( BndCnd( Dir::imax(), BndType::outlet() ) );
-    uvw_f.bc(m).add( BndCnd( Dir::imin(), BndType::symmetry() ) );
-    uvw_f.bc(m).add( BndCnd( Dir::imax(), BndType::outlet() ) );
+      l->bc(m).add( BndCnd( Dir::imin(), BndType::symmetry() ) );
+      l->bc(m).add( BndCnd( Dir::imax(), BndType::outlet() ) );
   #else
-    uvw.bc(m).add( BndCnd( Dir::imin(), BndType::outlet() ) );
-    uvw.bc(m).add( BndCnd( Dir::imax(), BndType::outlet() ) );
-    uvw_f.bc(m).add( BndCnd( Dir::imin(), BndType::outlet() ) );
-    uvw_f.bc(m).add( BndCnd( Dir::imax(), BndType::outlet() ) );
+      l->bc(m).add( BndCnd( Dir::imin(), BndType::outlet() ) );
+      l->bc(m).add( BndCnd( Dir::imax(), BndType::outlet() ) );
   #endif
 #endif
 #ifdef SYM
-    uvw.bc(m).add( BndCnd( Dir::kmin(), BndType::symmetry() ) );
-    uvw.bc(m).add( BndCnd( Dir::kmax(), BndType::outlet() ) );
-    uvw_f.bc(m).add( BndCnd( Dir::kmin(), BndType::symmetry() ) );
-    uvw_f.bc(m).add( BndCnd( Dir::kmax(), BndType::outlet() ) );
+      l->bc(m).add( BndCnd( Dir::kmin(), BndType::symmetry() ) );
+      l->bc(m).add( BndCnd( Dir::kmax(), BndType::outlet() ) );
 #else
-    uvw.bc(m).add( BndCnd( Dir::kmin(), BndType::outlet() ) );
-    uvw.bc(m).add( BndCnd( Dir::kmax(), BndType::outlet() ) );
-    uvw_f.bc(m).add( BndCnd( Dir::kmin(), BndType::outlet() ) );
-    uvw_f.bc(m).add( BndCnd( Dir::kmax(), BndType::outlet() ) );
+      l->bc(m).add( BndCnd( Dir::kmin(), BndType::outlet() ) );
+      l->bc(m).add( BndCnd( Dir::kmax(), BndType::outlet() ) );
 #endif
 #if CASE < 3
-    uvw.bc(m).add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
-    uvw.bc(m).add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
-    uvw_f.bc(m).add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
-    uvw_f.bc(m).add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
+      l->bc(m).add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
+      l->bc(m).add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
 #else 
   #ifdef SYM
-    uvw.bc(m).add( BndCnd( Dir::jmin(), BndType::symmetry() ) );
-    uvw.bc(m).add( BndCnd( Dir::jmax(), BndType::outlet() ) );
-    uvw_f.bc(m).add( BndCnd( Dir::jmin(), BndType::symmetry() ) );
-    uvw_f.bc(m).add( BndCnd( Dir::jmax(), BndType::outlet() ) );
+      l->bc(m).add( BndCnd( Dir::jmin(), BndType::symmetry() ) );
+      l->bc(m).add( BndCnd( Dir::jmax(), BndType::outlet() ) );
   #else
-    uvw.bc(m).add( BndCnd( Dir::jmin(), BndType::outlet() ) );
-    uvw.bc(m).add( BndCnd( Dir::jmax(), BndType::outlet() ) );
-    uvw_f.bc(m).add( BndCnd( Dir::jmin(), BndType::outlet() ) );
-    uvw_f.bc(m).add( BndCnd( Dir::jmax(), BndType::outlet() ) );
+      l->bc(m).add( BndCnd( Dir::jmin(), BndType::outlet() ) );
+      l->bc(m).add( BndCnd( Dir::jmax(), BndType::outlet() ) );
   #endif
 #endif
-    uvw_1(m)=uvw(m).shape();
+    }
+  }
+
+  for_m(m)
+    uvw_1(m)=uvw.coarse(m).shape();
+
+  for(auto l : c.levels) {
+#if CASE == 1
+    l->bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
+    l->bc().add( BndCnd( Dir::imax(), BndType::outlet() ) );
+#else
+  #ifdef SYM
+    l->bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
+    l->bc().add( BndCnd( Dir::imax(), BndType::outlet() ) );
+  #else
+    l->bc().add( BndCnd( Dir::imin(), BndType::outlet() ) );
+    l->bc().add( BndCnd( Dir::imax(), BndType::outlet() ) );
+  #endif
+#endif
+#ifdef SYM
+    l->bc().add( BndCnd( Dir::kmin(), BndType::symmetry() ) );
+    l->bc().add( BndCnd( Dir::kmax(), BndType::outlet() ) );
+#else
+    l->bc().add( BndCnd( Dir::kmin(), BndType::outlet() ) );
+    l->bc().add( BndCnd( Dir::kmax(), BndType::outlet() ) );
+#endif
+#if CASE < 3
+    l->bc().add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
+    l->bc().add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
+#else
+  #ifdef SYM
+    l->bc().add( BndCnd( Dir::jmin(), BndType::symmetry() ) );
+    l->bc().add( BndCnd( Dir::jmax(), BndType::outlet() ) );
+  #else
+    l->bc().add( BndCnd( Dir::jmin(), BndType::outlet() ) );
+    l->bc().add( BndCnd( Dir::jmax(), BndType::outlet() ) );
+  #endif
+#endif
+  }
+
+  press = c.coarse.shape();
+  p     = c.coarse.shape();
+
+  mdot = c.fine.shape();
+  mflx = c.fine.shape();
+  q    = c.fine.shape();
+
+  for_coarsefine(l) {
+    *f[l]     = c[l]->shape();
+    *g[l]     = c[l]->shape();
+    *kappa[l] = c[l]->shape();
   }
 
 #if CASE == 1
-  c.bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
-  c.bc().add( BndCnd( Dir::imax(), BndType::outlet() ) );
-  c_f.bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
-  c_f.bc().add( BndCnd( Dir::imax(), BndType::outlet() ) );
+  tpr.bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
+  tpr.bc().add( BndCnd( Dir::imax(), BndType::dirichlet(), tout ) );
 #else
   #ifdef SYM
-  c.bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
-  c.bc().add( BndCnd( Dir::imax(), BndType::outlet() ) );
-  c_f.bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
-  c_f.bc().add( BndCnd( Dir::imax(), BndType::outlet() ) );
+  tpr.bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
+  tpr.bc().add( BndCnd( Dir::imax(), BndType::dirichlet(), tout ) );
   #else
-  c.bc().add( BndCnd( Dir::imin(), BndType::outlet() ) );
-  c.bc().add( BndCnd( Dir::imax(), BndType::outlet() ) );
-  c_f.bc().add( BndCnd( Dir::imin(), BndType::outlet() ) );
-  c_f.bc().add( BndCnd( Dir::imax(), BndType::outlet() ) );
+  tpr.bc().add( BndCnd( Dir::imin(), BndType::dirichlet(), tout ) );
+  tpr.bc().add( BndCnd( Dir::imax(), BndType::dirichlet(), tout ) );
   #endif
 #endif
 #ifdef SYM
-  c.bc().add( BndCnd( Dir::kmin(), BndType::symmetry() ) );
-  c.bc().add( BndCnd( Dir::kmax(), BndType::outlet() ) );
-  c_f.bc().add( BndCnd( Dir::kmin(), BndType::symmetry() ) );
-  c_f.bc().add( BndCnd( Dir::kmax(), BndType::outlet() ) );
+  tpr.bc().add( BndCnd( Dir::kmin(), BndType::symmetry() ) );
+  tpr.bc().add( BndCnd( Dir::kmax(), BndType::dirichlet(), tout ) );
 #else
-  c.bc().add( BndCnd( Dir::kmin(), BndType::outlet() ) );
-  c.bc().add( BndCnd( Dir::kmax(), BndType::outlet() ) );
-  c_f.bc().add( BndCnd( Dir::kmin(), BndType::outlet() ) );
-  c_f.bc().add( BndCnd( Dir::kmax(), BndType::outlet() ) );
+  tpr.bc().add( BndCnd( Dir::kmin(), BndType::dirichlet(), tout ) );
+  tpr.bc().add( BndCnd( Dir::kmax(), BndType::dirichlet(), tout ) );
 #endif
 #if CASE < 3
-  c.bc().add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
-  c.bc().add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
-  c_f.bc().add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
-  c_f.bc().add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
+  tpr.bc().add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
+  tpr.bc().add( BndCnd( Dir::jmax(), BndType::pseudo() ) ); 
 #else
   #ifdef SYM
-  c.bc().add( BndCnd( Dir::jmin(), BndType::symmetry() ) );
-  c.bc().add( BndCnd( Dir::jmax(), BndType::outlet() ) );
-  c_f.bc().add( BndCnd( Dir::jmin(), BndType::symmetry() ) );
-  c_f.bc().add( BndCnd( Dir::jmax(), BndType::outlet() ) );
+  tpr.bc().add( BndCnd( Dir::jmin(), BndType::symmetry() ) );
+  tpr.bc().add( BndCnd( Dir::jmax(), BndType::dirichlet(), tout ) );
   #else
-  c.bc().add( BndCnd( Dir::jmin(), BndType::outlet() ) );
-  c.bc().add( BndCnd( Dir::jmax(), BndType::outlet() ) );
-  c_f.bc().add( BndCnd( Dir::jmin(), BndType::outlet() ) );
-  c_f.bc().add( BndCnd( Dir::jmax(), BndType::outlet() ) );
-  #endif
-#endif
-
-  press=c.shape();
-  p=c.shape();
-  kappa=c.shape();
-
-  f = p.shape();
-  g = c.shape();
-
-  kappa_f=c_f.shape();
-
-  f_f = c_f.shape();
-  mdot_f = c_f.shape();
-  mflx_f = c_f.shape();
-  q_f = c_f.shape();
-  g_f = c_f.shape();
-
-#if CASE == 1
-  tpr_f.bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
-  tpr_f.bc().add( BndCnd( Dir::imax(), BndType::dirichlet(), tout ) );
-#else
-  #ifdef SYM
-  tpr_f.bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
-  tpr_f.bc().add( BndCnd( Dir::imax(), BndType::dirichlet(), tout ) );
-  #else
-  tpr_f.bc().add( BndCnd( Dir::imin(), BndType::dirichlet(), tout ) );
-  tpr_f.bc().add( BndCnd( Dir::imax(), BndType::dirichlet(), tout ) );
-  #endif
-#endif
-#ifdef SYM
-  tpr_f.bc().add( BndCnd( Dir::kmin(), BndType::symmetry() ) );
-  tpr_f.bc().add( BndCnd( Dir::kmax(), BndType::dirichlet(), tout ) );
-#else
-  tpr_f.bc().add( BndCnd( Dir::kmin(), BndType::dirichlet(), tout ) );
-  tpr_f.bc().add( BndCnd( Dir::kmax(), BndType::dirichlet(), tout ) );
-#endif
-#if CASE < 3
-  tpr_f.bc().add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
-  tpr_f.bc().add( BndCnd( Dir::jmax(), BndType::pseudo() ) ); 
-#else
-  #ifdef SYM
-  tpr_f.bc().add( BndCnd( Dir::jmin(), BndType::symmetry() ) );
-  tpr_f.bc().add( BndCnd( Dir::jmax(), BndType::dirichlet(), tout ) );
-  #else
-  tpr_f.bc().add( BndCnd( Dir::jmin(), BndType::dirichlet(), tout ) );
-  tpr_f.bc().add( BndCnd( Dir::jmax(), BndType::dirichlet(), tout ) );
+  tpr.bc().add( BndCnd( Dir::jmin(), BndType::dirichlet(), tout ) );
+  tpr.bc().add( BndCnd( Dir::jmax(), BndType::dirichlet(), tout ) );
   #endif
 #endif
 
   /*----------------------+
   |  physical properties  |
   +----------------------*/
-  Matter vapor(d), liquid(d);
+  TwoLevelMatter vapor(d), liquid(d);
   vapor  .mu    (muv);
   vapor  .rho   (rhov);
   vapor  .cp    (cpv);  // J/m3
@@ -345,29 +314,15 @@ int main(int argc, char ** argv) {
   liquid.cp    (cpl);   // J/m3
   liquid.lambda(lambdal);
 
-  Matter mixed(liquid, vapor, & c);
+  TwoLevelMatter mixed(liquid, vapor, & c);
   mixed.sigma(sig);
   mixed.latent(latent);
-
-  Matter vapor_f(dfine), liquid_f(dfine);
-  vapor_f  .mu    (muv);
-  vapor_f  .rho   (rhov);
-  vapor_f  .cp    (cpv);  // J/m3
-  vapor_f  .lambda(lambdav);
-  liquid_f.mu    (mul);
-  liquid_f.rho   (rhol);
-  liquid_f.cp    (cpl);   // J/m3
-  liquid_f.lambda(lambdal);
-
-  Matter mixed_f(liquid_f, vapor_f, & c_f);
-  mixed_f.sigma(sig);
-  mixed_f.latent(latent);
 
   /*-------------------+
   |  time-integration  |
   +-------------------*/
-  const real dt = surftens_dt_coef*pow(vapor.rho()->value()*pow(dxmin,3.0)
-                / (2.0*boil::pi*mixed.sigma()->value()),0.5);
+  const real dt = surftens_dt_coef*pow(vapor.coarse.rho()->value()*pow(dxmin,3.0)
+                / (2.0*boil::pi*mixed.coarse.sigma()->value()),0.5);
   const int ndt = tend/dt;
   const int n_per_backup = ndt/n_bck;
   const int n_per_plot = ndt/n_plot;
@@ -381,70 +336,62 @@ int main(int argc, char ** argv) {
   /*-----------------+
   |  define solvers  |
   +-----------------*/
-  Krylov * solverCGic = new CG(d, Prec::ic2());
-  Krylov * solverCGdi = new CG(d, Prec::di());
-  Krylov * solverBICG = new BiCGS(d, Prec::di());
-
-  Krylov * solver = solverCGic;
-
-  Krylov * solverCGic_f = new CG(dfine, Prec::ic2());
-  Krylov * solverCGdi_f = new CG(dfine, Prec::di());
-  Krylov * solverBICG_f = new BiCGS(dfine, Prec::di());
-
-  Krylov * solver_f = solverCGic_f;
+  Krylov * solver_coarse = new CG(d.coarse(), Prec::ic2());
+  Krylov * solver_fine   = new CG(d.fine(), Prec::ic2());
 
   /*-------------------+
   |  define equations  |
   +-------------------*/
   /* momentum equation */
-  Momentum ns( uvw, xyz, time, solver, &mixed);
+  Momentum ns( uvw.coarse, xyz, time, solver_coarse, &mixed.coarse);
   ns.convection_set(TimeScheme::forward_euler());
   ns.diffusion_set(TimeScheme::backward_euler());
 
   /* pressure solver */
-  Pressure pr(p, f, uvw, time, solver, &mixed);
+  Pressure pr(p, f.coarse, uvw.coarse, time, solver_coarse, &mixed.coarse);
   AC multigrid( &pr );
   multigrid.stop_if_diverging(multigrid_stop_if_diverging);
   multigrid.min_cycles(multigrid_min_cycles);
   multigrid.max_cycles(multigrid_max_cycles);
 
   /* color function */
-  Vector & uvwvof = uvw_1;
 #if CASE > 1
-  VOF conc(c, g, kappa, uvwvof, time, solver);
+  VOF conc_coarse(c.coarse, g.coarse, kappa.coarse, uvw_1, time, solver_coarse);
 #else
-  VOFaxisym conc(c, g, kappa, uvwvof, time, solver);
+  VOFaxisym conc_coarse(c.coarse, g.coarse, kappa.coarse, uvw_1, time, solver_coarse);
 #endif
-  conc.set_curv_method(curv_method);
-  conc.set_topo_method(topo_method);
-  conc.set_wall_curv_method(wall_curv_method);
-  conc.set_use_interp(use_fs_interp);
-  conc.set_pressure_extrapolation_parameters(store_pressure_extrap,niter_pressure_extrap);
+  conc_coarse.set_curv_method(curv_method);
+  conc_coarse.set_topo_method(topo_method);
+  conc_coarse.set_wall_curv_method(wall_curv_method);
+  conc_coarse.set_use_interp(use_fs_interp);
+  conc_coarse.set_pressure_extrapolation_parameters(store_pressure_extrap,niter_pressure_extrap);
 
   /* solver on the fine grid */
-  Vector & uvwvof_f = uvw_f;
 #if CASE > 1
-  VOF conc_f(c_f, g_f, kappa_f, uvwvof_f, time, solver_f);
+  VOF conc_fine(c.fine, g.fine, kappa.fine, uvw.fine, time, solver_fine);
 #else
-  VOFaxisym conc_f(c_f, g_f, kappa_f, uvwvof_f, time, solver_f);
+  VOFaxisym conc_fine(c.fine, g.fine, kappa.fine, uvw.fine, time, solver_fine);
 #endif
-  conc_f.set_curv_method(curv_method);
-  conc_f.set_topo_method(topo_method);
-  conc_f.set_wall_curv_method(wall_curv_method);
-  conc_f.set_use_interp(use_fs_interp);
-  conc_f.set_pressure_extrapolation_parameters(store_pressure_extrap,niter_pressure_extrap);
+  conc_fine.set_topo_method(topo_method);
+  conc_fine.set_use_interp(use_fs_interp);
+
+  assert(p.domain()==press.domain());
+  std::cout<<tpr.domain()<<" "<<(&(d.fine()))<<" "<<q.domain()<<" "<<p.domain()<<boil::endl;
+  std::cout<<tpr.domain()<<" "<<(&(d.coarse()))<<" "<<mdot.domain()<<" "<<mflx.domain()<<boil::endl;
+  std::cout<<c.fine.domain()<<" "<<c.coarse.domain()<<boil::endl;
+  std::cout<<kappa.fine.domain()<<" "<<kappa.coarse.domain()<<boil::endl;
+  assert(tpr.domain()==q.domain());
+  assert(tpr.domain()==uvw.fine.domain());
+
 
   /* enthalpy equation */
   TIF tsat(tsat0);
-  Vector & uvwenth1 = uvw_f;
-  Vector & uvwenth2 = uvw_f;
-
 #if CASE > 1
-  EnthalpyFD enthFD      (tpr_f, q_f, uvw_f, uvwenth1, uvwenth2, time, solver_f, &mixed_f,
-                          conc_f.topo, tsat);
+  EnthalpyFD enthFD      (tpr, q, uvw.fine, time, solver_fine, &mixed.fine,
+                          conc_fine.topo, tsat);
 #else
-  EnthalpyFDaxisym enthFD(tpr_f, q_f, uvw_f, uvwenth1, uvwenth2, time, solver_f, &mixed_f,
-                          conc_f.topo, tsat);
+  EnthalpyFDaxisym enthFD(tpr, q, uvw.fine, time, solver_fine, &mixed.fine,
+                          conc_fine.topo, tsat);
 #endif
   enthFD.convection_set(TimeScheme::forward_euler());
   enthFD.diffusion_set(TimeScheme::backward_euler());
@@ -452,8 +399,8 @@ int main(int argc, char ** argv) {
   enthFD.set_no_solid_acceleration(no_solid_acceleration);
 
   /* phase change */
-  PhaseChange4 pc(mdot_f, mflx_f, tpr_f, q_f, c_f, g_f , f_f , uvw_f, conc_f.topo,
-                  tsat, time, &mixed_f);
+  PhaseChange4 pc(mdot, mflx, tpr, q, c.fine, g.fine , f.fine , uvw.fine, conc_fine.topo,
+                  tsat, time, &mixed.fine);
 #ifdef USE_SECOND_ORDER
   pc.set_second_order_accuracy(true);
 #else
@@ -478,19 +425,19 @@ int main(int argc, char ** argv) {
 
   int ts;
   /* load variables */
-  std::vector<Scalar*> load_scalars = { &press, &c, &tpr_f };
+  std::vector<Scalar*> load_scalars = { &press, &c.coarse, &tpr };
   std::vector<std::string> load_scalar_names = { "press", "c", "tpr" };
 
-  std::vector<Vector*> load_vectors = { &uvw };
+  std::vector<Vector*> load_vectors = { &uvw.coarse };
   std::vector<std::string> load_vector_names = { "uvw" };
 
   if(boil::load_backup("time.txt",ts,time,
                        load_scalars, load_scalar_names,
                        load_vectors, load_vector_names)) {
-    conc.init();
-    boil::prolongate_vf_XZ(conc.color(),conc_f.color(),conc,conc_f);
-    conc_f.color_to_vf(conc_f.color(),c_f);
-    conc_f.init();
+    conc_coarse.init();
+    boil::prolongate_color_XZ(conc_coarse,conc_fine);
+    conc_fine.color_to_vf();
+    conc_fine.init();
   } else {
     boil::oout << "######################" << boil::endl;
     boil::oout << "#                    #" << boil::endl;
@@ -506,42 +453,33 @@ int main(int argc, char ** argv) {
     const real zcent=0.0;
 
 #if CASE < 3
-    boil::setup_circle_xz(conc.color(), radius, xcent, zcent);
-    boil::setup_circle_xz(conc_f.color(), radius, xcent, zcent);
+    boil::setup_circle_xz(conc_coarse.color(), radius, xcent, zcent);
 #else
-    boil::setup_sphere(conc.color(), radius, xcent, ycent, zcent);
-    boil::setup_sphere(conc_f.color(), radius, xcent, ycent, zcent);
+    boil::setup_sphere(conc_coarse.color(), radius, xcent, ycent, zcent);
 #endif
-    conc.color().bnd_update();
-    conc.color().exchange_all();
-    conc_f.color().bnd_update();
-    conc_f.color().exchange_all();
+    conc_coarse.color().bnd_update();
+    conc_coarse.color().exchange_all();
 #if CASE == 1
-    conc.color_to_vf(conc.color(),c);
-    conc_f.color_to_vf(conc_f.color(),c_f);
+    conc_coarse.color_to_vf();
 #endif
-    for_vijk(c,i,j,k)
-      c[i][j][k] = 1.0-c[i][j][k];
-    for_vijk(c_f,i,j,k)
-      c_f[i][j][k] = 1.0-c_f[i][j][k];
+    for_vijk(c.coarse,i,j,k)
+      c.coarse[i][j][k] = 1.0-c.coarse[i][j][k];
 
-    c.bnd_update();
-    c.exchange_all();
-    c_f.bnd_update();
-    c_f.exchange_all();
-    conc.init();
-    conc.totalvol();
+    c.coarse.bnd_update();
+    c.coarse.exchange_all();
+    conc_coarse.init();
+    conc_coarse.totalvol();
 
-    boil::prolongate_vf_XZ(conc.color(),conc_f.color(),conc,conc_f);
-    conc_f.color_to_vf(conc_f.color(),c_f);
-    conc_f.init();
+    boil::prolongate_color_XZ(conc_coarse,conc_fine);
+    conc_fine.color_to_vf();
+    conc_fine.init();
 
-    for_vijk(tpr_f,i,j,k) {
-      real dist = pow(tpr_f.xc(i)-xcent,2.0)
+    for_vijk(tpr,i,j,k) {
+      real dist = pow(tpr.xc(i)-xcent,2.0)
 #if CASE == 3
-                 +pow(tpr_f.yc(j)-ycent,2.0)
+                 +pow(tpr.yc(j)-ycent,2.0)
 #endif
-                 +pow(tpr_f.zc(k)-zcent,2.0);
+                 +pow(tpr.zc(k)-zcent,2.0);
 
       real radius2=70.0e-6;
       real coef1 =  2.28023719E+05;
@@ -550,20 +488,20 @@ int main(int argc, char ** argv) {
       real coef4 =  6.46735617E+19;
       real coef5 = -1.35949950E+24;
       if (dist<=pow(radius,2.0)) {
-        tpr_f[i][j][k] = tsat0;
+        tpr[i][j][k] = tsat0;
       } else if(dist<=pow(radius2,2.0)) {
         real xi = sqrt(dist) - radius;
         real ttmp = coef5*pow(xi,5.0) + coef4*pow(xi,4.0) + coef3*pow(xi,3.0)
                   + coef2*pow(xi,2.0) + coef1*xi + tsat0;
-        tpr_f[i][j][k] = std::min(tout,ttmp);
+        tpr[i][j][k] = std::min(tout,ttmp);
       } else {
-        tpr_f[i][j][k] = tout;
+        tpr[i][j][k] = tout;
       }
     }
-    tpr_f.bnd_update();
-    tpr_f.exchange_all();
-    boil::plot->plot(uvw,c,conc.color(),press,f,"uvw-c-clr-press-f",0);
-    boil::plot->plot(uvw_f,conc_f.color(),tpr_f,mdot_f,f_f,"uvwf-clr-tpr-mdot-f",0);
+    tpr.bnd_update();
+    tpr.exchange_all();
+    boil::plot->plot(uvw.coarse,c.coarse,conc_coarse.color(),press,f.coarse,"uvw-c-clr-press-f",0);
+    boil::plot->plot(uvw.fine,conc_fine.color(),tpr,mdot,f.fine,"uvwf-clr-tpr-mdot-f",0);
 
   }
 
@@ -582,10 +520,10 @@ int main(int argc, char ** argv) {
     pc.update(); /* in fine space */
 
     /* restrict sources to coarse */
-    boil::restrictXZ_sum(f_f,f);
-    boil::restrictXZ(g_f,g);
+    f.restrict_sum_XZ();
+    g.restrict_sum_XZ();
 
-    ns.vol_phase_change(&f);
+    ns.vol_phase_change(&f.coarse);
 
     /* reset body force */
     for_m(m)
@@ -593,7 +531,7 @@ int main(int argc, char ** argv) {
         xyz[m][i][j][k]=0.0;
 
     /* surface tension */
-    conc.tension(&xyz, mixed,conc.color());
+    conc_coarse.tension(&xyz, mixed.coarse,conc_coarse.color());
 
     /*--------------------------+
     |  solve momentum equation  |
@@ -619,14 +557,14 @@ int main(int argc, char ** argv) {
     /* shift pressure */
     real pmin=1.0e+300;
     for_vijk(press,i,j,k){
-      if(d.ibody().on(i,j,k)){
+      if(d.coarse().ibody().on(i,j,k)){
         if(pmin>press[i][j][k]) pmin=press[i][j][k];
       }
     }
     boil::cart.min_real(&pmin);
 
     for_vijk(press,i,j,k){
-      if(d.ibody().on(i,j,k)){
+      if(d.coarse().ibody().on(i,j,k)){
         press[i][j][k] -= pmin;
       } else {
         press[i][j][k] = 0.0;
@@ -638,25 +576,24 @@ int main(int argc, char ** argv) {
     ns.cfl_max();
 
     /* we need to get velocity and geometry in the fine space */
-    boil::interpolateXZ(uvw,uvw_f,c,mdot_f,mixed_f);
+    uvw.divergence_free_interpolate_XZ(p,mdot,mixed.fine);
 
     /*---------------------------+
     |  solve transport equation  |
     +---------------------------*/
-    conc.new_time_step();
-    conc_f.new_time_step();
-    conc.advance_with_extrapolation(true,ResRat(1e-4),uvw,f,
-                                    &liquid,&uvw_1);
-    //conc.reconstruct_geometry();
-    conc.totalvol();
+    conc_fine.new_time_step();
+    conc_coarse.new_time_step();
+    conc_coarse.advance_with_extrapolation(true,ResRat(1e-4),uvw.coarse,f.coarse,
+                                           &liquid.coarse,&uvw_1);
+    conc_coarse.totalvol();
 
     /*------------------------+
     |  solve energy equation  |
     +------------------------*/
     /* we need to get geometry in the fine space */
-    boil::prolongate_vf_XZ(conc.color(),conc_f.color(),conc,conc_f);
-    conc_f.color_to_vf(conc_f.color(),c_f);
-    conc_f.ancillary();
+    boil::prolongate_color_XZ(conc_coarse,conc_fine);
+    conc_fine.color_to_vf();
+    conc_fine.ancillary();
 
     /* in the fine space */
     enthFD.discretize();
@@ -667,10 +604,10 @@ int main(int argc, char ** argv) {
     |  dt control  |
     +-------------*/
     /* minimum color function */
-    conc.color_minmax();
+    conc_coarse.color_minmax();
 
     /* front */
-    conc_f.front_minmax();
+    conc_fine.front_minmax();
 
     time.control_dt(ns.cfl_max(),cfl_limit,dt);
 
@@ -678,8 +615,8 @@ int main(int argc, char ** argv) {
     |  output data  |
     +--------------*/
     if(time.current_step() % n_per_plot == 0 || time.current_step()==1 ) {
-      boil::plot->plot(uvw,c,conc.color(),press,f,"uvw-c-clr-press-f",iint);
-      boil::plot->plot(uvw_f,conc_f.color(),tpr_f,mdot_f,f_f,"uvwf-clr-tpr-mdot-f",iint);
+      boil::plot->plot(uvw.coarse,c.coarse,conc_coarse.color(),press,f.coarse,"uvw-c-clr-press-f",iint);
+      boil::plot->plot(uvw.fine,conc_fine.color(),tpr,mdot,f.fine,"uvwf-clr-tpr-mdot-f",iint);
       iint++;
     }
 
@@ -706,7 +643,6 @@ int main(int argc, char ** argv) {
     }
 
   }
-
   boil::oout << "Finished." << boil::endl;
 
   boil::timer.stop();

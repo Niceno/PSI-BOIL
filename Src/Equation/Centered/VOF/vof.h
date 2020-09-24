@@ -86,6 +86,11 @@ class VOF : public Centered {
       return;
     }
 
+    virtual void color_to_vf(const bool nvec=true,const bool extalp=true,
+                             const bool bdn=true) {
+      return;
+    }
+
     void tension(Vector * vec, const Matter matt);
     void tension(Vector * vec, const Matter matt, const Scalar & scp);
     real totalvol(real * vaps = NULL);
@@ -106,6 +111,7 @@ class VOF : public Centered {
                               const Sign & sig, const bool flagging);
 
     virtual Scalar & color() {return phi;}
+    virtual const Scalar & color() const {return phi;}
     const Vector & flow() { return vflow; }
     Heaviside * heaviside() { return heavi; }
 

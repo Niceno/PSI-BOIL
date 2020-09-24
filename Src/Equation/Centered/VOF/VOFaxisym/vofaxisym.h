@@ -27,12 +27,17 @@ class VOFaxisym : public VOF {
     virtual void color_to_vf(Scalar & color, Scalar & vf,
                              const bool nvec=true,const bool extalp=true,
                              const bool bdn=true);
+    virtual void color_to_vf(const bool nvec=true,const bool extalp=true,
+                             const bool bdn=true) {
+       color_to_vf(color(),phi,nvec,extalp,bdn);
+    }
     void vf_to_color(const Scalar & vf, Scalar & color);
 
     //real calc_alpha_axisymmetric(const real nnx, const real v, const real eta0);
     //real calc_v_axisymmetric(real nnx, real alp, real eta0, real & Kp);
 
     virtual Scalar & color() {return clr;}
+    virtual const Scalar & color() const {return clr;}
 
     /* setter for reconstruction */
     void set_reconstruction_parameters(const real rtol, const int riter) {

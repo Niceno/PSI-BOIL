@@ -60,8 +60,9 @@ Domain::Domain(const Domain & fine_dom,
     exit(0);
   }
 
-  boil::oout<<"Creating coarser grid with strides "
-            <<*c1<<" "<<*c2<<" "<<*c3<<" .\n";
+  if(!boil::cart.iam())
+    boil::oout<<"Creating coarser grid with strides "
+              <<*c1<<" "<<*c2<<" "<<*c3<<" .\n";
 
   /* properly coarsen dummy grids */
   if(fine_dom.grid_x_org()->is_dummy()) {

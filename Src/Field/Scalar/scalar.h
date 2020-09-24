@@ -5,8 +5,9 @@
 #include <sstream>
 #include <fstream>
 #include <cmath>
+#include <array>
 #include "../../Parallel/communicator.h"
-#include "../../Domain/domain.h"
+#include "../../Domain/TwoLevel/twolevel.h"
 #include "../../Boundary/bndcnd.h"
 #include "scalar_browsing.h"
 #include "../../Global/global_malloc.h"
@@ -26,8 +27,7 @@
 class Scalar {
   public:
     /* global constructor */
-    explicit Scalar(const Domain & d);
-    explicit Scalar(const Domain & d, const char * n);
+    explicit Scalar(const Domain & d, const char * n = NULL);
     explicit Scalar(const Domain & d, BndCnd & b);
     explicit Scalar(const Scalar & s); 
     explicit Scalar(const Scalar * s); // this creates an alias
