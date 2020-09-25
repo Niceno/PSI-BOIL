@@ -118,8 +118,8 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
           lm = lambdal + edm*cpl/rhol/turbP;
         }
         fact = resistance_multiplier(dxm,dxfull-dxm,lc,lm,
-                                     htwallmodel.near_wall_resist);
-        resistm = (dxfull-dxm)/lm + htwallmodel.near_wall_resist;
+                                     htwallmodel->near_wall_resist);
+        resistm = (dxfull-dxm)/lm + htwallmodel->near_wall_resist;
       } else {
         fdm = std::max(fdm,epsl);
         resistm = (1.0-fdm)*dxm/lm;
@@ -139,7 +139,7 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
       ac = am + ap;
 #endif
       /* dirac source term */
-      sourceterm = htwallmodel.dirac_wall_source * am * resistm;
+      sourceterm = htwallmodel->dirac_wall_source * am * resistm;
 
 #ifdef DEBUG
       std::cout<<"f-s-s: "<<i<<" "<<j<<" "<<k<<" "<<am-ac+ap<<"\n";
@@ -169,8 +169,8 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
           lp = lambdal + edp*cpl/rhol/turbP;
         }
         fact = resistance_multiplier(dxp,dxfull-dxp,lc,lp,
-                                     htwallmodel.near_wall_resist);
-        resistp = (dxfull-dxp)/lp + htwallmodel.near_wall_resist;
+                                     htwallmodel->near_wall_resist);
+        resistp = (dxfull-dxp)/lp + htwallmodel->near_wall_resist;
 #ifdef DEBUG
         boil::oout<<"fact: "<<i<<" "<<j<<" "<<k<<" "
                   << fact<<" "<<fdp*lp/((1.0-fdp)*lc+fdp*lp)<<boil::endl;
@@ -194,7 +194,7 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
       ac = am + ap;
 #endif
       /* dirac source term */
-      sourceterm = htwallmodel.dirac_wall_source * ap * resistp;
+      sourceterm = htwallmodel->dirac_wall_source * ap * resistp;
 
 #ifdef DEBUG
       std::cout<<"s-s-f: "<<i<<" "<<j<<" "<<k<<" "<<am-ac+ap<<"\n";
@@ -300,7 +300,7 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
         }
 #endif
         /* dirac source term */
-        sourceterm = htwallmodel.dirac_wall_source * am * resistm;
+        sourceterm = htwallmodel->dirac_wall_source * am * resistm;
       }
 #ifdef DEBUG
       std::cout<<"s-f-f: "<<i<<" "<<j<<" "<<k<<" "<<am-ac+ap<<"\n";
@@ -349,7 +349,7 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
         }
 #endif
         /* dirac source term */
-        sourceterm = htwallmodel.dirac_wall_source * ap * resistp;
+        sourceterm = htwallmodel->dirac_wall_source * ap * resistp;
       }
 #ifdef DEBUG
       std::cout<<"f-f-s: "<<i<<" "<<j<<" "<<k<<" "<<am-ac+ap<<"\n";

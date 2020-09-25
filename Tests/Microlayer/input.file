@@ -1,0 +1,13 @@
+9 - wall superheat [K]
+0 - outlet superheat [K]
+9 - nucleation superheat [K]
+28700 - heat flux [W/m2], will be converted to vol. source
+1 - cangle [deg]
+1 - pressure [atm]
+10 - initradius [um]
+250 - LZsolid [um]
+0.7 - LZheater[um], 0. indicates a Dirac heater
+1000 - NZsolid [.int.]
+4096 - NXtot [.int.]
+6144 - NZtot [.int.]
+1 - case flag [.int.], indicates initialisation of variables

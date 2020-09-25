@@ -20,7 +20,7 @@ class TwoLevelScalar {
     {
     }
 
-    Scalar * operator [] (const int l) {return levels[l];}
+    Scalar & operator [] (const int l) {return *(levels[l]);}
 
     /* some restriction operators */
     void restrict_volume_XZ();

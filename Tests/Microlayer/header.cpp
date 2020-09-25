@@ -1,0 +1,2 @@
+//#define SETUP_ONLY
+//#define USE_BOTTOM_DIRICHLET

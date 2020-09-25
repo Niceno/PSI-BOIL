@@ -15,7 +15,7 @@ EnthalpyFD::EnthalpyFD(const Scalar & PHI,
                        Topology * TOPO,
                        TIF & tintmodel,
                        Matter * s,
-                       HTWallModel HTM) :
+                       HTWallModel * HTM) :
 /*---------------------+ 
 |  initialize parent   |
 +---------------------*/
@@ -50,6 +50,16 @@ EnthalpyFD::EnthalpyFD(const Scalar & PHI,
     accelerated_no_solid = true;
   }
 
+  /* heat transfer wall model should be equal to the one of enthalpy,
+   * that's why it is a pointer. however, the default argument is a
+   * nullptr, we need to fix that */
+  if(!htwallmodel) {
+    default_value_for_htwallmodel = true;
+    htwallmodel = new HTWallModel();
+  } else {
+    default_value_for_htwallmodel = false;
+  }
+
   ftif = phi.shape();
   phi.bnd_update();
 
@@ -61,6 +71,8 @@ EnthalpyFD::EnthalpyFD(const Scalar & PHI,
 
 /******************************************************************************/
 EnthalpyFD::~EnthalpyFD() {
+  if(default_value_for_htwallmodel)
+    delete htwallmodel;
 }	
 
 /******************************************************************************/

@@ -7,6 +7,7 @@
 #include "../Ravioli/decompose.h"
 #include "../Ravioli/column.h"
 #include "../Ravioli/buffers.h"
+#include "../Ravioli/rational.h"
 #include "../Custom/custom.h"
 #include "../Custom/IF97/if97.h"
 #include "../Domain/TwoLevel/twolevel.h"

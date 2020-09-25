@@ -21,7 +21,7 @@ class EnthalpyFDaxisym : public EnthalpyFD {
                      Topology * topo,
                      TIF & tifmodel,
                      Matter * sol = NULL,
-                     HTWallModel htwallmodel = HTWallModel::None()) :
+                     HTWallModel * htwallmodel = NULL) :
 
     EnthalpyFD(phi,f,u,uliq,ugas,t,sm,flu,topo,tifmodel,sol,htwallmodel) {
 
@@ -41,7 +41,7 @@ class EnthalpyFDaxisym : public EnthalpyFD {
                      Topology * topo,
                      TIF & tifmodel,
                      Matter * sol = NULL,
-                     HTWallModel htwallmodel = HTWallModel::None()) :
+                     HTWallModel * htwallmodel = NULL) :
     EnthalpyFDaxisym(phi,f,u,u,u,t,sm,flu,topo,tifmodel,sol,htwallmodel) {};
 
     ~EnthalpyFDaxisym() {};

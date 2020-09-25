@@ -38,7 +38,7 @@ class TwoLevelVector {
     Vector coarse;
     Vector fine;
 
-    Vector * operator [] (const int l) {return levels[l];}
+    Vector & operator [] (const int l) {return *(levels[l]);}
 
     std::array<Vector*,2> levels;
 };

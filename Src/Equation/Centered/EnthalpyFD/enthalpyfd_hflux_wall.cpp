@@ -85,7 +85,7 @@ real EnthalpyFD::hflux_wall(const Scalar & val, const Dir din
                 alen = fabs(val.zc(k)-val.zc(k+kof))
                      - distance_int_z(sig,i+iof,j+jof,k+kof,ts);
               }
-              hflux += (val[i][j][k]-ts)/(alen/lc+htwallmodel.near_wall_resist)*area;
+              hflux += (val[i][j][k]-ts)/(alen/lc+htwallmodel->near_wall_resist)*area;
             } /* interface */
           } /* vijk */
         } /* d == din */

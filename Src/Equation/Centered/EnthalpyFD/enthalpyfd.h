@@ -63,7 +63,7 @@ class EnthalpyFD : public Centered {
                Topology * topo,
                TIF & tifmodel,
                Matter * sol = NULL,
-               HTWallModel htwallmodel = HTWallModel::None());
+               HTWallModel * htwallmodel = NULL);
 
     /* Delegating constructor */
     EnthalpyFD(const Scalar & phi,
@@ -75,7 +75,7 @@ class EnthalpyFD : public Centered {
                Topology * topo,
                TIF & tifmodel,
                Matter * sol = NULL,
-               HTWallModel htwallmodel = HTWallModel::None()) :
+               HTWallModel * htwallmodel = NULL) :
     EnthalpyFD(phi,f,umixed,umixed,umixed,t,sm,flu,
                topo,tifmodel,sol,htwallmodel) {};
 
@@ -115,7 +115,7 @@ class EnthalpyFD : public Centered {
     }
 
     inline HTWallModel & heat_transfer_wall_model() {
-      return htwallmodel;
+      return *htwallmodel;
     }
 
     void convection();
@@ -210,12 +210,13 @@ class EnthalpyFD : public Centered {
 
     TIF & tifmodel;  
     Topology * topo;
-    HTWallModel htwallmodel;
+    HTWallModel * htwallmodel;
 
     real rhol,rhov,cpl,cpv,lambdal,lambdav,epsl;
     Scalar ftif;
     ScalarInt iflag,iflagold;
     real turbP; /* turbulent Prandtl number */
     bool laminar;
+    bool default_value_for_htwallmodel;
 };	
 #endif

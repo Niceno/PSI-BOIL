@@ -58,10 +58,10 @@ real EnthalpyFD::hflux_wall_ib(const Scalar * diff_eddy) {
         if(diff_eddy){
           lf += (*diff_eddy)[i][j][k]*cp_mass/turbP;
         }
-        resistf = dxf/lf + htwallmodel.near_wall_resist;
+        resistf = dxf/lf + htwallmodel->near_wall_resist;
       }
-      tw = htwallmodel.temperature_node(htwallmodel.dirac_wall_source,
-                                        resists, ts, resistf, tf);
+      tw = htwallmodel->temperature_node(htwallmodel->dirac_wall_source,
+                                         resists, ts, resistf, tf);
       gradt = (ts-tw)/dxs;
       hflux += area*ls*gradt;
     }
@@ -89,10 +89,10 @@ real EnthalpyFD::hflux_wall_ib(const Scalar * diff_eddy) {
         if(diff_eddy){
           lf += (*diff_eddy)[i][j][k]*cp_mass/turbP;
         }
-        resistf = dxf/lf + htwallmodel.near_wall_resist;
+        resistf = dxf/lf + htwallmodel->near_wall_resist;
       }
-      tw = htwallmodel.temperature_node(htwallmodel.dirac_wall_source,
-                                        resists, ts, resistf, tf);
+      tw = htwallmodel->temperature_node(htwallmodel->dirac_wall_source,
+                                         resists, ts, resistf, tf);
       gradt = (ts-tw)/dxs;
       hflux += area*ls*gradt;
     }
@@ -120,10 +120,10 @@ real EnthalpyFD::hflux_wall_ib(const Scalar * diff_eddy) {
         if(diff_eddy){
           lf += (*diff_eddy)[i][j][k]*cp_mass/turbP;
         }
-        resistf = dyf/lf + htwallmodel.near_wall_resist;
+        resistf = dyf/lf + htwallmodel->near_wall_resist;
       }
-      tw = htwallmodel.temperature_node(htwallmodel.dirac_wall_source,
-                                        resists, ts, resistf, tf);
+      tw = htwallmodel->temperature_node(htwallmodel->dirac_wall_source,
+                                         resists, ts, resistf, tf);
       gradt = (ts-tw)/dys;
       hflux += area*ls*gradt;
     }
@@ -151,10 +151,10 @@ real EnthalpyFD::hflux_wall_ib(const Scalar * diff_eddy) {
         if(diff_eddy){
           lf += (*diff_eddy)[i][j][k]*cp_mass/turbP;
         }
-        resistf = dyf/lf + htwallmodel.near_wall_resist;
+        resistf = dyf/lf + htwallmodel->near_wall_resist;
       }
-      tw = htwallmodel.temperature_node(htwallmodel.dirac_wall_source,
-                                        resists, ts, resistf, tf);
+      tw = htwallmodel->temperature_node(htwallmodel->dirac_wall_source,
+                                         resists, ts, resistf, tf);
       gradt = (ts-tw)/dys;
       hflux += area*ls*gradt;
     }
@@ -182,10 +182,10 @@ real EnthalpyFD::hflux_wall_ib(const Scalar * diff_eddy) {
         if(diff_eddy){
           lf += (*diff_eddy)[i][j][k]*cp_mass/turbP;
         }
-        resistf = dzf/lf + htwallmodel.near_wall_resist;
+        resistf = dzf/lf + htwallmodel->near_wall_resist;
       }
-      tw = htwallmodel.temperature_node(htwallmodel.dirac_wall_source,
-                                        resists, ts, resistf, tf);
+      tw = htwallmodel->temperature_node(htwallmodel->dirac_wall_source,
+                                         resists, ts, resistf, tf);
       gradt = (ts-tw)/dzs;
       hflux += area*ls*gradt;
     }
@@ -213,10 +213,10 @@ real EnthalpyFD::hflux_wall_ib(const Scalar * diff_eddy) {
         if(diff_eddy){
           lf += (*diff_eddy)[i][j][k]*cp_mass/turbP;
         }
-        resistf = dzf/lf + htwallmodel.near_wall_resist;
+        resistf = dzf/lf + htwallmodel->near_wall_resist;
       }
-      tw = htwallmodel.temperature_node(htwallmodel.dirac_wall_source,
-                                        resists, ts, resistf, tf);
+      tw = htwallmodel->temperature_node(htwallmodel->dirac_wall_source,
+                                         resists, ts, resistf, tf);
       gradt = (ts-tw)/dzs;
       hflux += area*ls*gradt;
     }

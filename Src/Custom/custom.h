@@ -109,6 +109,11 @@ namespace boil {
   inline real rho(const real rho0, const real beta, const real deltat) {
     return rho0/(1.+beta*deltat);
   } 
+
+  template <class T>
+  inline void print_line(T a) {
+    boil::oout<<a<<boil::endl;
+  }
 }
 
 #endif
