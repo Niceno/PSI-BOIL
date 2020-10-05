@@ -4,11 +4,19 @@
       boil::oout<<"PhaseChange4::turbP= "<<turbP<<"\n";
     }
  
-    inline bool get_accuracy_flag() const { return use_second_order_accuracy; }
+    inline int get_accuracy_order() const { return accuracy_order; }
+    inline void set_accuracy_order(const int ao) {
+      accuracy_order = ao;
+      boil::oout<<"PhaseChange4::accuracy_order= "
+                <<accuracy_order<<"\n";
+    }
     inline void set_second_order_accuracy(const bool flag) {
-      use_second_order_accuracy = flag;
-      boil::oout<<"PhaseChange4::use_second_order_accuracy= "
-                <<use_second_order_accuracy<<"\n";
+      if(flag)
+        accuracy_order = 2;
+      else
+        accuracy_order = 4;
+      boil::oout<<"PhaseChange4::accuracy_order= "
+                <<accuracy_order<<"\n";
     }
  
     inline bool get_extrapolation_flag() const {

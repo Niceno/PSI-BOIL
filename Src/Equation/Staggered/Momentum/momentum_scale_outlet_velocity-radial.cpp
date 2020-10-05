@@ -1,12 +1,19 @@
 #include "momentum.h"
 //#define TWODXY
-#define AXISYM
+#define TWODXZ
+//#define AXISYM
 #define SYM
 
 /******************************************************************************/
 void Momentum::scale_outlet_velocity(const real ubo, const real ratio) {
 
 #ifdef TWODXY
+  #ifdef SYM
+  const real prefact = 2.0/4.0*boil::pi;
+  #else
+  const real prefact = 2.0*boil::pi;
+  #endif
+#elif defined TWODXZ
   #ifdef SYM
   const real prefact = 2.0/4.0*boil::pi;
   #else
@@ -36,6 +43,8 @@ void Momentum::scale_outlet_velocity(const real ubo, const real ratio) {
 #ifdef TWODXY
   real deltz=u.zc(Comp::k(),ek(Comp::k()))-u.zc(Comp::k(),sk(Comp::k()));
   //boil::oout<<"deltz= "<<deltz<<"\n";
+#elif defined TWODXZ
+  real delty=u.yc(Comp::j(),ej(Comp::j()))-u.yc(Comp::j(),sj(Comp::j()));
 #endif
 
   for(int iloop=1; iloop<=2; iloop++){
@@ -65,6 +74,9 @@ void Momentum::scale_outlet_velocity(const real ubo, const real ratio) {
 #ifdef TWODXY
               real rr = sqrt(xx*xx + yy*yy);
               real uabs = volf_in/(prefact*rr*deltz);
+#elif defined TWODXZ
+              real rr = sqrt(xx*xx + zz*zz);
+              real uabs = volf_in/(prefact*rr*delty);
 #elif defined AXISYM
               real rr = sqrt(xx*xx + zz*zz);           
               real uabs = volf_in/(prefact*rr*rr);
@@ -92,6 +104,9 @@ void Momentum::scale_outlet_velocity(const real ubo, const real ratio) {
 #ifdef TWODXY
               real rr = sqrt(xx*xx + yy*yy);
               real uabs = volf_in/(prefact*rr*deltz);
+#elif defined TWODXZ
+              real rr = sqrt(xx*xx + zz*zz);
+              real uabs = volf_in/(prefact*rr*delty);
 #elif defined AXISYM
               real rr = sqrt(xx*xx + zz*zz);           
               real uabs = volf_in/(prefact*rr*rr);
@@ -125,7 +140,7 @@ void Momentum::scale_outlet_velocity(const real ubo, const real ratio) {
               real uabs = volf_in/(prefact*rr*rr);
               u[m][i][sj(m)-1][k] = uabs * yy / rr;
 #endif
-#ifdef AXISYM
+#if (defined AXISYM || defined TWODXZ)
               boil::aout<<"momentum::scale_outlet_vel: not allowed!"
                         <<boil::endl;
               exit(0);
@@ -154,7 +169,7 @@ void Momentum::scale_outlet_velocity(const real ubo, const real ratio) {
               real rr = sqrt(xx*xx + yy*yy + zz*zz);
               real uabs = volf_in/(prefact*rr*rr);
 #endif
-#ifdef AXISYM
+#if (defined AXISYM || defined TWODXZ)
               boil::aout<<"momentum::scale_outlet_vel: not allowed!"
                         <<boil::endl;
               exit(0);
@@ -176,13 +191,21 @@ void Momentum::scale_outlet_velocity(const real ubo, const real ratio) {
               real xx = u.xc(m,i);
               real yy = u.yc(m,j);
               real zz = u.zc(m,sk(m)-1);
-#ifndef TWODXY
-  #ifdef AXISYM
-              real rr = sqrt(xx*xx + zz*zz);           
-  #else
-              real rr = sqrt(xx*xx + yy*yy + zz*zz);
-  #endif
+#ifdef TWODXY
+              real uabs,rr;
+              boil::aout<<"momentum::scale_outlet_vel: not allowed!"
+                        <<boil::endl;
+              exit(0);
+#elif defined TWODXZ
+              real rr = sqrt(xx*xx + zz*zz);
+              real uabs = volf_in/(prefact*rr*delty);
+#elif defined AXISYM
+              real rr = sqrt(xx*xx + zz*zz);
               real uabs = volf_in/(prefact*rr*rr);
+#else
+              real rr = sqrt(xx*xx + yy*yy + zz*zz);
+              real uabs = volf_in/(prefact*rr*rr);
+#endif
               if(iloop==1){
                 sumflx += -dSz(m,i,j,sk(m)-1) * uabs * zz / rr;
               } else {
@@ -192,7 +215,6 @@ void Momentum::scale_outlet_velocity(const real ubo, const real ratio) {
                 for(int kk=1; kk<=boil::BW; kk++)
                   u[m][i][j][sk(m)-kk] = ratio1 * uabs * zz / rr;
               }
-#endif
             }
           }
           /* kmax */
@@ -201,13 +223,21 @@ void Momentum::scale_outlet_velocity(const real ubo, const real ratio) {
               real xx = u.xc(m,i);
               real yy = u.yc(m,j);
               real zz = u.zc(m,ek(m)+1);
-#ifndef TWODXY
-  #ifdef AXISYM
-              real rr = sqrt(xx*xx + zz*zz);           
-  #else
-              real rr = sqrt(xx*xx + yy*yy + zz*zz);
-  #endif
+#ifdef TWODXY
+              real uabs,rr;
+              boil::aout<<"momentum::scale_outlet_vel: not allowed!"
+                        <<boil::endl;
+              exit(0);
+#elif defined TWODXZ
+              real rr = sqrt(xx*xx + zz*zz);
+              real uabs = volf_in/(prefact*rr*delty);
+#elif defined AXISYM
+              real rr = sqrt(xx*xx + zz*zz);
               real uabs = volf_in/(prefact*rr*rr);
+#else
+              real rr = sqrt(xx*xx + yy*yy + zz*zz);
+              real uabs = volf_in/(prefact*rr*rr);
+#endif
               if(iloop==1){
                 sumflx += dSz(m,i,j,ek(m)+1) * uabs * zz / rr;
               } else {
@@ -217,7 +247,6 @@ void Momentum::scale_outlet_velocity(const real ubo, const real ratio) {
                 for(int kk=1; kk<=boil::BW; kk++)
                   u[m][i][j][ek(m)+kk] = ratio1 * uabs * zz / rr;
               }
-#endif
             }
           }
         } /* bc == outlet */

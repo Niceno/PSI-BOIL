@@ -154,9 +154,9 @@ class PhaseChange4 : public Centered {
     real turbP;
     real smdot_pos, smdot_neg;
     
+    int accuracy_order;
     bool default_value_for_htwallmodel;
-    bool use_second_order_accuracy, 
-         use_unconditional_extrapolation,
+    bool use_unconditional_extrapolation,
          discard_points_near_interface;
 };	
 

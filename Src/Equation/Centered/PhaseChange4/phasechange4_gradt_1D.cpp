@@ -151,11 +151,6 @@ real PhaseChange4::gradt1D(const bool is_solid, const Comp & m,
   int diff_req = stencil.size()-1;
 
   /* differences are implemented up to fourth-order */
-  int diff_max = 4;
-  /* is second-order accuracy desired? */
-  if(use_second_order_accuracy)
-    diff_max = 2;
-
 #if 0
   //if(m==Comp::i()&& (iflag[i][j][k]==1||iflag[i][j][k]==2) ) {
   if( (i==5&&k==28) || (i==28&&k==5) || (i==10&&k==27) || (i==27&&k==10) ) {
@@ -166,12 +161,12 @@ real PhaseChange4::gradt1D(const bool is_solid, const Comp & m,
     for(auto v : values) 
       boil::oout<<" "<<v;
     boil::oout<<" | "
-              <<nth_order_difference(stencil,values,std::min(diff_max,diff_req))
+              <<nth_order_difference(stencil,values,std::min(accuracy_order,diff_req))
               <<boil::endl;
   }
 #endif
 
   return nth_order_difference(stencil,values,
-                              std::min(diff_max,diff_req));
+                              std::min(accuracy_order,diff_req));
 
 }

@@ -107,7 +107,7 @@ PhaseChange4::PhaseChange4(const Scalar & MDOT,
   turbP = 0.9;
 
   /* flags */
-  use_second_order_accuracy = true;
+  accuracy_order = 2;
   use_unconditional_extrapolation = false;
 
   /* false-true: stability/accuracy tradeoff */

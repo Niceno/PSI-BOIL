@@ -118,6 +118,16 @@ class Topology {
     inline real get_zminft() const { return(zminft);};
     inline real get_zmaxft() const { return(zmaxft);};
 
+    /* references */
+    Scalar & get_vf()    { return *vf; }
+    Scalar & get_clr()   { return *clr; }
+    Scalar & get_nx()    { return *nx; }
+    Scalar & get_ny()    { return *ny; }
+    Scalar & get_nz()    { return *nz; }
+    Scalar & get_adens() { return *adens; }
+    Vector & get_fs()    { return *fs; }
+    ScalarInt & get_iflag() { return *iflag; }
+
     /* current variables */
     Scalar * vf;
     Scalar * clr;
