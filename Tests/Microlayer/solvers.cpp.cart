@@ -33,7 +33,7 @@
   multigrid.max_cycles(multigrid_max_cycles);
 
   /* color function */
-  VOFaxisym conc_coarse(c.coarse, g.coarse, kappa.coarse, uvw_1, time, solver_coarse);
+  VOF conc_coarse(c.coarse, g.coarse, kappa.coarse, uvw_1, time, solver_coarse);
 
   conc_coarse.set_curv_method(curv_method);
   conc_coarse.set_topo_method(topo_method);
@@ -50,7 +50,7 @@
   conc_coarse.set_wall_curv_method(wall_curv_method,Sign::neg(),cangle);
   
   /* vof on the fine grid */
-  VOFaxisym conc_fine(c.fine, g.fine, kappa.fine, uvw.fine, time, solver_fine);
+  VOF conc_fine(c.fine, g.fine, kappa.fine, uvw.fine, time, solver_fine);
   conc_fine.set_topo_method(topo_method);
   conc_fine.set_use_interp(use_fs_interp);
 
@@ -64,15 +64,15 @@
   }
 
   /* enthalpy equation */
-  EnthalpyFDaxisym enthFD_coarse(tpr.coarse, q.coarse, uvw.coarse, time, solver_coarse, &mixed.coarse,
-                                 conc_coarse.topo, tsat, &solid.coarse, htwm);
+  EnthalpyFD enthFD_coarse(tpr.coarse, q.coarse, uvw.coarse, time, solver_coarse, &mixed.coarse,
+                           conc_coarse.topo, tsat, &solid.coarse, htwm);
 
   enthFD_coarse.convection_set(TimeScheme::forward_euler());
   enthFD_coarse.diffusion_set(TimeScheme::backward_euler());
 
   /* enthalpy on the fine grid */
-  EnthalpyFDaxisym enthFD_fine(tpr.fine, q.fine, uvw.fine, time, solver_fine, &mixed.fine,
-                               conc_fine.topo, tsat, &solid.fine, htwm);
+  EnthalpyFD enthFD_fine(tpr.fine, q.fine, uvw.fine, time, solver_fine, &mixed.fine,
+                         conc_fine.topo, tsat, &solid.fine, htwm);
 
   enthFD_fine.convection_set(TimeScheme::forward_euler());
   enthFD_fine.diffusion_set(TimeScheme::backward_euler());

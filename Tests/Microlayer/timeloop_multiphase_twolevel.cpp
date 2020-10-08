@@ -34,7 +34,7 @@
     /*---------------+
     |  phase change  |
     +---------------*/
-    pc.update();
+    pc_fine.update();
 
     /* restrict sources to coarse */
     f.restrict_sum_XZ();
@@ -88,7 +88,7 @@
     press.exchange_all();
 
     /* we need to get velocity and geometry in the fine space */
-    uvw.divergence_free_interpolate_XZ(p,mdot,mixed.fine);
+    uvw.divergence_free_interpolate_XZ(p,mdot.fine,mixed.fine);
 
     /*---------------------------+
     |  solve transport equation  |
@@ -154,7 +154,7 @@
                        "uvwc-cc-press",
                        iint);
 
-      boil::plot->plot(uvw.fine,conc_fine.color(),tpr.fine,mdot,mflx,
+      boil::plot->plot(uvw.fine,conc_fine.color(),tpr.fine,mdot.fine,mflx.fine,
                        "uvwf-clrf-tprf-mdot-mflx",
                        iint);
 
@@ -177,7 +177,7 @@
                        "uvwc-cc-press",
                        iint);
 
-      boil::plot->plot(uvw.fine,conc_fine.color(),tpr.fine,mdot,mflx,
+      boil::plot->plot(uvw.fine,conc_fine.color(),tpr.fine,mdot.fine,mflx.fine,
                        "uvwf-clrf-tprf-mdot-mflx",
                        iint);
 
@@ -192,7 +192,7 @@
       std::stringstream ssb;
       ssb <<"bndtpr-"<<iint<<".txt";
       output.open(ssb.str(), std::ios::out);
-      boil::output_wall_heat_transfer_xz(tpr.fine,pc.node_tmp(),
+      boil::output_wall_heat_transfer_xz(tpr.fine,pc_fine.node_tmp(),
                                          solid.fine.lambda()->value(),output,NX0+NX1);
       boil::cart.barrier();
       output.close();

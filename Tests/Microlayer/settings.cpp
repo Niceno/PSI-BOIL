@@ -12,9 +12,9 @@
   real qsrc;
   if(LZheat>0.) {
     qsrc = qflux/fabs(LZheat);  /* [W/m3] */
-    boil::oout<<"qsrc= "<<qsrc<<" "<<qflux<<"\n";
+    boil::oout<<"qsrc (explicit)= "<<qsrc<<" "<<qflux<<"\n";
   } else {
-    qsrc= qflux; /* W/m2 */
+    qsrc = 0.0; /* W/m2 */
     boil::oout<<"qsrc (dirac)= "<<qsrc<<" "<<qflux<<"\n";
   }
 
@@ -31,7 +31,7 @@
   /* plot every */
   real t_per_plot = 0.01*1e-3;
   if(case_flag==0)
-    t_per_plot *= 100.;
+    t_per_plot = 0.1;
 
   /* steps per backup */
   const int n_per_backup = 5000;

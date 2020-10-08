@@ -35,7 +35,7 @@ int main(int argc, char ** argv) {
     boil::oout<<"- NZsolid [.int.]\n";
     boil::oout<<"- NXtot [.int.]\n";
     boil::oout<<"- NZtot [.int.]\n";
-    boil::oout<<"- case flag [.int.], indicates initialisation of variables\n";
+    boil::oout<<"- case flag [.int.], indicates initialisation and time loop\n";
 
     exit(0);
   }
@@ -135,7 +135,13 @@ int main(int argc, char ** argv) {
 #include "init.cpp"
 
 #ifndef SETUP_ONLY
-  #include "timeloop_multiphase.cpp"
+  if(case_flag==0) {
+  #include "timeloop_singlephase.cpp"
+  } else if(case_flag==1) {
+  #include "timeloop_multiphase_coarse.cpp"
+  } else {
+  #include "timeloop_multiphase_twolevel.cpp"
+  }
 #endif
 
   boil::oout << "Finished." << boil::endl;

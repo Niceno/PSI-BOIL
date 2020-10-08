@@ -46,7 +46,7 @@
   |  domain  |
   +---------*/
   Body floor("floor.stl");
-  TwoLevelAxisymmetric d(gx,gz,DX0,&floor);
+  TwoLevelCartesian d(gx,gx,gz,&floor);
 
   const real dxmin = d.coarse().dxyz_min();
   //boil::plot->plot(d.coarse(),"coarsedomain");

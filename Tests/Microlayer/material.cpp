@@ -38,12 +38,22 @@
   /* heater */
   /* sapphire */
   const real rhosol = 3980.0;
-  const real cpsol = 750*rhosol;
-  const real lambdasol = 35.;
+  const real trefsol = tsat0_K;
+  real cpsol = 0.9161e3; //D. A. Ditmars, et. al., J. Res. Nat. Bur. Stand., 87, (2), 159-163 (1982).
+  cpsol *= rhosol;
+  const real lambdasol = 25.12;
+  const real alpsol = lambdasol/cpsol;
+#if 0
   /* ito */
   const real rhoheat = 7140;
   const real cpheat = 2.58e6;
   const real lambdaheat = 10.2;
+#else
+  /* titanium */
+  const real rhoheat = 4506.;
+  const real cpheat = 544.3*rhoheat;
+  const real lambdaheat = 17.;
+#endif
 
   /* HT resistance */
   real resist(0);
@@ -80,4 +90,4 @@
   heater.cp     (cpheat);
   heater.lambda (lambdaheat);
   
-  TwoLevelMatter solid(substrate,heater,&csol);
+  TwoLevelMatter solid(substrate,heater,&csub);

@@ -25,12 +25,7 @@
   /*----------+
   |  grid(s)  |
   +----------*/
-  Grid1D gx0( Range<real>(0.0,LX0), NX0, Periodic::no() );
-  Grid1D gx1( Range<real>(LX0,LX1)
-            , Range<real>(1.1*DX0,3.1*DX0)
-            , NX1, Periodic::no() );
-
-  Grid1D gx(gx0, gx1, Periodic::no(), BndGrid::symmetry(), BndGrid::wall() );
+  Grid1D gx( Range<real>(0.0,LX0), NX0, Periodic::yes() );
 
   Grid1D gz0( Range<real>(0.0, LZ0), NZ0, Periodic::no() );
   Grid1D gz1( Range<real>(LZ0,LZ1)
@@ -46,7 +41,7 @@
   |  domain  |
   +---------*/
   Body floor("floor.stl");
-  TwoLevelAxisymmetric d(gx,gz,DX0,&floor);
+  TwoLevelCartesian d(gx,gx,gz,&floor);
 
   const real dxmin = d.coarse().dxyz_min();
   //boil::plot->plot(d.coarse(),"coarsedomain");

@@ -19,12 +19,12 @@
   +-----------------------------*/
   for(auto l : uvw.levels) {
     for_m(m) {
-      l->bc(m).add( BndCnd( Dir::imin(), BndType::symmetry() ) );
-      l->bc(m).add( BndCnd( Dir::imax(), BndType::wall() ) );
+      l->bc(m).add( BndCnd( Dir::imin(), BndType::periodic() ) );
+      l->bc(m).add( BndCnd( Dir::imax(), BndType::periodic() ) );
       l->bc(m).add( BndCnd( Dir::kmin(), BndType::wall() ) );
       l->bc(m).add( BndCnd( Dir::kmax(), BndType::outlet() ) );
-      l->bc(m).add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
-      l->bc(m).add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
+      l->bc(m).add( BndCnd( Dir::jmin(), BndType::periodic() ) );
+      l->bc(m).add( BndCnd( Dir::jmax(), BndType::periodic() ) );
     }
   }
 
@@ -32,12 +32,12 @@
     uvw_1(m)=uvw.coarse(m).shape();
 
   for(auto l : c.levels) {
-    l->bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
-    l->bc().add( BndCnd( Dir::imax(), BndType::neumann() ) );
+    l->bc().add( BndCnd( Dir::imin(), BndType::periodic() ) );
+    l->bc().add( BndCnd( Dir::imax(), BndType::periodic() ) );
     l->bc().add( BndCnd( Dir::kmin(), BndType::wall() ) );
     l->bc().add( BndCnd( Dir::kmax(), BndType::outlet() ) );
-    l->bc().add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
-    l->bc().add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
+    l->bc().add( BndCnd( Dir::jmin(), BndType::periodic() ) );
+    l->bc().add( BndCnd( Dir::jmax(), BndType::periodic() ) );
   }
 
   press = c.coarse.shape();
@@ -55,14 +55,14 @@
   }
 
   for(auto l : tpr.levels) {
-    l->bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
-    l->bc().add( BndCnd( Dir::imax(), BndType::neumann() ) );
+    l->bc().add( BndCnd( Dir::imin(), BndType::periodic() ) );
+    l->bc().add( BndCnd( Dir::imax(), BndType::periodic() ) );
 #ifdef USE_BOTTOM_DIRICHLET
     l->bc().add( BndCnd( Dir::kmin(), BndType::dirichlet(), twall ) );
 #else
     l->bc().add( BndCnd( Dir::kmin(), BndType::neumann() ) );
 #endif
     l->bc().add( BndCnd( Dir::kmax(), BndType::dirichlet(),tout) );
-    l->bc().add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
-    l->bc().add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
+    l->bc().add( BndCnd( Dir::jmin(), BndType::periodic() ) );
+    l->bc().add( BndCnd( Dir::jmax(), BndType::periodic() ) );
   }

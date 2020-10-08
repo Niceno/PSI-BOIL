@@ -1,8 +1,3 @@
-  /*---------------------------+
-  |  solve transport equation  |
-  +---------------------------*/
-  conc_coarse.new_time_step();
-
   /*------------+
   |  time loop  |
   +------------*/
@@ -28,6 +23,16 @@
       if(xyz.domain()->ibody().on(m,i,j,k))
         xyz[m][i][j][k] += -gravity * xyz.dV(m,i,j,k) * rhomix;
     }
+
+    /* surface tension */
+    conc_coarse.tension(&xyz, mixed.coarse,conc_coarse.color());
+    conc_coarse.output_cangle_2d(Comp::i(),Comp::k(),Sign::neg());
+
+    /*---------------+
+    |  phase change  |
+    +---------------*/
+    pc_coarse.update();
+    ns.vol_phase_change(&f.coarse);
 
     /*--------------------------+
     |  solve momentum equation  |
@@ -74,10 +79,29 @@
     press.bnd_update();
     press.exchange_all();
 
+    /*---------------------------+
+    |  solve transport equation  |
+    +---------------------------*/
+    conc_coarse.new_time_step();
+    conc_coarse.advance_with_extrapolation(false,ResRat(1e-6),uvw.coarse,f.coarse,
+                                           &liquid.coarse,&uvw_1);
+
+    for_avk(c.coarse,k) {
+      if(c.coarse.zc(k)>=(zmax-c.coarse.dzc(k))) {
+        for_avij(c.coarse,i,j) {
+          c.coarse[i][j][k]= 1.0;
+        }
+      }
+    }
+
+    c.coarse.bnd_update();
+    c.coarse.exchange_all();
+    conc_coarse.ancillary();
+    conc_coarse.totalvol();
+
     /*------------------------+
     |  solve energy equation  |
     +------------------------*/
-    /* in the coarse space */
     enthFD_coarse.discretize();
     enthFD_coarse.new_time_step();
     enthFD_coarse.solve(ResRat(1e-16),"enthFD");
@@ -85,21 +109,21 @@
     /*-------------+
     |  dt control  |
     +-------------*/
+    /* minimum color function */
+    conc_coarse.color_minmax();
+
+    /* front */
+    conc_coarse.front_minmax(Range<real>(0.  ,LX0),
+                           Range<real>(-LX0,LX0),
+                           Range<real>(0.  ,LZ1));
+
     time.control_dt(ns.cfl_max(),cfl_limit,dt);
 
     /*---------------------+
     |  stopping criterion  |
     +---------------------*/
-    real tprtest(0.);
-    for_vijk(tpr.coarse,i,j,k) {
-      if(tpr.coarse.zc(k)<0.&&tpr.coarse.zc(k)>-dxmin)
-        if(tpr.coarse.xc(i)<dxmin)
-          tprtest = tpr.coarse[i][j][k];
-    }
-    boil::cart.max_real(&tprtest);
-    boil::oout<<"tprnucl= "<<time.current_time()<<" "<<tprtest<<boil::endl;
-
-    if(tprtest>tnucl) {
+    if(   conc_coarse.topo->get_xmaxft()>LX0-dxmin
+       || conc_coarse.topo->get_zmaxft()>LX0-dxmin) {
       boil::save_backup(time.current_step(), 1, time,
                         load_scalars, load_scalar_names,
                         load_vectors, load_vector_names);
@@ -108,8 +132,8 @@
                       load_vectors, load_vector_names);
 
       iint++;
-      boil::plot->plot(uvw.coarse,c.coarse,tpr.coarse,press,
-                       "uvw-c-tpr-press",
+      boil::plot->plot(uvw.coarse,c.coarse,tpr.coarse,mdot.coarse,mflx.coarse,
+                       "uvw-c-tpr-mdot-mflx",
                        iint);
 
       /* cell-center velocities */
@@ -127,9 +151,25 @@
     bool otpcond = time.current_time() / t_per_plot >= real(iint);
     if(otpcond) {
       iint++;
-      boil::plot->plot(uvw.coarse,c.coarse,tpr.coarse,press,
-                       "uvw-c-tpr-press",
+      boil::plot->plot(uvw.coarse,c.coarse,tpr.coarse,mdot.coarse,mflx.coarse,
+                       "uvw-c-tpr-mdot-mflx",
                        iint);
+
+      std::fstream output;
+      std::stringstream ssp;
+      ssp <<"profile-"<<iint<<".txt";
+      output.open(ssp.str(), std::ios::out);
+      boil::output_profile_xz(conc_coarse.color(),output,Range<int>(NZsol+1,NZsol+NZ0+NZ1));
+      boil::cart.barrier();
+      output.close();
+
+      std::stringstream ssb;
+      ssb <<"bndtpr-"<<iint<<".txt";
+      output.open(ssb.str(), std::ios::out);
+      boil::output_wall_heat_transfer_xz(tpr.coarse,pc_coarse.node_tmp(),
+                                         solid.coarse.lambda()->value(),output,NX0+NX1);
+      boil::cart.barrier();
+      output.close();
     }
 
     /*--------------+
