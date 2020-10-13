@@ -47,8 +47,8 @@
       }
 
       if(case_flag==1||case_flag==2) {
-        boil::plot->plot(uvw.coarse,c.coarse,tpr.coarse,mdot.coarse,mflx.coarse,
-                         "uvw-c-tpr-mdot-mflx",
+        boil::plot->plot(uvw.coarse,c.coarse,tpr.coarse,mdot.coarse,mflx.coarse,press,
+                         "uvw-c-tpr-mdot-mflx-press",
                          0);
       } else {
         boil::plot->plot(uvw.fine,conc_fine.color(),tpr.fine,mdot.fine,mflx.fine,

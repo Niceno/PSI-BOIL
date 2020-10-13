@@ -152,8 +152,8 @@
                       load_vectors, load_vector_names);
 
       iint++;
-      boil::plot->plot(uvw.coarse,c.coarse,tpr.coarse,mdot.coarse,mflx.coarse,
-                       "uvw-c-tpr-mdot-mflx",
+      boil::plot->plot(uvw.coarse,c.coarse,tpr.coarse,mdot.coarse,mflx.coarse,press,
+                       "uvw-c-tpr-mdot-mflx-press",
                        iint);
 
       /* cell-center velocities */
@@ -171,8 +171,8 @@
     bool otpcond = time.current_time() / t_per_plot >= real(iint);
     if(otpcond) {
       iint++;
-      boil::plot->plot(uvw.coarse,c.coarse,tpr.coarse,mdot.coarse,mflx.coarse,
-                       "uvw-c-tpr-mdot-mflx",
+      boil::plot->plot(uvw.coarse,c.coarse,tpr.coarse,mdot.coarse,mflx.coarse,press,
+                       "uvw-c-tpr-mdot-mflx-press",
                        iint);
 
       std::fstream output;
