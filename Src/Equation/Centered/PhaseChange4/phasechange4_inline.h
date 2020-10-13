@@ -36,3 +36,7 @@
       boil::oout<<"PhaseChange4::discard_points_near_interface= "
                 <<discard_points_near_interface<<"\n";
     }
+
+    inline real get_smdot_pos() const {return smdot_pos;}
+    inline real get_smdot_neg() const {return smdot_neg;}
+    inline real get_smdot() const {return smdot_pos+smdot_neg;}

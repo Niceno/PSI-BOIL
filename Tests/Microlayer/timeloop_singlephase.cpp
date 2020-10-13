@@ -8,6 +8,7 @@
   +------------*/
   for(time.start(); time.end(); time.increase()) {
 
+#ifdef USE_MOMEMTUM_SINGLE_PHASE
     /*-------------------+
     |  reset body force  |
     +-------------------*/
@@ -73,6 +74,7 @@
 
     press.bnd_update();
     press.exchange_all();
+#endif
 
     /*------------------------+
     |  solve energy equation  |
@@ -91,10 +93,13 @@
     |  stopping criterion  |
     +---------------------*/
     real tprtest(0.);
-    for_vijk(tpr.coarse,i,j,k) {
-      if(tpr.coarse.zc(k)<0.&&tpr.coarse.zc(k)>-dxmin)
-        if(tpr.coarse.xc(i)<dxmin)
-          tprtest = tpr.coarse[i][j][k];
+    pc_coarse.update();
+    for_vmijk(pc_coarse.node_tmp(),Comp::k(),i,j,k) {
+      if(fabs(pc_coarse.node_tmp().zc(Comp::k(),k))<boil::atto) {
+        if(pc_coarse.node_tmp().xc(Comp::k(),i)<dxmin) {
+          tprtest = pc_coarse.node_tmp()[Comp::k()][i][j][k];
+        }
+      }
     }
     boil::cart.max_real(&tprtest);
     boil::oout<<"tprnucl= "<<time.current_time()<<" "<<tprtest<<boil::endl;
@@ -117,6 +122,9 @@
       boil::cell_center_velocities(uvw.coarse,u,v,w);
       boil::save_backup(time.current_step(), 1, time,
                         {&u,&v,&w}, {"u","v","w"});
+
+      /* output temperature field */
+      output_to_file(tpr.coarse,pc_coarse.node_tmp());
 
       break;
     }

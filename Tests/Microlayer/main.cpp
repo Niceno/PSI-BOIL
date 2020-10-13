@@ -2,6 +2,7 @@
 #include <fstream>
 #include <iostream>
 #include <fenv.h>
+#include <iterator>
 #define _GNU_SOURCE 1
 #if 1
 static void __attribute__ ((constructor)) trapfpe(void)
@@ -12,7 +13,7 @@ static void __attribute__ ((constructor)) trapfpe(void)
 #endif
 
 #include "header.cpp"
-#include "reader.cpp"
+#include "aux.cpp"
 
 /******************************************************************************/
 int main(int argc, char ** argv) {
@@ -32,13 +33,28 @@ int main(int argc, char ** argv) {
     boil::oout<<"- initradius [um]\n";
     boil::oout<<"- LZsolid [um]\n";
     boil::oout<<"- LZheater[um], 0. indicates a Dirac heater\n";
+    boil::oout<<"- multiplicative length in sol [-]\n";
+    boil::oout<<"- multiplicative length in x [-]\n";
+    boil::oout<<"- multiplicative length in z [-]\n";
+    boil::oout<<"- max cell aspect ratio [-]\n";
     boil::oout<<"- NZsolid [.int.]\n";
     boil::oout<<"- NXtot [.int.]\n";
     boil::oout<<"- NZtot [.int.]\n";
+    boil::oout<<"- transitional no. cells in sol [.int.]\n";
+    boil::oout<<"- transitional no. cells in X [.int.]\n";
+    boil::oout<<"- transitional no. cells in Z [.int.]\n";
     boil::oout<<"- case flag [.int.], indicates initialisation and time loop\n";
 
     exit(0);
   }
+
+/* case flags: 
+ * 0 - single-phase simulation for temperature distribution
+ * 1 - multi-phase, on coarse mesh, uniform temperatures
+ * 2 - multi-phase, on coarse mesh, temperatures from a file
+ * 3 - multi-phase, on fine mesh, uniform temperatures
+ * 4 - multi-phase, on fine mesh, temperatures from a file
+ */
 
 /******************************************************************************/
 /* ------------ input from command line */
@@ -52,7 +68,11 @@ int main(int argc, char ** argv) {
   real deltat_wall(0.), deltat_out(0.), deltat_nucl(0.), qflux(0.);
   real cangle(0.), prs(0.), radius(0.);
   real LZsol(0.), LZheat(0.);
-  int NZsol(0), NXtot(0), NZtot(0), case_flag(0);
+  real LXmult(0.), LZmult(0.), LZsolmult(0.);
+  real AR(0.);
+  int NZsol(0), NXtot(0), NZtot(0);
+  int NZsol_trans(0), NX_trans(0), NZ_trans(0);
+  int case_flag(0);
 
   std::vector<real*> readreal({&deltat_wall,
                                &deltat_out,
@@ -62,12 +82,19 @@ int main(int argc, char ** argv) {
                                &prs,
                                &radius,
                                &LZsol,
-                               &LZheat
+                               &LZheat,
+                               &LZsolmult,
+                               &LXmult,
+                               &LZmult,
+                               &AR
                               });
 
   std::vector<int*> readint({&NZsol,
                              &NXtot,
                              &NZtot,
+                             &NZsol_trans,
+                             &NX_trans,
+                             &NZ_trans,
                              &case_flag
                             });
 
@@ -110,12 +137,6 @@ int main(int argc, char ** argv) {
     boil::cart.sum_int(ri);
   }
 
-  /* some tests for consistency */
-  Rational finefact(3,4);
-  assert(!(NXtot%finefact.den()));
-  assert(NZtot>NZsol);
-  assert(!((NZtot-NZsol)%finefact.den()));
-
 #include "settings.cpp"
 
 #include "domain.cpp"
@@ -137,10 +158,13 @@ int main(int argc, char ** argv) {
 #ifndef SETUP_ONLY
   if(case_flag==0) {
   #include "timeloop_singlephase.cpp"
-  } else if(case_flag==1) {
+  } else if(case_flag<3) {
   #include "timeloop_multiphase_coarse.cpp"
-  } else {
+  } else if(case_flag<5) {
   #include "timeloop_multiphase_twolevel.cpp"
+  } else {
+    OMS(Underdevelopment. Exiting.);
+    exit(0);
   }
 #endif
 

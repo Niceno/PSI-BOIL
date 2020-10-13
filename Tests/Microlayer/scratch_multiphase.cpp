@@ -23,23 +23,30 @@
       conc_coarse.init();
 
       /* temperature */
-      for_coarsefine(l) {
-        tpr[l] = tout;
+      if(case_flag==1||case_flag==3) {
+        for_coarsefine(l) {
+          tpr[l] = tout;
 
-        for_vijk(tpr[l],i,j,k) {
-          if(tpr[l].domain()->ibody().off(i,j,k)) {
-            tpr[l][i][j][k] = twall;
-          } else if(c[l][i][j][k]<0.5) { /* almost good */
-            tpr[l][i][j][k] = tsat0;
-          } else if(tpr[l].zc(k)<=ztconst) {
-            tpr[l][i][j][k] = twall + (tout-twall)/ztconst * tpr[l].zc(k);
+          for_vijk(tpr[l],i,j,k) {
+            if(tpr[l].domain()->ibody().off(i,j,k)) {
+              tpr[l][i][j][k] = twall;
+            } 
           }
+          tpr[l].bnd_update();
+          tpr[l].exchange_all();
         }
-        tpr[l].bnd_update();
-        tpr[l].exchange_all();
+      } else {
+        for_coarsefine(l) {
+          tpr[l] = tout;
+
+          interpolate_from_file(tpr[l]);
+
+          tpr[l].bnd_update();
+          tpr[l].exchange_all();
+        }
       }
 
-      if(case_flag==1) {
+      if(case_flag==1||case_flag==2) {
         boil::plot->plot(uvw.coarse,c.coarse,tpr.coarse,mdot.coarse,mflx.coarse,
                          "uvw-c-tpr-mdot-mflx",
                          0);

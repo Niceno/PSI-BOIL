@@ -20,9 +20,16 @@
           csub[l][i][j][k] = 1.0;
         } else if(csub[l].zn(k)<= -LZheat) {
           csub[l][i][j][k] = (fabs(csub[l].zn(k))-LZheat)/csub[l].dzc(k);
-          q[l][i][j][k] = qsrc*(1.0-csub[l][i][j][k])*csub[l].dV(i,j,k);
+          /* estimation */ 
+          if(fabs(csub[l].xc(i))<=0.3*LX1&&fabs(csub[l].yc(j))<=0.3*LX1)
+            q[l][i][j][k] = qsrc*(1.0-csub[l][i][j][k])*csub[l].dV(i,j,k);
+          else
+            q[l][i][j][k] = 0.6*qsrc*(1.0-csub[l][i][j][k])*csub[l].dV(i,j,k);
         } else {
-          q[l][i][j][k] = qsrc*csub[l].dV(i,j,k);
+          if(fabs(csub[l].xc(i))<=0.3*LX1&&fabs(csub[l].yc(j))<=0.3*LX1)
+            q[l][i][j][k] = qsrc*csub[l].dV(i,j,k);
+          else
+            q[l][i][j][k] = 0.6*qsrc*csub[l].dV(i,j,k);
         }
       }
     }
@@ -41,7 +48,7 @@
     if(case_flag==0) {
 #include "scratch_singlephase.cpp"
     /* create a bubble from initial time step */
-    } else if(case_flag<3) {
+    } else if(case_flag<5) {
 #include "scratch_multiphase.cpp"
     } else {
       OMS(Underdevelopment. Exiting.);

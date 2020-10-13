@@ -20,7 +20,6 @@
 
   /* other */
   const real gravity = boil::g;
-  const real ztconst = 1e-3; /* from Duan */
 
 /******************************************************************************/
 /* ------------ numerical simulation settings */

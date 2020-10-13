@@ -1,6 +1,8 @@
   /*------------+
   |  time loop  |
   +------------*/
+  bool inertial = time.current_time()<boil::atto;
+  
   for(time.start(); time.end(); time.increase()) {
 
     /* restrict temperature to coarse */
@@ -35,6 +37,23 @@
     |  phase change  |
     +---------------*/
     pc_fine.update();
+
+    /* inertial cap */
+    if(inertial) {
+      real massflux_heat = pc_fine.get_smdot();
+      massflux_heat /= conc_fine.topo->get_totarea();
+      real massflux_inert = rhov*sqrt(boil::pi/7.*rhov*latent*deltat_nucl
+                                      /rhol/tsat0_K);
+      boil::oout<<"mflux= "<<massflux_heat<<" "<<massflux_inert<<" "
+                           <<massflux_inert/massflux_heat<<boil::endl;
+      if(massflux_inert<massflux_heat) {
+        mflx.fine *= massflux_inert/massflux_heat;
+        mdot.fine *= massflux_inert/massflux_heat;
+        pc_fine.sources();
+      } else {
+        inertial = false;
+      }
+    }
 
     /* restrict sources to coarse */
     f.restrict_sum_XZ();
@@ -141,7 +160,7 @@
     |  stopping criterion  |
     +---------------------*/
     if(   conc_fine.topo->get_xmaxft()>LX0-dxmin
-       || conc_fine.topo->get_zmaxft()>LX0-dxmin) {
+       || conc_fine.topo->get_zmaxft()>LZ0-dxmin) {
       boil::save_backup(time.current_step(), 1, time,
                         load_scalars, load_scalar_names,
                         load_vectors, load_vector_names);
@@ -185,7 +204,7 @@
       std::stringstream ssp;
       ssp <<"profile-"<<iint<<".txt";
       output.open(ssp.str(), std::ios::out);
-      boil::output_profile_xz(conc_coarse.color(),output,Range<int>(NZsol+1,NZsol+NZ0+NZ1));
+      boil::output_profile_xz(conc_coarse.color(),output,Range<int>(NZsol/2+1,NZtot/2));
       boil::cart.barrier();
       output.close();
 
@@ -193,7 +212,7 @@
       ssb <<"bndtpr-"<<iint<<".txt";
       output.open(ssb.str(), std::ios::out);
       boil::output_wall_heat_transfer_xz(tpr.fine,pc_fine.node_tmp(),
-                                         solid.fine.lambda()->value(),output,NX0+NX1);
+                                         solid.fine.lambda()->value(),output,NXtot);
       boil::cart.barrier();
       output.close();
     }

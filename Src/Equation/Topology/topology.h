@@ -118,6 +118,15 @@ class Topology {
     inline real get_zminft() const { return(zminft);};
     inline real get_zmaxft() const { return(zmaxft);};
 
+    /* getter for area */
+    inline real get_totarea() const { 
+      real are(0.);
+      for_vijk(get_adens(),i,j,k)
+        are += get_adens()[i][j][k]*get_adens().dV(i,j,k);
+      boil::cart.sum_real(&are);
+      return are;
+    }
+
     /* references */
     Scalar & get_vf()    { return *vf; }
     Scalar & get_clr()   { return *clr; }
@@ -127,6 +136,15 @@ class Topology {
     Scalar & get_adens() { return *adens; }
     Vector & get_fs()    { return *fs; }
     ScalarInt & get_iflag() { return *iflag; }
+
+    const Scalar & get_vf() const    { return *vf; }
+    const Scalar & get_clr() const   { return *clr; }
+    const Scalar & get_nx() const    { return *nx; }
+    const Scalar & get_ny() const    { return *ny; }
+    const Scalar & get_nz() const    { return *nz; }
+    const Scalar & get_adens() const { return *adens; }
+    const Vector & get_fs() const    { return *fs; }
+    const ScalarInt & get_iflag() const { return *iflag; }
 
     /* current variables */
     Scalar * vf;
