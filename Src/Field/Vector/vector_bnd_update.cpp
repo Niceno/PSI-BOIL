@@ -32,8 +32,9 @@ void Vector::bnd_update_nooutlet() {
            m == Comp::w() && ( d == Dir::kmin() || d == Dir::kmax()) 
           ) {
               bc(m).type(b) = BndType::wall();
-              boil::oout << "Adjusting symmetry b.c. for momentum at " << b
-                         << boil::endl;
+              if(!boil::cart.iam())
+                boil::oout << "Adjusting symmetry b.c. for momentum at " << b
+                           << " for "<<d<<" and "<<m<<boil::endl;
         } else {  // 28.11.2013 Yohei
           if( !bc(m).type_decomp(b) ) {
           for_vijk(bc(m).at(b), i,j,k) {

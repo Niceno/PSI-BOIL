@@ -124,7 +124,17 @@
                         {&u,&v,&w}, {"u","v","w"});
 
       /* output temperature field */
-      output_to_file(tpr.coarse,pc_coarse.node_tmp());
+      if(!boil::cart.iam())
+        output_to_file(tpr.coarse,pc_coarse.node_tmp());
+
+      std::fstream output;
+      std::stringstream ssb;
+      ssb <<"bndtpr-"<<iint<<".txt";
+      output.open(ssb.str(), std::ios::out);
+      boil::output_wall_heat_transfer_xz(tpr.coarse,pc_coarse.node_tmp(),
+                                         solid.coarse,output,NXtot/2);
+      boil::cart.barrier();
+      output.close();
 
       break;
     }
@@ -138,6 +148,16 @@
       boil::plot->plot(uvw.coarse,c.coarse,tpr.coarse,press,
                        "uvw-c-tpr-press",
                        iint);
+
+      std::fstream output;
+      std::stringstream ssb;
+      ssb <<"bndtpr-"<<iint<<".txt";
+      output.open(ssb.str(), std::ios::out);
+      pc_coarse.update();
+      boil::output_wall_heat_transfer_xz(tpr.coarse,pc_coarse.node_tmp(),
+                                         solid.coarse,output,NXtot/2);
+      boil::cart.barrier();
+      output.close();
     }
 
     /*--------------+

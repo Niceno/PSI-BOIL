@@ -83,12 +83,15 @@ namespace boil {
                          const Range<int> RZ);
   void output_wall_heat_transfer_xz(const Scalar & tpr,
                                     const Vector & bndtpr,
-                                    const real lambdas,
+                                    const Matter & sol,
                                     std::ostream & otp, const int NX);
 
   /* scalar error */
+  real l1_scalar_error(const Scalar & sca, const Scalar & scb);
   real l2_scalar_error(const Scalar & sca, const Scalar & scb);
   real li_scalar_error(const Scalar & sca, const Scalar & scb);
+  real l1_scalar_error_vol(const Scalar & sca, const Scalar & scb);
+  real l2_scalar_error_vol(const Scalar & sca, const Scalar & scb);
 
   /* setup circle */
   void setup_circle_xz(Scalar & c, const real radius, const real xcent, const real zcent);
@@ -97,6 +100,15 @@ namespace boil {
   real setup_sphere(Scalar & c, const real radius,
                     const real xcent, const real ycent, const real zcent,
                     const real mm = 20);
+
+  /* setup square */
+  void setup_plane(VOF & conc, const real nnx,
+                   const real nny, const real nnz,
+                   const real nalp);
+
+  void setup_square_xz(VOF & conc, Scalar & tmp,
+                       const real x0, const real z0,
+                       const real sa, const real sb);
 
   /* prolongate plic */
   void prolongate_color_XZ(const VOF & concc, VOF & concf);

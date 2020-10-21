@@ -187,7 +187,7 @@
       ssb <<"bndtpr-"<<iint<<".txt";
       output.open(ssb.str(), std::ios::out);
       boil::output_wall_heat_transfer_xz(tpr.coarse,pc_coarse.node_tmp(),
-                                         solid.coarse.lambda()->value(),output,NXtot/2);
+                                         solid.coarse,output,NXtot/2);
       boil::cart.barrier();
       output.close();
     }

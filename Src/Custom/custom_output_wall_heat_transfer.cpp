@@ -4,7 +4,7 @@ namespace boil {
   /******************************************************************************/
   void output_wall_heat_transfer_xz(const Scalar & tpr,
                                     const Vector & bndtpr,
-                                    const real lambdas,
+                                    const Matter & sol,
                                     std::ostream & otp, const int NX) {
   /***************************************************************************//**
     \brief Output wall temperature and heat flux in z-direction, assuming solid
@@ -23,6 +23,7 @@ namespace boil {
               tprsum = tpr[i][j][k];
               bndtprsum = bndtpr[Comp::w()][i][j][k+1];
               xpos = tpr.xc(i);
+              real lambdas = sol.lambda(i,j,k);
               hf = lambdas*(tprsum-bndtprsum)/(0.5*tpr.dzc(k));
             }
           } /* vjk */

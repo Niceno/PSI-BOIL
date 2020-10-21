@@ -2,9 +2,8 @@
 #include <fstream>
 #include <iostream>
 #include <fenv.h>
-//#define USE_BNDCLR
 //#define USE_CARTESIAN
-#define USE_CONTINUOUS
+//#define USE_CONTINUOUS
 
 #define _GNU_SOURCE 1
 #if 1
@@ -13,25 +12,6 @@ static void __attribute__ ((constructor)) trapfpe(void)
   /* Enable some exceptions. At startup all exceptions are masked. */
   feenableexcept(FE_INVALID|FE_DIVBYZERO|FE_OVERFLOW);
 }
-#endif
-
-#if 0
-const int level = 2;
-const int AR = 5;
-
-/* computed parameters */
-const int NX = 100*level;
-const int NZ = AR*NX;
-
-/* domain dimensions (given by problem) */
-const real LX = 1.0;
-const real LZ = real(AR)*LX;
-const real DX = LX/real(NX);
-
-const int mSimple = 1;
-
-const bool inverted = true;
-const real A = 1.0;
 #endif
 
 /******************************************************************************/
@@ -67,6 +47,16 @@ int main(int argc, char * argv[]) {
 
   const real A = 1.0;
 
+#ifdef USE_CARTESIAN
+  auto stream = [&](const real x, const real z) {
+    return A*x*z/LX;
+  };
+#else
+  auto stream = [&](const real x, const real z) {
+    return A*x*x*z/LX;
+  };
+#endif
+
   /*--------------------------------+
   |  choose the output file format  |
   +--------------------------------*/
@@ -98,10 +88,6 @@ int main(int argc, char * argv[]) {
   Scalar c  (d), g  (d), kappa(d), cold(d), cold2(d); // concentration
   Scalar press  (d), p(d), f  (d);
 
-#ifdef USE_BNDCLR
-  Vector bndclr(d), bndclrold(d);
-#endif
-
   /*-----------------------------+ 
   |  insert boundary conditions  |
   +-----------------------------*/
@@ -113,10 +99,6 @@ int main(int argc, char * argv[]) {
     uvw.bc(m).add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
     uvw.bc(m).add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
     uvw_old(m)=uvw(m).shape();
-#ifdef USE_BNDCLR
-    bndclr(m)    = uvw(m).shape();
-    bndclrold(m) = uvw(m).shape();
-#endif
   }
 
   c.bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
@@ -140,11 +122,7 @@ int main(int argc, char * argv[]) {
   water.mu    (1.0000e-3);
   water.rho   (1.0000e+0);
 
-#ifdef USE_BNDCLR
-  Matter mixed(water, air, &c, &bndclr);
-#else
   Matter mixed(water, air, &c);
-#endif
   mixed.sigma (0.01);
 #else
   air  .mu    (1.0000e-5);
@@ -152,11 +130,7 @@ int main(int argc, char * argv[]) {
   water.mu    (1.0000e-3);
   water.rho   (1.0000e+3);
 
-#ifdef USE_BNDCLR
-  Matter mixed(water, air, &c, &bndclr);
-#else
   Matter mixed(water, air, &c);
-#endif
   mixed.sigma (0.07);
 #endif
 
@@ -177,6 +151,7 @@ int main(int argc, char * argv[]) {
   |  initial condition  |
   +--------------------*/
   real a = boil::pi/LX;
+#ifdef USE_CONTINUOUS
   Comp m=Comp::u();
   for_avmijk(uvw,m,i,j,k) {
     real xpos = uvw.xc(m,i);
@@ -186,7 +161,6 @@ int main(int argc, char * argv[]) {
   uvw.exchange();
 
   m=Comp::w();
-#ifdef USE_CONTINUOUS
   for_avmijk(uvw,m,i,j,k) {
     real xpos = uvw.xc(m,i);
     real zpos = uvw.zc(m,k);
@@ -198,20 +172,40 @@ int main(int argc, char * argv[]) {
   }
   uvw.exchange();
 #else
-  for_vijk(cold,i,j,k) {
-    for(int kk(1); kk <= (k-boil::BW+1); ++kk) {
-  #ifdef USE_CARTESIAN
-      uvw[m][i][j][k+1] += -(uvw[Comp::u()][i+1][j][kk-1+boil::BW]-uvw[Comp::u()][i][j][kk-1+boil::BW])
-                           *cold.dzc(kk-1+boil::BW)/cold.dxc(i);
-  #else
-      uvw[m][i][j][k+1] += -(cold.xn(i+1)*uvw[Comp::u()][i+1][j][kk-1+boil::BW]
-                            -cold.xn(i  )*uvw[Comp::u()][i  ][j][kk-1+boil::BW])
-                           *cold.dzc(kk-1+boil::BW)/cold.dxc(i)/cold.xc(i);
-  #endif
+  Comp m=Comp::u();
+  for_avmijk(uvw,m,i,j,k) {
+    real xpos0 = uvw.xc(m,i);
+    if(fabs(xpos0)<boil::atto) {
+      uvw[m][i][j][k] = 0.0;
+      continue;
     }
+    real xpos1 = uvw.xc(m,i);
+    real zpos1 = uvw.zc(m,k)-0.5*DX;
+    real xpos2 = uvw.xc(m,i);
+    real zpos2 = uvw.zc(m,k)+0.5*DX;
+  #ifdef USE_CARTESIAN
+    uvw[m][i][j][k] = -(stream(xpos2,zpos2)-stream(xpos1,zpos1))/DX;
+  #else
+    uvw[m][i][j][k] = -(stream(xpos2,zpos2)-stream(xpos1,zpos1))/DX/xpos0;
+  #endif
   }
-#endif
   uvw.exchange();
+
+  m=Comp::w();
+  for_avmijk(uvw,m,i,j,k) {
+    real xpos0 = uvw.xc(m,i);
+    real xpos1 = uvw.xc(m,i)-0.5*DX;
+    real zpos1 = uvw.zc(m,k);
+    real xpos2 = uvw.xc(m,i)+0.5*DX;
+    real zpos2 = uvw.zc(m,k);
+  #ifdef USE_CARTESIAN
+    uvw[m][i][j][k] = (stream(xpos2,zpos2)-stream(xpos1,zpos1))/DX;
+  #else
+    uvw[m][i][j][k] = (stream(xpos2,zpos2)-stream(xpos1,zpos1))/DX/xpos0;
+  #endif
+  }
+  uvw.exchange();
+#endif
 
   cold = 0.0;
 
@@ -258,22 +252,14 @@ int main(int argc, char * argv[]) {
 #endif
 
 #ifdef USE_CARTESIAN
-  #ifdef USE_BNDCLR
-  VOF conc(c, g, kappa, uvw, time, solver, &bndclr);
-  #else
   VOF conc(c, g, kappa, uvw, time, solver);
-  #endif
   conc.set_normal_vector_method_all(NormMethod::ElviraXZ());
   for_avijk(c,i,j,k) {
     c[i][j][k] = cold[i][j][k];
     cold2[i][j][k] = cold[i][j][k];
   }
 #else
-  #ifdef USE_BNDCLR
-  VOFaxisym conc(c, g, kappa, uvw, time, solver, &bndclr);
-  #else
   VOFaxisym conc(c, g, kappa, uvw, time, solver);
-  #endif
   //conc.set_reconstruction_parameters(1e-5,conc.get_reconstruction_maxiter());
   conc.color_to_vf(cold,c);
   conc.color_to_vf(cold,cold2);
@@ -281,6 +267,7 @@ int main(int argc, char * argv[]) {
 
   conc.ancillary();
   conc.totalvol();
+  conc.front_minmax();
 
   c.bnd_update();
   c.exchange_all();
@@ -295,13 +282,7 @@ int main(int argc, char * argv[]) {
     real a_n = c.dSy(Sign::pos(),i,j,k);
     real a_b = c.dSz(Sign::neg(),i,j,k);
     real a_t = c.dSz(Sign::pos(),i,j,k);
-    real fnew = 0.0;
-    fnew += a_w*uvw[Comp::u()][i]  [j]  [k]  ;
-    fnew -= a_e*uvw[Comp::u()][i+1][j]  [k]  ;
-    fnew += a_s*uvw[Comp::v()][i]  [j]  [k]  ;
-    fnew -= a_n*uvw[Comp::v()][i]  [j+1][k]  ;
-    fnew += a_b*uvw[Comp::w()][i]  [j]  [k]  ;
-    fnew -= a_t*uvw[Comp::w()][i]  [j]  [k+1];
+    real fnew = uvw.outflow(i,j,k);
     fnew = fabs(fnew/c.dV(i,j,k));
     if(fnew>=fnew_max) {
       ii = i;
@@ -326,8 +307,19 @@ int main(int argc, char * argv[]) {
 
   ns.cfl_max();
 
-  real cmax_linf_linf(-1.0), cmax_l2(0.);
-  real cmin_linf_linf(+1.0), cmin_l2(0.);
+  /* load variables */
+  std::vector<Scalar*> load_scalars = { &c };
+  std::vector<std::string> load_scalar_names = { "c" };
+
+  real cmax_linf_linf(-1.0), cmax_l1(0.);
+  real cmin_linf_linf(+1.0), cmin_l1(0.);
+
+  int ts(0);
+  std::stringstream ssb;
+  ssb <<"time-"<<ndt<<".txt";
+  if(boil::load_backup(ssb.str(),ts,time,
+                       load_scalars, load_scalar_names)) {
+  } else {
   for(time.start(); time.end(); time.increase()) {
 
     if(time.current_step() == ndt/2+1) {
@@ -346,6 +338,8 @@ int main(int argc, char * argv[]) {
 
     if(time.current_step() % nint == 0) {
       boil::plot->plot(uvw, c, "uvw-c",  time.current_step());
+      boil::save_backup(time.current_step(), 0, time,
+                        load_scalars, load_scalar_names);
     }
 
     //if(time.current_step()==1000*level)
@@ -368,35 +362,34 @@ int main(int argc, char * argv[]) {
     }
     boil::cart.max_real(&cmax_linf);
     boil::cart.min_real(&cmin_linf);
-    cmax_l2 += std::pow( std::max(0.0,cmax_linf-1.0) , 2.0 );
-    cmin_l2 += std::pow( std::min(0.0,cmin_linf    ) , 2.0 );
+    cmax_l1 += fabs( std::max(0.0,cmax_linf-1.0) );
+    cmin_l1 += fabs( std::min(0.0,cmin_linf    ) );
     cmax_linf_linf = std::max(cmax_linf_linf,cmax_linf);
     cmin_linf_linf = std::min(cmin_linf_linf,cmin_linf);
   }
+  } /* bck */
 
   /* post-process */ 
-  cmax_l2 /= real(ndt);
-  cmin_l2 /= real(ndt);
-  cmax_l2 = sqrt(cmax_l2);
-  cmin_l2 = sqrt(cmin_l2);
+  cmax_l1 /= real(ndt);
+  cmin_l1 /= real(ndt);
 
   boil::oout<<"Errors over time: ";
-  boil::oout<<level<<" "<<inverted<<" | "<<cmax_l2<<" "<<cmin_l2<<" | "
+  boil::oout<<level<<" "<<inverted<<" | "<<cmax_l1<<" "<<cmin_l1<<" | "
             <<fabs(cmax_linf_linf-1.)<<" "<<fabs(cmin_linf_linf)<<boil::endl;
 
   real toterr = boil::li_scalar_error(cold2,c);
-  real toterr2 = boil::l2_scalar_error(cold2,c);
+  real toterr2 = boil::l1_scalar_error(cold2,c);
+  real toterr2_vol = boil::l1_scalar_error_vol(cold2,c);
 
-  boil::oout<<"Linf/2 error: ";
-  boil::oout<<level<<" "<<inverted<<" "<<toterr<<" "<<toterr2<<boil::endl;
+  boil::oout<<"Linf/1 error: ";
+  boil::oout<<level<<" "<<inverted<<" "<<toterr<<" "<<toterr2<<" "<<toterr2_vol<<boil::endl;
 
   std::ofstream output;
   output.open( "results_diverging_fwd.txt", std::ios::out | std::ios::app );
   if(!boil::cart.iam()) {
-    output<<level<<" "<<cfl_max<<" "<<inverted<<" | "<<cmax_l2<<" "<<cmin_l2<<" | "
-          <<fabs(cmax_linf_linf-1.)<<" "<<fabs(cmin_linf_linf)<<" | "<<toterr<<" "<<toterr2<<boil::endl;
+    output<<level<<" "<<cfl_max<<" "<<inverted<<" | "<<cmax_l1<<" "<<cmin_l1<<" | "
+          <<fabs(cmax_linf_linf-1.)<<" "<<fabs(cmin_linf_linf)<<" | "<<toterr<<" "<<toterr2<<" "<<toterr2_vol<<boil::endl;
   }
-
 
   boil::oout << "finished" << boil::endl;
 

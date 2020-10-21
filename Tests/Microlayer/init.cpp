@@ -10,6 +10,31 @@
   std::vector<Vector*> load_vectors = { &uvw.coarse };
   std::vector<std::string> load_vector_names = { "uvw" };
 
+  const real heater_extent = 1.5e-3;
+  const real outer_factor = 1.;//30e-2;//18.5e-2;
+
+  auto heatfunc = [&](const real x, const real y, const real c, const real v) {
+    real h = qsrc*c*v;
+    real ext0 = 4.3e-3;
+    real ext1 = 4.3e-3;
+    real ext_tilde = 0.8e-3;
+    real b0 = 1.;
+    real a0 = -b0/ext0;
+    real q_tilde = a0*ext_tilde+b0;
+    real a1 = q_tilde/(ext_tilde-ext1);
+    real b1 = -a1*ext1;
+
+    h *= std::max(0.,std::min(a0*x+b0,a1*x+b1));
+  
+    //h *= std::max(0.,(4.0e-3-x)/4.0e-3);
+    //h *= std::min(std::max(0.,a0*x+b0,std::max(0.,a*x+b));
+    //if(fabs(x)<=heater_extent&&fabs(y)<=heater_extent) {
+    //} else {
+    //  h *= outer_factor;
+    //}
+    return h;
+  };
+
   /* solid */
   csub.fine   = 0.0;
   csub.coarse = 0.0;
@@ -20,16 +45,11 @@
           csub[l][i][j][k] = 1.0;
         } else if(csub[l].zn(k)<= -LZheat) {
           csub[l][i][j][k] = (fabs(csub[l].zn(k))-LZheat)/csub[l].dzc(k);
-          /* estimation */ 
-          if(fabs(csub[l].xc(i))<=0.3*LX1&&fabs(csub[l].yc(j))<=0.3*LX1)
-            q[l][i][j][k] = qsrc*(1.0-csub[l][i][j][k])*csub[l].dV(i,j,k);
-          else
-            q[l][i][j][k] = 0.6*qsrc*(1.0-csub[l][i][j][k])*csub[l].dV(i,j,k);
+          q[l][i][j][k] = heatfunc(csub[l].xc(i),csub[l].yc(j),
+                                   1.0-csub[l][i][j][k],csub[l].dV(i,j,k));
         } else {
-          if(fabs(csub[l].xc(i))<=0.3*LX1&&fabs(csub[l].yc(j))<=0.3*LX1)
-            q[l][i][j][k] = qsrc*csub[l].dV(i,j,k);
-          else
-            q[l][i][j][k] = 0.6*qsrc*csub[l].dV(i,j,k);
+          q[l][i][j][k] = heatfunc(csub[l].xc(i),csub[l].yc(j),
+                                   1.0,csub[l].dV(i,j,k));
         }
       }
     }
