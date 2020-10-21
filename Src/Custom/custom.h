@@ -80,7 +80,11 @@ namespace boil {
 
   /* output scalar profile and wall heat transfer characteristics */
   void output_profile_xz(const Scalar & c, std::ostream & otp, 
-                         const Range<int> RZ);
+                         const Range<int> RZ, 
+                         const Range<int> RX = Range<int>(-1,-2));
+  void output_profile_zx(const Scalar & c, std::ostream & otp, 
+                         const Range<int> RX, 
+                         const Range<int> RZ = Range<int>(-1,-2));
   void output_wall_heat_transfer_xz(const Scalar & tpr,
                                     const Vector & bndtpr,
                                     const Matter & sol,

@@ -183,6 +183,19 @@
       boil::cart.barrier();
       output.close();
 
+      real ml_thickness_max = 10e-6;
+      std::stringstream ssm;
+      ssp <<"microlayer-"<<iint<<".txt";
+      output.open(ssm.str(), std::ios::out);
+      boil::output_profile_zx(conc_coarse.color(),output,
+                              Range<int>(1,NXtot/2),
+                              Range<int>(NZsol/2+1,
+                                         NZsol/2+ceil(ml_thickness_max/2./DX0)
+                                        )
+                             );
+      boil::cart.barrier();
+      output.close();
+
       std::stringstream ssb;
       ssb <<"bndtpr-"<<iint<<".txt";
       output.open(ssb.str(), std::ios::out);

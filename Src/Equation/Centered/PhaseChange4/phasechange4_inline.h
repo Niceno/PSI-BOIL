@@ -14,7 +14,7 @@
       if(flag)
         accuracy_order = 2;
       else
-        accuracy_order = 4;
+        accuracy_order = 1;
       boil::oout<<"PhaseChange4::accuracy_order= "
                 <<accuracy_order<<"\n";
     }
