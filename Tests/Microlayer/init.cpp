@@ -1,7 +1,7 @@
   int ts;
   /* load variables */
   std::vector<Scalar*> load_scalars = { &press, &c.coarse };
-  if(case_flag==2)
+  if(case_flag>2)
     load_scalars.push_back(&tpr.fine);
   else
     load_scalars.push_back(&tpr.coarse);
