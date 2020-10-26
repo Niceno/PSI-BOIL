@@ -31,11 +31,19 @@ class Sign {
     //! Operators.
     Sign operator - () const {return Sign(-val);}
     operator int () const {return val;}
+    Sign & operator *= (const Sign & s) {
+      val *= int(s);
+      return *this;
+    }
+    
+    friend Sign operator * (Sign first, const Sign & second) {
+      first *= second;
+      return first;
+    }
 
   private:
     /* prevent creation of new signs */
     explicit Sign(const int i) {val = i;}
     int val;
 };
-
 #endif

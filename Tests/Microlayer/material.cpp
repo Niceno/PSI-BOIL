@@ -32,7 +32,7 @@
                          <<cpl/rhol<<" "<<lambdal<<" "<<betal<<" "<<alpl<<boil::endl;
   boil::oout<<"twoprop= "<<tsat0_K<<" "<<sig<<" "<<latent<<boil::endl;
 
-  const real Jal = cpl*(twall-tsat0)/(latent*rhov);
+  const real Jal = cpl*deltat_nucl/(latent*rhov);
   boil::oout << "Jal= "<<Jal<<boil::endl;
 
   /* heater */

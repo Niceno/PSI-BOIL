@@ -1,4 +1,5 @@
 #include "enthalpyfd.h"
+#include "def.h"
 
 /***************************************************************************//**
 *  Performs a semi-Lagrangian convection step.
@@ -12,11 +13,28 @@ void EnthalpyFD::convective_time_step() {
 
   real dti = time->dti();
 
+#ifdef CNEW
+  for_ijk(i,j,k) {
+    if(dom->ibody().on(i,j,k)){
+      /* phase change: xor indicates change of phase */
+      if(topo->above_interface_old(i,j,k) ^ topo->above_interface(i,j,k)) {
+        phi[i][j][k] = tifmodel.Tint(i,j,k);     /* crude code */
+      }
+    }
+  }
+  phi.bnd_update();
+  phi.exchange();
+#endif
+
   /* no transport in solid */
   if( !solid() ) 
     for_ijk(i,j,k) {
       real c,r;
+#ifdef CNEW
+      if(topo->above_interface(i,j,k)) {
+#else
       if(topo->above_interface_old(i,j,k)) {
+#endif
         c = cpl;
       } else {
         c = cpv;
@@ -29,7 +47,11 @@ void EnthalpyFD::convective_time_step() {
       const real fV = dom->ibody().fV(i,j,k);
       const real cs = solid()->cp (i,j,k);
       real cf = cpl;
+#ifdef CNEW
+      if(!topo->above_interface(i,j,k)) {
+#else
       if(!topo->above_interface_old(i,j,k)) {
+#endif
         cf = cpv;
       }
 
@@ -47,6 +69,7 @@ void EnthalpyFD::convective_time_step() {
   for_ijk(i,j,k)
     fold[i][j][k] += conv_ts.Nm1() * cold[i][j][k]; /* conv_ts.Nm1() = 1.5 */
 
+#ifndef CNEW
   /* semi-lagrangian scheme */
   for_ijk(i,j,k){
     if(dom->ibody().on(i,j,k)){
@@ -85,6 +108,7 @@ void EnthalpyFD::convective_time_step() {
   }
   phi.bnd_update();
   phi.exchange();
+#endif
 
   return;
 }

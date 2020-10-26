@@ -39,6 +39,12 @@ class Topology {
       boil::oout<<"Topology::extrapolationparams: "<<mnew<<" "<<tolnew<<"\n";
     }
 
+    inline real get_close_to_cc() const { return close_to_cc; }
+    inline void set_close_to_cc(const real ccc_new) {
+      close_to_cc = ccc_new;
+      boil::oout<<"Topology::close_to_cc: "<<close_to_cc<<"\n";
+    }
+
     /* interface boolean */
     bool interface(const Sign dir, const Comp m,
                    const int i, const int j, const int k);
@@ -102,6 +108,41 @@ class Topology {
       const { return (*clr)[i][j][k]<clrsurf; }
     inline bool below_interface_old(const int i, const int j, const int k)
       const { return clrold[i][j][k]<clrsurf; }
+
+    /* <0: below interface, >0 above interface */
+    inline Sign sign_interface(const real c) const {
+      return above_interface(c) ? Sign::pos() : Sign::neg();
+    }
+    inline Sign sign_interface(const int i, const int j, const int k) 
+      const { return sign_interface((*clr)[i][j][k]); }
+    inline Sign sign_interface_old(const int i, const int j, const int k) 
+      const { return sign_interface(clrold[i][j][k]); }
+    
+    /* differences */
+    real zeroth_order_difference(const std::vector<real> & stencil,
+                                 const std::vector<real> & values);
+    real first_order_difference(const std::vector<real> & stencil,
+                                const std::vector<real> & values);
+    real second_order_difference(const std::vector<real> & stencil,
+                                 const std::vector<real> & values);
+    real third_order_difference(const std::vector<real> & stencil,
+                                const std::vector<real> & values);
+    real fourth_order_difference(const std::vector<real> & stencil,
+                                 const std::vector<real> & values);
+    real nth_order_difference(const std::vector<real> & stencil,
+                              const std::vector<real> & values,
+                              const int order);
+
+    /* testing */
+    bool test_differences(const int count);
+    bool test_differences(const std::vector<real> & stencil,
+                          const std::vector<real> & coefficients);
+    real evaluate_polynomial(const int order,
+                             const std::vector<real> & coefficients,
+                             const real x);
+    real evaluate_polynomial_derivative(const int order,
+                             const std::vector<real> & coefficients,
+                             const real x);
 
     /* front functions */
     void front_minmax(real * store_arr = NULL);

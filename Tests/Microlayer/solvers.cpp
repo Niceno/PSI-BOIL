@@ -57,22 +57,30 @@
   /* supplementary classes for heat transfer */
   TIF tsat(tsat0);
   HTWallModel * htwm = NULL;
-  if(NZheat>0) {
+  if(NZheat>0||NZsol==0) {
     htwm = new HTWallModel(HTWallModel::Resistance(resist));
   } else {
     htwm = new HTWallModel(HTWallModel::Full(resist,qflux));
   }
 
+  /* is there conjugate heat transfer? */
+  Matter * solid_coarse_ptr = NULL;
+  Matter * solid_fine_ptr = NULL;
+  if(NZsol>0) {
+    solid_coarse_ptr = &solid.coarse;
+    solid_fine_ptr = &solid.fine;
+  }
+
   /* enthalpy equation */
   EnthalpyFDaxisym enthFD_coarse(tpr.coarse, q.coarse, uvw.coarse, time, solver_coarse, &mixed.coarse,
-                                 conc_coarse.topo, tsat, &solid.coarse, htwm);
+                                 conc_coarse.topo, tsat, solid_coarse_ptr, htwm);
 
   enthFD_coarse.convection_set(TimeScheme::forward_euler());
   enthFD_coarse.diffusion_set(TimeScheme::backward_euler());
 
   /* enthalpy on the fine grid */
   EnthalpyFDaxisym enthFD_fine(tpr.fine, q.fine, uvw.fine, time, solver_fine, &mixed.fine,
-                               conc_fine.topo, tsat, &solid.fine, htwm);
+                               conc_fine.topo, tsat, solid_fine_ptr, htwm);
 
   enthFD_fine.convection_set(TimeScheme::forward_euler());
   enthFD_fine.diffusion_set(TimeScheme::backward_euler());
@@ -80,7 +88,7 @@
   /* phase change */
   PhaseChange4 pc_coarse(mdot.coarse, mflx.coarse, tpr.coarse, q.coarse,
                          c.coarse, g.coarse, f.coarse, uvw.coarse, conc_coarse.topo,
-                         tsat, time, &mixed.coarse, &solid.coarse,
+                         tsat, time, &mixed.coarse, solid_coarse_ptr,
                          &enthFD_coarse.heat_transfer_wall_model());
   pc_coarse.set_second_order_accuracy(use_second_order_accuracy);
   pc_coarse.set_discard_points_near_interface(discard_points_near_interface);
@@ -89,7 +97,7 @@
   /* phase change on the fine grid*/
   PhaseChange4 pc_fine(mdot.fine, mflx.fine, tpr.fine, q.fine,
                        c.fine, g.fine , f.fine , uvw.fine, conc_fine.topo,
-                       tsat, time, &mixed.fine, &solid.fine,
+                       tsat, time, &mixed.fine, solid_fine_ptr,
                        &enthFD_fine.heat_transfer_wall_model());
   pc_fine.set_second_order_accuracy(use_second_order_accuracy);
   pc_fine.set_discard_points_near_interface(discard_points_near_interface);

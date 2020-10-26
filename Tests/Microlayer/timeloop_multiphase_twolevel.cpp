@@ -38,15 +38,16 @@
     +---------------*/
     pc_fine.update();
 
+    real massflux_heat = pc_fine.get_smdot();
+    massflux_heat /= conc_fine.topo->get_totarea();
+    real massflux_inert = rhov*sqrt(boil::pi/7.*rhov*latent*deltat_nucl
+                                    /rhol/tsat0_K);
+    boil::oout<<"mflux= "<<time.current_time()<<" "
+                         <<massflux_heat<<" "<<massflux_inert<<" "
+                         <<massflux_inert/massflux_heat<<boil::endl;
     /* inertial cap */
     if(inertial) {
-      real massflux_heat = pc_fine.get_smdot();
-      massflux_heat /= conc_fine.topo->get_totarea();
-      real massflux_inert = rhov*sqrt(boil::pi/7.*rhov*latent*deltat_nucl
-                                      /rhol/tsat0_K);
-      boil::oout<<"mflux= "<<massflux_heat<<" "<<massflux_inert<<" "
-                           <<massflux_inert/massflux_heat<<boil::endl;
-      if(massflux_inert<massflux_heat) {
+      if(1.1*massflux_inert<massflux_heat) {
         mflx.fine *= massflux_inert/massflux_heat;
         mdot.fine *= massflux_inert/massflux_heat;
         pc_fine.sources();
@@ -210,7 +211,7 @@
 
       real ml_thickness_max = 10e-6;
       std::stringstream ssm;
-      ssp <<"microlayer-"<<iint<<".txt";
+      ssm <<"microlayer-"<<iint<<".txt";
       output.open(ssm.str(), std::ios::out);
       boil::output_profile_zx(conc_coarse.color(),output,
                               Range<int>(1,NXtot/2),

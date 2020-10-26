@@ -36,7 +36,8 @@ void PhaseChange4::calculate_node_temperature(const Scalar * diff_eddy) {
       /* inversion of fluid due to existence of interface */
       if(interface(Sign::neg(),m,i,j,k)) {
          lam_1 = lambda_inv(i,j,k,diff_eddy);
-         len_1 -= distance_int_x(Sign::neg(),i,j,k,tpr_1);
+         //len_1 -= distance_int_x(Sign::neg(),i,j,k,tpr_1);
+         len_1 = distance_int_x(Sign::pos(),i-1,j,k,tpr_1)-len_2;
          res_1 = len_1/lam_1 + htwallmodel->near_wall_resist;
       }
 
@@ -64,7 +65,8 @@ void PhaseChange4::calculate_node_temperature(const Scalar * diff_eddy) {
       /* inversion of fluid due to existence of interface */
       if(interface(Sign::pos(),m,i,j,k)) {
          lam_1 = lambda_inv(i,j,k,diff_eddy);
-         len_1 -= distance_int_x(Sign::pos(),i,j,k,tpr_1);
+         //len_1 -= distance_int_x(Sign::pos(),i,j,k,tpr_1);
+         len_1 = distance_int_x(Sign::neg(),i+1,j,k,tpr_1)-len_2;
          res_1 = len_1/lam_1 + htwallmodel->near_wall_resist;
       }
 
@@ -94,7 +96,8 @@ void PhaseChange4::calculate_node_temperature(const Scalar * diff_eddy) {
       /* inversion of fluid due to existence of interface */
       if(interface(Sign::neg(),m,i,j,k)) {
          lam_1 = lambda_inv(i,j,k,diff_eddy);
-         len_1 -= distance_int_y(Sign::neg(),i,j,k,tpr_1);
+         //len_1 -= distance_int_y(Sign::neg(),i,j,k,tpr_1);
+         len_1 = distance_int_y(Sign::pos(),i,j-1,k,tpr_1)-len_2;
          res_1 = len_1/lam_1 + htwallmodel->near_wall_resist;
       }
 
@@ -122,7 +125,8 @@ void PhaseChange4::calculate_node_temperature(const Scalar * diff_eddy) {
       /* inversion of fluid due to existence of interface */
       if(interface(Sign::pos(),m,i,j,k)) {
          lam_1 = lambda_inv(i,j,k,diff_eddy);
-         len_1 -= distance_int_y(Sign::pos(),i,j,k,tpr_1);
+         //len_1 -= distance_int_y(Sign::pos(),i,j,k,tpr_1);
+         len_1 = distance_int_y(Sign::neg(),i,j+1,k,tpr_1)-len_2;
          res_1 = len_1/lam_1 + htwallmodel->near_wall_resist;
       }
 
@@ -152,7 +156,8 @@ void PhaseChange4::calculate_node_temperature(const Scalar * diff_eddy) {
       /* inversion of fluid due to existence of interface */
       if(interface(Sign::neg(),m,i,j,k)) {
          lam_1 = lambda_inv(i,j,k,diff_eddy);
-         len_1 -= distance_int_z(Sign::neg(),i,j,k,tpr_1);
+         //len_1 -= distance_int_z(Sign::neg(),i,j,k,tpr_1);
+         len_1 = distance_int_z(Sign::pos(),i,j,k-1,tpr_1)-len_2;
          res_1 = len_1/lam_1 + htwallmodel->near_wall_resist;
       }
 
@@ -180,7 +185,8 @@ void PhaseChange4::calculate_node_temperature(const Scalar * diff_eddy) {
       /* inversion of fluid due to existence of interface */
       if(interface(Sign::pos(),m,i,j,k)) {
          lam_1 = lambda_inv(i,j,k,diff_eddy);
-         len_1 -= distance_int_z(Sign::pos(),i,j,k,tpr_1);
+         //len_1 -= distance_int_z(Sign::pos(),i,j,k,tpr_1);
+         len_1 = distance_int_z(Sign::neg(),i,j,k+1,tpr_1)-len_2;
          res_1 = len_1/lam_1 + htwallmodel->near_wall_resist;
       }
 

@@ -27,17 +27,18 @@ real EnthalpyFD::hflux_wall(const Scalar & val, const Dir din
       if(d != Dir::undefined()) {
         if(d == din) {
 
+          /* of is in fluid, not of is wall */
           int iof=0, jof=0, kof=0;
-      	  int of(0);
-	  Comp mcomp;
+          int of(0);
+          Comp mcomp;
           Sign sig = Sign::undefined();
 
-          if(d == Dir::imin()) { iof++; mcomp = Comp::i(); of = -1; sig = Sign::neg(); }
-          if(d == Dir::imax()) { iof--; mcomp = Comp::i(); of = +1; sig = Sign::pos(); }
-          if(d == Dir::jmin()) { jof++; mcomp = Comp::j(); of = -1; sig = Sign::neg(); }
-          if(d == Dir::jmax()) { jof--; mcomp = Comp::j(); of = +1; sig = Sign::pos(); } 
-          if(d == Dir::kmin()) { kof++; mcomp = Comp::k(); of = -1; sig = Sign::neg(); }
-          if(d == Dir::kmax()) { kof--; mcomp = Comp::k(); of = +1; sig = Sign::pos(); }
+          if(d == Dir::imin()) { iof++; mcomp = Comp::i(); of = -1; sig = Sign::pos(); }
+          if(d == Dir::imax()) { iof--; mcomp = Comp::i(); of = +1; sig = Sign::neg(); }
+          if(d == Dir::jmin()) { jof++; mcomp = Comp::j(); of = -1; sig = Sign::pos(); }
+          if(d == Dir::jmax()) { jof--; mcomp = Comp::j(); of = +1; sig = Sign::neg(); } 
+          if(d == Dir::kmin()) { kof++; mcomp = Comp::k(); of = -1; sig = Sign::pos(); }
+          if(d == Dir::kmax()) { kof--; mcomp = Comp::k(); of = +1; sig = Sign::neg(); }
     
           for_vijk(phi.bc().at(b),i,j,k){
             real area = fabs(iof)*val.dSx(sig,i,j,k)
@@ -52,7 +53,7 @@ real EnthalpyFD::hflux_wall(const Scalar & val, const Dir din
               real lc = solid()->lambda(i,j,k);
               hflux += lc*(val[i][j][k]-val[i+iof][j+jof][k+kof])/alen*area;
 
-            } else if(!interface(sig,mcomp,i+iof,j+jof,k+kof)) {
+            } else if(!interface(-sig,mcomp,i+iof,j+jof,k+kof)) {
               real lc=lambdav;
               real cp_mass = cpv/rhov;
               if(topo->above_interface(i+of,j+of,k+of)) {
@@ -64,7 +65,7 @@ real EnthalpyFD::hflux_wall(const Scalar & val, const Dir din
               }
               hflux += lc*(val[i][j][k]-val[i+iof][j+jof][k+kof])/alen*area;
 
-	    } else {
+            } else {
               real lc=lambdal;
               real cp_mass = cpl/rhol;
               if(topo->above_interface(i+of,j+of,k+of)) {
@@ -76,14 +77,17 @@ real EnthalpyFD::hflux_wall(const Scalar & val, const Dir din
               }
               real ts;
               if       (mcomp==Comp::i()) {
-                alen = fabs(val.xc(i)-val.xc(i+iof))
-                     - distance_int_x(sig,i+iof,j+jof,k+kof,ts);
+                //alen = fabs(val.xc(i)-val.xc(i+iof))
+                //     - distance_int_x(-sig,i+iof,j+jof,k+kof,ts);
+                alen = distance_int_x(sig,i,j,k,ts);
               } else if(mcomp==Comp::j()) {
-                alen = fabs(val.yc(j)-val.yc(j+jof))
-                     - distance_int_y(sig,i+iof,j+jof,k+kof,ts);
+                //alen = fabs(val.yc(j)-val.yc(j+jof))
+                //     - distance_int_y(-sig,i+iof,j+jof,k+kof,ts);
+                alen = distance_int_y(sig,i,j,k,ts);
               } else {
-                alen = fabs(val.zc(k)-val.zc(k+kof))
-                     - distance_int_z(sig,i+iof,j+jof,k+kof,ts);
+                //alen = fabs(val.zc(k)-val.zc(k+kof))
+                //     - distance_int_z(-sig,i+iof,j+jof,k+kof,ts);
+                alen = distance_int_z(sig,i,j,k,ts);
               }
               hflux += (val[i][j][k]-ts)/(alen/lc+htwallmodel->near_wall_resist)*area;
             } /* interface */
@@ -100,5 +104,4 @@ real EnthalpyFD::hflux_wall(const Scalar & val, const Dir din
   } else {
     return (hflux/areaw);
   }
-}	
-
+}

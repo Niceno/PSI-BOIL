@@ -1,6 +1,5 @@
 #include "enthalpyfd.h"
-#define VERSION_STABLE
-#define USE_PHASIC_VELOCITIES
+#include "def.h"
 
 /***************************************************************************//**
 *  \brief Interface for calling convection for new time step \f$\{C\}^{N}\f$.
@@ -65,7 +64,11 @@ void EnthalpyFD::convection(Scalar * conv) {
       //  u  //
       /////////
 #ifdef USE_PHASIC_VELOCITIES
+  #ifdef CNEW
+    if(topo->above_interface(i,j,k)) {
+  #else
     if(topo->above_interface_old(i,j,k)) {
+  #endif
       umf = (*uliq)[Comp::u()][i]  [j][k];  // u @ imin
       upf = (*uliq)[Comp::u()][i+1][j][k];  // u @ imax
     } else {
@@ -98,7 +101,11 @@ void EnthalpyFD::convection(Scalar * conv) {
       //  v  //
       /////////
 #ifdef USE_PHASIC_VELOCITIES
+  #ifdef CNEW
+    if(topo->above_interface(i,j,k)) {
+  #else
     if(topo->above_interface_old(i,j,k)) {
+  #endif
       vmf = (*uliq)[Comp::v()][i][j]  [k];  // v @ jmin
       vpf = (*uliq)[Comp::v()][i][j+1][k];  // v @ jmax
     } else {
@@ -131,7 +138,11 @@ void EnthalpyFD::convection(Scalar * conv) {
       //  w  //
       /////////
 #ifdef USE_PHASIC_VELOCITIES
+  #ifdef CNEW
+    if(topo->above_interface(i,j,k)) {
+  #else
     if(topo->above_interface_old(i,j,k)) {
+  #endif
       wmf = (*uliq)[Comp::w()][i][j][k];    // w @ kmin
       wpf = (*uliq)[Comp::w()][i][j][k+1];  // w @ kmax
     } else {
@@ -194,7 +205,11 @@ void EnthalpyFD::convection(Scalar * conv) {
 #else
   #ifdef USE_PHASIC_VELOCITIES
     real divu;
+  #ifdef CNEW
+    if(topo->above_interface(i,j,k)) {
+  #else
     if(topo->above_interface_old(i,j,k)) {
+  #endif
       divu = uliq->outflow(i,j,k);
     } else {
       divu = ugas->outflow(i,j,k);
@@ -212,8 +227,11 @@ void EnthalpyFD::convection(Scalar * conv) {
   +---------------------------*/
   for_ijk(i,j,k) {
 
+  #ifdef CNEW
+    if(abs(iflag[i][j][k])<3){
+  #else
     if(abs(iflagold[i][j][k])<3){
-
+  #endif
       real umf, upf, vmf, vpf, wmf, wpf, uc, vc, wc;
       real dtdxm, dtdxp, dtdym, dtdyp, dtdzm, dtdzp;
       real udtdx, vdtdy, wdtdz;
@@ -223,7 +241,11 @@ void EnthalpyFD::convection(Scalar * conv) {
       iumf=iupf=ivmf=ivpf=iwmf=iwpf=0;
 
 #ifdef USE_PHASIC_VELOCITIES
+  #ifdef CNEW
+      if(topo->above_interface(i,j,k)) {
+  #else
       if(topo->above_interface_old(i,j,k)) {
+  #endif
         // u
         umf = (*uliq)[Comp::u()][i]  [j][k];
         upf = (*uliq)[Comp::u()][i+1][j][k];
@@ -263,9 +285,17 @@ void EnthalpyFD::convection(Scalar * conv) {
 #endif
 
       // dtdxm
+  #ifdef CNEW
+      if(interface(Sign::neg(),Comp::i(),i,j,k)) {
+  #else
       if(interface_old(Sign::neg(),Comp::i(),i,j,k)) {
+  #endif
         real dxm, ts;
+  #ifdef CNEW
+        dxm = distance_int_x(Sign::neg(),i,j,k,ts);
+  #else
         dxm = distance_int_x_old(Sign::neg(),i,j,k,ts);
+  #endif      
         dtdxm = (phi[i][j][k]-ts)/dxm;
 #ifndef VERSION_STABLE
         umf = upf;
@@ -279,9 +309,17 @@ void EnthalpyFD::convection(Scalar * conv) {
       }
 
       // dtdxp
+  #ifdef CNEW
+      if(interface(Sign::pos(),Comp::i(),i,j,k)) {
+  #else
       if(interface_old(Sign::pos(),Comp::i(),i,j,k)) {
+  #endif
         real dxp, ts;
+  #ifdef CNEW
+        dxp = distance_int_x(Sign::pos(),i,j,k,ts);
+  #else
         dxp = distance_int_x_old(Sign::pos(),i,j,k,ts);
+  #endif      
         dtdxp = (ts-phi[i][j][k])/dxp;
 #ifndef VERSION_STABLE
         upf = umf;
@@ -295,9 +333,17 @@ void EnthalpyFD::convection(Scalar * conv) {
       }
 
       // dtdym
+  #ifdef CNEW
+      if(interface(Sign::neg(),Comp::j(),i,j,k)) {
+  #else
       if(interface_old(Sign::neg(),Comp::j(),i,j,k)) {
+  #endif
         real dym, ts;
+  #ifdef CNEW
+        dym = distance_int_y(Sign::neg(),i,j,k,ts);
+  #else
         dym = distance_int_y_old(Sign::neg(),i,j,k,ts);
+  #endif      
         dtdym = (phi[i][j][k]-ts)/dym;
 #ifndef VERSION_STABLE
         vmf = vpf;
@@ -311,9 +357,17 @@ void EnthalpyFD::convection(Scalar * conv) {
       }
 
       // dtdyp
+  #ifdef CNEW
+      if(interface(Sign::pos(),Comp::j(),i,j,k)) {
+  #else
       if(interface_old(Sign::pos(),Comp::j(),i,j,k)) {
+  #endif
         real dyp, ts;
+  #ifdef CNEW
+        dyp = distance_int_y(Sign::pos(),i,j,k,ts);
+  #else
         dyp = distance_int_y_old(Sign::pos(),i,j,k,ts);
+  #endif      
         dtdyp = (ts-phi[i][j][k])/dyp;
 #ifndef VERSION_STABLE
         vpf = vmf;
@@ -327,9 +381,17 @@ void EnthalpyFD::convection(Scalar * conv) {
       }
 
       // dtdzm
+  #ifdef CNEW
+      if(interface(Sign::neg(),Comp::k(),i,j,k)) {
+  #else
       if(interface_old(Sign::neg(),Comp::k(),i,j,k)) {
+  #endif
         real dzm, ts;
+  #ifdef CNEW
+        dzm = distance_int_z(Sign::neg(),i,j,k,ts);
+  #else
         dzm = distance_int_z_old(Sign::neg(),i,j,k,ts);
+  #endif      
         dtdzm = (phi[i][j][k]-ts)/dzm;
 #ifndef VERSION_STABLE
         wmf = wpf;
@@ -343,9 +405,17 @@ void EnthalpyFD::convection(Scalar * conv) {
       }
 
       // dtdzp
+  #ifdef CNEW
+      if(interface(Sign::pos(),Comp::k(),i,j,k)) {
+  #else
       if(interface_old(Sign::pos(),Comp::k(),i,j,k)) {
+  #endif
         real dzp, ts;
+  #ifdef CNEW
+        dzp = distance_int_z(Sign::pos(),i,j,k,ts);
+  #else
         dzp = distance_int_z_old(Sign::pos(),i,j,k,ts);
+  #endif      
         dtdzp = (ts-phi[i][j][k])/dzp;
 #ifndef VERSION_STABLE
         wpf = wmf;
@@ -399,7 +469,11 @@ void EnthalpyFD::convection(Scalar * conv) {
 
   for_ijk(i,j,k) {
     real r,c;
+  #ifdef CNEW
+    if(topo->above_interface(i,j,k)) {
+  #else
     if(topo->above_interface_old(i,j,k)) {
+  #endif
       c = cpl;
     } else {
       c = cpv;

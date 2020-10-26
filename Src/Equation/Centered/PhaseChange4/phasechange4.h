@@ -48,19 +48,9 @@ class PhaseChange4 : public Centered {
 
     Vector & node_tmp() {return bndtpr;}
 
-    /* testing */
-    bool test_differences(const int count);
-    bool test_differences(const std::vector<real> & stencil,
-                          const std::vector<real> & coefficients);
-    real evaluate_polynomial(const int order,
-                             const std::vector<real> & coefficients,
-                             const real x);
-    real evaluate_polynomial_derivative(const int order,
-                             const std::vector<real> & coefficients,
-                             const real x);
-    void request_gradient(const int i, const int j, const int k,
-                          std::vector<real> & tv,
-                          std::vector<real> & tl) {
+    void request_flux(const int i, const int j, const int k,
+                      std::vector<real> & tv,
+                      std::vector<real> & tl) {
       tv = {txv[i][j][k],tyv[i][j][k],tzv[i][j][k],tnv[i][j][k]};
       tl = {txl[i][j][k],tyl[i][j][k],tzl[i][j][k],tnl[i][j][k]};
       return;
@@ -98,6 +88,10 @@ class PhaseChange4 : public Centered {
     real distance_int_z(const Sign dir,
                         const int i, const int j, const int k,
                         real & tint);
+
+    /* ghost distance */
+    real ghost_distance(const Comp & m, const Sign & cell_marker,
+                        const int i, const int j, const int k);
  
     real Tint(const int i, const int j, const int k);
  
@@ -117,20 +111,6 @@ class PhaseChange4 : public Centered {
                        const int i, const int j, const int k);
     bool edge(const Sign dir, const Comp & m,
               const int i, const int j, const int k);
-
-    real zeroth_order_difference(const std::vector<real> & stencil,
-                                 const std::vector<real> & values);
-    real first_order_difference(const std::vector<real> & stencil,
-                                const std::vector<real> & values);
-    real second_order_difference(const std::vector<real> & stencil,
-                                 const std::vector<real> & values);
-    real third_order_difference(const std::vector<real> & stencil,
-                                const std::vector<real> & values);
-    real fourth_order_difference(const std::vector<real> & stencil,
-                                 const std::vector<real> & values);
-    real nth_order_difference(const std::vector<real> & stencil,
-                              const std::vector<real> & values,
-                              const int order);
 
     ScalarInt tempflag,iflag;
     Scalar txv, tyv, tzv;

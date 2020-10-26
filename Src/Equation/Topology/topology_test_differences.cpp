@@ -1,9 +1,9 @@
-#include "phasechange4.h"
+#include "topology.h"
 
 #include <random>
 
 /******************************************************************************/
-bool PhaseChange4::test_differences(const int count) {
+bool Topology::test_differences(const int count) {
 /******************************************************************************/
   std::mt19937 rng(123);
   std::uniform_real_distribution<real> distR1(1.,10.);
@@ -31,8 +31,8 @@ bool PhaseChange4::test_differences(const int count) {
 
 
 /******************************************************************************/
-bool PhaseChange4::test_differences(const std::vector<real> & stencil,
-                                    const std::vector<real> & coefficients) {
+bool Topology::test_differences(const std::vector<real> & stencil,
+                                const std::vector<real> & coefficients) {
 /***************************************************************************//**
 *  \brief Test if differences work correctly using polynomials
 *******************************************************************************/
@@ -94,9 +94,9 @@ bool PhaseChange4::test_differences(const std::vector<real> & stencil,
 }
 
 /******************************************************************************/
-real PhaseChange4::evaluate_polynomial(const int order,
-                                       const std::vector<real> & coefficients,
-                                       const real x) {
+real Topology::evaluate_polynomial(const int order,
+                                   const std::vector<real> & coefficients,
+                                   const real x) {
 /******************************************************************************/
   real val(0.);
   for(int i(0); i<=order; ++i) {
@@ -107,7 +107,7 @@ real PhaseChange4::evaluate_polynomial(const int order,
 }
 
 /******************************************************************************/
-real PhaseChange4::evaluate_polynomial_derivative(const int order,
+real Topology::evaluate_polynomial_derivative(const int order,
                                        const std::vector<real> & coefficients,
                                        const real x) {
 /******************************************************************************/

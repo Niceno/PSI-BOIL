@@ -14,7 +14,8 @@
 
   boil::oout<<"N1= "<<NX1<<" "<<NZ1<<" "<<NZsol1<<boil::endl;
 
-  const real DX0 = LZsol/(real(NZsol0)
+  const real DX0 = NZsol==0 ? LZsol :
+                   LZsol/(real(NZsol0)
                           +sqrt(AR)*real(NZsol_trans)+AR*real(NZsol1));
   const real DZ0 = DX0;
   boil::oout<<"DX= "<<DX0<<boil::endl;
@@ -80,31 +81,39 @@
     gzf = &gzf0;
   }
 
-  Grid1D gzs0( Range<real>(-LZsol0,0.0), NZsol0, Periodic::no() );
-  Grid1D * gzst, * gzs1, * gzs;
-  if(NZsol_trans>0) {
-    gzst = new Grid1D( Range<real>(-LZsol_trans,-LZsol0)
-                    , Range<real>(AR*DZ0,1.0*DZ0)
-                    , NZsol_trans, Periodic::no() );
-    if(NZsol1>0) {
-      gzs1 = new Grid1D( Range<real>(-LZsol,-LZsol_trans),
-                         NZsol1, Periodic::no() );
+  Grid1D * gzs0, * gzst, * gzs1, * gzs;
+  Grid1D * gz;
+  if(NZsol>0) {
+    gzs0 = new Grid1D( Range<real>(-LZsol0,0.0), NZsol0, Periodic::no() );
+    if(NZsol_trans>0) {
+      gzst = new Grid1D( Range<real>(-LZsol_trans,-LZsol0)
+                      , Range<real>(AR*DZ0,1.0*DZ0)
+                      , NZsol_trans, Periodic::no() );
+      if(NZsol1>0) {
+        gzs1 = new Grid1D( Range<real>(-LZsol,-LZsol_trans),
+                           NZsol1, Periodic::no() );
 
-      gzs = new Grid1D(*gzs1, *gzst, gzs0, Periodic::no());
+        gzs = new Grid1D(*gzs1, *gzst, *gzs0, Periodic::no());
+      } else {
+        gzs = new Grid1D(*gzst, *gzs0, Periodic::no());
+      }
     } else {
-      gzs = new Grid1D(*gzst, gzs0, Periodic::no());
+      gzs = gzs0;
     }
+    gz = new Grid1D(*gzs, *gzf, Periodic::no());
   } else {
-    gzs = &gzs0;
+    gz = gzf;
   }
-
-  Grid1D gz(*gzs, *gzf, Periodic::no());
 
   /*---------+
   |  domain  |
   +---------*/
   Body floor("floor.stl");
-  TwoLevelCartesian d(*gx,*gx,gz,&floor);
+  Body * floor_ptr = NULL;
+  if(NZsol>0) {
+    floor_ptr = &floor;
+  }
+  TwoLevelCartesian d(*gx,*gx,*gz,floor_ptr);
 
   const real dxmin = d.coarse().dxyz_min();
   //boil::plot->plot(d.coarse(),"coarsedomain");

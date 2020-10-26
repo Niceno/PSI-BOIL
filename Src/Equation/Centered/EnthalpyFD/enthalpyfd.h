@@ -168,6 +168,12 @@ class EnthalpyFD : public Centered {
     real Tint(const int i, const int j, const int k);
     real Tint_old(const int i, const int j, const int k);
 
+    /* cell distances */
+    real distance_center(const Sign sig, const Comp & m,
+                         const int i, const int j, const int k);
+    real distance_face(const Sign sig, const Comp & m,
+                       const int i, const int j, const int k);
+
     /* new distances */
     real distance_int(const Sign dir, const Comp & m,
                       const int i, const int j, const int k,
@@ -196,8 +202,18 @@ class EnthalpyFD : public Centered {
                             const int i, const int j, const int k,
                             real & tint);
 
+    /* ghost distance */
+    real ghost_distance(const Comp & m, const Sign & cell_marker,
+                        const int i, const int j, const int k);
+
     real gradt_ib(const int dir, const Comp & mcomp,
                   const int i, const int j, const int k);
+
+    /* conductivity function */
+    real lambda(const int i, const int j, const int k,
+                const Scalar * diff_eddy = NULL) const;
+    real lambda_inv(const int i, const int j, const int k,
+                    const Scalar * diff_eddy = NULL) const;
 
     /* This points to solid if solid() = true and fluid() otherwise.
        So you can always dereference it without segfaults */

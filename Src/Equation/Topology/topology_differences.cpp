@@ -1,4 +1,4 @@
-#include "phasechange4.h"
+#include "topology.h"
 
 /* 
    presented expressions were calculated using symbolic python package sympy,
@@ -8,9 +8,9 @@
 */
 
 /******************************************************************************/
-real PhaseChange4::nth_order_difference(const std::vector<real> & stencil,
-                                        const std::vector<real> & values,
-                                        const int order) {
+real Topology::nth_order_difference(const std::vector<real> & stencil,
+                                    const std::vector<real> & values,
+                                    const int order) {
 /***************************************************************************//**
 *  \brief Approximate first derivative using a desired-order difference.
 *******************************************************************************/
@@ -26,7 +26,7 @@ real PhaseChange4::nth_order_difference(const std::vector<real> & stencil,
     case 4 :
       return fourth_order_difference(stencil,values);
     default :
-      boil::aout<<"PC4: unrecognised difference requested. Exiting."
+      boil::aout<<"Topology: unrecognised difference requested. Exiting."
                 <<boil::endl;
       exit(0);
   }
@@ -35,8 +35,8 @@ real PhaseChange4::nth_order_difference(const std::vector<real> & stencil,
 }
 
 /******************************************************************************/
-real PhaseChange4::zeroth_order_difference(const std::vector<real> & stencil,
-                                           const std::vector<real> & values) {
+real Topology::zeroth_order_difference(const std::vector<real> & stencil,
+                                       const std::vector<real> & values) {
 /***************************************************************************//**
 *  \brief Approximate first derivative using a zeroth-order difference.
 *******************************************************************************/
@@ -45,8 +45,8 @@ real PhaseChange4::zeroth_order_difference(const std::vector<real> & stencil,
 
 
 /******************************************************************************/
-real PhaseChange4::first_order_difference(const std::vector<real> & stencil,
-                                          const std::vector<real> & values) {
+real Topology::first_order_difference(const std::vector<real> & stencil,
+                                      const std::vector<real> & values) {
 /***************************************************************************//**
 *  \brief Approximate first derivative using a first-order difference.
 *******************************************************************************/
@@ -60,8 +60,8 @@ real PhaseChange4::first_order_difference(const std::vector<real> & stencil,
 #if 1
 
 /******************************************************************************/
-real PhaseChange4::second_order_difference(const std::vector<real> & stencil,
-                                           const std::vector<real> & values) {
+real Topology::second_order_difference(const std::vector<real> & stencil,
+                                       const std::vector<real> & values) {
 /***************************************************************************//**
 *  \brief Approximate first derivative using a second-order difference.
 *******************************************************************************/
@@ -87,8 +87,8 @@ real PhaseChange4::second_order_difference(const std::vector<real> & stencil,
 }
 
 /******************************************************************************/
-real PhaseChange4::third_order_difference(const std::vector<real> & stencil,
-                                          const std::vector<real> & values) {
+real Topology::third_order_difference(const std::vector<real> & stencil,
+                                      const std::vector<real> & values) {
 /***************************************************************************//**
 *  \brief Approximate first derivative using a third-order difference.
 *******************************************************************************/
@@ -141,8 +141,8 @@ real PhaseChange4::third_order_difference(const std::vector<real> & stencil,
 
 
 /******************************************************************************/
-real PhaseChange4::fourth_order_difference(const std::vector<real> & stencil,
-                                           const std::vector<real> & values) {
+real Topology::fourth_order_difference(const std::vector<real> & stencil,
+                                       const std::vector<real> & values) {
 /***************************************************************************//**
 *  \brief Approximate first derivative using a fourth-order difference.
 *******************************************************************************/
@@ -247,8 +247,8 @@ real PhaseChange4::fourth_order_difference(const std::vector<real> & stencil,
 #else /* the functions below assume that zeroth point has stencil[0] = 0 */ 
 
 /******************************************************************************/
-real PhaseChange4::second_order_difference(const std::vector<real> & stencil,
-                                           const std::vector<real> & values) {
+real Topology::second_order_difference(const std::vector<real> & stencil,
+                                       const std::vector<real> & values) {
 /***************************************************************************//**
 *  \brief Approximate first derivative using a second-order difference.
 *******************************************************************************/
@@ -260,8 +260,8 @@ real PhaseChange4::second_order_difference(const std::vector<real> & stencil,
 }
 
 /******************************************************************************/
-real PhaseChange4::third_order_difference(const std::vector<real> & stencil,
-                                          const std::vector<real> & values) {
+real Topology::third_order_difference(const std::vector<real> & stencil,
+                                      const std::vector<real> & values) {
 /***************************************************************************//**
 *  \brief Approximate first derivative using a third-order difference.
 *******************************************************************************/
@@ -289,8 +289,8 @@ real PhaseChange4::third_order_difference(const std::vector<real> & stencil,
 }
 
 /******************************************************************************/
-real PhaseChange4::fourth_order_difference(const std::vector<real> & stencil,
-                                           const std::vector<real> & values) {
+real Topology::fourth_order_difference(const std::vector<real> & stencil,
+                                       const std::vector<real> & values) {
 /***************************************************************************//**
 *  \brief Approximate first derivative using a fourth-order difference.
 *******************************************************************************/

@@ -46,7 +46,8 @@ real EnthalpyFD::hflux_wall_ib(const Scalar * diff_eddy) {
       real resistf = dxf/lf;
       real resists = dxs/ls;
       if(interface(Sign::neg(),Comp::i(),i,j,k)) {
-        dxf = 0.5*phi.dxc(i) - distance_int_x(Sign::neg(),i,j,k,tf);
+        //dxf = 0.5*phi.dxc(i) - distance_int_x(Sign::neg(),i,j,k,tf);
+        dxf = distance_int_x(Sign::pos(),i-1,j,k,tf)-0.5*phi.dxc(i-1);
         /* inversion of lambda */
         if(!topo->above_interface(i,j,k)) {
           lf = lambdal;
@@ -77,7 +78,8 @@ real EnthalpyFD::hflux_wall_ib(const Scalar * diff_eddy) {
       real resistf = dxf/lf;
       real resists = dxs/ls;
       if(interface(Sign::pos(),Comp::i(),i,j,k)) {
-        dxf = 0.5*phi.dxc(i) - distance_int_x(Sign::pos(),i,j,k,tf);
+        //dxf = 0.5*phi.dxc(i) - distance_int_x(Sign::pos(),i,j,k,tf);
+        dxf = distance_int_x(Sign::neg(),i+1,j,k,tf)-0.5*phi.dxc(i+1);
         /* inversion of lambda */
         if(!topo->above_interface(i,j,k)) {
           lf = lambdal;
@@ -108,7 +110,8 @@ real EnthalpyFD::hflux_wall_ib(const Scalar * diff_eddy) {
       real resistf = dyf/lf;
       real resists = dys/ls;
       if(interface(Sign::neg(),Comp::j(),i,j,k)) {
-        dyf = 0.5*phi.dyc(j) - distance_int_y(Sign::neg(),i,j,k,tf);
+        //dyf = 0.5*phi.dyc(j) - distance_int_y(Sign::neg(),i,j,k,tf);
+        dyf = distance_int_y(Sign::pos(),i,j-1,k,tf)-0.5*phi.dyc(j-1);
         /* inversion of lambda */
         if(!topo->above_interface(i,j,k)) {
           lf = lambdal;
@@ -139,7 +142,8 @@ real EnthalpyFD::hflux_wall_ib(const Scalar * diff_eddy) {
       real resistf = dyf/lf;
       real resists = dys/ls;
       if(interface(Sign::pos(),Comp::j(),i,j,k)) {
-        dyf = 0.5*phi.dyc(j) - distance_int_y(Sign::pos(),i,j,k,tf);
+        //dyf = 0.5*phi.dyc(j) - distance_int_y(Sign::pos(),i,j,k,tf);
+        dyf = distance_int_y(Sign::neg(),i,j+1,k,tf)-0.5*phi.dyc(j+1);
         /* inversion of lambda */
         if(!topo->above_interface(i,j,k)) {
           lf = lambdal;
@@ -170,7 +174,8 @@ real EnthalpyFD::hflux_wall_ib(const Scalar * diff_eddy) {
       real resistf = dzf/lf;
       real resists = dzs/ls;
       if(interface(Sign::neg(),Comp::k(),i,j,k)) {
-        dzf = 0.5*phi.dzc(k) - distance_int_z(Sign::neg(),i,j,k,tf);
+        //dzf = 0.5*phi.dzc(k) - distance_int_z(Sign::neg(),i,j,k,tf);
+        dzf = distance_int_z(Sign::pos(),i,j,k-1,tf)-0.5*phi.dzc(k-1);
         /* inversion of lambda */
         if(!topo->above_interface(i,j,k)) {
           lf = lambdal;
@@ -201,7 +206,8 @@ real EnthalpyFD::hflux_wall_ib(const Scalar * diff_eddy) {
       real resistf = dzf/lf;
       real resists = dzs/ls;
       if(interface(Sign::pos(),Comp::k(),i,j,k)) {
-        dzf = 0.5*phi.dzc(k) - distance_int_z(Sign::pos(),i,j,k,tf);
+        //dzf = 0.5*phi.dzc(k) - distance_int_z(Sign::pos(),i,j,k,tf);
+        dzf = distance_int_z(Sign::neg(),i,j,k+1,tf)-0.5*phi.dzc(k+1);
         /* inversion of lambda */
         if(!topo->above_interface(i,j,k)) {
           lf = lambdal;

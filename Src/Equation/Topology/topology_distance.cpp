@@ -93,7 +93,8 @@ Sign Topology::distance1D_int_x(const int i, const int j, const int k,
                                 const Sign dir, real & dist) const {
   real centrex = vf->xc(i);
   if(dir>0) {
-    real edgex= centrex+0.5*vf->dxc(i);
+    //real edgex= centrex+0.5*vf->dxc(i);
+    real edgex= vf->xn(i+1);
     real intx = (*fs)[Comp::i()][i+1][j][k];
     real offx = vf->xc(i+1);
     if(intx>=centrex&&intx<=edgex) {
@@ -104,7 +105,8 @@ Sign Topology::distance1D_int_x(const int i, const int j, const int k,
       return Sign::pos();
     }
   } else {
-    real edgex= centrex-0.5*vf->dxc(i);
+    //real edgex= centrex-0.5*vf->dxc(i);
+    real edgex= vf->xn(i);
     real intx = (*fs)[Comp::i()][i  ][j][k];
     real offx = vf->xc(i-1);
     if(intx<=centrex&&intx>=edgex) {
@@ -123,7 +125,8 @@ Sign Topology::distance1D_int_y(const int i, const int j, const int k,
                                 const Sign dir, real & dist) const {
   real centrey = vf->yc(j);
   if(dir>0) {
-    real edgey= centrey+0.5*vf->dyc(j);
+    //real edgey= centrey+0.5*vf->dyc(j);
+    real edgey= vf->yn(j+1);
     real inty = (*fs)[Comp::j()][i][j+1][k];
     real offy = vf->yc(j+1);
     if(inty>=centrey&&inty<=edgey) {
@@ -134,7 +137,8 @@ Sign Topology::distance1D_int_y(const int i, const int j, const int k,
       return Sign::pos();
     }
   } else {
-    real edgey= centrey-0.5*vf->dyc(j);
+    //real edgey= centrey-0.5*vf->dyc(j);
+    real edgey= vf->yn(j);
     real inty = (*fs)[Comp::j()][i][j  ][k];
     real offy = vf->yc(j-1);
     if(inty<=centrey&&inty>=edgey) {
@@ -153,7 +157,8 @@ Sign Topology::distance1D_int_z(const int i, const int j, const int k,
                                 const Sign dir, real & dist) const {
   real centrez = vf->zc(k);
   if(dir>0) {
-    real edgez= centrez+0.5*vf->dzc(k);
+    //real edgez= centrez+0.5*vf->dzc(k);
+    real edgez= vf->zn(k+1);
     real intz = (*fs)[Comp::k()][i][j][k+1];
     real offz = vf->zc(k+1);
     if(intz>=centrez&&intz<=edgez) {
@@ -164,7 +169,8 @@ Sign Topology::distance1D_int_z(const int i, const int j, const int k,
       return Sign::pos();
     }
   } else {
-    real edgez= centrez-0.5*vf->dzc(k);
+    //real edgez= centrez-0.5*vf->dzc(k);
+    real edgez= vf->zn(k);
     real intz = (*fs)[Comp::k()][i][j][k  ];
     real offz = vf->zc(k-1);
     if(intz<=centrez&&intz>=edgez) {

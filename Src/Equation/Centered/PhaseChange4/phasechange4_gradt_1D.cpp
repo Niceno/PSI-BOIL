@@ -45,6 +45,11 @@ real PhaseChange4::gradt1D(const bool is_solid, const Comp & m,
   bool discard_center(false);
   std::set<int> discard_set = {};
 
+  /* for first order schemes, center is always discarded */
+  if(accuracy_order<2) {
+    discard_center = true;
+  }
+
   /*** add first and second point: always possible ***/
   
   /* west */
@@ -161,12 +166,12 @@ real PhaseChange4::gradt1D(const bool is_solid, const Comp & m,
     for(auto v : values) 
       boil::oout<<" "<<v;
     boil::oout<<" | "
-              <<nth_order_difference(stencil,values,std::min(accuracy_order,diff_req))
+              <<topo->nth_order_difference(stencil,values,std::min(accuracy_order,diff_req))
               <<boil::endl;
   }
 #endif
 
-  return nth_order_difference(stencil,values,
-                              std::min(accuracy_order,diff_req));
+  return topo->nth_order_difference(stencil,values,
+                                    std::min(accuracy_order,diff_req));
 
 }
