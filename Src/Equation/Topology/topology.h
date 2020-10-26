@@ -47,10 +47,10 @@ class Topology {
 
     /* interface boolean */
     bool interface(const Sign dir, const Comp m,
-                   const int i, const int j, const int k);
+                   const int i, const int j, const int k) const;
     bool interface_old(const Sign dir, const Comp m,
-                       const int i, const int j, const int k);
-    bool interface(const int i, const int j, const int k);
+                       const int i, const int j, const int k) const;
+    bool interface(const int i, const int j, const int k) const;
 
     /* distance to interface */
     real distance_int(const Sign dir, const Comp & m,

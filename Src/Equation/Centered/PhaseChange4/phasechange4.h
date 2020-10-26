@@ -50,7 +50,7 @@ class PhaseChange4 : public Centered {
 
     void request_flux(const int i, const int j, const int k,
                       std::vector<real> & tv,
-                      std::vector<real> & tl) {
+                      std::vector<real> & tl) const {
       tv = {txv[i][j][k],tyv[i][j][k],tzv[i][j][k],tnv[i][j][k]};
       tl = {txl[i][j][k],tyl[i][j][k],tzl[i][j][k],tnl[i][j][k]};
       return;

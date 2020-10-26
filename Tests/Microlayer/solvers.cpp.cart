@@ -72,7 +72,8 @@
   }
 
   /* enthalpy equation */
-  EnthalpyFD enthFD_coarse(tpr.coarse, q.coarse, uvw.coarse, time, solver_coarse, &mixed.coarse,
+  EnthalpyFD enthFD_coarse(tpr.coarse, q.coarse, uvw.coarse, uvw_1, uvw_coarse,
+                           time, solver_coarse, &mixed.coarse,
                            conc_coarse.topo, tsat, solid_coarse_ptr, htwm);
 
   enthFD_coarse.convection_set(TimeScheme::forward_euler());

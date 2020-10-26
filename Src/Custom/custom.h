@@ -4,6 +4,7 @@
 #include "../Field/Scalar/scalar.h"
 #include "../Field/Vector/vector.h"
 #include "../Equation/Centered/CIPCSL2/cipcsl2.h"
+#include "../Equation/Centered/PhaseChange4/phasechange4.h"
 #include "../Equation/Centered/VOF/vof.h"
 #include "../Equation/Nucleation/nucleation.h"
 #include "../Matter/matter.h"
@@ -88,6 +89,10 @@ namespace boil {
   void output_wall_heat_transfer_xz(const Scalar & tpr,
                                     const Vector & bndtpr,
                                     const Matter & sol,
+                                    std::ostream & otp, const int NX);
+  void output_wall_heat_transfer_xz(const Scalar & tpr,
+                                    const Topology & topo,
+                                    const PhaseChange4 & pc,
                                     std::ostream & otp, const int NX);
 
   /* scalar error */

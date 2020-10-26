@@ -4,7 +4,7 @@
  *  Checks if the given cell is at (or next to) an interface
 ******************************************************************************/
 bool Topology::interface(const Sign dir, const Comp m,
-                         const int i, const int j, const int k) {
+                         const int i, const int j, const int k) const {
   int of(1);
   if(dir<0) of = 0;
 
@@ -19,7 +19,7 @@ bool Topology::interface(const Sign dir, const Comp m,
 }
 
 bool Topology::interface_old(const Sign dir, const Comp m,
-                             const int i, const int j, const int k) {
+                             const int i, const int j, const int k) const {
   int of(1);
   if(dir<0) of = 0;
 
@@ -33,7 +33,7 @@ bool Topology::interface_old(const Sign dir, const Comp m,
   return false;
 }
 
-bool Topology::interface(const int i, const int j, const int k) {
+bool Topology::interface(const int i, const int j, const int k) const {
   if((*adens)[i][j][k]>boil::pico) {
     return true;
   }

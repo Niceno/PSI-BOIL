@@ -153,15 +153,27 @@ int main(int argc, char * argv[]) {
   /*----------------------+
   |  physical properties  |
   +----------------------*/
+  const real mul = 0.28e-3;
+  const real rhol = 958.4;
+  const real lambdal = 0.679;
+  const real cpl = 4215.9*rhol;
+  const real alpl = lambdal/cpl;
+
+  const real muv = 1.255e-5;
+  const real rhov = 0.597;
+  const real lambdav = 0.025;
+  const real cpv = 2030.*rhov;
+  const real alpv = lambdav/cpv;
+
   Matter vapor(d), liquid(d);
-  vapor  .mu    (1.255e-5);
-  vapor  .rho   (0.597);
-  vapor  .cp    (2030*0.597);
-  vapor  .lambda(0.025);
-  liquid.mu    (0.28e-3);
-  liquid.rho   (958.4);
-  liquid.cp    (4215.9*958.4);
-  liquid.lambda(0.679);
+  vapor  .mu    (muv);
+  vapor  .rho   (rhov);
+  vapor  .cp    (cpv);
+  vapor  .lambda(lambdav);
+  liquid.mu    (mul);
+  liquid.rho   (rhol);
+  liquid.cp    (cpl);
+  liquid.lambda(lambdal);
 
 #ifndef USE_VOF
   Matter mixed(liquid, vapor,& step); //c=1: full of liquid, c=0: full of vapor
@@ -188,19 +200,6 @@ int main(int argc, char * argv[]) {
   /*--------------------+
   |  initial condition  |
   +--------------------*/
-  /* read from file */
-  real xi[200],tprin[200];
-  std::fstream input;
-  input.open("input.sucking");
-  if( input.fail() ) {
-      boil::oout<<"Error: input.sucking is necessary!!!";
-      exit(0);
-  } else {
-    for(int i=0; i<200; i++){
-      input>>xi[i]>>tprin[i];
-    }
-  }
-
   /* color function */
   for_vijk(c,i,j,k)
     c[i][j][k] = 1.0;
@@ -217,25 +216,19 @@ int main(int argc, char * argv[]) {
   c.exchange_all();
 
   /* temperature */
-  for(int i=0; i<200; i++){
-    xi[i]+=xint;
-    tprin[i] -= 373.15;
-  }
-  real xiend=xi[199];
-  for_vijk(tpr,i,j,k){
+  const real betasol = 0.7677282527146145;
+  const real t0 = 0.1;
+  const real gamma = rhov*sqrt(alpv)/rhol/sqrt(alpl);
+  auto tsol = [&](const real x, const real t) {
+    return (Tout-Tsat)-(Tout-Tsat)/erfc(betasol*gamma)*
+           erfc(x/2./sqrt(alpl*t)+betasol*(rhov-rhol)/rhol*sqrt(alpv/alpl)); 
+  };
+  for_vijk(tpr,i,j,k) {
     real xtmp=tpr.xc(i);
-    if(xtmp>=xiend){
-      tpr[i][j][k] = Tout;
-    } else if (xtmp<=xint) {
+    if(xtmp<=xint) {
       tpr[i][j][k] = Tsat;
     } else {
-      for(int ii=0; ii<199; ii++){
-        if((xtmp-xi[ii])*(xtmp-xi[ii+1])<=0) {
-          real we1=(xi[ii+1]-xtmp)/(xi[ii+1]-xi[ii]);
-          real we2=(xtmp-xi[ii])/(xi[ii+1]-xi[ii]);
-          tpr[i][j][k]=we1*tprin[ii]+we2*tprin[ii+1];
-        }
-      }
+      tpr[i][j][k] = tsol(xtmp,t0); 
     }
   }
   tpr.bnd_update();
@@ -274,7 +267,7 @@ int main(int argc, char * argv[]) {
   conc.totalvol();
 
   TIF tsat(Tsat);
-  EnthalpyFD enthFD(tpr, q, uvw, time, solver, &mixed,
+  EnthalpyFD enthFD(tpr, q, uvw, uvw_1, uvw, time, solver, &mixed,
                      conc.topo,tsat);
   enthFD.convection_set(TimeScheme::forward_euler());
   enthFD.diffusion_set(TimeScheme::backward_euler());
@@ -320,6 +313,12 @@ int main(int argc, char * argv[]) {
     |  phase change  |
     +---------------*/
     pc.update();
+    real massflux_heat = pc.get_smdot();
+    massflux_heat /= conc.topo->get_totarea();
+    boil::oout<<"mflux= "<<time.current_time()<<" "
+                         <<massflux_heat<<" "
+                         <<boil::endl;
+
     ns.vol_phase_change(&f);
 
     /* essential for moving front */

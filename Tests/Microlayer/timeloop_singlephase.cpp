@@ -131,8 +131,13 @@
       std::stringstream ssb;
       ssb <<"bndtpr-"<<iint<<".txt";
       output.open(ssb.str(), std::ios::out);
-      boil::output_wall_heat_transfer_xz(tpr.coarse,pc_coarse.node_tmp(),
-                                         solid.coarse,output,NXtot/2);
+      if(NZsol>0) {
+        boil::output_wall_heat_transfer_xz(tpr.coarse,pc_coarse.node_tmp(),
+                                           solid.coarse,output,NXtot/2);
+      } else {
+        boil::output_wall_heat_transfer_xz(tpr.coarse,*(conc_coarse.topo),pc_coarse,
+                                           output,NXtot/2);
+      }
       boil::cart.barrier();
       output.close();
 

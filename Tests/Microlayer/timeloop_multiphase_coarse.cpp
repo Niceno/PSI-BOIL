@@ -44,7 +44,7 @@
                          <<massflux_inert/massflux_heat<<boil::endl;
     /* inertial cap */
     if(inertial) {
-      if(1.1*massflux_inert<massflux_heat) {
+      if(massflux_inert<1.1*massflux_heat) {
         mflx.coarse *= massflux_inert/massflux_heat;
         mdot.coarse *= massflux_inert/massflux_heat;
         pc_coarse.sources();
@@ -104,7 +104,7 @@
     |  solve transport equation  |
     +---------------------------*/
     conc_coarse.new_time_step();
-    conc_coarse.advance_with_extrapolation(false,ResRat(1e-6),uvw.coarse,f.coarse,
+    conc_coarse.advance_with_extrapolation(false,ResRat(1e-9),uvw.coarse,f.coarse,
                                            &liquid.coarse,&uvw_1);
 
     for_avk(c.coarse,k) {
@@ -200,8 +200,13 @@
       std::stringstream ssb;
       ssb <<"bndtpr-"<<iint<<".txt";
       output.open(ssb.str(), std::ios::out);
-      boil::output_wall_heat_transfer_xz(tpr.coarse,pc_coarse.node_tmp(),
-                                         solid.coarse,output,NXtot/2);
+      if(NZsol>0) {
+        boil::output_wall_heat_transfer_xz(tpr.coarse,pc_coarse.node_tmp(),
+                                           solid.coarse,output,NXtot/2);
+      } else {
+        boil::output_wall_heat_transfer_xz(tpr.coarse,*(conc_coarse.topo),pc_coarse,
+                                           output,NXtot/2);
+      }
       boil::cart.barrier();
       output.close();
     }

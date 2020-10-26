@@ -76,11 +76,11 @@
   const int niter_pressure_extrap = 1000;
 
   /* enthalpy */
-  const bool use_ht_resistance = true;
+  const bool use_ht_resistance = false;//true;
 
   /* phase change - 4 version */
   const bool use_second_order_accuracy = true;
-  const bool discard_points_near_interface = true;
+  const bool discard_points_near_interface = false;//true;
   const bool use_unconditional_extrapolation = false;
 
   /*--------------------------------+

@@ -47,7 +47,7 @@
                          <<massflux_inert/massflux_heat<<boil::endl;
     /* inertial cap */
     if(inertial) {
-      if(1.1*massflux_inert<massflux_heat) {
+      if(massflux_inert<1.1*massflux_heat) {
         mflx.fine *= massflux_inert/massflux_heat;
         mdot.fine *= massflux_inert/massflux_heat;
         pc_fine.sources();
@@ -225,8 +225,13 @@
       std::stringstream ssb;
       ssb <<"bndtpr-"<<iint<<".txt";
       output.open(ssb.str(), std::ios::out);
-      boil::output_wall_heat_transfer_xz(tpr.fine,pc_fine.node_tmp(),
-                                         solid.fine,output,NXtot);
+      if(NZsol>0) {
+        boil::output_wall_heat_transfer_xz(tpr.fine,pc_fine.node_tmp(),
+                                           solid.fine,output,NXtot);
+      } else {
+        boil::output_wall_heat_transfer_xz(tpr.fine,*(conc_fine.topo),pc_fine,
+                                           output,NXtot);
+      }
       boil::cart.barrier();
       output.close();
     }
