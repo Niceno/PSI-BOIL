@@ -36,7 +36,7 @@
       }
       boil::oout<<boil::endl;
       fullstr<<"0.";
-      boil::oout<<"eq= "<<fullstr.str()<<boil::endl;
+      //boil::oout<<"eq= "<<fullstr.str()<<boil::endl;
       char *eqtpr = new char[fullstr.str().length()+1];
       std::strcpy(eqtpr, fullstr.str().c_str());
 

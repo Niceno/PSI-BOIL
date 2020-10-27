@@ -1,6 +1,6 @@
 #include "matter.h"
 
-//#define USE_PROSPERETTI
+#define USE_PROSPERETTI
 
 /*============================================================================*/
 Matter::Matter(const Domain & d, const char * nm) {
