@@ -12,33 +12,22 @@ EnthalpyFD::EnthalpyFD(const Scalar & PHI,
                        Times & T,
                        Linear * S,
                        Matter * f,
-                       Topology * TOPO,
-                       TIF & tintmodel,
-                       Matter * s,
-                       HTWallModel * HTM) :
+                       const CommonHeatTransfer & CHT,
+                       Matter * s) :
 /*---------------------+ 
 |  initialize parent   |
 +---------------------*/
   Centered( PHI.domain(), PHI, F, & U, T, f, s, S ),
   ftif   (  *PHI.domain()),
-  topo(TOPO),
-  iflag(TOPO->iflag),
-  iflagold(&(TOPO->iflagold)),
+  cht(CHT),
+  iflag(CHT.topo->iflag),
+  iflagold(&(CHT.topo->iflagold)),
   uliq(&Uliq),
-  ugas(&Ugas),
-  tifmodel(tintmodel),
-  htwallmodel(HTM)
+  ugas(&Ugas)
 {
-  rhol = fluid()->rho(1),
-  rhov = fluid()->rho(0),
-  cpl  = fluid()->cp(1),
-  cpv  = fluid()->cp(0),
-  lambdal = fluid()->lambda(1),
-  lambdav = fluid()->lambda(0),
   assert(PHI.domain() == F.domain());
   assert(PHI.domain() == U.domain());
   epsl=1.0e-2; /* this appears in diff_matrix but should not play a role */
-  turbP=0.9;
   laminar=true;
 
   /* see header for explanation */
@@ -50,16 +39,6 @@ EnthalpyFD::EnthalpyFD(const Scalar & PHI,
     accelerated_no_solid = true;
   }
 
-  /* heat transfer wall model should be equal to the one of enthalpy,
-   * that's why it is a pointer. however, the default argument is a
-   * nullptr, we need to fix that */
-  if(!htwallmodel) {
-    default_value_for_htwallmodel = true;
-    htwallmodel = new HTWallModel();
-  } else {
-    default_value_for_htwallmodel = false;
-  }
-
   ftif = phi.shape();
   phi.bnd_update();
 
@@ -68,11 +47,3 @@ EnthalpyFD::EnthalpyFD(const Scalar & PHI,
 
   discretize();
 }	
-
-/******************************************************************************/
-EnthalpyFD::~EnthalpyFD() {
-  if(default_value_for_htwallmodel)
-    delete htwallmodel;
-}	
-
-/******************************************************************************/

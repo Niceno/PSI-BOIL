@@ -38,13 +38,13 @@ void PhaseChange4::calculate_node_temperature(const Scalar * diff_eddy) {
          lam_1 = lambda_inv(i,j,k,diff_eddy);
          //len_1 -= distance_int_x(Sign::neg(),i,j,k,tpr_1);
          len_1 = distance_int_x(Sign::pos(),i-1,j,k,tpr_1)-len_2;
-         res_1 = len_1/lam_1 + htwallmodel->near_wall_resist;
+         res_1 = len_1/lam_1 + cht.heat_transfer_wall_model().near_wall_resist;
       }
 
-      bndtpr[m][i][j][k] = htwallmodel->temperature_node(
-                                          htwallmodel->dirac_wall_source,
-                                          res_1, tpr_1,
-                                          res_2, tpr_2);
+      bndtpr[m][i][j][k] = cht.temperature_node(
+                                cht.heat_transfer_wall_model().dirac_wall_source,
+                                res_1, tpr_1,
+                                res_2, tpr_2);
 
     }
 
@@ -67,13 +67,13 @@ void PhaseChange4::calculate_node_temperature(const Scalar * diff_eddy) {
          lam_1 = lambda_inv(i,j,k,diff_eddy);
          //len_1 -= distance_int_x(Sign::pos(),i,j,k,tpr_1);
          len_1 = distance_int_x(Sign::neg(),i+1,j,k,tpr_1)-len_2;
-         res_1 = len_1/lam_1 + htwallmodel->near_wall_resist;
+         res_1 = len_1/lam_1 + cht.heat_transfer_wall_model().near_wall_resist;
       }
 
-      bndtpr[m][i+1][j][k] = htwallmodel->temperature_node(
-                                            htwallmodel->dirac_wall_source,
-                                            res_1, tpr_1,
-                                            res_2, tpr_2);
+      bndtpr[m][i+1][j][k] = cht.temperature_node(
+                                  cht.heat_transfer_wall_model().dirac_wall_source,
+                                  res_1, tpr_1,
+                                  res_2, tpr_2);
 
     }
 
@@ -98,13 +98,13 @@ void PhaseChange4::calculate_node_temperature(const Scalar * diff_eddy) {
          lam_1 = lambda_inv(i,j,k,diff_eddy);
          //len_1 -= distance_int_y(Sign::neg(),i,j,k,tpr_1);
          len_1 = distance_int_y(Sign::pos(),i,j-1,k,tpr_1)-len_2;
-         res_1 = len_1/lam_1 + htwallmodel->near_wall_resist;
+         res_1 = len_1/lam_1 + cht.heat_transfer_wall_model().near_wall_resist;
       }
 
-      bndtpr[m][i][j][k] = htwallmodel->temperature_node(
-                                          htwallmodel->dirac_wall_source,
-                                          res_1, tpr_1,
-                                          res_2, tpr_2);
+      bndtpr[m][i][j][k] = cht.temperature_node(
+                                cht.heat_transfer_wall_model().dirac_wall_source,
+                                res_1, tpr_1,
+                                res_2, tpr_2);
 
     }
 
@@ -127,13 +127,13 @@ void PhaseChange4::calculate_node_temperature(const Scalar * diff_eddy) {
          lam_1 = lambda_inv(i,j,k,diff_eddy);
          //len_1 -= distance_int_y(Sign::pos(),i,j,k,tpr_1);
          len_1 = distance_int_y(Sign::neg(),i,j+1,k,tpr_1)-len_2;
-         res_1 = len_1/lam_1 + htwallmodel->near_wall_resist;
+         res_1 = len_1/lam_1 + cht.heat_transfer_wall_model().near_wall_resist;
       }
 
-      bndtpr[m][i][j+1][k] = htwallmodel->temperature_node(
-                                            htwallmodel->dirac_wall_source,
-                                            res_1, tpr_1,
-                                            res_2, tpr_2);
+      bndtpr[m][i][j+1][k] = cht.temperature_node(
+                                  cht.heat_transfer_wall_model().dirac_wall_source,
+                                  res_1, tpr_1,
+                                  res_2, tpr_2);
 
     }
 
@@ -158,13 +158,13 @@ void PhaseChange4::calculate_node_temperature(const Scalar * diff_eddy) {
          lam_1 = lambda_inv(i,j,k,diff_eddy);
          //len_1 -= distance_int_z(Sign::neg(),i,j,k,tpr_1);
          len_1 = distance_int_z(Sign::pos(),i,j,k-1,tpr_1)-len_2;
-         res_1 = len_1/lam_1 + htwallmodel->near_wall_resist;
+         res_1 = len_1/lam_1 + cht.heat_transfer_wall_model().near_wall_resist;
       }
 
-      bndtpr[m][i][j][k] = htwallmodel->temperature_node(
-                                          htwallmodel->dirac_wall_source,
-                                          res_1, tpr_1,
-                                          res_2, tpr_2);
+      bndtpr[m][i][j][k] = cht.temperature_node(
+                                cht.heat_transfer_wall_model().dirac_wall_source,
+                                res_1, tpr_1,
+                                res_2, tpr_2);
 
     }
 
@@ -187,13 +187,13 @@ void PhaseChange4::calculate_node_temperature(const Scalar * diff_eddy) {
          lam_1 = lambda_inv(i,j,k,diff_eddy);
          //len_1 -= distance_int_z(Sign::pos(),i,j,k,tpr_1);
          len_1 = distance_int_z(Sign::neg(),i,j,k+1,tpr_1)-len_2;
-         res_1 = len_1/lam_1 + htwallmodel->near_wall_resist;
+         res_1 = len_1/lam_1 + cht.heat_transfer_wall_model().near_wall_resist;
       }
 
-      bndtpr[m][i][j][k+1] = htwallmodel->temperature_node(
-                                            htwallmodel->dirac_wall_source,
-                                            res_1, tpr_1,
-                                            res_2, tpr_2);
+      bndtpr[m][i][j][k+1] = cht.temperature_node(
+                                  cht.heat_transfer_wall_model().dirac_wall_source,
+                                  res_1, tpr_1,
+                                  res_2, tpr_2);
 
     }
 

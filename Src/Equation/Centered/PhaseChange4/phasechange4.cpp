@@ -11,10 +11,10 @@ PhaseChange4::PhaseChange4(const Scalar & MDOT,
                                const Vector & U, 
                                Topology * TOPO,
                                const TIF & TIFMODEL,
+                               const CommonHeatTransfer & CHT,
                                Times & T, 
                                Matter * f,
                                Matter * s,
-                               HTWallModel * HTM,
                                Sign SIG) :
 /*---------------------+ 
 |  initialize parent   |
@@ -42,7 +42,7 @@ PhaseChange4::PhaseChange4(const Scalar & MDOT,
   tnv     ( *MDOT.domain()),
   tempflag( *MDOT.domain()),
   tifmodel(TIFMODEL),
-  htwallmodel(HTM),
+  cht(CHT),
   matter_sig(SIG)
 {
 #if 0 /* don't use this, it creates BndCnd pointers */
@@ -85,16 +85,6 @@ PhaseChange4::PhaseChange4(const Scalar & MDOT,
     }
   }
 
-  /* heat transfer wall model should be equal to the one of enthalpy,
-   * that's why it is a pointer. however, the default argument is a
-   * nullptr, we need to fix that */
-  if(!htwallmodel) {
-    default_value_for_htwallmodel = true;
-    htwallmodel = new HTWallModel();
-  } else {
-    default_value_for_htwallmodel = false;
-  }
-
   /* set arguments */
   rhol = fluid()->rho(1);
   rhov = fluid()->rho(0);
@@ -117,7 +107,5 @@ PhaseChange4::PhaseChange4(const Scalar & MDOT,
 
 /******************************************************************************/
 PhaseChange4::~PhaseChange4() {
-  if(default_value_for_htwallmodel)
-    delete htwallmodel;
 }	
 

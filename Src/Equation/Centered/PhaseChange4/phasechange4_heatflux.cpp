@@ -80,7 +80,7 @@ void PhaseChange4::heat_flux(const Scalar * diff_eddy) {
     for_ijk(i,j,k) {
       /* bottom is in wall and this is an interfacial cell */
       if(dom->ibody().off(i,j,k-1) && interface(i,j,k)) {
-        tnl[i][j][k] = -lambda(i,j,k-1)*(bndtpr[m][i][j][k]-tpr[i][j][k-1])/(0.5*phi.dzc(k));
+        tnl[i][j][k] = -lambda(i,j,k-1)*(bndtpr[m][i][j][k]-tpr[i][j][k-1])/(0.5*phi.dzc(k-1));
         tnv[i][j][k] = 0.0;
       } /* 1 above solid */
     } /* ijk */

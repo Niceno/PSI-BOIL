@@ -17,8 +17,8 @@ void EnthalpyFD::convective_time_step() {
   for_ijk(i,j,k) {
     if(dom->ibody().on(i,j,k)){
       /* phase change: xor indicates change of phase */
-      if(topo->above_interface_old(i,j,k) ^ topo->above_interface(i,j,k)) {
-        phi[i][j][k] = tifmodel.Tint(i,j,k);     /* crude code */
+      if(cht.topo->above_interface_old(i,j,k) ^ cht.topo->above_interface(i,j,k)) {
+        phi[i][j][k] = cht.Tint(i,j,k);     /* crude code */
       }
     }
   }
@@ -31,13 +31,13 @@ void EnthalpyFD::convective_time_step() {
     for_ijk(i,j,k) {
       real c,r;
 #ifdef CNEW
-      if(topo->above_interface(i,j,k)) {
+      if(cht.topo->above_interface(i,j,k)) {
 #else
-      if(topo->above_interface_old(i,j,k)) {
+      if(cht.topo->above_interface_old(i,j,k)) {
 #endif
-        c = cpl;
+        c = cht.cpl(i,j,k);
       } else {
-        c = cpv;
+        c = cht.cpv(i,j,k);
       }
       fold[i][j][k] = c * dV(i,j,k) * phi[i][j][k] * dti;
     }
@@ -46,13 +46,13 @@ void EnthalpyFD::convective_time_step() {
     for_ijk(i,j,k) {
       const real fV = dom->ibody().fV(i,j,k);
       const real cs = solid()->cp (i,j,k);
-      real cf = cpl;
+      real cf = cht.cpl(i,j,k);
 #ifdef CNEW
-      if(!topo->above_interface(i,j,k)) {
+      if(!cht.topo->above_interface(i,j,k)) {
 #else
-      if(!topo->above_interface_old(i,j,k)) {
+      if(!cht.topo->above_interface_old(i,j,k)) {
 #endif
-        cf = cpv;
+        cf = cht.cpv(i,j,k);
       }
 
       fold[i][j][k] = (cf*fV + cs*(1.0-fV)) * dV(i,j,k)
@@ -74,34 +74,34 @@ void EnthalpyFD::convective_time_step() {
   for_ijk(i,j,k){
     if(dom->ibody().on(i,j,k)){
       real c;
-      if(topo->above_interface_old(i,j,k)) {
-        c = cpl;
+      if(cht.topo->above_interface_old(i,j,k)) {
+        c = cht.cpl(i,j,k);
       } else {
-        c = cpv;
+        c = cht.cpv(i,j,k);
       }
       real t_new = fold[i][j][k] / (c * dV(i,j,k)) / dti;
 
 #if 1
       /* phase change: xor indicates change of phase */
-      if(topo->above_interface_old(i,j,k) ^ topo->above_interface(i,j,k)) {
-        if( (phi[i][j][k]-tifmodel.Tint(i,j,k))*(t_new-tifmodel.Tint(i,j,k))<=0.0 ){
-          t_new = tifmodel.Tint(i,j,k);     /* crude code */
+      if(cht.topo->above_interface_old(i,j,k) ^ cht.topo->above_interface(i,j,k)) {
+        if( (phi[i][j][k]-cht.Tint(i,j,k))*(t_new-cht.Tint(i,j,k))<=0.0 ){
+          t_new = cht.Tint(i,j,k);     /* crude code */
         }
   #if 0
       /* phase does not change */
       } else {
-        if( (phi[i][j][k]-tifmodel.Tint(i,j,k))*(t_new-tifmodel.Tint(i,j,k))<0.0 ){
-          t_new = tifmodel.Tint(i,j,k);     /* crude code: Is this necessary? */
+        if( (phi[i][j][k]-cht.Tint(i,j,k))*(t_new-cht.Tint(i,j,k))<0.0 ){
+          t_new = cht.Tint(i,j,k);     /* crude code: Is this necessary? */
         }
   #endif
       }
 #endif
 
       phi [i][j][k] = t_new;
-      if(topo->above_interface(i,j,k)) {
-        c = cpl;
+      if(cht.topo->above_interface(i,j,k)) {
+        c = cht.cpl(i,j,k);
       } else {
-        c = cpv;
+        c = cht.cpv(i,j,k);
       }
       fold[i][j][k] = c * dV(i,j,k) * phi[i][j][k] * dti;
     }

@@ -1,28 +1,29 @@
-#include "enthalpyfd.h"
+#include "commonheattransfer.h"
 
 /******************************************************************************/
-real EnthalpyFD::distance_center(const Sign sig, const Comp & m,
-                                 const int i, const int j, const int k) {
+real CommonHeatTransfer::distance_center(const Sign sig, const Comp & m,
+                                         const int i, const int j, const int k)
+                                         const {
 /***************************************************************************//*** 
 *  \brief calculate distance to neighboring cell center  
 *******************************************************************************/
   if       (m==Comp::i()) {
     if(sig<0) {
-      return phi.dxw(i);
+      return topo->clrold.dxw(i);
     } else {
-      return phi.dxe(i);
+      return topo->clrold.dxe(i);
     }
   } else if(m==Comp::j()) {
     if(sig<0) {
-      return phi.dys(j);
+      return topo->clrold.dys(j);
     } else {
-      return phi.dyn(j);
+      return topo->clrold.dyn(j);
     }
   } else {
     if(sig<0) {
-      return phi.dzb(k);
+      return topo->clrold.dzb(k);
     } else {
-      return phi.dzt(k);
+      return topo->clrold.dzt(k);
     }
   }
 
@@ -30,17 +31,18 @@ real EnthalpyFD::distance_center(const Sign sig, const Comp & m,
 }
 
 /******************************************************************************/
-real EnthalpyFD::distance_face(const Sign sig, const Comp & m,
-                               const int i, const int j, const int k) {
+real CommonHeatTransfer::distance_face(const Sign sig, const Comp & m,
+                                       const int i, const int j, const int k)
+                                       const {
 /***************************************************************************//*** 
 *  \brief calculate distance to neighboring cell face  
 *******************************************************************************/
   if       (m==Comp::i()) {
-    return 0.5*phi.dxc(i);
+    return 0.5*topo->clrold.dxc(i);
   } else if(m==Comp::j()) {
-    return 0.5*phi.dyc(j);
+    return 0.5*topo->clrold.dyc(j);
   } else {
-    return 0.5*phi.dzc(k);
+    return 0.5*topo->clrold.dzc(k);
   }
 
   return 0.0;
@@ -57,9 +59,9 @@ real EnthalpyFD::distance_face(const Sign sig, const Comp & m,
 /*** new ***/
 
 /* generic */
-real EnthalpyFD::distance_int(const Sign dir, const Comp & m,
-                              const int i, const int j, const int k,
-                              real & tint) {
+real CommonHeatTransfer::distance_int(const Sign dir, const Comp & m,
+                                      const int i, const int j, const int k,
+                                      real & tint) const {
   if        (m==Comp::i()) {
     return distance_int_x(dir,i,j,k,tint);
   } else if (m==Comp::j()) {
@@ -73,9 +75,9 @@ real EnthalpyFD::distance_int(const Sign dir, const Comp & m,
 
 
 /* x-direction */
-real EnthalpyFD::distance_int_x(const Sign dir, 
-                                const int i, const int j, const int k,
-                                real & tint) {
+real CommonHeatTransfer::distance_int_x(const Sign dir, 
+                                        const int i, const int j, const int k,
+                                        real & tint) const {
   Sign cell_marker;
   real dist = topo->distance_int_x(dir,i,j,k,cell_marker);
   if(cell_marker < 0) {
@@ -90,9 +92,9 @@ real EnthalpyFD::distance_int_x(const Sign dir,
 }
 
 /* y-direction */
-real EnthalpyFD::distance_int_y(const Sign dir, 
-                                const int i, const int j, const int k,
-                                real & tint) {
+real CommonHeatTransfer::distance_int_y(const Sign dir, 
+                                        const int i, const int j, const int k,
+                                        real & tint) const {
   Sign cell_marker;
   real dist = topo->distance_int_y(dir,i,j,k,cell_marker);
   if(cell_marker < 0) {
@@ -107,9 +109,9 @@ real EnthalpyFD::distance_int_y(const Sign dir,
 }
 
 /* z-direction */
-real EnthalpyFD::distance_int_z(const Sign dir, 
-                                const int i, const int j, const int k,
-                                real & tint) {
+real CommonHeatTransfer::distance_int_z(const Sign dir, 
+                                        const int i, const int j, const int k,
+                                        real & tint) const {
   Sign cell_marker;
   real dist = topo->distance_int_z(dir,i,j,k,cell_marker);
   if(cell_marker < 0) {
@@ -126,9 +128,9 @@ real EnthalpyFD::distance_int_z(const Sign dir,
 /*** old ***/
 
 /* generic */
-real EnthalpyFD::distance_int_old(const Sign dir, const Comp & m,
-                              const int i, const int j, const int k,
-                              real & tint) {
+real CommonHeatTransfer::distance_int_old(const Sign dir, const Comp & m,
+                                          const int i, const int j, const int k,
+                                          real & tint) const {
   if        (m==Comp::i()) {
     return distance_int_x_old(dir,i,j,k,tint);
   } else if (m==Comp::j()) {
@@ -142,9 +144,9 @@ real EnthalpyFD::distance_int_old(const Sign dir, const Comp & m,
 
 
 /* x-direction */
-real EnthalpyFD::distance_int_x_old(const Sign dir, 
-                                const int i, const int j, const int k,
-                                real & tint) {
+real CommonHeatTransfer::distance_int_x_old(const Sign dir, 
+                                            const int i, const int j, const int k,
+                                            real & tint) const {
   Sign cell_marker;
   real dist = topo->distance_int_x_old(dir,i,j,k,cell_marker);
   if(cell_marker < 0) {
@@ -159,9 +161,9 @@ real EnthalpyFD::distance_int_x_old(const Sign dir,
 }
 
 /* y-direction */
-real EnthalpyFD::distance_int_y_old(const Sign dir, 
-                                const int i, const int j, const int k,
-                                real & tint) {
+real CommonHeatTransfer::distance_int_y_old(const Sign dir, 
+                                            const int i, const int j, const int k,
+                                            real & tint) const {
   Sign cell_marker;
   real dist = topo->distance_int_y_old(dir,i,j,k,cell_marker);
   if(cell_marker < 0) {
@@ -176,9 +178,9 @@ real EnthalpyFD::distance_int_y_old(const Sign dir,
 }
 
 /* z-direction */
-real EnthalpyFD::distance_int_z_old(const Sign dir, 
-                                const int i, const int j, const int k,
-                                real & tint) {
+real CommonHeatTransfer::distance_int_z_old(const Sign dir, 
+                                            const int i, const int j, const int k,
+                                            real & tint) const {
   Sign cell_marker;
   real dist = topo->distance_int_z_old(dir,i,j,k,cell_marker);
   if(cell_marker < 0) {

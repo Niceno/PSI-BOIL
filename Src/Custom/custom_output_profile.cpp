@@ -3,7 +3,8 @@
 namespace boil {
   /******************************************************************************/
   void output_profile_xz(const Scalar & c, std::ostream & otp,
-                         const Range<int> RZ, const Range<int> RX) {
+                         const Range<int> RZ, const Range<int> RX,
+                         const real subtract) {
   /***************************************************************************//**
     \brief Integrate 2D scalar in the x-z plane for all layers in z-direction and
            output the result to an output stream. 
@@ -36,6 +37,8 @@ namespace boil {
       } /* vk*/
       boil::cart.max_real(&zpos);
       boil::cart.sum_real(&xsum);
+      if(subtract>0.)
+        xsum = subtract - xsum;
       if(!boil::cart.iam()) {
         otp<<K<<" "<<zpos<<" "<<xsum<<boil::endl;
       }
@@ -46,7 +49,8 @@ namespace boil {
 
   /******************************************************************************/
   void output_profile_zx(const Scalar & c, std::ostream & otp,
-                         const Range<int> RX, const Range<int> RZ) {
+                         const Range<int> RX, const Range<int> RZ,
+                         const real subtract) {
   /***************************************************************************//**
     \brief Integrate 2D scalar in the x-z plane for all layers in x-direction and
            output the result to an output stream. 
@@ -79,6 +83,8 @@ namespace boil {
       } /* vi*/
       boil::cart.max_real(&xpos);
       boil::cart.sum_real(&zsum);
+      if(subtract>0.)
+        zsum = subtract - zsum;
       if(!boil::cart.iam()) {
         otp<<I<<" "<<xpos<<" "<<zsum<<boil::endl;
       }

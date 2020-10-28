@@ -222,7 +222,8 @@
       std::stringstream ssp;
       ssp <<"profile-"<<iint<<".txt";
       output.open(ssp.str(), std::ios::out);
-      boil::output_profile_xz(conc_coarse.color(),output,Range<int>(NZsol/2+1,NZtot/2));
+      boil::output_profile_xz(conc_coarse.color(),output,Range<int>(NZsol/2+1,NZtot/2),
+                              Range<int>(-1,-2),LX0);
       boil::cart.barrier();
       output.close();
 

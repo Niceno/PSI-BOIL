@@ -1,7 +1,5 @@
 #include "enthalpyfd.h"
 
-using namespace std;
-
 /***************************************************************************//**
 *  \brief Adds diffusion to right hand side.
 *
@@ -43,33 +41,23 @@ void EnthalpyFD::explicit_diffusion(const Scalar * diff_eddy) {
     |  x direction (w and e)  |
     +------------------------*/
     for_ijk(i,j,k){
-      real lc, cp_mass;
-      if(topo->above_interface(i,j,k)) {
-        lc = lambdal;
-        cp_mass = cpl/rhol;
-      } else {
-        lc = lambdav;
-        cp_mass = cpv/rhov;
-      }
-      if(diff_eddy){
-        lc += (*diff_eddy)[i][j][k]*cp_mass/turbP;
-      }
+      real lc = cht.lambda(i,j,k,diff_eddy);
       const real vol = phi.dV(i,j,k);
       const real pc = phi[i][j][k];
       real xm,xp,pm,pp,aflagm,aflagp;
       aflagm=aflagp=0.0;
-      if(!interface(Sign::neg(),Comp::i(),i,j,k)){
+      if(!cht.interface(Sign::neg(),Comp::i(),i,j,k)){
         xm=phi.dxw(i);
         pm=phi[i-1][j][k];
       } else {
-        xm = distance_int_x(Sign::neg(),i,j,k,pm);
+        xm = cht.distance_int_x(Sign::neg(),i,j,k,pm);
         aflagm=1.0;
       }
-      if(!interface(Sign::pos(),Comp::i(),i,j,k)){
+      if(!cht.interface(Sign::pos(),Comp::i(),i,j,k)){
         xp=phi.dxe(i);
         pp=phi[i+1][j][k];
       } else {
-        xp = distance_int_x(Sign::pos(),i,j,k,pp);
+        xp = cht.distance_int_x(Sign::pos(),i,j,k,pp);
         aflagp=1.0;
       }
       real cxm = coef_x_m(xm,xp,phi.xc(i));
@@ -89,33 +77,23 @@ void EnthalpyFD::explicit_diffusion(const Scalar * diff_eddy) {
     |  y direction (s and n)  |
     +------------------------*/
     for_ijk(i,j,k){
-      real lc,cp_mass;
-      if(topo->above_interface(i,j,k)) {
-        lc = lambdal;
-        cp_mass = cpl/rhol;
-      } else {
-        lc = lambdav;
-        cp_mass = cpv/rhov;
-      }
-      if(diff_eddy){
-        lc += (*diff_eddy)[i][j][k]*cp_mass/turbP;
-      }
+      real lc = cht.lambda(i,j,k,diff_eddy);
       const real vol = phi.dV(i,j,k);
       const real pc = phi[i][j][k];
       real ym,yp,pm,pp,aflagm,aflagp;
       aflagm=aflagp=0.0;
-      if(!interface(Sign::neg(),Comp::j(),i,j,k)){
+      if(!cht.interface(Sign::neg(),Comp::j(),i,j,k)){
         ym=phi.dys(j);
         pm=phi[i][j-1][k];
       } else {
-        ym = distance_int_y(Sign::neg(),i,j,k,pm);
+        ym = cht.distance_int_y(Sign::neg(),i,j,k,pm);
         aflagm=1.0;
       }
-      if(!interface(Sign::pos(),Comp::j(),i,j,k)){
+      if(!cht.interface(Sign::pos(),Comp::j(),i,j,k)){
         yp=phi.dyn(j);
         pp=phi[i][j+1][k];
       } else {
-        yp = distance_int_y(Sign::pos(),i,j,k,pp);
+        yp = cht.distance_int_y(Sign::pos(),i,j,k,pp);
         aflagp=1.0;
       }
       real cym = coef_y_m(ym,yp,phi.yc(j));
@@ -134,33 +112,23 @@ void EnthalpyFD::explicit_diffusion(const Scalar * diff_eddy) {
     |  z direction (b and t)  |
     +------------------------*/
     for_ijk(i,j,k){
-      real lc,cp_mass;
-      if(topo->above_interface(i,j,k)) {
-        lc = lambdal;
-        cp_mass = cpl/rhol;
-      } else {
-        lc = lambdav;
-        cp_mass = cpv/rhov;
-      }
-      if(diff_eddy){
-        lc += (*diff_eddy)[i][j][k]*cp_mass/turbP;
-      }
+      real lc = cht.lambda(i,j,k,diff_eddy);
       const real vol = phi.dV(i,j,k);
       const real pc = phi[i][j][k];
       real zm,zp,pm,pp,aflagm,aflagp;
       aflagm=aflagp=0.0;
-      if(!interface(Sign::neg(),Comp::k(),i,j,k)){
+      if(!cht.interface(Sign::neg(),Comp::k(),i,j,k)){
         zm=phi.dzb(k);
         pm=phi[i][j][k-1];
       } else {
-        zm = distance_int_z(Sign::neg(),i,j,k,pm);
+        zm = cht.distance_int_z(Sign::neg(),i,j,k,pm);
         aflagm=1.0;
       }
-      if(!interface(Sign::pos(),Comp::k(),i,j,k)){
+      if(!cht.interface(Sign::pos(),Comp::k(),i,j,k)){
         zp=phi.dzt(k);
         pp=phi[i][j][k+1];
       } else {
-        zp = distance_int_z(Sign::pos(),i,j,k,pp);
+        zp = cht.distance_int_z(Sign::pos(),i,j,k,pp);
         aflagp=1.0;
       }
       real czm = coef_z_m(zm,zp,phi.zc(k));
@@ -206,13 +174,12 @@ void EnthalpyFD::explicit_diffusion(const Scalar * diff_eddy) {
       for_ijk(i,j,k) {
 
         const real vol = phi.dV(i,j,k);
-        real lc, xm, xp;
-
         bool onm, onc, onp, ofm, ofc, ofp; // on & off
-        real lsm, lsc, lsp; // lambda
+        real lsm, lsc, lsp; // lambdas
+        real lvm, lvc, lvp; // lambdav
+        real llm, llc, llp; // lambdal
         int clm, clc, clp; // topology flag
         real dxm, dxp, fdm, fdp, fdms, fdps;
-        real edm, edc, edp; // eddy viscosity
         real pm, pc, pp;
         real am, ac, ap;
         real tm, tc, tp;
@@ -231,6 +198,12 @@ void EnthalpyFD::explicit_diffusion(const Scalar * diff_eddy) {
         lsm=safe_solid->lambda (i-ii,j-jj,k-kk);
         lsc=safe_solid->lambda (i   ,j   ,k   );
         lsp=safe_solid->lambda (i+ii,j+jj,k+kk);
+        lvm=cht.lambdav(i-ii,j-jj,k-kk,diff_eddy);
+        lvc=cht.lambdav(i   ,j   ,k   ,diff_eddy);
+        lvp=cht.lambdav(i+ii,j+jj,k+kk,diff_eddy);
+        llm=cht.lambdal(i-ii,j-jj,k-kk,diff_eddy);
+        llc=cht.lambdal(i   ,j   ,k   ,diff_eddy);
+        llp=cht.lambdal(i+ii,j+jj,k+kk,diff_eddy);
         clm=iflag[i-ii][j-jj][k-kk];
         clc=iflag[i   ][j   ][k   ];
         clp=iflag[i+ii][j+jj][k+kk];
@@ -274,12 +247,6 @@ void EnthalpyFD::explicit_diffusion(const Scalar * diff_eddy) {
         pm=phi[i-ii][j-jj][k-kk];
         pc=phi[i   ][j   ][k   ];
         pp=phi[i+ii][j+jj][k+kk];
-        edm=edc=edp=0.0;
-        if(diff_eddy){
-          if (onm) edm = (*diff_eddy)[i-ii][j-jj][k-kk];
-          if (onc) edc = (*diff_eddy)[i   ][j   ][k   ];
-          if (onp) edp = (*diff_eddy)[i+ii][j+jj][k+kk];
-        }
         diff_matrix(am, ac, ap
                   , tm, tc, tp
                   , aflagm, aflagp
@@ -288,10 +255,11 @@ void EnthalpyFD::explicit_diffusion(const Scalar * diff_eddy) {
                   , vol, aream, areap
                   , onm, onc, onp, ofm, ofc, ofp
                   , lsm, lsc, lsp
+                  , lvm, lvc, lvp
+                  , llm, llc, llp
                   , clm, clc, clp
                   , dxm, dxp, fdm, fdp, fdms, fdps
                   , pm, pc, pp
-                  , edm, edc, edp
                   , i, j, k, m);
   
         fold[i][j][k] += sourceterm;

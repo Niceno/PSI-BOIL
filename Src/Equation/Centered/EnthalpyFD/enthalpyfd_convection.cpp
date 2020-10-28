@@ -65,9 +65,9 @@ void EnthalpyFD::convection(Scalar * conv) {
       /////////
 #ifdef USE_PHASIC_VELOCITIES
   #ifdef CNEW
-    if(topo->above_interface(i,j,k)) {
+    if(cht.topo->above_interface(i,j,k)) {
   #else
-    if(topo->above_interface_old(i,j,k)) {
+    if(cht.topo->above_interface_old(i,j,k)) {
   #endif
       umf = (*uliq)[Comp::u()][i]  [j][k];  // u @ imin
       upf = (*uliq)[Comp::u()][i+1][j][k];  // u @ imax
@@ -102,9 +102,9 @@ void EnthalpyFD::convection(Scalar * conv) {
       /////////
 #ifdef USE_PHASIC_VELOCITIES
   #ifdef CNEW
-    if(topo->above_interface(i,j,k)) {
+    if(cht.topo->above_interface(i,j,k)) {
   #else
-    if(topo->above_interface_old(i,j,k)) {
+    if(cht.topo->above_interface_old(i,j,k)) {
   #endif
       vmf = (*uliq)[Comp::v()][i][j]  [k];  // v @ jmin
       vpf = (*uliq)[Comp::v()][i][j+1][k];  // v @ jmax
@@ -139,9 +139,9 @@ void EnthalpyFD::convection(Scalar * conv) {
       /////////
 #ifdef USE_PHASIC_VELOCITIES
   #ifdef CNEW
-    if(topo->above_interface(i,j,k)) {
+    if(cht.topo->above_interface(i,j,k)) {
   #else
-    if(topo->above_interface_old(i,j,k)) {
+    if(cht.topo->above_interface_old(i,j,k)) {
   #endif
       wmf = (*uliq)[Comp::w()][i][j][k];    // w @ kmin
       wpf = (*uliq)[Comp::w()][i][j][k+1];  // w @ kmax
@@ -206,9 +206,9 @@ void EnthalpyFD::convection(Scalar * conv) {
   #ifdef USE_PHASIC_VELOCITIES
     real divu;
   #ifdef CNEW
-    if(topo->above_interface(i,j,k)) {
+    if(cht.topo->above_interface(i,j,k)) {
   #else
-    if(topo->above_interface_old(i,j,k)) {
+    if(cht.topo->above_interface_old(i,j,k)) {
   #endif
       divu = uliq->outflow(i,j,k);
     } else {
@@ -242,9 +242,9 @@ void EnthalpyFD::convection(Scalar * conv) {
 
 #ifdef USE_PHASIC_VELOCITIES
   #ifdef CNEW
-      if(topo->above_interface(i,j,k)) {
+      if(cht.topo->above_interface(i,j,k)) {
   #else
-      if(topo->above_interface_old(i,j,k)) {
+      if(cht.topo->above_interface_old(i,j,k)) {
   #endif
         // u
         umf = (*uliq)[Comp::u()][i]  [j][k];
@@ -286,15 +286,15 @@ void EnthalpyFD::convection(Scalar * conv) {
 
       // dtdxm
   #ifdef CNEW
-      if(interface(Sign::neg(),Comp::i(),i,j,k)) {
+      if(cht.interface(Sign::neg(),Comp::i(),i,j,k)) {
   #else
-      if(interface_old(Sign::neg(),Comp::i(),i,j,k)) {
+      if(cht.interface_old(Sign::neg(),Comp::i(),i,j,k)) {
   #endif
         real dxm, ts;
   #ifdef CNEW
-        dxm = distance_int_x(Sign::neg(),i,j,k,ts);
+        dxm = cht.distance_int_x(Sign::neg(),i,j,k,ts);
   #else
-        dxm = distance_int_x_old(Sign::neg(),i,j,k,ts);
+        dxm = cht.distance_int_x_old(Sign::neg(),i,j,k,ts);
   #endif      
         dtdxm = (phi[i][j][k]-ts)/dxm;
 #ifndef VERSION_STABLE
@@ -302,7 +302,7 @@ void EnthalpyFD::convection(Scalar * conv) {
 #endif
       } else {
         if(dom->ibody().off(i-1,j,k)) {
-          dtdxm = gradt_ib(-1,Comp::i(),i,j,k);
+          dtdxm = cht.gradt_ib(Sign::neg(),Comp::i(),i,j,k,Old::yes,phi);
         } else {
           dtdxm = (phi[i  ][j][k]-phi[i-1][j][k])/dxw(i);
         }
@@ -310,15 +310,15 @@ void EnthalpyFD::convection(Scalar * conv) {
 
       // dtdxp
   #ifdef CNEW
-      if(interface(Sign::pos(),Comp::i(),i,j,k)) {
+      if(cht.interface(Sign::pos(),Comp::i(),i,j,k)) {
   #else
-      if(interface_old(Sign::pos(),Comp::i(),i,j,k)) {
+      if(cht.interface_old(Sign::pos(),Comp::i(),i,j,k)) {
   #endif
         real dxp, ts;
   #ifdef CNEW
-        dxp = distance_int_x(Sign::pos(),i,j,k,ts);
+        dxp = cht.distance_int_x(Sign::pos(),i,j,k,ts);
   #else
-        dxp = distance_int_x_old(Sign::pos(),i,j,k,ts);
+        dxp = cht.distance_int_x_old(Sign::pos(),i,j,k,ts);
   #endif      
         dtdxp = (ts-phi[i][j][k])/dxp;
 #ifndef VERSION_STABLE
@@ -326,7 +326,7 @@ void EnthalpyFD::convection(Scalar * conv) {
 #endif
       } else {
         if(dom->ibody().off(i+1,j,k)) {
-          dtdxp = gradt_ib(+1,Comp::i(),i,j,k);
+          dtdxp = cht.gradt_ib(Sign::pos(),Comp::i(),i,j,k,Old::yes,phi);
         } else {
           dtdxp = (phi[i+1][j][k]-phi[i  ][j][k])/dxe(i);
         }
@@ -334,15 +334,15 @@ void EnthalpyFD::convection(Scalar * conv) {
 
       // dtdym
   #ifdef CNEW
-      if(interface(Sign::neg(),Comp::j(),i,j,k)) {
+      if(cht.interface(Sign::neg(),Comp::j(),i,j,k)) {
   #else
-      if(interface_old(Sign::neg(),Comp::j(),i,j,k)) {
+      if(cht.interface_old(Sign::neg(),Comp::j(),i,j,k)) {
   #endif
         real dym, ts;
   #ifdef CNEW
-        dym = distance_int_y(Sign::neg(),i,j,k,ts);
+        dym = cht.distance_int_y(Sign::neg(),i,j,k,ts);
   #else
-        dym = distance_int_y_old(Sign::neg(),i,j,k,ts);
+        dym = cht.distance_int_y_old(Sign::neg(),i,j,k,ts);
   #endif      
         dtdym = (phi[i][j][k]-ts)/dym;
 #ifndef VERSION_STABLE
@@ -350,7 +350,7 @@ void EnthalpyFD::convection(Scalar * conv) {
 #endif
       } else {
         if(dom->ibody().off(i,j-1,k)) {
-          dtdym = gradt_ib(-1,Comp::j(),i,j,k);
+          dtdym = cht.gradt_ib(Sign::neg(),Comp::j(),i,j,k,Old::yes,phi);
         } else {
           dtdym = (phi[i][j  ][k]-phi[i][j-1][k])/dys(j);
         }
@@ -358,15 +358,15 @@ void EnthalpyFD::convection(Scalar * conv) {
 
       // dtdyp
   #ifdef CNEW
-      if(interface(Sign::pos(),Comp::j(),i,j,k)) {
+      if(cht.interface(Sign::pos(),Comp::j(),i,j,k)) {
   #else
-      if(interface_old(Sign::pos(),Comp::j(),i,j,k)) {
+      if(cht.interface_old(Sign::pos(),Comp::j(),i,j,k)) {
   #endif
         real dyp, ts;
   #ifdef CNEW
-        dyp = distance_int_y(Sign::pos(),i,j,k,ts);
+        dyp = cht.distance_int_y(Sign::pos(),i,j,k,ts);
   #else
-        dyp = distance_int_y_old(Sign::pos(),i,j,k,ts);
+        dyp = cht.distance_int_y_old(Sign::pos(),i,j,k,ts);
   #endif      
         dtdyp = (ts-phi[i][j][k])/dyp;
 #ifndef VERSION_STABLE
@@ -374,7 +374,7 @@ void EnthalpyFD::convection(Scalar * conv) {
 #endif
       } else {
         if(dom->ibody().off(i,j+1,k)) {
-          dtdyp = gradt_ib(+1,Comp::j(),i,j,k);
+          dtdyp = cht.gradt_ib(Sign::pos(),Comp::j(),i,j,k,Old::yes,phi);
         } else {
           dtdyp = (phi[i][j+1][k]-phi[i][j  ][k])/dyn(j);
         }
@@ -382,15 +382,15 @@ void EnthalpyFD::convection(Scalar * conv) {
 
       // dtdzm
   #ifdef CNEW
-      if(interface(Sign::neg(),Comp::k(),i,j,k)) {
+      if(cht.interface(Sign::neg(),Comp::k(),i,j,k)) {
   #else
-      if(interface_old(Sign::neg(),Comp::k(),i,j,k)) {
+      if(cht.interface_old(Sign::neg(),Comp::k(),i,j,k)) {
   #endif
         real dzm, ts;
   #ifdef CNEW
-        dzm = distance_int_z(Sign::neg(),i,j,k,ts);
+        dzm = cht.distance_int_z(Sign::neg(),i,j,k,ts);
   #else
-        dzm = distance_int_z_old(Sign::neg(),i,j,k,ts);
+        dzm = cht.distance_int_z_old(Sign::neg(),i,j,k,ts);
   #endif      
         dtdzm = (phi[i][j][k]-ts)/dzm;
 #ifndef VERSION_STABLE
@@ -398,7 +398,7 @@ void EnthalpyFD::convection(Scalar * conv) {
 #endif
       } else {
         if(dom->ibody().off(i,j,k-1)) {
-          dtdzm = gradt_ib(-1,Comp::k(),i,j,k);
+          dtdzm = cht.gradt_ib(Sign::neg(),Comp::k(),i,j,k,Old::yes,phi);
         } else {
           dtdzm = (phi[i][j][k  ]-phi[i][j][k-1])/dzb(k);
         }
@@ -406,15 +406,15 @@ void EnthalpyFD::convection(Scalar * conv) {
 
       // dtdzp
   #ifdef CNEW
-      if(interface(Sign::pos(),Comp::k(),i,j,k)) {
+      if(cht.interface(Sign::pos(),Comp::k(),i,j,k)) {
   #else
-      if(interface_old(Sign::pos(),Comp::k(),i,j,k)) {
+      if(cht.interface_old(Sign::pos(),Comp::k(),i,j,k)) {
   #endif
         real dzp, ts;
   #ifdef CNEW
-        dzp = distance_int_z(Sign::pos(),i,j,k,ts);
+        dzp = cht.distance_int_z(Sign::pos(),i,j,k,ts);
   #else
-        dzp = distance_int_z_old(Sign::pos(),i,j,k,ts);
+        dzp = cht.distance_int_z_old(Sign::pos(),i,j,k,ts);
   #endif      
         dtdzp = (ts-phi[i][j][k])/dzp;
 #ifndef VERSION_STABLE
@@ -422,7 +422,7 @@ void EnthalpyFD::convection(Scalar * conv) {
 #endif
       } else {
         if(dom->ibody().off(i,j,k+1)) {
-          dtdzp = gradt_ib(+1,Comp::k(),i,j,k);
+          dtdzp = cht.gradt_ib(Sign::pos(),Comp::k(),i,j,k,Old::yes,phi);
         } else {
           dtdzp = (phi[i][j][k+1]-phi[i][j][k  ])/dzt(k);
         }
@@ -470,13 +470,13 @@ void EnthalpyFD::convection(Scalar * conv) {
   for_ijk(i,j,k) {
     real r,c;
   #ifdef CNEW
-    if(topo->above_interface(i,j,k)) {
+    if(cht.topo->above_interface(i,j,k)) {
   #else
-    if(topo->above_interface_old(i,j,k)) {
+    if(cht.topo->above_interface_old(i,j,k)) {
   #endif
-      c = cpl;
+      c = cht.cpl(i,j,k);
     } else {
-      c = cpv;
+      c = cht.cpv(i,j,k);
     }
     (*conv)[i][j][k] = c * (*conv)[i][j][k];
   }

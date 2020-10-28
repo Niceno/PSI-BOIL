@@ -7,9 +7,7 @@
 #include "../../../Parallel/communicator.h"
 #include "../../../Timer/timer.h"
 #include "../../../Global/global_realistic.h"
-#include "../../Tifmodel/tif.h"
-#include "../../Topology/topology.h"
-#include "../../../Ravioli/htwallmodel.h"
+#include "../../CommonHeatTransfer/commonheattransfer.h"
 
 /***************************************************************************//**
 *  \brief Discretizes and solves enthalpy conservaion equation.
@@ -60,10 +58,8 @@ class EnthalpyFD : public Centered {
                Times & t,
                Linear * sm,
                Matter * flu,
-               Topology * topo,
-               TIF & tifmodel,
-               Matter * sol = NULL,
-               HTWallModel * htwallmodel = NULL);
+               const CommonHeatTransfer & cht,
+               Matter * sol = NULL);
 
     /* Delegating constructor */
     EnthalpyFD(const Scalar & phi,
@@ -72,25 +68,16 @@ class EnthalpyFD : public Centered {
                Times & t,
                Linear * sm,
                Matter * flu,
-               Topology * topo,
-               TIF & tifmodel,
-               Matter * sol = NULL,
-               HTWallModel * htwallmodel = NULL) :
+               const CommonHeatTransfer & cht,
+               Matter * sol = NULL) :
     EnthalpyFD(phi,f,umixed,umixed,umixed,t,sm,flu,
-               topo,tifmodel,sol,htwallmodel) {};
-
-
-    ~EnthalpyFD();
+               cht,sol) {};
 
     void new_time_step(const Scalar * diff_eddy = NULL);
     void convective_time_step();
     void explicit_diffusion(const Scalar * diff_eddy = NULL);
     void solve(const ResRat & fact, const char * name = NULL);
     void solve_sor(const int & it, const real & r, const char * name = NULL);
-
-    real hflux_wall(const Scalar & s, const Dir d
-                  , const Scalar * diff_eddy = NULL);
-    real hflux_wall_ib(const Scalar * diff_eddy = NULL);
 
     //! Interface call to parent's discretization.
     void discretize(const Scalar * diff_eddy = NULL) {
@@ -100,22 +87,12 @@ class EnthalpyFD : public Centered {
       boil::timer.stop("enthalpy discretize");
     }
 
-    inline real get_turbP() const { return turbP; }
-    inline void set_turbP(const real a) {
-      turbP = a;
-      boil::oout<<"EnthalpyFD::turbP= "<<turbP<<"\n";
-    }
-
     inline bool get_no_solid_acceleration() const
       { return accelerated_no_solid; }
     inline void set_no_solid_acceleration(const bool flag) {
       accelerated_no_solid = flag;
       boil::oout<<"EnthalpyFD::no_solid_acceleration= "
                 <<accelerated_no_solid<<"\n";
-    }
-
-    inline HTWallModel & heat_transfer_wall_model() {
-      return *htwallmodel;
     }
 
     void convection();
@@ -138,11 +115,12 @@ class EnthalpyFD : public Centered {
                 , const bool onm, const bool onc, const bool onp
                 , const bool ofm, const bool ofc, const bool ofp
                 , const real lsm, const real lsc, const real lsp
+                , const real lvm, const real lvc, const real lvp
+                , const real llm, const real llc, const real llp
                 , const int clm, const int clc, const int clp
                 , real dxm, real dxp
                 , real fdm, real fdp, real fdms, real fdps
                 , real pm, real pc, real pp
-                , const real edm, const real edc, const real edp
                 , const int i, const int j, const int k, const Comp m);
 
     inline real resistance_multiplier(const real dx1, const real dx2,
@@ -156,65 +134,6 @@ class EnthalpyFD : public Centered {
     virtual real coef_z_m(const real dxm, const real dxp, const real x0);
     virtual real coef_z_p(const real dxm, const real dxp, const real x0);
 
-    bool interface(const Sign dir, const Comp m,
-                   const int i, const int j, const int k);
-    bool interface_old(const Sign dir, const Comp m,
-                       const int i, const int j, const int k);
-
-    real Tint(const int dir, const Comp &mcomp, const real frac,
-              const int i, const int j, const int k);
-    real Tint_old(const int dir, const Comp &mcomp, const real frac,
-              const int i, const int j, const int k);
-    real Tint(const int i, const int j, const int k);
-    real Tint_old(const int i, const int j, const int k);
-
-    /* cell distances */
-    real distance_center(const Sign sig, const Comp & m,
-                         const int i, const int j, const int k);
-    real distance_face(const Sign sig, const Comp & m,
-                       const int i, const int j, const int k);
-
-    /* new distances */
-    real distance_int(const Sign dir, const Comp & m,
-                      const int i, const int j, const int k,
-                      real & tint);
-    real distance_int_x(const Sign dir,
-                        const int i, const int j, const int k,
-                        real & tint);
-    real distance_int_y(const Sign dir,
-                        const int i, const int j, const int k,
-                        real & tint);
-    real distance_int_z(const Sign dir,
-                        const int i, const int j, const int k,
-                        real & tint);
-
-    /* old distances */
-    real distance_int_old(const Sign dir, const Comp & m,
-                          const int i, const int j, const int k,
-                          real & tint);
-    real distance_int_x_old(const Sign dir,
-                            const int i, const int j, const int k,
-                            real & tint);
-    real distance_int_y_old(const Sign dir,
-                            const int i, const int j, const int k,
-                            real & tint);
-    real distance_int_z_old(const Sign dir,
-                            const int i, const int j, const int k,
-                            real & tint);
-
-    /* ghost distance */
-    real ghost_distance(const Comp & m, const Sign & cell_marker,
-                        const int i, const int j, const int k);
-
-    real gradt_ib(const int dir, const Comp & mcomp,
-                  const int i, const int j, const int k);
-
-    /* conductivity function */
-    real lambda(const int i, const int j, const int k,
-                const Scalar * diff_eddy = NULL) const;
-    real lambda_inv(const int i, const int j, const int k,
-                    const Scalar * diff_eddy = NULL) const;
-
     /* This points to solid if solid() = true and fluid() otherwise.
        So you can always dereference it without segfaults */
     const Matter * safe_solid; 
@@ -223,16 +142,12 @@ class EnthalpyFD : public Centered {
     bool accelerated_no_solid;
 
     const Vector * uliq, * ugas;
+    
+    const CommonHeatTransfer & cht;
 
-    TIF & tifmodel;  
-    Topology * topo;
-    HTWallModel * htwallmodel;
-
-    real rhol,rhov,cpl,cpv,lambdal,lambdav,epsl;
     Scalar ftif;
     ScalarInt iflag,iflagold;
-    real turbP; /* turbulent Prandtl number */
+    real epsl;
     bool laminar;
-    bool default_value_for_htwallmodel;
 };	
 #endif

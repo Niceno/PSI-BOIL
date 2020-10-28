@@ -7,9 +7,9 @@
 #include "../../../Parallel/communicator.h"
 #include "../../../Timer/timer.h"
 #include "../../../Global/global_realistic.h"
+#include "../../CommonHeatTransfer/commonheattransfer.h"
 #include "../../Tifmodel/tif.h"
 #include "../../Topology/topology.h"
-#include "../../../Ravioli/htwallmodel.h"
 
 #define IB
 
@@ -25,10 +25,10 @@ class PhaseChange4 : public Centered {
                  const Vector & u, 
                  Topology * topo,
                  const TIF & tifmodel,
+                 const CommonHeatTransfer & cht,
                  Times & t,
                  Matter * flu,
                  Matter * sol = NULL,
-                 HTWallModel * htwallmodel = NULL,
                  Sign matter_sig = Sign::pos());
  
     ~PhaseChange4();
@@ -126,16 +126,15 @@ class PhaseChange4 : public Centered {
     Scalar M;
 
     const TIF & tifmodel;
+    const CommonHeatTransfer & cht;
     const Sign matter_sig; /* pos: liquid is phi=1 and vice versa */
     Topology * topo;
-    HTWallModel * htwallmodel;
  
     real rhol, rhov, lambdal, lambdav, cpl, cpv;
     real turbP;
     real smdot_pos, smdot_neg;
     
     int accuracy_order;
-    bool default_value_for_htwallmodel;
     bool use_unconditional_extrapolation,
          discard_points_near_interface;
 };	

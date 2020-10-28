@@ -202,6 +202,8 @@ class Topology {
     Scalar clrold, vfold;
     Vector fsold;
 
+    const Domain * domain() const {return clrold.domain();}
+
   private:
     real frontPosition(const int i, const int j, const int k, const Comp m);
 

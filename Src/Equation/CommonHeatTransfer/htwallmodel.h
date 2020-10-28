@@ -52,6 +52,31 @@ class HTWallModel {
                 <<dws<<boil::endl;
     }
 
+    inline real temperature_node(const real len_s, const real lam_s, 
+                                 const real tmp_s, const real len_f,
+                                 const real lam_f, const real tmp_f) const {;
+/***************************************************************************//**
+*  \brief calculate temperature at node point
+*             len_s         len_f
+*             lam_s         lam_f
+*         *-------------*------------*
+*       tmp_s       tmp_node        tmp_f
+*******************************************************************************/
+      //return (len_f*lam_s*tmp_s + len_s*lam_f*tmp_f)/(len_f*lam_s + len_s*lam_f);
+      return temperature_node(0.,len_s/lam_s, tmp_s, len_f/lam_f, tmp_f);
+    }
+    inline real temperature_node(const real R_s, const real tmp_s,
+                                 const real R_f, const real tmp_f) const {
+      //return (R_f*tmp_s+R_s*tmp_f)/(R_f+R_s);
+      return temperature_node(0.,R_s,tmp_s,R_f,tmp_f);
+    };
+    /* with a source */
+    inline real temperature_node(const real Q,
+                                 const real R_s, const real tmp_s,
+                                 const real R_f, const real tmp_f) const {
+      return (R_f*R_s*Q+R_f*tmp_s+R_s*tmp_f)/(R_f+R_s);
+    };
+
     real near_wall_resist;
     /* units W/m2 */
     real dirac_wall_source;

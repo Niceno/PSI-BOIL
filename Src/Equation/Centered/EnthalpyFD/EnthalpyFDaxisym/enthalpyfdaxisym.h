@@ -18,12 +18,10 @@ class EnthalpyFDaxisym : public EnthalpyFD {
                      Times & t,
                      Linear * sm,
                      Matter * flu,
-                     Topology * topo,
-                     TIF & tifmodel,
-                     Matter * sol = NULL,
-                     HTWallModel * htwallmodel = NULL) :
+                     const CommonHeatTransfer & cht,
+                     Matter * sol = NULL) :
 
-    EnthalpyFD(phi,f,u,uliq,ugas,t,sm,flu,topo,tifmodel,sol,htwallmodel) {
+    EnthalpyFD(phi,f,u,uliq,ugas,t,sm,flu,cht,sol) {
 
       if(phi.domain()->is_cartesian()) {
            boil::oout<<"Warning: Initializing axisymmetric EnthalpyFD on a Cartesian "
@@ -38,11 +36,9 @@ class EnthalpyFDaxisym : public EnthalpyFD {
                      Times & t,
                      Linear * sm,
                      Matter * flu,
-                     Topology * topo,
-                     TIF & tifmodel,
-                     Matter * sol = NULL,
-                     HTWallModel * htwallmodel = NULL) :
-    EnthalpyFDaxisym(phi,f,u,u,u,t,sm,flu,topo,tifmodel,sol,htwallmodel) {};
+                     const CommonHeatTransfer & cht,
+                     Matter * sol = NULL) :
+    EnthalpyFDaxisym(phi,f,u,u,u,t,sm,flu,cht,sol) {};
 
     ~EnthalpyFDaxisym() {};
 

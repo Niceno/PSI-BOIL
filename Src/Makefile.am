@@ -25,6 +25,7 @@ SUBDIRS = Equation/Staggered/Momentum                              \
           Equation/Centered/VOF                                    \
           Equation/Centered/Distance                               \
           Equation/Centered                                        \
+          Equation/CommonHeatTransfer                              \
           Equation/Dispersed                                       \
           Equation/Floodfill                                       \
           Equation/Heaviside/MarchingCubes                         \
@@ -108,6 +109,7 @@ LDADD = Custom/IF97/libIF97.a                                                 \
         Equation/Tifmodel/Antoine/libAntoine.a                                \
         Equation/Tifmodel/Clapeyron/libClapeyron.a                            \
         Equation/Tifmodel/Schrage/libSchrage.a                                \
+        Equation/CommonHeatTransfer/libCommonHeatTransfer.a                   \
         Equation/Tifmodel/libTif.a                                            \
         Equation/Topology/libTopology.a                                       \
         Monitor/Rack/libRack.a                                                \

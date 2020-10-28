@@ -1,10 +1,10 @@
-#include "enthalpyfd.h"
+#include "commonheattransfer.h"
 
 /***************************************************************************//**
 *  \brief calculate heat flux on wall
 *******************************************************************************/
-real EnthalpyFD::hflux_wall(const Scalar & val, const Dir din
-                          , const Scalar * diff_eddy) {
+real CommonHeatTransfer::hflux_wall(const Scalar & val, const Dir din,
+                                    const Scalar * diff_eddy) const {
   //std::cout<<"hflux_wall: "<<din<<"\n";
 
   Formula form;
@@ -22,7 +22,7 @@ real EnthalpyFD::hflux_wall(const Scalar & val, const Dir din
     +------------------------*/
     if( val.bc().type(b) == BndType::dirichlet()) {
 
-      Dir d = phi.bc().direction(b);
+      Dir d = val.bc().direction(b);
 
       if(d != Dir::undefined()) {
         if(d == din) {
@@ -40,7 +40,7 @@ real EnthalpyFD::hflux_wall(const Scalar & val, const Dir din
           if(d == Dir::kmin()) { kof++; mcomp = Comp::k(); of = -1; sig = Sign::pos(); }
           if(d == Dir::kmax()) { kof--; mcomp = Comp::k(); of = +1; sig = Sign::neg(); }
     
-          for_vijk(phi.bc().at(b),i,j,k){
+          for_vijk(val.bc().at(b),i,j,k){
             real area = fabs(iof)*val.dSx(sig,i,j,k)
                       + fabs(jof)*val.dSy(sig,i,j,k)
                       + fabs(kof)*val.dSz(sig,i,j,k);
@@ -49,32 +49,16 @@ real EnthalpyFD::hflux_wall(const Scalar & val, const Dir din
                       + fabs(val.zc(k)-val.zc(k+kof));
 
             areaw += area;
-            if       (dom->ibody().off(i,j,k)) {
+            if       (val.domain()->ibody().off(i,j,k)) {
               real lc = solid()->lambda(i,j,k);
               hflux += lc*(val[i][j][k]-val[i+iof][j+jof][k+kof])/alen*area;
 
             } else if(!interface(-sig,mcomp,i+iof,j+jof,k+kof)) {
-              real lc=lambdav;
-              real cp_mass = cpv/rhov;
-              if(topo->above_interface(i+of,j+of,k+of)) {
-                lc = lambdal;
-                cp_mass = cpl/rhol;
-              }
-              if(diff_eddy){
-                lc += (*diff_eddy)[i][j][k]*cp_mass/turbP;
-              }
+              real lc=lambda(i,j,k,diff_eddy);
               hflux += lc*(val[i][j][k]-val[i+iof][j+jof][k+kof])/alen*area;
 
             } else {
-              real lc=lambdal;
-              real cp_mass = cpl/rhol;
-              if(topo->above_interface(i+of,j+of,k+of)) {
-                lc = lambdav;
-                cp_mass = cpv/rhov;
-              }
-              if(diff_eddy){
-                lc += (*diff_eddy)[i][j][k]*cp_mass/turbP;
-              }
+              real lc=lambda_inv(i,j,k,diff_eddy);
               real ts;
               if       (mcomp==Comp::i()) {
                 //alen = fabs(val.xc(i)-val.xc(i+iof))

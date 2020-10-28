@@ -44,6 +44,7 @@ AC_OUTPUT(Makefile                                                             \
           Src/Equation/Centered/Makefile                                       \
           Src/Equation/Staggered/Momentum/Makefile                             \
           Src/Equation/Staggered/Makefile                                      \
+          Src/Equation/CommonHeatTransfer/Makefile                             \
           Src/Equation/Dispersed/Makefile                                      \
           Src/Equation/Floodfill/Makefile                                      \
           Src/Equation/Heaviside/MarchingCubes/Makefile                        \

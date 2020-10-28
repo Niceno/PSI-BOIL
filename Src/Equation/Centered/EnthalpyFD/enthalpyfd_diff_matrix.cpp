@@ -18,11 +18,12 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
                 , const bool onm, const bool onc, const bool onp
                 , const bool ofm, const bool ofc, const bool ofp
                 , const real lsm, const real lsc, const real lsp
+                , const real lvm, const real lvc, const real lvp
+                , const real llm, const real llc, const real llp
                 , const int clm, const int clc, const int clp
                 , real dxm, real dxp
                 , real fdm, real fdp, real fdms, real fdps
                 , real pm, real pc, real pp
-                , const real edm, const real edc, const real edp
                 , const int i, const int j, const int k, const Comp m) {
   real lm, lc, lp; // lambda
   aflagm=aflagp=1.0;
@@ -37,9 +38,9 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
   // minus
   if(onm){
     if(clm>0){
-      lm = lambdal + edm*cpl/rhol/turbP;
+      lm = llm;
     } else {
-      lm = lambdav + edm*cpv/rhov/turbP;
+      lm = lvm;
     }
   } else {
     lm = lsm;
@@ -48,9 +49,9 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
   // center
   if(onc){
     if(clc>0){
-      lc = lambdal + edc*cpl/rhol/turbP;
+      lc = llc;
     } else {
-      lc = lambdav + edc*cpv/rhov/turbP;
+      lc = lvc;
     }
   } else {
     lc = lsc;
@@ -61,9 +62,9 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
   // plus
   if(onp){
     if(clp>0){
-      lp = lambdal + edp*cpl/rhol/turbP;
+      lp = llp;
     } else {
-      lp = lambdav + edp*cpv/rhov/turbP;
+      lp = lvp;
     }
   } else {
     lp = lsp;
@@ -99,13 +100,13 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
       real resistm;
 
       /* f-s-s */
-      if(interface(Sign::neg(),m,i,j,k)) {
+      if(cht.interface(Sign::neg(),m,i,j,k)) {
         /* removed from system matrix */
         aflagm = 0.0;
         /* dxm,fdm are corrected to account for interface position */
         /* tm is changed to the saturation temperature */
         fdm *= dxm;
-        dxm = distance_int(Sign::neg(),m,i,j,k,tm);
+        dxm = cht.distance_int(Sign::neg(),m,i,j,k,tm);
         real dxfull = dxm;
         fdm /= dxm; 
         fdm = std::max(fdm,epsl);
@@ -113,13 +114,13 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
         dxm = dxm * fdm;
         /* lambdaf is inverted */
         if(clm>0) {
-          lm = lambdav + edm*cpv/rhov/turbP;
+          lm = lvm;
         } else {
-          lm = lambdal + edm*cpl/rhol/turbP;
+          lm = llm;
         }
         fact = resistance_multiplier(dxm,dxfull-dxm,lc,lm,
-                                     htwallmodel->near_wall_resist);
-        resistm = (dxfull-dxm)/lm + htwallmodel->near_wall_resist;
+                                     cht.heat_transfer_wall_model().near_wall_resist);
+        resistm = (dxfull-dxm)/lm + cht.heat_transfer_wall_model().near_wall_resist;
       } else {
         fdm = std::max(fdm,epsl);
         resistm = (1.0-fdm)*dxm/lm;
@@ -139,7 +140,7 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
       ac = am + ap;
 #endif
       /* dirac source term */
-      sourceterm = htwallmodel->dirac_wall_source * am * resistm;
+      sourceterm = cht.heat_transfer_wall_model().dirac_wall_source * am * resistm;
 
 #ifdef DEBUG
       std::cout<<"f-s-s: "<<i<<" "<<j<<" "<<k<<" "<<am-ac+ap<<"\n";
@@ -150,13 +151,13 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
       real resistp;
 
       /* s-s-f */
-      if(interface(Sign::pos(),m,i,j,k)) {
+      if(cht.interface(Sign::pos(),m,i,j,k)) {
         /* removed from system matrix */
         aflagp = 0.0;
         /* dxp,fdp are corrected to account for interface position */
         /* tp is changed to the saturation temperature */
         fdp *= dxp;
-        dxp = distance_int(Sign::pos(),m,i,j,k,tp);
+        dxp = cht.distance_int(Sign::pos(),m,i,j,k,tp);
         real dxfull = dxp;
         fdp /= dxp; 
         fdp = std::max(fdp,epsl);
@@ -164,13 +165,13 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
         dxp = dxp * fdp;
         /* lambdaf is inverted */
         if(clp>0){
-          lp = lambdav + edp*cpv/rhov/turbP;
+          lp = lvp;
         } else {
-          lp = lambdal + edp*cpl/rhol/turbP;
+          lp = llp;
         }
         fact = resistance_multiplier(dxp,dxfull-dxp,lc,lp,
-                                     htwallmodel->near_wall_resist);
-        resistp = (dxfull-dxp)/lp + htwallmodel->near_wall_resist;
+                                     cht.heat_transfer_wall_model().near_wall_resist);
+        resistp = (dxfull-dxp)/lp + cht.heat_transfer_wall_model().near_wall_resist;
 #ifdef DEBUG
         boil::oout<<"fact: "<<i<<" "<<j<<" "<<k<<" "
                   << fact<<" "<<fdp*lp/((1.0-fdp)*lc+fdp*lp)<<boil::endl;
@@ -194,7 +195,7 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
       ac = am + ap;
 #endif
       /* dirac source term */
-      sourceterm = htwallmodel->dirac_wall_source * ap * resistp;
+      sourceterm = cht.heat_transfer_wall_model().dirac_wall_source * ap * resistp;
 
 #ifdef DEBUG
       std::cout<<"s-s-f: "<<i<<" "<<j<<" "<<k<<" "<<am-ac+ap<<"\n";
@@ -216,19 +217,19 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
 
     if(onm && onp){
       /* f-f-f */
-      if(!interface(Sign::neg(),m,i,j,k)){
+      if(!cht.interface(Sign::neg(),m,i,j,k)){
         dxm=dxm;
       } else {
-        dxm = distance_int(Sign::neg(),m,i,j,k,tm);
+        dxm = cht.distance_int(Sign::neg(),m,i,j,k,tm);
         aflagm=0.0;
 #ifdef DEBUG
 	std::cout<<"aflagm=0.0: " <<i<<" "<<j<<" "<<k<<" "<<clc<<"\n";
 #endif
       }
-      if(!interface(Sign::pos(),m,i,j,k)){
+      if(!cht.interface(Sign::pos(),m,i,j,k)){
         dxp=dxp;
       } else {
-        dxp = distance_int(Sign::pos(),m,i,j,k,tp);
+        dxp = cht.distance_int(Sign::pos(),m,i,j,k,tp);
         aflagp=0.0;
 #ifdef DEBUG
 	std::cout<<"aflagp=0.0: " <<i<<" "<<j<<" "<<k<<" "<<clc<<"\n";
@@ -258,18 +259,18 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
 #endif
     } else if(ofm && onp){ 
       /* s-f-f */
-      if(!interface(Sign::pos(),m,i,j,k)){
+      if(!cht.interface(Sign::pos(),m,i,j,k)){
         dxp=dxp;
       } else {
-        dxp = distance_int(Sign::pos(),m,i,j,k,tp);
+        dxp = cht.distance_int(Sign::pos(),m,i,j,k,tp);
         aflagp=0.0;
       }
-      if(interface(Sign::neg(),m,i,j,k)) {
+      if(cht.interface(Sign::neg(),m,i,j,k)) {
         /* removed from system matrix */
         aflagm = 0.0;
         /* dxm is corrected to account for interface position */
         /* tm is changed to the saturation temperature */
-        dxm = distance_int(Sign::neg(),m,i,j,k,tm);
+        dxm = cht.distance_int(Sign::neg(),m,i,j,k,tm);
         /* FDM */
         am = lc * vol * (this->*coef_m)(dxm,dxp,x0);
         ap = lc * vol * (this->*coef_p)(dxm,dxp,x0);
@@ -300,25 +301,25 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
         }
 #endif
         /* dirac source term */
-        sourceterm = htwallmodel->dirac_wall_source * am * resistm;
+        sourceterm = cht.heat_transfer_wall_model().dirac_wall_source * am * resistm;
       }
 #ifdef DEBUG
       std::cout<<"s-f-f: "<<i<<" "<<j<<" "<<k<<" "<<am-ac+ap<<"\n";
 #endif
     } else if(onm && ofp){
       /* f-f-s */
-      if(!interface(Sign::neg(),m,i,j,k)){
+      if(!cht.interface(Sign::neg(),m,i,j,k)){
         dxm=dxm;
       } else {
-        dxm = distance_int(Sign::neg(),m,i,j,k,tm);
+        dxm = cht.distance_int(Sign::neg(),m,i,j,k,tm);
         aflagm=0.0;
       }
-      if(interface(Sign::pos(),m,i,j,k)) {
+      if(cht.interface(Sign::pos(),m,i,j,k)) {
         /* removed from system matrix */
         aflagp = 0.0;
         /* dxp is corrected to account for interface position */
         /* tp is changed to the saturation temperature */
-        dxp = distance_int(Sign::pos(),m,i,j,k,tp);
+        dxp = cht.distance_int(Sign::pos(),m,i,j,k,tp);
         /* FDM */
         am = lc * vol * (this->*coef_m)(dxm,dxp,x0);
         ap = lc * vol * (this->*coef_p)(dxm,dxp,x0);
@@ -349,7 +350,7 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
         }
 #endif
         /* dirac source term */
-        sourceterm = htwallmodel->dirac_wall_source * ap * resistp;
+        sourceterm = cht.heat_transfer_wall_model().dirac_wall_source * ap * resistp;
       }
 #ifdef DEBUG
       std::cout<<"f-f-s: "<<i<<" "<<j<<" "<<k<<" "<<am-ac+ap<<"\n";
