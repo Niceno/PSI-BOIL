@@ -22,13 +22,14 @@ void PhaseChange4::mdot() {
     A.n[i][j][k] = 0.0;
     A.b[i][j][k] = 0.0;
     A.t[i][j][k] = 0.0;
-    if(interface(i,j,k)) {
+    if(cht.interface(i,j,k)) {
       if(dom->ibody().on(i,j,k)) {
         real mflxc=M[i][j][k];
 
         /* iso-surface area */
-        phi[i][j][k] = mflxc * adens[i][j][k];
-        phi[i][j][k] = mdot_cut(phi[i][j][k],vf[i][j][k],A.c[i][j][k]);
+        phi[i][j][k] = mflxc * cht.topo->get_adens()[i][j][k];
+        phi[i][j][k] = mdot_cut(phi[i][j][k],vf[i][j][k],
+                                cht.rhol(i,j,k),A.c[i][j][k]);
 
         /* calculate directional cut-mdot. normvector components squared
            are used as weighs as they naturally sum to one. redistribution 
@@ -76,7 +77,7 @@ void PhaseChange4::mdot() {
       phi[i][j][k] += A.t[i][j][k-1];
       /* cut-again */
       real dummy;
-      phi[i][j][k] = mdot_cut(phi[i][j][k],vf[i][j][k],dummy);
+      phi[i][j][k] = mdot_cut(phi[i][j][k],vf[i][j][k],cht.rhol(i,j,k),dummy);
     }
   }
 #endif

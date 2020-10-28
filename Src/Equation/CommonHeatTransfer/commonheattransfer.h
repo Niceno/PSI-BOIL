@@ -15,7 +15,8 @@
  */
 class CommonHeatTransfer {
   public:
-    CommonHeatTransfer(Topology * topo, TIF & tifmodel, 
+    CommonHeatTransfer(const Scalar & tpr,
+                       Topology * topo, const TIF & tifmodel, 
                        Matter * flu, Matter * sol = NULL,
                        HTWallModel * htwallmodel = NULL);
 
@@ -61,6 +62,10 @@ class CommonHeatTransfer {
     real ghost_distance(const Comp & m, const Sign & cell_marker,
                         const int i, const int j, const int k) const;
 
+    /* test domain edge */
+    bool edge(const Sign dir, const Comp & m,
+              const int i, const int j, const int k) const;
+
     /* thermal conductivity */
     real lambda(const int i, const int j, const int k,
                 const Scalar * diff_eddy = NULL) const;
@@ -82,6 +87,21 @@ class CommonHeatTransfer {
                   const Old old,
                   Scalar & val) const;
 
+    /* calculating a variable-stencil gradient */
+    real gradt1D(const bool is_solid, const Comp & m,
+                 const int i, const int j, const int k,
+                 const AccuracyOrder & accuracy_order,
+                 const bool discard_points) const;
+    bool add_point(const int i0, const int j0, const int k0,
+                   const int i1, const int j1, const int k1,
+                   const Sign dir, const Comp & m,
+                   const bool is_solid, bool & terminate,
+                   std::vector<real> & stencil,
+                   std::vector<real> & values) const;
+
+    /* calculate solid wall temperature */
+    void calculate_node_temperature(const Scalar * diff_eddy = NULL);
+
     /* members */
     inline HTWallModel & heat_transfer_wall_model() {
       return *htwallmodel;
@@ -90,12 +110,19 @@ class CommonHeatTransfer {
       return *htwallmodel;
     }
     Topology * topo;
-    TIF & tifmodel;
+    const TIF & tifmodel;
 
     const Matter * fluid() const {return flu;}
     const Matter * solid() const {return sol;}
 
+    const Scalar & tmp() const {return tpr;}
+    const Vector & node_tmp() const {return bndtpr;}
+    Vector & node_tmp() {return bndtpr;}
+
   private:
+    Scalar tpr;
+    Vector bndtpr;
+
     Matter * flu;
     Matter * sol;
     HTWallModel * htwallmodel;

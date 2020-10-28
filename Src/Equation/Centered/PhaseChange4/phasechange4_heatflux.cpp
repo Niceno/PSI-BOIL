@@ -13,7 +13,7 @@ void PhaseChange4::heat_flux(const Scalar * diff_eddy) {
 
   /* calculate temperature at solid-fluid boundaries */
   if(solid())
-    calculate_node_temperature(diff_eddy);
+    cht.calculate_node_temperature(diff_eddy);
 
   /* calculate heat flux */
   cal_hf(diff_eddy);
@@ -54,12 +54,12 @@ void PhaseChange4::heat_flux(const Scalar * diff_eddy) {
     neg_ext = {1,-1,-2};
   }
 
-  topo->extrapolate(txv,Sign::pos(),pos_ext);
-  topo->extrapolate(tyv,Sign::pos(),pos_ext);
-  topo->extrapolate(tzv,Sign::pos(),pos_ext);
-  topo->extrapolate(txl,Sign::neg(),neg_ext);
-  topo->extrapolate(tyl,Sign::neg(),neg_ext);
-  topo->extrapolate(tzl,Sign::neg(),neg_ext);
+  cht.topo->extrapolate(txv,Sign::pos(),pos_ext);
+  cht.topo->extrapolate(tyv,Sign::pos(),pos_ext);
+  cht.topo->extrapolate(tzv,Sign::pos(),pos_ext);
+  cht.topo->extrapolate(txl,Sign::neg(),neg_ext);
+  cht.topo->extrapolate(tyl,Sign::neg(),neg_ext);
+  cht.topo->extrapolate(tzl,Sign::neg(),neg_ext);
 #endif
 
   /* calculate the normal component */

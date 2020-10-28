@@ -14,11 +14,11 @@ static void __attribute__ ((constructor)) trapfpe(void)
 #define SYM
 //#define FS_TEST
 #define USE_PHASE_VEL_VOF
-//#define USE_PHASE_VEL_EFD
+#define USE_PHASE_VEL_EFD
 #define USE_SECOND_ORDER
 //#define USE_UNCOND_EXTRP
 //#define DISCARD_POINTS
-#define USE_MG
+//#define USE_MG
 #define CASE 1
 /* case 1 = axisymmetric
         2 = cartesian 2D
@@ -361,6 +361,8 @@ int main(int argc, char ** argv) {
 
   /* enthalpy equation */
   TIF tsat(tsat0);
+  CommonHeatTransfer cht(tpr,conc.topo,tsat,&mixed);
+
 #ifdef USE_PHASE_VEL_VOF
   #ifdef USE_PHASE_VEL_EFD
   Vector & uvwenth1 = uvw_1;
@@ -377,10 +379,10 @@ int main(int argc, char ** argv) {
 
 #if CASE > 1
   EnthalpyFD enthFD      (tpr, q, uvw, uvwenth1, uvwenth2, time, solver  , &mixed,
-                          conc.topo, tsat);
+                          cht);
 #else
   EnthalpyFDaxisym enthFD(tpr, q, uvw, uvwenth1, uvwenth2, time, solver  , &mixed,
-                          conc.topo, tsat);
+                          cht);
 #endif
   enthFD.convection_set(TimeScheme::forward_euler());
   enthFD.diffusion_set(TimeScheme::backward_euler());
@@ -388,8 +390,8 @@ int main(int argc, char ** argv) {
   enthFD.set_no_solid_acceleration(no_solid_acceleration);
 
   /* phase change */
-  PhaseChange4 pc(mdot, mflx, tpr, q, c, g , f , uvw, conc.topo,
-                  tsat, time, &mixed);
+  PhaseChange4 pc(mdot, mflx, q, c, g , f , uvw, cht,
+                  time, &mixed);
 #ifdef USE_SECOND_ORDER
   pc.set_second_order_accuracy(true);
 #else

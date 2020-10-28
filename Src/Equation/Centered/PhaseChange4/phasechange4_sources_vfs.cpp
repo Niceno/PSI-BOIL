@@ -8,7 +8,7 @@ void PhaseChange4::sources_vfs() {
 
   for_ijk(i,j,k){
     real vfsc = phi[i][j][k];
-    vfsc *= -(1.0/rhol)*matter_sig;
+    vfsc *= -(1.0/cht.rhol(i,j,k))*matter_sig;
     vfs[i][j][k]= vfs_cut(vfsc,vf[i][j][k]);
   }
   vfs.exchange();

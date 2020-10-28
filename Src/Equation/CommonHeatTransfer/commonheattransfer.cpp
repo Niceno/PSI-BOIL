@@ -1,15 +1,20 @@
 #include "commonheattransfer.h"
 
 /******************************************************************************/
-CommonHeatTransfer::CommonHeatTransfer(Topology * TOPO, TIF & tintmodel,
+CommonHeatTransfer::CommonHeatTransfer(const Scalar & TPR,
+                                       Topology * TOPO, 
+                                       const TIF & tintmodel,
                                        Matter * F, Matter * S,
                                        HTWallModel * HTM) :
+  tpr(&TPR),
   topo(TOPO),
   tifmodel(tintmodel),
   flu(F),
   sol(S),
-  htwallmodel(HTM)
+  htwallmodel(HTM),
+  bndtpr( *TOPO->get_fs().domain() )
 {
+  for_m(m) bndtpr(m) = topo->get_fs()(m).shape(); /* a mistake? */
   
   val_rhol = fluid()->rho(1);
   val_rhov = fluid()->rho(0);

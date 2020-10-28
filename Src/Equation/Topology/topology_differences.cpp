@@ -10,11 +10,11 @@
 /******************************************************************************/
 real Topology::nth_order_difference(const std::vector<real> & stencil,
                                     const std::vector<real> & values,
-                                    const int order) {
+                                    const AccuracyOrder & order) const {
 /***************************************************************************//**
 *  \brief Approximate first derivative using a desired-order difference.
 *******************************************************************************/
-  switch(order) {
+  switch(order.eval()) {
     case 0 :
       return zeroth_order_difference(stencil,values);
     case 1 :
@@ -36,7 +36,7 @@ real Topology::nth_order_difference(const std::vector<real> & stencil,
 
 /******************************************************************************/
 real Topology::zeroth_order_difference(const std::vector<real> & stencil,
-                                       const std::vector<real> & values) {
+                                       const std::vector<real> & values) const {
 /***************************************************************************//**
 *  \brief Approximate first derivative using a zeroth-order difference.
 *******************************************************************************/
@@ -46,7 +46,7 @@ real Topology::zeroth_order_difference(const std::vector<real> & stencil,
 
 /******************************************************************************/
 real Topology::first_order_difference(const std::vector<real> & stencil,
-                                      const std::vector<real> & values) {
+                                      const std::vector<real> & values) const {
 /***************************************************************************//**
 *  \brief Approximate first derivative using a first-order difference.
 *******************************************************************************/
@@ -61,7 +61,7 @@ real Topology::first_order_difference(const std::vector<real> & stencil,
 
 /******************************************************************************/
 real Topology::second_order_difference(const std::vector<real> & stencil,
-                                       const std::vector<real> & values) {
+                                       const std::vector<real> & values) const {
 /***************************************************************************//**
 *  \brief Approximate first derivative using a second-order difference.
 *******************************************************************************/
@@ -88,7 +88,7 @@ real Topology::second_order_difference(const std::vector<real> & stencil,
 
 /******************************************************************************/
 real Topology::third_order_difference(const std::vector<real> & stencil,
-                                      const std::vector<real> & values) {
+                                      const std::vector<real> & values) const {
 /***************************************************************************//**
 *  \brief Approximate first derivative using a third-order difference.
 *******************************************************************************/
@@ -142,7 +142,7 @@ real Topology::third_order_difference(const std::vector<real> & stencil,
 
 /******************************************************************************/
 real Topology::fourth_order_difference(const std::vector<real> & stencil,
-                                       const std::vector<real> & values) {
+                                       const std::vector<real> & values) const {
 /***************************************************************************//**
 *  \brief Approximate first derivative using a fourth-order difference.
 *******************************************************************************/
@@ -248,7 +248,7 @@ real Topology::fourth_order_difference(const std::vector<real> & stencil,
 
 /******************************************************************************/
 real Topology::second_order_difference(const std::vector<real> & stencil,
-                                       const std::vector<real> & values) {
+                                       const std::vector<real> & values) const {
 /***************************************************************************//**
 *  \brief Approximate first derivative using a second-order difference.
 *******************************************************************************/
@@ -261,7 +261,7 @@ real Topology::second_order_difference(const std::vector<real> & stencil,
 
 /******************************************************************************/
 real Topology::third_order_difference(const std::vector<real> & stencil,
-                                      const std::vector<real> & values) {
+                                      const std::vector<real> & values) const {
 /***************************************************************************//**
 *  \brief Approximate first derivative using a third-order difference.
 *******************************************************************************/
@@ -290,7 +290,7 @@ real Topology::third_order_difference(const std::vector<real> & stencil,
 
 /******************************************************************************/
 real Topology::fourth_order_difference(const std::vector<real> & stencil,
-                                       const std::vector<real> & values) {
+                                       const std::vector<real> & values) const {
 /***************************************************************************//**
 *  \brief Approximate first derivative using a fourth-order difference.
 *******************************************************************************/

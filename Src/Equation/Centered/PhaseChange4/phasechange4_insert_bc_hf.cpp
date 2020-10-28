@@ -7,12 +7,12 @@ void PhaseChange4::insert_bc_hf(const Scalar * diff_eddy) {
 *         N.B. fluid values are also updated but will be overwritten during
 *         extrapolation, since extrapolation also 'looks' into buffer cells.
 *******************************************************************************/
-  for(int b = 0; b < tpr.bc().count(); b++) {
+  for(int b = 0; b < cht.tmp().bc().count(); b++) {
 
-    if(tpr.bc().type_decomp(b))
+    if(cht.tmp().bc().type_decomp(b))
       continue;
 
-    if(tpr.bc().type(b) == BndType::dirichlet()) {
+    if(cht.tmp().bc().type(b) == BndType::dirichlet()) {
 
       Dir d = phi.bc().direction(b);
       if(d != Dir::undefined()) {
@@ -47,28 +47,28 @@ void PhaseChange4::insert_bc_hf(const Scalar * diff_eddy) {
           continue;
         }
 
-        for_vijk( tpr.bc().at(b), i,j,k ) {
+        for_vijk( cht.tmp().bc().at(b), i,j,k ) {
           int ii = i+ofx;
           int jj = j+ofy;
           int kk = k+ofz;
           
           /* is there an interface between cell centre and wall? */
-          if(interface(sig,mcomp,ii,jj,kk)) {
+          if(cht.interface(sig,mcomp,ii,jj,kk)) {
 
             /* wall temperature */
-            real tw = tpr[i][j][k];
+            real tw = cht.tmp()[i][j][k];
             /* interface temperature and distance wall-interface */
             real ti;
             real dist;
             /* subgrid thermal conductivity */
-            real lmb = lambda_inv(ii,jj,kk,diff_eddy);
+            real lmb = cht.lambda_inv(ii,jj,kk,diff_eddy);
             /* the temperature gradient for inverse phase is set 
              * extrapolation overwrites them though */
             if       (mcomp==Comp::i()) {
               //dist = distance_int_x(sig,ii,jj,kk,ti);
               //dist = distance_center(sig,mcomp,ii,jj,kk) - dist;
-              dist = distance_int_x(-sig,i,j,k,ti);
-              if(topo->above_interface(ii,jj,kk)) {
+              dist = cht.distance_int_x(-sig,i,j,k,ti);
+              if(cht.topo->above_interface(ii,jj,kk)) {
                 txv[ii][jj][kk] = (tw-ti)/(dist/lmb+cht.heat_transfer_wall_model().near_wall_resist)*real(sig);
                 txv[i ][j ][k ] = (tw-ti)/(dist/lmb+cht.heat_transfer_wall_model().near_wall_resist)*real(sig);
               } else {
@@ -78,8 +78,8 @@ void PhaseChange4::insert_bc_hf(const Scalar * diff_eddy) {
             } else if(mcomp==Comp::j()) {             
               //dist = distance_int_y(sig,ii,jj,kk,ti);
               //dist = distance_center(sig,mcomp,ii,jj,kk) - dist;
-              dist = distance_int_y(-sig,i,j,k,ti);
-              if(topo->above_interface(ii,jj,kk)) {
+              dist = cht.distance_int_y(-sig,i,j,k,ti);
+              if(cht.topo->above_interface(ii,jj,kk)) {
                 tyv[ii][jj][kk] = (tw-ti)/(dist/lmb+cht.heat_transfer_wall_model().near_wall_resist)*real(sig);
                 tyv[i ][j ][k ] = (tw-ti)/(dist/lmb+cht.heat_transfer_wall_model().near_wall_resist)*real(sig);
               } else {
@@ -89,8 +89,8 @@ void PhaseChange4::insert_bc_hf(const Scalar * diff_eddy) {
             } else {
               //dist = distance_int_z(sig,ii,jj,kk,ti);
               //dist = distance_center(sig,mcomp,ii,jj,kk) - dist;
-              dist = distance_int_z(-sig,i,j,k,ti);
-              if(topo->above_interface(ii,jj,kk)) {
+              dist = cht.distance_int_z(-sig,i,j,k,ti);
+              if(cht.topo->above_interface(ii,jj,kk)) {
                 tzv[ii][jj][kk] = (tw-ti)/(dist/lmb+cht.heat_transfer_wall_model().near_wall_resist)*real(sig);
                 tzv[i ][j ][k ] = (tw-ti)/(dist/lmb+cht.heat_transfer_wall_model().near_wall_resist)*real(sig);
               } else {

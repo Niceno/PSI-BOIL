@@ -68,6 +68,11 @@ inline bool interface_old(const Sign dir, const Comp m,
   return topo->interface_old(dir,m,i,j,k);
 }
 
+inline bool interface(const int i, const int j, const int k) const {
+
+  return topo->interface(i,j,k);
+}
+
 /***************************************************************************//**
  *  Call to tifmodel
 ******************************************************************************/

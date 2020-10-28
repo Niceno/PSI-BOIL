@@ -2,36 +2,29 @@
 
 /******************************************************************************/
 PhaseChange4::PhaseChange4(const Scalar & MDOT, 
-                               const Scalar & MFLX,
-                               const Scalar & TPR, 
-                               const Scalar & TPRS,
-                               const Scalar & VF,
-                               const Scalar & VFS,
-                               const Scalar & VS,
-                               const Vector & U, 
-                               Topology * TOPO,
-                               const TIF & TIFMODEL,
-                               const CommonHeatTransfer & CHT,
-                               Times & T, 
-                               Matter * f,
-                               Matter * s,
-                               Sign SIG) :
+                           const Scalar & MFLX,
+                           const Scalar & TPRS,
+                           const Scalar & VF,
+                           const Scalar & VFS,
+                           const Scalar & VS,
+                           const Vector & U, 
+                           CommonHeatTransfer & CHT,
+                           Times & T, 
+                           Matter * f,
+                           Matter * s,
+                           Sign SIG) :
 /*---------------------+ 
 |  initialize parent   |
 +---------------------*/
   Centered( MDOT.domain(), MDOT, VS, & U, T, f, s, NULL ),
-  tpr(&TPR),
   tprs(&TPRS),
   vf(&VF),
   vfs(&VFS),
   M(&MFLX),
-  topo(TOPO),
-  nx(TOPO->nx), /* these are aliases for easier use */
-  ny(TOPO->ny),
-  nz(TOPO->nz),
-  adens(TOPO->adens),
-  iflag(TOPO->iflag),
-  bndtpr  ( *U   .domain() ),
+  cht(CHT),
+  nx(CHT.topo->nx), /* these are aliases for easier use */
+  ny(CHT.topo->ny),
+  nz(CHT.topo->nz),
   txv     ( *MDOT.domain()),
   tyv     ( *MDOT.domain()),
   tzv     ( *MDOT.domain()),
@@ -40,9 +33,6 @@ PhaseChange4::PhaseChange4(const Scalar & MDOT,
   tzl     ( *MDOT.domain()),
   tnl     ( *MDOT.domain()),
   tnv     ( *MDOT.domain()),
-  tempflag( *MDOT.domain()),
-  tifmodel(TIFMODEL),
-  cht(CHT),
   matter_sig(SIG)
 {
 #if 0 /* don't use this, it creates BndCnd pointers */
@@ -64,8 +54,6 @@ PhaseChange4::PhaseChange4(const Scalar & MDOT,
   tnl.copy_shape(MDOT.shape());
   tnv.copy_shape(MDOT.shape());
 #endif
-  tempflag = MDOT.shape();
-  for_m(m) bndtpr(m) = U(m).shape(); /* a mistake? */
 
   for( int b=0; b<phi.bc().count(); b++ ) {
     if(    phi.bc().type(b) == BndType::dirichlet()
@@ -85,23 +73,12 @@ PhaseChange4::PhaseChange4(const Scalar & MDOT,
     }
   }
 
-  /* set arguments */
-  rhol = fluid()->rho(1);
-  rhov = fluid()->rho(0);
-  lambdal = fluid()->lambda(1);
-  lambdav = fluid()->lambda(0);
-  cpl = fluid()->cp(1);
-  cpv = fluid()->cp(0);
-
-  /* set constants */
-  turbP = 0.9;
-
   /* flags */
-  accuracy_order = 2;
+  accuracy_order = AccuracyOrder::Second();
   use_unconditional_extrapolation = false;
 
   /* false-true: stability/accuracy tradeoff */
-  discard_points_near_interface = false; //true;
+  discard_points_near_interface = false;
 
 }	
 

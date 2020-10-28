@@ -1,12 +1,12 @@
-#include "phasechange4.h"
+#include "commonheattransfer.h"
 
 /******************************************************************************/
-bool PhaseChange4::add_point(const int i0, const int j0, const int k0,
-                             const int i1, const int j1, const int k1,
-                             const Sign dir, const Comp & m,
-                             const bool is_solid, bool & terminate,
-                             std::vector<real> & stencil,
-                             std::vector<real> & values) {
+bool CommonHeatTransfer::add_point(const int i0, const int j0, const int k0,
+                                   const int i1, const int j1, const int k1,
+                                   const Sign dir, const Comp & m,
+                                   const bool is_solid, bool & terminate,
+                                   std::vector<real> & stencil,
+                                   std::vector<real> & values) const {
 /***************************************************************************//**
 *  \brief Add a point to a stencil. Output: if the previous point should be 
 *         discarded since the interface is too close to it.
@@ -34,7 +34,7 @@ bool PhaseChange4::add_point(const int i0, const int j0, const int k0,
     }
 
   /* are we at a solid-fluid boundary? */
-  } else if(is_solid!=dom->ibody().off(i1,j1,k1)) {
+  } else if(is_solid!=topo->domain()->ibody().off(i1,j1,k1)) {
 
     terminate = true; 
      

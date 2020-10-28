@@ -10,7 +10,8 @@ void PhaseChange4::sources_fext() {
     real mdotc=phi[i][j][k];
     real volc =dV(i,j,k);
     real dt = time->dt();
-    fext[i][j][k] = volc/dt*(1.0/rhov-1.0/rhol)*mdotc*matter_sig;
+    fext[i][j][k] = volc/dt*(1.0/cht.rhov(i,j,k)-1.0/cht.rhol(i,j,k))
+                   *mdotc*matter_sig;
   }
   fext.exchange();
 

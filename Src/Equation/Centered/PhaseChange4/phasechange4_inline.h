@@ -1,20 +1,14 @@
-    inline real get_turbP() const { return turbP; }
-    inline void set_turbP(const real a) {
-      turbP = a;
-      boil::oout<<"PhaseChange4::turbP= "<<turbP<<"\n";
-    }
- 
-    inline int get_accuracy_order() const { return accuracy_order; }
+    inline int get_accuracy_order() const { return accuracy_order.eval(); }
     inline void set_accuracy_order(const int ao) {
-      accuracy_order = ao;
+      accuracy_order = AccuracyOrder(ao);
       boil::oout<<"PhaseChange4::accuracy_order= "
-                <<accuracy_order<<"\n";
+                <<ao<<"\n";
     }
     inline void set_second_order_accuracy(const bool flag) {
       if(flag)
-        accuracy_order = 2;
+        accuracy_order = AccuracyOrder::Second();
       else
-        accuracy_order = 1;
+        accuracy_order = AccuracyOrder::First();
       boil::oout<<"PhaseChange4::accuracy_order= "
                 <<accuracy_order<<"\n";
     }

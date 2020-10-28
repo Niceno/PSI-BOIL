@@ -267,16 +267,17 @@ int main(int argc, char * argv[]) {
   conc.totalvol();
 
   TIF tsat(Tsat);
-  EnthalpyFD enthFD(tpr, q, uvw, uvw_1, uvw, time, solver, &mixed,
-                     conc.topo,tsat);
+  CommonHeatTransfer cht(tpr,conc.topo,tsat,&mixed);
+  EnthalpyFD enthFD(tpr, q, uvw, uvw_1, uvw, time, solver, &mixed, cht);
   enthFD.convection_set(TimeScheme::forward_euler());
   enthFD.diffusion_set(TimeScheme::backward_euler());
+  enthFD.set_no_solid_acceleration(false);
 #ifndef USE_PC4
   PhaseChangeVOF pc(mdot, mflx, tpr, q, c, g , f , uvw, conc.topo,
                     tsat, time, &mixed);
 #else
-  PhaseChange4   pc(mdot, mflx, tpr, q, c, g , f , uvw, conc.topo,
-                    tsat, time, &mixed);
+  PhaseChange4 pc(mdot, mflx, q, c, g , f , uvw, cht,
+                  time, &mixed)
   #ifdef USE_SECOND_ORDER
   pc.set_second_order_accuracy(true);
   #else

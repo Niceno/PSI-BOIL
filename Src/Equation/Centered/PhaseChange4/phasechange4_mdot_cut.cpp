@@ -1,7 +1,8 @@
 #include "phasechange4.h"
 
 /******************************************************************************/
-real PhaseChange4::mdot_cut(real mdotval, real vfval, real & mcut) {
+real PhaseChange4::mdot_cut(const real mdotval, const real vfval,
+                            const real rhol, real & mcut) {
 /***************************************************************************//**
 *  \brief Cut off mdot to prevent over/undershoots of vf, preserving the cut val
 *******************************************************************************/

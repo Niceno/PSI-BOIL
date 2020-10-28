@@ -7,6 +7,7 @@
 #include "../../Field/ScalarInt/scalarint.h"
 #include "../../Field/Vector/vector.h"
 #include "../../Domain/domain.h"
+#include "../../Ravioli/accorder.h"
 #include <set>
 
 ////////////////
@@ -120,18 +121,18 @@ class Topology {
     
     /* differences */
     real zeroth_order_difference(const std::vector<real> & stencil,
-                                 const std::vector<real> & values);
+                                 const std::vector<real> & values) const;
     real first_order_difference(const std::vector<real> & stencil,
-                                const std::vector<real> & values);
+                                const std::vector<real> & values) const;
     real second_order_difference(const std::vector<real> & stencil,
-                                 const std::vector<real> & values);
+                                 const std::vector<real> & values) const;
     real third_order_difference(const std::vector<real> & stencil,
-                                const std::vector<real> & values);
+                                const std::vector<real> & values) const;
     real fourth_order_difference(const std::vector<real> & stencil,
-                                 const std::vector<real> & values);
+                                 const std::vector<real> & values) const;
     real nth_order_difference(const std::vector<real> & stencil,
                               const std::vector<real> & values,
-                              const int order);
+                              const AccuracyOrder & order) const;
 
     /* testing */
     bool test_differences(const int count);

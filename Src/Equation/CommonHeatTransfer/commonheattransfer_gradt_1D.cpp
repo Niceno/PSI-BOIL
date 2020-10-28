@@ -1,8 +1,10 @@
-#include "phasechange4.h"
+#include "commonheattransfer.h"
 
 /******************************************************************************/
-real PhaseChange4::gradt1D(const bool is_solid, const Comp & m,
-                           const int i, const int j, const int k) {
+real CommonHeatTransfer::gradt1D(const bool is_solid, const Comp & m,
+                                 const int i, const int j, const int k,
+                                 const AccuracyOrder & accuracy_order,
+                                 const bool discard_points) const {
 /***************************************************************************//**
 *  \brief Calculate grad(tpr) in a given cell.
 *******************************************************************************/
@@ -46,7 +48,7 @@ real PhaseChange4::gradt1D(const bool is_solid, const Comp & m,
   std::set<int> discard_set = {};
 
   /* for first order schemes, center is always discarded */
-  if(accuracy_order<2) {
+  if(accuracy_order.eval()<2) {
     discard_center = true;
   }
 
@@ -143,7 +145,7 @@ real PhaseChange4::gradt1D(const bool is_solid, const Comp & m,
   /*** the stencil is now 3-7 points, ordered by importance ***/
   
   /*** do we want to discard points too close to an interface? ***/
-  if(discard_points_near_interface == true) {
+  if(discard_points) {
     /* A set is in ascending order as per STL and we can remove elements by
        using reverse iteration */
     for(auto rit = discard_set.rbegin(); rit != discard_set.rend(); rit++) {
@@ -154,6 +156,7 @@ real PhaseChange4::gradt1D(const bool is_solid, const Comp & m,
 
   /*** the stencil is now 2-7 points, ordered by importance ***/
   int diff_req = stencil.size()-1;
+  AccuracyOrder ao(std::min(diff_req,accuracy_order.eval()));
 
   /* differences are implemented up to fourth-order */
 #if 0
@@ -171,7 +174,6 @@ real PhaseChange4::gradt1D(const bool is_solid, const Comp & m,
   }
 #endif
 
-  return topo->nth_order_difference(stencil,values,
-                                    std::min(accuracy_order,diff_req));
+  return topo->nth_order_difference(stencil,values,ao);
 
 }
