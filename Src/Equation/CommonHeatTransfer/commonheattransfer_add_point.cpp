@@ -6,19 +6,20 @@ bool CommonHeatTransfer::add_point(const int i0, const int j0, const int k0,
                                    const Sign dir, const Comp & m,
                                    const bool is_solid, bool & terminate,
                                    std::vector<real> & stencil,
-                                   std::vector<real> & values) const {
+                                   std::vector<real> & values,
+                                   const Old old) const {
 /***************************************************************************//**
 *  \brief Add a point to a stencil. Output: if the previous point should be 
 *         discarded since the interface is too close to it.
 *******************************************************************************/
 
   /* is there an interface? */
-  if(!is_solid&&interface(dir,m,i0,j0,k0)) {
+  if(!is_solid&&interface(dir,m,i0,j0,k0,old)) {
 
     terminate = true; 
 
     real tgamma;
-    real dist_int = distance_int(dir,m,i0,j0,k0,tgamma);
+    real dist_int = distance_int(dir,m,i0,j0,k0,tgamma,old);
 
     /* directional choice */
     if(dir>0) {

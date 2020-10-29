@@ -4,6 +4,11 @@
       boil::oout<<"PhaseChange4::accuracy_order= "
                 <<ao<<"\n";
     }
+    inline void set_accuracy_order(const AccuracyOrder ao) {
+      accuracy_order = ao;
+      boil::oout<<"PhaseChange4::accuracy_order= "
+                <<ao<<"\n";
+    }
     inline void set_second_order_accuracy(const bool flag) {
       if(flag)
         accuracy_order = AccuracyOrder::Second();

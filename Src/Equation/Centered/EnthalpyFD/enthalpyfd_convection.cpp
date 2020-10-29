@@ -227,10 +227,14 @@ void EnthalpyFD::convection(Scalar * conv) {
   +---------------------------*/
   for_ijk(i,j,k) {
 
-  #ifdef CNEW
-    if(abs(iflag[i][j][k])<3){
+  #ifdef USE_FDM_CONVECTION
+    if(true) {
   #else
+    #ifdef CNEW
+    if(abs(iflag[i][j][k])<3){
+    #else
     if(abs(iflagold[i][j][k])<3){
+    #endif
   #endif
       real umf, upf, vmf, vpf, wmf, wpf, uc, vc, wc;
       real dtdxm, dtdxp, dtdym, dtdyp, dtdzm, dtdzp;
@@ -284,6 +288,17 @@ void EnthalpyFD::convection(Scalar * conv) {
       wpf = (*u)[Comp::w()][i][j][k+1];
 #endif
 
+#if 1
+  #ifdef CNEW
+      dtdxm = dtdxp = cht.gradt1D(false,Comp::i(),i,j,k,ao_conv,false,Old::no);
+      dtdym = dtdyp = cht.gradt1D(false,Comp::j(),i,j,k,ao_conv,false,Old::no);
+      dtdzm = dtdzp = cht.gradt1D(false,Comp::k(),i,j,k,ao_conv,false,Old::no);
+  #else
+      dtdxm = dtdxp = cht.gradt1D(false,Comp::i(),i,j,k,ao_conv,false,Old::yes);
+      dtdym = dtdyp = cht.gradt1D(false,Comp::j(),i,j,k,ao_conv,false,Old::yes);
+      dtdzm = dtdzp = cht.gradt1D(false,Comp::k(),i,j,k,ao_conv,false,Old::yes);
+  #endif
+#else
       // dtdxm
   #ifdef CNEW
       if(cht.interface(Sign::neg(),Comp::i(),i,j,k)) {
@@ -427,29 +442,19 @@ void EnthalpyFD::convection(Scalar * conv) {
           dtdzp = (phi[i][j][k+1]-phi[i][j][k  ])/dzt(k);
         }
       }
+#endif
 
       uc  = 0.5*(umf+upf);
       vc  = 0.5*(vmf+vpf);
       wc  = 0.5*(wmf+wpf);
-#if 1
+
       udtdx = 0.5*(uc+fabs(uc))*dtdxm
             + 0.5*(uc-fabs(uc))*dtdxp;
       vdtdy = 0.5*(vc+fabs(vc))*dtdym
             + 0.5*(vc-fabs(vc))*dtdyp;
       wdtdz = 0.5*(wc+fabs(wc))*dtdzm
             + 0.5*(wc-fabs(wc))*dtdzp;
-#else
-      real u_sign=copysign(1.0,uc);
-      real v_sign=copysign(1.0,vc);
-      real w_sign=copysign(1.0,wc);
-      udtdx = 0.5 * (u_sign+fabs(u_sign)) * dtdxm * umf  // uc > 0
-            - 0.5 * (u_sign-fabs(u_sign)) * dtdxp * upf; // uc < 0
-      vdtdy = 0.5 * (v_sign+fabs(v_sign)) * dtdym * vmf  // vc > 0
-            - 0.5 * (v_sign-fabs(v_sign)) * dtdyp * vpf; // vc < 0
-      wdtdz = 0.5 * (w_sign+fabs(w_sign)) * dtdzm * wmf  // wc > 0
-            - 0.5 * (w_sign-fabs(w_sign)) * dtdzp * wpf; // wc < 0
 
-#endif
       (*conv)[i][j][k] = - (udtdx + vdtdy + wdtdz) * dV(i,j,k);
 
     }

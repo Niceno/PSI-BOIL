@@ -20,7 +20,7 @@ class PhaseChange4 : public Centered {
                  const Scalar & vfs,
                  const Scalar & vs,
                  const Vector & u, 
-                 CommonHeatTransfer & cht,
+                 const CommonHeatTransfer & cht,
                  Times & t,
                  Matter * flu,
                  Matter * sol = NULL,
@@ -71,7 +71,7 @@ class PhaseChange4 : public Centered {
     Scalar nz;
     Scalar M;
 
-    CommonHeatTransfer & cht;
+    const CommonHeatTransfer & cht;
     const Sign matter_sig; /* pos: liquid is phi=1 and vice versa */
  
     real smdot_pos, smdot_neg;

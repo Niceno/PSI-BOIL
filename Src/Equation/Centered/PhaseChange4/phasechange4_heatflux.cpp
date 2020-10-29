@@ -12,8 +12,8 @@ void PhaseChange4::heat_flux(const Scalar * diff_eddy) {
   tnl = tnv = 0.;
 
   /* calculate temperature at solid-fluid boundaries */
-  if(solid())
-    cht.calculate_node_temperature(diff_eddy);
+  //if(solid()) /* done in cht.new_time_step() */
+  //  cht.calculate_node_temperature(diff_eddy);
 
   /* calculate heat flux */
   cal_hf(diff_eddy);

@@ -31,6 +31,13 @@ class CommonHeatTransfer {
                        const int i, const int j, const int k) const;
 
     /* new distances to interface */
+    inline real distance_int(const Sign dir, const Comp & m,
+                             const int i, const int j, const int k,
+                             real & tint, const Old old) const {
+      return (old==Old::yes) ?
+             distance_int_old(dir,m,i,j,k,tint) :
+             distance_int(dir,m,i,j,k,tint);
+    };
     real distance_int(const Sign dir, const Comp & m,
                       const int i, const int j, const int k,
                       real & tint) const;
@@ -91,13 +98,15 @@ class CommonHeatTransfer {
     real gradt1D(const bool is_solid, const Comp & m,
                  const int i, const int j, const int k,
                  const AccuracyOrder & accuracy_order,
-                 const bool discard_points) const;
+                 const bool discard_points,
+                 const Old old = Old::no) const;
     bool add_point(const int i0, const int j0, const int k0,
                    const int i1, const int j1, const int k1,
                    const Sign dir, const Comp & m,
                    const bool is_solid, bool & terminate,
                    std::vector<real> & stencil,
-                   std::vector<real> & values) const;
+                   std::vector<real> & values,
+                   const Old old) const;
 
     /* calculate solid wall temperature */
     void calculate_node_temperature(const Scalar * diff_eddy = NULL);

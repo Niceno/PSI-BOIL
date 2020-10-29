@@ -57,7 +57,7 @@ inline real temperature_node(const real Q,
  *  Checks if the given cell is at (or next to) an interface
 ******************************************************************************/
 inline bool interface(const Sign dir, const Comp m,
-                      const int i, const int j, const int k) const{
+                      const int i, const int j, const int k) const {
 
   return topo->interface(dir,m,i,j,k);
 }
@@ -66,6 +66,14 @@ inline bool interface_old(const Sign dir, const Comp m,
                           const int i, const int j, const int k) const {
 
   return topo->interface_old(dir,m,i,j,k);
+}
+
+inline bool interface(const Sign dir, const Comp m,
+                      const int i, const int j, const int k, const Old old)
+                      const {
+
+  return (old==Old::yes) ? 
+         topo->interface_old(dir,m,i,j,k) : topo->interface(dir,m,i,j,k);
 }
 
 inline bool interface(const int i, const int j, const int k) const {
@@ -101,4 +109,11 @@ inline real get_turbP() const { return turbP; }
 inline void set_turbP(const real a) {
   turbP = a;
   boil::oout<<"CommonHeatTransfer::turbP= "<<turbP<<"\n";
+}
+
+inline void init(const Scalar * diff_eddy = NULL) { new_time_step(diff_eddy); }
+inline void new_time_step(const Scalar * diff_eddy = NULL) { 
+  if(solid())
+    calculate_node_temperature(diff_eddy); 
+  return;
 }

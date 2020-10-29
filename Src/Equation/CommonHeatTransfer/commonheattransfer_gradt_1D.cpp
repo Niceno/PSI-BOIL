@@ -4,7 +4,8 @@
 real CommonHeatTransfer::gradt1D(const bool is_solid, const Comp & m,
                                  const int i, const int j, const int k,
                                  const AccuracyOrder & accuracy_order,
-                                 const bool discard_points) const {
+                                 const bool discard_points,
+                                 const Old old) const {
 /***************************************************************************//**
 *  \brief Calculate grad(tpr) in a given cell.
 *******************************************************************************/
@@ -47,28 +48,52 @@ real CommonHeatTransfer::gradt1D(const bool is_solid, const Comp & m,
   bool discard_center(false);
   std::set<int> discard_set = {};
 
-  /* for first order schemes, center is always discarded */
-  if(accuracy_order.eval()<2) {
-    discard_center = true;
-  }
-
   /*** add first and second point: always possible ***/
   
   /* west */
   *idx0 = 0;
   *idx1 = -1;
 
-  discard_center |= add_point(i+ii0,j+jj0,k+kk0, i+ii1,j+jj1,k+kk1,
-                              Sign::neg(), m, is_solid, wend, stencil, values);
+  bool discard_center_by_west = add_point(i+ii0,j+jj0,k+kk0, i+ii1,j+jj1,k+kk1,
+                                          Sign::neg(), m, is_solid, wend, 
+                                          stencil, values, old);
   w_idx = stencil.size()-1;
 
   /* east */
   *idx0 = 0;
   *idx1 = +1;
 
-  discard_center |= add_point(i+ii0,j+jj0,k+kk0, i+ii1,j+jj1,k+kk1,
-                              Sign::pos(), m, is_solid, eend, stencil, values);
+  bool discard_center_by_east = add_point(i+ii0,j+jj0,k+kk0, i+ii1,j+jj1,k+kk1,
+                                          Sign::pos(), m, is_solid, eend, 
+                                          stencil, values, old);
   e_idx = stencil.size()-1;
+
+  /* special treatment for first order */
+  if(accuracy_order.eval()==1) {
+    /* 1. upwind or
+     * 2. discard_center not set (user's mistake!)
+     * AND
+     * interface on only one side */
+    bool iw = interface(Sign::neg(),m,i,j,k,old);
+    bool ie = interface(Sign::pos(),m,i,j,k,old);
+    if(  (accuracy_order==AccuracyOrder::FirstUpwind()||!discard_points)
+       &&(ie!=iw)
+      ) {
+      /* if interface in west, discard east and vice versa */
+      int dscrd_idx = iw*e_idx+ie*w_idx;
+      stencil.erase(stencil.begin() + dscrd_idx);
+      values.erase(values.begin() + dscrd_idx);
+
+      return topo->first_order_difference(stencil,values);
+
+    /* central: center is always discarded */
+    } else {
+      discard_center = true;
+    }
+  } else {
+    /* either marks center for discarding */
+    discard_center = discard_center_by_west | discard_center_by_east;
+  }
 
   /* check for discarding */
   if(discard_center)
@@ -83,7 +108,7 @@ real CommonHeatTransfer::gradt1D(const bool is_solid, const Comp & m,
   
     /* w-w point possibly marks w point for discard */
     if(add_point(i+ii0,j+jj0,k+kk0, i+ii1,j+jj1,k+kk1,
-                 Sign::neg(), m, is_solid, wend, stencil, values))
+                 Sign::neg(), m, is_solid, wend, stencil, values,old))
       discard_set.insert(w_idx);
 
     ww_idx = stencil.size()-1;
@@ -99,7 +124,7 @@ real CommonHeatTransfer::gradt1D(const bool is_solid, const Comp & m,
   
     /* e-e point possibly marks e point for discard */
     if(add_point(i+ii0,j+jj0,k+kk0, i+ii1,j+jj1,k+kk1,
-                 Sign::pos(), m, is_solid, eend, stencil, values))
+                 Sign::pos(), m, is_solid, eend, stencil, values,old))
       discard_set.insert(e_idx);
 
     ee_idx = stencil.size()-1;
@@ -117,7 +142,7 @@ real CommonHeatTransfer::gradt1D(const bool is_solid, const Comp & m,
 
     /* w-w-w point possibly marks w-w point for discard */
     if(add_point(i+ii0,j+jj0,k+kk0, i+ii1,j+jj1,k+kk1,
-                 Sign::neg(), m, is_solid, wend, stencil, values))
+                 Sign::neg(), m, is_solid, wend, stencil, values,old))
       discard_set.insert(ww_idx);
 
     www_idx = stencil.size()-1;
@@ -133,7 +158,7 @@ real CommonHeatTransfer::gradt1D(const bool is_solid, const Comp & m,
 
     /* e-e-e point possibly marks e-e point for discard */
     if(add_point(i+ii0,j+jj0,k+kk0, i+ii1,j+jj1,k+kk1,
-                 Sign::pos(), m, is_solid, eend, stencil, values))
+                 Sign::pos(), m, is_solid, eend, stencil, values,old))
       discard_set.insert(ee_idx);
 
     eee_idx = stencil.size()-1;
