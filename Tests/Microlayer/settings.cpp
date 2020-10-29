@@ -79,9 +79,12 @@
   const bool use_ht_resistance = false;//true;
 
   /* phase change - 4 version */
-  const bool use_second_order_accuracy = true;
+  const bool use_second_order_accuracy = false;
   const bool discard_points_near_interface = false;//true;
   const bool use_unconditional_extrapolation = false;
+
+  /* ghost distance */
+  const real resistance_equivalent = 1e-6;
 
   /*--------------------------------+
   |  choose the output file format  |

@@ -94,10 +94,10 @@
     +---------------------*/
     real tprtest(0.);
     pc_coarse.update();
-    for_vmijk(pc_coarse.node_tmp(),Comp::k(),i,j,k) {
-      if(fabs(pc_coarse.node_tmp().zc(Comp::k(),k))<boil::atto) {
-        if(pc_coarse.node_tmp().xc(Comp::k(),i)<dxmin) {
-          tprtest = pc_coarse.node_tmp()[Comp::k()][i][j][k];
+    for_vmijk(cht_coarse.node_tmp(),Comp::k(),i,j,k) {
+      if(fabs(cht_coarse.node_tmp().zc(Comp::k(),k))<boil::atto) {
+        if(cht_coarse.node_tmp().xc(Comp::k(),i)<dxmin) {
+          tprtest = cht_coarse.node_tmp()[Comp::k()][i][j][k];
         }
       }
     }
@@ -125,14 +125,14 @@
 
       /* output temperature field */
       if(!boil::cart.iam())
-        output_to_file(tpr.coarse,pc_coarse.node_tmp());
+        output_to_file(tpr.coarse,cht_coarse.node_tmp());
 
       std::fstream output;
       std::stringstream ssb;
       ssb <<"bndtpr-"<<iint<<".txt";
       output.open(ssb.str(), std::ios::out);
       if(NZsol>0) {
-        boil::output_wall_heat_transfer_xz(tpr.coarse,pc_coarse.node_tmp(),
+        boil::output_wall_heat_transfer_xz(tpr.coarse,cht_coarse.node_tmp(),
                                            solid.coarse,output,NXtot/2);
       } else {
         boil::output_wall_heat_transfer_xz(tpr.coarse,*(conc_coarse.topo),pc_coarse,
@@ -159,7 +159,7 @@
       ssb <<"bndtpr-"<<iint<<".txt";
       output.open(ssb.str(), std::ios::out);
       pc_coarse.update();
-      boil::output_wall_heat_transfer_xz(tpr.coarse,pc_coarse.node_tmp(),
+      boil::output_wall_heat_transfer_xz(tpr.coarse,cht_coarse.node_tmp(),
                                          solid.coarse,output,NXtot/2);
       boil::cart.barrier();
       output.close();

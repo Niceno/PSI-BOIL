@@ -16,7 +16,6 @@ class PhaseChange4 : public Centered {
     PhaseChange4(const Scalar & mdot, 
                  const Scalar & mflx,
                  const Scalar & tprs,
-                 const Scalar & vf,
                  const Scalar & vfs,
                  const Scalar & vs,
                  const Vector & u, 

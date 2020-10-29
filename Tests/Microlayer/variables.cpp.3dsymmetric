@@ -1,10 +1,10 @@
   /*------------------+
   |  define unknowns  |
   +------------------*/
-  Vector xyz(d.coarse());                    /* force */
-  Vector uvw_1(d.coarse());                  /* phasic vel */
-  Scalar p(d.coarse()), press(d.coarse());   /* pressure */
-  Scalar mu_t(d.coarse());                   /* artificial viscosity */
+  Vector xyz(d.coarse());                      /* force */
+  Vector uvw_1(d.coarse()), uvw_2(d.coarse()); /* phasic vel */
+  Scalar p(d.coarse()), press(d.coarse());     /* pressure */
+  Scalar mu_t(d.coarse());                     /* artificial viscosity */
 
   /* the following variables exist on both levels: */
   TwoLevelVector uvw(d);                         /* velocity */
@@ -28,8 +28,10 @@
     }
   }
 
-  for_m(m)
+  for_m(m) {
     uvw_1(m)=uvw.coarse(m).shape();
+    uvw_2(m)=uvw.coarse(m).shape();
+  }
 
   for(auto l : c.levels) {
     l->bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );

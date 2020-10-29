@@ -72,6 +72,9 @@
     conc_coarse.tension(&xyz, mixed.coarse,conc_coarse.color());
     conc_coarse.output_cangle_2d(Comp::i(),Comp::k(),Sign::neg());
 
+    /* boundary temperature */
+    cht_coarse.new_time_step();
+
     /*---------------+
     |  phase change  |
     +---------------*/
@@ -147,7 +150,7 @@
     +---------------------------*/
     conc_coarse.new_time_step();
     conc_coarse.advance_with_extrapolation(false,ResRat(1e-9),uvw.coarse,f.coarse,
-                                           &liquid.coarse,&uvw_1);
+                                           &liquid.coarse,&uvw_1,&vapor.coarse,&uvw_2);
 
     for_avk(c.coarse,k) {
       if(c.coarse.zc(k)>=(zmax-c.coarse.dzc(k))) {
@@ -244,7 +247,7 @@
       ssb <<"bndtpr-"<<iint<<".txt";
       output.open(ssb.str(), std::ios::out);
       if(NZsol>0) {
-        boil::output_wall_heat_transfer_xz(tpr.coarse,pc_coarse.node_tmp(),
+        boil::output_wall_heat_transfer_xz(tpr.coarse,cht_coarse.node_tmp(),
                                            solid.coarse,output,NXtot/2);
       } else {
         boil::output_wall_heat_transfer_xz(tpr.coarse,*(conc_coarse.topo),pc_coarse,

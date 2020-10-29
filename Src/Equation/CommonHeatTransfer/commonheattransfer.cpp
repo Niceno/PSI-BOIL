@@ -23,6 +23,7 @@ CommonHeatTransfer::CommonHeatTransfer(const Scalar & TPR,
   val_lambdal = fluid()->lambda(1);
   val_lambdav = fluid()->lambda(0);
   turbP=0.9;
+  resistance_equivalent = 0.0;
 
   /* heat transfer wall model should be equal to the one of enthalpy,
    * that's why it is a pointer. however, the default argument is a

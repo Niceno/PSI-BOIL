@@ -77,6 +77,9 @@
 
   }
 
+  cht_fine.init();
+  cht_coarse.init();
+
   /* set iint */
   int iint = time.current_time() / t_per_plot;
   boil::oout<<"iint= "<<iint<<"\n";

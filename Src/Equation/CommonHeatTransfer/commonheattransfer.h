@@ -140,6 +140,7 @@ class CommonHeatTransfer {
 
     real val_rhov,val_rhol,val_cpv,val_cpl,val_lambdav,val_lambdal;
     real turbP; /* turbulent Prandtl number */
+    real resistance_equivalent; /* length scale of heat transfer resistance */
 };
 
 #endif

@@ -4,7 +4,6 @@
 PhaseChange4::PhaseChange4(const Scalar & MDOT, 
                            const Scalar & MFLX,
                            const Scalar & TPRS,
-                           const Scalar & VF,
                            const Scalar & VFS,
                            const Scalar & VS,
                            const Vector & U, 
@@ -18,11 +17,11 @@ PhaseChange4::PhaseChange4(const Scalar & MDOT,
 +---------------------*/
   Centered( MDOT.domain(), MDOT, VS, & U, T, f, s, NULL ),
   tprs(&TPRS),
-  vf(&VF),
   vfs(&VFS),
   M(&MFLX),
   cht(CHT),
-  nx(CHT.topo->nx), /* these are aliases for easier use */
+  vf(CHT.topo->vf), /* these are aliases for easier use */
+  nx(CHT.topo->nx),
   ny(CHT.topo->ny),
   nz(CHT.topo->nz),
   txv     ( *MDOT.domain()),

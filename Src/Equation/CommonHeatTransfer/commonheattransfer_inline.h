@@ -111,6 +111,13 @@ inline void set_turbP(const real a) {
   boil::oout<<"CommonHeatTransfer::turbP= "<<turbP<<"\n";
 }
 
+/* units [m] */
+inline real get_resistance_equivalent() const { return resistance_equivalent; }
+inline void set_resistance_equivalent(const real re) {
+  resistance_equivalent = re;
+  boil::oout<<"CommonHeatTransfer::resistance_equivalent= "<<re<<"\n";
+}
+
 inline void init(const Scalar * diff_eddy = NULL) { new_time_step(diff_eddy); }
 inline void new_time_step(const Scalar * diff_eddy = NULL) { 
   if(solid())

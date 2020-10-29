@@ -30,7 +30,7 @@ real CommonHeatTransfer::ghost_distance(const Comp & m, const Sign & cell_marker
                                         const {
   real res(0.);
   if(cell_marker*topo->sign_interface(i,j,k) < 0) {
-    res = 0.0;//6.3771e-08;
+    res = resistance_equivalent;
   }
   if(m==Comp::i()) {
     res /= std::max(boil::pico,fabs(topo->get_nx()[i][j][k]));

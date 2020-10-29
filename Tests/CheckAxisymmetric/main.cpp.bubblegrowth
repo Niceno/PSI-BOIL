@@ -15,7 +15,7 @@ static void __attribute__ ((constructor)) trapfpe(void)
 //#define FS_TEST
 #define USE_PHASE_VEL_VOF
 #define USE_PHASE_VEL_EFD
-#define USE_SECOND_ORDER
+//#define USE_SECOND_ORDER
 //#define USE_UNCOND_EXTRP
 //#define DISCARD_POINTS
 //#define USE_MG
@@ -78,10 +78,10 @@ int main(int argc, char ** argv) {
 /* ------------ optional simulation settings */
 
   /* multigrid */
-  //const bool multigrid_stop_if_diverging = true;
-  const bool multigrid_stop_if_diverging = false;
+  const bool multigrid_stop_if_diverging = true;
+  //const bool multigrid_stop_if_diverging = false;
 
-  const int multigrid_min_cycles = 6;
+  const int multigrid_min_cycles = 1;
   const int multigrid_max_cycles = 20;
 
   /* vof */
@@ -390,12 +390,13 @@ int main(int argc, char ** argv) {
   enthFD.set_no_solid_acceleration(no_solid_acceleration);
 
   /* phase change */
-  PhaseChange4 pc(mdot, mflx, q, c, g , f , uvw, cht,
+  PhaseChange4 pc(mdot, mflx, q, g , f , uvw, cht,
                   time, &mixed);
 #ifdef USE_SECOND_ORDER
   pc.set_second_order_accuracy(true);
 #else
-  pc.set_second_order_accuracy(false);
+  //pc.set_second_order_accuracy(false);
+  pc.set_accuracy_order(AccuracyOrder::FirstUpwind());
 #endif
 #ifdef USE_UNCOND_EXTRP
   pc.set_unconditional_extrapolation(true);
@@ -588,7 +589,7 @@ int main(int argc, char ** argv) {
     ns.solve(ResRat(1e-14));
 
     p = 0.0;
-    if (multigrid.vcycle(ResRat(1e-6))) OMS(converged);
+    if (multigrid.fcycle(ResRat(1e-6))) OMS(converged);
     //pr.solve(ResRat(1e-6));
     p.exchange();
     ns.project(p);
