@@ -78,7 +78,7 @@ class ConcentrationTP : public Centered {
       boil::oout<<"ConcentrationTP::turbS= "<<turbS<<"\n";
     }
 
-    void convection();
+    virtual void convection();
     void extrapolate();
 
     //! Velocity calculations.

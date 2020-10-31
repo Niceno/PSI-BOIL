@@ -95,7 +95,7 @@ class Centered : public Equation {
     virtual void solve(const ResRat & fact, const char * name = NULL); 
     virtual real update_rhs();
 
-    virtual void diffusion();
+    virtual void diffusion(const Scalar * diff_eddy = NULL);
     virtual void convection();
 
     void save(const char *, const int = -1);

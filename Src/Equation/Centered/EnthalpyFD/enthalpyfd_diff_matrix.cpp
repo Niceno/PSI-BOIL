@@ -8,7 +8,7 @@
 *******************************************************************************/
 void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
                 , real & tm, real & tc, real & tp
-                , real & aflagm, real & aflagp
+                , bool & aflagm, bool & aflagp
                 , real & sourceterm
                 , const real x0, const coef_gen coef_m, const coef_gen coef_p
                 , const real vol, const real aream, const real areap
@@ -20,10 +20,9 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
                 , const int clm, const int clc, const int clp
                 , real dxm, real dxp
                 , real fdm, real fdp, real fdms, real fdps
-                , real pm, real pc, real pp
                 , const int i, const int j, const int k, const Comp m) {
   real lm, lc, lp; // lambda
-  aflagm=aflagp=1.0;
+  aflagm=aflagp=true;
 
 #ifdef DEBUG
   boil::oout<<"start: "<<i<<" "<<j<<" "<<k<<" "<<m<<" | "<<onm<<" "<<onc<<" "<<onp<<boil::endl;
@@ -71,10 +70,6 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
   |  center in solid  |
   +------------------*/
   if(ofc){
-    tm = pm; 
-    tc = pc; 
-    tp = pp; 
-
     if(ofm && ofp){
       /* s-s-s */
 #ifdef USE_FDM_SOLID
@@ -99,7 +94,7 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
       /* f-s-s */
       if(cht.interface(Sign::neg(),m,i,j,k)) {
         /* removed from system matrix */
-        aflagm = 0.0;
+        aflagm = false;
         /* dxm,fdm are corrected to account for interface position */
         /* tm is changed to the saturation temperature */
         fdm *= dxm;
@@ -150,7 +145,7 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
       /* s-s-f */
       if(cht.interface(Sign::pos(),m,i,j,k)) {
         /* removed from system matrix */
-        aflagp = 0.0;
+        aflagp = false;
         /* dxp,fdp are corrected to account for interface position */
         /* tp is changed to the saturation temperature */
         fdp *= dxp;
@@ -208,28 +203,24 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
   |  center in fluid  |
   +------------------*/
   } else {
-    tm = pm; 
-    tc = pc; 
-    tp = pp; 
-
     if(onm && onp){
       /* f-f-f */
       if(!cht.interface(Sign::neg(),m,i,j,k)){
         dxm=dxm;
       } else {
         dxm = cht.distance_int(Sign::neg(),m,i,j,k,tm);
-        aflagm=0.0;
+        aflagm=false;
 #ifdef DEBUG
-	std::cout<<"aflagm=0.0: " <<i<<" "<<j<<" "<<k<<" "<<clc<<"\n";
+	std::cout<<"aflagm=false: " <<i<<" "<<j<<" "<<k<<" "<<clc<<"\n";
 #endif
       }
       if(!cht.interface(Sign::pos(),m,i,j,k)){
         dxp=dxp;
       } else {
         dxp = cht.distance_int(Sign::pos(),m,i,j,k,tp);
-        aflagp=0.0;
+        aflagp=false;
 #ifdef DEBUG
-	std::cout<<"aflagp=0.0: " <<i<<" "<<j<<" "<<k<<" "<<clc<<"\n";
+	std::cout<<"aflagp=false: " <<i<<" "<<j<<" "<<k<<" "<<clc<<"\n";
 #endif
       }
 #ifdef USE_FDM_FLUID /* now, finite difference is applied always, as in system_diffusive */
@@ -238,7 +229,7 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
       ap = lc * vol * (this->*coef_p)(dxm,dxp,x0);
       ac = am + ap;
 #else
-      //if(aflagm==0.0 || aflagp==0.0) {
+      //if(!aflagm || !aflagp) {
       if(fabs(clc)<3) {
         /* FDM */
         am = lc * vol * (this->*coef_m)(dxm,dxp,x0);
@@ -260,11 +251,11 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
         dxp=dxp;
       } else {
         dxp = cht.distance_int(Sign::pos(),m,i,j,k,tp);
-        aflagp=0.0;
+        aflagp=false;
       }
       if(cht.interface(Sign::neg(),m,i,j,k)) {
         /* removed from system matrix */
-        aflagm = 0.0;
+        aflagm = false;
         /* dxm is corrected to account for interface position */
         /* tm is changed to the saturation temperature */
         dxm = cht.distance_int(Sign::neg(),m,i,j,k,tm);
@@ -283,7 +274,7 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
            - lc*vol*(this->*coef_m)(dxm,dxp,x0)*(1.0-fdm)*lc/(fdm*lm+(1.0-fdm)*lc);
         ap = lc*vol*(this->*coef_p)(dxm,dxp,x0);
 #else
-        //if(aflagp==0.0) {
+        //if(!aflagp) {
         if(fabs(clc)<3) {
           /* FDM */
           am = lc*vol*(this->*coef_m)(dxm,dxp,x0)*fdm*lm/(fdm*lm+(1.0-fdm)*lc);
@@ -309,11 +300,11 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
         dxm=dxm;
       } else {
         dxm = cht.distance_int(Sign::neg(),m,i,j,k,tm);
-        aflagm=0.0;
+        aflagm=false;
       }
       if(cht.interface(Sign::pos(),m,i,j,k)) {
         /* removed from system matrix */
-        aflagp = 0.0;
+        aflagp = false;
         /* dxp is corrected to account for interface position */
         /* tp is changed to the saturation temperature */
         dxp = cht.distance_int(Sign::pos(),m,i,j,k,tp);
@@ -332,7 +323,7 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
            - lc*vol*(this->*coef_p)(dxm,dxp,x0)*(1.0-fdp)*lc/((1.0-fdp)*lc+fdp*lp);
         ap = lc*vol*(this->*coef_p)(dxm,dxp,x0)*fdp*lp/((1.0-fdp)*lc+fdp*lp);
 #else
-        //if(aflagm==0.0) {
+        //if(!aflagm) {
         if(fabs(clc)<3) {
           /* FVM */
           am = lc*vol*(this->*coef_m)(dxm,dxp,x0);

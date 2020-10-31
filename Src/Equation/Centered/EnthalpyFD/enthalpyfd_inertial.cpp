@@ -1,20 +1,21 @@
 #include "enthalpyfd.h"
 #include "def.h"
 
-void EnthalpyFD::inertial(const Old old) {
-  inertial(phi,old);
+void EnthalpyFD::inertial(const bool cross_interface, const Old old) {
+  inertial(phi,cross_interface,old);
 }
 /***************************************************************************//**
 *  Calculates inertial contribution to rhs
 *******************************************************************************/
-void EnthalpyFD::inertial(Scalar & sca, const Old old) {
+void EnthalpyFD::inertial(Scalar & sca, const bool cross_interface, 
+                          const Old old) {
 
   /*---------------------------+
   |  fold = rho * cp * T / dt  |
   +---------------------------*/
   real dti = time->dti();
 
-  if(old==Old::no) {
+  if(cross_interface) {
     for_ijk(i,j,k) {
       if(dom->ibody().on(i,j,k)){
         /* phase change: xor indicates change of phase */

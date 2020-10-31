@@ -15,9 +15,9 @@ void EnthalpyFD::convective_time_step(Scalar & sca) {
   |  fold = rho * cp * T / dt  |
   +---------------------------*/
 #ifdef CNEW
-  inertial(sca,Old::no);
+  inertial(sca,true,Old::no);
 #else
-  inertial(sca,Old::yes);
+  inertial(sca,true,Old::yes);
 #endif
 
   /*-----------------------------------------------------------------------+

@@ -170,7 +170,7 @@ int main(int argc, char ** argv) {
   Scalar c  (d), g  (d), kappa(d); // concentration
   Scalar tpr(d), q  (d);           // temperature
   Scalar mdot(d), mflx(d);         // phase-change rate
-
+  Scalar tprold(d), tprap1(d), tprap2(d);
 
   /*-----------------------------+ 
   |  insert boundary conditions  |
@@ -284,6 +284,9 @@ int main(int argc, char ** argv) {
   tpr.bc().add( BndCnd( Dir::jmax(), BndType::dirichlet(), tout ) );
   #endif
 #endif
+  tprold = tpr.shape();
+  tprap1 = tpr.shape();
+  tprap2 = tpr.shape();
 
   /*----------------------+
   |  physical properties  |
@@ -386,6 +389,7 @@ int main(int argc, char ** argv) {
 #endif
   enthFD.convection_set(TimeScheme::forward_euler());
   enthFD.diffusion_set(TimeScheme::backward_euler());
+  enthFD.set_gradt_accuracy_order(AccuracyOrder::Fourth());
 
   enthFD.set_no_solid_acceleration(no_solid_acceleration);
 
@@ -396,7 +400,7 @@ int main(int argc, char ** argv) {
   pc.set_second_order_accuracy(true);
 #else
   //pc.set_second_order_accuracy(false);
-  pc.set_accuracy_order(AccuracyOrder::FirstUpwind());
+  pc.set_accuracy_order(AccuracyOrder::FourthUpwind());
 #endif
 #ifdef USE_UNCOND_EXTRP
   pc.set_unconditional_extrapolation(true);
@@ -653,9 +657,35 @@ int main(int argc, char ** argv) {
     /*------------------------+
     |  solve energy equation  |
     +------------------------*/
+#if 1
     enthFD.discretize();
     enthFD.new_time_step();
     enthFD.solve(ResRat(1e-16),"enthFD");
+#else
+    tprold = tpr;
+    enthFD.discretize();
+    //enthFD.new_time_step();
+    for(int i(0); i<3;++i) {
+      for(int j(0); j<3;++j) {
+        enthFD.convective_time_step(tprold);
+        if(j==0) {
+          tprap1 = tpr;
+        } else {
+          tpr = (tprap1+tpr);
+          tpr /= 2.;
+        }
+      }
+      enthFD.inertial(tpr,false,Old::no);
+      enthFD.explicit_diffusion();
+      enthFD.solve(ResRat(1e-16));
+      if(i==0) {
+        tprap2 = tpr;
+      } else {
+        tpr = (tprap2+tpr);
+        tpr /= 2.;
+      }
+    }
+#endif
 
     /*-------------+
     |  dt control  |

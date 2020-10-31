@@ -1,5 +1,4 @@
 #include "enthalpyfd.h"
-using namespace std;
 
 /***************************************************************************//**
 *  \brief Creates diffusive part of the system matrix \f$ [A] \f$.
@@ -19,89 +18,96 @@ void EnthalpyFD::create_system_diffusive(const Scalar * diff_eddy) {
     for_ijk(i,j,k) {
       real lc = cht.lambda(i,j,k,diff_eddy);
       const real vol = phi.dV(i,j,k);
-      real xm,xp,aflagm,aflagp;
-      aflagm=aflagp=1.0;
+      real xm,xp,pm,pp;
+      bool aflagm(true),aflagp(true);
       if(!cht.interface(Sign::neg(),Comp::i(),i,j,k)){
         xm=phi.dxw(i);
       } else {
-        real ts;
-        xm = cht.distance_int_x(Sign::neg(),i,j,k,ts);
-        aflagm=0.0;
+        xm = cht.distance_int_x(Sign::neg(),i,j,k,pm);
+        aflagm=false;
       }
       if(!cht.interface(Sign::pos(),Comp::i(),i,j,k)){
         xp=phi.dxe(i);
       } else {
-        real ts;
-        xp = cht.distance_int_x(Sign::pos(),i,j,k,ts);
-        aflagp=0.0;
+        xp = cht.distance_int_x(Sign::pos(),i,j,k,pp);
+        aflagp=false;
       }
       real cxm = coef_x_m(xm,xp,phi.xc(i));
       real cxp = coef_x_p(xm,xp,phi.xc(i));
 
-      A.w[i][j][k] =  tscn * lc * vol * cxm * aflagm;
+      A.w[i][j][k] = aflagm ? tscn * lc * vol * cxm * aflagm : 0.0;
       A.c[i][j][k] += tscn * lc * vol * (cxm+cxp);
-      A.e[i][j][k] =  tscn * lc * vol * cxp * aflagp;
+      A.e[i][j][k] = aflagp ? tscn * lc * vol * cxp * aflagp : 0.0;
+      /* rhs */
+      ftif[i][j][k] =  aflagm ? 0.0 : tscn * lc * vol * cxm * pm;
+      ftif[i][j][k] += aflagp ? 0.0 : tscn * lc * vol * cxp * pp;
     }
 
     /* coefficients in j direction (s and n) */
     for_ijk(i,j,k) {
       real lc = cht.lambda(i,j,k,diff_eddy);
       const real vol = phi.dV(i,j,k);
-      real ym,yp,aflagm,aflagp;
-      aflagm=aflagp=1.0;
+      real ym,yp,pm,pp;
+      bool aflagm(true),aflagp(true);
       if(!cht.interface(Sign::neg(),Comp::j(),i,j,k)){
         ym=phi.dys(j);
       } else {
-        real ts;
-        ym = cht.distance_int_y(Sign::neg(),i,j,k,ts);
-        aflagm=0.0;
+        ym = cht.distance_int_y(Sign::neg(),i,j,k,pm);
+        aflagm=false;
       }
       if(!cht.interface(Sign::pos(),Comp::j(),i,j,k)){
         yp=phi.dyn(j);
       } else {
-        real ts;
-        yp = cht.distance_int_y(Sign::pos(),i,j,k,ts);
-        aflagp=0.0;
+        yp = cht.distance_int_y(Sign::pos(),i,j,k,pp);
+        aflagp=false;
       }
       real cym = coef_y_m(ym,yp,phi.yc(j));
       real cyp = coef_y_p(ym,yp,phi.yc(j));
 
-      A.s[i][j][k] =  tscn * lc * vol * cym * aflagm;
+      A.s[i][j][k] = aflagm ? tscn * lc * vol * cym : 0.0;
       A.c[i][j][k] += tscn * lc * vol * (cym+cyp);
-      A.n[i][j][k] =  tscn * lc * vol * cyp * aflagp;
+      A.n[i][j][k] = aflagp ? tscn * lc * vol * cyp : 0.0;
+      /* rhs */
+      ftif[i][j][k] += aflagm ? 0.0 : tscn * lc * vol * cym * pm;
+      ftif[i][j][k] += aflagp ? 0.0 : tscn * lc * vol * cyp * pp;
     }
 
     /* coefficients in k direction (b and t) */
     for_ijk(i,j,k) {
       real lc = cht.lambda(i,j,k,diff_eddy);
       const real vol = phi.dV(i,j,k);
-      real zm,zp,aflagm,aflagp;
-      aflagm=aflagp=1.0;
+      real zm,zp,pm,pp;
+      bool aflagm(true),aflagp(true);
       if(!cht.interface(Sign::neg(),Comp::k(),i,j,k)){
         zm=phi.dzb(k);
       } else {
-        real ts;
-        zm = cht.distance_int_z(Sign::neg(),i,j,k,ts);
-        aflagm=0.0;
+        zm = cht.distance_int_z(Sign::neg(),i,j,k,pm);
+        aflagm=false;
       }
       if(!cht.interface(Sign::pos(),Comp::k(),i,j,k)){
         zp=phi.dzt(k);
       } else {
-        real ts;
-        zp = cht.distance_int_z(Sign::pos(),i,j,k,ts);
-        aflagp=0.0;
+        zp = cht.distance_int_z(Sign::pos(),i,j,k,pp);
+        aflagp=false;
       }
       real czm = coef_z_m(zm,zp,phi.zc(k));
       real czp = coef_z_p(zm,zp,phi.zc(k));
 
-      A.b[i][j][k] =  tscn * lc * vol * czm * aflagm;
+      A.b[i][j][k] = aflagm ? tscn * lc * vol * czm : 0.0;
       A.c[i][j][k] += tscn * lc * vol * (czm+czp);
-      A.t[i][j][k] =  tscn * lc * vol * czp * aflagp;
+      A.t[i][j][k] = aflagp ? tscn * lc * vol * czp : 0.0;
+      /* rhs */
+      ftif[i][j][k] += aflagm ? 0.0 : tscn * lc * vol * czm * pm;
+      ftif[i][j][k] += aflagp ? 0.0 : tscn * lc * vol * czp * pp;
     }
     /*-------------------------------+
     |  a "touch" from immersed body  |
     +-------------------------------*/
     if(dom->ibody().nccells() > 0) {
+      boil::oout<<"EFD: Conduction without solid. "
+                <<"Underdevelopment. Exiting."<<boil::endl;
+      exit(0); /* highly improbable this code would work */
+#if 0
       for(int cc=0; cc<dom->ibody().nccells(); cc++) {
         int i,j,k;
         dom->ibody().ijk(cc,&i,&j,&k); // OPR(i); OPR(j); OPR(k);
@@ -154,7 +160,7 @@ void EnthalpyFD::create_system_diffusive(const Scalar * diff_eddy) {
         }
 
       }
-
+#endif
     } /* is there an immersed body */
 
   /*---------------------------------------------+
@@ -171,6 +177,8 @@ void EnthalpyFD::create_system_diffusive(const Scalar * diff_eddy) {
        instead. Note that if, at one point, existence of ibodies without solid
        conduction is allowed, this of course needs rewriting */
 
+    ftif = 0.;
+
     for_ijk(i,j,k) {
 
       const real vol = phi.dV(i,j,k);
@@ -180,11 +188,10 @@ void EnthalpyFD::create_system_diffusive(const Scalar * diff_eddy) {
       real llm, llc, llp; // lambdal
       int clm, clc, clp; // topology flag
       real dxm, dxp, fdm, fdp, fdms, fdps;
-      real pm, pc, pp;    // temperature-input
       real am, ac, ap;
       real tm, tc, tp;    // temperature-output
-      real aflagm, aflagp;
-      real sourceterm; /* dummy */
+      bool aflagm, aflagp;
+      real sourceterm(0.0);
       real pos0;
       coef_gen coef_m, coef_p;
 
@@ -217,9 +224,9 @@ void EnthalpyFD::create_system_diffusive(const Scalar * diff_eddy) {
       fdp=dom->ibody().fdxe(i,j,k);
       fdms=dom->ibody().fdxe(i-1,j,k);
       fdps=dom->ibody().fdxw(i+1,j,k);
-      pm=phi[i-1][j][k];
-      pc=phi[i  ][j][k];
-      pp=phi[i+1][j][k];
+      tm=phi[i-1][j][k];
+      tc=phi[i  ][j][k];
+      tp=phi[i+1][j][k];
 
       diff_matrix(am, ac, ap
                 , tm, tc, tp
@@ -233,11 +240,15 @@ void EnthalpyFD::create_system_diffusive(const Scalar * diff_eddy) {
                 , llm, llc, llp
                 , clm, clc, clp
                 , dxm, dxp, fdm, fdp, fdms, fdps
-                , pm, pc, pp
                 , i, j, k, Comp::u());
-      A.w[i][j][k] = tscn * am * aflagm;
+      A.w[i][j][k] = aflagm ? tscn * am : 0.0;
       A.c[i][j][k]+= tscn * ac;
-      A.e[i][j][k] = tscn * ap * aflagp;
+      A.e[i][j][k] = aflagp ? tscn * ap : 0.0;
+     
+      /* rhs */
+      ftif[i][j][k] += tscn * sourceterm;
+      ftif[i][j][k] += aflagm ? 0.0 : tscn * am * tm;
+      ftif[i][j][k] += aflagp ? 0.0 : tscn * ap * tp;
 
       /* j-direction */
       onm=dom->ibody().on(i,j-1,k);
@@ -267,9 +278,9 @@ void EnthalpyFD::create_system_diffusive(const Scalar * diff_eddy) {
       fdp=dom->ibody().fdyn(i,j,k);
       fdms=dom->ibody().fdyn(i,j-1,k);
       fdps=dom->ibody().fdys(i,j+1,k);
-      pm=phi[i][j-1][k];
-      pc=phi[i][j  ][k];
-      pp=phi[i][j+1][k];
+      tm=phi[i][j-1][k];
+      tc=phi[i][j  ][k];
+      tp=phi[i][j+1][k];
   
       diff_matrix(am, ac, ap
                 , tm, tc, tp
@@ -283,11 +294,15 @@ void EnthalpyFD::create_system_diffusive(const Scalar * diff_eddy) {
                 , llm, llc, llp
                 , clm, clc, clp
                 , dxm, dxp, fdm, fdp, fdms, fdps
-                , pm, pc, pp
                 , i, j, k, Comp::v());
-      A.s[i][j][k] = tscn * am * aflagm;
+      A.s[i][j][k] = aflagm ? tscn * am : 0.0;
       A.c[i][j][k]+= tscn * ac;
-      A.n[i][j][k] = tscn * ap * aflagp;
+      A.n[i][j][k] = aflagp ? tscn * ap : 0.0;
+     
+      /* rhs */
+      ftif[i][j][k] += tscn * sourceterm;
+      ftif[i][j][k] += aflagm ? 0.0 : tscn * am * tm;
+      ftif[i][j][k] += aflagp ? 0.0 : tscn * ap * tp;
   
       /* k-direction */
       onm=dom->ibody().on(i,j,k-1);
@@ -317,9 +332,9 @@ void EnthalpyFD::create_system_diffusive(const Scalar * diff_eddy) {
       fdp=dom->ibody().fdzt(i,j,k);
       fdms=dom->ibody().fdzt(i,j,k-1);
       fdps=dom->ibody().fdzb(i,j,k+1);
-      pm=phi[i][j][k-1];
-      pc=phi[i][j][k  ];
-      pp=phi[i][j][k+1];
+      tm=phi[i][j][k-1];
+      tc=phi[i][j][k  ];
+      tp=phi[i][j][k+1];
 
       diff_matrix(am, ac, ap
                 , tm, tc, tp
@@ -333,11 +348,15 @@ void EnthalpyFD::create_system_diffusive(const Scalar * diff_eddy) {
                 , llm, llc, llp
                 , clm, clc, clp
                 , dxm, dxp, fdm, fdp, fdms, fdps
-                , pm, pc, pp
                 , i, j, k, Comp::w());
-      A.b[i][j][k] = tscn * am * aflagm;
+      A.b[i][j][k] = aflagm ? tscn * am : 0.0;
       A.c[i][j][k]+= tscn * ac;
-      A.t[i][j][k] = tscn * ap * aflagp;
+      A.t[i][j][k] = aflagp ? tscn * ap : 0.0;
+     
+      /* rhs */
+      ftif[i][j][k] += tscn * sourceterm;
+      ftif[i][j][k] += aflagm ? 0.0 : tscn * am * tm;
+      ftif[i][j][k] += aflagp ? 0.0 : tscn * ap * tp;
     }
   } /* conduction through solid */
  

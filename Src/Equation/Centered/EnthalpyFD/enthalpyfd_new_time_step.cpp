@@ -38,7 +38,8 @@ void EnthalpyFD::new_time_step(const Scalar * diff_eddy) {
     }
   }
   
-  explicit_diffusion(diff_eddy);
+  if(diff_ts.Nm1() > 0.0)
+    diffusion(diff_eddy);
 
   return;
 }

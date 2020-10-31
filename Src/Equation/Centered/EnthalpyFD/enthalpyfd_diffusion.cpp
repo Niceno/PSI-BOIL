@@ -27,13 +27,11 @@
 *  stipulated in main program. Obviously, these concerns are important for 
 *  non-implicit time stepping schemes only.
 *******************************************************************************/
-void EnthalpyFD::explicit_diffusion(const Scalar * diff_eddy) {
+void EnthalpyFD::diffusion(const Scalar * diff_eddy) {
 
   phi.exchange();
 
   /* get time stepping coefficient */
-  real tscn = diff_ts.N();
-  assert( tscn > 0.0 );
   real tsc = diff_ts.Nm1(); /* 0.5 for c.n. 0.0 for fully implicit */
 
   if( accelerated_no_solid ) {
@@ -67,10 +65,6 @@ void EnthalpyFD::explicit_diffusion(const Scalar * diff_eddy) {
       const real Ac = tsc * lc * vol * (cxm+cxp);
       const real Ae = tsc * lc * vol * cxp;
       fold[i][j][k] += Aw*pm - Ac*pc + Ae*pp;
-      /* add implicit part of the diffusion term */
-      const real Awi = tscn * lc * vol * cxm * aflagm;
-      const real Aei = tscn * lc * vol * cxp * aflagp;
-      ftif[i][j][k] = Awi*pm + Aei*pp;
     }
 
     /*------------------------+ 
@@ -103,9 +97,6 @@ void EnthalpyFD::explicit_diffusion(const Scalar * diff_eddy) {
       const real Ac = tsc * lc * vol * (cym+cyp);
       const real An = tsc * lc * vol * cyp;
       fold[i][j][k] += As*pm - Ac*pc + An*pp;
-      const real Asi = tscn * lc * vol * cym * aflagm;
-      const real Ani = tscn * lc * vol * cyp * aflagp;
-      ftif[i][j][k] += Asi*pm + Ani*pp;
     }
 
     /*------------------------+ 
@@ -138,9 +129,6 @@ void EnthalpyFD::explicit_diffusion(const Scalar * diff_eddy) {
       const real Ac = tsc * lc * vol * (czm+czp);
       const real At = tsc * lc * vol * czp;
       fold[i][j][k] += Ab*pm - Ac*pc + At*pp;
-      const real Abi = tscn * lc * vol * czm * aflagm;
-      const real Ati = tscn * lc * vol * czp * aflagp;
-      ftif[i][j][k] += Abi*pm + Ati*pp;
     }
     // need to add here immersed boundary without solid !!!
 
@@ -157,8 +145,6 @@ void EnthalpyFD::explicit_diffusion(const Scalar * diff_eddy) {
        and each direction), the matter pointer is set to fluid in the constructor
        instead. Note that if, at one point, existence of ibodies without solid
        conduction is allowed, this of course needs rewriting */
-
-    ftif = 0.;
 
     for_m(m){
       int ii,jj,kk;
@@ -180,10 +166,9 @@ void EnthalpyFD::explicit_diffusion(const Scalar * diff_eddy) {
         real llm, llc, llp; // lambdal
         int clm, clc, clp; // topology flag
         real dxm, dxp, fdm, fdp, fdms, fdps;
-        real pm, pc, pp;
         real am, ac, ap;
         real tm, tc, tp;
-        real aflagm, aflagp;
+        bool aflagm, aflagp;
         real aream, areap;
         real sourceterm(0.0);
         real pos0;
@@ -244,9 +229,9 @@ void EnthalpyFD::explicit_diffusion(const Scalar * diff_eddy) {
           fdms=dom->ibody().fdzt(i,j,k-1);
           fdps=dom->ibody().fdzb(i,j,k+1);
         }
-        pm=phi[i-ii][j-jj][k-kk];
-        pc=phi[i   ][j   ][k   ];
-        pp=phi[i+ii][j+jj][k+kk];
+        tm=phi[i-ii][j-jj][k-kk];
+        tc=phi[i   ][j   ][k   ];
+        tp=phi[i+ii][j+jj][k+kk];
         diff_matrix(am, ac, ap
                   , tm, tc, tp
                   , aflagm, aflagp
@@ -259,16 +244,14 @@ void EnthalpyFD::explicit_diffusion(const Scalar * diff_eddy) {
                   , llm, llc, llp
                   , clm, clc, clp
                   , dxm, dxp, fdm, fdp, fdms, fdps
-                  , pm, pc, pp
                   , i, j, k, m);
   
-        fold[i][j][k] += sourceterm;
-        if(tsc!=0){
-          fold[i][j][k] += tsc * (am*tm*aflagm - ac*tc + ap*tp*aflagp);
-        }
-        ftif[i][j][k] += tscn * (am*(1.0-aflagm)*tm+ap*(1.0-aflagp)*tp);
-      }
-    }
+        fold[i][j][k] -= tsc * ac*tc;
+        fold[i][j][k] += aflagm ? tsc * am*tm : 0.0;
+        fold[i][j][k] += aflagp ? tsc * ap*tp : 0.0;
+        fold[i][j][k] += tsc * sourceterm;
+      } /* ijk */
+    } /* m */
   } /* solid conduction */
 
   return;

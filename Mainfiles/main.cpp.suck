@@ -322,7 +322,7 @@ int main(int argc, char * argv[]) {
           tpr /= 2.;
         }
       }
-      enthFD.inertial(tpr,Old::no);
+      enthFD.inertial(tpr,false,Old::no);
       enthFD.explicit_diffusion();
       enthFD.solve(ResRat(1e-7));
       if(i==0) {

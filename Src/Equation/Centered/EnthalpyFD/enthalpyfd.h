@@ -74,11 +74,11 @@ class EnthalpyFD : public Centered {
                cht,sol) {};
 
     void new_time_step(const Scalar * diff_eddy = NULL);
-    void inertial(Scalar & sca, const Old old = Old::yes);
-    void inertial(const Old old = Old::yes);
+    void inertial(Scalar & sca, const bool interface_crossed, const Old old); 
+    void inertial(const bool interface_crossed, const Old old); 
     void convective_time_step(Scalar & sca);
     void convective_time_step();
-    void explicit_diffusion(const Scalar * diff_eddy = NULL);
+    virtual void diffusion(const Scalar * diff_eddy = NULL);
     void solve(const ResRat & fact, const char * name = NULL);
     void solve_sor(const int & it, const real & r, const char * name = NULL);
 
@@ -110,7 +110,7 @@ class EnthalpyFD : public Centered {
                 <<accelerated_no_solid<<"\n";
     }
 
-    void convection();
+    virtual void convection();
 
   protected:
     typedef real (EnthalpyFD::*coef_gen)(const real,const real,const real);
@@ -123,7 +123,7 @@ class EnthalpyFD : public Centered {
     void convection(Scalar * sca);
     void diff_matrix(real & am, real & ac, real & ap
                 , real & tm, real & tc, real & tp
-                , real & aflagm, real & aflagp
+                , bool & aflagm, bool & aflagp
                 , real & sourceterm
                 , const real x0, const coef_gen coef_m, const coef_gen coef_p
                 , const real vol, const real aream, const real areap
@@ -135,7 +135,6 @@ class EnthalpyFD : public Centered {
                 , const int clm, const int clc, const int clp
                 , real dxm, real dxp
                 , real fdm, real fdp, real fdms, real fdps
-                , real pm, real pc, real pp
                 , const int i, const int j, const int k, const Comp m);
 
     inline real resistance_multiplier(const real dx1, const real dx2,

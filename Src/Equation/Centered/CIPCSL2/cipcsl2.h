@@ -188,7 +188,7 @@ class CIPCSL2 : public Centered {
 
   protected:
     void bnd_wall_kappa();
-    void convection();
+    virtual void convection();
     void curv(const Scalar & g);
     void curv_interface();
     void curv_interface_ext();
