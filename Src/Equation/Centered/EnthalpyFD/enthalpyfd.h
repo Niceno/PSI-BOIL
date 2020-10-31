@@ -74,6 +74,9 @@ class EnthalpyFD : public Centered {
                cht,sol) {};
 
     void new_time_step(const Scalar * diff_eddy = NULL);
+    void inertial(Scalar & sca, const Old old = Old::yes);
+    void inertial(const Old old = Old::yes);
+    void convective_time_step(Scalar & sca);
     void convective_time_step();
     void explicit_diffusion(const Scalar * diff_eddy = NULL);
     void solve(const ResRat & fact, const char * name = NULL);

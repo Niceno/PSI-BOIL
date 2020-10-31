@@ -81,6 +81,12 @@ inline bool interface(const int i, const int j, const int k) const {
   return topo->interface(i,j,k);
 }
 
+inline bool above_interface(const int i, const int j, const int k,
+                            const Old old) const {
+  return (old==Old::yes) ?
+         topo->above_interface_old(i,j,k) : topo->above_interface(i,j,k);
+}
+
 /***************************************************************************//**
  *  Call to tifmodel
 ******************************************************************************/

@@ -5,6 +5,7 @@ bool CommonHeatTransfer::add_point(const int i0, const int j0, const int k0,
                                    const int i1, const int j1, const int k1,
                                    const Sign dir, const Comp & m,
                                    const bool is_solid, bool & terminate,
+                                   bool & interface_reached,
                                    std::vector<real> & stencil,
                                    std::vector<real> & values,
                                    const Old old) const {
@@ -17,6 +18,7 @@ bool CommonHeatTransfer::add_point(const int i0, const int j0, const int k0,
   if(!is_solid&&interface(dir,m,i0,j0,k0,old)) {
 
     terminate = true; 
+    interface_reached = true;
 
     real tgamma;
     real dist_int = distance_int(dir,m,i0,j0,k0,tgamma,old);

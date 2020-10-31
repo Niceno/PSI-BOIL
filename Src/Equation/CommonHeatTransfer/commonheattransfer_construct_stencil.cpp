@@ -1,18 +1,21 @@
 #include "commonheattransfer.h"
 
 /******************************************************************************/
-real CommonHeatTransfer::gradt1D(const bool is_solid, const Comp & m,
+void CommonHeatTransfer::construct_stencil(
+                                 std::vector<real> & stencil,
+                                 std::vector<real> & values,
+                                 const bool is_solid, const Comp & m,
                                  const int i, const int j, const int k,
                                  const AccuracyOrder & accuracy_order,
                                  const bool discard_points,
                                  const Old old) const {
 /***************************************************************************//**
-*  \brief Calculate grad(tpr) in a given cell.
+*  \brief Construct stencil for difference calculations.
 *******************************************************************************/
 
-  /* set-up arrays */
-  std::vector<real> stencil;
-  std::vector<real> values;
+  /* reset vectors */
+  stencil.clear();
+  values.clear();
 
   /* reference indices */
   int c_idx(-1), w_idx(-1), e_idx(-1), 
@@ -43,6 +46,8 @@ real CommonHeatTransfer::gradt1D(const bool is_solid, const Comp & m,
 
   /* set-up termination flags */
   bool wend(false), eend(false);
+  bool interface_west(false), interface_east(false);
+  int int_west_idx(-1), int_east_idx(-1);
 
   /* prepare possible discarding set */
   bool discard_center(false);
@@ -55,41 +60,45 @@ real CommonHeatTransfer::gradt1D(const bool is_solid, const Comp & m,
   *idx1 = -1;
 
   bool discard_center_by_west = add_point(i+ii0,j+jj0,k+kk0, i+ii1,j+jj1,k+kk1,
-                                          Sign::neg(), m, is_solid, wend, 
+                                          Sign::neg(), m, is_solid, 
+                                          wend, interface_west,
                                           stencil, values, old);
   w_idx = stencil.size()-1;
+
+  /* interface position is recorded, if true */
+  if(interface_west)
+    int_west_idx = w_idx;
 
   /* east */
   *idx0 = 0;
   *idx1 = +1;
 
   bool discard_center_by_east = add_point(i+ii0,j+jj0,k+kk0, i+ii1,j+jj1,k+kk1,
-                                          Sign::pos(), m, is_solid, eend, 
+                                          Sign::pos(), m, is_solid, 
+                                          eend, interface_east,
                                           stencil, values, old);
   e_idx = stencil.size()-1;
 
+  /* interface position is recorded, if true */
+  if(interface_east)
+    int_east_idx = e_idx;
+
   /* special treatment for first order */
   if(accuracy_order.eval()==1) {
-    /* 1. upwind or
-     * 2. discard_center not set (user's mistake!)
-     * AND
-     * interface on only one side */
-    bool iw = interface(Sign::neg(),m,i,j,k,old);
-    bool ie = interface(Sign::pos(),m,i,j,k,old);
-    if(  (accuracy_order==AccuracyOrder::FirstUpwind()||!discard_points)
-       &&(ie!=iw)
-      ) {
+    int dscrd_idx(-1);
+    /* 1. upwind AND interface on only one side */
+    if(accuracy_order.upwind()&&(interface_east!=interface_west)) {
       /* if interface in west, discard east and vice versa */
-      int dscrd_idx = iw*e_idx+ie*w_idx;
-      stencil.erase(stencil.begin() + dscrd_idx);
-      values.erase(values.begin() + dscrd_idx);
-
-      return topo->first_order_difference(stencil,values);
-
-    /* central: center is always discarded */
+      dscrd_idx = interface_west*e_idx+interface_east*w_idx;
+    /* 2. central  */
     } else {
-      discard_center = true;
+      dscrd_idx = c_idx;
     }
+
+    stencil.erase(stencil.begin() + dscrd_idx);
+    values.erase(values.begin() + dscrd_idx);
+    return;
+
   } else {
     /* either marks center for discarding */
     discard_center = discard_center_by_west | discard_center_by_east;
@@ -108,10 +117,17 @@ real CommonHeatTransfer::gradt1D(const bool is_solid, const Comp & m,
   
     /* w-w point possibly marks w point for discard */
     if(add_point(i+ii0,j+jj0,k+kk0, i+ii1,j+jj1,k+kk1,
-                 Sign::neg(), m, is_solid, wend, stencil, values,old))
+                 Sign::neg(), m, is_solid, wend, interface_west,
+                 stencil, values, old))
       discard_set.insert(w_idx);
 
     ww_idx = stencil.size()-1;
+
+#if 0
+    /* interface position is recorded, if true */
+    if(interface_west)
+      int_west_idx = ww_idx;
+#endif
 
     /* correct distance */
     stencil[ww_idx] += stencil[w_idx];
@@ -124,10 +140,17 @@ real CommonHeatTransfer::gradt1D(const bool is_solid, const Comp & m,
   
     /* e-e point possibly marks e point for discard */
     if(add_point(i+ii0,j+jj0,k+kk0, i+ii1,j+jj1,k+kk1,
-                 Sign::pos(), m, is_solid, eend, stencil, values,old))
+                 Sign::pos(), m, is_solid, eend, interface_east,
+                 stencil, values, old))
       discard_set.insert(e_idx);
 
     ee_idx = stencil.size()-1;
+
+#if 0
+    /* interface position is recorded, if true */
+    if(interface_east)
+      int_east_idx = ee_idx;
+#endif
 
     /* correct distance */
     stencil[ee_idx] += stencil[e_idx];
@@ -142,10 +165,17 @@ real CommonHeatTransfer::gradt1D(const bool is_solid, const Comp & m,
 
     /* w-w-w point possibly marks w-w point for discard */
     if(add_point(i+ii0,j+jj0,k+kk0, i+ii1,j+jj1,k+kk1,
-                 Sign::neg(), m, is_solid, wend, stencil, values,old))
+                 Sign::neg(), m, is_solid, wend, interface_west,
+                 stencil, values, old))
       discard_set.insert(ww_idx);
 
     www_idx = stencil.size()-1;
+
+#if 0
+    /* interface position is recorded, if true */
+    if(interface_west)
+      int_west_idx = www_idx;
+#endif
 
     /* correct distance */
     stencil[www_idx] += stencil[ww_idx];
@@ -158,13 +188,33 @@ real CommonHeatTransfer::gradt1D(const bool is_solid, const Comp & m,
 
     /* e-e-e point possibly marks e-e point for discard */
     if(add_point(i+ii0,j+jj0,k+kk0, i+ii1,j+jj1,k+kk1,
-                 Sign::pos(), m, is_solid, eend, stencil, values,old))
+                 Sign::pos(), m, is_solid, eend, interface_east,
+                 stencil, values, old))
       discard_set.insert(ee_idx);
 
     eee_idx = stencil.size()-1;
 
+#if 0
+    /* interface position is recorded, if true */
+    if(interface_east)
+      int_east_idx = eee_idx;
+#endif
+
     /* correct distance */
     stencil[eee_idx] += stencil[ee_idx];
+  }
+
+  /*** do we want to reposition the stencil to an interface? ***/
+  /* only used if upwind_to_interface is true and interface is directly
+     adjacent from one side -> xor gate used */
+  if(accuracy_order.upwind()&&(interface_west^interface_east)) {
+    real new_origin = interface_west ?
+                      stencil[int_west_idx] :
+                      stencil[int_east_idx];
+    
+    for(int idx(0); idx != stencil.size(); ++idx) {
+      stencil[idx] -= new_origin;
+    }
   }
 
   /*** the stencil is now 3-7 points, ordered by importance ***/
@@ -179,26 +229,5 @@ real CommonHeatTransfer::gradt1D(const bool is_solid, const Comp & m,
     }
   }
 
-  /*** the stencil is now 2-7 points, ordered by importance ***/
-  int diff_req = stencil.size()-1;
-  AccuracyOrder ao(std::min(diff_req,accuracy_order.eval()));
-
-  /* differences are implemented up to fourth-order */
-#if 0
-  //if(m==Comp::i()&& (iflag[i][j][k]==1||iflag[i][j][k]==2) ) {
-  if( (i==5&&k==28) || (i==28&&k==5) || (i==10&&k==27) || (i==27&&k==10) ) {
-    boil::oout<<"gradt1D: "<<i<<" "<<k<<" "<<m<<" "<<iflag[i][j][k]<<" |";
-    for(auto s : stencil) 
-      boil::oout<<" "<<s;
-    boil::oout<<" |";
-    for(auto v : values) 
-      boil::oout<<" "<<v;
-    boil::oout<<" | "
-              <<topo->nth_order_difference(stencil,values,std::min(accuracy_order,diff_req))
-              <<boil::endl;
-  }
-#endif
-
-  return topo->nth_order_difference(stencil,values,ao);
-
+  return;
 }

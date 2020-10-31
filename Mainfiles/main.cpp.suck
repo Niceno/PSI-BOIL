@@ -3,7 +3,7 @@
 #define USE_VOF
 //#define USE_FULL
 #define USE_PC4
-#define USE_SECOND_ORDER
+//#define USE_SECOND_ORDER
 #define USE_VOF_VEL
 //#define USE_UNCOND_EXTRP
 //#define DISCARD_POINTS
@@ -39,7 +39,7 @@ int main(int argc, char * argv[]) {
   const real LZ = DX*real(NZ);
 
   const real xint = 0.002205323668813564;
-  const real x0 = xint-1.01*DX;
+  const real x0 = xint-2.01*DX;
 
   const real Tout=5.;
   const real Tsat=0.;
@@ -87,7 +87,7 @@ int main(int argc, char * argv[]) {
   Scalar tpr(d), q  (d), step(d); // temperature
   Scalar mdot(d);        // phase-change
   Scalar mflx(d);        // phase-change
-  Scalar sflag(d);        // phase-change
+  Scalar tprold(d),tprap1(d),tprap2(d);
 
   /*-----------------------------+ 
   |  insert boundary conditions  |
@@ -134,7 +134,6 @@ int main(int argc, char * argv[]) {
   g = c.shape();
   step = c.shape();
   cold = c.shape();
-  sflag = c.shape();
 
   tpr.bc().add( BndCnd( Dir::imin(), BndType::dirichlet(), Tsat ) );
   tpr.bc().add( BndCnd( Dir::imax(), BndType::dirichlet(), Tout ) );
@@ -149,6 +148,9 @@ int main(int argc, char * argv[]) {
   tpr.bc().add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
   tpr.bc().add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
 #endif
+  tprap1 = tpr.shape();
+  tprap2 = tpr.shape();
+  tprold = tpr.shape();
 
   /*----------------------+
   |  physical properties  |
@@ -204,10 +206,10 @@ int main(int argc, char * argv[]) {
   for_vijk(c,i,j,k)
     c[i][j][k] = 1.0;
   for_vijk(c,i,j,k) {
-    if(i==boil::BW&&((c.xc(boil::BW)-x0)<2.*c.dxc(boil::BW))) {
+    if(c.xc(i)-x0<2.*c.dxc(i)) {
       c[i][j][k]=0.0;
-    } else if(i==1+boil::BW&&((c.xc(boil::BW)-x0)<2.*c.dxc(boil::BW))) {
-      c[i][j][k]=0.99; /* approximately one cell */
+    } else if(c.xc(i)-x0<3.*c.dxc(i)) {
+      c[i][j][k]=0.99; /* approximately two cells */
     } else {
       c[i][j][k] = 1.0;
     }
@@ -272,16 +274,17 @@ int main(int argc, char * argv[]) {
   enthFD.convection_set(TimeScheme::forward_euler());
   enthFD.diffusion_set(TimeScheme::backward_euler());
   enthFD.set_no_solid_acceleration(false);
+  enthFD.set_gradt_accuracy_order(AccuracyOrder::Fourth());
 #ifndef USE_PC4
   PhaseChangeVOF pc(mdot, mflx, tpr, q, c, g , f , uvw, conc.topo,
                     tsat, time, &mixed);
 #else
-  PhaseChange4 pc(mdot, mflx, q, c, g , f , uvw, cht,
-                  time, &mixed)
+  PhaseChange4 pc(mdot, mflx, q, g , f , uvw, cht,
+                  time, &mixed);
   #ifdef USE_SECOND_ORDER
   pc.set_second_order_accuracy(true);
   #else
-  pc.set_second_order_accuracy(false);
+  pc.set_accuracy_order(AccuracyOrder::FourthUpwind());
   #endif
   #ifdef USE_UNCOND_EXTRP
   pc.set_unconditional_extrapolation(true);
@@ -306,9 +309,29 @@ int main(int argc, char * argv[]) {
     /*------------------------+
     |  solve energy equation  |
     +------------------------*/
+    tprold = tpr;
     enthFD.discretize();
-    enthFD.new_time_step();
-    enthFD.solve(ResRat(1e-7));
+    //enthFD.new_time_step();
+    for(int i(0); i<3;++i) {
+      for(int j(0); j<3;++j) {
+        enthFD.convective_time_step(tprold);
+        if(j==0) {
+          tprap1 = tpr;
+        } else {
+          tpr = (tprap1+tpr);
+          tpr /= 2.;
+        }
+      }
+      enthFD.inertial(tpr,Old::no);
+      enthFD.explicit_diffusion();
+      enthFD.solve(ResRat(1e-7));
+      if(i==0) {
+        tprap2 = tpr;
+      } else {
+        tpr = (tprap2+tpr);
+        tpr /= 2.;
+      }
+    }
 
     /*---------------+
     |  phase change  |
@@ -338,7 +361,7 @@ int main(int argc, char * argv[]) {
     ns.solve(ResRat(1e-7));
 
     p = 0.0;
-    if (multigrid.wcycle(ResRat(1e-7))) OMS(converged);
+    if (multigrid.fcycle(ResRat(1e-7))) OMS(converged);
     p.exchange();
     ns.project(p);
     press += p;
@@ -377,34 +400,6 @@ int main(int argc, char * argv[]) {
       boil::plot->plot(uvw,c,tpr,mdot,"uvw-c-tpr-mdot",time.current_step());
     }
   }
-
-#if 1
-  std::ofstream fout;
-  fout.open("velocity-u.txt");
-  Comp m=Comp::u();
-  for_vmi(uvw,m,i) {
-       fout << uvw.xc(m,i) << "  " << uvw[m][i][1][1] << "\n";
-  }
-  fout.close();
-
-  fout.open("color.txt");
-  for_vi(c,i) {
-       fout << c.xc(i) << "  " << c[i][1][1] << "\n";
-  }
-  fout.close();
-
-  fout.open("temperature.txt");
-  for_vi(tpr,i) {
-        fout << tpr.xc(i) << "  " << tpr[i][1][1] << "\n";
-  }
-  fout.close();
-
-  fout.open("mdot.txt");
-  for_vi(tpr,i) {
-        fout << c.xc(i) << "  " << mdot[i][1][1] << "\n";
-  }
-  fout.close();
-#endif
 
   boil::oout << "finished" << boil::endl;
   boil::timer.stop();

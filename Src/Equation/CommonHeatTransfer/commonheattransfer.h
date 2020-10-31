@@ -94,16 +94,31 @@ class CommonHeatTransfer {
                   const Old old,
                   Scalar & val) const;
 
-    /* calculating a variable-stencil gradient */
-    real gradt1D(const bool is_solid, const Comp & m,
-                 const int i, const int j, const int k,
-                 const AccuracyOrder & accuracy_order,
-                 const bool discard_points,
-                 const Old old = Old::no) const;
+    /* calculating a variable-stencil difference */
+    real first_derivative(const bool is_solid, const Comp & m,
+                          const int i, const int j, const int k,
+                          const AccuracyOrder & accuracy_order,
+                          const bool discard_points,
+                          const Old old = Old::no) const;
+    real second_derivative(const bool is_solid, const Comp & m,
+                           const int i, const int j, const int k,
+                           const AccuracyOrder & accuracy_order,
+                           const bool discard_points,
+                           const Old old = Old::no) const;
+
+    void construct_stencil(std::vector<real> & stencil,
+                           std::vector<real> & values,
+                           const bool is_solid, const Comp & m,
+                           const int i, const int j, const int k,
+                           const AccuracyOrder & accuracy_order,
+                           const bool discard_points,
+                           const Old old) const;
+
     bool add_point(const int i0, const int j0, const int k0,
                    const int i1, const int j1, const int k1,
                    const Sign dir, const Comp & m,
                    const bool is_solid, bool & terminate,
+                   bool & interface_reached,
                    std::vector<real> & stencil,
                    std::vector<real> & values,
                    const Old old) const;

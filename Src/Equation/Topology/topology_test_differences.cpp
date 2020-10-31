@@ -3,7 +3,7 @@
 #include <random>
 
 /******************************************************************************/
-bool Topology::test_differences(const int count) {
+bool Topology::test_differences_first(const int count) {
 /******************************************************************************/
   std::mt19937 rng(123);
   std::uniform_real_distribution<real> distR1(1.,10.);
@@ -16,11 +16,11 @@ bool Topology::test_differences(const int count) {
     boil::oout<<i<<boil::endl;
 
     /* completely randomised stencil with random polynomial */
-    flag = flag & test_differences({0.,(distI(rng)>0 ? 1 : -1) * distR1(rng),
+    flag = flag & test_differences_first(
+                                   {0.,(distI(rng)>0 ? 1 : -1) * distR1(rng),
                                        (distI(rng)>0 ? 1 : -1) * distR1(rng),
                                        (distI(rng)>0 ? 1 : -1) * distR1(rng),
                                        (distI(rng)>0 ? 1 : -1) * distR1(rng)},
-
                                    {distR2(rng),distR2(rng),distR2(rng),
                                     distR2(rng),distR2(rng)});
   }
@@ -31,8 +31,8 @@ bool Topology::test_differences(const int count) {
 
 
 /******************************************************************************/
-bool Topology::test_differences(const std::vector<real> & stencil,
-                                const std::vector<real> & coefficients) {
+bool Topology::test_differences_first(const std::vector<real> & stencil,
+                                      const std::vector<real> & coefficients) {
 /***************************************************************************//**
 *  \brief Test if differences work correctly using polynomials
 *******************************************************************************/
@@ -48,7 +48,7 @@ bool Topology::test_differences(const std::vector<real> & stencil,
 
   /* first-order */
   real derivative_1st = coefficients[1];
-  real difference_1st = first_order_difference(stencil,
+  real difference_1st = first_order_first(stencil,
                         {evaluate_polynomial(1,coefficients,stencil[0]),
                          evaluate_polynomial(1,coefficients,stencil[1])});
 
@@ -57,7 +57,7 @@ bool Topology::test_differences(const std::vector<real> & stencil,
 
   /* second-order */
   real derivative_2nd = coefficients[1];
-  real difference_2nd = second_order_difference(stencil,
+  real difference_2nd = second_order_first(stencil,
                         {evaluate_polynomial(2,coefficients,stencil[0]),
                          evaluate_polynomial(2,coefficients,stencil[1]),
                          evaluate_polynomial(2,coefficients,stencil[2])});
@@ -67,7 +67,7 @@ bool Topology::test_differences(const std::vector<real> & stencil,
 
   /* third-order */
   real derivative_3rd = coefficients[1];
-  real difference_3rd = third_order_difference(stencil,
+  real difference_3rd = third_order_first(stencil,
                         {evaluate_polynomial(3,coefficients,stencil[0]),
                          evaluate_polynomial(3,coefficients,stencil[1]),
                          evaluate_polynomial(3,coefficients,stencil[2]),
@@ -78,7 +78,7 @@ bool Topology::test_differences(const std::vector<real> & stencil,
 
   /* fourth-order */
   real derivative_4th = coefficients[1];
-  real difference_4th = fourth_order_difference(stencil,
+  real difference_4th = fourth_order_first(stencil,
                         {evaluate_polynomial(4,coefficients,stencil[0]),
                          evaluate_polynomial(4,coefficients,stencil[1]),
                          evaluate_polynomial(4,coefficients,stencil[2]),

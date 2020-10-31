@@ -7,6 +7,7 @@ libEnthalpyFD_a_SOURCES = enthalpyfd.h                        \
                           enthalpyfd_convective_time_step.cpp \
                           enthalpyfd_diff_matrix.cpp          \
                           enthalpyfd_explicit_diffusion.cpp   \
+                          enthalpyfd_inertial.cpp             \
                           enthalpyfd_new_time_step.cpp        \
                           enthalpyfd_solve.cpp                \
                           enthalpyfd_solve_sor.cpp            \

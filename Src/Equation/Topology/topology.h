@@ -120,24 +120,38 @@ class Topology {
       const { return sign_interface(clrold[i][j][k]); }
     
     /* differences */
-    real zeroth_order_difference(const std::vector<real> & stencil,
-                                 const std::vector<real> & values) const;
-    real first_order_difference(const std::vector<real> & stencil,
-                                const std::vector<real> & values) const;
-    real second_order_difference(const std::vector<real> & stencil,
-                                 const std::vector<real> & values) const;
-    real third_order_difference(const std::vector<real> & stencil,
-                                const std::vector<real> & values) const;
-    real fourth_order_difference(const std::vector<real> & stencil,
-                                 const std::vector<real> & values) const;
-    real nth_order_difference(const std::vector<real> & stencil,
-                              const std::vector<real> & values,
-                              const AccuracyOrder & order) const;
+    real zeroth_order_first(const std::vector<real> & stencil,
+                            const std::vector<real> & values) const;
+    real first_order_first (const std::vector<real> & stencil,
+                            const std::vector<real> & values) const;
+    real second_order_first(const std::vector<real> & stencil,
+                            const std::vector<real> & values) const;
+    real third_order_first (const std::vector<real> & stencil,
+                            const std::vector<real> & values) const;
+    real fourth_order_first(const std::vector<real> & stencil,
+                            const std::vector<real> & values) const;
+    real nth_order_first(const std::vector<real> & stencil,
+                         const std::vector<real> & values,
+                         const AccuracyOrder & order) const;
+
+    real zeroth_order_second(const std::vector<real> & stencil,
+                             const std::vector<real> & values) const;
+    real first_order_second (const std::vector<real> & stencil,
+                             const std::vector<real> & values) const;
+    real second_order_second(const std::vector<real> & stencil,
+                             const std::vector<real> & values) const;
+    real third_order_second (const std::vector<real> & stencil,
+                             const std::vector<real> & values) const;
+    real fourth_order_second(const std::vector<real> & stencil,
+                             const std::vector<real> & values) const;
+    real nth_order_second(const std::vector<real> & stencil,
+                          const std::vector<real> & values,
+                          const AccuracyOrder & order) const;
 
     /* testing */
-    bool test_differences(const int count);
-    bool test_differences(const std::vector<real> & stencil,
-                          const std::vector<real> & coefficients);
+    bool test_differences_first(const int count);
+    bool test_differences_first(const std::vector<real> & stencil,
+                                const std::vector<real> & coefficients);
     real evaluate_polynomial(const int order,
                              const std::vector<real> & coefficients,
                              const real x);

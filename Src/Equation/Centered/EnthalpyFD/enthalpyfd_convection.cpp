@@ -290,13 +290,19 @@ void EnthalpyFD::convection(Scalar * conv) {
 
 #if 1
   #ifdef CNEW
-      dtdxm = dtdxp = cht.gradt1D(false,Comp::i(),i,j,k,ao_conv,false,Old::no);
-      dtdym = dtdyp = cht.gradt1D(false,Comp::j(),i,j,k,ao_conv,false,Old::no);
-      dtdzm = dtdzp = cht.gradt1D(false,Comp::k(),i,j,k,ao_conv,false,Old::no);
+      dtdxm = dtdxp = cht.first_derivative(false,Comp::i(),i,j,k,
+                                           ao_conv,false,Old::no);
+      dtdym = dtdyp = cht.first_derivative(false,Comp::j(),i,j,k,
+                                           ao_conv,false,Old::no);
+      dtdzm = dtdzp = cht.first_derivative(false,Comp::k(),i,j,k,
+                                           ao_conv,false,Old::no);
   #else
-      dtdxm = dtdxp = cht.gradt1D(false,Comp::i(),i,j,k,ao_conv,false,Old::yes);
-      dtdym = dtdyp = cht.gradt1D(false,Comp::j(),i,j,k,ao_conv,false,Old::yes);
-      dtdzm = dtdzp = cht.gradt1D(false,Comp::k(),i,j,k,ao_conv,false,Old::yes);
+      dtdxm = dtdxp = cht.first_derivative(false,Comp::i(),i,j,k,
+                                           ao_conv,false,Old::yes);
+      dtdym = dtdyp = cht.first_derivative(false,Comp::j(),i,j,k,
+                                           ao_conv,false,Old::yes);
+      dtdzm = dtdzp = cht.first_derivative(false,Comp::k(),i,j,k,
+                                           ao_conv,false,Old::yes);
   #endif
 #else
       // dtdxm

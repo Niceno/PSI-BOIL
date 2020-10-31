@@ -10,11 +10,11 @@ void PhaseChange4::cal_hf(const Scalar * diff_eddy) {
     const bool is_solid = dom->ibody().off(i,j,k);
     const real lmb = cht.lambda(i,j,k,diff_eddy);
 
-    real gtx = cht.gradt1D(is_solid,Comp::i(),i,j,k,
+    real gtx = cht.first_derivative(is_solid,Comp::i(),i,j,k,
                            accuracy_order,discard_points_near_interface);
-    real gty = cht.gradt1D(is_solid,Comp::j(),i,j,k,
+    real gty = cht.first_derivative(is_solid,Comp::j(),i,j,k,
                            accuracy_order,discard_points_near_interface);
-    real gtz = cht.gradt1D(is_solid,Comp::k(),i,j,k,
+    real gtz = cht.first_derivative(is_solid,Comp::k(),i,j,k,
                            accuracy_order,discard_points_near_interface);
 
     /* ghost values */

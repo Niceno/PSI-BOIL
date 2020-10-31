@@ -16,17 +16,23 @@ class AccuracyOrder {
     AccuracyOrder() {val=-1;}
     explicit AccuracyOrder(const int m, const bool upwind = false) {
       val = m;
-      upw = upwind; /* for the moment, only affects first order */
+      upw = upwind;
     }
 
-    static const AccuracyOrder undefined() {return AccuracyOrder(-1);}
-    static const AccuracyOrder Zeroth()    {return AccuracyOrder( 0);}
-    static const AccuracyOrder First()     {return AccuracyOrder( 1);}
+    static const AccuracyOrder undefined()     {return AccuracyOrder(-1);}
+    static const AccuracyOrder Zeroth()        {return AccuracyOrder( 0);}
+    static const AccuracyOrder First()         {return AccuracyOrder( 1);}
+    static const AccuracyOrder Second()        {return AccuracyOrder( 2);}
+    static const AccuracyOrder Third()         {return AccuracyOrder( 3);}
+    static const AccuracyOrder Fourth()        {return AccuracyOrder( 4);}
     static const AccuracyOrder FirstCentral()  {return AccuracyOrder(1,false);}
     static const AccuracyOrder FirstUpwind()   {return AccuracyOrder(1, true);}
-    static const AccuracyOrder Second()    {return AccuracyOrder( 2);}
-    static const AccuracyOrder Third()     {return AccuracyOrder( 3);}
-    static const AccuracyOrder Fourth()    {return AccuracyOrder( 4);}
+    static const AccuracyOrder SecondCentral() {return AccuracyOrder(2,false);}
+    static const AccuracyOrder SecondUpwind()  {return AccuracyOrder(2, true);}
+    static const AccuracyOrder ThirdCentral()  {return AccuracyOrder(3,false);}
+    static const AccuracyOrder ThirdUpwind()   {return AccuracyOrder(3, true);}
+    static const AccuracyOrder FourthCentral() {return AccuracyOrder(4,false);}
+    static const AccuracyOrder FourthUpwind()  {return AccuracyOrder(4, true);}
 
     //! Prints the components name.
     friend std::ostream & operator << (std::ostream & ost, const AccuracyOrder & com) {

@@ -1,70 +1,31 @@
 #include "enthalpyfd.h"
 #include "def.h"
 
+void EnthalpyFD::convective_time_step() {
+  convective_time_step(phi);
+}
+
 /***************************************************************************//**
 *  Performs a semi-Lagrangian convection step.
 *  (convection and diffusion solved separately)
 *******************************************************************************/
-void EnthalpyFD::convective_time_step() {
+void EnthalpyFD::convective_time_step(Scalar & sca) {
 
   /*---------------------------+
   |  fold = rho * cp * T / dt  |
   +---------------------------*/
-
-  real dti = time->dti();
-
 #ifdef CNEW
-  for_ijk(i,j,k) {
-    if(dom->ibody().on(i,j,k)){
-      /* phase change: xor indicates change of phase */
-      if(cht.topo->above_interface_old(i,j,k) ^ cht.topo->above_interface(i,j,k)) {
-        phi[i][j][k] = cht.Tint(i,j,k);     /* crude code */
-      }
-    }
-  }
-  phi.bnd_update();
-  phi.exchange();
-#endif
-
-  /* no transport in solid */
-  if( !solid() ) 
-    for_ijk(i,j,k) {
-      real c,r;
-#ifdef CNEW
-      if(cht.topo->above_interface(i,j,k)) {
+  inertial(sca,Old::no);
 #else
-      if(cht.topo->above_interface_old(i,j,k)) {
+  inertial(sca,Old::yes);
 #endif
-        c = cht.cpl(i,j,k);
-      } else {
-        c = cht.cpv(i,j,k);
-      }
-      fold[i][j][k] = c * dV(i,j,k) * phi[i][j][k] * dti;
-    }
-  /* with transport in solid */
-  else {
-    for_ijk(i,j,k) {
-      const real fV = dom->ibody().fV(i,j,k);
-      const real cs = solid()->cp (i,j,k);
-      real cf = cht.cpl(i,j,k);
-#ifdef CNEW
-      if(!cht.topo->above_interface(i,j,k)) {
-#else
-      if(!cht.topo->above_interface_old(i,j,k)) {
-#endif
-        cf = cht.cpv(i,j,k);
-      }
-
-      fold[i][j][k] = (cf*fV + cs*(1.0-fV)) * dV(i,j,k)
-                    * phi[i][j][k] * dti;
-    }
-  }
 
   /*-----------------------------------------------------------------------+
   |  fold = fold + C                                                       |
   |  Euler explicit 1st order for convection term                          |
   |  Semi-lagrangian scheme: update convection term, separating diffusion  |
   +-----------------------------------------------------------------------*/
+  real dti = time->dti();
   convection(&cold);
   for_ijk(i,j,k)
     fold[i][j][k] += conv_ts.Nm1() * cold[i][j][k]; /* conv_ts.Nm1() = 1.5 */
