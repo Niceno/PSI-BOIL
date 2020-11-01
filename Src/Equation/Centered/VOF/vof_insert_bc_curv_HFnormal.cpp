@@ -43,7 +43,7 @@ void VOF::insert_bc_curv_HFnormal(const Scalar & scp,
     if(!ranged||ridx.contains(scp.domain()->global_I(i)-boil::BW+1)) {
      for_jk(j,k) {
        if(dom->ibody().on(i,j,k)) {
-         if(dom->ibody().off(i,j,k-1) || (k==sk() && kminw)) {
+         if(dom->ibody().off(i,j,k-1) || (k==sk() && bflag_struct.kminw)) {
            bool test =  ((scp[i-1][j][k]-phisurf)*(scp[i][j][k]-phisurf)<=0.0)
                       ||((scp[i-1][j][k]-phisurf)*(scp[i][j][k]-phisurf)<=0.0)
                       ||((scp[i][j][k-1]-phisurf)*(scp[i][j][k]-phisurf)<=0.0)
@@ -148,7 +148,7 @@ void VOF::insert_bc_curv_HFnormal(const Scalar & scp,
   real mult;
   for_ijk(i,j,k) {
     if(dom->ibody().on(i,j,k)) {
-      if(dom->ibody().off(i,j,k-1) || (k==sk() && kminw)) {
+      if(dom->ibody().off(i,j,k-1) || (k==sk() && bflag_struct.kminw)) {
         bool test =  ((scp[i-1][j][k]-phisurf)*(scp[i][j][k]-phisurf)<=0.0)
                    ||((scp[i-1][j][k]-phisurf)*(scp[i][j][k]-phisurf)<=0.0)
                    ||((scp[i][j-1][k]-phisurf)*(scp[i][j][k]-phisurf)<=0.0)
@@ -211,7 +211,7 @@ void VOF::insert_bc_curv_HFnormal(const Scalar & scp,
                                                      { scp.dys(j),
                                                        scp.dyc(j),
                                                        scp.dyn(j) },
-                                                     ifull, jfull,
+                                                     bflag_struct.ifull, bflag_struct.jfull,
                                                      mult, max_n, cangle);
 
         } else {

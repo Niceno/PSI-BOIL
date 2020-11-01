@@ -323,7 +323,6 @@ int main(int argc, char * argv[]) {
         }
       }
       enthFD.inertial(tpr,false,Old::no);
-      enthFD.explicit_diffusion();
       enthFD.solve(ResRat(1e-7));
       if(i==0) {
         tprap2 = tpr;

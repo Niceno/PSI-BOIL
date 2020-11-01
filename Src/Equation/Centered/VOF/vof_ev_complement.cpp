@@ -15,7 +15,7 @@ void VOF::ev_complement(const ScalarInt & pflag, const Scalar & scp,
   Comp m;
 
   m = Comp::u();
-  if(ifull)
+  if(bflag_struct.ifull)
     for_vmijk(ugas,m,i,j,k) {
       if(uliq[m][i][j][k]!=umixed[m][i][j][k]) {
         real bdval;
@@ -32,7 +32,7 @@ void VOF::ev_complement(const ScalarInt & pflag, const Scalar & scp,
     }
 
   m = Comp::v();
-  if(jfull)
+  if(bflag_struct.jfull)
     for_vmijk(ugas,m,i,j,k) {
       if(uliq[m][i][j][k]!=umixed[m][i][j][k]) {
         real bdval;
@@ -49,7 +49,7 @@ void VOF::ev_complement(const ScalarInt & pflag, const Scalar & scp,
     }
 
   m = Comp::w();
-  if(kfull)
+  if(bflag_struct.kfull)
     for_vmijk(ugas,m,i,j,k) {
       if(uliq[m][i][j][k]!=umixed[m][i][j][k]) {
         real bdval;

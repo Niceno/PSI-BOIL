@@ -30,6 +30,7 @@ libVof_a_SOURCES =      vof.h                              \
                         vof_forward.cpp                    \
                         vof_front_minmax.cpp               \
                         vof_fs3.cpp                        \
+                        vof_fs_bnd_symmetry.cpp            \
                         vof_gradphi.cpp                    \
                         vof_ib_norm.cpp                    \
                         vof_insert_bc_curv_divnorm.cpp     \

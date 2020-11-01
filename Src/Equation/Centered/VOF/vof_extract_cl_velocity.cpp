@@ -32,7 +32,7 @@ real VOF::extract_cl_velocity_2d(const Comp ctangential, const Comp cnormal,
     if(Iloc<Iglob && (!ranged||ridx.contains(Iloc))) {
       for_jk(j,k) {
         if(dom->ibody().on(i,j,k)) {
-          if(dom->ibody().off(i,j,k-1) || (k==sk() && kminw)) {
+          if(dom->ibody().off(i,j,k-1) || (k==sk() && bflag_struct.kminw)) {
             if(abs(iflag[i][j][k])==1) {
               Iglob = Iloc;
               veloc1 = (*u)[Comp::u()][i][j][k];

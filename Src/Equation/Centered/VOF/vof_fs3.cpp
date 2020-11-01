@@ -12,6 +12,41 @@ void VOF::cal_fs3(const Scalar & scp) {
   /* tolerance is necessary because the linear-planes are not closed */
   /* with this version, it shouldnt be necessary anymore */
   real tolf = 0.0e-2;
+
+  /* fs is a result of calculations involving nx,ny,nz,nalpha,color
+   * and cell dimensions. Thus, by taking care of properly exchanging
+   * these variables, we can safely venture to calculate fs in buffer
+   * cells without dealing with the exchange() method, which would 
+   * not function properly for fs. So don't worry and let's loop over
+   * (almost) all cells, including buffers except for the furthest one */
+  int ibeg(si()), iend(ei()+1);
+  int jbeg(sj()), jend(ej()+1);
+  int kbeg(sk()), kend(ek()+1);
+
+  if(bflag_struct.ifull) {
+    if(bflag_struct.iminp) {
+      ibeg -= boil::BW-1;
+    }
+    if(bflag_struct.imaxp) {
+      iend += boil::BW-1;
+    }
+  }
+  if(bflag_struct.jfull) {
+    if(bflag_struct.jminp) {
+      jbeg -= boil::BW-1;
+    }
+    if(bflag_struct.jmaxp) {
+      jend += boil::BW-1;
+    }
+  }
+  if(bflag_struct.kfull) {
+    if(bflag_struct.kminp) {
+      kbeg -= boil::BW-1;
+    }
+    if(bflag_struct.kmaxp) {
+      kend += boil::BW-1;
+    }
+  }
         
   /* initialize */
   for_m(m)
@@ -19,16 +54,15 @@ void VOF::cal_fs3(const Scalar & scp) {
       fs[m][i][j][k] = boil::unreal;
 
   Comp m;
-  
+
   /******************************************
   *             x-direction                 *
   ******************************************/
 
   m = Comp::i();
-  //for_vmijk(u,m,i,j,k) {  /* don't use vmijk. wall will be skipped! */
-  for(int i=si(); i<=ei()+1; i++)
-  for(int j=sj(); j<=ej()  ; j++)
-  for(int k=sk(); k<=ek()  ; k++) {
+  for(int i=ibeg; i<=iend; i++)
+  for(int j=sj(); j<=ej(); j++)
+  for(int k=sk(); k<=ek(); k++) {
 
     /* degenerate cases */
     real clrw = scp[i-1][j][k];
@@ -85,10 +119,9 @@ void VOF::cal_fs3(const Scalar & scp) {
   ******************************************/
 
   m = Comp::j();
-  //for_vmijk(u,m,i,j,k) {  /* don't use vmijk. wall will be skipped! */
-  for(int i=si(); i<=ei()  ; i++)
-  for(int j=sj(); j<=ej()+1; j++)
-  for(int k=sk(); k<=ek()  ; k++) {
+  for(int i=si(); i<=ei(); i++)
+  for(int j=jbeg; j<=jend; j++)
+  for(int k=sk(); k<=ek(); k++) {
 
     /* degenerate cases */
     real clrs = scp[i][j-1][k];
@@ -144,10 +177,9 @@ void VOF::cal_fs3(const Scalar & scp) {
   ******************************************/
 
   m = Comp::k();
-  //for_vmijk(u,m,i,j,k) {  /* don't use vmijk. wall will be skipped! */
-  for(int i=si(); i<=ei()  ; i++)
-  for(int j=sj(); j<=ej()  ; j++)
-  for(int k=sk(); k<=ek()+1; k++) {
+  for(int i=si(); i<=ei(); i++)
+  for(int j=sj(); j<=ej(); j++)
+  for(int k=kbeg; k<=kend; k++) {
 
     /* degenerate cases */
     real clrb = scp[i][j][k-1];
@@ -214,6 +246,8 @@ void VOF::cal_fs3(const Scalar & scp) {
               <<" Exiting."<<boil::endl;
     exit(0);
   }
+  /* symmetry */
+  fs_bnd_symmetry(scp,fs,tol_wall);
   //fs.exchange_all();
 
   //boil::plot->plot(fs,scp, "fs-clr", 0);

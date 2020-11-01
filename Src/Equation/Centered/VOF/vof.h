@@ -223,6 +223,8 @@ class VOF : public Centered {
                           real & dzzt1, real & dzzc1);
 
     void cal_fs3(const Scalar & scp);
+    void fs_bnd_symmetry(const Scalar & scp, Vector & fs,
+                         const real & tol_wall);
     void extract_alpha(const Scalar & scp);
     void extract_alpha_near_bnd(const Scalar & scp);
     void standardized_norm_vect(const Scalar & mx,
@@ -381,10 +383,7 @@ class VOF : public Centered {
     real phisurf;
     real tol_wall, tol_flux, tol_ext, flux_cfl;
     real ww, dxmin;
-    bool iminp, imaxp, jminp, jmaxp, kminp, kmaxp; // true = periodic
-    bool iminw, imaxw, jminw, jmaxw, kminw, kmaxw; // true = wall
-    bool iminc, imaxc, jminc, jmaxc, kminc, kmaxc; // true = cut-stencil
-    bool ifull, jfull, kfull; // true = not a dummy direction
+    const BndFlag bflag_struct;
     bool limit_color, use_interp, store_pressure_extrap;
     bool is_initialized;
     real minclr, maxclr;

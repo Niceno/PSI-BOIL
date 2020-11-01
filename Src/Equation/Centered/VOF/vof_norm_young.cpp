@@ -73,12 +73,12 @@ void VOF::norm_young_kernel(real & nx_val, real & ny_val, real & nz_val,
 
     /* check boundary condition */
     jflag=1;
-    if (iii  ==si() && iminc==true) jflag=0;
-    if (iii-1==ei() && imaxc==true) jflag=0;
-    if (jjj  ==sj() && jminc==true) jflag=0;
-    if (jjj-1==ej() && jmaxc==true) jflag=0;
-    if (kkk  ==sk() && kminc==true) jflag=0;
-    if (kkk-1==ek() && kmaxc==true) jflag=0;
+    if (iii  ==si() && bflag_struct.iminc==true) jflag=0;
+    if (iii-1==ei() && bflag_struct.imaxc==true) jflag=0;
+    if (jjj  ==sj() && bflag_struct.jminc==true) jflag=0;
+    if (jjj-1==ej() && bflag_struct.jmaxc==true) jflag=0;
+    if (kkk  ==sk() && bflag_struct.kminc==true) jflag=0;
+    if (kkk-1==ek() && bflag_struct.kmaxc==true) jflag=0;
 
     sum_jflag += jflag;
 

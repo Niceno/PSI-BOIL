@@ -379,4 +379,6 @@ class Scalar {
 
 };
 
+#include "bndshape.h"
+
 #endif

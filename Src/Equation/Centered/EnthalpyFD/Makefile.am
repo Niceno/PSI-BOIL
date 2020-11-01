@@ -1,5 +1,6 @@
 noinst_LIBRARIES = libEnthalpyFD.a
 libEnthalpyFD_a_SOURCES = enthalpyfd.h                        \
+                          enthalpyfd_inline.h                 \
                           enthalpyfd.cpp                      \
                           enthalpyfd_coefficients.cpp         \
                           enthalpyfd_create_system.cpp        \

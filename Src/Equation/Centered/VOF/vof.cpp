@@ -40,7 +40,8 @@ VOF::VOF(const Scalar & PHI,
   wall_curv_method(CurvMethod::DivNorm()),
   subgrid_method(SubgridMethod::PLIC()),
   topo_method(TopoMethod::Hybrid()),
-  hf_set()
+  hf_set(),
+  bflag_struct(PHI)
 
 /*------------------------------------------------------+
 |  this constructor is called only at the finest level  |
@@ -170,139 +171,6 @@ VOF::VOF(const Scalar & PHI,
   /* apply boundary condition */
   phi.bnd_update();
   phi.exchange_all();
-
-  /* check boundary condition */
-  iminp = imaxp = jminp = jmaxp = kminp = kmaxp = false; // true for periodic
-  iminc = imaxc = jminc = jmaxc = kminc = kmaxc = true;  // true for cut-stencil
-  iminw = imaxw = jminw = jmaxw = kminw = kmaxw = false; // true for wall
-  ifull = jfull = kfull = true; // true for not a dummy direction
-  // imin
-  Dir d = Dir::imin();
-  if (phi.bc().type_decomp(d)) {
-    iminp=true;
-    iminc=false;
-  } else {
-    if (phi.bc().type(d,BndType::periodic())) {
-      iminp=true;
-      iminc=false;
-    } else if (phi.bc().type(d,BndType::wall())) {
-      iminw=true;
-    } else if (phi.bc().type(d,BndType::pseudo())) {
-      iminp=true;
-      iminc=false;
-      ifull = false;
-    }
-    if (dom->bnd_symmetry(d)) iminc=false;
-  }
-  // imax
-  d = Dir::imax();
-  if (phi.bc().type_decomp(d)) {
-    imaxp=true;
-    imaxc=false;
-  } else {
-    if (phi.bc().type(d,BndType::periodic())) {
-      imaxp=true;
-      imaxc=false;
-    } else if (phi.bc().type(d,BndType::wall())) {
-      imaxw=true;
-    } else if (phi.bc().type(d,BndType::pseudo())) {
-      imaxp=true;
-      imaxc=false;
-      ifull = false;
-    }
-    if (dom->bnd_symmetry(d)) imaxc=false;
-  }
-  // jmin
-  d = Dir::jmin();
-  if (phi.bc().type_decomp(d)) {
-    jminp=true;
-    jminc=false;
-  } else {
-    if (phi.bc().type(d,BndType::periodic())) {
-      jminp=true;
-      jminc=false;
-    } else if (phi.bc().type(d,BndType::wall())) {
-      jminw=true;
-    } else if (phi.bc().type(d,BndType::pseudo())) {
-      jminp=true;
-      jminc=false;
-      jfull = false;
-    }
-    if (dom->bnd_symmetry(d)) jminc=false;
-  }
-  // jmax
-  d = Dir::jmax();
-  if (phi.bc().type_decomp(d)) {
-    jmaxp=true;
-    jmaxc=false;
-  } else {
-    if (phi.bc().type(d,BndType::periodic())) {
-      jmaxp=true;
-      jmaxc=false;
-    } else if (phi.bc().type(d,BndType::wall())) {
-      jmaxw=true;
-    } else if (phi.bc().type(d,BndType::pseudo())) {
-      jmaxp=true;
-      jmaxc=false;
-      jfull = false;
-    }
-    if (dom->bnd_symmetry(d)) jmaxc=false;
-  }
-  // kmin
-  d = Dir::kmin();
-  if (phi.bc().type_decomp(d)) {
-    kminp=true;
-    kminc=false;
-  } else {
-    if (phi.bc().type(d,BndType::periodic())) {
-      kminp=true;
-      kminc=false;
-    } else if (phi.bc().type(d,BndType::wall())) {
-      kminw=true;
-    } else if (phi.bc().type(d,BndType::pseudo())) {
-      kminp=true;
-      kminc=false;
-      kfull = false;
-    }
-    if (dom->bnd_symmetry(d)) kminc=false;
-  }
-  // kmax
-  d = Dir::kmax();
-  if (phi.bc().type_decomp(d)) {
-    kmaxp=true;
-    kmaxc=false;
-  } else {
-    if (phi.bc().type(d,BndType::periodic())) {
-      kmaxp=true;
-      kmaxc=false;
-    } else if (phi.bc().type(d,BndType::wall())) {
-      kmaxw=true;
-    } else if (phi.bc().type(d,BndType::pseudo())) {
-      kmaxp=true;
-      kmaxc=false;
-      kfull = false;
-    }
-    if (dom->bnd_symmetry(d)) kmaxc=false;
-  }
-
-#if 0
-  boil::aout<<"curv_HF::periodic= "<<boil::cart.iam()<<" "
-            <<iminp<<" "<<imaxp<<" "
-            <<jminp<<" "<<jmaxp<<" "
-            <<kminp<<" "<<kmaxp<<"\n";
-
-  boil::aout<<"curv_HF::wall= "<<boil::cart.iam()<<" "
-            <<iminw<<" "<<imaxw<<" "
-            <<jminw<<" "<<jmaxw<<" "
-            <<kminw<<" "<<kmaxw<<"\n";
-
-  boil::aout<<"curv_HF::cut-stencil= "<<boil::cart.iam()<<" "
-            <<iminc<<" "<<imaxc<<" "
-            <<jminc<<" "<<jmaxc<<" "
-            <<kminc<<" "<<kmaxc<<"\n";
-
-  boil::oout<<"VOF-full: "<<ifull<<" "<<jfull<<" "<<kfull<<boil::endl;
-#endif
 
 }	
 

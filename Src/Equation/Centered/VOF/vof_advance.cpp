@@ -193,15 +193,15 @@ void VOF::advance_geometric(Scalar & scp) {
     vflow(m) = 0.;
 
   /* advance in x-direction */
-  if(ifull)
+  if(bflag_struct.ifull)
     advance_x(scp);
 
   /* advance in y-direction */
-  if(jfull)
+  if(bflag_struct.jfull)
     advance_y(scp);
   
   /* advance in z-direction */
-  if(kfull)
+  if(bflag_struct.kfull)
     advance_z(scp);
 
   /* update phi */

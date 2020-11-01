@@ -1,6 +1,7 @@
 noinst_LIBRARIES = libHeaviside.a
 libHeaviside_a_SOURCES = heaviside.h                     \
                          heaviside_geometry.h            \
+                         heaviside.cpp                   \
                          heaviside_calculate.cpp         \
                          heaviside_fs_bnd_1D.cpp         \
                          heaviside_fs_bnd_geometric.cpp  \

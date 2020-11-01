@@ -63,7 +63,7 @@ void VOF::insert_bc_curv_HFmixed(const Scalar & scp,
   for_ijk(i,j,k) {
     if(dom->ibody().on(i,j,k)) {
       bool flag(false);
-      if       (dom->ibody().off(i,j,k-1)||(kminw && (k==sk()  ))) {
+      if       (dom->ibody().off(i,j,k-1)||(bflag_struct.kminw && (k==sk()  ))) {
         flag = true;
         aligned_min = &aligned_0_min;
         aligned_max = &aligned_0_max;
@@ -71,7 +71,7 @@ void VOF::insert_bc_curv_HFmixed(const Scalar & scp,
         nonaligned_max = &nonaligned_0_max;
         nontrivial_min = &nontrivial_0_min;
         nontrivial_max = &nontrivial_0_max;
-      } else if(dom->ibody().off(i,j,k-2)||(kminw && (k==sk()+1))) {
+      } else if(dom->ibody().off(i,j,k-2)||(bflag_struct.kminw && (k==sk()+1))) {
         flag = true;
         aligned_min = &aligned_1_min;
         aligned_max = &aligned_1_max;
@@ -79,7 +79,7 @@ void VOF::insert_bc_curv_HFmixed(const Scalar & scp,
         nonaligned_max = &nonaligned_1_max;
         nontrivial_min = &nontrivial_1_min;
         nontrivial_max = &nontrivial_1_max;
-      } else if(dom->ibody().off(i,j,k-3)||(kminw && (k==sk()+2))) {
+      } else if(dom->ibody().off(i,j,k-3)||(bflag_struct.kminw && (k==sk()+2))) {
         flag = true;
         aligned_min = &aligned_2_min;
         aligned_max = &aligned_2_max;
@@ -214,7 +214,7 @@ void VOF::insert_bc_curv_HFmixed(const Scalar & scp,
       for_ijk(i,j,k) {
         if(dom->ibody().on(i,j,k)) {
           /* 0 */
-          if(dom->ibody().off(i,j,k-1)||(kminw && (k==sk()  ))) {
+          if(dom->ibody().off(i,j,k-1)||(bflag_struct.kminw && (k==sk()  ))) {
             int Iglob_0 = scp.domain()->global_I(i)-boil::BW+1;
             if(Iglob_0>=Icont_0_start&&Iglob_0<=Icont_max_end) {
               if(tempflag2[i][j][k]==1) {
@@ -224,7 +224,7 @@ void VOF::insert_bc_curv_HFmixed(const Scalar & scp,
           }
 
           /* 1 */
-          if(dom->ibody().off(i,j,k-2)||(kminw && (k==sk()+1))) {
+          if(dom->ibody().off(i,j,k-2)||(bflag_struct.kminw && (k==sk()+1))) {
             int Iglob_1 = scp.domain()->global_I(i)-boil::BW+1;
             if(Iglob_1>=Icont_1_start&&Iglob_1<=Icont_max_end) {
               if(tempflag2[i][j][k]==1) {
@@ -234,7 +234,7 @@ void VOF::insert_bc_curv_HFmixed(const Scalar & scp,
           }
 
           /* 2 */
-          if(dom->ibody().off(i,j,k-3)||(kminw && (k==sk()+2))) {
+          if(dom->ibody().off(i,j,k-3)||(bflag_struct.kminw && (k==sk()+2))) {
             int Iglob_2 = scp.domain()->global_I(i)-boil::BW+1;
             if(Iglob_2>=Icont_2_start&&Iglob_2<=Icont_max_end) {
               if(tempflag2[i][j][k]==1) {

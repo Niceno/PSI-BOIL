@@ -657,7 +657,7 @@ int main(int argc, char ** argv) {
     /*------------------------+
     |  solve energy equation  |
     +------------------------*/
-#if 1
+#if 0
     enthFD.discretize();
     enthFD.new_time_step();
     enthFD.solve(ResRat(1e-16),"enthFD");
@@ -676,7 +676,6 @@ int main(int argc, char ** argv) {
         }
       }
       enthFD.inertial(tpr,false,Old::no);
-      enthFD.explicit_diffusion();
       enthFD.solve(ResRat(1e-16));
       if(i==0) {
         tprap2 = tpr;

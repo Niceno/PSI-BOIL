@@ -10,9 +10,9 @@ void VOF::flood(Scalar & scp,const real mult) {
 
   for_avijk(scp,i,j,k) {
     if(   dom->ibody().off(i,j,k) 
-       || (i<si() && iminw) || (i>ei() && imaxw)
-       || (j<sj() && jminw) || (j>ej() && jmaxw)
-       || (k<sk() && kminw) || (k>ek() && kmaxw)
+       || (i<si() && bflag_struct.iminw) || (i>ei() && bflag_struct.imaxw)
+       || (j<sj() && bflag_struct.jminw) || (j>ej() && bflag_struct.jmaxw)
+       || (k<sk() && bflag_struct.kminw) || (k>ek() && bflag_struct.kmaxw)
       ) {
       scp[i][j][k] = colref;
     }

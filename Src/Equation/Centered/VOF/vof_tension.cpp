@@ -32,7 +32,7 @@ void VOF::tension(Vector * vec, const Matter matt, const Scalar & scp) {
 
   Comp m;
   if(rho_diff==0.0){
-    if(ifull) {
+    if(bflag_struct.ifull) {
       m = Comp::u();
       for_vmijk((*vec),m,i,j,k) {
         if(dom->ibody().on(m,i,j,k)) {
@@ -44,7 +44,7 @@ void VOF::tension(Vector * vec, const Matter matt, const Scalar & scp) {
         }
       }
     }
-    if(jfull) {
+    if(bflag_struct.jfull) {
       m = Comp::v();
       for_vmijk((*vec),m,i,j,k) {
         if(dom->ibody().on(m,i,j,k)) {
@@ -56,7 +56,7 @@ void VOF::tension(Vector * vec, const Matter matt, const Scalar & scp) {
         }
       }
     }
-    if(kfull) {
+    if(bflag_struct.kfull) {
       m = Comp::w();
       for_vmijk((*vec),m,i,j,k) {
         if(dom->ibody().on(m,i,j,k)) {
@@ -69,7 +69,7 @@ void VOF::tension(Vector * vec, const Matter matt, const Scalar & scp) {
       }
     }
   } else {
-    if(ifull) {
+    if(bflag_struct.ifull) {
       m = Comp::u();
       for_vmijk((*vec),m,i,j,k) {
         if(dom->ibody().on(m,i,j,k)) {
@@ -83,7 +83,7 @@ void VOF::tension(Vector * vec, const Matter matt, const Scalar & scp) {
         }
       }
     }
-    if(jfull) {
+    if(bflag_struct.jfull) {
       m = Comp::v();
       for_vmijk((*vec),m,i,j,k) {
         if(dom->ibody().on(m,i,j,k)) {
@@ -97,7 +97,7 @@ void VOF::tension(Vector * vec, const Matter matt, const Scalar & scp) {
         }
       }
     }
-    if(kfull) {
+    if(bflag_struct.kfull) {
       m = Comp::w();
       for_vmijk((*vec),m,i,j,k) {
         if(dom->ibody().on(m,i,j,k)) {

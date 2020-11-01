@@ -71,8 +71,8 @@ void VOFaxisym::curv_HF() {
     if(dom->ibody().on(i,j,k)) {
 #if 0 /* no longer necessary! */
       /* exclude near-wall cells: treated specially */
-      if(   (i==si() && iminw) || (i==ei() && imaxw)
-         || (k==sk() && kminw) || (k==ek() && kmaxw)
+      if(   (i==si() && bflag_struct.iminw) || (i==ei() && bflag_struct.imaxw)
+         || (k==sk() && bflag_struct.kminw) || (k==ek() && bflag_struct.kmaxw)
          || dom->ibody().off(i-1,j,k) || dom->ibody().off(i+1,j,k)
          || dom->ibody().off(i,j,k-1) || dom->ibody().off(i,j,k+1)
         ) {
@@ -126,7 +126,7 @@ void VOFaxisym::curv_HF() {
 #endif
 
       if(mMax==Comp::i()) {
-        if(!ifull) {
+        if(!bflag_struct.ifull) {
           boil::oout<<"Curv_HF: Pseudo direction selected at "<<i<<" "<<j<<" "
                     <<k<<" with mMax="<<mMax<<" ; exiting."<<boil::endl;
           exit(0);
@@ -151,7 +151,7 @@ void VOFaxisym::curv_HF() {
           real kap_cart(0.0), kap_cyl(0.0);
           calculate_curvature_HF_axisymmetric(hm,hc,hp,
                                               clr.dzb(k),clr.dzc(k),clr.dzt(k),
-                                              kfull,mult,mMax,xcent_adj,
+                                              bflag_struct.kfull,mult,mMax,xcent_adj,
                                               kap_cart,kap_cyl,
                                               i,j,k);
           kappa[i][j][k] = kap_cart + kap_cyl;
@@ -161,7 +161,7 @@ void VOFaxisym::curv_HF() {
         }
 
       } else if(mMax==Comp::k()) {
-        if(!kfull) {
+        if(!bflag_struct.kfull) {
           boil::oout<<"Curv_HF: Pseudo direction selected at "<<i<<" "<<j<<" "
                     <<k<<" with mMax="<<mMax<<" ; exiting."<<boil::endl;
           exit(0);
@@ -186,7 +186,7 @@ void VOFaxisym::curv_HF() {
           real kap_cart(0.0), kap_cyl(0.0);
           calculate_curvature_HF_axisymmetric(hm,hc,hp,
                                               clr.dxw(i),clr.dxc(i),clr.dxe(i),
-                                              ifull,mult,mMax,xcent,
+                                              bflag_struct.ifull,mult,mMax,xcent,
                                               kap_cart,kap_cyl,
                                               i,j,k);
           kappa[i][j][k] = kap_cart + kap_cyl;
@@ -196,7 +196,7 @@ void VOFaxisym::curv_HF() {
         }
 
       } else { /* blending */
-        if(!ifull||!kfull) {
+        if(!bflag_struct.ifull||!bflag_struct.kfull) {
           boil::oout<<"Curv_HF: Pseudo direction selected at "<<i<<" "<<j<<" "
                     <<k<<" while blending; exiting."<<boil::endl;
           exit(0);
@@ -247,7 +247,7 @@ void VOFaxisym::curv_HF() {
 
             calculate_curvature_HF_axisymmetric(hm_x,hc_x,hp_x,
                                                 clr.dzb(k),clr.dzc(k),clr.dzt(k),
-                                                kfull,mult_x,Comp::i(),xcent_x,
+                                                bflag_struct.kfull,mult_x,Comp::i(),xcent_x,
                                                 kap_x_cart,kap_x_cyl,
                                                 i,j,k);
             kap_x_cyl *= 1.0-bfactor;
@@ -261,7 +261,7 @@ void VOFaxisym::curv_HF() {
 
             calculate_curvature_HF_axisymmetric(hm_z,hc_z,hp_z,
                                                 clr.dxw(i),clr.dxc(i),clr.dxe(i),
-                                                ifull,mult_z,Comp::k(),xcent_z,
+                                                bflag_struct.ifull,mult_z,Comp::k(),xcent_z,
                                                 kap_z_cart,kap_z_cyl,
                                                 i,j,k);
             kap_z_cyl *= bfactor;
@@ -371,19 +371,19 @@ void VOFaxisym::fill_stencil_x(arr2D & stencil, arr2D & gridstencil,
   imax= mof;  /* normal stencil size 2*mof+1 */
 
   /* limit stencil size for cut-stencil */
-  if(iminc) imin=std::max(-mof,si()-i);
-  if(imaxc) imax=std::min( mof,ei()-i);
+  if(bflag_struct.iminc) imin=std::max(-mof,si()-i);
+  if(bflag_struct.imaxc) imax=std::min( mof,ei()-i);
 
   /* because of ghost grid in solid/walls */
   int imin_grid = imin;
   int imax_grid = imax;
 
   /* update at walls */
-  if( iminw && -mof<si()-i ) {
+  if( bflag_struct.iminw && -mof<si()-i ) {
     imin = si()-i-1;
     imin_grid = imin+1; 
   }
-  if( imaxw &&  mof>ei()-i ) {
+  if( bflag_struct.imaxw &&  mof>ei()-i ) {
     imax = ei()-i+1;
     imax_grid = imax-1;
   }
@@ -442,19 +442,19 @@ void VOFaxisym::fill_stencil_z(arr2D & stencil, arr2D & gridstencil,
   kmax= mof;  /* normal stencil size 2*mof+1 */
 
   /* limit stencil size for cut-stencil */
-  if(kminc) kmin=std::max(-mof,sk()-k);
-  if(kmaxc) kmax=std::min( mof,ek()-k);
+  if(bflag_struct.kminc) kmin=std::max(-mof,sk()-k);
+  if(bflag_struct.kmaxc) kmax=std::min( mof,ek()-k);
 
   /* because of ghost grid in solid/walls */
   int kmin_grid = kmin;
   int kmax_grid = kmax;
         
   /* update at walls */
-  if( kminw && -mof<sk()-k ) {
+  if( bflag_struct.kminw && -mof<sk()-k ) {
     kmin = sk()-k-1;
     kmin_grid = kmin+1; 
   }
-  if( kmaxw &&  mof>ek()-k ) {
+  if( bflag_struct.kmaxw &&  mof>ek()-k ) {
     kmax = ek()-k+1;
     kmax_grid = kmax-1;
   }

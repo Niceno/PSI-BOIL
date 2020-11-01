@@ -18,22 +18,57 @@ void Heaviside::cal_fs_geom(const Scalar & scp,
   /* if you decide to use it, don't forget to scale by grid spacing, as this is
      currently implemented as a constant tolerance! */
 
+  /* fs is a result of calculations involving nx,ny,nz,nalpha,color
+   * and cell dimensions. Thus, by taking care of properly exchanging
+   * these variables, we can safely venture to calculate fs in buffer
+   * cells without dealing with the exchange() method, which would 
+   * not function properly for fs. So don't worry and let's loop over
+   * (almost) all cells, including buffers except for the furthest one */
+  int ibeg(scp.si()), iend(scp.ei()+1);
+  int jbeg(scp.sj()), jend(scp.ej()+1);
+  int kbeg(scp.sk()), kend(scp.ek()+1);
+
+  if(bflag_struct.ifull) {
+    if(bflag_struct.iminp) {
+      ibeg -= boil::BW-1;
+    }
+    if(bflag_struct.imaxp) {
+      iend += boil::BW-1;
+    }
+  }
+  if(bflag_struct.jfull) {
+    if(bflag_struct.jminp) {
+      jbeg -= boil::BW-1;
+    }
+    if(bflag_struct.jmaxp) {
+      jend += boil::BW-1;
+    }
+  }
+  if(bflag_struct.kfull) {
+    if(bflag_struct.kminp) {
+      kbeg -= boil::BW-1;
+    }
+    if(bflag_struct.kmaxp) {
+      kend += boil::BW-1;
+    }
+  }
+        
   /* initialize */
   for_m(m)
     for_avmijk(fs,m,i,j,k)
       fs[m][i][j][k] = boil::unreal;
 
   Comp m;
-  
+
   /******************************************
   *             x-direction                 *
   ******************************************/
 
   m = Comp::i();
-  for(int i=scp.si(); i<=scp.ei()+1; i++)
-  for(int j=scp.sj(); j<=scp.ej()  ; j++)
-  for(int k=scp.sk(); k<=scp.ek()  ; k++) {
-  
+  for(int i=ibeg; i<=iend; i++)
+  for(int j=scp.sj(); j<=scp.ej(); j++)
+  for(int k=scp.sk(); k<=scp.ek(); k++) {
+
     /* degenerate cases */
     real clrw = scp[i-1][j][k];
     real clre = scp[i  ][j][k];
@@ -92,10 +127,10 @@ void Heaviside::cal_fs_geom(const Scalar & scp,
   ******************************************/
 
   m = Comp::j();
-  for(int i=scp.si(); i<=scp.ei()  ; i++)
-  for(int j=scp.sj(); j<=scp.ej()+1; j++)
-  for(int k=scp.sk(); k<=scp.ek()  ; k++) {
-               
+  for(int i=scp.si(); i<=scp.ei(); i++)
+  for(int j=jbeg; j<=jend; j++)
+  for(int k=scp.sk(); k<=scp.ek(); k++) {
+
     /* degenerate cases */
     real clrs = scp[i][j-1][k];
     real clrn = scp[i][j  ][k];
@@ -149,9 +184,9 @@ void Heaviside::cal_fs_geom(const Scalar & scp,
   ******************************************/
 
   m = Comp::k();
-  for(int i=scp.si(); i<=scp.ei()  ; i++)
-  for(int j=scp.sj(); j<=scp.ej()  ; j++)
-  for(int k=scp.sk(); k<=scp.ek()+1; k++) {
+  for(int i=scp.si(); i<=scp.ei(); i++)
+  for(int j=scp.sj(); j<=scp.ej(); j++)
+  for(int k=kbeg; k<=kend; k++) {
 
     /* degenerate cases */
     real clrb = scp[i][j][k-1];

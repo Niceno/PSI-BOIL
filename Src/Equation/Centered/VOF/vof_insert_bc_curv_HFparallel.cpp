@@ -50,7 +50,7 @@ void VOF::insert_bc_curv_HFparallel(const Scalar & scp,
       if(!ranged||ridx.contains(scp.domain()->global_I(i)-boil::BW+1)) {
         for_jk(j,k) {
           if(dom->ibody().on(i,j,k)) {
-            if(dom->ibody().off(i,j,k-1) || (k==sk() && kminw)) {
+            if(dom->ibody().off(i,j,k-1) || (k==sk() && bflag_struct.kminw)) {
               if( (scp.xn(i  )<h0) && (h0<scp.xn(i+1)) ) {
                 kappa[i][j][k] = kappa_wall;
                 tempflag[i][j][k] = 1;

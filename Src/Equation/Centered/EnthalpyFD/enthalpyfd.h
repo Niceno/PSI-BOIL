@@ -78,6 +78,7 @@ class EnthalpyFD : public Centered {
     void inertial(const bool interface_crossed, const Old old); 
     void convective_time_step(Scalar & sca);
     void convective_time_step();
+    virtual void convection();
     virtual void diffusion(const Scalar * diff_eddy = NULL);
     void solve(const ResRat & fact, const char * name = NULL);
     void solve_sor(const int & it, const real & r, const char * name = NULL);
@@ -90,27 +91,7 @@ class EnthalpyFD : public Centered {
       boil::timer.stop("enthalpy discretize");
     }
 
-    inline int get_gradt_accuracy_order() const { return ao_conv.eval(); }
-    inline void set_gradt_accuracy_order(const int ao) {
-      ao_conv = AccuracyOrder(ao);
-      boil::oout<<"EnthalpyFD::gradt_accuracy_order= "
-                <<ao<<"\n";
-    }
-    inline void set_gradt_accuracy_order(const AccuracyOrder ao) {
-      ao_conv = ao;
-      boil::oout<<"EnthalpyFD::gradt_accuracy_order= "
-                <<ao<<"\n";
-    }
-
-    inline bool get_no_solid_acceleration() const
-      { return accelerated_no_solid; }
-    inline void set_no_solid_acceleration(const bool flag) {
-      accelerated_no_solid = flag;
-      boil::oout<<"EnthalpyFD::no_solid_acceleration= "
-                <<accelerated_no_solid<<"\n";
-    }
-
-    virtual void convection();
+#include "enthalpyfd_inline.h"
 
   protected:
     typedef real (EnthalpyFD::*coef_gen)(const real,const real,const real);

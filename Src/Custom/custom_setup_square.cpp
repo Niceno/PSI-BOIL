@@ -82,8 +82,9 @@ namespace boil {
       tmp[i][j][k] = std::max(tmp[i][j][k],0.0);
     }
 
-    tmp.exchange();
+    tmp.exchange_all();
     conc.color() = tmp;
+    conc.color().bnd_update();
     tmp = 0.;
 
     return;

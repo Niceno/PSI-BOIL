@@ -1,0 +1,184 @@
+#include "Include/psi-boil.h"
+#include <fstream>
+#include <iostream>
+#include <fenv.h>
+#define USE_CARTESIAN
+//#define USE_FULL
+
+#define _GNU_SOURCE 1
+#if 1
+static void __attribute__ ((constructor)) trapfpe(void)
+{
+  /* Enable some exceptions. At startup all exceptions are masked. */
+  feenableexcept(FE_INVALID|FE_DIVBYZERO|FE_OVERFLOW);
+}
+#endif
+
+/******************************************************************************/
+int main(int argc, char * argv[]) {
+
+  boil::timer.start();
+
+  /* domain dimensions (given by problem) */
+  const real LX = 2.;
+  const real LZ = 2.;
+
+  /* computed parameters */
+  const int NX = 20;
+  const int NZ = 20;
+
+  const real DX = LX/real(NX);
+
+  /*--------------------------------+
+  |  choose the output file format  |
+  +--------------------------------*/
+  boil::plot = new PlotTEC();
+  //boil::plot = new PlotTEC(AsNodes::no(), Buffers::yes());
+
+  /*----------+
+  |  grid(s)  |
+  +----------*/
+  Grid1D gx( Range<real>(0.0,LX), NX, Periodic::no(),
+#ifdef USE_CARTESIAN
+             BndGrid::symmetry() );
+#else
+             BndGrid::symmetry(), BndGrid::wall() );
+#endif
+  Grid1D gz( Range<real>(0.0,LZ), NZ, Periodic::yes() );
+
+  /*---------+
+  |  domain  |
+  +---------*/
+#ifdef USE_CARTESIAN
+  #ifndef USE_FULL
+  Grid1D gy(DX);
+  #else
+  Grid1D gy( Range<real>(0.0,3.*DX), 3, Periodic::yes() );
+  #endif
+  Domain d(gx,gy,gz);
+#else
+  Axisymmetric d(gx,gz,DX,NULL);
+#endif
+
+  /*------------------+
+  |  define unknowns  |
+  +------------------*/
+  Vector uvw(d); // vel
+  Scalar c  (d), g  (d), kappa(d), cold(d), cold2(d); // concentration
+
+  /*-----------------------------+
+  |  insert boundary conditions  |
+  +-----------------------------*/
+  for_m(m) {
+    uvw.bc(m).add( BndCnd( Dir::imin(), BndType::symmetry() ) );
+#ifdef USE_CARTESIAN
+    uvw.bc(m).add( BndCnd( Dir::imax(), BndType::symmetry() ) );
+#else
+    uvw.bc(m).add( BndCnd( Dir::imax(), BndType::neumann() ) );
+#endif
+    uvw.bc(m).add( BndCnd( Dir::kmin(), BndType::periodic() ) );
+    uvw.bc(m).add( BndCnd( Dir::kmax(), BndType::periodic() ) );
+#ifdef USE_FULL
+    uvw.bc(m).add( BndCnd( Dir::jmin(), BndType::periodic() ) );
+    uvw.bc(m).add( BndCnd( Dir::jmax(), BndType::periodic() ) );
+#else
+    uvw.bc(m).add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
+    uvw.bc(m).add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
+#endif
+  }
+
+  c.bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
+#ifdef USE_CARTESIAN
+  c.bc().add( BndCnd( Dir::imax(), BndType::symmetry() ) );
+#else
+  c.bc().add( BndCnd( Dir::imax(), BndType::neumann() ) );
+#endif
+  c.bc().add( BndCnd( Dir::kmin(), BndType::periodic() ) );
+  c.bc().add( BndCnd( Dir::kmax(), BndType::periodic() ) );
+#ifdef USE_FULL
+  c.bc().add( BndCnd( Dir::jmin(), BndType::periodic() ) );
+  c.bc().add( BndCnd( Dir::jmax(), BndType::periodic() ) );
+#else
+  c.bc().add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
+  c.bc().add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
+#endif
+
+  g=c.shape();
+  kappa=c.shape();
+  cold=c.shape();
+  cold2=c.shape();
+
+  Matter air(d), water(d);
+  air  .mu    (1.0000e-5);
+  air  .rho   (1.2500e+0);
+  water.mu    (1.0000e-3);
+  water.rho   (1.0000e+3);
+
+  Matter mixed(water, air, &c);
+  mixed.sigma (0.07);
+
+  /*-------------------+
+  |  time-integration  |
+  +-------------------*/
+  const real dt = 1.0;
+  const real ttot = 10.;
+  Times time(ttot,dt);
+
+  boil::oout<<"Times= "<<dt<<ttot<<" "<<time.total_steps()<<boil::endl;
+
+  /*----------------+
+  |  linear solver  |
+  +----------------*/
+  Krylov * solver = new CG(d, Prec::ic2());
+
+#ifdef USE_CARTESIAN
+  VOF conc(c, g, kappa, uvw, time, solver);
+  conc.set_normal_vector_method_all(NormMethod::ElviraXZ());
+#else
+  VOFaxisym conc(c, g, kappa, uvw, time, solver);
+#endif
+
+  real deta = 2.25;0.75;0.25;
+  deta *= DX;
+  //boil::setup_square_xz(conc,cold2,deta,LZ-deta,
+  boil::setup_square_xz(conc,cold2,LX/2.+deta,LZ-deta,
+                        0.,LX/2.-2.*deta);
+  cold = conc.color();
+#if 0
+  boil::setup_square_xz(conc,cold2,LX/2.-Rlo,LZ/2.+Rlo,
+                        0.,2.*Rlo);
+  cold -= conc.color();
+  for_avijk(cold2,i,j,k) {
+    cold2[i][j][k] = - cold2[i][j][k];
+  }
+  cold += cold2;
+#endif
+  cold.bnd_update();
+  cold.exchange_all();
+
+  conc.color_to_vf(cold,c);
+  conc.color_to_vf(cold,cold2);
+
+  conc.ancillary();
+  conc.totalvol();
+  conc.color_minmax();
+
+  c.bnd_update();
+  c.exchange_all();
+
+  boil::plot->plot(uvw,c,conc.color(), "uvw-c-clr", 0);
+  
+  //exit(0);
+  Comp m = Comp::i();
+  for_avijk(c,i,j,k) {
+    if(j==boil::BW&&k==boil::BW+NZ/4+NZ/2)
+      boil::oout<<i<<" "<<k<<" | "<<conc.color()[i][j][k]<<" "<<c.xc(i)<<" |"
+                <<" "<<conc.topo->get_fs()[m][i][j][k]<<" "<<conc.topo->get_fs()[m][i+1][j][k]<<" "
+                <<boil::endl;
+  }
+
+  boil::oout << "finished" << boil::endl;
+
+  boil::timer.stop();
+  boil::timer.report();
+}

@@ -12,7 +12,7 @@ void VOF::ev_project(const ScalarInt & pflag, const Matter * fluid,
   int pfm, pfp;
 
   m = Comp::u();
-  if(ifull)
+  if(bflag_struct.ifull)
     for_vmijk(u,m,i,j,k) {
       pfm = abs(pflag[i-1][j][k]);
       pfp = abs(pflag[i  ][j][k]);
@@ -24,7 +24,7 @@ void VOF::ev_project(const ScalarInt & pflag, const Matter * fluid,
     }
 
   m = Comp::v();
-  if(jfull)
+  if(bflag_struct.jfull)
     for_vmijk(u,m,i,j,k) {
       pfm = abs(pflag[i][j-1][k]);
       pfp = abs(pflag[i][j  ][k]);
@@ -36,7 +36,7 @@ void VOF::ev_project(const ScalarInt & pflag, const Matter * fluid,
     }
 
   m = Comp::w();
-  if(kfull)
+  if(bflag_struct.kfull)
     for_vmijk(u,m,i,j,k) {
       pfm = abs(pflag[i][j][k-1]);
       pfp = abs(pflag[i][j][k  ]);

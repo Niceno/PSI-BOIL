@@ -9,9 +9,6 @@ void Heaviside::fs_bnd_nosubgrid(const Scalar & scp, Vector & fs,
 *                    to cell boundaries!!!
 ******************************************************************************/
 
-  /* tolerance is necessary because of errors */
-  real tolf = 0.0e-2;
-
   for( int b=0; b<scp.bc().count(); b++ ) {
 
     if( scp.bc().type_decomp(b) ) continue;

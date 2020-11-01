@@ -71,15 +71,15 @@ void VOF::curv_HF() {
     if(dom->ibody().on(i,j,k)) {
 #if 0 /* no longer necessary! */
       /* exclude near-wall cells: treated specially */
-      if(   (i==si() && iminw) || (i==ei() && imaxw)
-         || (j==sj() && jminw) || (j==ej() && jmaxw)
-         || (k==sk() && kminw) || (k==ek() && kmaxw)
+      if(   (i==si() && bflag_struct.iminw) || (i==ei() && bflag_struct.imaxw)
+         || (j==sj() && bflag_struct.jminw) || (j==ej() && bflag_struct.jmaxw)
+         || (k==sk() && bflag_struct.kminw) || (k==ek() && bflag_struct.kmaxw)
          || dom->ibody().off(i-1,j,k) || dom->ibody().off(i+1,j,k)
          || dom->ibody().off(i,j-1,k) || dom->ibody().off(i,j+1,k)
          || dom->ibody().off(i,j,k-1) || dom->ibody().off(i,j,k+1)
-         || (i==si()+1 && iminw) || (i==ei()-1 && imaxw)
-         || (j==sj()+1 && jminw) || (j==ej()-1 && jmaxw)
-         || (k==sk()+1 && kminw) || (k==ek()-1 && kmaxw)
+         || (i==si()+1 && bflag_struct.iminw) || (i==ei()-1 && bflag_struct.imaxw)
+         || (j==sj()+1 && bflag_struct.jminw) || (j==ej()-1 && bflag_struct.jmaxw)
+         || (k==sk()+1 && bflag_struct.kminw) || (k==ek()-1 && bflag_struct.kmaxw)
          || dom->ibody().off(i-2,j,k) || dom->ibody().off(i+2,j,k)
          || dom->ibody().off(i,j-2,k) || dom->ibody().off(i,j+2,k)
          || dom->ibody().off(i,j,k-2) || dom->ibody().off(i,j,k+2)
@@ -138,7 +138,7 @@ void VOF::curv_HF() {
       }
 
       if(mMax==Comp::i()) {
-        if(!ifull) {
+        if(!bflag_struct.ifull) {
           boil::oout<<"Curv_HF: Pseudo direction selected at "<<i<<" "<<j<<" "
                     <<k<<" with mMax="<<mMax<<" ; exiting."<<boil::endl;
           exit(0);
@@ -149,19 +149,19 @@ void VOF::curv_HF() {
         int imax= mof;  /* normal stencil size 2*mof+1 */
 
         /* limit stencil size for cut-stencil */
-        if(iminc) imin=std::max(-mof,si()-i);
-        if(imaxc) imax=std::min( mof,ei()-i);
+        if(bflag_struct.iminc) imin=std::max(-mof,si()-i);
+        if(bflag_struct.imaxc) imax=std::min( mof,ei()-i);
 
         /* because of ghost grid in solid/walls */
         int imin_grid = imin;
         int imax_grid = imax;
         
         /* update at walls */
-        if( iminw && -mof<si()-i ) {
+        if( bflag_struct.iminw && -mof<si()-i ) {
           imin = si()-i-1;
           imin_grid = imin+1;
         }
-        if( imaxw &&  mof>ei()-i ) {
+        if( bflag_struct.imaxw &&  mof>ei()-i ) {
           imax = ei()-i+1;
           imax_grid = imax-1;
         }
@@ -217,12 +217,12 @@ void VOF::curv_HF() {
                        imin,imax,
                        phi.dys(j),phi.dyc(j),phi.dyn(j),
                        phi.dzb(k),phi.dzc(k),phi.dzt(k),
-                       max_n,jfull,kfull,
+                       max_n,bflag_struct.jfull,bflag_struct.kfull,
                        kappa[i][j][k],tempflag[i][j][k]);
                        //i,j,k);
 
       } else if(mMax==Comp::j()) {
-        if(!jfull) {
+        if(!bflag_struct.jfull) {
           boil::oout<<"Curv_HF: Pseudo direction selected at "<<i<<" "<<j<<" "
                     <<k<<" with mMax="<<mMax<<" ; exiting."<<boil::endl;
           exit(0);
@@ -233,19 +233,19 @@ void VOF::curv_HF() {
         int jmax= mof;  /* normal stencil size 2*mof+1 */
 
         /* limit stencil size for cut-stencil */
-        if(jminc) jmin=std::max(-mof,sj()-j);
-        if(jmaxc) jmax=std::min( mof,ej()-j);
+        if(bflag_struct.jminc) jmin=std::max(-mof,sj()-j);
+        if(bflag_struct.jmaxc) jmax=std::min( mof,ej()-j);
 
         /* because of ghost grid in solid/walls */
         int jmin_grid = jmin;
         int jmax_grid = jmax;
         
         /* update at walls */
-        if( jminw && -mof<sj()-j ) {
+        if( bflag_struct.jminw && -mof<sj()-j ) {
           jmin = sj()-j-1;
           jmin_grid = jmin+1;
         }
-        if( jmaxw &&  mof>ej()-j ) {
+        if( bflag_struct.jmaxw &&  mof>ej()-j ) {
           jmax = ej()-j+1;
           jmax_grid = jmax-1;
         }
@@ -301,12 +301,12 @@ void VOF::curv_HF() {
                        jmin,jmax,
                        phi.dxw(i),phi.dxc(i),phi.dxe(i),
                        phi.dzb(k),phi.dzc(k),phi.dzt(k),
-                       max_n,ifull,kfull,
+                       max_n,bflag_struct.ifull,bflag_struct.kfull,
                        kappa[i][j][k],tempflag[i][j][k]);
                        //i,j,k);
 
       } else { 
-        if(!kfull) {
+        if(!bflag_struct.kfull) {
           boil::oout<<"Curv_HF: Pseudo direction selected at "<<i<<" "<<j<<" "
                     <<k<<" with mMax="<<mMax<<" ; exiting."<<boil::endl;
           exit(0);
@@ -317,19 +317,19 @@ void VOF::curv_HF() {
         int kmax= mof;  /* normal stencil size 2*mof+1 */ 
 
         /* limit stencil size for cut-stencil */
-        if(kminc) kmin=std::max(-mof,sk()-k);
-        if(kmaxc) kmax=std::min( mof,ek()-k);
+        if(bflag_struct.kminc) kmin=std::max(-mof,sk()-k);
+        if(bflag_struct.kmaxc) kmax=std::min( mof,ek()-k);
 
         /* because of ghost grid in solid/walls */
         int kmin_grid = kmin;
         int kmax_grid = kmax;
         
         /* update at walls */
-        if( kminw && -mof<sk()-k ) {
+        if( bflag_struct.kminw && -mof<sk()-k ) {
           kmin = sk()-k-1;
           kmin_grid = kmin+1;
         }
-        if( kmaxw &&  mof>ek()-k ) {
+        if( bflag_struct.kmaxw &&  mof>ek()-k ) {
           kmax = ek()-k+1;
           kmax_grid = kmax-1;
         }
@@ -385,7 +385,7 @@ void VOF::curv_HF() {
                        kmin,kmax,
                        phi.dxw(i),phi.dxc(i),phi.dxe(i),
                        phi.dys(j),phi.dyc(j),phi.dyn(j),
-                       max_n,ifull,jfull,
+                       max_n,bflag_struct.ifull,bflag_struct.jfull,
                        kappa[i][j][k],tempflag[i][j][k]);
                        //i,j,k);
 

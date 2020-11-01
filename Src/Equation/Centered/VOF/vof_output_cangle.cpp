@@ -48,7 +48,7 @@ void VOF::output_cangle_2d(const Scalar & scp,
     if(!ranged||ridx.contains(scp.domain()->global_I(i)-boil::BW+1)) {
       for_jk(j,k) {
         if(dom->ibody().on(i,j,k)) {
-          if(dom->ibody().off(i,j,k-1) || (k==sk() && kminw)) {
+          if(dom->ibody().off(i,j,k-1) || (k==sk() && bflag_struct.kminw)) {
             h0 += (mult_wall < 0 ? (1.-scp[i][j][k  ]) : scp[i][j][k  ]) * scp.dxc(i);
             h1 += (mult_wall < 0 ? (1.-scp[i][j][k+1]) : scp[i][j][k+1]) * scp.dxc(i);
             h2 += (mult_wall < 0 ? (1.-scp[i][j][k+2]) : scp[i][j][k+2]) * scp.dxc(i);
