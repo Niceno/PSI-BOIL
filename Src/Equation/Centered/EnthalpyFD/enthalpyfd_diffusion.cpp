@@ -247,8 +247,8 @@ void EnthalpyFD::diffusion(const Scalar * diff_eddy) {
                   , i, j, k, m);
   
         fold[i][j][k] -= tsc * ac*tc;
-        fold[i][j][k] += aflagm ? tsc * am*tm : 0.0;
-        fold[i][j][k] += aflagp ? tsc * ap*tp : 0.0;
+        fold[i][j][k] += tsc * am*tm;
+        fold[i][j][k] += tsc * ap*tp;
         fold[i][j][k] += tsc * sourceterm;
       } /* ijk */
     } /* m */

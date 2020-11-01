@@ -1,7 +1,7 @@
 #include "momentum.h"
 //#define TWODXY
 #define TWODXZ
-//#define AXISYM
+#define AXISYM
 #define SYM
 
 /******************************************************************************/

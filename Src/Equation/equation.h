@@ -31,7 +31,7 @@ class Equation {
 
     virtual void discretize(const Scalar * diff_eddy = NULL) = 0;
 
-    void diffusion_set (const TimeScheme & ts) {diff_ts = ts; discretize();}
+    virtual void diffusion_set (const TimeScheme & ts) {diff_ts = ts; discretize();}
     void convection_set(const TimeScheme & ts) {conv_ts = ts;}
     void convection_set(const ConvScheme & cs) {lim.set(cs);}
 
