@@ -12,6 +12,7 @@
   TwoLevelScalar f(d);                           /* pressure src */
   TwoLevelScalar csub(d);                        /* heater color */
   TwoLevelScalar tpr(d), q(d);                   /* temperature */
+  TwoLevelScalar tprap1(d), tprap2(d), tprold(d);/* temperature */
   TwoLevelScalar mdot(d), mflx(d);               /* phase-change rate */
 
   /*-----------------------------+
@@ -67,4 +68,10 @@
     l->bc().add( BndCnd( Dir::kmax(), BndType::dirichlet(),tout) );
     l->bc().add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
     l->bc().add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
+  }
+
+  for_coarsefine(l) {
+    tprap1[l] = tpr[l].shape();
+    tprap2[l] = tpr[l].shape();
+    tprold[l] = tpr[l].shape();
   }

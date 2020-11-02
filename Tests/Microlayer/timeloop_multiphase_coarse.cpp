@@ -168,9 +168,34 @@
     /*------------------------+
     |  solve energy equation  |
     +------------------------*/
+    tprold.coarse = tpr.coarse;
+#if 0
     enthFD_coarse.discretize();
     enthFD_coarse.new_time_step();
     enthFD_coarse.solve(ResRat(1e-16),"enthFD");
+#else
+    enthFD_coarse.discretize();
+    //enthFD_coarse.new_time_step();
+    for(int i(0); i<3;++i) {
+      for(int j(0); j<3;++j) {
+        enthFD_coarse.convective_time_step(tprold.coarse);
+        if(j==0) {
+          tprap1.coarse = tpr.coarse;
+        } else {
+          tpr.coarse = (tprap1.coarse+tpr.coarse);
+          tpr.coarse /= 2.;
+        }
+      }
+      enthFD_coarse.inertial(tpr.coarse,false,Old::no);
+      enthFD_coarse.solve(ResRat(1e-16));
+      if(i==0) {
+        tprap2.coarse = tpr.coarse;
+      } else {
+        tpr.coarse = (tprap2.coarse+tpr.coarse);
+        tpr.coarse /= 2.;
+      }
+    }
+#endif
 
     /*-------------+
     |  dt control  |
