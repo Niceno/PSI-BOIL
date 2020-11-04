@@ -14,14 +14,31 @@ inline real rhov(const int i, const int j, const int k) const {
   return val_rhov;
 }
 inline real lambdal(const int i, const int j, const int k,
-                    const Scalar * diff_eddy) const {
+                    const Scalar * diff_eddy = NULL) const {
   return diff_eddy ? val_lambdal + (*diff_eddy)[i][j][k]*val_cpl/val_rhol/turbP
                    : val_lambdal;
 }
 inline real lambdav(const int i, const int j, const int k,
-                    const Scalar * diff_eddy) const {
+                    const Scalar * diff_eddy = NULL) const {
   return diff_eddy ? val_lambdav + (*diff_eddy)[i][j][k]*val_cpv/val_rhov/turbP
                    : val_lambdav;
+}
+
+/***************************************************************************//**
+ * Heat transfer resistance and wall source
+******************************************************************************/
+inline real int_resistance_liq(const int i, const int j, const int k) const {
+  return int_resistance_liq_val;
+}
+inline real int_resistance_vap(const int i, const int j, const int k) const {
+  return int_resistance_vap_val;
+}
+inline real wall_resistance(const int i, const int j, const int k) const {
+  return wall_resistance_val;
+}
+
+inline real dirac_wall_source(const int i, const int j, const int k) const {
+  return dirac_wall_source_val;
 }
 
 /***************************************************************************//**
@@ -117,12 +134,45 @@ inline void set_turbP(const real a) {
   boil::oout<<"CommonHeatTransfer::turbP= "<<turbP<<"\n";
 }
 
-/* units [m] */
-inline real get_resistance_equivalent() const { return resistance_equivalent; }
-inline void set_resistance_equivalent(const real re) {
-  resistance_equivalent = re;
-  boil::oout<<"CommonHeatTransfer::resistance_equivalent= "<<re<<"\n";
+/* units W/m2 */
+inline real get_dirac_wall_source() const { return dirac_wall_source_val; }
+inline void set_dirac_wall_source(const real a) {
+  dirac_wall_source_val = a;
+  boil::oout<<"CommonHeatTransfer::dirac_wall_source= "
+            <<dirac_wall_source_val<<"\n";
 }
+
+/* units [K/(W/m^2)] = [m/(W/mK)] */
+inline real get_int_resistance_vap() const { 
+  return int_resistance_vap_val;
+}
+inline real get_int_resistance_liq() const { 
+  return int_resistance_liq_val;
+}
+inline void set_int_resistance(const real re) {
+  int_resistance_vap_val = re;
+  int_resistance_liq_val = re;
+  boil::oout<<"CommonHeatTransfer::int_resistance= "<<re<<"\n";
+}
+inline void set_int_resistance_vap(const real re) {
+  int_resistance_vap_val = re;
+  boil::oout<<"CommonHeatTransfer::int_resistance_vap= "
+            <<re<<"\n";
+}
+inline void set_int_resistance_liq(const real re) {
+  int_resistance_liq_val = re;
+  boil::oout<<"CommonHeatTransfer::int_resistance_liq= "
+            <<re<<"\n";
+}
+inline real get_wall_resistance() const {
+  return wall_resistance_val;
+}
+inline void set_wall_resistance(const real re) {
+  wall_resistance_val = re;
+  boil::oout<<"CommonHeatTransfer::wall_resistance= "<<re<<"\n";
+}
+
+/**************************/
 
 inline void init(const Scalar * diff_eddy = NULL) { new_time_step(diff_eddy); }
 inline void new_time_step(const Scalar * diff_eddy = NULL) { 

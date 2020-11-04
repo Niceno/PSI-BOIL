@@ -56,11 +56,14 @@
   const real lambdaheat = 17.;
 #endif
 
+  /* ghost distance */
   /* HT resistance */
-  real resist(0);
-  if(use_ht_resistance) {
-    resist = Schrage::calculate_heat_transfer_resistance(tsat0_K,rhov,Mv,latent);
-  }
+  real resistance_liq(0.0);
+  real accomult = 2.*accommodation/(2.-accommodation);
+  if(accommodation>0.0) {
+    resistance_liq = Schrage::calculate_heat_transfer_resistance(tsat0_K,rhov,Mv,latent)
+                   /(accomult*0.5);
+  } 
 
   /*----------------------+
   |  physical properties  |

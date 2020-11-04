@@ -13,28 +13,28 @@ void PhaseChange4::dirac_source_terms() {
      for_ijk(i,j,k) {
        if(dom->ibody().off(i,j,k)) {
          if(dom->ibody().on(i-1,j,k)) {
-           txv[i][j][k] += cht.heat_transfer_wall_model().dirac_wall_source;
-           txl[i][j][k] += cht.heat_transfer_wall_model().dirac_wall_source;
+           txv[i][j][k] += cht.dirac_wall_source(i-1,j,k);
+           txl[i][j][k] += cht.dirac_wall_source(i-1,j,k);
          }
          if(dom->ibody().on(i+1,j,k)) {
-           txv[i][j][k] -= cht.heat_transfer_wall_model().dirac_wall_source;
-           txl[i][j][k] -= cht.heat_transfer_wall_model().dirac_wall_source;
+           txv[i][j][k] -= cht.dirac_wall_source(i+1,j,k);
+           txl[i][j][k] -= cht.dirac_wall_source(i+1,j,k);
          }
          if(dom->ibody().on(i,j-1,k)) {
-           tyv[i][j][k] += cht.heat_transfer_wall_model().dirac_wall_source;
-           tyl[i][j][k] += cht.heat_transfer_wall_model().dirac_wall_source;
+           tyv[i][j][k] += cht.dirac_wall_source(i,j-1,k);
+           tyl[i][j][k] += cht.dirac_wall_source(i,j-1,k);
          }
          if(dom->ibody().on(i,j+1,k)) {
-           tyv[i][j][k] -= cht.heat_transfer_wall_model().dirac_wall_source;
-           tyl[i][j][k] -= cht.heat_transfer_wall_model().dirac_wall_source;
+           tyv[i][j][k] -= cht.dirac_wall_source(i,j+1,k);
+           tyl[i][j][k] -= cht.dirac_wall_source(i,j+1,k);
          }
          if(dom->ibody().on(i,j,k-1)) {
-           tzv[i][j][k] += cht.heat_transfer_wall_model().dirac_wall_source;
-           tzl[i][j][k] += cht.heat_transfer_wall_model().dirac_wall_source;
+           tzv[i][j][k] += cht.dirac_wall_source(i,j,k-1);
+           tzl[i][j][k] += cht.dirac_wall_source(i,j,k-1);
          }
          if(dom->ibody().on(i,j,k+1)) {
-           tzv[i][j][k] -= cht.heat_transfer_wall_model().dirac_wall_source;
-           tzl[i][j][k] -= cht.heat_transfer_wall_model().dirac_wall_source;
+           tzv[i][j][k] -= cht.dirac_wall_source(i,j,k+1);
+           tzl[i][j][k] -= cht.dirac_wall_source(i,j,k+1);
          }
        } /* center off */
      } /* ijk */

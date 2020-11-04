@@ -1,21 +1,24 @@
     inline int get_accuracy_order() const { return accuracy_order.eval(); }
     inline void set_accuracy_order(const int ao) {
       accuracy_order = AccuracyOrder(ao);
-      boil::oout<<"PhaseChange4::accuracy_order= "
-                <<ao<<"\n";
+      if(!boil::cart.iam())
+        boil::oout<<"PhaseChange4::accuracy_order= "
+                  <<ao<<"\n";
     }
     inline void set_accuracy_order(const AccuracyOrder ao) {
       accuracy_order = ao;
-      boil::oout<<"PhaseChange4::accuracy_order= "
-                <<ao<<"\n";
+      if(!boil::cart.iam())
+        boil::oout<<"PhaseChange4::accuracy_order= "
+                  <<ao<<"\n";
     }
     inline void set_second_order_accuracy(const bool flag) {
       if(flag)
         accuracy_order = AccuracyOrder::Second();
       else
         accuracy_order = AccuracyOrder::First();
-      boil::oout<<"PhaseChange4::accuracy_order= "
-                <<accuracy_order<<"\n";
+      if(!boil::cart.iam())
+        boil::oout<<"PhaseChange4::accuracy_order= "
+                  <<accuracy_order<<"\n";
     }
  
     inline bool get_extrapolation_flag() const {

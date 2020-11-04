@@ -9,8 +9,8 @@
 /* this is a comment from some time ago:
  * using FDM worsens the performance. Also, for FDM, the correct BndGrid for
  * Neumann boundary condition is extrapolate, rather than wall */
-//#define USE_FDM_SOLID
-//#define USE_FDM_FLUID
+#define USE_FDM_SOLID
+#define USE_FDM_FLUID
 
 /*--- related to convection construction  ---*/
 #define USE_FDM_CONVECTION

@@ -27,7 +27,6 @@ EnthalpyFD::EnthalpyFD(const Scalar & PHI,
 {
   assert(PHI.domain() == F.domain());
   assert(PHI.domain() == U.domain());
-  epsl=1.0e-2; /* this appears in diff_matrix but should not play a role */
   laminar=true;
   ao_conv = AccuracyOrder::Second();
 

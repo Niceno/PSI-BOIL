@@ -6,7 +6,9 @@ void CommonHeatTransfer::calculate_node_temperature(const Scalar * diff_eddy) {
 *  \brief calculate node temperature at the solid/fluid boundary 
 *******************************************************************************/
   for_m(m)
-    bndtpr(m) = boil::unreal;
+    bndtpr_flu(m) = boil::unreal;
+  for_m(m)
+    bndtpr_sol(m) = boil::unreal;
 
   /*--------------+
   | immersed body |
@@ -31,20 +33,27 @@ void CommonHeatTransfer::calculate_node_temperature(const Scalar * diff_eddy) {
       real len_2 = 0.5*tpr.dxc(i-1);
 
       real res_1 = len_1/lam_1;
-      real res_2 = len_2/lam_2;
+      real res_2a = len_2/lam_2;
+      real res_2b = wall_resistance(i,j,k);
+      real res_2 = res_2a + res_2b;
+      real qmult = res_2a / res_2;
 
       /* inversion of fluid due to existence of interface */
       if(interface(Sign::neg(),m,i,j,k)) {
          lam_1 = lambda_inv(i,j,k,diff_eddy);
          //len_1 -= distance_int_x(Sign::neg(),i,j,k,tpr_1);
          len_1 = distance_int_x(Sign::pos(),i-1,j,k,tpr_1)-len_2;
-         res_1 = len_1/lam_1 + htwallmodel->near_wall_resist;
+         res_1 = len_1/lam_1;
       }
 
-      bndtpr[m][i][j][k] = temperature_node(
-                                htwallmodel->dirac_wall_source,
-                                res_1, tpr_1,
-                                res_2, tpr_2);
+      bndtpr_flu[m][i][j][k] = temperature_node(
+                                 dirac_wall_source(i,j,k)*qmult,
+                                 res_1, tpr_1,
+                                 res_2, tpr_2);
+      bndtpr_sol[m][i][j][k] = temperature_node(
+                                 dirac_wall_source(i,j,k),
+                                 res_2b, bndtpr_flu[m][i][j][k],
+                                 res_2a, tpr_2);
 
     }
 
@@ -60,20 +69,27 @@ void CommonHeatTransfer::calculate_node_temperature(const Scalar * diff_eddy) {
       real len_2 = 0.5*tpr.dxc(i+1);
 
       real res_1 = len_1/lam_1;
-      real res_2 = len_2/lam_2;
+      real res_2a = len_2/lam_2;
+      real res_2b = wall_resistance(i,j,k);
+      real res_2 = res_2a + res_2b;
+      real qmult = res_2a / res_2;
 
       /* inversion of fluid due to existence of interface */
       if(interface(Sign::pos(),m,i,j,k)) {
          lam_1 = lambda_inv(i,j,k,diff_eddy);
          //len_1 -= distance_int_x(Sign::pos(),i,j,k,tpr_1);
          len_1 = distance_int_x(Sign::neg(),i+1,j,k,tpr_1)-len_2;
-         res_1 = len_1/lam_1 + htwallmodel->near_wall_resist;
+         res_1 = len_1/lam_1;
       }
 
-      bndtpr[m][i+1][j][k] = temperature_node(
-                                  htwallmodel->dirac_wall_source,
-                                  res_1, tpr_1,
-                                  res_2, tpr_2);
+      bndtpr_flu[m][i+1][j][k] = temperature_node(
+                                   dirac_wall_source(i,j,k)*qmult,
+                                   res_1, tpr_1,
+                                   res_2, tpr_2);
+      bndtpr_sol[m][i+1][j][k] = temperature_node(
+                                   dirac_wall_source(i,j,k),
+                                   res_2b, bndtpr_flu[m][i+1][j][k],
+                                   res_2a, tpr_2);
 
     }
 
@@ -91,20 +107,27 @@ void CommonHeatTransfer::calculate_node_temperature(const Scalar * diff_eddy) {
       real len_2 = 0.5*tpr.dyc(j-1);
 
       real res_1 = len_1/lam_1;
-      real res_2 = len_2/lam_2;
+      real res_2a = len_2/lam_2;
+      real res_2b = wall_resistance(i,j,k);
+      real res_2 = res_2a + res_2b;
+      real qmult = res_2a / res_2;
 
       /* inversion of fluid due to existence of interface */
       if(interface(Sign::neg(),m,i,j,k)) {
          lam_1 = lambda_inv(i,j,k,diff_eddy);
          //len_1 -= distance_int_y(Sign::neg(),i,j,k,tpr_1);
          len_1 = distance_int_y(Sign::pos(),i,j-1,k,tpr_1)-len_2;
-         res_1 = len_1/lam_1 + htwallmodel->near_wall_resist;
+         res_1 = len_1/lam_1;
       }
 
-      bndtpr[m][i][j][k] = temperature_node(
-                                htwallmodel->dirac_wall_source,
-                                res_1, tpr_1,
-                                res_2, tpr_2);
+      bndtpr_flu[m][i][j][k] = temperature_node(
+                                 dirac_wall_source(i,j,k)*qmult,
+                                 res_1, tpr_1,
+                                 res_2, tpr_2);
+      bndtpr_sol[m][i][j][k] = temperature_node(
+                                 dirac_wall_source(i,j,k),
+                                 res_2b, bndtpr_flu[m][i][j][k],
+                                 res_2a, tpr_2);
 
     }
 
@@ -120,20 +143,27 @@ void CommonHeatTransfer::calculate_node_temperature(const Scalar * diff_eddy) {
       real len_2 = 0.5*tpr.dyc(j+1);
 
       real res_1 = len_1/lam_1;
-      real res_2 = len_2/lam_2;
+      real res_2a = len_2/lam_2;
+      real res_2b = wall_resistance(i,j,k);
+      real res_2 = res_2a + res_2b;
+      real qmult = res_2a / res_2;
 
       /* inversion of fluid due to existence of interface */
       if(interface(Sign::pos(),m,i,j,k)) {
          lam_1 = lambda_inv(i,j,k,diff_eddy);
          //len_1 -= distance_int_y(Sign::pos(),i,j,k,tpr_1);
          len_1 = distance_int_y(Sign::neg(),i,j+1,k,tpr_1)-len_2;
-         res_1 = len_1/lam_1 + htwallmodel->near_wall_resist;
+         res_1 = len_1/lam_1;
       }
 
-      bndtpr[m][i][j+1][k] = temperature_node(
-                                  htwallmodel->dirac_wall_source,
-                                  res_1, tpr_1,
-                                  res_2, tpr_2);
+      bndtpr_flu[m][i][j+1][k] = temperature_node(
+                                   dirac_wall_source(i,j,k)*qmult,
+                                   res_1, tpr_1,
+                                   res_2, tpr_2);
+      bndtpr_sol[m][i][j+1][k] = temperature_node(
+                                   dirac_wall_source(i,j,k),
+                                   res_2b, bndtpr_flu[m][i][j+1][k],
+                                   res_2a, tpr_2);
 
     }
 
@@ -151,20 +181,27 @@ void CommonHeatTransfer::calculate_node_temperature(const Scalar * diff_eddy) {
       real len_2 = 0.5*tpr.dzc(k-1);
 
       real res_1 = len_1/lam_1;
-      real res_2 = len_2/lam_2;
+      real res_2a = len_2/lam_2;
+      real res_2b = wall_resistance(i,j,k);
+      real res_2 = res_2a + res_2b;
+      real qmult = res_2a / res_2;
 
       /* inversion of fluid due to existence of interface */
       if(interface(Sign::neg(),m,i,j,k)) {
          lam_1 = lambda_inv(i,j,k,diff_eddy);
          //len_1 -= distance_int_z(Sign::neg(),i,j,k,tpr_1);
          len_1 = distance_int_z(Sign::pos(),i,j,k-1,tpr_1)-len_2;
-         res_1 = len_1/lam_1 + htwallmodel->near_wall_resist;
+         res_1 = len_1/lam_1;
       }
 
-      bndtpr[m][i][j][k] = temperature_node(
-                                htwallmodel->dirac_wall_source,
-                                res_1, tpr_1,
-                                res_2, tpr_2);
+      bndtpr_flu[m][i][j][k] = temperature_node(
+                                 dirac_wall_source(i,j,k)*qmult,
+                                 res_1, tpr_1,
+                                 res_2, tpr_2);
+      bndtpr_sol[m][i][j][k] = temperature_node(
+                                 dirac_wall_source(i,j,k),
+                                 res_2b, bndtpr_flu[m][i][j][k],
+                                 res_2a, tpr_2);
 
     }
 
@@ -180,20 +217,27 @@ void CommonHeatTransfer::calculate_node_temperature(const Scalar * diff_eddy) {
       real len_2 = 0.5*tpr.dzc(k+1);
 
       real res_1 = len_1/lam_1;
-      real res_2 = len_2/lam_2;
+      real res_2a = len_2/lam_2;
+      real res_2b = wall_resistance(i,j,k);
+      real res_2 = res_2a + res_2b;
+      real qmult = res_2a / res_2;
 
       /* inversion of fluid due to existence of interface */
       if(interface(Sign::pos(),m,i,j,k)) {
          lam_1 = lambda_inv(i,j,k,diff_eddy);
          //len_1 -= distance_int_z(Sign::pos(),i,j,k,tpr_1);
          len_1 = distance_int_z(Sign::neg(),i,j,k+1,tpr_1)-len_2;
-         res_1 = len_1/lam_1 + htwallmodel->near_wall_resist;
+         res_1 = len_1/lam_1;
       }
 
-      bndtpr[m][i][j][k+1] = temperature_node(
-                                  htwallmodel->dirac_wall_source,
-                                  res_1, tpr_1,
-                                  res_2, tpr_2);
+      bndtpr_flu[m][i][j][k+1] = temperature_node(
+                                   dirac_wall_source(i,j,k)*qmult,
+                                   res_1, tpr_1,
+                                   res_2, tpr_2);
+      bndtpr_sol[m][i][j][k+1] = temperature_node(
+                                   dirac_wall_source(i,j,k),
+                                   res_2b, bndtpr_flu[m][i][j][k+1],
+                                   res_2a, tpr_2);
 
     }
 

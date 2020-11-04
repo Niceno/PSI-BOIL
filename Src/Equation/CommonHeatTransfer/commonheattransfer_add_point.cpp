@@ -44,10 +44,16 @@ bool CommonHeatTransfer::add_point(const int i0, const int j0, const int k0,
     /* directional choice */
     if(dir>0) {
       stencil.push_back( distance_face(dir,m,i0,j0,k0));
-      values.push_back(bndtpr[m][i1][j1][k1]);
+      if(is_solid)
+        values.push_back(bndtpr_sol[m][i1][j1][k1]);
+      else
+        values.push_back(bndtpr_flu[m][i1][j1][k1]);
     } else {
       stencil.push_back(-distance_face(dir,m,i0,j0,k0));
-      values.push_back(bndtpr[m][i0][j0][k0]);
+      if(is_solid)
+        values.push_back(bndtpr_sol[m][i0][j0][k0]);
+      else
+        values.push_back(bndtpr_flu[m][i0][j0][k0]);
     }
 
   /* neither interface, nor boundary */

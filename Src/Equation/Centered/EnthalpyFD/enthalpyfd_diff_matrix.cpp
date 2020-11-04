@@ -88,21 +88,16 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
 #endif
     } else if(onm && ofp){
 
-      real fact;
-      real resistm;
-
       /* f-s-s */
+      real fact;
+      real resist_f, resist_s;
+
+      /* fluid resistance */
       if(cht.interface(Sign::neg(),m,i,j,k)) {
         /* removed from system matrix */
         aflagm = false;
-        /* dxm,fdm are corrected to account for interface position */
         /* tm is changed to the saturation temperature */
-        fdm *= dxm;
-        dxm = cht.distance_int(Sign::neg(),m,i,j,k,tm);
-        real dxfull = dxm;
-        fdm /= dxm; 
-        fdm = std::max(fdm,epsl);
-        /* dxm is corrected */
+        real dxfull = cht.distance_int(Sign::neg(),m,i,j,k,tm);
         dxm = dxm * fdm;
         /* lambdaf is inverted */
         if(clm>0) {
@@ -110,15 +105,20 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
         } else {
           lm = llm;
         }
-        fact = resistance_multiplier(dxm,dxfull-dxm,lc,lm,
-                                     cht.heat_transfer_wall_model().near_wall_resist);
-        resistm = (dxfull-dxm)/lm + cht.heat_transfer_wall_model().near_wall_resist;
+        resist_f = (dxfull-dxm)/lm;
+        resist_s = dxm/lc;
+        resist_f += cht.wall_resistance(i-(m==Comp::i()),
+                                        j-(m==Comp::j()),
+                                        k-(m==Comp::k()));
       } else {
-        fdm = std::max(fdm,epsl);
-        resistm = (1.0-fdm)*dxm/lm;
+        resist_f = (1.0-fdm)*dxm/lm;
         dxm = dxm * fdm;
-        fact = fdm*lm/(fdm*lm+(1.0-fdm)*lc);
+        resist_s = dxm/lc;
+        resist_f += cht.wall_resistance(i-(m==Comp::i()),
+                                        j-(m==Comp::j()),
+                                        k-(m==Comp::k()));
       }
+      fact = resistance_multiplier(resist_s,resist_f);
 
 #ifdef USE_FDM_SOLID
       /* FDM */
@@ -132,28 +132,25 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
       ac = am + ap;
 #endif
       /* dirac source term */
-      sourceterm = cht.heat_transfer_wall_model().dirac_wall_source * am * resistm;
+      sourceterm = cht.dirac_wall_source(i-(m==Comp::i()),
+                                         j-(m==Comp::j()),
+                                         k-(m==Comp::k())) * am * resist_f;
 
 #ifdef DEBUG
       std::cout<<"f-s-s: "<<i<<" "<<j<<" "<<k<<" "<<am-ac+ap<<"\n";
 #endif
     } else if(ofm && onp){
 
-      real fact;
-      real resistp;
-
       /* s-s-f */
+      real fact;
+      real resist_f, resist_s;
+
+      /* fluid resistance */
       if(cht.interface(Sign::pos(),m,i,j,k)) {
         /* removed from system matrix */
         aflagp = false;
-        /* dxp,fdp are corrected to account for interface position */
         /* tp is changed to the saturation temperature */
-        fdp *= dxp;
-        dxp = cht.distance_int(Sign::pos(),m,i,j,k,tp);
-        real dxfull = dxp;
-        fdp /= dxp; 
-        fdp = std::max(fdp,epsl);
-        /* dxp is corrected */
+        real dxfull = cht.distance_int(Sign::pos(),m,i,j,k,tp);
         dxp = dxp * fdp;
         /* lambdaf is inverted */
         if(clp>0){
@@ -161,19 +158,24 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
         } else {
           lp = llp;
         }
-        fact = resistance_multiplier(dxp,dxfull-dxp,lc,lp,
-                                     cht.heat_transfer_wall_model().near_wall_resist);
-        resistp = (dxfull-dxp)/lp + cht.heat_transfer_wall_model().near_wall_resist;
-#ifdef DEBUG
-        boil::oout<<"fact: "<<i<<" "<<j<<" "<<k<<" "
-                  << fact<<" "<<fdp*lp/((1.0-fdp)*lc+fdp*lp)<<boil::endl;
-#endif
+        resist_f = (dxfull-dxp)/lp;
+        resist_s = dxp/lc;
+        resist_f += cht.wall_resistance(i+(m==Comp::i()),
+                                        j+(m==Comp::j()),
+                                        k+(m==Comp::k()));
       } else {
-        fdp = std::max(fdp,epsl);
-        resistp = (1.0-fdp)*dxp/lp;
+        resist_f = (1.0-fdp)*dxp/lp;
         dxp = dxp * fdp;
-        fact = fdp*lp/((1.0-fdp)*lc+fdp*lp);
+        resist_s = dxp/lc;
+        resist_f += cht.wall_resistance(i+(m==Comp::i()),
+                                        j+(m==Comp::j()),
+                                        k+(m==Comp::k()));
       }
+      fact = resistance_multiplier(resist_s,resist_f);
+#ifdef DEBUG
+      boil::oout<<"fact: "<<i<<" "<<j<<" "<<k<<" "
+                << fact<<" "<<fdp*lp/((1.0-fdp)*lc+fdp*lp)<<boil::endl;
+#endif
 
 #ifdef USE_FDM_SOLID
       /* FDM */
@@ -187,7 +189,9 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
       ac = am + ap;
 #endif
       /* dirac source term */
-      sourceterm = cht.heat_transfer_wall_model().dirac_wall_source * ap * resistp;
+      sourceterm = cht.dirac_wall_source(i+(m==Comp::i()),
+                                         j+(m==Comp::j()),
+                                         k+(m==Comp::k())) * ap * resist_f;
 
 #ifdef DEBUG
       std::cout<<"s-s-f: "<<i<<" "<<j<<" "<<k<<" "<<am-ac+ap<<"\n";
@@ -264,32 +268,31 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
         ap = lc * vol * (this->*coef_p)(dxm,dxp,x0);
         ac = am + ap;
       } else {
-        fdm = std::max(fdm,epsl);
-        real resistm = (1.0-fdm)*dxm/lm;
+        real resist_s = (1.0-fdm)*dxm/lm + cht.wall_resistance(i,j,k);
         dxm = dxm * fdm;
+        real resist_f = dxm/lc;
+        real fact = resistance_multiplier(resist_f,resist_s);
 #ifdef USE_FDM_FLUID /* now, finite difference is applied always, as in system_diffusive */
         /* FDM */
-        am = lc*vol*(this->*coef_m)(dxm,dxp,x0)*fdm*lm/(fdm*lm+(1.0-fdm)*lc);
-        ac = lc*vol*((this->*coef_m)(dxm,dxp,x0)+(this->*coef_p)(dxm,dxp,x0))
-           - lc*vol*(this->*coef_m)(dxm,dxp,x0)*(1.0-fdm)*lc/(fdm*lm+(1.0-fdm)*lc);
+        am = lc*vol*(this->*coef_m)(dxm,dxp,x0)*fact;
         ap = lc*vol*(this->*coef_p)(dxm,dxp,x0);
+        ac = am + ap;
 #else
         //if(!aflagp) {
         if(fabs(clc)<3) {
           /* FDM */
-          am = lc*vol*(this->*coef_m)(dxm,dxp,x0)*fdm*lm/(fdm*lm+(1.0-fdm)*lc);
-          ac = lc*vol*((this->*coef_m)(dxm,dxp,x0)+(this->*coef_p)(dxm,dxp,x0))
-             - lc*vol*(this->*coef_m)(dxm,dxp,x0)*(1.0-fdm)*lc/(fdm*lm+(1.0-fdm)*lc);
+          am = lc*vol*(this->*coef_m)(dxm,dxp,x0)*fact;
           ap = lc*vol*(this->*coef_p)(dxm,dxp,x0);
+          ac = am + ap;
         } else {
           /* FVM */
-          am = lc * aream / dxm * fdm * lm / (fdm*lm+(1.0-fdm)*lc);
+          am = lc * aream / dxm * fact;
           ap = 0.5 * (lc + lp) * areap / dxp;
           ac = am + ap;
         }
 #endif
         /* dirac source term */
-        sourceterm = cht.heat_transfer_wall_model().dirac_wall_source * am * resistm;
+        sourceterm = cht.dirac_wall_source(i,j,k) * am * resist_s;
       }
 #ifdef DEBUG
       std::cout<<"s-f-f: "<<i<<" "<<j<<" "<<k<<" "<<am-ac+ap<<"\n";
@@ -313,32 +316,31 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
         ap = lc * vol * (this->*coef_p)(dxm,dxp,x0);
         ac = am + ap;
       } else {
-        fdp = std::max(fdp,epsl);
-        real resistp = (1.0-fdp)*dxp/lp;
+        real resist_s = (1.0-fdp)*dxp/lp + cht.wall_resistance(i,j,k);
         dxp = dxp * fdp;
+        real resist_f = dxp/lc;
+        real fact = resistance_multiplier(resist_f,resist_s);
 #ifdef USE_FDM_FLUID /* now, finite difference is applied always, as in system_diffusive */
         /* FDM */
         am = lc*vol*(this->*coef_m)(dxm,dxp,x0);
-        ac = lc*vol*((this->*coef_m)(dxm,dxp,x0)+(this->*coef_p)(dxm,dxp,x0))
-           - lc*vol*(this->*coef_p)(dxm,dxp,x0)*(1.0-fdp)*lc/((1.0-fdp)*lc+fdp*lp);
-        ap = lc*vol*(this->*coef_p)(dxm,dxp,x0)*fdp*lp/((1.0-fdp)*lc+fdp*lp);
+        ap = lc*vol*(this->*coef_p)(dxm,dxp,x0)*fact;
+        ac = am + ap;
 #else
         //if(!aflagm) {
         if(fabs(clc)<3) {
           /* FVM */
           am = lc*vol*(this->*coef_m)(dxm,dxp,x0);
-          ac = lc*vol*((this->*coef_m)(dxm,dxp,x0)+(this->*coef_p)(dxm,dxp,x0))
-             - lc*vol*(this->*coef_p)(dxm,dxp,x0)*(1.0-fdp)*lc/((1.0-fdp)*lc+fdp*lp);
-          ap = lc*vol*(this->*coef_p)(dxm,dxp,x0)*fdp*lp/((1.0-fdp)*lc+fdp*lp);
+          ap = lc*vol*(this->*coef_p)(dxm,dxp,x0)*fact;
+          ac = am + ap;
         } else {
           /* FVM */
           am = 0.5 * (lc + lm) * aream / dxm;
-          ap = lc * areap / dxp * fdp * lp / (fdp*lp+(1.0-fdp)*lc);
+          ap = lc * areap / dxp * fact;
           ac = am + ap;
         }
 #endif
         /* dirac source term */
-        sourceterm = cht.heat_transfer_wall_model().dirac_wall_source * ap * resistp;
+        sourceterm = cht.dirac_wall_source(i,j,k) * ap * resist_s;
       }
 #ifdef DEBUG
       std::cout<<"f-f-s: "<<i<<" "<<j<<" "<<k<<" "<<am-ac+ap<<"\n";
@@ -361,8 +363,7 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
 /***************************************************************************//**
 * Effect of flux continuity 
 *******************************************************************************/
-inline real EnthalpyFD::resistance_multiplier(const real dx1, const real dx2,
-                                              const real l1, const real l2,
+inline real EnthalpyFD::resistance_multiplier(const real resistminus,
                                               const real resistplus) const {
-  return dx1/l1 / (dx1/l1 + dx2/l2 + resistplus);
+  return resistminus / (resistminus + resistplus);
 }

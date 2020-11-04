@@ -88,9 +88,7 @@ namespace boil {
                          const Range<int> RX, 
                          const Range<int> RZ = Range<int>(-1,-2),
                          const real subtract = -1.);
-  void output_wall_heat_transfer_xz(const Scalar & tpr,
-                                    const Vector & bndtpr,
-                                    const Matter & sol,
+  void output_wall_heat_transfer_xz(const CommonHeatTransfer & cht,
                                     std::ostream & otp, const int NX);
   void output_wall_heat_transfer_xz(const Scalar & tpr,
                                     const Topology & topo,

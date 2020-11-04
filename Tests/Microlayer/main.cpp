@@ -29,6 +29,7 @@ int main(int argc, char ** argv) {
     boil::oout<<"- nucleation superheat [K]\n";
     boil::oout<<"- heat flux [W/m2], will be converted to vol. source\n";
     boil::oout<<"- cangle [deg]\n";
+    boil::oout<<"- accommodation coefficient [-] \n";
     boil::oout<<"- pressure [atm]\n";
     boil::oout<<"- initradius [um]\n";
     boil::oout<<"- LZsolid [um]\n";
@@ -66,7 +67,7 @@ int main(int argc, char ** argv) {
 
   /* important: set all values to zero to start with */
   real deltat_wall(0.), deltat_out(0.), deltat_nucl(0.), qflux(0.);
-  real cangle(0.), prs(0.), radius(0.);
+  real cangle(0.), accommodation(0.), prs(0.), radius(0.);
   real LZsol(0.), LZheat(0.);
   real LXmult(0.), LZmult(0.), LZsolmult(0.);
   real AR(0.);
@@ -79,6 +80,7 @@ int main(int argc, char ** argv) {
                                &deltat_nucl,
                                &qflux,
                                &cangle,
+                               &accommodation,
                                &prs,
                                &radius,
                                &LZsol,

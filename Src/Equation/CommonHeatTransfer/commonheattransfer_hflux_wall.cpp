@@ -73,7 +73,7 @@ real CommonHeatTransfer::hflux_wall(const Scalar & val, const Dir din,
                 //     - distance_int_z(-sig,i+iof,j+jof,k+kof,ts);
                 alen = distance_int_z(sig,i,j,k,ts);
               }
-              hflux += (val[i][j][k]-ts)/(alen/lc+htwallmodel->near_wall_resist)*area;
+              hflux += (val[i][j][k]-ts)/(alen/lc+wall_resistance(i+of,j+of,k+of))*area;
             } /* interface */
           } /* vijk */
         } /* d == din */

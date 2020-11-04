@@ -3,7 +3,6 @@
 
 #include "../Topology/topology.h"
 #include "../Tifmodel/tif.h"
-#include "../../Ravioli/htwallmodel.h"
 
 ///////////////////////////
 //                       //
@@ -17,8 +16,7 @@ class CommonHeatTransfer {
   public:
     CommonHeatTransfer(const Scalar & tpr,
                        Topology * topo, const TIF & tifmodel, 
-                       Matter * flu, Matter * sol = NULL,
-                       HTWallModel * htwallmodel = NULL);
+                       Matter * flu, Matter * sol = NULL);
 
     ~CommonHeatTransfer();
 
@@ -126,13 +124,6 @@ class CommonHeatTransfer {
     /* calculate solid wall temperature */
     void calculate_node_temperature(const Scalar * diff_eddy = NULL);
 
-    /* members */
-    inline HTWallModel & heat_transfer_wall_model() {
-      return *htwallmodel;
-    }
-    inline const HTWallModel & heat_transfer_wall_model() const {
-      return *htwallmodel;
-    }
     Topology * topo;
     const TIF & tifmodel;
 
@@ -140,22 +131,24 @@ class CommonHeatTransfer {
     const Matter * solid() const {return sol;}
 
     const Scalar & tmp() const {return tpr;}
-    const Vector & node_tmp() const {return bndtpr;}
-    Vector & node_tmp() {return bndtpr;}
+    const Vector & node_tmp_sol() const {return bndtpr_sol;}
+    const Vector & node_tmp_flu() const {return bndtpr_flu;}
+    Vector & node_tmp_sol() {return bndtpr_sol;}
+    Vector & node_tmp_flu() {return bndtpr_flu;}
 
   private:
     Scalar tpr;
-    Vector bndtpr;
+    Vector bndtpr_sol, bndtpr_flu;
 
     Matter * flu;
     Matter * sol;
-    HTWallModel * htwallmodel;
-
-    bool default_value_for_htwallmodel;
 
     real val_rhov,val_rhol,val_cpv,val_cpl,val_lambdav,val_lambdal;
     real turbP; /* turbulent Prandtl number */
-    real resistance_equivalent; /* length scale of heat transfer resistance */
+    real dirac_wall_source_val; /* units W/m2 */ 
+    /* heat transfer resistance */
+    real wall_resistance_val;
+    real int_resistance_vap_val, int_resistance_liq_val; 
 };
 
 #endif

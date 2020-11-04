@@ -69,33 +69,33 @@ void PhaseChange4::insert_bc_hf(const Scalar * diff_eddy) {
               //dist = distance_center(sig,mcomp,ii,jj,kk) - dist;
               dist = cht.distance_int_x(-sig,i,j,k,ti);
               if(cht.topo->above_interface(ii,jj,kk)) {
-                txv[ii][jj][kk] = (tw-ti)/(dist/lmb+cht.heat_transfer_wall_model().near_wall_resist)*real(sig);
-                txv[i ][j ][k ] = (tw-ti)/(dist/lmb+cht.heat_transfer_wall_model().near_wall_resist)*real(sig);
+                txv[ii][jj][kk] = (tw-ti)/(dist/lmb+cht.wall_resistance(ii,jj,kk))*real(sig);
+                txv[i ][j ][k ] = (tw-ti)/(dist/lmb+cht.wall_resistance(ii,jj,kk))*real(sig);
               } else {
-                txl[ii][jj][kk] = (tw-ti)/(dist/lmb+cht.heat_transfer_wall_model().near_wall_resist)*real(sig);
-                txl[i ][j ][k ] = (tw-ti)/(dist/lmb+cht.heat_transfer_wall_model().near_wall_resist)*real(sig);
+                txl[ii][jj][kk] = (tw-ti)/(dist/lmb+cht.wall_resistance(ii,jj,kk))*real(sig);
+                txl[i ][j ][k ] = (tw-ti)/(dist/lmb+cht.wall_resistance(ii,jj,kk))*real(sig);
               }
             } else if(mcomp==Comp::j()) {             
               //dist = distance_int_y(sig,ii,jj,kk,ti);
               //dist = distance_center(sig,mcomp,ii,jj,kk) - dist;
               dist = cht.distance_int_y(-sig,i,j,k,ti);
               if(cht.topo->above_interface(ii,jj,kk)) {
-                tyv[ii][jj][kk] = (tw-ti)/(dist/lmb+cht.heat_transfer_wall_model().near_wall_resist)*real(sig);
-                tyv[i ][j ][k ] = (tw-ti)/(dist/lmb+cht.heat_transfer_wall_model().near_wall_resist)*real(sig);
+                tyv[ii][jj][kk] = (tw-ti)/(dist/lmb+cht.wall_resistance(ii,jj,kk))*real(sig);
+                tyv[i ][j ][k ] = (tw-ti)/(dist/lmb+cht.wall_resistance(ii,jj,kk))*real(sig);
               } else {
-                tyl[ii][jj][kk] = (tw-ti)/(dist/lmb+cht.heat_transfer_wall_model().near_wall_resist)*real(sig);
-                tyl[i ][j ][k ] = (tw-ti)/(dist/lmb+cht.heat_transfer_wall_model().near_wall_resist)*real(sig);
+                tyl[ii][jj][kk] = (tw-ti)/(dist/lmb+cht.wall_resistance(ii,jj,kk))*real(sig);
+                tyl[i ][j ][k ] = (tw-ti)/(dist/lmb+cht.wall_resistance(ii,jj,kk))*real(sig);
               }
             } else {
               //dist = distance_int_z(sig,ii,jj,kk,ti);
               //dist = distance_center(sig,mcomp,ii,jj,kk) - dist;
               dist = cht.distance_int_z(-sig,i,j,k,ti);
               if(cht.topo->above_interface(ii,jj,kk)) {
-                tzv[ii][jj][kk] = (tw-ti)/(dist/lmb+cht.heat_transfer_wall_model().near_wall_resist)*real(sig);
-                tzv[i ][j ][k ] = (tw-ti)/(dist/lmb+cht.heat_transfer_wall_model().near_wall_resist)*real(sig);
+                tzv[ii][jj][kk] = (tw-ti)/(dist/lmb+cht.wall_resistance(ii,jj,kk))*real(sig);
+                tzv[i ][j ][k ] = (tw-ti)/(dist/lmb+cht.wall_resistance(ii,jj,kk))*real(sig);
               } else {
-                tzl[ii][jj][kk] = (tw-ti)/(dist/lmb+cht.heat_transfer_wall_model().near_wall_resist)*real(sig);
-                tzl[i ][j ][k ] = (tw-ti)/(dist/lmb+cht.heat_transfer_wall_model().near_wall_resist)*real(sig);
+                tzl[ii][jj][kk] = (tw-ti)/(dist/lmb+cht.wall_resistance(ii,jj,kk))*real(sig);
+                tzl[i ][j ][k ] = (tw-ti)/(dist/lmb+cht.wall_resistance(ii,jj,kk))*real(sig);
               }
             }
 

@@ -56,12 +56,6 @@
 
   /* supplementary classes for heat transfer */
   TIF tsat(tsat0);
-  HTWallModel * htwm = NULL;
-  if(NZheat>0||NZsol==0) {
-    htwm = new HTWallModel(HTWallModel::Resistance(resist));
-  } else {
-    htwm = new HTWallModel(HTWallModel::Full(resist,qflux));
-  }
 
   /* is there conjugate heat transfer? */
   Matter * solid_coarse_ptr = NULL;
@@ -73,12 +67,22 @@
 
   /* function kernel of heat transfer */
   CommonHeatTransfer cht_coarse(tpr.coarse,conc_coarse.topo,tsat,
-                                &mixed.coarse,solid_coarse_ptr,htwm);
+                                &mixed.coarse,solid_coarse_ptr);
   CommonHeatTransfer cht_fine(tpr.fine,conc_fine.topo,tsat,
-                                &mixed.fine,solid_fine_ptr,htwm);
+                                &mixed.fine,solid_fine_ptr);
 
-  cht_coarse.set_resistance_equivalent(resistance_equivalent);
-  cht_fine.set_resistance_equivalent(resistance_equivalent);
+  if(use_wall_resistance) {
+    cht_coarse.set_wall_resistance(resistance_liq);
+    cht_fine.set_wall_resistance(resistance_liq);
+  } else {
+    cht_coarse.set_int_resistance_liq(resistance_liq);
+    cht_fine.set_int_resistance_liq(resistance_liq);
+  }
+  if(NZheat>0||NZsol==0) {
+  } else {
+    cht_coarse.set_dirac_wall_source(qflux);
+    cht_fine.set_dirac_wall_source(qflux);
+  }
 
   /* enthalpy equation */
   EnthalpyFDaxisym enthFD_coarse(tpr.coarse, q.coarse, uvw.coarse, uvw_1, uvw_2,
@@ -87,6 +91,7 @@
 
   enthFD_coarse.convection_set(TimeScheme::forward_euler());
   enthFD_coarse.diffusion_set(TimeScheme::backward_euler());
+  enthFD_coarse.set_gradt_accuracy_order(ao_efd_conv);
 
   /* enthalpy on the fine grid */
   EnthalpyFDaxisym enthFD_fine(tpr.fine, q.fine, uvw.fine, time, solver_fine, &mixed.fine,
@@ -94,12 +99,13 @@
 
   enthFD_fine.convection_set(TimeScheme::forward_euler());
   enthFD_fine.diffusion_set(TimeScheme::backward_euler());
+  enthFD_fine.set_gradt_accuracy_order(ao_efd_conv);
 
   /* phase change */
   PhaseChange4 pc_coarse(mdot.coarse, mflx.coarse, q.coarse,
                          g.coarse, f.coarse, uvw.coarse, cht_coarse,
                          time, &mixed.coarse, solid_coarse_ptr);
-  pc_coarse.set_second_order_accuracy(use_second_order_accuracy);
+  pc_coarse.set_accuracy_order(ao_pc);
   pc_coarse.set_discard_points_near_interface(discard_points_near_interface);
   pc_coarse.set_unconditional_extrapolation(use_unconditional_extrapolation);
 
@@ -107,6 +113,6 @@
   PhaseChange4 pc_fine(mdot.fine, mflx.fine, q.fine,
                        g.fine, f.fine, uvw.fine, cht_fine,
                        time, &mixed.fine, solid_fine_ptr);
-  pc_fine.set_second_order_accuracy(use_second_order_accuracy);
+  pc_fine.set_accuracy_order(ao_pc);
   pc_fine.set_discard_points_near_interface(discard_points_near_interface);
   pc_fine.set_unconditional_extrapolation(use_unconditional_extrapolation);

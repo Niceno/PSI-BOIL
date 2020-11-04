@@ -5,6 +5,10 @@
   
   for(time.start(); time.end(); time.increase()) {
 
+#ifdef USE_BOTTOM_DIRICHLET
+  #include "update_tpr_bnd.cpp"
+#endif
+
     /* restrict temperature to coarse */
     tpr.restrict_volume_XZ();
 
@@ -118,7 +122,7 @@
     +---------------------------*/
     conc_fine.new_time_step();
     conc_coarse.new_time_step();
-    conc_coarse.advance_with_extrapolation(false,ResRat(1e-6),uvw.coarse,f.coarse,
+    conc_coarse.advance_with_extrapolation(false,ResRat(1e-9),uvw.coarse,f.coarse,
                                            &liquid.coarse,&uvw_1,&vapor.coarse,&uvw_2);
 
     for_avk(c.coarse,k) {
@@ -154,7 +158,7 @@
     conc_coarse.color_minmax();
 
     /* front */
-    conc_fine.front_minmax(Range<real>(0.  ,LX0),
+    conc_fine.front_minmax(Range<real>(0.  ,LX1),
                            Range<real>(-LX0,LX0),
                            Range<real>(0.  ,LZ1));
 
@@ -209,7 +213,7 @@
       ssp <<"profile-"<<iint<<".txt";
       output.open(ssp.str(), std::ios::out);
       boil::output_profile_xz(conc_coarse.color(),output,Range<int>(NZsol/2+1,NZtot/2),
-                              Range<int>(-1,-2),LX0);
+                              Range<int>(-1,-2),LX1);
       boil::cart.barrier();
       output.close();
 
@@ -230,8 +234,7 @@
       ssb <<"bndtpr-"<<iint<<".txt";
       output.open(ssb.str(), std::ios::out);
       if(NZsol>0) {
-        boil::output_wall_heat_transfer_xz(tpr.fine,cht_fine.node_tmp(),
-                                           solid.fine,output,NXtot);
+        boil::output_wall_heat_transfer_xz(cht_fine,output,NXtot);
       } else {
         boil::output_wall_heat_transfer_xz(tpr.fine,*(conc_fine.topo),pc_fine,
                                            output,NXtot);

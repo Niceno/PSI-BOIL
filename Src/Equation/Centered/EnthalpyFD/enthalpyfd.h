@@ -118,9 +118,7 @@ class EnthalpyFD : public Centered {
                 , real fdm, real fdp, real fdms, real fdps
                 , const int i, const int j, const int k, const Comp m);
 
-    inline real resistance_multiplier(const real dx1, const real dx2,
-                                      const real l1, const real l2,
-                                      const real resistplus = 0.0) const;
+    inline real resistance_multiplier(const real res1, const real res2) const;
 
     virtual real coef_x_m(const real dxm, const real dxp, const real x0);
     virtual real coef_x_p(const real dxm, const real dxp, const real x0);
@@ -144,7 +142,6 @@ class EnthalpyFD : public Centered {
 
     Scalar ftif;
     ScalarInt iflag,iflagold;
-    real epsl;
     bool laminar;
 };	
 #endif

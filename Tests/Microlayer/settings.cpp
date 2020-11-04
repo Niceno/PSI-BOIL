@@ -76,15 +76,13 @@
   const int niter_pressure_extrap = 1000;
 
   /* enthalpy */
-  const bool use_ht_resistance = false;//true;
+  const AccuracyOrder ao_efd_conv = AccuracyOrder::Fourth();
+  const bool use_wall_resistance = true;
 
   /* phase change - 4 version */
-  const bool use_second_order_accuracy = false;
+  const AccuracyOrder ao_pc = AccuracyOrder::FourthUpwind();
   const bool discard_points_near_interface = false;//true;
   const bool use_unconditional_extrapolation = false;
-
-  /* ghost distance */
-  const real resistance_equivalent = 1e-6;
 
   /*--------------------------------+
   |  choose the output file format  |

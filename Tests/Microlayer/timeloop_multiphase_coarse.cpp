@@ -2,49 +2,19 @@
   |  time loop  |
   +------------*/
   bool inertial = time.current_time()<boil::atto;
+  real z0 = 4e-6;
+  real z1 = 7e-6;
+  auto cap_frac = [&](const real x, const real z,
+                      const real val) {
+    return val*std::max(0.0,
+                      std::min(1.0,
+                        (z-z0)/(z1-z0)));
+  };
   
   for(time.start(); time.end(); time.increase()) {
-    
+
 #ifdef USE_BOTTOM_DIRICHLET
-    /* reset boundary condition for temperature */
-    if(NZsol==0&&(case_flag==2||case_flag==4)) {
-      std::vector<real> C0 = {12.56791608260579,
-                              -0.38231422424431977,
-                              -2.5843730362760384,
-                              1.0982624468028859,
-                              -0.1961483629504791};
-      std::vector<real> C1 = {8.302991250503421,
-                              13.176340482203388,
-                              -15.81871438800867,
-                              5.836534846472568,
-                              -0.6514010904922061};
-
-      std::vector<real> Cinter = C0;
-      for(int i(0); i<Cinter.size();++i) {
-        Cinter[i] += time.current_time()/0.21e-3 * (C1[i]-C0[i]);
-      }
-
-      std::vector<std::ostringstream> sci(Cinter.size());
-      std::vector<std::string> scistr(Cinter.size());
-      std::ostringstream fullstr;
-      boil::oout<<"tpr_bnd_update= "<<time.current_time()<<" ";
-      for(int i(0); i<Cinter.size();++i) {
-        sci[i]<<Cinter[i];
-        scistr[i] = sci[i].str();
-        boil::oout<<scistr[i]<<" ";
-        fullstr<<"("<<scistr[i]<<")*(x/1e-3)^"<<i<<"+";
-      }
-      boil::oout<<boil::endl;
-      fullstr<<"0.";
-      //boil::oout<<"eq= "<<fullstr.str()<<boil::endl;
-      char *eqtpr = new char[fullstr.str().length()+1];
-      std::strcpy(eqtpr, fullstr.str().c_str());
-
-      for(auto l : tpr.levels) {
-       l->bc().modify( BndCnd( Dir::kmin(), BndType::dirichlet(), eqtpr) );
-       l->bnd_update();
-     }
-    }
+  #include "update_tpr_bnd.cpp"
 #endif
 
     /*-------------------+
@@ -80,23 +50,46 @@
     +---------------*/
     pc_coarse.update();
 
-    real massflux_heat = pc_coarse.get_smdot();
-    massflux_heat /= conc_coarse.topo->get_totarea();
+    real massflow_heat = pc_coarse.get_smdot();
+    real massflux_heat = massflow_heat/conc_coarse.topo->get_totarea();
     real massflux_inert = rhov*sqrt(boil::pi/7.*rhov*latent*deltat_nucl
                                     /rhol/tsat0_K);
-    boil::oout<<"mflux= "<<time.current_time()<<" "
-                         <<massflux_heat<<" "<<massflux_inert<<" "
-                         <<massflux_inert/massflux_heat<<boil::endl;
-    /* inertial cap */
-    if(inertial) {
-      if(massflux_inert<1.1*massflux_heat) {
-        mflx.coarse *= massflux_inert/massflux_heat;
-        mdot.coarse *= massflux_inert/massflux_heat;
-        pc_coarse.sources();
-      } else {
-        inertial = false;
+
+    real massflow_cap(0.0), massflow_ml(0.0);
+    real are_cap(0.0), are_ml(0.0);
+    for_vijk(c.coarse,i,j,k) {
+      if(conc_coarse.topo->interface(i,j,k)) {
+        real a = conc_coarse.topo->get_area(i,j,k);
+        real a_cap = cap_frac(c.coarse.xc(i),
+                              c.coarse.zc(k),
+                              a);
+        real a_ml = a-a_cap;  
+
+        massflow_cap += mflx.coarse[i][j][k]*a_cap;
+        massflow_ml += mflx.coarse[i][j][k]*a_ml;
+        are_cap += a_cap;
+        are_ml += a_ml;
       }
     }
+    boil::cart.sum_real(&massflow_cap);
+    boil::cart.sum_real(&massflow_ml);
+    boil::cart.sum_real(&are_cap);
+    boil::cart.sum_real(&are_ml);
+    
+    real massflux_cap = massflow_cap/are_cap;
+    real massflux_ml = massflow_ml/are_ml;
+
+    mflx.coarse = massflux_heat;
+    mflx.coarse.bnd_update();
+    mflx.coarse.exchange();
+    pc_coarse.finalize();
+
+    boil::oout<<"mflux= "<<time.current_time()<<" "
+                         <<massflux_heat<<" "<<massflux_inert<<" "
+                         <<massflux_inert/massflux_heat<<" | "
+                         <<massflow_heat<<" "<<massflow_cap<<" "<<massflow_ml<<" | "
+                         <<massflux_cap<<" "<<massflux_ml
+                         <<boil::endl;
 
     ns.vol_phase_change(&f.coarse);
 
@@ -169,7 +162,7 @@
     |  solve energy equation  |
     +------------------------*/
     tprold.coarse = tpr.coarse;
-#if 0
+#if 1
     enthFD_coarse.discretize();
     enthFD_coarse.new_time_step();
     enthFD_coarse.solve(ResRat(1e-16),"enthFD");
@@ -204,7 +197,7 @@
     conc_coarse.color_minmax();
 
     /* front */
-    conc_coarse.front_minmax(Range<real>(0.  ,LX0),
+    conc_coarse.front_minmax(Range<real>(0.  ,LX1),
                            Range<real>(-LX0,LX0),
                            Range<real>(0.  ,LZ1));
 
@@ -251,7 +244,7 @@
       ssp <<"profile-"<<iint<<".txt";
       output.open(ssp.str(), std::ios::out);
       boil::output_profile_xz(conc_coarse.color(),output,Range<int>(NZsol/2+1,NZtot/2),
-                              Range<int>(-1,-2),LX0);
+                              Range<int>(-1,-2),LX1);
       boil::cart.barrier();
       output.close();
 
@@ -272,8 +265,7 @@
       ssb <<"bndtpr-"<<iint<<".txt";
       output.open(ssb.str(), std::ios::out);
       if(NZsol>0) {
-        boil::output_wall_heat_transfer_xz(tpr.coarse,cht_coarse.node_tmp(),
-                                           solid.coarse,output,NXtot/2);
+        boil::output_wall_heat_transfer_xz(cht_coarse,output,NXtot/2);
       } else {
         boil::output_wall_heat_transfer_xz(tpr.coarse,*(conc_coarse.topo),pc_coarse,
                                            output,NXtot/2);

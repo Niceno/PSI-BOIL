@@ -182,6 +182,9 @@ class Topology {
       boil::cart.sum_real(&are);
       return are;
     }
+    inline real get_area(const int i, const int j, const int k) const {
+      return get_adens()[i][j][k]*get_adens().dV(i,j,k);
+    }
 
     /* references */
     Scalar & get_vf()    { return *vf; }
