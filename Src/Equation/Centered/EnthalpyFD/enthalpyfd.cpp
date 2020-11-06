@@ -23,12 +23,20 @@ EnthalpyFD::EnthalpyFD(const Scalar & PHI,
   iflag(CHT.topo->iflag),
   iflagold(&(CHT.topo->iflagold)),
   uliq(&Uliq),
-  ugas(&Ugas)
+  ugas(&Ugas),
+  flux_liq( *U.domain() ),
+  flux_gas( *U.domain() ),
+  bflag_struct(PHI)
 {
   assert(PHI.domain() == F.domain());
   assert(PHI.domain() == U.domain());
   laminar=true;
   ao_conv = AccuracyOrder::Second();
+
+  for_m(m) {
+    flux_liq(m) = (*uliq)(m).shape();
+    flux_gas(m) = (*ugas)(m).shape();
+  }
 
   /* see header for explanation */
   if(solid()) {

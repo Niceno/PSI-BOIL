@@ -200,3 +200,17 @@ bool interpolate_from_file(Scalar & sca) {
 
   return 0;
 }
+
+/* row output */
+real output_row(const real zp, const Scalar & sca, const bool inv) {
+  real h0 = 0.0;
+  for_vk(sca,k) {
+    if(sca.zn(k)<zp&&sca.zn(k+1)>=zp) {
+      for_vi(sca,i) {
+        h0 += (inv ? (1.-sca[i][boil::BW][k]) : sca[i][boil::BW][k]) * sca.dxc(i);
+      } /* i */
+    } /* in range */
+  } /* k */
+  boil::cart.sum_real(&h0);
+  return h0;
+}

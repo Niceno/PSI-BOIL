@@ -51,5 +51,12 @@ class EnthalpyFDaxisym : public EnthalpyFD {
     virtual real coef_z_m(const real dxm, const real dxp, const real x0);
     virtual real coef_z_p(const real dxm, const real dxp, const real x0);
 
+    virtual real neg_div_x(const int i, const int j, const int k,
+                           const Vector & flux);
+    virtual real neg_div_y(const int i, const int j, const int k,
+                           const Vector & flux);
+    virtual real neg_div_z(const int i, const int j, const int k,
+                           const Vector & flux);
+
 };
 #endif

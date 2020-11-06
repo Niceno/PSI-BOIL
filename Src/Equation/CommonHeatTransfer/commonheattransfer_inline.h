@@ -126,6 +126,17 @@ inline real Tint_old(const int i, const int j, const int k) const {
 }
 
 /***************************************************************************//**
+ *  distance
+******************************************************************************/
+inline real distance_int(const Sign dir, const Comp & m,
+                         const int i, const int j, const int k, const Old old,
+                         real & tint) const {
+  return (old==Old::yes) ?
+         distance_int_old(dir,m,i,j,k,tint) : distance_int(dir,m,i,j,k,tint);
+}
+
+
+/***************************************************************************//**
  *  other
 ******************************************************************************/
 inline real get_turbP() const { return turbP; }

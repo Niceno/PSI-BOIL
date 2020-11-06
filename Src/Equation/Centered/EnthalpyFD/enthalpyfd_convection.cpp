@@ -288,7 +288,7 @@ void EnthalpyFD::convection(Scalar * conv) {
       wpf = (*u)[Comp::w()][i][j][k+1];
 #endif
 
-#if 1
+#if 0
   #ifdef CNEW
       dtdxm = dtdxp = cht.first_derivative(false,Comp::i(),i,j,k,
                                            ao_conv,false,Old::no);

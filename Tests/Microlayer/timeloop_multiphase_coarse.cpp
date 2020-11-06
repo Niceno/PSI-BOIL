@@ -2,14 +2,29 @@
   |  time loop  |
   +------------*/
   bool inertial = time.current_time()<boil::atto;
-  real z0 = 4e-6;
-  real z1 = 7e-6;
+  Range<real> ml_range_z(0e-6,6e-6);
   auto cap_frac = [&](const real x, const real z,
+                      const Range<real> & xr, const Range<real> zr,
                       const real val) {
-    return val*std::max(0.0,
-                      std::min(1.0,
-                        (z-z0)/(z1-z0)));
+    if(z>zr.last()||!xr.exists()) {
+      return val;
+    } else {
+      return val*xr.fraction(x);
+    }
   };
+  auto cap_val  = [&](const real x, const real z, 
+                      const Range<real> & xr, const Range<real> zr,
+                      const real val0, const real val1) {
+    if(z>zr.last()||!xr.exists()) {
+      return val1;
+    } else {
+      return val0+(val1-val0)*xr.fraction(x);
+    }
+  };
+
+  conc_coarse.front_minmax(Range<real>(0.  ,LX1),
+                           Range<real>(-LX0,LX0),
+                           Range<real>(0.  ,LZ1));
   
   for(time.start(); time.end(); time.increase()) {
 
@@ -55,6 +70,14 @@
     real massflux_inert = rhov*sqrt(boil::pi/7.*rhov*latent*deltat_nucl
                                     /rhol/tsat0_K);
 
+    /* transition zone */
+    real xmaxbub = conc_coarse.topo->get_xmaxft();
+    real xmaxml = output_row(ml_range_z.last(),c.coarse,true);
+    real xtrml = 1.5*xmaxml - 0.5*xmaxbub;
+    boil::oout<<"MLranges= "<<time.current_time()<<" "<<xtrml
+                            <<" "<<xmaxml<<" "<<xmaxbub<<boil::endl;
+    Range<real> ml_range_x(xtrml,xmaxml);
+
     real massflow_cap(0.0), massflow_ml(0.0);
     real are_cap(0.0), are_ml(0.0);
     for_vijk(c.coarse,i,j,k) {
@@ -62,6 +85,7 @@
         real a = conc_coarse.topo->get_area(i,j,k);
         real a_cap = cap_frac(c.coarse.xc(i),
                               c.coarse.zc(k),
+                              ml_range_x, ml_range_z,
                               a);
         real a_ml = a-a_cap;  
 
@@ -76,10 +100,25 @@
     boil::cart.sum_real(&are_cap);
     boil::cart.sum_real(&are_ml);
     
-    real massflux_cap = massflow_cap/are_cap;
-    real massflux_ml = massflow_ml/are_ml;
+    real massflux_cap(0.0), massflux_ml(0.0);
+    if(are_cap>0.0)
+      massflux_cap = massflow_cap/are_cap;
+    if(are_ml>0.0)
+      massflux_ml = massflow_ml/are_ml;
 
+#if 1
+    for_vijk(c.coarse,i,j,k) {
+      if(conc_coarse.topo->interface(i,j,k)) {
+        mflx.coarse[i][j][k] = cap_val(c.coarse.xc(i),
+                                       c.coarse.zc(k),
+                                       ml_range_x, ml_range_z,
+                                       mflx.coarse[i][j][k],
+                                       massflux_cap);
+      }
+    }
+#else
     mflx.coarse = massflux_heat;
+#endif
     mflx.coarse.bnd_update();
     mflx.coarse.exchange();
     pc_coarse.finalize();

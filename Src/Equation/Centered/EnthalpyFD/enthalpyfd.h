@@ -1,8 +1,9 @@
 #ifndef ENTHALPYFD_H
 #define ENTHALPYFD_H
 
-#include "../../../Parallel/mpi_macros.h"
 #include <cmath>
+#include <functional>
+#include "../../../Parallel/mpi_macros.h"
 #include "../centered.h"
 #include "../../../Parallel/communicator.h"
 #include "../../../Timer/timer.h"
@@ -27,6 +28,9 @@
 *  \f$\lambda \; [\frac{W}{mK}]\f$ is thermal conductivity and 
 *  \f$\dot{Q} \; [\frac{J}{s}]\f$ is (external) heat source rate. 
 *******************************************************************************/
+
+#include "enthalpyfd_ravioli.h"
+
 
 ////////////////
 //            //
@@ -127,6 +131,16 @@ class EnthalpyFD : public Centered {
     virtual real coef_z_m(const real dxm, const real dxp, const real x0);
     virtual real coef_z_p(const real dxm, const real dxp, const real x0);
 
+    virtual real neg_div_x(const int i, const int j, const int k,
+                           const Vector & flux);
+    virtual real neg_div_y(const int i, const int j, const int k,
+                           const Vector & flux);
+    virtual real neg_div_z(const int i, const int j, const int k,
+                           const Vector & flux);
+
+    void extrapolate_values(std::vector<StencilPoint> & stencil,
+                            const StencilPoint & ctp, const StencilPoint & ctm);
+
     /* This points to solid if solid() = true and fluid() otherwise.
        So you can always dereference it without segfaults */
     const Matter * safe_solid; 
@@ -135,11 +149,13 @@ class EnthalpyFD : public Centered {
     bool accelerated_no_solid;
 
     const Vector * uliq, * ugas;
+    Vector flux_liq, flux_gas;
     
     const CommonHeatTransfer & cht;
     /* gradt in convection difference order */
     AccuracyOrder ao_conv;
 
+    const BndFlag bflag_struct;
     Scalar ftif;
     ScalarInt iflag,iflagold;
     bool laminar;

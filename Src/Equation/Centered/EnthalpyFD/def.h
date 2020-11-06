@@ -13,4 +13,4 @@
 #define USE_FDM_FLUID
 
 /*--- related to convection construction  ---*/
-#define USE_FDM_CONVECTION
+//#define USE_FDM_CONVECTION
