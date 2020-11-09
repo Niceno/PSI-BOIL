@@ -31,7 +31,7 @@ bool Topology::test_differences_first(const int count) {
 
 
 /******************************************************************************/
-bool Topology::test_differences_first(const std::vector<real> & stencil,
+bool Topology::test_differences_first(const std::vector<real> & stenpos,
                                       const std::vector<real> & coefficients) {
 /***************************************************************************//**
 *  \brief Test if differences work correctly using polynomials
@@ -39,51 +39,55 @@ bool Topology::test_differences_first(const std::vector<real> & stencil,
 
   bool flag(true);
 
-  for(auto s : stencil)
+  for(auto s : stenpos)
     boil::oout<<s<<" ";
   boil::oout<<boil::endl;
   for(auto c : coefficients)
     boil::oout<<c<<" ";
   boil::oout<<boil::endl;
 
+  std::vector<StencilPoint> stencil;
+  int ii(0);
+  for(auto s : stenpos) {
+    stencil.push_back(
+      StencilPoint(ii,evaluate_polynomial(1,coefficients,s),s));
+    ii++;
+  }
+
   /* first-order */
   real derivative_1st = coefficients[1];
-  real difference_1st = first_order_first(stencil,
-                        {evaluate_polynomial(1,coefficients,stencil[0]),
-                         evaluate_polynomial(1,coefficients,stencil[1])});
+  
+  real difference_1st = first_order_first(stencil);
 
   flag = flag & fabs(derivative_1st-difference_1st)<boil::nano;
   boil::oout<<derivative_1st<<" "<<difference_1st<<" "<<flag<<boil::endl;
 
   /* second-order */
+  for(auto & s : stencil) {
+    s.val = evaluate_polynomial(2,coefficients,s.pos);
+  } 
   real derivative_2nd = coefficients[1];
-  real difference_2nd = second_order_first(stencil,
-                        {evaluate_polynomial(2,coefficients,stencil[0]),
-                         evaluate_polynomial(2,coefficients,stencil[1]),
-                         evaluate_polynomial(2,coefficients,stencil[2])});
+  real difference_2nd = second_order_first(stencil);
 
   flag = flag & fabs(derivative_2nd-difference_2nd)<boil::nano;
   boil::oout<<derivative_2nd<<" "<<difference_2nd<<" "<<flag<<boil::endl;
 
   /* third-order */
+  for(auto & s : stencil) {
+    s.val = evaluate_polynomial(3,coefficients,s.pos);
+  } 
   real derivative_3rd = coefficients[1];
-  real difference_3rd = third_order_first(stencil,
-                        {evaluate_polynomial(3,coefficients,stencil[0]),
-                         evaluate_polynomial(3,coefficients,stencil[1]),
-                         evaluate_polynomial(3,coefficients,stencil[2]),
-                         evaluate_polynomial(3,coefficients,stencil[3])});
+  real difference_3rd = third_order_first(stencil);
 
   flag = flag & fabs(derivative_3rd-difference_3rd)<boil::nano;
   boil::oout<<derivative_3rd<<" "<<difference_3rd<<" "<<flag<<boil::endl;
 
   /* fourth-order */
+  for(auto & s : stencil) {
+    s.val = evaluate_polynomial(4,coefficients,s.pos);
+  } 
   real derivative_4th = coefficients[1];
-  real difference_4th = fourth_order_first(stencil,
-                        {evaluate_polynomial(4,coefficients,stencil[0]),
-                         evaluate_polynomial(4,coefficients,stencil[1]),
-                         evaluate_polynomial(4,coefficients,stencil[2]),
-                         evaluate_polynomial(4,coefficients,stencil[3]),
-                         evaluate_polynomial(4,coefficients,stencil[4])});
+  real difference_4th = fourth_order_first(stencil);
 
   flag = flag & fabs(derivative_4th-difference_4th)<boil::nano;
   boil::oout<<derivative_4th<<" "<<difference_4th<<" "<<flag<<boil::endl;

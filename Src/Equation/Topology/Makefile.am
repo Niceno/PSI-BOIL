@@ -9,6 +9,8 @@ libTopology_a_SOURCES = topology.h                    \
                         topology_interface.cpp        \
                         topology_new_time_step.cpp    \
 			topology_second_difference.cpp\
-			topology_test_differences.cpp
+			topology_test_differences.cpp \
+			topology_third_difference.cpp \
+			topology_zeroth_difference.cpp
 
 INCLUDE = -I@top_srcdir@/

@@ -11,11 +11,10 @@ real CommonHeatTransfer::first_derivative(const bool is_solid, const Comp & m,
 *******************************************************************************/
 
   /* set-up arrays */
-  std::vector<real> stencil;
-  std::vector<real> values;
+  std::vector<StencilPoint> stencil;
 
   /* construct the stencil and fill it with values */
-  construct_stencil(stencil,values,is_solid,m,i,j,k,
+  construct_stencil(stencil,is_solid,m,i,j,k,
                     accuracy_order,discard_points,old);
 
   /*** the stencil is now 2-7 points, ordered by importance ***/
@@ -24,7 +23,7 @@ real CommonHeatTransfer::first_derivative(const bool is_solid, const Comp & m,
 
   /* differences are implemented up to fourth-order */
 
-  return topo->nth_order_first(stencil,values,ao);
+  return topo->nth_order_first(stencil,ao);
 
 }
 
@@ -39,11 +38,10 @@ real CommonHeatTransfer::second_derivative(const bool is_solid, const Comp & m,
 *******************************************************************************/
 
   /* set-up arrays */
-  std::vector<real> stencil;
-  std::vector<real> values;
+  std::vector<StencilPoint> stencil;
 
   /* construct the stencil and fill it with values */
-  construct_stencil(stencil,values,is_solid,m,i,j,k,
+  construct_stencil(stencil,is_solid,m,i,j,k,
                     accuracy_order,discard_points,old);
 
   /*** the stencil is now 2-7 points, ordered by importance ***/
@@ -52,6 +50,6 @@ real CommonHeatTransfer::second_derivative(const bool is_solid, const Comp & m,
 
   /* differences are implemented up to fourth-order */
 
-  return topo->nth_order_second(stencil,values,ao);
+  return topo->nth_order_second(stencil,ao);
 
 }

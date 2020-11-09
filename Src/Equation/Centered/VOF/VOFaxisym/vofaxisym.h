@@ -60,9 +60,9 @@ class VOFaxisym : public VOF {
     virtual void norm(const Scalar & color, const NormMethod & nm,
                       const bool extalp = true);
 
-    virtual void advance_x(Scalar & sca);
-    virtual void advance_y(Scalar & sca) {};
-    virtual void advance_z(Scalar & sca);
+    virtual void advance_x(const Scalar & sca);
+    virtual void advance_y(const Scalar & sca) {};
+    virtual void advance_z(const Scalar & sca);
 
     void set_reconstruction_flag(const Scalar & scp, ScalarInt & flag,
                                  const int nlayer);

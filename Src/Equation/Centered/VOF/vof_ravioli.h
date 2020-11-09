@@ -224,6 +224,53 @@ class DetachmentModel {
     real etacrit, etacurr;
 };
 
+////////////////////////
+//                    //
+//  Advection method  //
+//                    //
+////////////////////////
+/* this is a ravioli class for advection method selection */
+class AdvectionMethod {
+  public:
+    AdvectionMethod() {val=-1;}
+
+    static const AdvectionMethod undefined()  {
+      return AdvectionMethod(-1);
+    }
+    static const AdvectionMethod NaiveSplit() {
+      return AdvectionMethod( 1);
+    }
+    static const AdvectionMethod ReconstructedSplit() {
+      return AdvectionMethod( 2);
+    }
+    /* Weymouth and Yue (2009), JCP */
+    static const AdvectionMethod BoundedSplit() {
+      return AdvectionMethod( 3);
+    }
+
+    //! Prints the components name.
+    friend std::ostream & operator << (std::ostream & ost, 
+                                       const AdvectionMethod & com) {
+      switch(com.val) {
+        case(-1): ost << "undefined"; break;
+        case( 1): ost << "Naive-split"; break;
+        case( 2): ost << "Reconstructed-split"; break;
+        case( 3): ost << "Bounded-split"; break;
+      }
+
+      return ost;
+    }
+
+    bool operator == (const AdvectionMethod & o) const {return val == o.val;}
+    bool operator != (const AdvectionMethod & o) const {return val != o.val;}
+
+  private:
+    int val;
+
+    /* avoid implicit conversions of integer to Advection */
+    explicit AdvectionMethod(const int m) {val = m;}
+};
+
 /////////////
 //         //
 //  HFset  //

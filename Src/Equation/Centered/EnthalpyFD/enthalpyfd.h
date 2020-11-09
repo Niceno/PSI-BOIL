@@ -2,7 +2,6 @@
 #define ENTHALPYFD_H
 
 #include <cmath>
-#include <functional>
 #include "../../../Parallel/mpi_macros.h"
 #include "../centered.h"
 #include "../../../Parallel/communicator.h"
@@ -28,9 +27,6 @@
 *  \f$\lambda \; [\frac{W}{mK}]\f$ is thermal conductivity and 
 *  \f$\dot{Q} \; [\frac{J}{s}]\f$ is (external) heat source rate. 
 *******************************************************************************/
-
-#include "enthalpyfd_ravioli.h"
-
 
 ////////////////
 //            //
@@ -97,6 +93,12 @@ class EnthalpyFD : public Centered {
 
 #include "enthalpyfd_inline.h"
 
+    /* unit tests */
+    bool test_extrapolation(const int count);
+    bool test_extrapolation(std::vector<real> & stencil,
+                            const std::vector<real> & coefficients,
+                            const std::vector<int> & cutpoints);
+
   protected:
     typedef real (EnthalpyFD::*coef_gen)(const real,const real,const real);
     
@@ -131,15 +133,14 @@ class EnthalpyFD : public Centered {
     virtual real coef_z_m(const real dxm, const real dxp, const real x0);
     virtual real coef_z_p(const real dxm, const real dxp, const real x0);
 
-    virtual real neg_div_x(const int i, const int j, const int k,
-                           const Vector & flux);
-    virtual real neg_div_y(const int i, const int j, const int k,
-                           const Vector & flux);
-    virtual real neg_div_z(const int i, const int j, const int k,
-                           const Vector & flux);
-
+    real face_value(const Sign matter_sig, const Comp m, const real vel,
+                    const int i, const int j, const int k,
+                    const int ofx, const int ofy, const int ofz,
+                    const Old old);
     void extrapolate_values(std::vector<StencilPoint> & stencil,
-                            const StencilPoint & ctp, const StencilPoint & ctm);
+                            const StencilPoint & ctm, const StencilPoint & ctp);
+    real point_extrapolation(const std::vector<StencilPoint> & stencil,
+                             const real xpos);
 
     /* This points to solid if solid() = true and fluid() otherwise.
        So you can always dereference it without segfaults */

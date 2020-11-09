@@ -8,24 +8,24 @@
 */
 
 /******************************************************************************/
-real Topology::nth_order_second(const std::vector<StencilPoint> & stencil,
-                                const AccuracyOrder & order) const {
+real Topology::nth_order_third(const std::vector<StencilPoint> & stencil,
+                               const AccuracyOrder & order) const {
 /***************************************************************************//**
-*  \brief Approximate second derivative using a desired-order difference.
+*  \brief Approximate third derivative using a desired-order difference.
 *******************************************************************************/
   switch(order.eval()) {
     case 0 :
-      return zeroth_order_second(stencil);
+      return zeroth_order_third(stencil);
     case 1 :
-      return first_order_second(stencil);
+      return first_order_third(stencil);
     case 2 :
-      return second_order_second(stencil);
+      return third_order_third(stencil);
     case 3 :
-      return third_order_second(stencil);
+      return third_order_third(stencil);
     case 4 :
-      return fourth_order_second(stencil);
+      return fourth_order_third(stencil);
     default :
-      boil::aout<<"Topology: unrecognised second difference requested. Exiting."
+      boil::aout<<"Topology: unrecognised third difference requested. Exiting."
                 <<boil::endl;
       exit(0);
   }
@@ -34,55 +34,40 @@ real Topology::nth_order_second(const std::vector<StencilPoint> & stencil,
 }
 
 /******************************************************************************/
-real Topology::zeroth_order_second(const std::vector<StencilPoint> & stencil)
+real Topology::zeroth_order_third(const std::vector<StencilPoint> & stencil)
                                                                          const {
 /***************************************************************************//**
-*  \brief Approximate second derivative using a zeroth-order difference.
+*  \brief Approximate third derivative using a zeroth-order difference.
 *******************************************************************************/
   return 0.0;
 }
 
 /******************************************************************************/
-real Topology::first_order_second(const std::vector<StencilPoint> & stencil)
-                                                                         const {
+real Topology::first_order_third(const std::vector<StencilPoint> & stencil)
+                                                                       const {
 /***************************************************************************//**
-*  \brief Approximate second derivative using a first-order difference.
+*  \brief Approximate third derivative using a first-order difference.
 *******************************************************************************/
   return 0.0;
 }
 
 /******************************************************************************/
-real Topology::second_order_second(const std::vector<StencilPoint> & stencil)
-                                                                         const {
+real Topology::second_order_third(const std::vector<StencilPoint> & stencil)
+                                                                       const {
 /***************************************************************************//**
-*  \brief Approximate second derivative using a second-order difference.
+*  \brief Approximate third derivative using a second-order difference.
 *******************************************************************************/
-  real c0 = 2./(stencil[0].pos*stencil[0].pos
-              - stencil[0].pos*stencil[1].pos
-              - stencil[0].pos*stencil[2].pos
-              + stencil[1].pos*stencil[2].pos);
-
-  real c1 = -2./(stencil[0].pos*stencil[1].pos
-               - stencil[0].pos*stencil[2].pos
-               - stencil[1].pos*stencil[1].pos
-               + stencil[1].pos*stencil[2].pos);
-
-  real c2 = 2./(stencil[0].pos*stencil[1].pos
-              - stencil[0].pos*stencil[2].pos
-              - stencil[1].pos*stencil[2].pos
-              + stencil[2].pos*stencil[2].pos);
-
-  return c0*stencil[0].val+c1*stencil[1].val+c2*stencil[2].val;
+  return 0.0;
 }
 
 /******************************************************************************/
-real Topology::third_order_second(const std::vector<StencilPoint> & stencil)
-                                                                         const {
+real Topology::third_order_third(const std::vector<StencilPoint> & stencil)
+                                                                       const {
 /***************************************************************************//**
-*  \brief Approximate second derivative using a third-order difference.
+*  \brief Approximate third derivative using a third-order difference.
 *******************************************************************************/
-  real c0 = -2.*(stencil[1].pos + stencil[2].pos + stencil[3].pos)
-               /(stencil[0].pos*stencil[0].pos*stencil[0].pos
+
+  real c0 =  6./(stencil[0].pos*stencil[0].pos*stencil[0].pos
                - stencil[0].pos*stencil[0].pos*stencil[1].pos
                - stencil[0].pos*stencil[0].pos*stencil[2].pos
                - stencil[0].pos*stencil[0].pos*stencil[3].pos
@@ -91,8 +76,7 @@ real Topology::third_order_second(const std::vector<StencilPoint> & stencil)
                + stencil[0].pos*stencil[2].pos*stencil[3].pos
                - stencil[1].pos*stencil[2].pos*stencil[3].pos);
 
-  real c1 =  2.*(stencil[0].pos + stencil[2].pos + stencil[3].pos)
-               /(stencil[0].pos*stencil[1].pos*stencil[1].pos
+  real c1 = -6./(stencil[0].pos*stencil[1].pos*stencil[1].pos
                - stencil[0].pos*stencil[1].pos*stencil[2].pos
                - stencil[0].pos*stencil[1].pos*stencil[3].pos
                + stencil[0].pos*stencil[2].pos*stencil[3].pos
@@ -100,9 +84,8 @@ real Topology::third_order_second(const std::vector<StencilPoint> & stencil)
                + stencil[1].pos*stencil[1].pos*stencil[2].pos
                + stencil[1].pos*stencil[1].pos*stencil[3].pos
                - stencil[1].pos*stencil[2].pos*stencil[3].pos);
-
-  real c2 = -2.*(stencil[0].pos + stencil[1].pos + stencil[3].pos)
-               /(stencil[0].pos*stencil[1].pos*stencil[2].pos
+  
+  real c2 =  6./(stencil[0].pos*stencil[1].pos*stencil[2].pos
                - stencil[0].pos*stencil[1].pos*stencil[3].pos
                - stencil[0].pos*stencil[2].pos*stencil[2].pos
                + stencil[0].pos*stencil[2].pos*stencil[3].pos
@@ -111,14 +94,13 @@ real Topology::third_order_second(const std::vector<StencilPoint> & stencil)
                + stencil[2].pos*stencil[2].pos*stencil[2].pos
                - stencil[2].pos*stencil[2].pos*stencil[3].pos);
 
-  real c3 =  2.*(stencil[0].pos + stencil[1].pos + stencil[2].pos)
-               /(stencil[0].pos*stencil[1].pos*stencil[2].pos
+  real c3 = -6./(stencil[0].pos*stencil[1].pos*stencil[2].pos
                - stencil[0].pos*stencil[1].pos*stencil[3].pos
                - stencil[0].pos*stencil[2].pos*stencil[3].pos
-               + stencil[0].pos*stencil[3].pos*stencil[3].pos
+               + stencil[0].pos*stencil[3].pos*stencil[3].pos 
                - stencil[1].pos*stencil[2].pos*stencil[3].pos
                + stencil[1].pos*stencil[3].pos*stencil[3].pos
-               + stencil[2].pos*stencil[3].pos*stencil[3].pos
+               + stencil[2].pos*stencil[3].pos*stencil[3].pos 
                - stencil[3].pos*stencil[3].pos*stencil[3].pos);
 
   return c0*stencil[0].val+c1*stencil[1].val
@@ -126,34 +108,33 @@ real Topology::third_order_second(const std::vector<StencilPoint> & stencil)
 }
 
 /******************************************************************************/
-real Topology::fourth_order_second(const std::vector<StencilPoint> & stencil)
+real Topology::fourth_order_third(const std::vector<StencilPoint> & stencil)
                                                                          const {
 /***************************************************************************//**
-*  \brief Approximate second derivative using a fourth-order difference.
+*  \brief Approximate third derivative using a fourth-order difference.
 *******************************************************************************/
-  real c0 =  2.*(stencil[1].pos*stencil[2].pos + stencil[1].pos*stencil[3].pos
-               + stencil[1].pos*stencil[4].pos + stencil[2].pos*stencil[3].pos
-               + stencil[2].pos*stencil[4].pos + stencil[3].pos*stencil[4].pos)
-               /(stencil[0].pos*stencil[0].pos*stencil[0].pos*stencil[0].pos
-               - stencil[0].pos*stencil[0].pos*stencil[0].pos*stencil[1].pos
-               - stencil[0].pos*stencil[0].pos*stencil[0].pos*stencil[2].pos
-               - stencil[0].pos*stencil[0].pos*stencil[0].pos*stencil[3].pos
-               - stencil[0].pos*stencil[0].pos*stencil[0].pos*stencil[4].pos
-               + stencil[0].pos*stencil[0].pos*stencil[1].pos*stencil[2].pos
-               + stencil[0].pos*stencil[0].pos*stencil[1].pos*stencil[3].pos
-               + stencil[0].pos*stencil[0].pos*stencil[1].pos*stencil[4].pos
-               + stencil[0].pos*stencil[0].pos*stencil[2].pos*stencil[3].pos
-               + stencil[0].pos*stencil[0].pos*stencil[2].pos*stencil[4].pos
-               + stencil[0].pos*stencil[0].pos*stencil[3].pos*stencil[4].pos
-               - stencil[0].pos*stencil[1].pos*stencil[2].pos*stencil[3].pos
-               - stencil[0].pos*stencil[1].pos*stencil[2].pos*stencil[4].pos
-               - stencil[0].pos*stencil[1].pos*stencil[3].pos*stencil[4].pos
-               - stencil[0].pos*stencil[2].pos*stencil[3].pos*stencil[4].pos
-               + stencil[1].pos*stencil[2].pos*stencil[3].pos*stencil[4].pos);
 
-  real c1 = -2.*(stencil[0].pos*stencil[2].pos + stencil[0].pos*stencil[3].pos
-               + stencil[0].pos*stencil[4].pos + stencil[2].pos*stencil[3].pos
-               + stencil[2].pos*stencil[4].pos + stencil[3].pos*stencil[4].pos)
+  real c0 =  -6.*(stencil[1].pos + stencil[2].pos
+                + stencil[3].pos + stencil[4].pos)
+                /(stencil[0].pos*stencil[0].pos*stencil[0].pos*stencil[0].pos
+                - stencil[0].pos*stencil[0].pos*stencil[0].pos*stencil[1].pos
+                - stencil[0].pos*stencil[0].pos*stencil[0].pos*stencil[2].pos
+                - stencil[0].pos*stencil[0].pos*stencil[0].pos*stencil[3].pos
+                - stencil[0].pos*stencil[0].pos*stencil[0].pos*stencil[4].pos
+                + stencil[0].pos*stencil[0].pos*stencil[1].pos*stencil[2].pos
+                + stencil[0].pos*stencil[0].pos*stencil[1].pos*stencil[3].pos
+                + stencil[0].pos*stencil[0].pos*stencil[1].pos*stencil[4].pos
+                + stencil[0].pos*stencil[0].pos*stencil[2].pos*stencil[3].pos
+                + stencil[0].pos*stencil[0].pos*stencil[2].pos*stencil[4].pos
+                + stencil[0].pos*stencil[0].pos*stencil[3].pos*stencil[4].pos
+                - stencil[0].pos*stencil[1].pos*stencil[2].pos*stencil[3].pos
+                - stencil[0].pos*stencil[1].pos*stencil[2].pos*stencil[4].pos
+                - stencil[0].pos*stencil[1].pos*stencil[3].pos*stencil[4].pos
+                - stencil[0].pos*stencil[2].pos*stencil[3].pos*stencil[4].pos 
+                + stencil[1].pos*stencil[2].pos*stencil[3].pos*stencil[4].pos);
+
+  real c1 =  6.*(stencil[0].pos + stencil[2].pos
+               + stencil[3].pos + stencil[4].pos)
                /(stencil[0].pos*stencil[1].pos*stencil[1].pos*stencil[1].pos
                - stencil[0].pos*stencil[1].pos*stencil[1].pos*stencil[2].pos
                - stencil[0].pos*stencil[1].pos*stencil[1].pos*stencil[3].pos
@@ -171,9 +152,8 @@ real Topology::fourth_order_second(const std::vector<StencilPoint> & stencil)
                - stencil[1].pos*stencil[1].pos*stencil[3].pos*stencil[4].pos
                + stencil[1].pos*stencil[2].pos*stencil[3].pos*stencil[4].pos);
 
-  real c2 =  2.*(stencil[0].pos*stencil[1].pos + stencil[0].pos*stencil[3].pos
-               + stencil[0].pos*stencil[4].pos + stencil[1].pos*stencil[3].pos
-               + stencil[1].pos*stencil[4].pos + stencil[3].pos*stencil[4].pos)
+  real c2 = -6.*(stencil[0].pos + stencil[1].pos
+               + stencil[3].pos + stencil[4].pos)
                /(stencil[0].pos*stencil[1].pos*stencil[2].pos*stencil[2].pos
                - stencil[0].pos*stencil[1].pos*stencil[2].pos*stencil[3].pos
                - stencil[0].pos*stencil[1].pos*stencil[2].pos*stencil[4].pos
@@ -191,9 +171,8 @@ real Topology::fourth_order_second(const std::vector<StencilPoint> & stencil)
                - stencil[2].pos*stencil[2].pos*stencil[2].pos*stencil[4].pos
                + stencil[2].pos*stencil[2].pos*stencil[3].pos*stencil[4].pos);
 
-  real c3 = -2.*(stencil[0].pos*stencil[1].pos + stencil[0].pos*stencil[2].pos
-               + stencil[0].pos*stencil[4].pos + stencil[1].pos*stencil[2].pos
-               + stencil[1].pos*stencil[4].pos + stencil[2].pos*stencil[4].pos)
+  real c3 =  6.*(stencil[0].pos + stencil[1].pos
+               + stencil[2].pos + stencil[4].pos)
                /(stencil[0].pos*stencil[1].pos*stencil[2].pos*stencil[3].pos
                - stencil[0].pos*stencil[1].pos*stencil[2].pos*stencil[4].pos
                - stencil[0].pos*stencil[1].pos*stencil[3].pos*stencil[3].pos
@@ -211,9 +190,8 @@ real Topology::fourth_order_second(const std::vector<StencilPoint> & stencil)
                - stencil[3].pos*stencil[3].pos*stencil[3].pos*stencil[3].pos
                + stencil[3].pos*stencil[3].pos*stencil[3].pos*stencil[4].pos);
 
-  real c4 =  2.*(stencil[0].pos*stencil[1].pos + stencil[0].pos*stencil[2].pos
-               + stencil[0].pos*stencil[3].pos + stencil[1].pos*stencil[2].pos
-               + stencil[1].pos*stencil[3].pos + stencil[2].pos*stencil[3].pos)
+  real c4 = -6.*(stencil[0].pos + stencil[1].pos
+               + stencil[2].pos + stencil[3].pos)
                /(stencil[0].pos*stencil[1].pos*stencil[2].pos*stencil[3].pos
                - stencil[0].pos*stencil[1].pos*stencil[2].pos*stencil[4].pos
                - stencil[0].pos*stencil[1].pos*stencil[3].pos*stencil[4].pos
@@ -230,7 +208,7 @@ real Topology::fourth_order_second(const std::vector<StencilPoint> & stencil)
                - stencil[2].pos*stencil[4].pos*stencil[4].pos*stencil[4].pos
                - stencil[3].pos*stencil[4].pos*stencil[4].pos*stencil[4].pos
                + stencil[4].pos*stencil[4].pos*stencil[4].pos*stencil[4].pos);
-  
-  return c0*stencil[0].val+c1*stencil[1].val+c2*stencil[2].val
-        +c3*stencil[3].val+c4*stencil[4].val;
+
+  return c0*stencil[0].val+c1*stencil[1].val
+        +c2*stencil[2].val+c3*stencil[3].val+c4*stencil[4].val;
 }

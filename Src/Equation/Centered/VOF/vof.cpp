@@ -40,6 +40,7 @@ VOF::VOF(const Scalar & PHI,
   wall_curv_method(CurvMethod::DivNorm()),
   subgrid_method(SubgridMethod::PLIC()),
   topo_method(TopoMethod::Hybrid()),
+  advect_method(AdvectionMethod::BoundedSplit()),
   hf_set(),
   bflag_struct(PHI)
 
@@ -166,7 +167,24 @@ VOF::VOF(const Scalar & PHI,
   store_pressure_extrap=false;
   niter_pressure_extrap=1000;
 
-  discretize();
+  /* labelling of advection directions */
+  label_adv = {0,1,2,3,4,5};
+
+  /* dims 0,1,3 are fine */
+  /* 5 is not achievable for sure */
+  if(bflag_struct.dim==2) {
+    /* xy */
+    if(!bflag_struct.kfull) {
+      label_adv = {0,1,5,2,3,5};
+    /* xz */
+    } else if(!bflag_struct.jfull) {
+      label_adv = {0,5,1,2,5,3};
+    /* yz */
+    } else {
+      label_adv = {5,0,1,5,2,3};
+    }
+  }
+
 
   /* apply boundary condition */
   phi.bnd_update();

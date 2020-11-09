@@ -19,18 +19,21 @@ int main(int argc, char * argv[]) {
 
   boil::timer.start();
 
-  if(argc<3){
+  if(argc<4){
     boil::oout<<"Three arguments (gridlevel, cfl, inversion) required!"<<"\n";
-    boil::oout<<"./Boil gridlevel cfl-max inversion"<<"\n";
+    boil::oout<<"./Boil wmin gridlevel cfl-max inversion"<<"\n";
     exit(0);
   }
-  const int level = atoi(argv[1]);
+  const real wmin = atof(argv[1]);
+  boil::oout<<"wmin= "<<wmin<<"\n";
+
+  const int level = atoi(argv[2]);
   boil::oout<<"glevel= "<<level<<"\n";
 
-  const real cfl_max = atof(argv[2]);
+  const real cfl_max = atof(argv[3]);
   boil::oout<<"cfl-max= "<<cfl_max<<"\n";
 
-  const bool inverted = atoi(argv[3]);
+  const bool inverted = atoi(argv[4]);
   boil::oout<<"inversion= "<<inverted<<"\n";
 
   /* computed parameters */
@@ -264,6 +267,8 @@ int main(int argc, char * argv[]) {
   conc.color_to_vf(cold,c);
   conc.color_to_vf(cold,cold2);
 #endif
+  //conc.set_advection_method(AdvectionMethod::ReconstructedSplit());
+  conc.set_advection_method(AdvectionMethod::BoundedSplit());
 
   conc.ancillary();
   conc.totalvol();

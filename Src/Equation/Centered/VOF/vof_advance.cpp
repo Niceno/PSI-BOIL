@@ -8,24 +8,27 @@ void VOF::advance(const bool anci) {
   advance(phi,anci);
 }
 
-void VOF::advance(Scalar & scp, const bool anci) {
+void VOF::advance(const Scalar & scp, const bool anci) {
  
   boil::timer.start("vof advance");
+  
+  /* reset phi */
+  phi = scp;
 
   /*---------------------+
   |  phase change shift  |
   +---------------------*/
-  advance_phase_change(scp);
+  advance_phase_change(phi);
 
   /*-----------------------+
   |  reconstruct geometry  |
   +-----------------------*/
-  reconstruct_geometry(scp);
+  reconstruct_geometry(phi);
 
   /*--------------------+
   |  geometric advance  |
   +--------------------*/
-  advance_geometric(scp);
+  advance_geometric(phi);
 
   boil::timer.stop("vof advance");
 
@@ -33,7 +36,7 @@ void VOF::advance(Scalar & scp, const bool anci) {
   |  ancillary ITM parameters  |
   +---------------------------*/
   if(anci)
-    ancillary(color());
+    ancillary(color(),false);
 
   return;
 }
@@ -50,7 +53,7 @@ void VOF::advance_with_extrapolation(const bool anci, const ResRat & resrat,
                              fluid_1,uvw_1,fluid_2,uvw_2);
 }
 
-void VOF::advance_with_extrapolation(Scalar & scp, 
+void VOF::advance_with_extrapolation(const Scalar & scp, 
                                      const bool anci, const ResRat & resrat,
                                      const Vector & umixed, const Scalar & fext, 
                                      const Matter * fluid_1, Vector * uvw_1,
@@ -58,15 +61,18 @@ void VOF::advance_with_extrapolation(Scalar & scp,
 
   boil::timer.start("vof advance");
 
+  /* reset phi */
+  phi = scp;
+
   /*---------------------+
   |  phase change shift  |
   +---------------------*/
-  advance_phase_change(scp);
+  advance_phase_change(phi);
 
   /*-----------------------+
   |  reconstruct geometry  |
   +-----------------------*/
-  reconstruct_geometry(scp);
+  reconstruct_geometry(phi);
 
   boil::timer.stop("vof advance");
 
@@ -90,7 +96,7 @@ void VOF::advance_with_extrapolation(Scalar & scp,
   /*--------------------+
   |  geometric advance  |
   +--------------------*/
-  advance_geometric(scp);
+  advance_geometric(phi);
 
   boil::timer.stop("vof advance");
 
@@ -98,7 +104,7 @@ void VOF::advance_with_extrapolation(Scalar & scp,
   |  ancillary ITM parameters  |
   +---------------------------*/
   if(anci)
-    ancillary(color());
+    ancillary(color(),false);
 
   return;
 }
@@ -115,7 +121,7 @@ void VOF::advance_with_extrapolation(const bool anci, const ResRat & resrat,
                              fluid_1,uvw_1,fluid_2,uvw_2);
 }
 
-void VOF::advance_with_extrapolation(Scalar & scp, 
+void VOF::advance_with_extrapolation(const Scalar & scp, 
                                      const bool anci, const ResRat & resrat,
                                      const Vector & umixed,
                                      const Matter * fluid_1, Vector * uvw_1,
@@ -123,15 +129,18 @@ void VOF::advance_with_extrapolation(Scalar & scp,
 
   boil::timer.start("vof advance");
 
+  /* reset phi */
+  phi = scp;
+
   /*---------------------+
   |  phase change shift  |
   +---------------------*/
-  advance_phase_change(scp);
+  advance_phase_change(phi);
 
   /*-----------------------+
   |  reconstruct geometry  |
   +-----------------------*/
-  reconstruct_geometry(scp);
+  reconstruct_geometry(phi);
 
   boil::timer.stop("vof advance");
 
@@ -155,7 +164,7 @@ void VOF::advance_with_extrapolation(Scalar & scp,
   /*--------------------+
   |  geometric advance  |
   +--------------------*/
-  advance_geometric(scp);
+  advance_geometric(phi);
 
   boil::timer.stop("vof advance");
 
@@ -163,7 +172,7 @@ void VOF::advance_with_extrapolation(Scalar & scp,
   |  ancillary ITM parameters  |
   +---------------------------*/
   if(anci)
-    ancillary(color());
+    ancillary(color(),false);
 
   return;
 }
@@ -192,31 +201,34 @@ void VOF::advance_geometric(Scalar & scp) {
   for_m(m)
     vflow(m) = 0.;
 
-  /* advance in x-direction */
-  if(bflag_struct.ifull)
-    advance_x(scp);
+  /* different methods */
+  if(advect_method==AdvectionMethod::NaiveSplit()) {
+    advect_naive(scp);
+  } else if(advect_method==AdvectionMethod::ReconstructedSplit()) {
+    advect_reconstructed(scp);
+  } else if(advect_method==AdvectionMethod::BoundedSplit()) {
+    advect_bounded(scp);
+  }
 
-  /* advance in y-direction */
-  if(bflag_struct.jfull)
-    advance_y(scp);
-  
-  /* advance in z-direction */
-  if(bflag_struct.kfull)
-    advance_z(scp);
+  return;
+}
+
+/******************************************************************************/
+void VOF::update_phi(const Scalar & cellvol, Scalar & scp) {
 
   /* update phi */
-  if (limit_color) {
+  if(limit_color) {
     for_ijk(i,j,k){
-      real phi_tmp = stmp[i][j][k] / dV(i,j,k);
-      phi[i][j][k] = std::min(1.0,std::max(0.0,phi_tmp));
+      real phi_tmp = cellvol[i][j][k] / dV(i,j,k);
+      scp[i][j][k] = std::min(1.0,std::max(0.0,phi_tmp));
     }
   } else {
     int ierr=0;
     for_ijk(i,j,k){
-      phi[i][j][k] = stmp[i][j][k] / dV(i,j,k);
-      if (phi[i][j][k]<-1.0||phi[i][j][k]>2.0) {
+      scp[i][j][k] = cellvol[i][j][k] / dV(i,j,k);
+      if (scp[i][j][k]<-1.0||scp[i][j][k]>2.0) {
         boil::aout<<"Error!!! Too small or too large phi in vof_advance. phi= "
-                  <<phi[i][j][k]<<"\n";
+                  <<scp[i][j][k]<<"\n";
         boil::aout<<"proc= "<<boil::cart.iam()
                   <<" (i,j,k)= "<<i<<" "<<j<<" "<<k<<"\n";
         boil::aout<<"(x,y,z)= "<<phi.xc(i)<<" "<<phi.yc(j)<<" "<<phi.zc(k)<<"\n";
@@ -224,15 +236,14 @@ void VOF::advance_geometric(Scalar & scp) {
       }
     }
     boil::cart.sum_int(&ierr);
-    if (ierr>=1) {
-      boil::plot->plot((*u),phi,color(),kappa, "uvw-phi-clr-kappa", time->current_step());
+    if(ierr>=1) {
+      boil::plot->plot((*u),scp,color(),"uvw-phi-clr", time->current_step());
       exit(0);
     }
   }
 
-  phi.bnd_update();
-  phi.exchange_all();
-
+  scp.bnd_update();
+  scp.exchange_all();
+  
   return;
 }
-

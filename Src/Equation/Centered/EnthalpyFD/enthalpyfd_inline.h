@@ -19,3 +19,17 @@
       boil::oout<<"EnthalpyFD::no_solid_acceleration= "
                 <<accelerated_no_solid<<"\n";
     }
+
+    inline bool stencil_min(const Comp & m, 
+                            const int i, const int j, const int k) const {
+      return (m==Comp::i())*(i==si() && bflag_struct.iminc)
+            +(m==Comp::j())*(j==sj() && bflag_struct.jminc)
+            +(m==Comp::k())*(k==sk() && bflag_struct.kminc);
+    }
+
+    inline bool stencil_max(const Comp & m, 
+                            const int i, const int j, const int k) const {
+      return (m==Comp::i())*(i==ei() && bflag_struct.imaxc)
+            +(m==Comp::j())*(j==ej() && bflag_struct.jmaxc)
+            +(m==Comp::k())*(k==ek() && bflag_struct.kmaxc);
+    }

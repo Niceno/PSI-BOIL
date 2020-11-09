@@ -10,6 +10,8 @@
 #include "../../Ravioli/accorder.h"
 #include <set>
 
+#include "topology_ravioli.h"
+
 ////////////////
 //            //
 //  Topology  //
@@ -119,38 +121,63 @@ class Topology {
     inline Sign sign_interface_old(const int i, const int j, const int k) 
       const { return sign_interface(clrold[i][j][k]); }
     
-    /* differences */
-    real zeroth_order_first(const std::vector<real> & stencil,
-                            const std::vector<real> & values) const;
-    real first_order_first (const std::vector<real> & stencil,
-                            const std::vector<real> & values) const;
-    real second_order_first(const std::vector<real> & stencil,
-                            const std::vector<real> & values) const;
-    real third_order_first (const std::vector<real> & stencil,
-                            const std::vector<real> & values) const;
-    real fourth_order_first(const std::vector<real> & stencil,
-                            const std::vector<real> & values) const;
-    real nth_order_first(const std::vector<real> & stencil,
-                         const std::vector<real> & values,
+    /* differences; order = number of points used (not acc order) */
+    /* zeroth difference = interpolation */
+    real nth_order_nth(const std::vector<StencilPoint> & stencil,
+                       const AccuracyOrder & order_der,
+                       const AccuracyOrder & order_dif) const {
+      switch(order_der.eval()) {
+        case 0 :
+          return nth_order_zeroth(stencil,order_dif);
+        case 1 :
+          return nth_order_first(stencil,order_dif);
+        case 2 :
+          return nth_order_second(stencil,order_dif);
+        case 3 :
+          return nth_order_third(stencil,order_dif);
+        default :
+          boil::aout<<"Topology: unrecognised difference requested. Exiting."
+                    <<boil::endl;
+          exit(0);
+      }
+      return 0.0;
+    }
+
+    real zeroth_order_zeroth(const std::vector<StencilPoint> & stencil) const;
+    real first_order_zeroth (const std::vector<StencilPoint> & stencil) const;
+    real second_order_zeroth(const std::vector<StencilPoint> & stencil) const;
+    real third_order_zeroth (const std::vector<StencilPoint> & stencil) const;
+    real fourth_order_zeroth(const std::vector<StencilPoint> & stencil) const;
+    real nth_order_zeroth(const std::vector<StencilPoint> & stencil,
+                          const AccuracyOrder & order) const;
+
+    real zeroth_order_first(const std::vector<StencilPoint> & stencil) const;
+    real first_order_first (const std::vector<StencilPoint> & stencil) const;
+    real second_order_first(const std::vector<StencilPoint> & stencil) const;
+    real third_order_first (const std::vector<StencilPoint> & stencil) const;
+    real fourth_order_first(const std::vector<StencilPoint> & stencil) const;
+    real nth_order_first(const std::vector<StencilPoint> & stencil,
                          const AccuracyOrder & order) const;
 
-    real zeroth_order_second(const std::vector<real> & stencil,
-                             const std::vector<real> & values) const;
-    real first_order_second (const std::vector<real> & stencil,
-                             const std::vector<real> & values) const;
-    real second_order_second(const std::vector<real> & stencil,
-                             const std::vector<real> & values) const;
-    real third_order_second (const std::vector<real> & stencil,
-                             const std::vector<real> & values) const;
-    real fourth_order_second(const std::vector<real> & stencil,
-                             const std::vector<real> & values) const;
-    real nth_order_second(const std::vector<real> & stencil,
-                          const std::vector<real> & values,
+    real zeroth_order_second(const std::vector<StencilPoint> & stencil) const;
+    real first_order_second (const std::vector<StencilPoint> & stencil) const;
+    real second_order_second(const std::vector<StencilPoint> & stencil) const;
+    real third_order_second (const std::vector<StencilPoint> & stencil) const;
+    real fourth_order_second(const std::vector<StencilPoint> & stencil) const;
+    real nth_order_second(const std::vector<StencilPoint> & stencil,
                           const AccuracyOrder & order) const;
+
+    real zeroth_order_third(const std::vector<StencilPoint> & stencil) const;
+    real first_order_third (const std::vector<StencilPoint> & stencil) const;
+    real second_order_third(const std::vector<StencilPoint> & stencil) const;
+    real third_order_third (const std::vector<StencilPoint> & stencil) const;
+    real fourth_order_third(const std::vector<StencilPoint> & stencil) const;
+    real nth_order_third(const std::vector<StencilPoint> & stencil,
+                         const AccuracyOrder & order) const;
 
     /* testing */
     bool test_differences_first(const int count);
-    bool test_differences_first(const std::vector<real> & stencil,
+    bool test_differences_first(const std::vector<real> & stenpos,
                                 const std::vector<real> & coefficients);
     real evaluate_polynomial(const int order,
                              const std::vector<real> & coefficients,

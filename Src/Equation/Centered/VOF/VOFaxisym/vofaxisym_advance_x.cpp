@@ -1,7 +1,7 @@
 #include "vofaxisym.h"
 
 /******************************************************************************/
-void VOFaxisym::advance_x(Scalar & scp) {
+void VOFaxisym::advance_x(const Scalar & scp) {
   
   /* advance in the x-direction */
 

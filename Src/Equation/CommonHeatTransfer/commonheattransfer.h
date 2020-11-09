@@ -104,8 +104,7 @@ class CommonHeatTransfer {
                            const bool discard_points,
                            const Old old = Old::no) const;
 
-    void construct_stencil(std::vector<real> & stencil,
-                           std::vector<real> & values,
+    void construct_stencil(std::vector<StencilPoint> & stencil,
                            const bool is_solid, const Comp & m,
                            const int i, const int j, const int k,
                            const AccuracyOrder & accuracy_order,
@@ -117,8 +116,7 @@ class CommonHeatTransfer {
                    const Sign dir, const Comp & m,
                    const bool is_solid, bool & terminate,
                    bool & interface_reached,
-                   std::vector<real> & stencil,
-                   std::vector<real> & values,
+                   std::vector<StencilPoint> & stencil,
                    const Old old) const;
 
     /* calculate solid wall temperature */

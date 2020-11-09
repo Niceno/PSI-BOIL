@@ -8,6 +8,7 @@ libVof_a_SOURCES =      vof.h                              \
                         vof_advance_x.cpp                  \
                         vof_advance_y.cpp                  \
                         vof_advance_z.cpp                  \
+			vof_advection_schemes.cpp          \
                         vof_ancillary.cpp                  \
                         vof_bdnorm.cpp                     \
                         vof_bndclr.cpp                     \

@@ -41,7 +41,7 @@ class VOF : public Centered {
     void forward(Scalar & scp);
 
     void advance(const bool anci = true);
-    void advance(Scalar & sca, const bool anci = true);
+    void advance(const Scalar & sca, const bool anci = true);
 
     void advance_with_extrapolation(const bool anci, const ResRat & resrat,
                                     const Vector & umixed, const Scalar & fext,
@@ -49,7 +49,7 @@ class VOF : public Centered {
                                     const Matter * fluid_2 = NULL,
                                     Vector * uvw_2 = NULL);
 
-    void advance_with_extrapolation(Scalar & sca,
+    void advance_with_extrapolation(const Scalar & sca,
                                     const bool anci, const ResRat & resrat,
                                     const Vector & umixed, const Scalar & fext,
                                     const Matter * fluid_1, Vector * uvw_1,
@@ -62,7 +62,7 @@ class VOF : public Centered {
                                     const Matter * fluid_2 = NULL,
                                     Vector * uvw_2 = NULL);
 
-    void advance_with_extrapolation(Scalar & sca,
+    void advance_with_extrapolation(const Scalar & sca,
                                     const bool anci, const ResRat & resrat,
                                     const Vector & umixed,
                                     const Matter * fluid_1, Vector * uvw_1,
@@ -74,7 +74,8 @@ class VOF : public Centered {
     
 
     void curvature();
-    void ancillary(); /* calcs ancillary params such as adens w/o advance */
+    /* calcs ancillary params such as adens w/o advance */
+    void ancillary(const bool reconstruct = true);
     virtual void reconstruct_geometry();
     virtual void reconstruct_geometry(Scalar & scp);
 
@@ -138,6 +139,7 @@ class VOF : public Centered {
     void cal_adens_gradclr_2phi(Scalar & adensgeom, const Scalar & sca);
     void cal_adens_gradclr_6phi(Scalar & adensgeom, const Scalar & sca);
 
+    void color_minmax();
 #include "vof_inline.h"
 
     Vector * bndclr;
@@ -146,10 +148,17 @@ class VOF : public Centered {
     Scalar nalpha;
     Scalar nx,ny,nz;/* normal to interface */
   protected:
-    void ancillary(Scalar & scp);
-    virtual void advance_x(Scalar & sca);
-    virtual void advance_y(Scalar & sca);
-    virtual void advance_z(Scalar & sca);
+    void ancillary(Scalar & scp, const bool reconstruct = true);
+    virtual void advance_x(const Scalar & sca);
+    virtual void advance_y(const Scalar & sca);
+    virtual void advance_z(const Scalar & sca);
+
+    void update_phi(const Scalar & cellvol, Scalar & sca);
+    void advect_naive(Scalar & scp);
+    void advect_reconstructed(Scalar & scp);
+    void advect_bounded(Scalar & scp);
+    void divergence_skew(const Comp & m, const ScalarInt & marker,
+                         Scalar & cellvol);
 
     void ev_discretize(const Matter * fluid, const ScalarInt & pflag,
                        Matrix & A);
@@ -395,7 +404,11 @@ class VOF : public Centered {
     CurvMethod bulk_curv_method, wall_curv_method;
     SubgridMethod subgrid_method;
     TopoMethod topo_method;
+    AdvectionMethod advect_method;
     HFset hf_set;
+
+    /* labels for advection rotation */
+    std::array<int,6> label_adv;
 
     int niter_pressure_extrap;
     int Nfilm_crit;

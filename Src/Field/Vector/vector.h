@@ -189,6 +189,15 @@ class Vector {
               real *, real *, real *,
               real *, real *, real *) const;
 
+    /* divergence */
+    real divergence(const Comp & m, const int i, const int j, const int k) const
+    { return (this->*pnt_div[~m])(i,j,k); }
+    real divergence(const int i, const int j, const int k) const {
+      return divergence(Comp::u(),i,j,k)
+            +divergence(Comp::v(),i,j,k)
+            +divergence(Comp::w(),i,j,k);
+    }
+
     /* outflow from a scalar cell = integral divergence */
     real outflow(const int i, const int j, const int k) const;
 
@@ -295,6 +304,8 @@ class Vector {
 
     real (Vector::*pnt_dV[3])(const int i, const int j, const int k) const;
 
+    real (Vector::*pnt_div[3])(const int i, const int j, const int k) const;
+
     /* these will be pointed to by above pointers */
     real xc_nrm      (const int i) const {return dom-> xc(i);}
     real xc_staggered(const int i) const {return dom-> xn(i);}
@@ -382,6 +393,26 @@ class Vector {
     real dV_xstaggered(const int i, const int j, const int k) const {return dom->dV_xstag(i,j,k);}
     real dV_ystaggered(const int i, const int j, const int k) const {return dom->dV_ystag(i,j,k);}
     real dV_zstaggered(const int i, const int j, const int k) const {return dom->dV_zstag(i,j,k);}
+
+    /* divergence */
+    real div_zero(const int i, const int j, const int k) const { return 0.; } /* for pseudo dir */
+    real div_x_cart(const int i, const int j, const int k) const {
+      return (vec[Comp::u()][i+1][j][k]-vec[Comp::u()][i][j][k])
+             /dxe(Comp::u(),i);
+    }
+    real div_y_cart(const int i, const int j, const int k) const {
+      return (vec[Comp::v()][i][j+1][k]-vec[Comp::v()][i][j][k])
+             /dyn(Comp::v(),j);
+    }
+    real div_z_cart(const int i, const int j, const int k) const {
+      return (vec[Comp::w()][i][j][k+1]-vec[Comp::w()][i][j][k])
+             /dzt(Comp::k(),k);
+    }
+    real div_x_axi(const int i, const int j, const int k) const {
+      return (vec[Comp::u()][i+1][j][k]*xc(Comp::u(),i+1)
+             -vec[Comp::u()][i  ][j][k]*xc(Comp::u(),i  ))
+             /dxe(Comp::u(),i)/xn(Comp::u(),i+1);
+    }
 
     /* take care that all of the data bellow is passed in copy constructor */
     ScalarP  vec;

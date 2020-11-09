@@ -1,5 +1,5 @@
 /* getter and setter for wall value tolerance */
-inline real get_tol_wall() { return tol_wall; }
+inline real get_tol_wall() const { return tol_wall; }
 inline void set_tol_wall(real tolnew) {
   tol_wall = tolnew;
   boil::oout<<"VOF: New wall value tolerance: "<<tol_wall<<boil::endl;
@@ -7,7 +7,7 @@ inline void set_tol_wall(real tolnew) {
 }
 
 /* getter and setter for bulk_curv_method */
-inline CurvMethod get_curv_method() {return bulk_curv_method;}
+inline CurvMethod get_curv_method() const {return bulk_curv_method;}
 void set_curv_method(const CurvMethod cm) {
   bulk_curv_method=cm;
   if(cm==CurvMethod::HF()){
@@ -23,13 +23,21 @@ void set_curv_method(const CurvMethod cm) {
   }
 }
 
+/* getter and setter for advect_method */
+inline AdvectionMethod get_advection_method() const {return advect_method;}
+void set_advection_method(const AdvectionMethod am) {
+  advect_method=am;
+  if(!boil::cart.iam())
+    boil::oout<<"VOF:::advection method: "<<am<<boil::endl;
+}
+
 /* setter for cangle */
 inline void set_cangle(const real r) {
   cangle=r/180.0*boil::pi;
   boil::oout<<"set_cangle: cangle= "<<r<<"\n";
 }
 /* getter for cangle */
-inline real get_cangle() { return(cangle/boil::pi*180.0);};
+inline real get_cangle() const { return(cangle/boil::pi*180.0);};
 
 /* setter for limit_color */
 inline void set_limit_color(const bool b) {
@@ -37,7 +45,7 @@ inline void set_limit_color(const bool b) {
   boil::oout<<"set_limit_color= "<<b<<"\n";
 }
 /* getter for limit_color */
-inline bool get_limit_color() { return(limit_color);};
+inline bool get_limit_color() const { return(limit_color);};
 
 /* setter for subgrid method */
 inline void set_subgrid_method(const SubgridMethod b) {
@@ -46,7 +54,7 @@ inline void set_subgrid_method(const SubgridMethod b) {
     boil::oout<<"Subgrid method: "<<subgrid_method<<boil::endl;
 }
 /* getter for subgrid method */
-inline SubgridMethod get_subgrid_method() { return(subgrid_method);};
+inline SubgridMethod get_subgrid_method() const { return(subgrid_method);};
 
 /* setter for use_interp */
 inline void set_use_interp(const bool b) {
@@ -54,12 +62,11 @@ inline void set_use_interp(const bool b) {
   boil::oout<<"set_use_interp= "<<b<<"\n";
 }
 /* getter for use_interp */
-inline bool get_use_interp() { return(use_interp);};
+inline bool get_use_interp() const { return(use_interp);};
 
 /* min and max of color function in fluid domain */
-inline real minval() {return minclr;}
-inline real maxval() {return maxclr;}
-void color_minmax();
+inline real minval() const {return minclr;}
+inline real maxval() const {return maxclr;}
 inline void set_minval(real r) {minclr=r;}
 inline void set_maxval(real r) {maxclr=r;}
 
@@ -109,10 +116,10 @@ void set_normal_vector_method_all(const NormMethod nm) {
 }
 
 /* getter for normal vector method */
-inline NormMethod get_normal_vector_method_advance() {
+inline NormMethod get_normal_vector_method_advance() const {
   return norm_method_advance;
 }
-inline NormMethod get_normal_vector_method_curvature() {
+inline NormMethod get_normal_vector_method_curvature() const {
   return norm_method_curvature;
 }
 
@@ -167,10 +174,10 @@ void set_wall_curv_method(const CurvMethod wcm,
 }
 
 /* getter for near-wall curvature method */
-inline CurvMethod get_wall_curv_method() { return wall_curv_method;};
+inline CurvMethod get_wall_curv_method() const { return wall_curv_method;};
 
 /* getter for critical film length */
-inline int get_critical_film_length() { return Nfilm_crit;};
+inline int get_critical_film_length() const { return Nfilm_crit;};
 
 /* setter for topoogy method */
 void set_topo_method(const TopoMethod tpm) {
@@ -181,7 +188,7 @@ void set_topo_method(const TopoMethod tpm) {
 }
 
 /* getter for topology method */
-inline TopoMethod get_topo_method() { return topo_method;};
+inline TopoMethod get_topo_method() const { return topo_method;};
 
 /* setter for pressure extrapolation */
 void set_pressure_extrapolation_parameters(const bool eflag, const int eiter) {
@@ -193,10 +200,10 @@ void set_pressure_extrapolation_parameters(const bool eflag, const int eiter) {
 }
 
 /* getter for pressure extrapolation */
-inline bool get_store_pressure_extrapolation_flag() { return store_pressure_extrap;}
-inline int get_pressure_extrapolation_maxiter() { return niter_pressure_extrap;}
+inline bool get_store_pressure_extrapolation_flag() const { return store_pressure_extrap;}
+inline int get_pressure_extrapolation_maxiter() const { return niter_pressure_extrap;}
 
 /* bounded color */
-inline real bounded_color(const real cval) {
+inline real bounded_color(const real cval) const {
   return std::max(0.0,std::min(1.0,cval));
 }

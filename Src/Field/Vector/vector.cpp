@@ -266,6 +266,27 @@ void Vector::coordinate() {
   pnt_dV[1] = &Vector::dV_ystaggered;
   pnt_dV[2] = &Vector::dV_zstaggered;
 
+  /* divergence */
+  if(dom->is_dummy(0)) {
+    pnt_div[0] = &Vector::div_zero;
+  } else {
+    if(dom->is_axisymmetric()) {
+      pnt_div[0] = &Vector::div_x_axi;
+    } else {
+      pnt_div[0] = &Vector::div_x_cart;
+    }
+  }
+  if(dom->is_dummy(1)) {
+    pnt_div[1] = &Vector::div_zero;
+  } else {
+    pnt_div[1] = &Vector::div_y_cart;
+  }
+  if(dom->is_dummy(2)) {
+    pnt_div[2] = &Vector::div_zero;
+  } else {
+    pnt_div[2] = &Vector::div_z_cart;
+  }
+
   return;
 }	
 

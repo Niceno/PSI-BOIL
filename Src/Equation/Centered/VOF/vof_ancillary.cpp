@@ -1,12 +1,12 @@
 #include "vof.h"
 
-void VOF::ancillary() {
-  ancillary(color());
+void VOF::ancillary(const bool reconstruct) {
+  ancillary(color(),reconstruct);
   return;
 }
 
 /******************************************************************************/
-void VOF::ancillary(Scalar & scp) {
+void VOF::ancillary(Scalar & scp, const bool reconstruct) {
 /***************************************************************************//**
 *  \brief Calculate ancillary vof parameters.
 *******************************************************************************/
@@ -15,7 +15,8 @@ void VOF::ancillary(Scalar & scp) {
 
   /* reconstruct geometry */
   /* attention! PHI must be used here! */
-  reconstruct_geometry(phi);
+  if(reconstruct)
+    reconstruct_geometry(phi);
 
   if(topo_method==TopoMethod::Hybrid()) {
 

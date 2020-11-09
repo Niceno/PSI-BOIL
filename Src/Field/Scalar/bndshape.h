@@ -133,7 +133,10 @@ class BndFlag {
       }
       if (sca.domain()->bnd_symmetry(d)) kmaxc=false;
     }
-  }
+ 
+    dim = int(ifull)+int(jfull)+int(kfull);
+
+  } /* constructor */
 
   bool iminp, imaxp, /* true for periodic */
        jminp, jmaxp,
@@ -145,5 +148,6 @@ class BndFlag {
        jminw, jmaxw,
        kminw, kmaxw,
        ifull, jfull, kfull;
+  int dim; /* true dimension of the problem */
 };
 #endif

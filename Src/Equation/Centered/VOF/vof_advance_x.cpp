@@ -1,7 +1,7 @@
 #include "vof.h"
 
 /******************************************************************************/
-void VOF::advance_x(Scalar & scp) {
+void VOF::advance_x(const Scalar & scp) {
   
   // advance in the x-direction
 

@@ -2,8 +2,7 @@
 
 /******************************************************************************/
 void CommonHeatTransfer::construct_stencil(
-                                 std::vector<real> & stencil,
-                                 std::vector<real> & values,
+                                 std::vector<StencilPoint> & stencil,
                                  const bool is_solid, const Comp & m,
                                  const int i, const int j, const int k,
                                  const AccuracyOrder & accuracy_order,
@@ -15,7 +14,6 @@ void CommonHeatTransfer::construct_stencil(
 
   /* reset vectors */
   stencil.clear();
-  values.clear();
 
   /* reference indices */
   int c_idx(-1), w_idx(-1), e_idx(-1), 
@@ -23,8 +21,7 @@ void CommonHeatTransfer::construct_stencil(
                  www_idx(-1), eee_idx(-1);
 
   /* add zeroth point */
-  stencil.push_back(0);
-  values.push_back(tpr[i][j][k]);
+  stencil.push_back(StencilPoint(0,tpr[i][j][k],0.));
   c_idx = stencil.size()-1;
 
   /* set-up generic directional indexing */
@@ -62,7 +59,7 @@ void CommonHeatTransfer::construct_stencil(
   bool discard_center_by_west = add_point(i+ii0,j+jj0,k+kk0, i+ii1,j+jj1,k+kk1,
                                           Sign::neg(), m, is_solid, 
                                           wend, interface_west,
-                                          stencil, values, old);
+                                          stencil, old);
   w_idx = stencil.size()-1;
 
   /* interface position is recorded, if true */
@@ -76,7 +73,7 @@ void CommonHeatTransfer::construct_stencil(
   bool discard_center_by_east = add_point(i+ii0,j+jj0,k+kk0, i+ii1,j+jj1,k+kk1,
                                           Sign::pos(), m, is_solid, 
                                           eend, interface_east,
-                                          stencil, values, old);
+                                          stencil, old);
   e_idx = stencil.size()-1;
 
   /* interface position is recorded, if true */
@@ -96,7 +93,6 @@ void CommonHeatTransfer::construct_stencil(
     }
 
     stencil.erase(stencil.begin() + dscrd_idx);
-    values.erase(values.begin() + dscrd_idx);
     return;
 
   } else {
@@ -118,7 +114,7 @@ void CommonHeatTransfer::construct_stencil(
     /* w-w point possibly marks w point for discard */
     if(add_point(i+ii0,j+jj0,k+kk0, i+ii1,j+jj1,k+kk1,
                  Sign::neg(), m, is_solid, wend, interface_west,
-                 stencil, values, old))
+                 stencil, old))
       discard_set.insert(w_idx);
 
     ww_idx = stencil.size()-1;
@@ -130,7 +126,7 @@ void CommonHeatTransfer::construct_stencil(
 #endif
 
     /* correct distance */
-    stencil[ww_idx] += stencil[w_idx];
+    stencil[ww_idx].pos += stencil[w_idx].pos;
   }
 
   /* east-east */
@@ -141,7 +137,7 @@ void CommonHeatTransfer::construct_stencil(
     /* e-e point possibly marks e point for discard */
     if(add_point(i+ii0,j+jj0,k+kk0, i+ii1,j+jj1,k+kk1,
                  Sign::pos(), m, is_solid, eend, interface_east,
-                 stencil, values, old))
+                 stencil, old))
       discard_set.insert(e_idx);
 
     ee_idx = stencil.size()-1;
@@ -153,7 +149,7 @@ void CommonHeatTransfer::construct_stencil(
 #endif
 
     /* correct distance */
-    stencil[ee_idx] += stencil[e_idx];
+    stencil[ee_idx].pos += stencil[e_idx].pos;
   }
 
   /*** if termination flags did not fire, add further points ***/
@@ -166,7 +162,7 @@ void CommonHeatTransfer::construct_stencil(
     /* w-w-w point possibly marks w-w point for discard */
     if(add_point(i+ii0,j+jj0,k+kk0, i+ii1,j+jj1,k+kk1,
                  Sign::neg(), m, is_solid, wend, interface_west,
-                 stencil, values, old))
+                 stencil, old))
       discard_set.insert(ww_idx);
 
     www_idx = stencil.size()-1;
@@ -178,7 +174,7 @@ void CommonHeatTransfer::construct_stencil(
 #endif
 
     /* correct distance */
-    stencil[www_idx] += stencil[ww_idx];
+    stencil[www_idx].pos += stencil[ww_idx].pos;
   }
 
   /* east-east-east */
@@ -189,7 +185,7 @@ void CommonHeatTransfer::construct_stencil(
     /* e-e-e point possibly marks e-e point for discard */
     if(add_point(i+ii0,j+jj0,k+kk0, i+ii1,j+jj1,k+kk1,
                  Sign::pos(), m, is_solid, eend, interface_east,
-                 stencil, values, old))
+                 stencil, old))
       discard_set.insert(ee_idx);
 
     eee_idx = stencil.size()-1;
@@ -201,7 +197,7 @@ void CommonHeatTransfer::construct_stencil(
 #endif
 
     /* correct distance */
-    stencil[eee_idx] += stencil[ee_idx];
+    stencil[eee_idx].pos += stencil[ee_idx].pos;
   }
 
   /*** do we want to reposition the stencil to an interface? ***/
@@ -209,11 +205,11 @@ void CommonHeatTransfer::construct_stencil(
      adjacent from one side -> xor gate used */
   if(accuracy_order.upwind()&&(interface_west^interface_east)) {
     real new_origin = interface_west ?
-                      stencil[int_west_idx] :
-                      stencil[int_east_idx];
+                      stencil[int_west_idx].pos :
+                      stencil[int_east_idx].pos;
     
     for(int idx(0); idx != stencil.size(); ++idx) {
-      stencil[idx] -= new_origin;
+      stencil[idx].pos -= new_origin;
     }
   }
 
@@ -225,7 +221,6 @@ void CommonHeatTransfer::construct_stencil(
        using reverse iteration */
     for(auto rit = discard_set.rbegin(); rit != discard_set.rend(); rit++) {
       stencil.erase( stencil.begin() + (*rit) );
-      values.erase( values.begin() + (*rit) );
     }
   }
 

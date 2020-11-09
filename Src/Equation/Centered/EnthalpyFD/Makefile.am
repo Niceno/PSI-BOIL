@@ -8,8 +8,8 @@ libEnthalpyFD_a_SOURCES = enthalpyfd.h                        \
                           enthalpyfd_convective_time_step.cpp \
                           enthalpyfd_diff_matrix.cpp          \
                           enthalpyfd_diffusion.cpp            \
-                          enthalpyfd_divergence.cpp           \
                           enthalpyfd_extrapolate_values.cpp   \
+                          enthalpyfd_face_value.cpp           \
                           enthalpyfd_inertial.cpp             \
                           enthalpyfd_new_time_step.cpp        \
                           enthalpyfd_solve.cpp                \
@@ -17,6 +17,7 @@ libEnthalpyFD_a_SOURCES = enthalpyfd.h                        \
                           enthalpyfd_system_bnd.cpp           \
                           enthalpyfd_system_diffusive.cpp     \
                           enthalpyfd_system_innertial.cpp     \
+			  enthalpyfd_test_extrapolation.cpp   \
                           enthalpyfd_update_rhs.cpp
 
 INCLUDE = -I@top_srcdir@/
