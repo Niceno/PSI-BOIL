@@ -33,3 +33,6 @@
             +(m==Comp::j())*(j==ej() && bflag_struct.jmaxc)
             +(m==Comp::k())*(k==ek() && bflag_struct.kmaxc);
     }
+
+    inline const Vector & flx_liq() const { return flux_liq; }
+    inline const Vector & flx_gas() const { return flux_gas; }

@@ -1,7 +1,7 @@
 #include "enthalpyfd.h"
 
 /* order of extrapolation */
-const int max_ord(3);
+const int max_ord(1);
 
 /***************************************************************************//**
 *  \brief Extrapolate value stencil for gradient calculation.
@@ -21,13 +21,8 @@ void EnthalpyFD::extrapolate_values(std::vector<StencilPoint> & stencil,
     for(int idx(ctm.idx); idx<=fin; ++idx) {
       cut_stencil.push_back(stencil[idx]);
     }
-    if(fin==ctp.idx&&ctp.idx<5)
+    if(cut_stencil.size()<max_ord+1&&ctp.idx<5)
       cut_stencil.push_back(ctp);
-
-    /* for the purposes of taylor extrapolation, stencil edge is set to zero */
-    const real zeropos = cut_stencil[0].pos;
-    for(auto & s : cut_stencil)
-      s.pos -= zeropos;
 
     /* point extrapolation */
     for(int idx(0); idx<ctm.idx; ++idx) {
@@ -37,7 +32,7 @@ void EnthalpyFD::extrapolate_values(std::vector<StencilPoint> & stencil,
              - real(ctm.idx-idx)*(stencil[ctm.idx+1].pos-stencil[ctm.idx].pos);
     }
     /* value extrapolation */
-    //point_extrapolation(stencil,0,ctm.idx,cut_stencil,zeropos);
+    point_extrapolation(stencil,0,ctm.idx,cut_stencil);
   }
 
   /* extrapolate east */
@@ -51,25 +46,17 @@ void EnthalpyFD::extrapolate_values(std::vector<StencilPoint> & stencil,
     for(int idx(ctp.idx); idx>=fin; --idx) {
       cut_stencil.push_back(stencil[idx]);
     }
-    if(fin==ctm.idx&&ctm.idx>0)
+    if(cut_stencil.size()<max_ord+1&&ctm.idx>0)
       cut_stencil.push_back(ctm);
 
-    /* for the purposes of taylor extrapolation, stencil edge is set to zero */
-    const real zeropos = cut_stencil[0].pos;
-    for(auto & s : cut_stencil)
-      s.pos -= zeropos;
-
     /* point extrapolation */
-    for(int idx(ctp.idx+1); idx<=5; ++idx) {
+    for(int idx(ctp.idx+1); idx<6; ++idx) {
 
       /* extend stencil linearly */
       stencil[idx].pos = stencil[ctp.idx].pos
              + real(idx-ctp.idx)*(stencil[ctp.idx].pos-stencil[ctp.idx-1].pos);
-      /* value extrapolation */
-      //stencil[idx].val = point_extrapolation(cut_stencil,
-      //                                       stencil[idx].pos-zeropos);
     }
-    //point_extrapolation(stencil,ctp.idx+1,5+1,cut_stencil,zeropos);
+    point_extrapolation(stencil,ctp.idx+1,5+1,cut_stencil);
   }
 
   return;
@@ -79,76 +66,91 @@ void EnthalpyFD::extrapolate_values(std::vector<StencilPoint> & stencil,
 /***************************************************************************//**
 *  Lagrangian extrapolation
 *******************************************************************************/
-real EnthalpyFD::point_extrapolation(const std::vector<StencilPoint> & stencil,
-                                     const real xpos) {
-  real L(0.0);
-  for(int j(0); j<stencil.size(); ++j) {
-    real p(1.);
-    for(int m(0); m<stencil.size(); ++m) {
-      if(m!=j)
-        p *= (xpos-stencil[m].pos)/(stencil[j].pos-stencil[m].pos);
-    }
-    L += stencil[j].val*p;
-  }
+void EnthalpyFD::point_extrapolation(std::vector<StencilPoint> & stencil,
+                                     const int i0, const int i1,
+                                     const std::vector<StencilPoint> & extcil) {
 
-  return L; 
+  assert(extcil.size()==max_ord+1);
+
+  for(int idx(i0); idx<i1; ++idx) {
+    real L(0.0);
+    for(int j(0); j<extcil.size(); ++j) {
+      real p(1.);
+      for(int m(0); m<extcil.size(); ++m) {
+        if(m!=j)
+          p *= (stencil[idx].pos-extcil[m].pos)/(extcil[j].pos-extcil[m].pos);
+      }
+      L += extcil[j].val*p;
+    }
+    stencil[idx].val = L;
+  }
 }
 #else
 /***************************************************************************//**
-*  Taylor extrapolation
+*  Taylor extrapolation. We use the fact that for a polynomial constructed with
+*  as many points as the order is, the difference at a given point is exactly
+*  equal to the derivative at that point.
 *******************************************************************************/
-real EnthalpyFD::point_extrapolation(std::vector<StencilPoint> & stencil,
-                                     const int i0, const i1,
-                                     const std::vector<StencilPoint> & extcil,
-                                     const real zeropos) {
-  /* construct Taylor polynomial */
-  std::vector<real> coefs;
-  cht.topo->construct_taylor_polynomial(extcil,coefs);
+void EnthalpyFD::point_extrapolation(std::vector<StencilPoint> & stencil,
+                                     const int i0, const int i1,
+                                     const std::vector<StencilPoint> & extcil) {
 
-  /* for linear and quadratic, just extrapolate */
-  if(coefs.size()<max_ord+1) {
-    for(int idx(i0); idx<i1; ++idx) {
-      stencil[idx].val = cht.topo->evaluate_polynomial(coefs.size()-1,coefs,
-                                                   stencil[idx].pos-zeropos);
-    }
+  std::vector<StencilPoint> modcil = extcil;
+  int ord(extcil.size()-1);
+
+  /*** testing for reduced-order ***/
+  bool flag =   (ord<=2) /* for linear and quadratic, just extrapolate */
+              || /* non-monotonic data */
+               !(  std::is_sorted(modcil.begin(),modcil.end(),
+                                  [](const StencilPoint & s1,
+                                     const StencilPoint & s2) {
+                                     return s1.val<s2.val;  })
+                 ||std::is_sorted(modcil.begin(),modcil.end(),
+                                  [](const StencilPoint & s1,
+                                     const StencilPoint & s2) {
+                                     return s1.val>s2.val;  })
+                );
+
+  if(flag) {
+    ord = std::min(2,ord);
   } else {
-    /* test for oscillations */
-    real det = 4.*coefs[2]*coefs[2]-12.*coefs[3]*coefs[1];
+    /* for monotonic, we test the derivatives at stencil point */
+    std::vector<real> ders;
 
-    /* no extrema or degenerate cubic: just extrapolate */
-    if(det<0.||fabs(coefs[3])<boil::atto) {
-      for(int idx(i0); idx<i1; ++idx) {
-        stencil[idx].val = cht.topo->evaluate_polynomial(coefs.size()-1,coefs,
-                                                    stencil[idx].pos-zeropos);
-      }
-    } else {
-      /* write down extrema */
-      real ext_1 = (-2.*coefs[2]+sqrt(det))/(6.*coefs[3]);
-      real ext_2 = (-2.*coefs[2]-sqrt(det))/(6.*coefs[3]);
-      Range<real> ext_range(
-                        std::min(extcil->begin().pos,extcil->rbegin().pos),
-                        std::max(extcil->begin().pos,extcil->rbegin().pos));
+    for(int idx(0); idx<modcil.size(); ++idx) {
+      /* shift origin to extrapolated point */
+      for(int jdx(0); jdx<modcil.size(); ++jdx)
+        modcil[jdx].pos = extcil[jdx].pos-extcil[idx].pos;
 
-      /* is extcil in an order? */
-      bool ext_ordered =  std::is_sorted(extcil.begin(),extcil.end(),
-                                         [](const StencilPoint & s1,
-                                            const StencilPoint & s2) {
-                                              return s1.val<s2.val;  })
-                        ||std::is_sorted(extcil.begin(),extcil.end(),
-                                         [](const StencilPoint & s1,
-                                            const StencilPoint & s2) {
-                                              return s1.val>s2.val;  });
-
-      /* if ordered and extremum exists in bounds, go with quadratic */
-      if(ext_ordered&&(ext_range.contains(ext_1)||ext_range.contains(ext_2))) {
-        for(int idx(i0); idx<i1; ++idx) {
-          stencil[idx].val = cht.topo->evaluate_polynomial(coefs.size()-1,coefs,
-                                                      stencil[idx].pos-zeropos);
-        }
-      } else {
-
+      /* evaluate */
+      ders.push_back(cht.topo->nth_order_first(modcil,
+                                               AccuracyOrder(ord)));
+    }
+    
+    /* is the derivative of the same sign? */
+    bool mono(true);
+    for(int idx(0); idx<ders.size()-1; ++idx) {
+      mono &= signum(1.0,ders[idx])==signum(1.0,ders[idx+1]);
     }
 
+    /* fall-back to quadratic */
+    if(!mono)
+      ord = std::min(2,ord);
+
+  } /* if flag */
+
+  /* extrapolate */
+  for(int idx(i0); idx<i1; ++idx) {
+    /* shift origin to extrapolated point */
+    for(int jdx(0); jdx<modcil.size(); ++jdx) {
+      modcil[jdx].pos = extcil[jdx].pos-stencil[idx].pos;
+    }
+
+    /* extrapolate */
+    stencil[idx].val = cht.topo->nth_order_zeroth(modcil,
+                                                  AccuracyOrder(ord));
   }
 
+  return;
+}
 #endif

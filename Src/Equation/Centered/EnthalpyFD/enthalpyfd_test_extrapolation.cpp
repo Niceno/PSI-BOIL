@@ -99,13 +99,26 @@ bool EnthalpyFD::test_extrapolation(std::vector<real> & stencil,
   StencilPoint ctm(cutpoints[0],ctm_val,ctm_pos), 
                ctp(cutpoints[1],ctp_val,ctp_pos);
 
-  boil::oout<<"Cutoffs: "<<ctm.idx<<" "<<ctm.pos<<" "<<ctm.val<<" | ";
-  boil::oout<<ctp.idx<<" "<<ctp.pos<<" "<<ctp.val<<" | "<<boil::endl;
+  boil::oout<<"Cutoffs: "<<ctm.idx<<" "<<ctm.pos<<" "<<ctm.val
+            <<" "<<cht.topo->evaluate_polynomial_derivative(ord,coefficients,ctm.pos)
+            <<" | ";
+  boil::oout<<ctp.idx<<" "<<ctp.pos<<" "<<ctp.val
+            <<" "<<cht.topo->evaluate_polynomial_derivative(ord,coefficients,ctp.pos)
+            <<" | "<<boil::endl;
 
   /* test */
+  boil::oout<<"pol-ders | ";
+  for(auto & s : stp) {
+    boil::oout<<s.idx<<" "<<s.pos
+              <<" "<<cht.topo->evaluate_polynomial_derivative(ord,coefficients,s.pos)
+              <<" | ";
+  }
+  boil::oout<<boil::endl;
+
   boil::oout<<"pre-test | ";
   for(auto & s : stp) {
-    boil::oout<<s.idx<<" "<<s.pos<<" "<<s.val<<" | ";
+    boil::oout<<s.idx<<" "<<s.pos<<" "<<s.val
+              <<" | ";
   }
   boil::oout<<boil::endl;
 

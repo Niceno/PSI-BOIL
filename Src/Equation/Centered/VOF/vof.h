@@ -414,9 +414,6 @@ class VOF : public Centered {
     int Nfilm_crit;
     real cangle;
     real mult_wall;
-
-    inline real signum(const real a, const real b) const { return a*((b>0.)-(b<0.)); }
-    inline int signum(const int a, const int b) const { return a*((b>0)-(b<0)); }
 };	
 #endif
 

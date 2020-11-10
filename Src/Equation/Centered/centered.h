@@ -113,6 +113,9 @@ class Centered : public Equation {
 
   friend class AC;
 
+    inline real signum(const real a, const real b) const { return a*((b>0.)-(b<0.)); }
+    inline int signum(const int a, const int b) const { return a*((b>0)-(b<0)); }
+
   protected:
     inline int si() const {return phi.si();}
     inline int sj() const {return phi.sj();}

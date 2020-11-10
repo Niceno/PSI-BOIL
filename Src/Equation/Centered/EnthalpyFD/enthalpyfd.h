@@ -139,8 +139,9 @@ class EnthalpyFD : public Centered {
                     const Old old);
     void extrapolate_values(std::vector<StencilPoint> & stencil,
                             const StencilPoint & ctm, const StencilPoint & ctp);
-    real point_extrapolation(const std::vector<StencilPoint> & stencil,
-                             const real xpos);
+    void point_extrapolation(std::vector<StencilPoint> & stencil,
+                             const int i0, const int i1,
+                             const std::vector<StencilPoint> & extcil);
 
     /* This points to solid if solid() = true and fluid() otherwise.
        So you can always dereference it without segfaults */

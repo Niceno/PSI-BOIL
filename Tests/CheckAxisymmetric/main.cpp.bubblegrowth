@@ -657,7 +657,7 @@ int main(int argc, char ** argv) {
     /*------------------------+
     |  solve energy equation  |
     +------------------------*/
-#if 0
+#if 1
     enthFD.discretize();
     enthFD.new_time_step();
     enthFD.solve(ResRat(1e-16),"enthFD");

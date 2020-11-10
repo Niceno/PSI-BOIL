@@ -17,7 +17,7 @@ void EnthalpyFD::convective_time_step(Scalar & sca) {
 #ifdef CNEW
   inertial(sca,true,Old::no);
 #else
-  inertial(sca,true,Old::yes);
+  inertial(sca,false,Old::yes);
 #endif
 
   /*-----------------------------------------------------------------------+
@@ -45,9 +45,9 @@ void EnthalpyFD::convective_time_step(Scalar & sca) {
 #if 1
       /* phase change: xor indicates change of phase */
       if(cht.topo->above_interface_old(i,j,k) ^ cht.topo->above_interface(i,j,k)) {
-        if( (phi[i][j][k]-cht.Tint(i,j,k))*(t_new-cht.Tint(i,j,k))<=0.0 ){
+        //if( (phi[i][j][k]-cht.Tint(i,j,k))*(t_new-cht.Tint(i,j,k))<=0.0 ){
           t_new = cht.Tint(i,j,k);     /* crude code */
-        }
+        //}
   #if 0
       /* phase does not change */
       } else {

@@ -20,8 +20,8 @@ bool VOF::ev_solve(const ScalarInt & pflag, const Matrix & A,
 
   /* Jacobi iterations */
   bool converged(false);
-  real l2err_first, linferr_first;
-  real l2err(0.0), linferr(0.0);
+  //real l2err_first, l2err(0.0);
+  real linferr(0.0), linferr_first;
   for(int n(0); n<niter; ++n) {
     for_ijk(i,j,k) {
       if(abs(pflag[i][j][k])<3) {
@@ -39,7 +39,7 @@ bool VOF::ev_solve(const ScalarInt & pflag, const Matrix & A,
 
     /* measure error */
     int nele(0);
-    l2err=0.;
+    //l2err=0.;
     linferr=0.;
     for_ijk(i,j,k) {
 #if 0
@@ -50,9 +50,8 @@ bool VOF::ev_solve(const ScalarInt & pflag, const Matrix & A,
         if(diff>linferr)
           linferr = diff;
       }
-#else
+#elif 0
       if(abs(pflag[i][j][k])==1&&fabs(b[i][j][k])>boil::atto) {
-      //if(abs(pflag[i][j][k])==1) {
         nele++;
         real diff = b[i][j][k] - A.w[i][j][k]*x[i-1][j][k]
                                - A.e[i][j][k]*x[i+1][j][k]
@@ -65,16 +64,31 @@ bool VOF::ev_solve(const ScalarInt & pflag, const Matrix & A,
         if(fabs(diff)>linferr)
           linferr = fabs(diff);
       }
+#else
+      if(abs(pflag[i][j][k])==1) {
+        nele++;
+        real urat = b[i][j][k] - A.w[i][j][k]*x[i-1][j][k]
+                               - A.e[i][j][k]*x[i+1][j][k]
+                               - A.s[i][j][k]*x[i][j-1][k]
+                               - A.n[i][j][k]*x[i][j+1][k]
+                               - A.b[i][j][k]*x[i][j][k-1]
+                               - A.t[i][j][k]*x[i][j][k+1]
+                               - A.c[i][j][k]*x[i][j][k];
+
+        urat = fabs(urat)/dV(i,j,k)*time->dt();
+        if(urat>linferr)
+          linferr = urat;
+      }
 #endif
     }
     boil::cart.sum_int(&nele);
-    boil::cart.sum_real(&l2err);
+    //boil::cart.sum_real(&l2err);
     boil::cart.max_real(&linferr);
-    if(nele>0)
-      l2err /= real(nele);
-    l2err = sqrt(l2err);
+    //if(nele>0)
+    //  l2err /= real(nele);
+    //l2err = sqrt(l2err);
     if(n==0) {
-      l2err_first = l2err;
+      //l2err_first = l2err;
       linferr_first = linferr;
     }
 #ifdef DEBUG
