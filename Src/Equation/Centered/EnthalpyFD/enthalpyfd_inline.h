@@ -1,14 +1,14 @@
-    inline int get_gradt_accuracy_order() const { return ao_conv.eval(); }
-    inline void set_gradt_accuracy_order(const int ao) {
+    inline int get_flux_accuracy_order() const { return ao_conv.eval(); }
+    inline void set_flux_accuracy_order(const int ao) {
       ao_conv = AccuracyOrder(ao);
       if(!boil::cart.iam())
-        boil::oout<<"EnthalpyFD::gradt_accuracy_order= "
+        boil::oout<<"EnthalpyFD::flux_accuracy_order= "
                   <<ao<<"\n";
     }
-    inline void set_gradt_accuracy_order(const AccuracyOrder ao) {
+    inline void set_flux_accuracy_order(const AccuracyOrder ao) {
       ao_conv = ao;
       if(!boil::cart.iam())
-        boil::oout<<"EnthalpyFD::gradt_accuracy_order= "
+        boil::oout<<"EnthalpyFD::flux_accuracy_order= "
                   <<ao<<"\n";
     }
 

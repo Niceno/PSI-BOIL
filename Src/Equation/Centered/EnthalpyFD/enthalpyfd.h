@@ -137,6 +137,11 @@ class EnthalpyFD : public Centered {
                     const int i, const int j, const int k,
                     const int ofx, const int ofy, const int ofz,
                     const Old old);
+    real extrapolate_value(const Sign & dir,
+                           const std::vector<StencilPoint> & stencil,
+                           const StencilPoint & ctm,
+                           const StencilPoint & ctp,
+                           const real xpos);
     void extrapolate_values(std::vector<StencilPoint> & stencil,
                             const StencilPoint & ctm, const StencilPoint & ctp);
     void point_extrapolation(std::vector<StencilPoint> & stencil,

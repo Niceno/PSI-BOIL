@@ -1,7 +1,56 @@
 #include "enthalpyfd.h"
 
-/* order of extrapolation */
-const int max_ord(1);
+/***************************************************************************//**
+*  \brief Extrapolate single value
+*******************************************************************************/
+real EnthalpyFD::extrapolate_value(const Sign & dir,
+                                   const std::vector<StencilPoint> & stencil,
+                                   const StencilPoint & ctm,
+                                   const StencilPoint & ctp,
+                                   const real xpos) {
+
+  std::vector<StencilPoint> sp = {StencilPoint(-1,0.,xpos)};
+
+  /* extrapolate west */
+  if(dir<0) {
+    assert(ctm.idx>0);
+  
+    /* construct the extrapolation stencil */
+    std::vector<StencilPoint> cut_stencil;
+    int fin = std::min(ctm.idx+ao_conv.eval()-1,ctp.idx);
+
+    cut_stencil.push_back(ctm);
+    for(int idx(ctm.idx); idx<=fin; ++idx) {
+      cut_stencil.push_back(stencil[idx]);
+    }
+    if(cut_stencil.size()<ao_conv.eval()+1&&ctp.idx<5)
+      cut_stencil.push_back(ctp);
+
+    /* point extrapolation */
+    point_extrapolation(sp,0,1,cut_stencil);
+  }
+
+  /* extrapolate east */
+  if(dir>0) {
+    assert(ctp.idx<5);
+
+    /* construct the extrapolation stencil */
+    std::vector<StencilPoint> cut_stencil;
+    int fin = std::max(ctp.idx-ao_conv.eval()+1,ctm.idx);
+
+    cut_stencil.push_back(ctp);
+    for(int idx(ctp.idx); idx>=fin; --idx) {
+      cut_stencil.push_back(stencil[idx]);
+    }
+    if(cut_stencil.size()<ao_conv.eval()+1&&ctm.idx>0)
+      cut_stencil.push_back(ctm);
+
+    /* point extrapolation */
+    point_extrapolation(sp,0,1,cut_stencil);
+  }
+
+  return sp[0].val;
+}
 
 /***************************************************************************//**
 *  \brief Extrapolate value stencil for gradient calculation.
@@ -15,13 +64,13 @@ void EnthalpyFD::extrapolate_values(std::vector<StencilPoint> & stencil,
   
     /* construct the extrapolation stencil */
     std::vector<StencilPoint> cut_stencil;
-    int fin = std::min(ctm.idx+max_ord-1,ctp.idx);
+    int fin = std::min(ctm.idx+ao_conv.eval()-1,ctp.idx);
 
     cut_stencil.push_back(ctm);
     for(int idx(ctm.idx); idx<=fin; ++idx) {
       cut_stencil.push_back(stencil[idx]);
     }
-    if(cut_stencil.size()<max_ord+1&&ctp.idx<5)
+    if(cut_stencil.size()<ao_conv.eval()+1&&ctp.idx<5)
       cut_stencil.push_back(ctp);
 
     /* point extrapolation */
@@ -40,13 +89,13 @@ void EnthalpyFD::extrapolate_values(std::vector<StencilPoint> & stencil,
 
     /* construct the extrapolation stencil */
     std::vector<StencilPoint> cut_stencil;
-    int fin = std::max(ctp.idx-max_ord+1,ctm.idx);
+    int fin = std::max(ctp.idx-ao_conv.eval()+1,ctm.idx);
 
     cut_stencil.push_back(ctp);
     for(int idx(ctp.idx); idx>=fin; --idx) {
       cut_stencil.push_back(stencil[idx]);
     }
-    if(cut_stencil.size()<max_ord+1&&ctm.idx>0)
+    if(cut_stencil.size()<ao_conv.eval()+1&&ctm.idx>0)
       cut_stencil.push_back(ctm);
 
     /* point extrapolation */
@@ -62,7 +111,7 @@ void EnthalpyFD::extrapolate_values(std::vector<StencilPoint> & stencil,
   return;
 }
 
-#if 1
+#if 0
 /***************************************************************************//**
 *  Lagrangian extrapolation
 *******************************************************************************/
@@ -70,7 +119,7 @@ void EnthalpyFD::point_extrapolation(std::vector<StencilPoint> & stencil,
                                      const int i0, const int i1,
                                      const std::vector<StencilPoint> & extcil) {
 
-  assert(extcil.size()==max_ord+1);
+  assert(extcil.size()==ao_conv.eval()+1);
 
   for(int idx(i0); idx<i1; ++idx) {
     real L(0.0);

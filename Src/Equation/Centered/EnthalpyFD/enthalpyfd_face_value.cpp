@@ -167,6 +167,7 @@ real EnthalpyFD::face_value(const Sign matter_sig, const Comp m, const real vel,
   /* sanity check */
   assert(ctp.idx>=ctm.idx);
 
+#if 0
   /* extrapolation of missing values */
   extrapolate_values(stencil,ctm,ctp);
 
@@ -182,4 +183,30 @@ real EnthalpyFD::face_value(const Sign matter_sig, const Comp m, const real vel,
 
   /* evaluate flux */
   return tval;
+#else
+  /* upwind TVD */
+  if(vel>0.) {
+    if(ctm.idx<=1&&ctp.idx>=3) {
+      //return lim.limit(+1., stencil[1].val, stencil[2].val, stencil[3].val);
+      ctp = StencilPoint(2,stencil[3].val,stencil[3].pos);
+      return extrapolate_value(Sign::pos(),stencil,ctm,ctp,0.);
+    } else if(fabs(real(ctm.idx)-2.5)>fabs(real(ctp.idx)-2.5)) {
+      return extrapolate_value(Sign::pos(),stencil,ctm,ctp,0.);
+    } else {
+      return extrapolate_value(Sign::neg(),stencil,ctm,ctp,0.);
+    }
+  } else {
+    if(ctp.idx>=4&&ctm.idx<=2) {
+      //return lim.limit(+1., stencil[4].val, stencil[3].val, stencil[2].val);
+      ctm = StencilPoint(3,stencil[2].val,stencil[2].pos);
+      return extrapolate_value(Sign::neg(),stencil,ctm,ctp,0.);
+    } else if(fabs(real(ctp.idx)-2.5)>fabs(real(ctm.idx)-2.5)) {
+      return extrapolate_value(Sign::neg(),stencil,ctm,ctp,0.);
+    } else {
+      return extrapolate_value(Sign::pos(),stencil,ctm,ctp,0.);
+    }
+  }
+
+  return 0.0;
+#endif
 }
