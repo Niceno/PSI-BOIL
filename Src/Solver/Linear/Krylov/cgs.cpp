@@ -38,7 +38,7 @@ void CGS :: solve(Matrix & A, Scalar & x, Scalar & b, const MaxIter & mi,
   +----------------------*/
   r = b - A * x;
   //real res = sqrt(r.dot(r)); 
-  real res = sqrt(r.dot_voldiv(r))/x.domain()->gitot();
+  real res = sqrt(r.dot_voldiv_avg(r));
   real res0 = res;
 
   // OMS(------------);
@@ -137,7 +137,7 @@ void CGS :: solve(Matrix & A, Scalar & x, Scalar & b, const MaxIter & mi,
     |  exit if converged  |
     +--------------------*/
     //res = sqrt(r.dot(r));
-    res = sqrt(r.dot_voldiv(r))/x.domain()->gitot();
+    res = sqrt(r.dot_voldiv_avg(r));
 
     // OPR(res);
 
@@ -157,7 +157,7 @@ void CGS :: solve(Matrix & A, Scalar & x, Scalar & b, const MaxIter & mi,
   q = A * x;
 
   if(name!=NULL) boil::oout << name 
-                            << ", residual = " << res/sqrt(q.dot(q))*x.domain()->gitot() 
+                            << ", residual = " << res/sqrt(q.dot_voldiv_avg(q)) 
                             << ", ratio = " << res/res0
                             << ", iterations = " << i+1 
                             << boil::endl;

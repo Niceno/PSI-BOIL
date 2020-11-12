@@ -251,10 +251,10 @@ int main(int argc, char * argv[]) {
 
   AC multigrid( &pr );
   if(mSimple>1) {
-    multigrid.min_cycles(4);  // 4
+    multigrid.min_cycles(1);  // 4
     multigrid.max_cycles(8); // 8
   } else {
-    multigrid.min_cycles(6);  // 6
+    multigrid.min_cycles(1);  // 6
   }
   multigrid.stop_if_diverging(true);
 

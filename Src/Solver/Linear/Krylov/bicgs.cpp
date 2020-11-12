@@ -39,7 +39,7 @@ void BiCGS :: solve(Matrix & A, Scalar & x, Scalar & b, const MaxIter & mi,
   +----------------------*/
   r = b - A * x;
   //real res = sqrt(r.dot(r)); 
-  real res = sqrt(r.dot_voldiv(r))/r.domain()->gitot();
+  real res = sqrt(r.dot_voldiv_avg(r));
   real res0 = res;
 
   // OMS(------------);
@@ -151,7 +151,7 @@ void BiCGS :: solve(Matrix & A, Scalar & x, Scalar & b, const MaxIter & mi,
     |  exit if converged  |
     +--------------------*/
     //res = sqrt(r.dot(r));
-    res = sqrt(r.dot_voldiv(r))/r.domain()->gitot();
+    res = sqrt(r.dot_voldiv_avg(r));
 
     // OPR(res);
 
@@ -176,7 +176,7 @@ void BiCGS :: solve(Matrix & A, Scalar & x, Scalar & b, const MaxIter & mi,
   p = A * x;
 
   if(name!=NULL) boil::oout << name 
-                            << ", residual = " << res/sqrt(p.dot_voldiv(p))*p.domain()->gitot() 
+                            << ", residual = " << res/sqrt(p.dot_voldiv_avg(p))
                             << ", ratio = " << res/res0
                             << ", iterations = " << i+1 
                             << boil::endl;

@@ -18,8 +18,8 @@ real AC::residual(Centered & h, real * linf) const {
 #else
   /* estimate residual */
   h.res = h.fnew - h.A * h.phi;
-  real r2 = h.res.dot_voldiv(h.res);
-  r2 = sqrt(r2)/h.domain()->gitot()*L[0]->time->dt();
+  real r2 = h.res.dot_voldiv_avg(h.res);
+  r2 = sqrt(r2)*L[0]->time->dt();
 
   if(linf) {// && r2>0.) {
     *linf = h.res.max_abs_voldiv()*L[0]->time->dt();

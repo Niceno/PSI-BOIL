@@ -276,6 +276,28 @@ class Scalar {
         d+=val[i][j][k]*s.val[i][j][k]/dV(i,j,k)/dV(i,j,k);
       boil::cart.sum_real(&d); return d;
     }
+
+    real dot_avg(const Scalar & s)
+     {real d=0.0; int ntot(0);
+      for_ijk(i,j,k) {
+        d+=val[i][j][k]*s.val[i][j][k];
+        ntot++;
+      }
+      boil::cart.sum_real(&d);
+      boil::cart.sum_int(&ntot);
+      return d/real(ntot*ntot);}
+
+    real dot_voldiv_avg(const Scalar & s) {
+      real d=0.0; int ntot(0);
+      for_ijk(i,j,k) {
+        d+=val[i][j][k]*s.val[i][j][k]/dV(i,j,k)/dV(i,j,k);
+        ntot++;
+      }
+      boil::cart.sum_real(&d); 
+      boil::cart.sum_int(&ntot);
+      return d/real(ntot*ntot);
+    }
+
     /*
        sum */
     real sum() {
