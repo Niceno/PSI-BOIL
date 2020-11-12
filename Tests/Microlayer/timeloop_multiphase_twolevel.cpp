@@ -2,6 +2,29 @@
   |  time loop  |
   +------------*/
   bool inertial = time.current_time()<boil::atto;
+  Range<real> ml_range_z(0e-6,6e-6);
+  auto cap_frac = [&](const real x, const real z,
+                      const Range<real> & xr, const Range<real> zr,
+                      const real val) {
+    if(z>zr.last()||!xr.exists()) {
+      return val;
+    } else {
+      return val*xr.fraction(x);
+    }
+  };
+  auto cap_val  = [&](const real x, const real z, 
+                      const Range<real> & xr, const Range<real> zr,
+                      const real val0, const real val1) {
+    if(z>zr.last()||!xr.exists()) {
+      return val1;
+    } else {
+      return val0+(val1-val0)*xr.fraction(x);
+    }
+  };
+
+  conc_coarse.front_minmax(Range<real>(0.  ,LX1),
+                           Range<real>(-LX0,LX0),
+                           Range<real>(0.  ,LZ1));
   
   for(time.start(); time.end(); time.increase()) {
 
@@ -86,7 +109,9 @@
     p = 0.0;
     if(multigrid.cycle(multigrid_cycle0,
                        multigrid_cycle1,
-                       multigrid_rr,multigrid_mi))
+                       multigrid_rt,
+                       multigrid_rr,
+                       multigrid_mi))
       OMS(converged);
 
     p.exchange();
@@ -122,7 +147,7 @@
     +---------------------------*/
     conc_fine.new_time_step();
     conc_coarse.new_time_step();
-    conc_coarse.advance_with_extrapolation(false,ResRat(1e-9),uvw.coarse,f.coarse,
+    conc_coarse.advance_with_extrapolation(false,ResRat(1e-6),uvw.coarse,f.coarse,
                                            &liquid.coarse,&uvw_1,&vapor.coarse,&uvw_2);
 
     for_avk(c.coarse,k) {

@@ -37,16 +37,17 @@ void CGS :: solve(Matrix & A, Scalar & x, Scalar & b, const MaxIter & mi,
   |  compute r = b - A x  |
   +----------------------*/
   r = b - A * x;
-  real res = r.dot(r); 
+  //real res = sqrt(r.dot(r)); 
+  real res = sqrt(r.dot_voldiv(r))/x.domain()->gitot();
   real res0 = res;
 
   // OMS(------------);
-  // OPR(sqrt(res0));
+  // OPR(res0);
   // OPR(res_tol);
   // OPR(res_rat);
 
   /* should res be scaled with A and x? */
-  if(sqrt(res) < res_tol) return; // temporary meassure
+  if(res < res_tol) return; // temporary meassure
 
   /*------------+
   |  choose r~  |
@@ -135,14 +136,15 @@ void CGS :: solve(Matrix & A, Scalar & x, Scalar & b, const MaxIter & mi,
     /*--------------------+
     |  exit if converged  |
     +--------------------*/
-    res = r.dot(r);
+    //res = sqrt(r.dot(r));
+    res = sqrt(r.dot_voldiv(r))/x.domain()->gitot();
 
-    // OPR( sqrt(res) );
+    // OPR(res);
 
     /* should res be scaled with A and u? */
-    if( sqrt(res) < res_tol ) break;
+    if( res < res_tol ) break;
 
-    if( sqrt(res) < sqrt(res0) * res_rat ) break; 
+    if( res < res0 * res_rat ) break; 
 
     /*----------------+
     |  rho_old = rho  |
@@ -155,8 +157,8 @@ void CGS :: solve(Matrix & A, Scalar & x, Scalar & b, const MaxIter & mi,
   q = A * x;
 
   if(name!=NULL) boil::oout << name 
-                            << ", residual = " << sqrt(res/q.dot(q)) 
-                            << ", ratio = " << sqrt ( res/res0 )
+                            << ", residual = " << res/sqrt(q.dot(q))*x.domain()->gitot() 
+                            << ", ratio = " << res/res0
                             << ", iterations = " << i+1 
                             << boil::endl;
 }

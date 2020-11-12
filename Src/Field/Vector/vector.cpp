@@ -98,6 +98,10 @@ Vector::Vector(const Vector * v) : aliav(true), vec(v->vec) {
     pnt_dSz_dir[~m] = v->pnt_dSz_dir[~m];
 
     pnt_dV[~m] = v->pnt_dV[~m];
+
+    pnt_div[~m] = v->pnt_div[~m];
+    for_m(d)
+      pnt_div_stag[~m][~d] = v->pnt_div_stag[~m][~d];
   }
 
   dom    = v->dom;
@@ -269,22 +273,61 @@ void Vector::coordinate() {
   /* divergence */
   if(dom->is_dummy(0)) {
     pnt_div[0] = &Vector::div_zero;
+    for_m(m) 
+      pnt_div_stag[~m][0] = &Vector::div_zero;
   } else {
     if(dom->is_axisymmetric()) {
       pnt_div[0] = &Vector::div_x_axi;
+      pnt_div_stag[0][0] = &Vector::div_stag_x_x_axi;
+      pnt_div_stag[1][0] = &Vector::div_x_axi;
+      if(dom->is_dummy(2))
+        pnt_div_stag[2][0] = &Vector::div_x_axi;
+      else 
+        pnt_div_stag[2][0] = &Vector::div_stag_z_x_axi;
     } else {
       pnt_div[0] = &Vector::div_x_cart;
+      pnt_div_stag[0][0] = &Vector::div_stag_x_x_cart;
+      if(dom->is_dummy(1))
+        pnt_div_stag[1][0] = &Vector::div_x_cart;
+      else
+        pnt_div_stag[1][0] = &Vector::div_stag_y_x_cart;
+      if(dom->is_dummy(2))
+        pnt_div_stag[2][0] = &Vector::div_x_cart;
+      else
+        pnt_div_stag[2][0] = &Vector::div_stag_z_x_cart;
     }
   }
   if(dom->is_dummy(1)) {
     pnt_div[1] = &Vector::div_zero;
+    for_m(m) 
+      pnt_div_stag[~m][1] = &Vector::div_zero;
   } else {
     pnt_div[1] = &Vector::div_y_cart;
+    pnt_div_stag[1][1] = &Vector::div_stag_y_y_cart;
+    if(dom->is_dummy(0))
+      pnt_div_stag[0][1] = &Vector::div_y_cart;
+    else
+      pnt_div_stag[0][1] = &Vector::div_stag_x_y_cart;
+    if(dom->is_dummy(2))
+      pnt_div_stag[2][1] = &Vector::div_y_cart;
+    else
+      pnt_div_stag[2][1] = &Vector::div_stag_z_y_cart;
   }
   if(dom->is_dummy(2)) {
     pnt_div[2] = &Vector::div_zero;
+    for_m(m) 
+      pnt_div_stag[~m][2] = &Vector::div_zero;
   } else {
     pnt_div[2] = &Vector::div_z_cart;
+    pnt_div_stag[2][2] = &Vector::div_stag_z_z_cart;
+    if(dom->is_dummy(0))
+      pnt_div_stag[0][2] = &Vector::div_z_cart;
+    else
+      pnt_div_stag[0][2] = &Vector::div_stag_x_z_cart;
+    if(dom->is_dummy(1))
+      pnt_div_stag[1][2] = &Vector::div_z_cart;
+    else
+      pnt_div_stag[1][2] = &Vector::div_stag_y_z_cart;
   }
 
   return;

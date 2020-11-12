@@ -29,6 +29,7 @@
   Pressure pr(p, f.coarse, uvw.coarse, time, solver_coarse, &mixed.coarse);
   AC multigrid( &pr );
   multigrid.stop_if_diverging(multigrid_stop_if_diverging);
+  multigrid.use_linf_error(multigrid_use_linf);
   multigrid.min_cycles(multigrid_min_cycles);
   multigrid.max_cycles(multigrid_max_cycles);
 
@@ -39,6 +40,7 @@
   conc_coarse.set_topo_method(topo_method);
   conc_coarse.set_use_interp(use_fs_interp);
   conc_coarse.set_pressure_extrapolation_parameters(store_pressure_extrap,niter_pressure_extrap);
+  conc_coarse.set_advection_method(advect_method);
 
   if(subgrid_method) {
     conc_coarse.set_subgrid_method(SubgridMethod::SLICliquid());
@@ -91,7 +93,7 @@
 
   enthFD_coarse.convection_set(TimeScheme::forward_euler());
   enthFD_coarse.diffusion_set(TimeScheme::backward_euler());
-  enthFD_coarse.set_gradt_accuracy_order(ao_efd_conv);
+  enthFD_coarse.set_flux_accuracy_order(ao_efd_conv);
 
   /* enthalpy on the fine grid */
   EnthalpyFDaxisym enthFD_fine(tpr.fine, q.fine, uvw.fine, time, solver_fine, &mixed.fine,
@@ -99,7 +101,7 @@
 
   enthFD_fine.convection_set(TimeScheme::forward_euler());
   enthFD_fine.diffusion_set(TimeScheme::backward_euler());
-  enthFD_fine.set_gradt_accuracy_order(ao_efd_conv);
+  enthFD_fine.set_flux_accuracy_order(ao_efd_conv);
 
   /* phase change */
   PhaseChange4 pc_coarse(mdot.coarse, mflx.coarse, q.coarse,

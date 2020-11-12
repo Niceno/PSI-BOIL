@@ -33,6 +33,7 @@ class IntegralPC {
       c0 = Cycle::none();
       c1 = Cycle::F();
       rr_cav = ResRat(5e-5);
+      rt_cav = ResTol(5e-5);
       
       const int niter = 1000;
       MaxIter mm = MaxIter(niter);
@@ -48,11 +49,12 @@ class IntegralPC {
     real solve(const ResTol & rt, const real pinf, const Range<real> & tprr,
                const bool progress = true);
 
-    void set_mg_params(const Cycle & C0,  const Cycle & C1, 
+    void set_mg_params(const Cycle & C0,  const Cycle & C1, const ResTol & RT, 
                        const ResRat & RR, const std::array<MaxIter,3> & MI) {
       c0 = C0;
       c1 = C1;
       rr_cav = RR;
+      rt_cav = RT;
       mi = MI;
       
       return;
@@ -110,6 +112,7 @@ class IntegralPC {
 
     Cycle c0, c1;
     ResRat rr_cav, rr_ns;
+    ResTol rt_cav;
     std::array<MaxIter,3> mi;
 
     ResTol errtol;

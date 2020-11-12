@@ -1,7 +1,7 @@
 #include "vof.h"
 
 /******************************************************************************/
-void VOF::advance_z(const Scalar & scp) {
+void VOF::advance_z(const Scalar & scp, Scalar & cellvol) {
 
   /* advance in the z-direction */
 
@@ -49,9 +49,9 @@ void VOF::advance_z(const Scalar & scp) {
       }
     }
 
-    // update stmp
-    stmp[i][j][k-1] = stmp[i][j][k-1] - f;
-    stmp[i  ][j][k] = stmp[i  ][j][k] + f;
+    /* update cellvol */
+    cellvol[i][j][k-1] = cellvol[i][j][k-1] - f;
+    cellvol[i  ][j][k] = cellvol[i  ][j][k] + f;
     vflow[m][i][j][k] = f;
 
   }

@@ -1,11 +1,11 @@
 #include "momentum.h"
 
 /******************************************************************************/
-void Momentum::new_time_step() {
-  new_time_step(u);
+void Momentum::new_time_step(const Scalar * prs) {
+  new_time_step(u,prs);
 }
 
-void Momentum::new_time_step(const Vector & vec) {
+void Momentum::new_time_step(const Vector & vec, const Scalar * prs) {
   /*------------+
   |      dV  n  |
   |  f = -- u   |
@@ -51,7 +51,7 @@ void Momentum::new_time_step(const Vector & vec) {
   /* a condition like: if(conv_ts != backward_euler()) would be good */
   if (conv_ts.Nm1()==0.0 && conv_ts.Nm2()==0.0) {
   } else {
-    convection(&cold);
+    convection(&cold,prs);
     for_m(m) {
       for_mijk(m,i,j,k) /*conv_ts.Nm1()=1.5*/
         fold[m][i][j][k] += conv_ts.Nm1() * cold[m][i][j][k];

@@ -65,7 +65,8 @@
 #else
     l->bc().add( BndCnd( Dir::kmin(), BndType::neumann() ) );
 #endif
-    l->bc().add( BndCnd( Dir::kmax(), BndType::dirichlet(),tout) );
+    //l->bc().add( BndCnd( Dir::kmax(), BndType::dirichlet(),tout) );
+    l->bc().add( BndCnd( Dir::kmax(), BndType::outlet()) );
     l->bc().add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
     l->bc().add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
   }

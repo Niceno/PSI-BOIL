@@ -389,7 +389,7 @@ int main(int argc, char ** argv) {
 #endif
   enthFD.convection_set(TimeScheme::forward_euler());
   enthFD.diffusion_set(TimeScheme::backward_euler());
-  enthFD.set_gradt_accuracy_order(AccuracyOrder::Fourth());
+  enthFD.set_flux_accuracy_order(AccuracyOrder::Second());
 
   enthFD.set_no_solid_acceleration(no_solid_acceleration);
 
@@ -624,17 +624,8 @@ int main(int argc, char ** argv) {
     |  solve transport equation  |
     +---------------------------*/
     conc.new_time_step();
-    conc.advance_phase_change(c);
-    conc.reconstruct_geometry(c);
-    conc.interfacial_flagging(conc.color());
-#ifdef USE_PHASE_VEL_VOF
-    conc.extrapolate_velocity(conc.color(),f,&liquid,uvw,uvw_1,ResRat(1e-4),Sign::pos(),true);
-  #ifdef USE_PHASE_VEL_EFD
-    conc.extrapolate_velocity(conc.color(),f,&vapor,uvw,uvw_2,ResRat(1e-4),Sign::neg(),false);
-  #endif
-#endif
-    conc.advance_geometric(c);
-    conc.ancillary();
+    conc.advance_with_extrapolation(true,ResRat(1e-6),uvw,f,
+                                    &liquid,&uvw_1,&vapor,&uvw_2);
 #if CASE == 3
   #ifdef USE_MG
     conc.heaviside()->marker_gradient(*conc.topo->adens);

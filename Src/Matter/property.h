@@ -98,6 +98,28 @@ class PropertyMix : public Property {
 
 ///////////////////
 //               //
+//  PropertyInv  // -> 1/Property
+//               //
+///////////////////
+class PropertyInv : public Property {
+
+  public:
+    PropertyInv(const Property * pa) {
+      assert(pa !=NULL);
+      a  = pa;
+    }
+
+    real value(const int i, const int j, const int k) const {
+      return 1.0 / a -> value(i,j,k);
+    }
+    real value(const Comp & m,
+               const int i, const int j, const int k) const {
+      return 1.0 / a -> value(m,i,j,k);
+    }
+};
+
+///////////////////
+//               //
 //  PropertyDiv  // -> combination of two properties; division
 //               //
 ///////////////////

@@ -149,9 +149,9 @@ class VOF : public Centered {
     Scalar nx,ny,nz;/* normal to interface */
   protected:
     void ancillary(Scalar & scp, const bool reconstruct = true);
-    virtual void advance_x(const Scalar & sca);
-    virtual void advance_y(const Scalar & sca);
-    virtual void advance_z(const Scalar & sca);
+    virtual void advance_x(const Scalar & sca, Scalar & cellvol);
+    virtual void advance_y(const Scalar & sca, Scalar & cellvol);
+    virtual void advance_z(const Scalar & sca, Scalar & cellvol);
 
     void update_phi(const Scalar & cellvol, Scalar & sca);
     void advect_naive(Scalar & scp);

@@ -38,16 +38,17 @@ void BiCGS :: solve(Matrix & A, Scalar & x, Scalar & b, const MaxIter & mi,
   |  compute r = b - A x  |
   +----------------------*/
   r = b - A * x;
-  real res = r.dot(r); 
+  //real res = sqrt(r.dot(r)); 
+  real res = sqrt(r.dot_voldiv(r))/r.domain()->gitot();
   real res0 = res;
 
   // OMS(------------);
-  // OPR(sqrt(res0));
+  // OPR(res0);
   // OPR(res_tol);
   // OPR(res_rat);
 
   /* should res be scaled with A and x? */
-  if(sqrt(res) < res_tol) return; // temporary meassure
+  if(res < res_tol) return; // temporary meassure
 
   /*------------+
   |  choose r~  |
@@ -149,14 +150,15 @@ void BiCGS :: solve(Matrix & A, Scalar & x, Scalar & b, const MaxIter & mi,
     /*--------------------+
     |  exit if converged  |
     +--------------------*/
-    res = r.dot(r);
+    //res = sqrt(r.dot(r));
+    res = sqrt(r.dot_voldiv(r))/r.domain()->gitot();
 
-    // OPR( sqrt(res) );
+    // OPR(res);
 
     /* should res be scaled with A and u? */
-    if( sqrt(res) < res_tol ) break;
+    if( res < res_tol ) break;
 
-    if( sqrt(res) < sqrt(res0) * res_rat ) break; 
+    if( res < res0 * res_rat ) break; 
 
     /*---------------------------------------------------+
     |  for continuation it is necessary that omega != 0  |
@@ -174,8 +176,8 @@ void BiCGS :: solve(Matrix & A, Scalar & x, Scalar & b, const MaxIter & mi,
   p = A * x;
 
   if(name!=NULL) boil::oout << name 
-                            << ", residual = " << sqrt(res/p.dot(p)) 
-                            << ", ratio = " << sqrt ( res/res0 )
+                            << ", residual = " << res/sqrt(p.dot_voldiv(p))*p.domain()->gitot() 
+                            << ", ratio = " << res/res0
                             << ", iterations = " << i+1 
                             << boil::endl;
 }

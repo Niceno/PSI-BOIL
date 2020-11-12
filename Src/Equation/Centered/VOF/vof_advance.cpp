@@ -195,7 +195,7 @@ void VOF::advance_geometric(Scalar & scp) {
 
   /* liquid volume */
   for_aijk(i,j,k){
-    stmp[i][j][k] = scp[i][j][k] * dV(i,j,k);
+    cold[i][j][k] = scp[i][j][k] * dV(i,j,k);
   }
 
   for_m(m)
@@ -237,7 +237,7 @@ void VOF::update_phi(const Scalar & cellvol, Scalar & scp) {
     }
     boil::cart.sum_int(&ierr);
     if(ierr>=1) {
-      boil::plot->plot((*u),scp,color(),"uvw-phi-clr", time->current_step());
+      boil::plot->plot(vflow,scp,color(),cellvol,"flux-phi-clr-vol", time->current_step());
       exit(0);
     }
   }

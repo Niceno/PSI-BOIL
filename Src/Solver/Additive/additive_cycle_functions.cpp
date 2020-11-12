@@ -9,7 +9,7 @@ const char * sname = NULL;
 #endif
 
 /******************************************************************************/
-bool AC::init_cycles(real & res_0, int * ncyc) {
+bool AC::init_cycles(const ResTol & toler, real & res_0, int * ncyc) {
   /*--------------------+ 
   |  update the r.h.s.  |
   +--------------------*/
@@ -29,8 +29,11 @@ bool AC::init_cycles(real & res_0, int * ncyc) {
   +-------------------*/ 
   real reslinf_0;
   res_0 = residual(*L[0],&reslinf_0);
+  if(use_linf)
+    res_0 = reslinf_0;
+
   L[0]->fold = L[0]->phi; /* store "good" solution */
-  if((res_0 < targ_res_val && min_cyc==0) || res_0==0.0) {
+  if((res_0 < real(toler) && min_cyc==0) || res_0==0.0) {
     boil::oout << "Converged in 0 cycles!" << boil::endl;
     if(ncyc) * ncyc = 0;
     return true;
@@ -42,7 +45,8 @@ bool AC::init_cycles(real & res_0, int * ncyc) {
 }
 
 /******************************************************************************/
-int AC::converged(const ResRat & factor, const int & cycle, 
+int AC::converged(const ResTol & toler, const ResRat & factor,
+                  const int & cycle, 
                   const real & res_0, const real & res0,
                   int * ncyc) {
   real reslinf1;
@@ -51,7 +55,10 @@ int AC::converged(const ResRat & factor, const int & cycle,
   boil::oout << "Cycle " << cycle << "; res = " << res1 <<" ; "
              << reslinf1<< boil::endl;
 
-  if( (res1/res_0 < factor || res1 < targ_res_val) && cycle >= min_cyc ) {
+  real & res_control = use_linf ? reslinf1 : res1;
+
+  if( (cycle >= min_cyc) && (   (res_control/res_0 < real(factor))
+                             || (res_control < real(toler))  ) ) {
     if(cycle > 1)
       boil::oout << "Converged in " << cycle << " cycles!" << boil::endl;
     else
@@ -62,7 +69,7 @@ int AC::converged(const ResRat & factor, const int & cycle,
 
   //if(stop_if_div)
   if(stop_if_div && cycle >= min_cyc)
-    if(res1 >= res0) {
+    if(res_control >= res0) {
       L[0]->phi = L[0]->fold; /* restore last "good" solution */
       boil::oout << "Failed to conv. " << cycle << " cycles!" << boil::endl;
       return 1;

@@ -156,6 +156,12 @@ class Scalar {
     real max_abs() const;
     real min_at() const;
     real max_at() const;
+    real min_voldiv() const;
+    real max_voldiv() const;
+    real min_abs_voldiv() const;
+    real max_abs_voldiv() const;
+    real min_at_voldiv() const;
+    real max_at_voldiv() const;
 
     /* capital letters mean global logical coordinates */
     real average_I(int I) const; 
@@ -263,6 +269,13 @@ class Scalar {
     real dot(const Scalar & s) 
      {real d=0.0; for_ijk(i,j,k) d+=val[i][j][k]*s.val[i][j][k]; 
       boil::cart.sum_real(&d); return d;}
+
+    real dot_voldiv(const Scalar & s) {
+      real d=0.0; 
+      for_ijk(i,j,k) 
+        d+=val[i][j][k]*s.val[i][j][k]/dV(i,j,k)/dV(i,j,k);
+      boil::cart.sum_real(&d); return d;
+    }
     /*
        sum */
     real sum() {

@@ -10,8 +10,7 @@ AC::AC(Centered * cen, Linear * sol) {
   /* set variables which steer the cycle */
   max_cyc = 20;
   min_cyc =  0;
-  targ_res_val = boil::nano;
-  targ_res_rat = 0.01;
+  use_linf = false;
   stop_if_div  = true;
   mv_def = {MaxIter(20),MaxIter(20),MaxIter(20)};
 

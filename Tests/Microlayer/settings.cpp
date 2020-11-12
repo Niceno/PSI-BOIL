@@ -36,7 +36,7 @@
   const int n_per_backup = 5000;
 
   /* dt settings */
-  const real surftens_dt_coef = 10.;
+  const real surftens_dt_coef = 1.;
   const real initdtcoef = 1./10.;
 
   /* cfl with and without interfaces */
@@ -51,6 +51,7 @@
 
   /* multigrid */
   const bool multigrid_stop_if_diverging = true;
+  const bool multigrid_use_linf = true;
   const int multigrid_min_cycles = 1;
   const int multigrid_max_cycles = 20;
 
@@ -58,7 +59,8 @@
   MaxIter multigrid_mm = MaxIter(multigrid_niter);
   std::array<MaxIter,3> multigrid_mi = {multigrid_mm,multigrid_mm,multigrid_mm};
 
-  ResRat multigrid_rr = ResRat(5e-5);
+  ResRat multigrid_rr = ResRat(-1.);
+  ResTol multigrid_rt = ResTol(5e-3);
 
   const Cycle multigrid_cycle0 = Cycle::Z();
   const Cycle multigrid_cycle1 = Cycle::F();
@@ -67,6 +69,8 @@
   const CurvMethod curv_method = CurvMethod::HF();
   const CurvMethod wall_curv_method = CurvMethod::HFnormalXZ();
 
+  const AdvectionMethod advect_method = AdvectionMethod::BoundedSplit();
+  //const AdvectionMethod advect_method = AdvectionMethod::NaiveSplit();
   const TopoMethod topo_method = TopoMethod::Hybrid();
 
   const bool detachment_model = false;
@@ -76,7 +80,8 @@
   const int niter_pressure_extrap = 1000;
 
   /* enthalpy */
-  const AccuracyOrder ao_efd_conv = AccuracyOrder::Fourth();
+  const AccuracyOrder ao_efd_conv = AccuracyOrder::First();//Second();//Third();
+  //const AccuracyOrder ao_efd_conv = AccuracyOrder::Third();
   const bool use_wall_resistance = true;
 
   /* phase change - 4 version */

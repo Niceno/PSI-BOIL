@@ -1,7 +1,7 @@
 #include "vofaxisym.h"
 
 /******************************************************************************/
-void VOFaxisym::advance_x(const Scalar & scp) {
+void VOFaxisym::advance_x(const Scalar & scp, Scalar & cellvol) {
   
   /* advance in the x-direction */
 
@@ -56,9 +56,9 @@ void VOFaxisym::advance_x(const Scalar & scp) {
       }
     }
 
-    /* update stmp */
-    stmp[i-1][j][k] = stmp[i-1][j][k] - f;
-    stmp[i  ][j][k] = stmp[i  ][j][k] + f;
+    /* update cellvol */
+    cellvol[i-1][j][k] = cellvol[i-1][j][k] - f;
+    cellvol[i  ][j][k] = cellvol[i  ][j][k] + f;
     vflow[m][i][j][k] = f;
 
   }

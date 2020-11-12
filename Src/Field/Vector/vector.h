@@ -197,6 +197,15 @@ class Vector {
             +divergence(Comp::v(),i,j,k)
             +divergence(Comp::w(),i,j,k);
     }
+    real divergence_staggered(const Comp & m, const Comp & d, 
+                              const int i, const int j, const int k) const
+    { return (this->*pnt_div_stag[~m][~d])(i,j,k); }
+    real divergence_staggered(const Comp & m, 
+                              const int i, const int j, const int k) const {
+      return divergence_staggered(m,Comp::u(),i,j,k)
+            +divergence_staggered(m,Comp::v(),i,j,k)
+            +divergence_staggered(m,Comp::w(),i,j,k);
+    }
 
     /* outflow from a scalar cell = integral divergence */
     real outflow(const int i, const int j, const int k) const;
@@ -305,6 +314,7 @@ class Vector {
     real (Vector::*pnt_dV[3])(const int i, const int j, const int k) const;
 
     real (Vector::*pnt_div[3])(const int i, const int j, const int k) const;
+    real (Vector::*pnt_div_stag[3][3])(const int i, const int j, const int k) const;
 
     /* these will be pointed to by above pointers */
     real xc_nrm      (const int i) const {return dom-> xc(i);}
@@ -412,6 +422,58 @@ class Vector {
       return (vec[Comp::u()][i+1][j][k]*xc(Comp::u(),i+1)
              -vec[Comp::u()][i  ][j][k]*xc(Comp::u(),i  ))
              /dxe(Comp::u(),i)/xn(Comp::u(),i+1);
+    }
+
+    real div_stag_x_x_cart(const int i, const int j, const int k) const {
+      return 0.5*(div_x_cart(i-1,j,k)+div_x_cart(i,j,k));
+    }
+    real div_stag_x_y_cart(const int i, const int j, const int k) const {
+      return 0.5*(div_y_cart(i-1,j,k)+div_y_cart(i,j,k));
+    }
+    real div_stag_x_z_cart(const int i, const int j, const int k) const {
+      return 0.5*(div_z_cart(i-1,j,k)+div_z_cart(i,j,k));
+    }
+    real div_stag_y_x_cart(const int i, const int j, const int k) const {
+      return 0.5*(div_x_cart(i,j-1,k)+div_x_cart(i,j,k));
+    }
+    real div_stag_y_y_cart(const int i, const int j, const int k) const {
+      return 0.5*(div_y_cart(i,j-1,k)+div_y_cart(i,j,k));
+    }
+    real div_stag_y_z_cart(const int i, const int j, const int k) const {
+      return 0.5*(div_z_cart(i,j-1,k)+div_z_cart(i,j,k));
+    }
+    real div_stag_z_x_cart(const int i, const int j, const int k) const {
+      return 0.5*(div_x_cart(i,j,k-1)+div_x_cart(i,j,k));
+    }
+    real div_stag_z_y_cart(const int i, const int j, const int k) const {
+      return 0.5*(div_y_cart(i,j,k-1)+div_y_cart(i,j,k));
+    }
+    real div_stag_z_z_cart(const int i, const int j, const int k) const {
+      return 0.5*(div_z_cart(i,j,k-1)+div_z_cart(i,j,k));
+    }
+
+    real div_stag_x_x_axi(const int i, const int j, const int k) const {
+      /* continuity-based averaging */
+#if 0
+      real um = 0.5*(vec[Comp::u()][i-1][j][k]*dSx(m,i-1,j,k)
+                    +vec[Comp::u()][i  ][j][k]*dSx(m,i  ,j,k))
+                    /dSx(m,Sign::neg(),i,j,k);
+      real up = 0.5*(vec[Comp::u()][i  ][j][k]*dSx(m,i  ,j,k)
+                    +vec[Comp::u()][i+1][j][k]*dSx(m,i+1,j,k))
+                    /dSx(m,Sign::neg(),i,j,k);
+      return (up*xn(Comp::u(),i+1)-um*xn(Comp::u(),i))
+             /dxc(Comp::u(),i)/xc(Comp::u(),i);
+#else
+      real umxn = vec[Comp::u()][i-1][j][k]*xc(Comp::u(),i-1)
+                 +vec[Comp::u()][i  ][j][k]*xc(Comp::u(),i  );
+      real upxn = vec[Comp::u()][i+1][j][k]*xc(Comp::u(),i+1)
+                 +vec[Comp::u()][i  ][j][k]*xc(Comp::u(),i  );
+
+      return 0.5*(upxn-umxn)/dxc(Comp::u(),i)/xc(Comp::u(),i);
+#endif
+    }
+    real div_stag_z_x_axi(const int i, const int j, const int k) const {
+      return 0.5*(div_x_axi(i,j,k-1)+div_x_axi(i,j,k));
     }
 
     /* take care that all of the data bellow is passed in copy constructor */

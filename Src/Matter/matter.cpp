@@ -29,8 +29,12 @@ Matter::Matter(const Domain & d, const char * nm) {
   tens = NULL;
   heat = NULL;
 
+#ifdef USE_PROSPERETTI
   /* density over viscosity */
   dens_o_visc = new PropertyDiv(dens,visc);
+  /* one over viscosity */
+  //one_o_visc = new PropertyInv(visc);
+#endif
 }
 
 /*============================================================================*/
@@ -80,10 +84,17 @@ Matter::Matter(const Matter & a,
 #ifndef USE_PROSPERETTI
   visc = new PropertyMix(a.visc, b.visc, ca, cda, cdb);
 #else /* force balance according to Prosperetti, 2002 */
+  #if 1
   assert(a.dens_o_visc != NULL);
   assert(b.dens_o_visc != NULL);
   dens_o_visc = new PropertyMix(a.dens_o_visc,b.dens_o_visc,ca,cda,cdb);
   visc = new PropertyDiv(dens,dens_o_visc);
+  #else
+  assert(a.one_o_visc != NULL);
+  assert(b.one_o_visc != NULL);
+  one_o_visc = new PropertyMix(a.one_o_visc,b.one_o_visc,ca,cda,cdb);
+  visc = new PropertyInv(one_o_visc);
+  #endif
 #endif
 
   if( a.nam.length() > 0 && b.nam.length() > 0 )

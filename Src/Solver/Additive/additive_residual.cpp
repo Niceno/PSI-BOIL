@@ -3,6 +3,7 @@
 /******************************************************************************/
 real AC::residual(Centered & h, real * linf) const {
 	
+#if 0
   /* estimate residual */
   h.res = h.fnew - h.A * h.phi;
   real r2 = h.res.dot(h.res);
@@ -13,5 +14,17 @@ real AC::residual(Centered & h, real * linf) const {
   if(linf && r2>0.)
     *linf = h.res.max_abs()/sqrt(r2);
 
-  return sqrt(r2 / (f2+boil::pico));
+  return sqrt(r2 / (f2+boil::atto));
+#else
+  /* estimate residual */
+  h.res = h.fnew - h.A * h.phi;
+  real r2 = h.res.dot_voldiv(h.res);
+  r2 = sqrt(r2)/h.domain()->gitot()*L[0]->time->dt();
+
+  if(linf) {// && r2>0.) {
+    *linf = h.res.max_abs_voldiv()*L[0]->time->dt();
+  }
+
+  return r2;
+#endif
 }	

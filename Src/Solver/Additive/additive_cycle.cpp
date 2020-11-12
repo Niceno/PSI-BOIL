@@ -1,7 +1,7 @@
 #include "additive.h"
 
 /******************************************************************************/
-bool AC::cycle(const Cycle & init, const Cycle & loop,
+bool AC::cycle(const Cycle & init, const Cycle & loop, const ResTol & toler,
                const ResRat & factor, const std::array<MaxIter,3> & mv,
                int * ncyc) {
 /*------------------+
@@ -14,7 +14,7 @@ bool AC::cycle(const Cycle & init, const Cycle & loop,
   |  initialize cycles  |
   +--------------------*/
   real res_0;
-  if(init_cycles(res_0,ncyc)) {
+  if(init_cycles(toler,res_0,ncyc)) {
     boil::oout<<"res_0 "<<res_0<<boil::endl;
     boil::timer.stop("cycle");
     return true;
@@ -36,8 +36,11 @@ bool AC::cycle(const Cycle & init, const Cycle & loop,
     full_cycle(0,init,mv);
 
     /* evaluate convergence */
-    real res0 = residual(*L[0]);
-    int con = converged(factor,0,res_0,res0,ncyc);
+    real reslinf0;
+    real res0 = residual(*L[0],&reslinf0);
+    if(use_linf)
+      res0 = reslinf0;
+    int con = converged(toler,factor,0,res_0,res0,ncyc);
   } 
   //else {
   //  L[nlevels-1]->phi  = 0.0;
@@ -49,7 +52,10 @@ bool AC::cycle(const Cycle & init, const Cycle & loop,
   +--------------------------*/
   for(int c=1; c<=max_cyc; c++) {
  
-    real res0 = residual(*L[0]);
+    real reslinf0;
+    real res0 = residual(*L[0],&reslinf0);
+    if(use_linf)
+      res0 = reslinf0;
 
     /* recursive kernel */
     if       (loop==Cycle::V()) {
@@ -67,7 +73,7 @@ bool AC::cycle(const Cycle & init, const Cycle & loop,
     }
 
     /* evaluate convergence */
-    int con = converged(factor,c,res_0,res0,ncyc);
+    int con = converged(toler,factor,c,res_0,res0,ncyc);
     switch(con) {
       case 0 :
         boil::timer.stop("cycle");

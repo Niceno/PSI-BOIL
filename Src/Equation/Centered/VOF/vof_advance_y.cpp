@@ -1,7 +1,7 @@
 #include "vof.h"
 
 /******************************************************************************/
-void VOF::advance_y(const Scalar & scp) {
+void VOF::advance_y(const Scalar & scp, Scalar & cellvol) {
 
   /* advance in the y-direction */
 
@@ -49,9 +49,9 @@ void VOF::advance_y(const Scalar & scp) {
       }
     }
 
-    // update stmp
-    stmp[i][j-1][k] = stmp[i][j-1][k] - f;
-    stmp[i][j  ][k] = stmp[i][j  ][k] + f;
+    /* update cellvol */
+    cellvol[i][j-1][k] = cellvol[i][j-1][k] - f;
+    cellvol[i][j  ][k] = cellvol[i][j  ][k] + f;
     vflow[m][i][j][k] = f;
 
   }

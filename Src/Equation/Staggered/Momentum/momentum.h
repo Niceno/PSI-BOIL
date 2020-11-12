@@ -84,10 +84,10 @@ class Momentum : public Staggered {
     void project(const Scalar & frc);
     void project(const Scalar & frc, Vector & veloc);
     void project_ghost(const Scalar & frc, const Scalar & c, const Scalar & k);
-    void new_time_step();
-    void new_time_step(const Vector & v);
+    void new_time_step(const Scalar * prs = NULL);
+    void new_time_step(const Vector & v, const Scalar * prs = NULL);
     void grad(Scalar & p);
-    void convection() {convection(&cnew);}
+    void convection(const Scalar * prs = NULL) {convection(&cnew,prs);}
     real vol_phase_change(Scalar * psrc);
     
     void save(const char *, const int = -1);
@@ -109,7 +109,7 @@ class Momentum : public Staggered {
     void convective_outlet(Vector & veloc, const real ubo);
     void scale_outlet_velocity(const real ubo, const real ratio);
 
-    void convection(Vector * conv);
+    void convection(Vector * conv, const Scalar * prs = NULL);
     void diffusion();
 
     void advection_rho_c();
