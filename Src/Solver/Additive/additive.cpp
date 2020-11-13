@@ -12,7 +12,10 @@ AC::AC(Centered * cen, Linear * sol) {
   min_cyc =  0;
   use_linf = false;
   stop_if_div  = true;
+  resrat_val = ResRat(boil::atto);
+  restol_val = ResTol(boil::atto);
   mv_def = {MaxIter(20),MaxIter(20),MaxIter(20)};
+  ms_def = {MaxIter(-1),MaxIter(-1),MaxIter(-1)};
 
   /* coarsen the variable */
   cen -> coarsen();	

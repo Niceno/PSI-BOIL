@@ -17,7 +17,7 @@ class CG : public Krylov {
     CG(const Domain & s, const Prec & pc) : Krylov(s, pc) {allocate(s);}
     CG(const Domain & s)                  : Krylov(s)     {allocate(s);}
 
-    virtual void solve(Matrix & A, Scalar & x, Scalar & b, 
+    virtual bool solve(Matrix & A, Scalar & x, Scalar & b, 
                        const MaxIter & mi, const char * name = NULL,
                        const ResRat & rr = ResRat(),
                        const ResTol & rt = ResTol(),

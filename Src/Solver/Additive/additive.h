@@ -34,51 +34,64 @@ class AC {
                const ResTol & toler, 
                const ResRat & factor, 
                const std::array<MaxIter,3> & mv,
+               const std::array<MaxIter,3> & ms,
                int * ncyc = NULL);
 
     bool vcycle(const ResTol & toler, const ResRat & factor, int * ncyc = NULL) {
-      return cycle(Cycle::none(),Cycle::V(),toler,factor,mv_def,ncyc);
+      return cycle(Cycle::none(),Cycle::V(),toler,factor,mv_def,ms_def,ncyc);
     }
     bool fcycle(const ResTol & toler, const ResRat & factor, int * ncyc = NULL) {
-      return cycle(Cycle::none(),Cycle::F(),toler,factor,mv_def,ncyc);
+      return cycle(Cycle::none(),Cycle::F(),toler,factor,mv_def,ms_def,ncyc);
     }
     bool wcycle(const ResTol & toler, const ResRat & factor, int * ncyc = NULL) {
-      return cycle(Cycle::none(),Cycle::W(),toler,factor,mv_def,ncyc);
+      return cycle(Cycle::none(),Cycle::W(),toler,factor,mv_def,ms_def,ncyc);
     }
 
     bool fullcycle(const Cycle & loop, const ResTol & toler, const ResRat & factor,
                    int * ncyc = NULL) {
-      return cycle(Cycle::V(),loop,toler,factor,mv_def,ncyc);
+      return cycle(Cycle::V(),loop,toler,factor,mv_def,ms_def,ncyc);
+    }
+    bool flexcycle(const ResTol & toler, const ResRat & factor, int * ncyc = NULL) {
+      return cycle(Cycle::none(),Cycle::flex(),toler,
+                   factor,mv_def,ms_def,ncyc);
     }
 
     bool vcycle(const ResRat & factor, int * ncyc = NULL) { 
-      return cycle(Cycle::none(),Cycle::V(),ResTol(-1.0),factor,mv_def,ncyc);
+      return cycle(Cycle::none(),Cycle::V(),ResTol(-1.0),factor,mv_def,ms_def,ncyc);
     }
     bool fcycle(const ResRat & factor, int * ncyc = NULL) { 
-      return cycle(Cycle::none(),Cycle::F(),ResTol(-1.0),factor,mv_def,ncyc);
+      return cycle(Cycle::none(),Cycle::F(),ResTol(-1.0),factor,mv_def,ms_def,ncyc);
     }
     bool wcycle(const ResRat & factor, int * ncyc = NULL) { 
-      return cycle(Cycle::none(),Cycle::W(),ResTol(-1.0),factor,mv_def,ncyc);
+      return cycle(Cycle::none(),Cycle::W(),ResTol(-1.0),factor,mv_def,ms_def,ncyc);
     }
 
     bool fullcycle(const Cycle & loop, const ResRat & factor,
                    int * ncyc = NULL) { 
-      return cycle(Cycle::V(),loop,ResTol(-1.0),factor,mv_def,ncyc);
+      return cycle(Cycle::V(),loop,ResTol(-1.0),factor,mv_def,ms_def,ncyc);
+    }
+    bool flexcycle(const ResRat & factor, int * ncyc = NULL) {
+      return cycle(Cycle::none(),Cycle::flex(),ResTol(-1.0),
+                   factor,mv_def,ms_def,ncyc);
     }
 
     bool vcycle(const ResTol & toler, int * ncyc = NULL) {
-      return cycle(Cycle::none(),Cycle::V(),toler,ResRat(-1.0),mv_def,ncyc);
+      return cycle(Cycle::none(),Cycle::V(),toler,ResRat(-1.0),mv_def,ms_def,ncyc);
     }
     bool fcycle(const ResTol & toler, int * ncyc = NULL) {
-      return cycle(Cycle::none(),Cycle::F(),toler,ResRat(-1.0),mv_def,ncyc);
+      return cycle(Cycle::none(),Cycle::F(),toler,ResRat(-1.0),mv_def,ms_def,ncyc);
     }
     bool wcycle(const ResTol & toler, int * ncyc = NULL) {
-      return cycle(Cycle::none(),Cycle::W(),toler,ResRat(-1.0),mv_def,ncyc);
+      return cycle(Cycle::none(),Cycle::W(),toler,ResRat(-1.0),mv_def,ms_def,ncyc);
     }
 
     bool fullcycle(const Cycle & loop, const ResTol & toler,
                    int * ncyc = NULL) {
-      return cycle(Cycle::V(),loop,toler,ResRat(-1.0),mv_def,ncyc);
+      return cycle(Cycle::V(),loop,toler,ResRat(-1.0),mv_def,ms_def,ncyc);
+    }
+    bool flexcycle(const ResTol & toler, int * ncyc = NULL) {
+      return cycle(Cycle::none(),Cycle::flex(),toler,
+                   ResRat(-1.0),mv_def,ms_def,ncyc);
     }
 
     //! Set and get the maximum number of cycles
@@ -88,6 +101,18 @@ class AC {
     //! Set and get the minimum number of cycles
     void min_cycles(const int mc) {min_cyc = mc;}
     int  min_cycles() const       {return min_cyc;}
+
+    //! Set and get the restol
+    void restol(const ResTol & rt) {restol_val = rt;}
+    ResTol restol() const          {return restol_val;}
+
+    //! Set and get the resrat
+    void resrat(const ResRat & rr) {resrat_val = rr;}
+    ResRat resrat() const          {return resrat_val;}
+
+    //! Set and get stale-iteration count
+    void stale_iter_array(const std::array<MaxIter,3> & mn) {ms_def = mn;}
+    std::array<MaxIter,3> stale_iter_array() const          {return ms_def;}
 
     //! Set and get max-iteration array
     void max_iter_array(const std::array<MaxIter,3> & mn) {mv_def = mn;}
@@ -126,18 +151,25 @@ class AC {
                   const real & res_beg, const real & reslinf_beg,
                   const real & res0, const real & reslinf0,
                   int * ncyc);
-    void call_smoother(const int l, const MaxIter & mi,
+    bool call_smoother(const int l, const MaxIter & mi,
                        const ResRat & res_rat, const ResTol & res_tol,
-                       const int gi); 
-    void call_solver(const int l, const MaxIter & mi,
+                       const MaxIter & ms, const int gi); 
+    bool call_solver(const int l, const MaxIter & mi,
                      const ResRat & res_rat, const ResTol & res_tol,
-                     const int gi); 
+                     const MaxIter & ms, const int gi); 
 
-    void v_cycle(const int l, const std::array<MaxIter,3> & mv, const int gi);
-    void f_cycle(const int l, const std::array<MaxIter,3> & mv, const int gi);
-    void w_cycle(const int l, const std::array<MaxIter,3> & mv, const int gi);
+    void v_cycle(const int l, const std::array<MaxIter,3> & mv, 
+                              const std::array<MaxIter,3> & ms, const int gi);
+    void f_cycle(const int l, const std::array<MaxIter,3> & mv,
+                              const std::array<MaxIter,3> & ms, const int gi);
+    void w_cycle(const int l, const std::array<MaxIter,3> & mv,
+                              const std::array<MaxIter,3> & ms, const int gi);
     void full_cycle(const int l, const Cycle & cyc, 
-                    const std::array<MaxIter,3> & mv, const int gi);
+                    const std::array<MaxIter,3> & mv, 
+                    const std::array<MaxIter,3> & ms, const int gi);
+    void flex_cycle(const int l,const std::array<MaxIter,3> & mv,
+                    const std::array<MaxIter,3> & ms, const int gi,
+                    const Sign sig = Sign::neg());
 
     //! Pointers to coarser levels. 
     Centered * L[64];
@@ -149,8 +181,10 @@ class AC {
     //! Parameters for steering of a cycle
     int  max_cyc;
     int  min_cyc;
+    ResTol restol_val;
+    ResRat resrat_val;
     bool stop_if_div, use_linf;
-    std::array<MaxIter,3> mv_def;
+    std::array<MaxIter,3> mv_def, ms_def;
 };
 
 #endif

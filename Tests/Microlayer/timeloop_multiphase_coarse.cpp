@@ -196,8 +196,14 @@
                        multigrid_cycle1,
                        multigrid_rt,
                        multigrid_rr,
-                       multigrid_mi))
+                       multigrid_mi,
+                       MaxIter(-1)))
       OMS(converged);
+
+    boil::oout << "Finished." << boil::endl;
+  boil::timer.stop();
+  boil::timer.report();
+  exit(0);
 
     p.exchange();
     ns.project(p);

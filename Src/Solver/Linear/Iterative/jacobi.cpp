@@ -7,7 +7,7 @@
 *
 *  \note The arguments are explained in the parent-parent, Linear.
 *******************************************************************************/
-void Jacobi :: solve(Matrix & A, Scalar & x, Scalar & b, const MaxIter & mi,
+bool Jacobi :: solve(Matrix & A, Scalar & x, Scalar & b, const MaxIter & mi,
                      const char * name,
                      const ResRat & res_rat, const ResTol & res_tol,
                      const real scale,
@@ -31,8 +31,9 @@ void Jacobi :: solve(Matrix & A, Scalar & x, Scalar & b, const MaxIter & mi,
 #endif
 
   /* should res be scaled with A and x? */
-  if(sqrt(res) < res_tol) return; // temporary meassure
+  if(sqrt(res) < res_tol) return true; // temporary meassure
 
+  bool converged(false);
   int i;
   for(i=0; i<mi; i++) {
     
@@ -54,9 +55,9 @@ void Jacobi :: solve(Matrix & A, Scalar & x, Scalar & b, const MaxIter & mi,
 #endif
 
     /* should res be scaled with A and x? */
-    if( sqrt(res) < res_tol ) break;
+    if( sqrt(res) < res_tol ) { converged = true; break; }
 
-    if( sqrt(res) < sqrt(res0) * res_rat ) break; 
+    if( sqrt(res) < sqrt(res0) * res_rat ) { converged = true; break; } 
   }
 
   /* for normalisation */
@@ -68,6 +69,6 @@ void Jacobi :: solve(Matrix & A, Scalar & x, Scalar & b, const MaxIter & mi,
                             << ", iterations = " << i+1 
                             << boil::endl;
 
-  return;
+  return converged;
 
 }

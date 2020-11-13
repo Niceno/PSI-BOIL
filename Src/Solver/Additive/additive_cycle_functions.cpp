@@ -81,24 +81,21 @@ int AC::converged(const ResTol & toler, const ResRat & factor,
 }
 
 /******************************************************************************/
-void AC::call_smoother(const int l, const MaxIter & mi, 
+bool AC::call_smoother(const int l, const MaxIter & mi, 
                        const ResRat & res_rat, const ResTol & res_tol,
-                       const int gi) {
+                       const MaxIter & ms, const int gi) {
 
-  L[l] -> solver->solve( L[l]->A, L[l]->phi, L[l]->fnew,
-                         mi, sname, res_rat, res_tol, 
-                         L[0]->time->dti()*L[0]->scale );
-
-  return;
+  return L[l]->solver->solve(L[l]->A, L[l]->phi, L[l]->fnew,
+                             mi, sname, res_rat, res_tol, 
+                             L[0]->time->dti()*L[0]->scale, int(ms));
 }
 
 /******************************************************************************/
-void AC::call_solver(const int l, const MaxIter & mi, 
+bool AC::call_solver(const int l, const MaxIter & mi, 
                      const ResRat & res_rat, const ResTol & res_tol,
-                     const int gi) {
+                     const MaxIter & ms, const int gi) {
 
-  solver->solve( L[l]->A, L[l]->phi, L[l]->fnew,
-                 mi, sname, res_rat, res_tol, L[0]->time->dti()*L[0]->scale );
-
-  return;
+  return solver->solve(L[l]->A, L[l]->phi, L[l]->fnew,
+                       mi, sname, res_rat, res_tol, 
+                       L[0]->time->dti()*L[0]->scale, int(ms));
 }

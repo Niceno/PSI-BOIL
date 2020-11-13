@@ -111,7 +111,8 @@
                        multigrid_cycle1,
                        multigrid_rt,
                        multigrid_rr,
-                       multigrid_mi))
+                       multigrid_mi,
+                       MaxIter(-1)))
       OMS(converged);
 
     p.exchange();

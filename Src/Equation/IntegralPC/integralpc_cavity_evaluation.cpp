@@ -18,7 +18,7 @@ real IntegralPC::cavity_evaluation(const real pinf, const real pcc) {
   press = pinf;
   capr.discretize();
   capr.coarsen();
-  if(multigrid_cavity.cycle(c0,c1,rt_cav,rr_cav,mi))
+  if(multigrid_cavity.cycle(c0,c1,rt_cav,rr_cav,mi,{MaxIter(-1),MaxIter(-1),MaxIter(-1)}))
     OMS(converged);
   press.exchange();
 

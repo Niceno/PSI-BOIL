@@ -7,7 +7,7 @@
 *
 *  \note The arguments are explained in the parent-parent, Linear.
 *******************************************************************************/
-void GaussSeidel :: solve(Matrix & A, Scalar & x, Scalar & b,
+bool GaussSeidel :: solve(Matrix & A, Scalar & x, Scalar & b,
                           const MaxIter & mi, const char * name,
                           const ResRat & res_rat, const ResTol & res_tol,
                           const real scale,
@@ -20,19 +20,28 @@ void GaussSeidel :: solve(Matrix & A, Scalar & x, Scalar & b,
   |  exchange and compute r = b - A x  |
   +-----------------------------------*/
   r = b - A * x;
-  real res = r.dot(r); 
+  real res = sqrt(r.dot_voldiv_avg(r))/scale;
   real res0 = res;
+
+  /* staleness vector */
+  std::vector<real> resvect;
+  if(stalecount>0) {
+    resvect.resize(stalecount);
+    for(auto & r : resvect)
+      r = boil::unreal;
+  }
 
 #ifdef DEBUG
   OMS(------------);
-  OPR(sqrt(res0));
+  OPR(res0);
   OPR(res_tol);
   OPR(res_rat);
 #endif
 
   /* should res be scaled with A and x? */
-  if(sqrt(res) < res_tol) return; // temporary meassure
+  if(res < res_tol) return true; // temporary meassure
 
+  bool converged(false);
   int i;
   for(i=0; i<mi; i++) {
     
@@ -55,27 +64,53 @@ void GaussSeidel :: solve(Matrix & A, Scalar & x, Scalar & b,
     /*--------------------+
     |  exit if converged  |
     +--------------------*/
-    res = r.dot(r);
+    res = sqrt(r.dot_voldiv_avg(r))/scale;
 
 #ifdef DEBUG
-    OPR( sqrt(res) );
+    OPR( res );
+    if(stalecount>0) {
+      boil::oout<<i<<" ";
+      for(auto & r : resvect)
+        boil::oout<<" "<<r;
+      boil::oout<<" "<<res<<boil::endl;
+    }
 #endif
 
     /* should res be scaled with A and x? */
-    if( sqrt(res) < res_tol ) break;
+    if( res < res_tol ) { converged = true; break; }
 
-    if( sqrt(res) < sqrt(res0) * res_rat ) break; 
+    if( res < res0 * res_rat ) { converged = true; break; } 
+
+    if(stalecount>0) {
+      bool staleflag(true);
+      for(auto & r : resvect) {
+        if(res<r) {
+          staleflag = false;
+          break;
+        }
+      }
+      if(staleflag) {
+        if(name!=NULL) {
+          boil::oout << name  << " staled!";
+          for(auto & r : resvect)
+            boil::oout<<" "<<r;
+          boil::oout<<" "<<res<<boil::endl;
+        }
+        break;
+      } else {
+        std::rotate(resvect.begin(),resvect.begin()+1,resvect.end());
+        resvect.back() = res;
+      }
+    }
+
   }
 
-  /* for normalisation */
-  r = A * x;
-
   if(name!=NULL) boil::oout << name 
-                            << ", residual = " << sqrt(res/r.dot(r)) 
-                            << ", ratio = " << sqrt ( res/res0 )
+                            << ", residual = " << res 
+                            << ", ratio = " << res/res0
                             << ", iterations = " << i+1 
                             << boil::endl;
 
-  return;
+  return converged;
 
 }

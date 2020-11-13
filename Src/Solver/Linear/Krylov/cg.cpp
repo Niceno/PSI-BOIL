@@ -7,7 +7,7 @@
 *
 *  \note The arguments are explained in the parent-parent, Linear.
 *******************************************************************************/
-void CG :: solve(Matrix & A, Scalar & x, Scalar & b, const MaxIter & mi,
+bool CG :: solve(Matrix & A, Scalar & x, Scalar & b, const MaxIter & mi,
                  const char * name,
                  const ResRat & res_rat, const ResTol & res_tol,
                  const real scale,
@@ -60,8 +60,9 @@ void CG :: solve(Matrix & A, Scalar & x, Scalar & b, const MaxIter & mi,
 #endif 
 
   /* should res be scaled with A and x? */
-  if(res < res_tol) return; // temporary meassure
+  if(res < res_tol) return true; // temporary meassure
 
+  bool converged(false);
   int i;
   for(i=0; i<mi; i++) {
 
@@ -120,13 +121,19 @@ void CG :: solve(Matrix & A, Scalar & x, Scalar & b, const MaxIter & mi,
 
 #ifdef DEBUG
     OPR(res);
+    if(stalecount>0) {
+      boil::oout<<i<<" ";
+      for(auto & r : resvect)
+        boil::oout<<" "<<r;
+      boil::oout<<" "<<res<<boil::endl;
+    }
 #endif
 
     /* should res be scaled with A and x? */
-    if( res < res_tol ) break;
+    if( res < res_tol ) { converged = true; break; }
 
-    if( res < res0 * res_rat ) break; 
-
+    if( res < res0 * res_rat ) { converged = true; break; }
+    
     if(stalecount>0) {
       bool staleflag(true);
       for(auto & r : resvect) {
@@ -142,6 +149,8 @@ void CG :: solve(Matrix & A, Scalar & x, Scalar & b, const MaxIter & mi,
             boil::oout<<" "<<r;
           boil::oout<<" "<<res<<boil::endl;
         }
+        /* restore last good solution */
+        //x -= alfa * p;
         break;
       } else {
         std::rotate(resvect.begin(),resvect.begin()+1,resvect.end());
@@ -164,4 +173,6 @@ void CG :: solve(Matrix & A, Scalar & x, Scalar & b, const MaxIter & mi,
                             << ", ratio = " << res/res0
                             << ", iterations = " << i+1 
                             << boil::endl;
+
+  return converged;
 }

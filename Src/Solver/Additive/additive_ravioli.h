@@ -13,6 +13,7 @@ class Cycle {
     static const Cycle V()    {return Cycle( 1);}
     static const Cycle F()    {return Cycle( 2);}
     static const Cycle W()    {return Cycle( 4);}
+    static const Cycle flex() {return Cycle( 5);}
 
     //! Prints the cycle name.
     friend std::ostream & operator << (std::ostream & ost, const Cycle & com) {
@@ -21,6 +22,7 @@ class Cycle {
         case( 1): ost << "V-cycle"; break;
         case( 2): ost << "F-cycle"; break;
         case( 4): ost << "W-cycle"; break;
+        case( 5): ost << "flex-cycle"; break;
       }
 
       return ost;

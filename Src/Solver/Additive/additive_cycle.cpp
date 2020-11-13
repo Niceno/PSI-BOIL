@@ -3,7 +3,7 @@
 /******************************************************************************/
 bool AC::cycle(const Cycle & init, const Cycle & loop, const ResTol & toler,
                const ResRat & factor, const std::array<MaxIter,3> & mv,
-               int * ncyc) {
+               const std::array<MaxIter,3> & ms, int * ncyc) {
 /*------------------+
 |  make few cycles  |
 +------------------*/
@@ -35,17 +35,14 @@ bool AC::cycle(const Cycle & init, const Cycle & loop, const ResTol & toler,
   real reslinf_m0, res_m0, reslinf_m1, res_m1;
 
   if(init!=Cycle::none()) {
-    L[0]->phi = 0.0;
-    //L[nlevels-1]->fnew = 0.0;
-    full_cycle(0,init,mv,0);
+    //L[0]->phi = 0.0;
+    full_cycle(0,init,mv,ms,0);
 
     /* evaluate convergence */
     res_m1 = residual(*L[0],&reslinf_m1);
     converged(toler,factor,0,res_m0,reslinf_m0,
                              res_0,reslinf_0,res_m1,reslinf_m1,ncyc);
   } else {
-    //L[nlevels-1]->phi  = 0.0;
-    //L[nlevels-1]->fnew = 0.0;
   
     /* evaluate convergence */
     res_m1 = residual(*L[0],&reslinf_m1);
@@ -59,14 +56,16 @@ bool AC::cycle(const Cycle & init, const Cycle & loop, const ResTol & toler,
  
     /* recursive kernel */
     if       (loop==Cycle::V()) {
-      v_cycle(0,mv,c);
+      v_cycle(0,mv,ms,c);
     } else if(loop==Cycle::F()) {
-      f_cycle(0,mv,c);
+      f_cycle(0,mv,ms,c);
     } else if(loop==Cycle::W()) {
-      w_cycle(0,mv,c);
+      w_cycle(0,mv,ms,c);
+    } else if(loop==Cycle::flex()) {
+      flex_cycle(0,mv,ms,c);
     /* just solve */
     } else {
-      call_solver(0,MaxIter(40),ResRat(0.001),ResTol(boil::femto),c);
+      call_solver(0,MaxIter(40),ResRat(0.001),ResTol(boil::femto),MaxIter(-1),c);
       res_m0 = residual(*L[0]);
       boil::oout << "res = " << res_m0 << boil::endl;
       break;

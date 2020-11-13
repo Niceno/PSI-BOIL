@@ -55,12 +55,12 @@
   const int multigrid_min_cycles = 1;
   const int multigrid_max_cycles = 20;
 
-  const int multigrid_niter = 30;
-  MaxIter multigrid_mm = MaxIter(multigrid_niter);
-  std::array<MaxIter,3> multigrid_mi = {multigrid_mm,multigrid_mm,multigrid_mm};
+  MaxIter multigrid_mm_smooth = MaxIter(20);
+  MaxIter multigrid_mm_solve = MaxIter(100);
+  std::array<MaxIter,3> multigrid_mi = {multigrid_mm_smooth,multigrid_mm_smooth,multigrid_mm_solve};
 
   ResRat multigrid_rr = ResRat(-1.);
-  ResTol multigrid_rt = ResTol(5e-7);
+  ResTol multigrid_rt = ResTol(1e-3);
 
   const Cycle multigrid_cycle0 = Cycle::Z();
   const Cycle multigrid_cycle1 = Cycle::F();

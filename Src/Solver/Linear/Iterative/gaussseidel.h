@@ -16,7 +16,7 @@ class GaussSeidel : public Iterative {
   public:
     GaussSeidel(const Domain & s) : Iterative(s)     {allocate(s);}
 
-    virtual void solve(Matrix & A, Scalar & x, Scalar & b, 
+    virtual bool solve(Matrix & A, Scalar & x, Scalar & b, 
                        const MaxIter & mi, const char * name = NULL,
                        const ResRat & rr = ResRat(),
                        const ResTol & rt = ResTol(),

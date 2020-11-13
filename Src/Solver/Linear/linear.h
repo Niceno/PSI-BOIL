@@ -43,7 +43,7 @@ class Linear {
         \param rt - residual tolerance, 
         \param rr - residual ratio.     
     */
-    virtual void solve(Matrix & A,              
+    virtual bool solve(Matrix & A,              
                        Scalar & x,               
                        Scalar & b,                
                        const MaxIter & mi,

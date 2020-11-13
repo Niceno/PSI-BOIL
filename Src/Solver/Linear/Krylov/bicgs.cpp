@@ -6,7 +6,7 @@
 *
 *  \note The arguments are explained in the parent-parent, Linear.
 *******************************************************************************/
-void BiCGS :: solve(Matrix & A, Scalar & x, Scalar & b, const MaxIter & mi, 
+bool BiCGS :: solve(Matrix & A, Scalar & x, Scalar & b, const MaxIter & mi, 
                     const char * name,
                     const ResRat & res_rat, const ResTol & res_tol,
                     const real scale,
@@ -66,13 +66,14 @@ void BiCGS :: solve(Matrix & A, Scalar & x, Scalar & b, const MaxIter & mi,
 #endif 
 
   /* should res be scaled with A and x? */
-  if(res < res_tol) return; // temporary meassure
+  if(res < res_tol) return true; // temporary meassure
 
   /*------------+
   |  choose r~  |
   +------------*/
   r_ = r;
 
+  bool converged(false);
   int i;
   for(i=0; i<mi; i++) {
 
@@ -176,9 +177,9 @@ void BiCGS :: solve(Matrix & A, Scalar & x, Scalar & b, const MaxIter & mi,
 #endif
 
     /* should res be scaled with A and u? */
-    if( res < res_tol ) break;
+    if( res < res_tol ) { converged = true; break; }
 
-    if( res < res0 * res_rat ) break; 
+    if( res < res0 * res_rat ) { converged = true; break; }
 
     /*---------------------------------------------------+
     |  for continuation it is necessary that omega != 0  |
@@ -222,4 +223,6 @@ void BiCGS :: solve(Matrix & A, Scalar & x, Scalar & b, const MaxIter & mi,
                             << ", ratio = " << res/res0
                             << ", iterations = " << i+1 
                             << boil::endl;
+
+  return converged;
 }

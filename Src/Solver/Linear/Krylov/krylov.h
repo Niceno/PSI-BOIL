@@ -17,7 +17,7 @@ class Krylov : public Linear {
     Krylov(const Domain & d, const Prec & pc = Prec::di())
       : Linear(d,pc) {}; 
 
-    virtual void solve(Matrix & A,              
+    virtual bool solve(Matrix & A,              
                        Scalar & x,               
                        Scalar & b,                
                        const MaxIter & mi,

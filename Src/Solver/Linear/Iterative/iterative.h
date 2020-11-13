@@ -17,7 +17,7 @@ class Iterative : public Linear {
     Iterative(const Domain & d)
       : Linear(d) {}; 
 
-    virtual void solve(Matrix & A,              
+    virtual bool solve(Matrix & A,              
                        Scalar & x,               
                        Scalar & b,                
                        const MaxIter & mi,
