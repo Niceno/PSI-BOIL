@@ -9,7 +9,10 @@
 *******************************************************************************/
 void Jacobi :: solve(Matrix & A, Scalar & x, Scalar & b, const MaxIter & mi,
                      const char * name,
-                     const ResRat & res_rat, const ResTol & res_tol) {
+                     const ResRat & res_rat, const ResTol & res_tol,
+                     const real scale,
+                     const int stalecount,
+                     const bool precform) {
 
   r = x.shape(); r=0.0;
 

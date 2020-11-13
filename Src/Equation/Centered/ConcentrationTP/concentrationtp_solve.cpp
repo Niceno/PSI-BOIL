@@ -6,7 +6,8 @@
 *      [A] \cdot \{ \phi \}^N = \{ f \}
 *  \f] 
 *******************************************************************************/
-void ConcentrationTP::solve(const ResRat & fact, const char * name) {
+void ConcentrationTP::solve(const ResTol & toler, const const ResRat & fact,
+                            const char * name) {
 
   assert(solver);
 
@@ -29,7 +30,7 @@ void ConcentrationTP::solve(const ResRat & fact, const char * name) {
     }
   }
 
-  solver->solve(A, phi, fnew, MaxIter(20), name, fact);
+  solver->solve(A, phi, fnew, MaxIter(20), name, fact, toler,scale*time->dti());
   phi.bnd_update();
 
   /* stop the timing */

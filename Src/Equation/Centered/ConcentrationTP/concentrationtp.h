@@ -70,7 +70,14 @@ class ConcentrationTP : public Centered {
 
     //! Start a new time step.
     void new_time_step(const Scalar * diff_eddy = NULL);
-    void solve(const ResRat & fact, const char * name = NULL);
+    virtual void solve(const ResTol & toler, const ResRat & fact,
+                       const char * name = NULL);
+    virtual void solve(const ResTol & toler, const char * name = NULL) {
+      solve(toler,ResRat(-1.),name);
+    } 
+    virtual void solve(const ResRat & fact, const char * name = NULL) {
+      solve(ResTol(-1.),fact,name);
+    }
 
     inline real get_turbS() const { return turbS; }
     void set_turbS(const real a) {

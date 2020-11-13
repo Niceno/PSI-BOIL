@@ -51,7 +51,7 @@
 
   /* multigrid */
   const bool multigrid_stop_if_diverging = true;
-  const bool multigrid_use_linf = true;
+  const bool multigrid_use_linf = false;//true;
   const int multigrid_min_cycles = 1;
   const int multigrid_max_cycles = 20;
 
@@ -60,7 +60,7 @@
   std::array<MaxIter,3> multigrid_mi = {multigrid_mm,multigrid_mm,multigrid_mm};
 
   ResRat multigrid_rr = ResRat(-1.);
-  ResTol multigrid_rt = ResTol(5e-3);
+  ResTol multigrid_rt = ResTol(5e-7);
 
   const Cycle multigrid_cycle0 = Cycle::Z();
   const Cycle multigrid_cycle1 = Cycle::F();

@@ -19,7 +19,10 @@ class GaussSeidel : public Iterative {
     virtual void solve(Matrix & A, Scalar & x, Scalar & b, 
                        const MaxIter & mi, const char * name = NULL,
                        const ResRat & rr = ResRat(),
-                       const ResTol & rt = ResTol());
+                       const ResTol & rt = ResTol(),
+                       const real scale = 1.0,
+                       const int stalecount = -1,
+                       const bool precform = true);
 
   private:
     void allocate(const Domain & s) {

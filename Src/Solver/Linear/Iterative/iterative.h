@@ -23,7 +23,10 @@ class Iterative : public Linear {
                        const MaxIter & mi,
                        const char * var_name,
                        const ResRat & rr = ResRat(), 
-                       const ResTol & rt = ResTol()) = 0;
+                       const ResTol & rt = ResTol(),
+                       const real scale = 1.0,
+                       const int stalecount = -1,
+                       const bool precform = true) = 0;
 };
 
 #endif

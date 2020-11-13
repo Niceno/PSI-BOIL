@@ -1,5 +1,4 @@
 #include "enthalpyfd.h"
-using namespace std;
 
 /***************************************************************************//**
 *  Solves linear system of equations:
@@ -7,7 +6,8 @@ using namespace std;
 *      [A] \cdot \{ \phi \}^N = \{ f \}
 *  \f] 
 *******************************************************************************/
-void EnthalpyFD::solve(const ResRat & fact, const char * name) {
+void EnthalpyFD::solve(const ResTol & toler, const ResRat & fact, 
+                       const char * name) {
 
   assert(solver);
 
@@ -24,8 +24,7 @@ void EnthalpyFD::solve(const ResRat & fact, const char * name) {
   /* solve */
   update_rhs();
 
-  //solver->solve(A, phi, fnew, 20, name, 1e-32, fact);
-  solver->solve(A, phi, fnew, MaxIter(20), name, fact);
+  solver->solve(A, phi, fnew, MaxIter(20), name, fact, toler,scale*time->dti());
 
   phi.bnd_update();
 

@@ -13,7 +13,6 @@ libEnthalpyFD_a_SOURCES = enthalpyfd.h                        \
                           enthalpyfd_inertial.cpp             \
                           enthalpyfd_new_time_step.cpp        \
                           enthalpyfd_solve.cpp                \
-                          enthalpyfd_solve_sor.cpp            \
                           enthalpyfd_system_bnd.cpp           \
                           enthalpyfd_system_diffusive.cpp     \
                           enthalpyfd_system_innertial.cpp     \

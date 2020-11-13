@@ -92,7 +92,14 @@ class Centered : public Equation {
     virtual void new_time_step(const Scalar * diff_eddy = NULL);
 
     //! Solvers discretized system of equaions.
-    virtual void solve(const ResRat & fact, const char * name = NULL); 
+    virtual void solve(const ResTol & toler, const ResRat & fact,
+                       const char * name = NULL); 
+    virtual void solve(const ResTol & toler, const char * name = NULL) {
+      solve(toler,ResRat(-1.),name);
+    } 
+    virtual void solve(const ResRat & fact, const char * name = NULL) {
+      solve(ResTol(-1.),fact,name);
+    }
     virtual real update_rhs();
 
     virtual void diffusion(const Scalar * diff_eddy = NULL);

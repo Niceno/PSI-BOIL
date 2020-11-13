@@ -118,20 +118,26 @@ class AC {
     void coarsen_system(const Centered & h, Centered & H) const; 
 
     //! Individual components of a cycle
-    bool init_cycles(const ResTol & toler, real & res_0, int * ncyc);
+    bool init_cycles(const ResTol & toler, real & res_0, real & reslinf_0, 
+                     int * ncyc);
     int converged(const ResTol & toler, const ResRat & factor,
                   const int & cycle,
-                  const real & res_0, const real & res0,
+                  real & res1, real & reslinf1,
+                  const real & res_beg, const real & reslinf_beg,
+                  const real & res0, const real & reslinf0,
                   int * ncyc);
     void call_smoother(const int l, const MaxIter & mi,
-                       const ResRat & res_rat, const ResTol & res_tol); 
+                       const ResRat & res_rat, const ResTol & res_tol,
+                       const int gi); 
     void call_solver(const int l, const MaxIter & mi,
-                     const ResRat & res_rat, const ResTol & res_tol); 
+                     const ResRat & res_rat, const ResTol & res_tol,
+                     const int gi); 
 
-    void v_cycle(const int l, const std::array<MaxIter,3> & mv);
-    void f_cycle(const int l, const std::array<MaxIter,3> & mv);
-    void w_cycle(const int l, const std::array<MaxIter,3> & mv);
-    void full_cycle(const int l, const Cycle & cyc, const std::array<MaxIter,3> & mv);
+    void v_cycle(const int l, const std::array<MaxIter,3> & mv, const int gi);
+    void f_cycle(const int l, const std::array<MaxIter,3> & mv, const int gi);
+    void w_cycle(const int l, const std::array<MaxIter,3> & mv, const int gi);
+    void full_cycle(const int l, const Cycle & cyc, 
+                    const std::array<MaxIter,3> & mv, const int gi);
 
     //! Pointers to coarser levels. 
     Centered * L[64];

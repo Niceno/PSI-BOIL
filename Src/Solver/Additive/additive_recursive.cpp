@@ -1,23 +1,23 @@
 #include "additive.h"
 
 /******************************************************************************/
-void AC::v_cycle(const int l,const std::array<MaxIter,3> & mv) {
+void AC::v_cycle(const int l,const std::array<MaxIter,3> & mv, const int gi) {
 
   if(l!=nlevels-1) {
     /* pre-smooth */
     //call_smoother(l,MaxIter(5),ResRat(0.1),ResTol(boil::nano));
-    call_smoother(l,mv[0],ResRat(boil::atto),ResTol(boil::atto));
+    call_smoother(l,mv[0],ResRat(boil::atto),ResTol(boil::atto),gi);
 
     /* restrict residual to coarser grid */
-    residual(*L[l]);
+    //residual(*L[l]);
     restriction(*L[l], *L[l+1]);
 
     /* recursive call to a coarser level */
-    v_cycle(l+1,mv);
+    v_cycle(l+1,mv,gi);
  
     /* post-smooth */
     //call_smoother(l,MaxIter(20 * (l+1)),ResRat(0.01),ResTol(boil::pico));
-    call_smoother(l,mv[2],ResRat(boil::atto),ResTol(boil::atto));
+    call_smoother(l,mv[2],ResRat(boil::atto),ResTol(boil::atto),gi);
 
     /* prolongate to a finer level */
     if(l > 0)
@@ -25,7 +25,7 @@ void AC::v_cycle(const int l,const std::array<MaxIter,3> & mv) {
 
   } else {
     /* solve 'precisely' at the coarsest level */
-    call_solver(l,MaxIter(100),ResRat(1e-6),ResTol(boil::atto));
+    call_solver(l,MaxIter(100),ResRat(1e-6),ResTol(boil::atto),gi);
 
     /* prolongate to a finer level */
     interpolation(*L[l], *L[l-1]);
@@ -35,34 +35,34 @@ void AC::v_cycle(const int l,const std::array<MaxIter,3> & mv) {
 }
 
 /******************************************************************************/
-void AC::f_cycle(const int l,const std::array<MaxIter,3> & mv) {
+void AC::f_cycle(const int l,const std::array<MaxIter,3> & mv, const int gi) {
 
   if(l!=nlevels-1) {
     /* pre-smooth */
     //call_smoother(l,MaxIter(5),ResRat(0.1),ResTol(boil::nano));
-    call_smoother(l,mv[0],ResRat(boil::atto),ResTol(boil::atto));
+    call_smoother(l,mv[0],ResRat(boil::atto),ResTol(boil::atto),gi);
 
     /* restrict residual to coarser grid */
-    residual(*L[l]);
+    //residual(*L[l]);
     restriction(*L[l], *L[l+1]);
 
     /* recursive call to a coarser level */
-    f_cycle(l+1,mv);
+    f_cycle(l+1,mv,gi);
 
     /* re-smooth */
     //call_smoother(l,MaxIter(10 * (l+1)),ResRat(0.01),ResTol(boil::pico));
-    call_smoother(l,mv[1],ResRat(boil::atto),ResTol(boil::atto));
+    call_smoother(l,mv[1],ResRat(boil::atto),ResTol(boil::atto),gi);
 
     /* restrict residual to coarser grid */
-    residual(*L[l]);
+    //residual(*L[l]);
     restriction(*L[l], *L[l+1]);
 
     /* recursive call to a coarser level on the way back */
-    v_cycle(l+1,mv);
+    v_cycle(l+1,mv,gi);
 
     /* post-smooth */
     //call_smoother(l,MaxIter(20 * (l+1)),ResRat(0.01),ResTol(boil::pico));
-    call_smoother(l,mv[2],ResRat(boil::atto),ResTol(boil::atto));
+    call_smoother(l,mv[2],ResRat(boil::atto),ResTol(boil::atto),gi);
 
     /* prolongate to a finer level */
     if(l > 0)
@@ -70,7 +70,7 @@ void AC::f_cycle(const int l,const std::array<MaxIter,3> & mv) {
 
   } else {
     /* solve 'precisely' at the coarsest level */
-    call_solver(l,MaxIter(40 * (l+1)),ResRat(0.001),ResTol(boil::femto));
+    call_solver(l,MaxIter(40 * (l+1)),ResRat(0.001),ResTol(boil::femto),gi);
 
     /* prolongate to a finer level */
     interpolation(*L[l], *L[l-1]);
@@ -80,34 +80,34 @@ void AC::f_cycle(const int l,const std::array<MaxIter,3> & mv) {
 }
 
 /******************************************************************************/
-void AC::w_cycle(const int l,const std::array<MaxIter,3> & mv) {
+void AC::w_cycle(const int l,const std::array<MaxIter,3> & mv, const int gi) {
 
   if(l!=nlevels-1) {
     /* pre-smooth */
     //call_smoother(l,MaxIter(5),ResRat(0.1),ResTol(boil::nano));
-    call_smoother(l,mv[0],ResRat(boil::atto),ResTol(boil::atto));
+    call_smoother(l,mv[0],ResRat(boil::atto),ResTol(boil::atto),gi);
 
     /* restrict residual to coarser grid */
-    residual(*L[l]);
+    //residual(*L[l]);
     restriction(*L[l], *L[l+1]);
 
     /* recursive call to a coarser level */
-    w_cycle(l+1,mv);
+    w_cycle(l+1,mv,gi);
 
     /* re-smooth */
     //call_smoother(l,MaxIter(10 * (l+1)),ResRat(0.01),ResTol(boil::pico));
-    call_smoother(l,mv[1],ResRat(boil::atto),ResTol(boil::atto));
+    call_smoother(l,mv[1],ResRat(boil::atto),ResTol(boil::atto),gi);
 
     /* restrict residual to coarser grid */
-    residual(*L[l]);
+    //residual(*L[l]);
     restriction(*L[l], *L[l+1]);
 
     /* recursive call to a coarser level on the way back */
-    w_cycle(l+1,mv);
+    w_cycle(l+1,mv,gi);
 
     /* post-smooth */
     //call_smoother(l,MaxIter(20 * (l+1)),ResRat(0.01),ResTol(boil::pico));
-    call_smoother(l,mv[2],ResRat(boil::atto),ResTol(boil::atto));
+    call_smoother(l,mv[2],ResRat(boil::atto),ResTol(boil::atto),gi);
 
     /* prolongate to a finer level */
     if(l > 0)
@@ -115,7 +115,7 @@ void AC::w_cycle(const int l,const std::array<MaxIter,3> & mv) {
 
   } else {
     /* solve 'precisely' at the coarsest level */
-    call_solver(l,MaxIter(40 * (l+1)),ResRat(0.001),ResTol(boil::femto));
+    call_solver(l,MaxIter(40 * (l+1)),ResRat(0.001),ResTol(boil::femto),gi);
 
     /* prolongate to a finer level */
     interpolation(*L[l], *L[l-1]);
@@ -126,30 +126,31 @@ void AC::w_cycle(const int l,const std::array<MaxIter,3> & mv) {
 
 /******************************************************************************/
 void AC::full_cycle(const int l, const Cycle & cyc,
-                    const std::array<MaxIter,3> & mv) {
+                    const std::array<MaxIter,3> & mv,
+                    const int gi) {
 
   if(l!=nlevels-1) {
     /* restrict fnew to coarser grid */
     restriction(*L[l], *L[l+1]);
 
     /* recursive call to a coarser level */
-    full_cycle(l+1,cyc,mv);
+    full_cycle(l+1,cyc,mv,gi);
 
     /* recursive call to a coarser level on the way back */
     if       (cyc==Cycle::V()) {
-      v_cycle(l,mv);
+      v_cycle(l,mv,gi);
     } else if(cyc==Cycle::F()) {
-      f_cycle(l,mv);
+      f_cycle(l,mv,gi);
     } else if(cyc==Cycle::W()) {
-      w_cycle(l,mv);
+      w_cycle(l,mv,gi);
       /* just solve (shouldn't happen) */
     } else {
-      call_solver(l,MaxIter(20 * (l+1)),ResRat(0.01),ResTol(boil::pico));
+      call_solver(l,MaxIter(20 * (l+1)),ResRat(0.01),ResTol(boil::pico),gi);
     }
 
   } else {
     /* solve 'precisely' at the coarsest level */
-    call_solver(l,MaxIter(40 * (l+1)),ResRat(0.001),ResTol(boil::femto));
+    call_solver(l,MaxIter(40 * (l+1)),ResRat(0.001),ResTol(boil::femto),gi);
 
     /* prolongate to a finer level */
     interpolation(*L[l], *L[l-1]);

@@ -76,7 +76,9 @@ class Momentum : public Staggered {
     }
 
     real cfl_max() const;
-    void solve(const ResRat & fact);
+    void solve(const ResTol & toler, const ResRat & fact);
+    void solve(const ResTol & toler) { solve(toler,ResRat(-1.)); };
+    void solve(const ResRat & fact) { solve(ResTol(-1.),fact); };
     real bulk(const Comp & m, const real & coord) const;
 
     void get_eps(Scalar * src);

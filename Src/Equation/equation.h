@@ -27,7 +27,7 @@ class Equation {
       dom(d), time(t), flu(f), sol(s), solver(sm),
       conv_ts(TimeScheme::adams_bashforth()),
       diff_ts(TimeScheme::crank_nicolson()),
-      lim(ConvScheme::superbee()) {}  
+      lim(ConvScheme::superbee()), scale(1.0) {}  
 
     virtual void discretize(const Scalar * diff_eddy = NULL) = 0;
 
@@ -41,6 +41,13 @@ class Equation {
     const Matter * solid() const {return sol;}
 
     const Domain * domain() const {return dom;}
+
+    real get_scale() const { return scale; }
+    void set_scale(const real s) { 
+      scale = s; 
+      boil::oout<<"Equation scale: "<<s<<boil::endl;
+      return;
+    }
     
   protected:
     TimeScheme diff_ts;
@@ -51,6 +58,8 @@ class Equation {
     const Times  * time;
     Matter * flu;
     Matter * sol;
+
+    real scale;
 };
 
 #endif

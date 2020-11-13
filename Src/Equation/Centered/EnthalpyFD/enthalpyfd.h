@@ -80,8 +80,14 @@ class EnthalpyFD : public Centered {
     void convective_time_step();
     virtual void convection();
     virtual void diffusion(const Scalar * diff_eddy = NULL);
-    void solve(const ResRat & fact, const char * name = NULL);
-    void solve_sor(const int & it, const real & r, const char * name = NULL);
+    virtual void solve(const ResTol & toler, const ResRat & fact,
+                       const char * name = NULL);
+    virtual void solve(const ResTol & toler, const char * name = NULL) {
+      solve(toler,ResRat(-1.),name);
+    } 
+    virtual void solve(const ResRat & fact, const char * name = NULL) {
+      solve(ResTol(-1.),fact,name);
+    }
 
     //! Interface call to parent's discretization.
     void discretize(const Scalar * diff_eddy = NULL) {

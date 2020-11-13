@@ -21,9 +21,12 @@ class Krylov : public Linear {
                        Scalar & x,               
                        Scalar & b,                
                        const MaxIter & mi,
-                       const char * var_name,
+                       const char * var_name = NULL,
                        const ResRat & rr = ResRat(), 
-                       const ResTol & rt = ResTol()) = 0;
+                       const ResTol & rt = ResTol(),
+                       const real scale = 1.0,
+                       const int stalecount = -1,
+                       const bool precform = true) = 0;
 };
 
 #endif

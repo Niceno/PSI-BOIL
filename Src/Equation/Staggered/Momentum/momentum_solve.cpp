@@ -2,7 +2,7 @@
 #include "../../../Plot/plot.h"
 
 /******************************************************************************/
-void Momentum::solve(const ResRat & factor) {
+void Momentum::solve(const ResTol & toler, const ResRat & factor) {
 
   boil::timer.start("momentum solver");
 
@@ -54,7 +54,7 @@ void Momentum::solve(const ResRat & factor) {
     if(m==Comp::u()) 
       if(ifull) {
         solver->solve(*Am, u(m), fnew(m), 
-                       MaxIter(10), "u", factor);
+                       MaxIter(10), "u", factor,toler,scale*time->dti());
       } else {
         for_avmijk(u,m,i,j,k) 
           u[m][i][j][k] = 0.0;
@@ -62,7 +62,7 @@ void Momentum::solve(const ResRat & factor) {
     if(m==Comp::v()) 
       if(jfull) {
         solver->solve(*Am, u(m), fnew(m), 
-                       MaxIter(10), "v", factor);
+                       MaxIter(10), "v", factor,toler,scale*time->dti());
       } else {
         for_avmijk(u,m,i,j,k) 
           u[m][i][j][k] = 0.0;
@@ -70,7 +70,7 @@ void Momentum::solve(const ResRat & factor) {
     if(m==Comp::w()) 
       if(kfull) {
         solver->solve(*Am, u(m), fnew(m), 
-                       MaxIter(10), "w", factor);
+                       MaxIter(10), "w", factor,toler,scale*time->dti());
       } else {
         for_avmijk(u,m,i,j,k) 
           u[m][i][j][k] = 0.0;

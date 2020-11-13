@@ -17,9 +17,13 @@ class CGS : public Krylov {
     CGS(const Domain & s, const Prec & pc) : Krylov(s, pc) {allocate(s);}
     CGS(const Domain & s)                  : Krylov(s)     {allocate(s);}
 
-    void solve(Matrix & A, Scalar & x, Scalar & b, const MaxIter & mi, 
-               const char * name = NULL,
-               const ResRat & rr = ResRat(), const ResTol & rt = ResTol());
+    virtual void solve(Matrix & A, Scalar & x, Scalar & b, 
+                       const MaxIter & mi, const char * name = NULL,
+                       const ResRat & rr = ResRat(),
+                       const ResTol & rt = ResTol(),
+                       const real scale = 1.0,
+                       const int stalecount = -1,
+                       const bool precform = true);
 
   private:
     void allocate(const Domain & d) {
