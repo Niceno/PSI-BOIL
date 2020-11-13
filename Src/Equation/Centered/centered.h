@@ -98,7 +98,7 @@ class Centered : public Equation {
       solve(toler,ResRat(-1.),name);
     } 
     virtual void solve(const ResRat & fact, const char * name = NULL) {
-      solve(ResTol(-1.),fact,name);
+      solve(ResTol(boil::atto),fact,name);
     }
     virtual real update_rhs();
 
