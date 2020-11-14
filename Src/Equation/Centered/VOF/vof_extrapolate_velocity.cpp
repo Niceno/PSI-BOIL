@@ -5,7 +5,7 @@
 /******************************************************************************/
 void VOF::extrapolate_velocity(const Scalar & scp, const Scalar & fext,
                                const Matter * fluid, const Vector & umixed, 
-                               Vector & unew, const ResRat & resrat,
+                               Vector & unew, const ResTol & restol,
                                const Sign & sig, const bool flagging) {
 /***************************************************************************//**
 *  \brief Calculate divergence-free velocity field extension. Interface has to
@@ -50,7 +50,7 @@ void VOF::extrapolate_velocity(const Scalar & scp, const Scalar & fext,
 
   /* step three: solve the system A*p = fext */
   const bool converged = ev_solve(tempflag,A,fext,stmp,*pold,
-                                  store_pressure_extrap,niter_pressure_extrap,resrat);
+                                  store_pressure_extrap,niter_pressure_extrap,restol);
 
   /* step four: project using the mixture-to-single velocity correction */
   for_m(m)
@@ -81,7 +81,7 @@ void VOF::extrapolate_velocity(const Scalar & scp, const Scalar & fext,
 /******************************************************************************/
 void VOF::extrapolate_velocity(const Scalar & scp,
                                const Matter * fluid, const Vector & umixed, 
-                               Vector & unew, const ResRat & resrat,
+                               Vector & unew, const ResTol & restol,
                                const Sign & sig, const bool flagging) {
 /***************************************************************************//**
 *  \brief Calculate divergence-free velocity field extension. Interface has to
@@ -132,7 +132,7 @@ void VOF::extrapolate_velocity(const Scalar & scp,
 
   /* step three: solve the system A*p = stmp2 (fext) */
   const bool converged = ev_solve(tempflag,A,stmp2,stmp,*pold,
-                                  store_pressure_extrap,niter_pressure_extrap,resrat);
+                                  store_pressure_extrap,niter_pressure_extrap,restol);
 
   /* step four: project using the mixture-to-single velocity correction */
   for_m(m)

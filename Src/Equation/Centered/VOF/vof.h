@@ -8,7 +8,7 @@
 #include "../../Topology/topology.h"
 #include "../../../Global/global_realistic.h"
 #include "../../../Parallel/communicator.h"
-#include "../../../Ravioli/resrat.h"
+#include "../../../Ravioli/restol.h"
 
 #define IB
 
@@ -43,27 +43,27 @@ class VOF : public Centered {
     void advance(const bool anci = true);
     void advance(const Scalar & sca, const bool anci = true);
 
-    void advance_with_extrapolation(const bool anci, const ResRat & resrat,
+    void advance_with_extrapolation(const bool anci, const ResTol & restol,
                                     const Vector & umixed, const Scalar & fext,
                                     const Matter * fluid_1, Vector * uvw_1,
                                     const Matter * fluid_2 = NULL,
                                     Vector * uvw_2 = NULL);
 
     void advance_with_extrapolation(const Scalar & sca,
-                                    const bool anci, const ResRat & resrat,
+                                    const bool anci, const ResTol & restol,
                                     const Vector & umixed, const Scalar & fext,
                                     const Matter * fluid_1, Vector * uvw_1,
                                     const Matter * fluid_2 = NULL,
                                     Vector * uvw_2 = NULL);
 
-    void advance_with_extrapolation(const bool anci, const ResRat & resrat,
+    void advance_with_extrapolation(const bool anci, const ResTol & restol,
                                     const Vector & umixed,
                                     const Matter * fluid_1, Vector * uvw_1,
                                     const Matter * fluid_2 = NULL,
                                     Vector * uvw_2 = NULL);
 
     void advance_with_extrapolation(const Scalar & sca,
-                                    const bool anci, const ResRat & resrat,
+                                    const bool anci, const ResTol & restol,
                                     const Vector & umixed,
                                     const Matter * fluid_1, Vector * uvw_1,
                                     const Matter * fluid_2 = NULL,
@@ -104,11 +104,11 @@ class VOF : public Centered {
 
     void extrapolate_velocity(const Scalar & scp, const Scalar & fext,
                               const Matter * fluid, const Vector & umixed, 
-                              Vector & unew, const ResRat & resrat,
+                              Vector & unew, const ResTol & restol,
                               const Sign & sig, const bool flagging);
     void extrapolate_velocity(const Scalar & scp,
                               const Matter * fluid, const Vector & umixed,
-                              Vector & unew, const ResRat & resrat,
+                              Vector & unew, const ResTol & restol,
                               const Sign & sig, const bool flagging);
 
     virtual Scalar & color() {return phi;}
@@ -167,7 +167,7 @@ class VOF : public Centered {
     bool ev_solve(const ScalarInt & pflag, const Matrix & A,
                   const Scalar & b, Scalar & x, Scalar & xold,
                   const bool init_guess, const int niter,
-                  const ResRat & resrat);
+                  const ResTol & restol);
     void ev_calculate_source(const ScalarInt & pflag, const Vector & u,
                              Scalar & fext);
     void ev_project(const ScalarInt & pflag, const Matter * fluid,

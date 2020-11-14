@@ -6,7 +6,7 @@
 bool VOF::ev_solve(const ScalarInt & pflag, const Matrix & A,
                    const Scalar & b, Scalar & x, Scalar & xold, 
                    const bool init_guess, const int niter,
-                   const ResRat & resrat) { 
+                   const ResTol & restol) { 
 /***************************************************************************//**
 *  \brief Solve the problem A*x = b using Jacobi iterations.
 *  pflag = -2,-1,1,-2 : solution domain
@@ -104,7 +104,7 @@ bool VOF::ev_solve(const ScalarInt & pflag, const Matrix & A,
 
     /* converged? */
     //if(linferr/linferr_first<resrat) {
-    if(linferr<resrat) {
+    if(linferr<restol) {
       converged = true;
 //#ifdef DEBUG
       real errrat(0);

@@ -2,11 +2,6 @@
 
 #define USE_VOF
 //#define USE_FULL
-#define USE_PC4
-//#define USE_SECOND_ORDER
-#define USE_VOF_VEL
-//#define USE_UNCOND_EXTRP
-//#define DISCARD_POINTS
 
 const int NZ = 4;
 
@@ -252,11 +247,7 @@ int main(int argc, char * argv[]) {
   conc.set_nredist(1);
   conc.set_itsharpen(4);
 #else 
-  #ifdef USE_VOF_VEL
   VOF conc  (c,  g, kappa, uvw_1, time, solver);
-  #else
-  VOF conc  (c,  g, kappa, uvw, time, solver);
-  #endif
 #endif
   AC multigrid( &pr );
   multigrid.stop_if_diverging(true);
@@ -274,29 +265,12 @@ int main(int argc, char * argv[]) {
   enthFD.convection_set(TimeScheme::forward_euler());
   enthFD.diffusion_set(TimeScheme::backward_euler());
   enthFD.set_no_solid_acceleration(false);
-  enthFD.set_gradt_accuracy_order(AccuracyOrder::Fourth());
-#ifndef USE_PC4
-  PhaseChangeVOF pc(mdot, mflx, tpr, q, c, g , f , uvw, conc.topo,
-                    tsat, time, &mixed);
-#else
+  enthFD.set_flux_accuracy_order(AccuracyOrder::First());
   PhaseChange4 pc(mdot, mflx, q, g , f , uvw, cht,
                   time, &mixed);
-  #ifdef USE_SECOND_ORDER
-  pc.set_second_order_accuracy(true);
-  #else
   pc.set_accuracy_order(AccuracyOrder::FourthUpwind());
-  #endif
-  #ifdef USE_UNCOND_EXTRP
-  pc.set_unconditional_extrapolation(true);
-  #else
   pc.set_unconditional_extrapolation(false);
-  #endif
-  #ifdef DISCARD_POINTS
-  pc.set_discard_points_near_interface(true);
-  #else
   pc.set_discard_points_near_interface(false);
-  #endif
-#endif
 
   boil::plot->plot(uvw, c, tpr, mdot, "uvw-c-tpr-mdot", 0);
 
@@ -331,10 +305,10 @@ int main(int argc, char * argv[]) {
 	xyz[m][i][j][k]=0.0;
 
     ns.grad(press);
-    ns.solve(ResRat(1e-7));
+    ns.solve(ResRat(1e-14));
 
     p = 0.0;
-    if (multigrid.fcycle(ResRat(1e-7))) OMS(converged);
+    if (multigrid.fcycle(ResTol(1e-7))) OMS(converged);
     p.exchange();
     ns.project(p);
     press += p;
@@ -349,12 +323,8 @@ int main(int argc, char * argv[]) {
     conc.new_time_step();
 
     cold=c;
-#ifndef USE_VOF_VEL
-    conc.advance();
-#else
-    conc.advance_with_extrapolation(true,ResRat(1e-7),uvw,f,
+    conc.advance_with_extrapolation(true,ResTol(1e-7),uvw,f,
                                     &liquid,&uvw_1);
-#endif
  
     conc.front_minmax();
     conc.totalvol();
@@ -377,28 +347,9 @@ int main(int argc, char * argv[]) {
     /*------------------------+
     |  solve energy equation  |
     +------------------------*/
-    tprold = tpr;
     enthFD.discretize();
-    //enthFD.new_time_step();
-    for(int i(0); i<1;++i) {
-      for(int j(0); j<1;++j) {
-        enthFD.convective_time_step(tprold);
-        if(j==0) {
-          tprap1 = tpr;
-        } else {
-          tpr = (tprap1+tpr);
-          tpr /= 2.;
-        }
-      }
-      enthFD.inertial(tpr,false,Old::no);
-      enthFD.solve(ResRat(1e-7));
-      if(i==0) {
-        tprap2 = tpr;
-      } else {
-        tpr = (tprap2+tpr);
-        tpr /= 2.;
-      }
-    }
+    enthFD.new_time_step();
+    enthFD.solve(ResRat(1e-14));
 
     if(time.current_step() % (nint)==0 ||time.current_step()==1) {
       boil::plot->plot(uvw,c,tpr,mdot,"uvw-c-tpr-mdot",time.current_step());

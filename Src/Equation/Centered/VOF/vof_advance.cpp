@@ -42,19 +42,19 @@ void VOF::advance(const Scalar & scp, const bool anci) {
 }
 
 /******************************************************************************/
-void VOF::advance_with_extrapolation(const bool anci, const ResRat & resrat,
+void VOF::advance_with_extrapolation(const bool anci, const ResTol & restol,
                                      const Vector & umixed, const Scalar & fext, 
                                      const Matter * fluid_1, Vector * uvw_1, 
                                      const Matter * fluid_2, Vector * uvw_2) {
 /***************************************************************************//**
 *  \brief Advance VOF, extrapolating velocities in the process.
 *******************************************************************************/
-  advance_with_extrapolation(phi,anci,resrat,umixed,fext,
+  advance_with_extrapolation(phi,anci,restol,umixed,fext,
                              fluid_1,uvw_1,fluid_2,uvw_2);
 }
 
 void VOF::advance_with_extrapolation(const Scalar & scp, 
-                                     const bool anci, const ResRat & resrat,
+                                     const bool anci, const ResTol & restol,
                                      const Vector & umixed, const Scalar & fext, 
                                      const Matter * fluid_1, Vector * uvw_1,
                                      const Matter * fluid_2, Vector * uvw_2) {
@@ -81,14 +81,14 @@ void VOF::advance_with_extrapolation(const Scalar & scp,
   +-------------------------*/
   if(fluid_1) {
     extrapolate_velocity(color(),fext,fluid_1,umixed,(*uvw_1),
-                         resrat,Sign::pos(),true); /* true for int. flagging */
+                         restol,Sign::pos(),true); /* true for int. flagging */
   }
   if(fluid_2) {
     bool iflagging = false;
     if(!fluid_1) iflagging = true;
 
     extrapolate_velocity(color(),fext,fluid_2,umixed,(*uvw_2),
-                         resrat,Sign::neg(),iflagging);
+                         restol,Sign::neg(),iflagging);
   }
 
   boil::timer.start("vof advance");
@@ -110,19 +110,19 @@ void VOF::advance_with_extrapolation(const Scalar & scp,
 }
 
 /******************************************************************************/
-void VOF::advance_with_extrapolation(const bool anci, const ResRat & resrat,
+void VOF::advance_with_extrapolation(const bool anci, const ResTol & restol,
                                      const Vector & umixed,
                                      const Matter * fluid_1, Vector * uvw_1, 
                                      const Matter * fluid_2, Vector * uvw_2) {
 /***************************************************************************//**
 *  \brief Advance VOF, extrapolating velocities in the process.
 *******************************************************************************/
-  advance_with_extrapolation(phi,anci,resrat,umixed,
+  advance_with_extrapolation(phi,anci,restol,umixed,
                              fluid_1,uvw_1,fluid_2,uvw_2);
 }
 
 void VOF::advance_with_extrapolation(const Scalar & scp, 
-                                     const bool anci, const ResRat & resrat,
+                                     const bool anci, const ResTol & restol,
                                      const Vector & umixed,
                                      const Matter * fluid_1, Vector * uvw_1,
                                      const Matter * fluid_2, Vector * uvw_2) {
@@ -149,14 +149,14 @@ void VOF::advance_with_extrapolation(const Scalar & scp,
   +-------------------------*/
   if(fluid_1) {
     extrapolate_velocity(color(),fluid_1,umixed,(*uvw_1),
-                         resrat,Sign::pos(),true); /* true for int. flagging */
+                         restol,Sign::pos(),true); /* true for int. flagging */
   }
   if(fluid_2) {
     bool iflagging = false;
     if(!fluid_1) iflagging = true;
 
     extrapolate_velocity(color(),fluid_2,umixed,(*uvw_2),
-                         resrat,Sign::neg(),iflagging);
+                         restol,Sign::neg(),iflagging);
   }
 
   boil::timer.start("vof advance");

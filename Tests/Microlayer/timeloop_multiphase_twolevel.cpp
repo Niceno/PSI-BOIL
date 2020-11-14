@@ -112,7 +112,7 @@
                        multigrid_rt,
                        multigrid_rr,
                        multigrid_mi,
-                       MaxIter(-1)))
+                       multigrid_mstale))
       OMS(converged);
 
     p.exchange();
@@ -148,7 +148,7 @@
     +---------------------------*/
     conc_fine.new_time_step();
     conc_coarse.new_time_step();
-    conc_coarse.advance_with_extrapolation(false,ResRat(1e-6),uvw.coarse,f.coarse,
+    conc_coarse.advance_with_extrapolation(false,ResTol(1e-6),uvw.coarse,f.coarse,
                                            &liquid.coarse,&uvw_1,&vapor.coarse,&uvw_2);
 
     for_avk(c.coarse,k) {

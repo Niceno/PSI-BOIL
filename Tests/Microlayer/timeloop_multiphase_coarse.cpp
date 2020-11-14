@@ -151,7 +151,7 @@
     if(are_ml>0.0)
       massflux_ml = massflow_ml/are_ml;
 
-#if 1
+#if 0
     for_vijk(c.coarse,i,j,k) {
       if(conc_coarse.topo->interface(i,j,k)) {
         mflx.coarse[i][j][k] = cap_val(c.coarse.xc(i),
@@ -161,12 +161,15 @@
                                        massflux_cap);
       }
     }
-#else
-    mflx.coarse = massflux_heat;
-#endif
     mflx.coarse.bnd_update();
     mflx.coarse.exchange();
     pc_coarse.finalize();
+#elif 0
+    mflx.coarse = massflux_heat;
+    mflx.coarse.bnd_update();
+    mflx.coarse.exchange();
+    pc_coarse.finalize();
+#endif
 
     boil::oout<<"mflux= "<<time.current_time()<<" "
                          <<massflux_heat<<" "<<massflux_inert<<" "
@@ -197,13 +200,8 @@
                        multigrid_rt,
                        multigrid_rr,
                        multigrid_mi,
-                       MaxIter(-1)))
+                       multigrid_mstale))
       OMS(converged);
-
-    boil::oout << "Finished." << boil::endl;
-  boil::timer.stop();
-  boil::timer.report();
-  exit(0);
 
     p.exchange();
     ns.project(p);
@@ -234,7 +232,7 @@
     |  solve transport equation  |
     +---------------------------*/
     conc_coarse.new_time_step();
-    conc_coarse.advance_with_extrapolation(false,ResRat(1e-6),uvw.coarse,f.coarse,
+    conc_coarse.advance_with_extrapolation(false,ResTol(1e-6),uvw.coarse,f.coarse,
                                            &liquid.coarse,&uvw_1,&vapor.coarse,&uvw_2);
 
     for_avk(c.coarse,k) {

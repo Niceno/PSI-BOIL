@@ -6,7 +6,7 @@
 *      [A] \cdot \{ \phi \}^N = \{ f \}
 *  \f] 
 *******************************************************************************/
-void ConcentrationTP::solve(const ResTol & toler, const const ResRat & fact,
+void ConcentrationTP::solve(const ResTol & toler, const ResRat & fact,
                             const char * name) {
 
   assert(solver);

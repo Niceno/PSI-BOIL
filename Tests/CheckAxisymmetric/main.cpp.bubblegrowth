@@ -389,7 +389,7 @@ int main(int argc, char ** argv) {
 #endif
   enthFD.convection_set(TimeScheme::forward_euler());
   enthFD.diffusion_set(TimeScheme::backward_euler());
-  enthFD.set_flux_accuracy_order(AccuracyOrder::Second());
+  enthFD.set_flux_accuracy_order(AccuracyOrder::First());
 
   enthFD.set_no_solid_acceleration(no_solid_acceleration);
 
@@ -587,13 +587,13 @@ int main(int argc, char ** argv) {
     pr.coarsen();
 
     /* momentum */
-    ns.new_time_step();
+    ns.new_time_step(&f);
 
     ns.grad(press);
     ns.solve(ResRat(1e-14));
 
     p = 0.0;
-    if (multigrid.fcycle(ResRat(1e-6))) OMS(converged);
+    if (multigrid.fcycle(ResTol(1e-6))) OMS(converged);
     //pr.solve(ResRat(1e-6));
     p.exchange();
     ns.project(p);
@@ -624,7 +624,7 @@ int main(int argc, char ** argv) {
     |  solve transport equation  |
     +---------------------------*/
     conc.new_time_step();
-    conc.advance_with_extrapolation(true,ResRat(1e-6),uvw,f,
+    conc.advance_with_extrapolation(true,ResTol(1e-6),uvw,f,
                                     &liquid,&uvw_1,&vapor,&uvw_2);
 #if CASE == 3
   #ifdef USE_MG
