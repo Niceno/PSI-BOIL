@@ -40,7 +40,7 @@ real Topology::distance_int_x(const Sign dir,
   }
 
   boil::aout<<"Topology::int_dist_x: Error! Flag inconsistent w/ vol. fraction!\n";
-  boil::aout<<i<<" "<<j<<" "<<k<<" "<<dir<<" "
+  boil::aout<<i<<" "<<j<<" "<<k<<" "<<dir*1.0<<" "
             <<(*iflag)[i][j][k]<<" "<<(*iflag)[i+dir][j][k]<<" "
             <<(*clr)[i][j][k]<<" "<<(*clr)[i+dir][j][k]<<boil::endl;
   exit(0);
@@ -60,7 +60,7 @@ real Topology::distance_int_y(const Sign dir,
   }
 
   boil::aout<<"Topology::int_dist_y: Error! Flag inconsistent w/ vol. fraction!\n";
-  boil::aout<<i<<" "<<j<<" "<<k<<" "<<dir<<" "
+  boil::aout<<i<<" "<<j<<" "<<k<<" "<<dir*1.0<<" "
             <<(*iflag)[i][j][k]<<" "<<(*iflag)[i][j+dir][k]<<" "
             <<(*clr)[i][j][k]<<" "<<(*clr)[i][j+dir][k]<<boil::endl;
   exit(0);
@@ -80,7 +80,7 @@ real Topology::distance_int_z(const Sign dir,
   }
 
   boil::aout<<"Topology::int_dist_z: Error! Flag inconsistent w/ vol. fraction!\n";
-  boil::aout<<i<<" "<<j<<" "<<k<<" "<<dir<<" "
+  boil::aout<<i<<" "<<j<<" "<<k<<" "<<dir*1.0<<" "
             <<(*iflag)[i][j][k]<<" "<<(*iflag)[i][j][k+dir]<<" "
             <<(*clr)[i][j][k]<<" "<<(*clr)[i][j][k+dir]<<boil::endl;
   exit(0);
@@ -93,8 +93,7 @@ Sign Topology::distance1D_int_x(const int i, const int j, const int k,
                                 const Sign dir, real & dist) const {
   real centrex = vf->xc(i);
   if(dir>0) {
-    //real edgex= centrex+0.5*vf->dxc(i);
-    real edgex= vf->xn(i+1);
+    real edgex= centrex+0.5*vf->dxc(i);
     real intx = (*fs)[Comp::i()][i+1][j][k];
     real offx = vf->xc(i+1);
     if(intx>=centrex&&intx<=edgex) {
@@ -105,8 +104,7 @@ Sign Topology::distance1D_int_x(const int i, const int j, const int k,
       return Sign::pos();
     }
   } else {
-    //real edgex= centrex-0.5*vf->dxc(i);
-    real edgex= vf->xn(i);
+    real edgex= centrex-0.5*vf->dxc(i);
     real intx = (*fs)[Comp::i()][i  ][j][k];
     real offx = vf->xc(i-1);
     if(intx<=centrex&&intx>=edgex) {
@@ -125,8 +123,7 @@ Sign Topology::distance1D_int_y(const int i, const int j, const int k,
                                 const Sign dir, real & dist) const {
   real centrey = vf->yc(j);
   if(dir>0) {
-    //real edgey= centrey+0.5*vf->dyc(j);
-    real edgey= vf->yn(j+1);
+    real edgey= centrey+0.5*vf->dyc(j);
     real inty = (*fs)[Comp::j()][i][j+1][k];
     real offy = vf->yc(j+1);
     if(inty>=centrey&&inty<=edgey) {
@@ -137,8 +134,7 @@ Sign Topology::distance1D_int_y(const int i, const int j, const int k,
       return Sign::pos();
     }
   } else {
-    //real edgey= centrey-0.5*vf->dyc(j);
-    real edgey= vf->yn(j);
+    real edgey= centrey-0.5*vf->dyc(j);
     real inty = (*fs)[Comp::j()][i][j  ][k];
     real offy = vf->yc(j-1);
     if(inty<=centrey&&inty>=edgey) {
@@ -157,8 +153,7 @@ Sign Topology::distance1D_int_z(const int i, const int j, const int k,
                                 const Sign dir, real & dist) const {
   real centrez = vf->zc(k);
   if(dir>0) {
-    //real edgez= centrez+0.5*vf->dzc(k);
-    real edgez= vf->zn(k+1);
+    real edgez= centrez+0.5*vf->dzc(k);
     real intz = (*fs)[Comp::k()][i][j][k+1];
     real offz = vf->zc(k+1);
     if(intz>=centrez&&intz<=edgez) {
@@ -169,8 +164,7 @@ Sign Topology::distance1D_int_z(const int i, const int j, const int k,
       return Sign::pos();
     }
   } else {
-    //real edgez= centrez-0.5*vf->dzc(k);
-    real edgez= vf->zn(k);
+    real edgez= centrez-0.5*vf->dzc(k);
     real intz = (*fs)[Comp::k()][i][j][k  ];
     real offz = vf->zc(k-1);
     if(intz<=centrez&&intz>=edgez) {
