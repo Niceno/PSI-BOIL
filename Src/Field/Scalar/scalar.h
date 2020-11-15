@@ -285,7 +285,7 @@ class Scalar {
       }
       boil::cart.sum_real(&d);
       boil::cart.sum_int(&ntot);
-      return d/real(ntot*ntot);}
+      return d/real(ntot)/real(ntot);}
 
     real dot_voldiv_avg(const Scalar & s) {
       real d=0.0; int ntot(0);
@@ -295,7 +295,7 @@ class Scalar {
       }
       boil::cart.sum_real(&d); 
       boil::cart.sum_int(&ntot);
-      return d/real(ntot*ntot);
+      return d/real(ntot)/real(ntot);
     }
 
     /*
