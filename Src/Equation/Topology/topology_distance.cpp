@@ -40,7 +40,7 @@ real Topology::distance_int_x(const Sign dir,
   }
 
   boil::aout<<"Topology::int_dist_x: Error! Flag inconsistent w/ vol. fraction!\n";
-  boil::aout<<i<<" "<<j<<" "<<k<<" "<<dir*1.0<<" "
+  boil::aout<<i<<" "<<j<<" "<<k<<" "<<int(dir)<<" "
             <<(*iflag)[i][j][k]<<" "<<(*iflag)[i+dir][j][k]<<" "
             <<(*clr)[i][j][k]<<" "<<(*clr)[i+dir][j][k]<<boil::endl;
   exit(0);
@@ -60,7 +60,7 @@ real Topology::distance_int_y(const Sign dir,
   }
 
   boil::aout<<"Topology::int_dist_y: Error! Flag inconsistent w/ vol. fraction!\n";
-  boil::aout<<i<<" "<<j<<" "<<k<<" "<<dir*1.0<<" "
+  boil::aout<<i<<" "<<j<<" "<<k<<" "<<int(dir)<<" "
             <<(*iflag)[i][j][k]<<" "<<(*iflag)[i][j+dir][k]<<" "
             <<(*clr)[i][j][k]<<" "<<(*clr)[i][j+dir][k]<<boil::endl;
   exit(0);
@@ -80,7 +80,7 @@ real Topology::distance_int_z(const Sign dir,
   }
 
   boil::aout<<"Topology::int_dist_z: Error! Flag inconsistent w/ vol. fraction!\n";
-  boil::aout<<i<<" "<<j<<" "<<k<<" "<<dir*1.0<<" "
+  boil::aout<<i<<" "<<j<<" "<<k<<" "<<int(dir)<<" "
             <<(*iflag)[i][j][k]<<" "<<(*iflag)[i][j][k+dir]<<" "
             <<(*clr)[i][j][k]<<" "<<(*clr)[i][j][k+dir]<<boil::endl;
   exit(0);
