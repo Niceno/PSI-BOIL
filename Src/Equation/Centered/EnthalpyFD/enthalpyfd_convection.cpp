@@ -65,14 +65,14 @@ void EnthalpyFD::convection(Scalar * conv) {
   /*-------------------------+
   |  convection scalar (FD)  |
   +-------------------------*/
-  /* conv = (-div(f) + T*div(u))*dV */
+  /* conv = -(div(f) - T*div(u))*dV */
   for_ijk(i,j,k) {
     if(cht.above_interface(i,j,k,old)) {
       (*conv)[i][j][k] = flux_liq.divergence(i,j,k)
-                       + phi[i][j][k]*uliq->divergence(i,j,k);
+                       - phi[i][j][k]*uliq->divergence(i,j,k);
     } else {
       (*conv)[i][j][k] = flux_gas.divergence(i,j,k)
-                       + phi[i][j][k]*ugas->divergence(i,j,k);
+                       - phi[i][j][k]*ugas->divergence(i,j,k);
     }
     (*conv)[i][j][k] *= -dV(i,j,k);
   }

@@ -1,6 +1,6 @@
 #include "momentum.h"
 //#define TWODXY
-#define TWODXZ
+//#define TWODXZ
 #define AXISYM
 #define SYM
 
