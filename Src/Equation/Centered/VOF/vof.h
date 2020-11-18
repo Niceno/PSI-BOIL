@@ -303,7 +303,7 @@ class VOF : public Centered {
              , const real & r1, const real & r2, const real & r3
              , const int & i1, const int & i2, const int &i3
              , real r[] );
-    void smooth(const Scalar & sca, Scalar & scb, const int itnum);
+    void smooth(Scalar & sca, const int itnum);
     void true_norm_vect(const Scalar & nx,
                         const Scalar & ny,
                         const Scalar & nz,

@@ -41,12 +41,12 @@ real CommonHeatTransfer::hflux_wall(const Scalar & val, const Dir din,
           if(d == Dir::kmax()) { kof--; mcomp = Comp::k(); of = +1; sig = Sign::neg(); }
     
           for_vijk(val.bc().at(b),i,j,k){
-            real area = fabs(iof)*val.dSx(sig,i,j,k)
-                      + fabs(jof)*val.dSy(sig,i,j,k)
-                      + fabs(kof)*val.dSz(sig,i,j,k);
-            real alen = fabs(val.xc(i)-val.xc(i+iof))
-                      + fabs(val.yc(j)-val.yc(j+jof))
-                      + fabs(val.zc(k)-val.zc(k+kof));
+            real area = std::abs(iof)*val.dSx(sig,i,j,k)
+                      + std::abs(jof)*val.dSy(sig,i,j,k)
+                      + std::abs(kof)*val.dSz(sig,i,j,k);
+            real alen = std::abs(val.xc(i)-val.xc(i+iof))
+                      + std::abs(val.yc(j)-val.yc(j+jof))
+                      + std::abs(val.zc(k)-val.zc(k+kof));
 
             areaw += area;
             if       (val.domain()->ibody().off(i,j,k)) {

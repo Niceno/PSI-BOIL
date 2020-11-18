@@ -59,7 +59,7 @@ void Momentum::solve(const ResTol & toler, const ResRat & factor) {
         for_avmijk(u,m,i,j,k) 
           u[m][i][j][k] = 0.0;
       }
-    if(m==Comp::v()) 
+    if(m==Comp::v()) { 
       if(jfull) {
         solver->solve(*Am, u(m), fnew(m), 
                        MaxIter(10), "v", factor,toler,scale*time->dti());
@@ -67,7 +67,8 @@ void Momentum::solve(const ResTol & toler, const ResRat & factor) {
         for_avmijk(u,m,i,j,k) 
           u[m][i][j][k] = 0.0;
       }
-    if(m==Comp::w()) 
+    }
+    if(m==Comp::w()) {
       if(kfull) {
         solver->solve(*Am, u(m), fnew(m), 
                        MaxIter(10), "w", factor,toler,scale*time->dti());
@@ -75,6 +76,7 @@ void Momentum::solve(const ResTol & toler, const ResRat & factor) {
         for_avmijk(u,m,i,j,k) 
           u[m][i][j][k] = 0.0;
       }
+    }
   }
 
   /* set velocity in solid zero */

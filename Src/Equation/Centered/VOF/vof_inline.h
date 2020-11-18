@@ -158,7 +158,7 @@ void set_wall_curv_method(const CurvMethod wcm,
     } else if(cangle>0.) {
       /* estimate */
       real cangrad = cangle*boil::pi/180.;
-      Nfilm_crit = std::max(4,abs(cos(cangrad)/sin(cangrad)));
+      Nfilm_crit = std::max(4,abs(int(cos(cangrad)/sin(cangrad))));
       boil::oout<<"Wall critical film length: "<<Nfilm_crit<<boil::endl;
     } else {
       Nfilm_crit = boil::unint;

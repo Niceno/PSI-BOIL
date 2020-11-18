@@ -65,6 +65,6 @@ void Momentum::new_time_step(const Vector & vec, const Scalar * prs) {
   |       2     |
   +------------*/
   /* a condition like: if(diff_ts != backward_euler()) would be good */
-  if(diff_ts.Nm1() != 0.0);
+  if(diff_ts.Nm1() != 0.0)
     diffusion();
 }
