@@ -1,3 +1,4 @@
+1 - surface tension dt coefficient [-]
 0 - wall superheat [K]
 0 - outlet superheat [K]
 12.55 - nucleation superheat [K]
@@ -18,4 +19,6 @@
 20 - transitional no. cells in sol [.int.]
 20 - transitional no. cells in X [.int.]
 20 - transitional no. cells in Z [.int.]
+1 - domain decomposition factor in X [.int.]
+1 - domain decomposition factor in Z [.int.]
 2 - case flag [.int.], indicates initialisation and time loop

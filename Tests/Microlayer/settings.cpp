@@ -36,7 +36,6 @@
   const int n_per_backup = 5000;
 
   /* dt settings */
-  const real surftens_dt_coef = 1.;//0.5;
   const real initdtcoef = 1./10.;
 
   /* cfl with and without interfaces */

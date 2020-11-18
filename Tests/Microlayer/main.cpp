@@ -66,6 +66,7 @@ int main(int argc, char ** argv) {
   boil::oout<<"Reading input file << "<<deck<<" >>\n";
 
   /* important: set all values to zero to start with */
+  real surftens_dt_coef(0.);
   real deltat_wall(0.), deltat_out(0.), deltat_nucl(0.), qflux(0.);
   real cangle(0.), accommodation(0.), prs(0.), radius(0.);
   real LZsol(0.), LZheat(0.);
@@ -73,9 +74,11 @@ int main(int argc, char ** argv) {
   real AR(0.);
   int NZsol(0), NXtot(0), NZtot(0);
   int NZsol_trans(0), NX_trans(0), NZ_trans(0);
+  int factor_x(0), factor_z(0);
   int case_flag(0);
 
-  std::vector<real*> readreal({&deltat_wall,
+  std::vector<real*> readreal({&surftens_dt_coef,
+                               &deltat_wall,
                                &deltat_out,
                                &deltat_nucl,
                                &qflux,
@@ -97,6 +100,8 @@ int main(int argc, char ** argv) {
                              &NZsol_trans,
                              &NX_trans,
                              &NZ_trans,
+                             &factor_x,
+                             &factor_z,
                              &case_flag
                             });
 

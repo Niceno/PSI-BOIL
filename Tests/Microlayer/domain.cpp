@@ -111,6 +111,7 @@
   /*---------+
   |  domain  |
   +---------*/
+  Domain::set_decomposition_factors(factor_x,1,factor_z);
   Body floor("floor.stl");
   Body * floor_ptr = NULL;
   if(NZsol>0) {
