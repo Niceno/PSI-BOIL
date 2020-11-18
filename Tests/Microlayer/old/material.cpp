@@ -68,7 +68,7 @@
   /*----------------------+
   |  physical properties  |
   +----------------------*/
-  Matter vapor(d), liquid(d);
+  TwoLevelMatter vapor(d), liquid(d);
   vapor  .mu    (muv);
   vapor  .rho   (rhov);
   vapor  .cp    (cpv);  /* J/m3 */
@@ -82,11 +82,11 @@
   liquid.mmass (Mv);
   liquid.beta  (betal);
 
-  Matter mixed(liquid, vapor, & c);
+  TwoLevelMatter mixed(liquid, vapor, & c);
   mixed.sigma(sig);
   mixed.latent(latent);
 
-  Matter substrate(d), heater(d);
+  TwoLevelMatter substrate(d), heater(d);
   substrate.rho    (rhosol);
   substrate.cp     (cpsol);
   substrate.lambda (lambdasol);
@@ -94,4 +94,4 @@
   heater.cp     (cpheat);
   heater.lambda (lambdaheat);
   
-  Matter solid(substrate,heater,&csub);
+  TwoLevelMatter solid(substrate,heater,&csub);

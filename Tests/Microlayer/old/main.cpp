@@ -162,6 +162,8 @@ int main(int argc, char ** argv) {
   #include "timeloop_singlephase.cpp"
   } else if(case_flag<3) {
   #include "timeloop_multiphase_coarse.cpp"
+  } else if(case_flag<5) {
+  #include "timeloop_multiphase_twolevel.cpp"
   } else {
     OMS(Underdevelopment. Exiting.);
     exit(0);

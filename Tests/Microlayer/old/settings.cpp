@@ -28,7 +28,7 @@
   const int ndt = 10e6; /* inconsequential */
   
   /* plot every */
-  real t_per_plot = 0.005*1e-3;
+  real t_per_plot = 0.01*1e-3;
   if(case_flag==0)
     t_per_plot = 0.1;
 
@@ -36,7 +36,7 @@
   const int n_per_backup = 5000;
 
   /* dt settings */
-  const real surftens_dt_coef = 1.;//0.5;
+  const real surftens_dt_coef = 1.;
   const real initdtcoef = 1./10.;
 
   /* cfl with and without interfaces */
@@ -55,16 +55,14 @@
   const int multigrid_min_cycles = 1;
   const int multigrid_max_cycles = 20;
 
-  MaxIter multigrid_mm_smooth1 = MaxIter(25);
-  MaxIter multigrid_mm_smooth2 = MaxIter(40);
-  MaxIter multigrid_mm_solve = MaxIter(200);
-  MaxIter multigrid_mm_stale1 = MaxIter(10);
-  MaxIter multigrid_mm_stale2 = MaxIter(-1);
-  std::array<MaxIter,3> multigrid_mi = {multigrid_mm_smooth1,multigrid_mm_smooth2,multigrid_mm_solve};
-  std::array<MaxIter,3> multigrid_mstale = {multigrid_mm_stale1,multigrid_mm_stale1,multigrid_mm_stale2};
+  MaxIter multigrid_mm_smooth = MaxIter(20);
+  MaxIter multigrid_mm_solve = MaxIter(100);
+  MaxIter multigrid_mm_stale = MaxIter(-1);
+  std::array<MaxIter,3> multigrid_mi = {multigrid_mm_smooth,multigrid_mm_smooth,multigrid_mm_solve};
+  std::array<MaxIter,3> multigrid_mstale = {multigrid_mm_stale,multigrid_mm_stale,multigrid_mm_stale};
 
   ResRat multigrid_rr = ResRat(-1.);
-  ResTol multigrid_rt = ResTol(5e-7);
+  ResTol multigrid_rt = ResTol(5e-5);
 
   const Cycle multigrid_cycle0 = Cycle::Z();
   const Cycle multigrid_cycle1 = Cycle::F();

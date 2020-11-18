@@ -13,59 +13,6 @@ bool read_variable(std::ifstream & input, T & var) {
 }
 
 /* write an interpolation table from a single-proc scalar;
- * data in the format val(z = col,x = row)
- */
-void write_table_all(const Scalar & sca,
-                     std::fstream & otp) {
-  for_avi(sca,i) {
-    otp << sca.xc(i) << " ";
-  }
-  otp << boil::endl;
-
-  for_avk(sca,k) {
-    otp << sca.zc(k) << " ";
-  }
-  otp << boil::endl;
-
-  int j(boil::BW);
-  for_avk(sca,k) {
-    for_avi(sca,i) {
-      otp<<sca[i][j][k]<<" ";
-    }
-    otp << boil::endl;
-  }
-
-  return;
-}
-
-/* write an interpolation table from a single-proc vector;
- * data in the format val(z = col,x = row)
- */
-void write_table_all(const Vector & vec,
-                     const Comp & m,
-                     std::fstream & otp) {
-  for_avmi(vec,m,i) {
-    otp << vec.xc(m,i) << " ";
-  }
-  otp << boil::endl;
-
-  for_avmk(vec,m,k) {
-    otp << vec.zc(m,k) << " ";
-  }
-  otp << boil::endl;
-
-  int j(boil::BW);
-  for_avmk(vec,m,k) {
-    for_avmi(vec,m,i) {
-      otp<<vec[m][i][j][k]<<" ";
-    }
-    otp << boil::endl;
-  }
-
-  return;
-}
-
-/* write an interpolation table from a single-proc scalar;
  * the vector is for solid-liquid boundary
  * 1st line = x-vals
  * 2nd line = z-vals
@@ -132,37 +79,6 @@ void output_to_file(const Scalar & sca, const Vector & bndsca) {
   std::fstream output;
   output.open(fname,std::ios::out);
   write_table(sca,bndsca,output);
-  output.close();
-
-  return;
-}
-
-void output_by_proc(const Scalar & sca, const std::string & nm) {
-
-  std::string fname = nm+"_"+std::to_string(boil::cart.iam());
-  std::fstream output;
-  output.open(fname,std::ios::out);
-  write_table_all(sca,output);
-  output.close();
-
-  for(int i(0); i<boil::cart.nproc();++i) {
-
-  }
-
-  return;
-}
-
-void output_by_proc(const Vector & vec, const std::string & nm) {
-
-  std::string fname = nm+"_u_"+std::to_string(boil::cart.iam());
-  std::fstream output;
-  output.open(fname,std::ios::out);
-  write_table_all(vec,Comp::u(),output);
-  output.close();
-
-  fname = nm+"_w_"+std::to_string(boil::cart.iam());
-  output.open(fname,std::ios::out);
-  write_table_all(vec,Comp::w(),output);
   output.close();
 
   return;

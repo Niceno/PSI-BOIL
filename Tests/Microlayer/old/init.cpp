@@ -1,9 +1,13 @@
   int ts;
   /* load variables */
-  std::vector<Scalar*> load_scalars = { &press, &c, &tpr };
+  std::vector<Scalar*> load_scalars = { &press, &c.coarse };
+  if(case_flag>2)
+    load_scalars.push_back(&tpr.fine);
+  else
+    load_scalars.push_back(&tpr.coarse);
   std::vector<std::string> load_scalar_names = { "press", "c", "tpr" };
 
-  std::vector<Vector*> load_vectors = { &uvw };
+  std::vector<Vector*> load_vectors = { &uvw.coarse };
   std::vector<std::string> load_vector_names = { "uvw" };
 
   const real heater_extent = 1.5e-3;
@@ -32,18 +36,21 @@
   };
 
   /* solid */
-  csub = 0.0;
-  for_vijk(csub,i,j,k) {
-    if(csub.zc(k)<0.) {
-      if(csub.zn(k+1)<=-LZheat) {
-        csub[i][j][k] = 1.0;
-      } else if(csub.zn(k)<= -LZheat) {
-        csub[i][j][k] = (fabs(csub.zn(k))-LZheat)/csub.dzc(k);
-        q[i][j][k] = heatfunc(csub.xc(i),csub.yc(j),
-                              1.0-csub[i][j][k],csub.dV(i,j,k));
-      } else {
-        q[i][j][k] = heatfunc(csub.xc(i),csub.yc(j),
-                              1.0,csub.dV(i,j,k));
+  csub.fine   = 0.0;
+  csub.coarse = 0.0;
+  for_coarsefine(l) {
+    for_vijk(csub[l],i,j,k) {
+      if(csub[l].zc(k)<0.) {
+        if(csub[l].zn(k+1)<=-LZheat) {
+          csub[l][i][j][k] = 1.0;
+        } else if(csub[l].zn(k)<= -LZheat) {
+          csub[l][i][j][k] = (fabs(csub[l].zn(k))-LZheat)/csub[l].dzc(k);
+          q[l][i][j][k] = heatfunc(csub[l].xc(i),csub[l].yc(j),
+                                   1.0-csub[l][i][j][k],csub[l].dV(i,j,k));
+        } else {
+          q[l][i][j][k] = heatfunc(csub[l].xc(i),csub[l].yc(j),
+                                   1.0,csub[l].dV(i,j,k));
+        }
       }
     }
   }
@@ -51,8 +58,10 @@
   if(boil::load_backup("time.txt",ts,time,
                        load_scalars, load_scalar_names,
                        load_vectors, load_vector_names)) {
-    conc.init();
-    conc.color_to_vf();
+    conc_coarse.init();
+    boil::prolongate_color_XZ(conc_coarse,conc_fine);
+    conc_fine.color_to_vf();
+    conc_fine.init();
   } else {
 
     /* start from single phase scratch */
@@ -68,7 +77,8 @@
 
   }
 
-  cht.init();
+  cht_fine.init();
+  cht_coarse.init();
 
   /* set iint */
   int iint = time.current_time() / t_per_plot;

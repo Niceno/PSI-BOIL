@@ -1,78 +1,60 @@
   /*------------------+
   |  define unknowns  |
   +------------------*/
-  Vector xyz(d.coarse());                      /* force */
-  Vector uvw_1(d.coarse()), uvw_2(d.coarse()); /* phasic vel */
-  Scalar p(d.coarse()), press(d.coarse());     /* pressure */
-  Scalar mu_t(d.coarse());                     /* artificial viscosity */
+  Vector xyz(d);                      /* force */
+  Vector uvw_1(d), uvw_2(d); /* phasic vel */
+  Scalar p(d), press(d);     /* pressure */
+  Scalar mu_t(d);                     /* artificial viscosity */
 
-  /* the following variables exist on both levels: */
-  TwoLevelVector uvw(d);                         /* velocity */
-  TwoLevelScalar c(d), g(d), kappa(d);           /* concentration */
-  TwoLevelScalar f(d);                           /* pressure src */
-  TwoLevelScalar csub(d);                        /* heater color */
-  TwoLevelScalar tpr(d), q(d);                   /* temperature */
-  TwoLevelScalar tprap1(d), tprap2(d), tprold(d);/* temperature */
-  TwoLevelScalar mdot(d), mflx(d);               /* phase-change rate */
+  Vector uvw(d);                         /* velocity */
+  Scalar c(d), g(d), kappa(d);           /* concentration */
+  Scalar f(d);                           /* pressure src */
+  Scalar csub(d);                        /* heater color */
+  Scalar tpr(d), q(d);                   /* temperature */
+  Scalar mdot(d), mflx(d);               /* phase-change rate */
 
   /*-----------------------------+
   |  insert boundary conditions  |
   +-----------------------------*/
-  for(auto l : uvw.levels) {
-    for_m(m) {
-      l->bc(m).add( BndCnd( Dir::imin(), BndType::symmetry() ) );
-      l->bc(m).add( BndCnd( Dir::imax(), BndType::wall() ) );
-      l->bc(m).add( BndCnd( Dir::kmin(), BndType::wall() ) );
-      l->bc(m).add( BndCnd( Dir::kmax(), BndType::outlet() ) );
-      l->bc(m).add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
-      l->bc(m).add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
-    }
-  }
-
   for_m(m) {
-    uvw_1(m)=uvw.coarse(m).shape();
-    uvw_2(m)=uvw.coarse(m).shape();
+    uvw.bc(m).add( BndCnd( Dir::imin(), BndType::symmetry() ) );
+    uvw.bc(m).add( BndCnd( Dir::imax(), BndType::wall() ) );
+    uvw.bc(m).add( BndCnd( Dir::kmin(), BndType::wall() ) );
+    uvw.bc(m).add( BndCnd( Dir::kmax(), BndType::outlet() ) );
+    uvw.bc(m).add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
+    uvw.bc(m).add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
+
+    uvw_1(m)=uvw(m).shape();
+    uvw_2(m)=uvw(m).shape();
   }
 
-  for(auto l : c.levels) {
-    l->bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
-    l->bc().add( BndCnd( Dir::imax(), BndType::neumann() ) );
-    l->bc().add( BndCnd( Dir::kmin(), BndType::wall() ) );
-    l->bc().add( BndCnd( Dir::kmax(), BndType::outlet() ) );
-    l->bc().add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
-    l->bc().add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
-  }
+  c.bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
+  c.bc().add( BndCnd( Dir::imax(), BndType::neumann() ) );
+  c.bc().add( BndCnd( Dir::kmin(), BndType::wall() ) );
+  c.bc().add( BndCnd( Dir::kmax(), BndType::outlet() ) );
+  c.bc().add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
+  c.bc().add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
 
-  press = c.coarse.shape();
-  p     = c.coarse.shape();
-  mu_t  = c.coarse.shape();
+  press = c.shape();
+  p     = c.shape();
+  mu_t  = c.shape();
 
-  for_coarsefine(l) {
-    f[l]     = c[l].shape();
-    g[l]     = c[l].shape();
-    kappa[l] = c[l].shape();
-    csub[l]  = c[l].shape();
-    q[l]     = c[l].shape();
-    mdot[l]  = c[l].shape();
-    mflx[l]  = c[l].shape();
-  }
+  f     = c.shape();
+  g     = c.shape();
+  kappa = c.shape();
+  csub  = c.shape();
+  q     = c.shape();
+  mdot  = c.shape();
+  mflx  = c.shape();
 
-  for(auto l : tpr.levels) {
-    l->bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
-    l->bc().add( BndCnd( Dir::imax(), BndType::neumann() ) );
+  tpr.bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
+  tpr.bc().add( BndCnd( Dir::imax(), BndType::neumann() ) );
 #ifdef USE_BOTTOM_DIRICHLET
-    l->bc().add( BndCnd( Dir::kmin(), BndType::dirichlet(), twall ) );
+  tpr.bc().add( BndCnd( Dir::kmin(), BndType::dirichlet(), twall ) );
 #else
-    l->bc().add( BndCnd( Dir::kmin(), BndType::neumann() ) );
+  tpr.bc().add( BndCnd( Dir::kmin(), BndType::neumann() ) );
 #endif
-    //l->bc().add( BndCnd( Dir::kmax(), BndType::dirichlet(),tout) );
-    l->bc().add( BndCnd( Dir::kmax(), BndType::outlet()) );
-    l->bc().add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
-    l->bc().add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
-  }
-
-  for_coarsefine(l) {
-    tprap1[l] = tpr[l].shape();
-    tprap2[l] = tpr[l].shape();
-    tprold[l] = tpr[l].shape();
-  }
+  //tpr.bc().add( BndCnd( Dir::kmax(), BndType::dirichlet(),tout) );
+  tpr.bc().add( BndCnd( Dir::kmax(), BndType::outlet()) );
+  tpr.bc().add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
+  tpr.bc().add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
