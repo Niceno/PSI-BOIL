@@ -24,6 +24,8 @@ int main(int argc, char ** argv) {
     boil::oout<<"Two command line arguments required!"<<"\n";
     boil::oout<<"./Boil wmin file-with-inputs"<<"\n";
     boil::oout<<"Inputs:\n";
+    boil::oout<<"- surface tension dt coefficient [-]\n";
+    boil::oout<<"- cfl limit [-]\n";
     boil::oout<<"- wall superheat [K]\n";
     boil::oout<<"- outlet superheat [K]\n";
     boil::oout<<"- nucleation superheat [K]\n";
@@ -44,6 +46,8 @@ int main(int argc, char ** argv) {
     boil::oout<<"- transitional no. cells in sol [.int.]\n";
     boil::oout<<"- transitional no. cells in X [.int.]\n";
     boil::oout<<"- transitional no. cells in Z [.int.]\n";
+    boil::oout<<"- domain decomposition factor in X [.int.]\n";
+    boil::oout<<"- domain decomposition factor in Z [.int.]\n";
     boil::oout<<"- case flag [.int.], indicates initialisation and time loop\n";
 
     exit(0);
@@ -53,6 +57,7 @@ int main(int argc, char ** argv) {
  * 0 - single-phase simulation for temperature distribution
  * 1 - multi-phase, on coarse mesh, uniform temperatures
  * 2 - multi-phase, on coarse mesh, temperatures from a file
+ * ------------- these are obsolete
  * 3 - multi-phase, on fine mesh, uniform temperatures
  * 4 - multi-phase, on fine mesh, temperatures from a file
  */
@@ -66,7 +71,7 @@ int main(int argc, char ** argv) {
   boil::oout<<"Reading input file << "<<deck<<" >>\n";
 
   /* important: set all values to zero to start with */
-  real surftens_dt_coef(0.);
+  real surftens_dt_coef(0.), cfl_limit(0.);
   real deltat_wall(0.), deltat_out(0.), deltat_nucl(0.), qflux(0.);
   real cangle(0.), accommodation(0.), prs(0.), radius(0.);
   real LZsol(0.), LZheat(0.);
@@ -78,6 +83,7 @@ int main(int argc, char ** argv) {
   int case_flag(0);
 
   std::vector<real*> readreal({&surftens_dt_coef,
+                               &cfl_limit,
                                &deltat_wall,
                                &deltat_out,
                                &deltat_nucl,
@@ -166,7 +172,7 @@ int main(int argc, char ** argv) {
   if(case_flag==0) {
   #include "timeloop_singlephase.cpp"
   } else if(case_flag<3) {
-  #include "timeloop_multiphase_coarse.cpp"
+  #include "timeloop_multiphase.cpp"
   } else {
     OMS(Underdevelopment. Exiting.);
     exit(0);

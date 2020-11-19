@@ -20,7 +20,7 @@ Schrage::Schrage(const real Tref,
   real latent = fluid()->latent()->value();
   tr = Tref;
 
-  hresis = calculate_heat_transfer_resistance(tr,rhov,mmass,latent);
+  hresis = calculate_heat_transfer_resistance(tr,rhov,mmass,latent,1.);
   mresis = hresis * latent;
   boil::oout<<"Schrage: Transfer resistance= "<<hresis<<" "<<mresis<<boil::endl;
 
@@ -35,7 +35,9 @@ Schrage::Schrage(const real Tref,
 +----------------*/
 real Schrage::calculate_heat_transfer_resistance(const real tr, const real rhov,
                                                  const real mmass,
-                                                 const real latent) {
-  return std::pow(tr,1.5)/2.0/rhov/latent/latent
+                                                 const real latent,
+                                                 const real accommodation) {
+  const real accomult = 2.*accommodation/(2.-accommodation);
+  return std::pow(tr,1.5)/accomult/rhov/latent/latent
                          /sqrt(mmass/(2.0*boil::pi*boil::R));
 }

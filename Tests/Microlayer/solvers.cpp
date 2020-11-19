@@ -20,8 +20,11 @@
   |  define equations  |
   +-------------------*/
   /* momentum equation */
-  Momentum ns( uvw, xyz, time, solver, &mixed);
-  ns.convection_set(TimeScheme::forward_euler());
+  Momentum ns(uvw, xyz, time, solver, &mixed);
+  if(mSimple>1)
+    ns.convection_set(TimeScheme::backward_euler()); //ns.convection is mandatory
+  else
+    ns.convection_set(TimeScheme::forward_euler());
   ns.diffusion_set(TimeScheme::backward_euler());
 
   /* pressure solver */

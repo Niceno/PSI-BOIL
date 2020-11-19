@@ -31,7 +31,8 @@ class Schrage : public TIF {
 
     static real calculate_heat_transfer_resistance(
                                           const real tr, const real rhov,
-                                          const real mmass, const real latent);
+                                          const real mmass, const real latent,
+                                          const real accommodation);
 
   protected:
     real mresis, hresis, latent, rhol;

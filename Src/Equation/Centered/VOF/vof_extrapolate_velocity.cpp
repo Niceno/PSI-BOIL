@@ -56,7 +56,7 @@ void VOF::extrapolate_velocity(const Scalar & scp, const Scalar & fext,
   for_m(m)
     for_avmijk(umixed,m,i,j,k)
       unew[m][i][j][k] = umixed[m][i][j][k];
-  if(converged)
+  //if(converged)
     ev_project(tempflag,fluid,stmp,unew);
 
 #ifdef DEBUG

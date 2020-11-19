@@ -11,7 +11,8 @@ namespace boil {
                    const std::vector<std::string> & nucl_names,
                    const std::vector<CIPCSL2*> & cipcsl2s,
                    const std::vector<std::string> & cipcsl2_names,
-                   const std::vector<real*> & store_values) {
+                   const std::vector<real*> & store_reals,
+                   const std::vector<int*> & store_ints) {
     /* file name */
     std::stringstream ss;
     if(!irregular) {
@@ -51,7 +52,9 @@ namespace boil {
       output << time.dt() << boil::endl;
 
       /* save tracked values */
-      for(auto val : store_values)
+      for(auto val : store_reals)
+        output << *val << boil::endl;
+      for(auto val : store_ints)
         output << *val << boil::endl;
       output.close();
     }
@@ -69,7 +72,8 @@ namespace boil {
                    const std::vector<std::string> & nucl_names,
                    const std::vector<CIPCSL2*> & cipcsl2s,
                    const std::vector<std::string> & cipcsl2_names,
-                   const std::vector<real*> & store_values) {
+                   const std::vector<real*> & store_reals,
+                   const std::vector<int*> & store_ints) {
     ts = 0;
     std::fstream input;
     input.open(fname,std::ios::in);
@@ -86,9 +90,10 @@ namespace boil {
       time.set_dt(dtf);
 
       /* load tracked values */
-      //if(store_values != NULL)
-        for(auto val : store_values)
-          input >> *val;
+      for(auto val : store_reals)
+        input >> *val;
+      for(auto val : store_ints)
+        input >> *val;
 
       /* load scalars */
       for(int i(0); i<scalars.size(); ++i) {
@@ -125,7 +130,8 @@ namespace boil {
                  const std::vector<std::string> & nucl_names,
                  const std::vector<CIPCSL2*> & cipcsl2s,
                  const std::vector<std::string> & cipcsl2_names,
-                 const std::vector<real*> & values) {
+                 const std::vector<real*> & store_reals,
+                 const std::vector<int*> & store_ints) {
     /* rm scalars */
     for(int i(0); i<scalars.size(); ++i) {
        scalars[i]->rm(scalar_names[i].c_str(),ts);

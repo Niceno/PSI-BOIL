@@ -36,7 +36,8 @@ namespace boil {
                    const std::vector<std::string> & nucl_names = {},
                    const std::vector<CIPCSL2*> & cipcsl2s = {},
                    const std::vector<std::string> & cipcsl2_names = {},
-                   const std::vector<real*> & store_values = {});
+                   const std::vector<real*> & store_reals = {},
+                   const std::vector<int*> & store_ints = {});
 
   bool load_backup(const std::string & fname,
                    int & ts, Times & time,
@@ -48,7 +49,8 @@ namespace boil {
                    const std::vector<std::string> & nucl_names = {},
                    const std::vector<CIPCSL2*> & cipcsl2s = {},
                    const std::vector<std::string> & cipcsl2_names = {},
-                   const std::vector<real*> & store_values = {});
+                   const std::vector<real*> & store_reals = {},
+                   const std::vector<int*> & store_ints = {});
 
   void rm_backup(const int ts,
                  const std::vector<Scalar*> & scalars,
@@ -59,7 +61,8 @@ namespace boil {
                  const std::vector<std::string> & nucl_names = {},
                  const std::vector<CIPCSL2*> & cipcsl2s = {},
                  const std::vector<std::string> & cipcsl2_names = {},
-                 const std::vector<real*> & values = {});
+                 const std::vector<real*> & store_reals = {},
+                 const std::vector<int*> & store_ints = {});
 
   /* irun test and set */
   void test_irun(const std::string & testfile = "run.txt");

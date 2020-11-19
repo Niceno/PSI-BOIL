@@ -14,8 +14,6 @@
   const real sig = IF97::sigma97(tsat0_K);
   const real latent=IF97::hvap_p(prs)-IF97::hliq_p(prs);
 
-  //const real betal = (7.03+(tsat0_K-273.15-100.)/160.*(22.1-7.03))*1e-4; /* roughly */
-
   /* estimate betal */
   const real betal = -(IF97::rholiq_p(1.01*prs)-IF97::rholiq_p(0.99*prs))
                      /(IF97::Tsat97(1.01*prs)-IF97::Tsat97(0.99*prs))/rhol;
@@ -56,13 +54,12 @@
   const real lambdaheat = 17.;
 #endif
 
-  /* ghost distance */
   /* HT resistance */
   real resistance_liq(0.0);
-  real accomult = 2.*accommodation/(2.-accommodation);
   if(accommodation>0.0) {
-    resistance_liq = Schrage::calculate_heat_transfer_resistance(tsat0_K,rhov,Mv,latent)
-                   /(accomult*0.5);
+    resistance_liq = 
+      Schrage::calculate_heat_transfer_resistance
+            (tsat0_K,rhov,Mv,latent,accommodation);
   } 
 
   /*----------------------+

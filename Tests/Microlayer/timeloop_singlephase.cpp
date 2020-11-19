@@ -104,23 +104,29 @@
     boil::oout<<"tprnucl= "<<time.current_time()<<" "<<tprtest<<boil::endl;
 
     if(tprtest>tnucl) {
-      boil::save_backup(time.current_step(), 1, time,
-                        load_scalars, load_scalar_names,
-                        load_vectors, load_vector_names);
-      boil::rm_backup(ts,
-                      load_scalars, load_scalar_names,
-                      load_vectors, load_vector_names);
-
-      iint++;
-      boil::plot->plot(uvw,c,tpr,press,
-                       "uvw-c-tpr-press",
-                       iint);
-
       /* cell-center velocities */
       Scalar u(d), v(d), w(d);
       boil::cell_center_velocities(uvw,u,v,w);
       boil::save_backup(time.current_step(), 1, time,
                         {&u,&v,&w}, {"u","v","w"});
+
+      boil::save_backup(time.current_step(), 1, time,
+                        load_scalars, load_scalar_names,
+                        load_vectors, load_vector_names,
+                        load_nucls,   load_nucl_names,
+                        load_cipcsls, load_cipcsl_names,
+                        store_reals,  store_ints);
+      boil::rm_backup(ts,
+                      load_scalars, load_scalar_names,
+                      load_vectors, load_vector_names,
+                      load_nucls,   load_nucl_names,
+                      load_cipcsls, load_cipcsl_names,
+                      store_reals,  store_ints);
+
+      iint++;
+      boil::plot->plot(uvw,c,tpr,press,
+                       "uvw-c-tpr-press",
+                       iint);
 
       /* output temperature field */
       if(!boil::cart.iam())
@@ -131,10 +137,10 @@
       ssb <<"bndtpr-"<<iint<<".txt";
       output.open(ssb.str(), std::ios::out);
       if(NZsol>0) {
-        boil::output_wall_heat_transfer_xz(cht,output,NXtot/2);
+        boil::output_wall_heat_transfer_xz(cht,output,NXtot);
       } else {
         boil::output_wall_heat_transfer_xz(tpr,*(conc.topo),pc,
-                                           output,NXtot/2);
+                                           output,NXtot);
       }
       boil::cart.barrier();
       output.close();
@@ -157,7 +163,7 @@
       ssb <<"bndtpr-"<<iint<<".txt";
       output.open(ssb.str(), std::ios::out);
       pc.update();
-      boil::output_wall_heat_transfer_xz(cht,output,NXtot/2);
+      boil::output_wall_heat_transfer_xz(cht,output,NXtot);
       boil::cart.barrier();
       output.close();
     }
@@ -168,16 +174,25 @@
     if(time.current_step() % n_per_backup == 0) {
       boil::save_backup(time.current_step(), 0, time,
                         load_scalars, load_scalar_names,
-                        load_vectors, load_vector_names);
+                        load_vectors, load_vector_names,
+                        load_nucls,   load_nucl_names,
+                        load_cipcsls, load_cipcsl_names,
+                        store_reals,  store_ints);
     }
 
     if(boil::timer.current_min() > (wmin-30.0)) {
       boil::save_backup(time.current_step(), 1, time,
                         load_scalars, load_scalar_names,
-                        load_vectors, load_vector_names);
+                        load_vectors, load_vector_names,
+                        load_nucls,   load_nucl_names,
+                        load_cipcsls, load_cipcsl_names,
+                        store_reals,  store_ints);
       boil::rm_backup(ts,
                       load_scalars, load_scalar_names,
-                      load_vectors, load_vector_names);
+                      load_vectors, load_vector_names,
+                      load_nucls,   load_nucl_names,
+                      load_cipcsls, load_cipcsl_names,
+                      store_reals,  store_ints);
 
       boil::set_irun(0);
 

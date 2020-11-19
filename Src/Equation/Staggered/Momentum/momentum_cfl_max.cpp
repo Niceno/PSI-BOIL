@@ -47,6 +47,7 @@ real Momentum::cfl_max() const {
                << u.xc(dir,im) << " " << u.yc(dir,jm) << " " << u.zc(dir,km) 
                << boil::endl;
   }
+  boil::cart.barrier();
 
   return cflm;
 }

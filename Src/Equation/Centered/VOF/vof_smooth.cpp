@@ -9,6 +9,8 @@ void VOF::smooth(Scalar & sca, const int itnum) {
 *            temporary: stmp
 *******************************************************************************/
 
+  stmp = 0.;
+
   if (itnum>=1) {
     /*-----------------------------+
     |  diffusion, explicit Jakobi  |
@@ -49,16 +51,16 @@ void VOF::smooth(Scalar & sca, const int itnum) {
                       + coef_y_m*sca[i][j-1][k] + coef_y_p*sca[i][j+1][k]
                       + coef_z_m*sca[i][j][k-1] + coef_z_p*sca[i][j][k+1]
                       - coef_c*sca[i][j][k];
-      }
+      } /* ijk */
 
       /* update */
-      for_ijk(i,j,k){
+      for_ijk(i,j,k) {
         sca[i][j][k]+=dtau*stmp[i][j][k];
       }
       sca.bnd_update();
       sca.exchange();
-    }
-  }
+    } /* iter */
+  } /* itnum >= 1 */
 
 #if 0
   boil::plot->plot(sca, "sca", time->current_step());

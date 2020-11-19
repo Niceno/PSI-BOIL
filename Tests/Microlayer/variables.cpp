@@ -2,16 +2,16 @@
   |  define unknowns  |
   +------------------*/
   Vector xyz(d);                      /* force */
-  Vector uvw_1(d), uvw_2(d); /* phasic vel */
-  Scalar p(d), press(d);     /* pressure */
-  Scalar mu_t(d);                     /* artificial viscosity */
+  Vector uvw_1(d), uvw_2(d);          /* phasic vel */
+  Scalar p(d), press(d);              /* pressure */
+  Scalar mu_t(d);                     /* artificial viscosity, unused */
 
-  Vector uvw(d);                         /* velocity */
-  Scalar c(d), g(d), kappa(d);           /* concentration */
-  Scalar f(d);                           /* pressure src */
-  Scalar csub(d);                        /* heater color */
-  Scalar tpr(d), q(d);                   /* temperature */
-  Scalar mdot(d), mflx(d);               /* phase-change rate */
+  Vector uvw(d), uvw_old(d);          /* velocity */
+  Scalar c(d), g(d), kappa(d);        /* concentration */
+  Scalar f(d);                        /* pressure src */
+  Scalar csub(d);                     /* heater color */
+  Scalar tpr(d), tprold(d), q(d);     /* temperature */
+  Scalar mdot(d), mflx(d);            /* phase-change rate */
 
   /*-----------------------------+
   |  insert boundary conditions  |
@@ -26,6 +26,7 @@
 
     uvw_1(m)=uvw(m).shape();
     uvw_2(m)=uvw(m).shape();
+    uvw_old(m)=uvw(m).shape();
   }
 
   c.bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
@@ -38,7 +39,6 @@
   press = c.shape();
   p     = c.shape();
   mu_t  = c.shape();
-
   f     = c.shape();
   g     = c.shape();
   kappa = c.shape();
@@ -58,3 +58,5 @@
   tpr.bc().add( BndCnd( Dir::kmax(), BndType::outlet()) );
   tpr.bc().add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
   tpr.bc().add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
+
+  tprold = tpr.shape();

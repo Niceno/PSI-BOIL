@@ -35,13 +35,11 @@
   /* steps per backup */
   const int n_per_backup = 5000;
 
+  /* simple alg */
+  const int mSimple = 1;
+
   /* dt settings */
   const real initdtcoef = 1./10.;
-
-  /* cfl with and without interfaces */
-  real cfl_limit(0.1);
-  if(case_flag==0)
-    cfl_limit = 0.2;
 
   /* only liquid beyond this (fractional height) */
   const real zmax_mult = 0.9;
@@ -55,15 +53,15 @@
   const int multigrid_max_cycles = 20;
 
   MaxIter multigrid_mm_smooth1 = MaxIter(25);
-  MaxIter multigrid_mm_smooth2 = MaxIter(40);
-  MaxIter multigrid_mm_solve = MaxIter(200);
+  MaxIter multigrid_mm_smooth2 = MaxIter(30);
+  MaxIter multigrid_mm_solve = MaxIter(100);
   MaxIter multigrid_mm_stale1 = MaxIter(10);
   MaxIter multigrid_mm_stale2 = MaxIter(-1);
   std::array<MaxIter,3> multigrid_mi = {multigrid_mm_smooth1,multigrid_mm_smooth2,multigrid_mm_solve};
   std::array<MaxIter,3> multigrid_mstale = {multigrid_mm_stale1,multigrid_mm_stale1,multigrid_mm_stale2};
 
   ResRat multigrid_rr = ResRat(-1.);
-  ResTol multigrid_rt = ResTol(5e-7);
+  ResTol multigrid_rt = ResTol(5e-6);
 
   const Cycle multigrid_cycle0 = Cycle::Z();
   const Cycle multigrid_cycle1 = Cycle::F();

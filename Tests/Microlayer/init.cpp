@@ -1,10 +1,19 @@
-  int ts;
+  int ts,iint(0);
   /* load variables */
   std::vector<Scalar*> load_scalars = { &press, &c, &tpr };
   std::vector<std::string> load_scalar_names = { "press", "c", "tpr" };
 
   std::vector<Vector*> load_vectors = { &uvw };
   std::vector<std::string> load_vector_names = { "uvw" };
+
+  std::vector<Nucleation*> load_nucls = {};
+  std::vector<std::string> load_nucl_names = {};
+  std::vector<CIPCSL2*> load_cipcsls = {};
+  std::vector<std::string> load_cipcsl_names = {};
+
+  std::vector<real*> store_reals = {};
+  std::vector<int*>  store_ints  = { &iint };
+
 
   const real heater_extent = 1.5e-3;
   const real outer_factor = 1.;//30e-2;//18.5e-2;
@@ -50,7 +59,10 @@
 
   if(boil::load_backup("time.txt",ts,time,
                        load_scalars, load_scalar_names,
-                       load_vectors, load_vector_names)) {
+                       load_vectors, load_vector_names,
+                       load_nucls,   load_nucl_names,
+                       load_cipcsls, load_cipcsl_names,
+                       store_reals,  store_ints)) {
     conc.init();
     conc.color_to_vf();
   } else {
@@ -70,6 +82,6 @@
 
   cht.init();
 
-  /* set iint */
-  int iint = time.current_time() / t_per_plot;
+  /* iint */
+  //int iint = time.current_time() / t_per_plot;
   boil::oout<<"iint= "<<iint<<"\n";

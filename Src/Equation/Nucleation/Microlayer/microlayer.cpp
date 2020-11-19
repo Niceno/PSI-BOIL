@@ -37,7 +37,7 @@ Microlayer::Microlayer( Scalar & DM,
   rmax = boil::unreal;
 
   hresis = Schrage::calculate_heat_transfer_resistance(tifmodel->tref(), 
-                                                 rhov,mmass,latent);
+                                                 rhov,mmass,latent,1.);
 
   str_dSprev = false;
 
