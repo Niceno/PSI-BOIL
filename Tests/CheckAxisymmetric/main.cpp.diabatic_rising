@@ -11,10 +11,8 @@ static void __attribute__ ((constructor)) trapfpe(void)
 }
 #endif
 
-//#define AXISYM
-#define USE_PHASE_VEL_VOF
-//#define USE_PHASE_VEL_EFD
-#define USE_MG
+#define AXISYM
+//#define USE_MG
 
 /******************************************************************************/
 int main(int argc, char ** argv) {
@@ -248,7 +246,6 @@ int main(int argc, char ** argv) {
   boil::oout<<"main:dxmin= "<<dxmin<<" "<<boil::cart.iam()<<" "<<dt<<"\n";
   boil::oout<<"main:nparams= "<<t_per_plot<<" "<<n_per_backup<<"\n";
   Times time(ndt, dt);
-  time.print_time(false);
   time.set_coef_dec(0.75);
   time.set_dt(dt);
 
@@ -277,11 +274,7 @@ int main(int argc, char ** argv) {
   multigrid.max_cycles(multigrid_max_cycles);
 
   /* color function */
-#ifdef USE_PHASE_VEL_VOF
   Vector & uvwvof = uvw_1;
-#else
-  Vector & uvwvof = uvw;
-#endif
 #ifndef AXISYM
   VOF conc(c, g, kappa, uvwvof, time, solver);
 #else
@@ -295,26 +288,19 @@ int main(int argc, char ** argv) {
 
   /* enthalpy equation */
   TIF tsat(tsat0);
-#ifdef USE_PHASE_VEL_VOF
-  #ifdef USE_PHASE_VEL_EFD
   Vector & uvwenth1 = uvw_1;
   Vector & uvwenth2 = uvw_2;
-  //Vector & uvwenth2 = uvw;
-  #else
-  Vector & uvwenth1 = uvw;
-  Vector & uvwenth2 = uvw;
-  #endif
-#else
-  Vector & uvwenth1 = uvw;
-  Vector & uvwenth2 = uvw;
-#endif
+
+  /* function kernel of heat transfer */
+  CommonHeatTransfer cht(tpr,conc.topo,tsat,
+                         &mixed);
 
 #ifndef AXISYM
   EnthalpyFD enthFD      (tpr, q, uvw, uvwenth1, uvwenth2, time, solver  , &mixed,
-                          conc.topo, tsat);
+                          cht);
 #else
   EnthalpyFDaxisym enthFD(tpr, q, uvw, uvwenth1, uvwenth2, time, solver  , &mixed,
-                          conc.topo, tsat);
+                          cht);
 #endif
   enthFD.convection_set(TimeScheme::forward_euler());
   enthFD.diffusion_set(TimeScheme::backward_euler());
@@ -322,53 +308,29 @@ int main(int argc, char ** argv) {
   enthFD.set_no_solid_acceleration(no_solid_acceleration);
 
   /* phase change */
-  PhaseChange4 pc(mdot, mflx, tpr, q, c, g, f, uvw, conc.topo,
-                  tsat, time, &mixed);
-  pc.set_second_order_accuracy(true);
+  PhaseChange4 pc(mdot, mflx, q, g, f, uvw, cht,
+                  time, &mixed);
+  pc.set_accuracy_order(AccuracyOrder::FourthUpwind());
   pc.set_discard_points_near_interface(false);
   pc.set_unconditional_extrapolation(false);
 
   /*-------------------+
   |  check if restart  |
   +-------------------*/
-  std::fstream input;
-  int irun = 0;
-  if(boil::cart.iam()==0){
-    input.open("run.txt", std::ios::in);
-    if( !input.fail() ) {
-      input >> irun;
-      boil::oout<<"read irun.  irun= "<<irun<<"\n";
-    }
-    input.close();
-  }
-  boil::cart.sum_int(&irun);
-  if (irun==1){
-    boil::oout<<"exit job due to irun=1"<<"\n";
-    exit(0);
-  }
+  boil::test_irun();
+  boil::set_irun(1);
 
-  if(boil::cart.iam()==0){
-    std::fstream output;
-    output.open("run.txt", std::ios::out);
-    output << 1 << boil::endl;
-    output.close();
-  }
+  int ts;
+  /* load variables */
+  std::vector<Scalar*> load_scalars = { &press, &c, &tpr };
+  std::vector<std::string> load_scalar_names = { "press", "c", "tpr" };
 
-  int ts=0;
-  input.open("time.txt", std::ios::in);
-  if( !input.fail() ) {
-    real t,dtf;
-    input >> ts;
-    input >> t;
-    input >> dtf;
-    uvw.  load("uvw",ts);
-    press.load("press",ts);
-    c. load("c", ts);
-    tpr.  load("tpr", ts);
-    time.first_step(ts);
-    time.current_time(t);
-    time.set_dt(dtf);
+  std::vector<Vector*> load_vectors = { &uvw };
+  std::vector<std::string> load_vector_names = { "uvw" };
 
+  if(boil::load_backup("time.txt",ts,time,
+                       load_scalars, load_scalar_names,
+                       load_vectors, load_vector_names)) {
     conc.init();
   } else {
     boil::oout << "######################" << boil::endl;
@@ -380,9 +342,6 @@ int main(int argc, char ** argv) {
     /*--------------------+
     |  initial condition  |
     +--------------------*/
-    for_vijk(c,i,j,k) 
-      c[i][j][k] = 0.0;
-
     const real xcent=0.0;
     const real ycent=0.0;
     const real zcent=1.0e-3;
@@ -405,12 +364,12 @@ int main(int argc, char ** argv) {
     conc.init();
     conc.totalvol();
 
-    for_vijk(c,i,j,k) {
-      real dist = pow(c.xc(i)-xcent,2.0)
+    for_vijk(tpr,i,j,k) {
+      real dist = pow(tpr.xc(i)-xcent,2.0)
 #ifndef AXISYM
-                 +pow(c.yc(j)-ycent,2.0)
+                 +pow(tpr.yc(j)-ycent,2.0)
 #endif
-                 +pow(c.zc(k)-zcent,2.0);
+                 +pow(tpr.zc(k)-zcent,2.0);
       if (dist<=pow(radius,2.0)) {
         tpr[i][j][k] = tsat0;
       } else {
@@ -424,7 +383,6 @@ int main(int argc, char ** argv) {
     boil::plot->plot(uvw,c,tpr,press,mdot,mflx,"uvw-c-tpr-press-mdot-mflx",0); 
 
   }
-  input.close();
 
   /* set iint */
   int iint = int(time.current_time()/t_per_plot) + 1;
@@ -434,14 +392,6 @@ int main(int argc, char ** argv) {
   |  time loop  |
   +------------*/
   for(time.start(); time.end(); time.increase()) {
-
-    boil::oout << "########################" << boil::endl;
-    boil::oout << "# TIME:      " << time.current_time() << boil::endl;
-    boil::oout << "# DT:        " << time.dt() << boil::endl;
-    boil::oout << "# TIME STEP: " << time.current_step()
-               << "/"             << time.total_steps() << boil::endl;
-    boil::oout << "# WTIME:     " << boil::timer.current_min() << boil::endl;
-    boil::oout << "########################" << boil::endl;
 
     /*---------------+
     |  phase change  |
@@ -459,13 +409,16 @@ int main(int argc, char ** argv) {
     
     /* gravity force */
     const Comp m = Comp::w();
-    for_vmijk(xyz,m,i,j,k){
-      real phil=c[i][j][k];
+    for_vmijk(xyz,m,i,j,k) {
+      real phil=std::max(0.0,std::min(1.0,c[i][j][k]));
       real phiv=1.0-phil;
       real deltmp=tpr[i][j][k]-tsat0;
-      real rhomix = liquid.rho()->value()*phil
-                  + vapor.rho()->value() *phiv;
-      xyz[m][i][j][k] += -gravity * xyz.dV(m,i,j,k) * rhomix;
+      real rhomix = phil*boil::rho(liquid.rho()->value(),
+                                   liquid.beta()->value(),deltmp)
+                  + phiv*boil::rho(vapor.rho()->value(),
+                                   vapor.beta()->value(),deltmp);
+      if(xyz.domain()->ibody().on(m,i,j,k))
+        xyz[m][i][j][k] += -gravity * xyz.dV(m,i,j,k) * rhomix;
     }
 
     /*--------------------------+
@@ -477,13 +430,13 @@ int main(int argc, char ** argv) {
     pr.coarsen();
 
     /* momentum */
-    ns.new_time_step();
+    ns.new_time_step(&f);
 
     ns.grad(press);
     ns.solve(ResRat(1e-14));
 
     p = 0.0;
-    if (multigrid.fcycle(ResRat(1e-6))) OMS(converged);
+    if (multigrid.fcycle(ResTol(3e-5))) OMS(converged);
     //pr.solve(ResRat(1e-6));
     p.exchange();
     ns.project(p);
@@ -514,17 +467,8 @@ int main(int argc, char ** argv) {
     |  solve transport equation  |
     +---------------------------*/
     conc.new_time_step();
-    conc.advance_phase_change(c);
-    conc.reconstruct_geometry(c);
-    conc.interfacial_flagging(conc.color());
-#ifdef USE_PHASE_VEL_VOF
-    conc.extrapolate_velocity(conc.color(),f,&liquid,uvw,uvw_1,ResRat(1e-4),Sign::pos(),true);
-  #ifdef USE_PHASE_VEL_EFD
-    conc.extrapolate_velocity(conc.color(),f,&vapor,uvw,uvw_2,ResRat(1e-4),Sign::neg(),false);
-  #endif
-#endif
-    conc.advance_geometric(c);
-    conc.ancillary();
+    conc.advance_with_extrapolation(true,ResTol(1e-6),uvw,f,
+                                    &liquid,&uvw_1,&vapor,&uvw_2);
 #ifdef USE_MG
     conc.heaviside()->marker_gradient(*conc.topo->adens);
 #endif
@@ -560,53 +504,26 @@ int main(int argc, char ** argv) {
     |  backup data  |
     +--------------*/
     if(time.current_step() % n_per_backup == 0) {
-      uvw  .save("uvw",   time.current_step());
-      press.save("press", time.current_step());
-      c    .save("c"   ,  time.current_step());
-      tpr  .save("tpr" ,  time.current_step());
-      if( boil::cart.iam()==0) {
-        std::fstream output;
-        std::stringstream ss;
-        ss <<"time-"<<time.current_step()<<".txt";
-        std::string fname = ss.str();
-        int len = fname.length();
-        char * cfname = new char[len+1];
-        memcpy(cfname, fname.c_str(), len+1);
-        output << std::setprecision(16);
-        output.open(cfname, std::ios::out);
-        output << time.current_step() << "\n";
-        output << time.current_time()+time.dt() << "\n";
-        output << time.dt() << "\n";
-        output.close();
-      }
+      boil::save_backup(time.current_step(), 0, time,
+                        load_scalars, load_scalar_names,
+                        load_vectors, load_vector_names);
     }
 
-    if( boil::timer.current_min() > wmin-12.0
+    if(  boil::timer.current_min() > (wmin-12.0)
       || time.current_step()==time.total_steps()) {
-      uvw  .save("uvw",   time.current_step());
-      press.save("press", time.current_step());
-      c .save("c",  time.current_step());
-      tpr  .save("tpr",   time.current_step());
-      std::fstream output;
-      output.open("time.txt", std::ios::out);
-      output << time.current_step() << boil::endl;
-      output << time.current_time()+time.dt() << boil::endl;
-      output << time.dt() << boil::endl;
-      output.close();
-      output.open("run.txt", std::ios::out);
-      output << 0 << boil::endl;
-      output.close();
-      boil::timer.stop();
-      boil::timer.report();
-      uvw  .rm("uvw", ts);
-      press.rm("press", ts);
-      c .rm("c", ts);
-      tpr  .rm("tpr", ts);
-      exit(0); 
+      boil::save_backup(time.current_step(), 1, time,
+                        load_scalars, load_scalar_names,
+                        load_vectors, load_vector_names);
+      boil::rm_backup(ts,
+                      load_scalars, load_scalar_names,
+                      load_vectors, load_vector_names);
+
+      boil::set_irun(0);
+      break;
     }
   }
 
-  boil::oout << "finished" << boil::endl;
+  boil::oout << "Finished." << boil::endl;
 
   boil::timer.stop();
   boil::timer.report();

@@ -11,14 +11,9 @@ static void __attribute__ ((constructor)) trapfpe(void)
 }
 #endif
 
-#define INVERTED
-//#define USE_PHASE_VEL_EFD
-#define USE_SOLID
-#define SMALL
+//#define USE_SOLID
 //#define SETUP_ONLY
 #define USE_BOTTOM_DIRICHLET
-//#define USE_NUCLEATION
-//#define CARTESIAN
 
 /******************************************************************************/
 int main(int argc, char ** argv) {
@@ -50,12 +45,6 @@ int main(int argc, char ** argv) {
   boil::oout<<"LZ= "<<LZ1<<"\n";
 
 /******************************************************************************/
-/* ------------ rescaling factors */
-  const real xmult = 1e0;
-  const real tmult = 1e0;
-  const real mmult = xmult*tmult;
-
-/******************************************************************************/
 /* ------------ boundary or initial conditions */
   const real tsat0 = 0.0;
 
@@ -64,23 +53,6 @@ int main(int argc, char ** argv) {
   const real tout = twall;
 
   const real twall0 = twall;
-  const real tseed = twall0-0.001;
-
-/******************************************************************************/
-/* ------------ values to be directly rescaled */
-  real gravity = 0.0;//boil::g; /* m/s2 */
-  real R = boil::R;
-  
-  real qflux=0.0;
-  real seedper = 1e-5; /* s */
-
-  /* rescaling */
-  gravity *= xmult/tmult/tmult; /* [m/s2] */
-  R *= mmult*xmult*xmult/tmult/tmult; /* [kgm2/s2/mol/K] */
-
-  seedper *= tmult;
-
-  qflux *= mmult/tmult/tmult/tmult;     // [kg/s3]
 
 /******************************************************************************/
 /* ------------ numerical simulation settings */
@@ -89,14 +61,14 @@ int main(int argc, char ** argv) {
   const int ndt = 10e6; /* inconsequential */
 
   /* total time */
-  const real tend = 10e-3 * tmult;
+  const real tend = 10e-3;
 
   /* steps per backup */
   const int n_per_backup = 10000;
 
   /* if yes, plotting each t_per_plot seconds. Else, each n_per_plot steps */
   const bool use_t_per_plot = true;
-  const real t_per_plot = 0.02e-3*tmult;
+  const real t_per_plot = 0.02e-3;
   const int n_per_plot = ndt/100;
 
   /* dt settings */
@@ -111,26 +83,36 @@ int main(int argc, char ** argv) {
 
   /* multigrid */
   const bool multigrid_stop_if_diverging = true;
-  //const bool multigrid_stop_if_diverging = false;
+  const bool multigrid_use_linf = false;//true;
+  const int multigrid_min_cycles = 1;
+  const int multigrid_max_cycles = 20;
 
-  const int multigrid_min_cycles = 3;
-  const int multigrid_max_cycles = 20;//10+2*gLevel;
+  MaxIter multigrid_mm_smooth1 = MaxIter(25);
+  MaxIter multigrid_mm_smooth2 = MaxIter(30);
+  MaxIter multigrid_mm_solve = MaxIter(100);
+  MaxIter multigrid_mm_stale1 = MaxIter(10);
+  MaxIter multigrid_mm_stale2 = MaxIter(-1);
+  std::array<MaxIter,3> multigrid_mi = {multigrid_mm_smooth1,multigrid_mm_smooth2,multigrid_mm_solve};
+  std::array<MaxIter,3> multigrid_mstale = {multigrid_mm_stale1,multigrid_mm_stale1,multigrid_mm_stale2};
+
+  ResRat multigrid_rr = ResRat(-1.);
+  ResTol multigrid_rt = ResTol(5e-5);
+
+  const Cycle multigrid_cycle0 = Cycle::Z();
+  const Cycle multigrid_cycle1 = Cycle::F();
 
   /* vof */
   const CurvMethod curv_method = CurvMethod::HF();
   const CurvMethod wall_curv_method = CurvMethod::HFnormalXZ();
-  //const CurvMethod wall_curv_method = CurvMethod::HFmixedXZ();
-  const int Nfilm_crit = 4;
   const TopoMethod topo_method = TopoMethod::Hybrid();
 
-  const bool detachment_model = false;
   const bool subgrid_method = true; /* use slic subgrid */
   const bool use_fs_interp = false;
   const bool store_pressure_extrap = false;
   const int niter_pressure_extrap = 1000;
 
   /* phase change */
-  const bool near_wall_modelling = true; /* use near wall modelling */
+  const AccuracyOrder ao_pc = AccuracyOrder::FourthUpwind();
 
 /******************************************************************************/
 /* ------------ material properties */
@@ -163,55 +145,34 @@ int main(int argc, char ** argv) {
 
 /******************************************************************************/
 /* ------------ domain dimensions */
-  //real LX1 = 3.2e-3;
   real LX1 = 6.4e-3;
   real LX2 = 3.5e-3;
   real LX3 = 5.0e-3;
 
-  //const int NX1 = 4*128*gLevel;
   const int NX1 = 2*4*128*gLevel;
-  const int NX2 = 140*gLevel;
-  const int NX3 = 160*gLevel;
-
-  const real gridrat = real(2*NX3)/real(NX1);
 
   /* in experiment, ITO: 200 nm, glass: 5 mm;
      here, glass: 4*DX0 */
+#ifdef USE_SOLID
   const int NZ0 = 4;
-
-  LX1 *= xmult;
-  LX2 *= xmult;
-  LX3 *= xmult;
-  LZ1 *= xmult;
+#else
+  const int NZ0 = 0;
+#endif
 
 /******************************************************************************/
 /* ------------ calculated values */
   const real DX0 = LX1/real(NX1);
-  const real DX1 = (LX3-LX2)/real(NX3);
-
-  boil::oout<<"DX: "<<DX0<<" "<<DX1<<boil::endl;
-  
   const real DZ0 = DX0;
-  const real DZ1 = DX1;
 
   int NZ(0);
   const int NZ1 = int(0.5*LZ1/DZ0+1e-5)-NZ0;
   boil::oout<<"NZ: "<<0.5*LZ1/DZ0<<" "<<NZ1<<boil::endl;
-#ifdef USE_SOLID
-  NZ += NZ0+NZ1;
-#else
-  NZ += NZ1;
-#endif
+  NZ = NZ0+NZ1;
 
   const real LZ0 = -NZ0*DZ0;
 
   /* other parameters */
-  const real zplant= LZ1/18.; // when bottom of bubble reaches zplant, next seed is set
   const real xmax=0.95*LX1; /* only liquid beyond 0.95*LX1 */
-
-  /* heater power */
-  real qsrc=qflux/fabs(LZ0);  // [W/m3]
-  boil::oout<<"#qsrc= "<<qsrc<<" qflux= "<<qflux<<"\n";
 
 /******************************************************************************/
 /* ------------- setup finished */
@@ -228,44 +189,23 @@ int main(int argc, char ** argv) {
   |  grid(s)  |
   +----------*/
   Grid1D gx1( Range<real>(0.0,LX1), NX1, Periodic::no(), BndGrid::symmetry(), BndGrid::wall() );
-  //Grid1D gx2( Range<real>(LX1,LX2),
-  //            Range<real>(DX0,DX1),
-  //            NX2, Periodic::no() );
-  //Grid1D gx3( Range<real>(LX2,LX3), NX3, Periodic::no() );
-
-  //Grid1D gx_small(gx1, gx2, Periodic::no(), BndGrid::symmetry(), BndGrid::wall());
-  //Grid1D gx_large(gx1, gx2, gx3, Periodic::no(), BndGrid::symmetry(), BndGrid::wall());
-
-  Grid1D gz0( Range<real>(LZ0, 0.0), NZ0, Periodic::no() );
-  Grid1D gz1( Range<real>(0.0, LZ1/2.), NZ1, Periodic::no() );
-  Grid1D & gzf = gz1;
-
-#ifdef SMALL
-  //Grid1D & gx = gx_small;
   Grid1D & gx = gx1;
-#else
-  Grid1D & gx = gx_large;
-#endif
 
+  Grid1D gz1( Range<real>(0.0, LZ1/2.), NZ1, Periodic::no(), BndGrid::wall(), BndGrid::symmetry() );
+  Grid1D & gzf = gz1;
+#ifdef USE_SOLID
+  Grid1D gz0( Range<real>(LZ0, 0.0), NZ0, Periodic::no() );
   Grid1D gz(gz0, gzf, Periodic::no(), BndGrid::wall(), BndGrid::symmetry());
+#endif
 
   /*---------+
   |  domain  |
   +---------*/
   Body floor("floor.stl");
-#ifdef CARTESIAN
-  Grid1D gy(DX0);
-  #ifdef USE_SOLID
-  Domain d(gx,gy,gz,&floor);
-  #else
-  Domain d(gx,gy,gzf);
-  #endif
-#else
-  #ifdef USE_SOLID
+#ifdef USE_SOLID
   Axisymmetric d(gx,gz,DX0,&floor);
-  #else
+#else
   Axisymmetric d(gx,gzf,DX0);
-  #endif
 #endif
   const real dxmin = d.dxyz_min();
 
@@ -278,8 +218,6 @@ int main(int argc, char ** argv) {
   Scalar c  (d), g  (d), kappa(d); // concentration
   Scalar tpr(d), q  (d);           // temperature
   Scalar mdot(d), mflx(d);         // phase-change rate
-  Scalar auxscalar(d), auxscalar2(d), cold(d);
-  Scalar mu_t(d);                  // eddy viscosity
 
   /*-----------------------------+
   |  insert boundary conditions  |
@@ -309,25 +247,16 @@ int main(int argc, char ** argv) {
   mdot = p.shape();
   mflx = p.shape();
   q = p.shape();
-  mu_t = p.shape();
   kappa = p.shape();
   g = p.shape();
-  auxscalar = p.shape();
-  auxscalar2 = p.shape();
 
   /* should avoid spurious flows from the outlet */
   c.bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
-#ifdef INVERTED
   c.bc().add( BndCnd( Dir::imax(), BndType::dirichlet(), 1.0 ) );
-#else
-  c.bc().add( BndCnd( Dir::imax(), BndType::dirichlet(), 0.0 ) );
-#endif
   c.bc().add( BndCnd( Dir::kmin(), BndType::wall() ) );
   c.bc().add( BndCnd( Dir::kmax(), BndType::symmetry() ) );
   c.bc().add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
   c.bc().add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
-
-  cold = c.shape();
 
   tpr.bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
   tpr.bc().add( BndCnd( Dir::imax(), BndType::neumann() ) );
@@ -364,20 +293,10 @@ int main(int argc, char ** argv) {
 
   Matter * zero = &vapor;
   Matter * one = &liquid;
-#ifndef INVERTED
-    zero = &liquid;
-    one = &vapor;
-#endif
   Matter mixed(*one,*zero, &c);
   mixed.sigma(sig);
   mixed.latent(latent);
 
-  /* rescaling */
-  vapor.rescale(xmult,tmult,mmult);
-  liquid.rescale(xmult,tmult,mmult);
-  mixed.rescale(xmult,tmult,mmult);
-  heater.rescale(xmult,tmult,mmult);
-  
   /*-------------------+
   |  time-integration  |
   +-------------------*/
@@ -394,8 +313,6 @@ int main(int argc, char ** argv) {
   Linear * solverCGic = new CG(d, Prec::ic2());
   Linear * solverCGdi = new CG(d, Prec::di());
   Linear * solverBICG = new BiCGS(d, Prec::di());
-  //Linear * solverIT = new Jacobi(d);
-  Linear * solverIT = new GaussSeidel(d);
 
   Linear * solver = solverCGic;
 
@@ -411,16 +328,13 @@ int main(int argc, char ** argv) {
   Pressure pr(p, f, uvw, time, solver, &mixed);
   AC multigrid( &pr );
   multigrid.stop_if_diverging(multigrid_stop_if_diverging);
+  multigrid.use_linf_error(multigrid_use_linf);
   multigrid.min_cycles(multigrid_min_cycles);
   multigrid.max_cycles(multigrid_max_cycles);
 
   /* color function */
   Vector & uvwvof = uvw_1;
-#ifdef CARTESIAN
-  VOF conc(c, g, kappa, uvwvof, time, solver);
-#else
   VOFaxisym conc(c, g, kappa, uvwvof, time, solver);
-#endif
  
   conc.set_curv_method(curv_method);
   conc.set_topo_method(topo_method);
@@ -428,90 +342,38 @@ int main(int argc, char ** argv) {
   conc.set_pressure_extrapolation_parameters(store_pressure_extrap,niter_pressure_extrap);
 
   if(subgrid_method) {
-#ifdef INVERTED
     conc.set_subgrid_method(SubgridMethod::SLICliquid());
-#else
-    conc.set_subgrid_method(SubgridMethod::SLICgas());
-#endif
   } else {
     conc.set_subgrid_method(SubgridMethod::None());
   }
 
-  /* 1-cangle */
-#ifndef INVERTED
-  cangle = 180.-cangle;
-#endif
   conc.set_cangle(cangle);
-  /* liquid-cangle */
-#ifndef INVERTED
-  cangle = 180.-cangle;
-#endif
-
-  if(detachment_model) {
-#ifndef INVERTED
-      conc.set_wall_curv_method(wall_curv_method,Sign::pos(),cangle,Nfilm_crit);
-#else
-      conc.set_wall_curv_method(wall_curv_method,Sign::neg(),cangle,Nfilm_crit);
-#endif
-  } else {
-#ifndef INVERTED
-      conc.set_wall_curv_method(wall_curv_method,Sign::pos(),cangle,Nfilm_crit);
-#else
-      conc.set_wall_curv_method(wall_curv_method,Sign::neg(),cangle,Nfilm_crit);
-#endif 
-  }
+  conc.set_wall_curv_method(wall_curv_method,Sign::neg(),cangle);
   
   /* enthalpy equation */
   TIF tsat(tsat0);
 
-#ifdef USE_PHASE_VEL_EFD
   Vector & uvwenth1 = uvw_1;
   Vector & uvwenth2 = uvw_2;
-  //Vector & uvwenth2 = uvw;
-#else
-  Vector & uvwenth1 = uvw;
-  Vector & uvwenth2 = uvw;
-#endif
 
-#ifdef USE_NUCLEATION
-  /* nucleation site */
-  real rseed = 2.0*dxmin;
-  #ifdef INVERTED
-  Nucleation nucl( &c, &tpr, &q, &time, auxscalar, &mixed, rseed
-                 , 0.0e-10, conc.get_cangle());
-  #else
-  Nucleation nucl( &c, &tpr, &q, &time, auxscalar, &mixed, rseed
-                 , 0.0e-10, conc.get_cangle(), Sign::neg());
-  #endif
-  /* useless microlayer parameter */
-  nucl.set_slope(1.0*4.46e-3);
-  nucl.set_seed_period(seedper);
-#endif
-
-  Matter * sld = NULL;
+  /* is there conjugate heat transfer? */
+  Matter * solid_ptr = NULL;
 #ifdef USE_SOLID
-  sld = &heater;
+  solid_ptr = &heater;
 #endif
-#ifdef CARTESIAN
-  EnthalpyFD enthFD(tpr, q, uvw, uvwenth1, uvwenth2, time, solver  , &mixed,
-                    conc.topo, tsat,sld);
-#else
+
+  /* function kernel of heat transfer */
+  CommonHeatTransfer cht(tpr,conc.topo,tsat,
+                         &mixed,solid_ptr);
+
   EnthalpyFDaxisym enthFD(tpr, q, uvw, uvwenth1, uvwenth2, time, solver  , &mixed,
-                          conc.topo, tsat,sld);
-#endif
+                          cht,solid_ptr);
   enthFD.convection_set(TimeScheme::forward_euler());
   enthFD.diffusion_set(TimeScheme::backward_euler());
 
   /* phase change */
-#ifdef INVERTED
-  PhaseChangeVOF pc(mdot, mflx, tpr, q, c, g, f, uvw, conc.topo,
-                    tsat, time, &mixed, sld);
-#else
-  PhaseChangeVOF pc(mdot, mflx, tpr, q, c, g, f, uvw, conc.topo,
-                    tsat, time, &mixed, sld,Sign::neg());
-#endif
-
-  pc.set_near_wall_modelling(near_wall_modelling);
+  PhaseChange4 pc(mdot, mflx, q, g, f, uvw, cht, time, &mixed, solid_ptr);
+  pc.set_accuracy_order(ao_pc);
 
   /*-------------------+
   |  check if restart  |
@@ -550,26 +412,9 @@ int main(int argc, char ** argv) {
     press.load("press",   ts);
     c. load("c", ts);
     tpr.  load("tpr", ts);
-#ifdef VARIABLE
-    (tsat.tif).load("tif",ts);
-#endif
-#ifdef USE_NUCLEATION
-    nucl. load("nucl", ts);
-#endif
     time.first_step(ts);
     time.current_time(t);
     time.set_dt(dtf);
-#ifdef USE_NUCLEATION
-    /* set allow_replant */
-    if( ns.cfl_max()<=cfl_with && time.dt()<=dt) {
-      boil::oout<<"Restart: Allow replant.\n";
-      for(int nsd=0; nsd<nucl.size(); nsd++){
-        nucl.sites[nsd].set_allow_replant(true);
-      }
-    } else {
-      boil::oout<<"Restart: Deny replant for this step.\n";
-    }
-#endif
     conc.init();
   } else {
     boil::oout << "######################" << boil::endl;
@@ -581,40 +426,17 @@ int main(int argc, char ** argv) {
     /*--------------------+
     |  initial condition  |
     +--------------------*/
-#ifndef USE_NUCLEATION
-    boil::setup_circle_xz(cold, 0.5*LZ1, 0.0, 0.5*LZ1);
-    conc.color_to_vf(cold,c);
-  #ifdef INVERTED
+    boil::setup_circle_xz(conc.color(), 0.5*LZ1, 0.0, 0.5*LZ1);
+    conc.color_to_vf(conc.color(),c);
     for_vijk(c,i,j,k) {
       c[i][j][k] = 1. - c[i][j][k];
     }
-  #endif
-#else
-  #ifdef INVERTED
-    for_avijk(c,i,j,k) {
-      c[i][j][k] = 1.;
-    }
-  #endif
-
-    /* set seed */
-    real zsite=rseed*cos(0.0/180.0*boil::pi);
-    nucl.add(Site( 0.000,  0.000, zsite, tseed, zplant));
-  #if 1
-    /* plant seed from initial step */
-    nucl.plant();
-    for(int ns=0; ns<nucl.size(); ns++){
-      nucl.sites[ns].set_time_seed(0.0);
-    }
-  #endif
-#endif
     for_avijk(c,i,j,k) {
       if(d.ibody().off(i,j,k))
         c[i][j][k] = -1.;
     }
     c.bnd_update();
     c.exchange_all();
-
-    cold = c;
 
     conc.init();
 
@@ -627,17 +449,16 @@ int main(int argc, char ** argv) {
     }
     tpr.bnd_update();
     tpr.exchange_all();
-    boil::plot->plot(uvw,c,tpr,kappa,mdot,(*(conc.topo.adens))
-                    ,"uvw-c-tpr-curv-mdot-adens",0);
+    boil::plot->plot(uvw,c,tpr,press,mdot,mflx,
+                    "uvw-c-tpr-press-mdot-mflx",
+                     0);
     
     std::fstream output;
     std::stringstream ss;
     ss <<"profile-"<<0<<".txt";
     output.open(ss.str(), std::ios::out);
-    for_avijk(c,i,j,k) {
-      auxscalar2[i][j][k] = 1.0-std::max(0.0,std::min(1.0,conc.color()[i][j][k]));
-    }
-    boil::output_profile_xz(auxscalar2,output,NZ);
+    boil::output_profile_xz(conc.color(),output,Range<int>(NZ0+1,NZ),
+                            Range<int>(-1,-2),LX1);
     boil::cart.barrier();
     output.close();
   }
@@ -656,12 +477,17 @@ int main(int argc, char ** argv) {
   }
 
   boil::oout<<"iint= "<<iint<<"\n";
+  cht.init();
  
   /*------------+
   |  time loop  |
   +------------*/
 #ifndef SETUP_ONLY
   for(time.start(); time.end(); time.increase()) {
+
+    /* new time step */
+    conc.new_time_step();
+    cht.new_time_step();
 
     /*----------------------------------------------+
     |  reset body force & source term for enthalpy  |
@@ -670,14 +496,8 @@ int main(int argc, char ** argv) {
       for_avmijk(xyz,m,i,j,k)
         xyz[m][i][j][k]=0.0;
 
-    q=0.0;
-    for_vk(tpr,k){
-      if((tpr.zc(k)<0.0)){
-        for_vij(tpr,i,j){
-          q[i][j][k]=qsrc*tpr.dV(i,j,k);
-        }
-      }
-    }
+    /* surface tension */
+    conc.tension(&xyz, mixed,conc.color());
 
     /*---------------+
     |  phase change  |
@@ -688,52 +508,27 @@ int main(int argc, char ** argv) {
     /*--------------------------+
     |  solve momentum equation  |
     +--------------------------*/
-    /* gravity force */
-    Comp m = Comp::w();
-    for_vmijk(xyz,m,i,j,k){
-#ifdef INVERTED
-      real phil=std::max(0.0,std::min(1.0,c[i][j][k]));
-      real phiv=1.0-phil;
-#else
-      real phiv=std::max(0.0,std::min(1.0,c[i][j][k]));
-      real phil=1.0-phil;
-#endif
-      real deltmp=tpr[i][j][k]-tsat0;
-      real rhomix = phil*boil::rho(liquid.rho()->value(),
-                                   liquid.beta()->value(),deltmp)
-                  + phiv*boil::rho(vapor.rho()->value(),
-                                   vapor.beta()->value(),deltmp);
-      if(d.ibody().on(m,i,j,k))
-        xyz[m][i][j][k] += -gravity * xyz.dV(m,i,j,k) * rhomix;
-    }
-
-    /* surface tension */
-    conc.tension(&xyz, mixed,conc.color());
-
-    /*--------------------------+
-    |  solve momentum equation  |
-    +--------------------------*/
     /* essential for moving front */
-    ns.discretize( &mu_t );
+    ns.discretize();
     pr.discretize();
     pr.coarsen();
 
     /* momentum */
-    ns.new_time_step();
+    ns.new_time_step(&f);
 
     ns.grad(press);
     ns.solve(ResRat(1e-14));
 
-    const int niter = 50;
-    MaxIter mm = MaxIter(niter);
-    std::array<MaxIter,3> mi = {mm,mm,mm};
-
-    ResRat rr = ResRat(1e-4);
-
+    /* pressure */
     p = 0.0;
-    if (multigrid.cycle(Cycle::none(),Cycle::F(),rr,mi)) OMS(converged)
-    //if (multigrid.wcycle(ResRat(1e-4))) OMS(converged);
-    //pr.solve(ResRat(1e-6),"Pressure");
+    if(multigrid.cycle(multigrid_cycle0,
+                       multigrid_cycle1,
+                       multigrid_rt,
+                       multigrid_rr,
+                       multigrid_mi,
+                       multigrid_mstale))
+      OMS(converged);
+
     p.exchange();
     ns.project(p);
     press += p;
@@ -763,34 +558,14 @@ int main(int argc, char ** argv) {
     /*---------------------------+
     |  solve transport equation  |
     +---------------------------*/
-#ifdef USE_PHASE_VEL_EFD
-    conc.advance_with_extrapolation(false,ResRat(1e-6),uvw,f,
+    conc.advance_with_extrapolation(false,ResTol(1e-6),uvw,f,
                                     one,&uvw_1,
                                     zero,&uvw_2);
-#else
-    conc.advance_with_extrapolation(false,ResRat(1e-6),uvw,f,
-                                    one,&uvw_1);
-#endif
 
     for_vijk(c,i,j,k) {
-/*
-#ifndef USE_NUCLEATION
-  #ifdef INVERTED
-      if(c[i][j][k]>cold[i][j][k]) {
-  #else
-      if(c[i][j][k]<cold[i][j][k]) {
-  #endif
-        c[i][j][k] = cold[i][j][k];
-      }
-#endif
-*/
       if(c.xc(i)>=(xmax-c.dxc(i))) {
         for_avjk(c,j,k) {
-#ifdef INVERTED
           c[i][j][k]= 1.0;
-#else
-          c[i][j][k]= 0.0;
-#endif
         }
       }
     }
@@ -814,7 +589,7 @@ int main(int argc, char ** argv) {
     conc.color_minmax();
 
     /* front */
-    conc.front_minmax( Range<real>(0,LX1) ,Range<real>(0,LX1)
+    conc.front_minmax( Range<real>(0,LX1) ,Range<real>(-LX1,LX1)
                       ,Range<real>(0, LZ1));
 
     time.control_dt(ns.cfl_max(), cfl_with, dt);
@@ -829,16 +604,15 @@ int main(int argc, char ** argv) {
       otpcond = time.current_step() / n_per_plot >= real(iint);
     if(otpcond) {
       iint++;
-      boil::plot->plot(uvw,c,tpr,kappa,mdot,(*(conc.topo.adens))
-                      ,"uvw-c-tpr-curv-mdot-adens",iint);
+      boil::plot->plot(uvw,c,tpr,press,mdot,mflx,
+                      "uvw-c-tpr-press-mdot-mflx",
+                       iint);
       std::fstream output;
       std::stringstream ss;
       ss <<"profile-"<<iint<<".txt";
       output.open(ss.str(), std::ios::out);
-      for_avijk(c,i,j,k) {
-        auxscalar2[i][j][k] = 1.0-std::max(0.0,std::min(1.0,conc.color()[i][j][k]));
-      }
-      boil::output_profile_xz(auxscalar2,output,NZ);
+      boil::output_profile_xz(conc.color(),output,Range<int>(NZ0+1,NZ),
+                              Range<int>(-1,-2),LX1);
       boil::cart.barrier();
       output.close();
     }
@@ -851,12 +625,6 @@ int main(int argc, char ** argv) {
       press.save("press", time.current_step());
       c.save("c",  time.current_step());
       tpr  .save("tpr",   time.current_step());
-#ifdef VARIABLE
-      (tsat.tif).save("tif",   time.current_step());
-#endif
-#ifdef USE_NUCLEATION
-      nucl .save("nucl",   time.current_step());
-#endif
       if( boil::cart.iam()==0) {
         std::fstream output;
         std::stringstream ss;
@@ -880,12 +648,6 @@ int main(int argc, char ** argv) {
       press.save("press", time.current_step());
       c.save("c",  time.current_step());
       tpr  .save("tpr",   time.current_step());
-#ifdef VARIABLE
-      (tsat.tif).save("tif",   time.current_step());
-#endif
-#ifdef USE_NUCLEATION
-      nucl .save("nucl",   time.current_step());
-#endif
       std::fstream output;
       output << std::setprecision(16);
       output.open("time.txt", std::ios::out);
@@ -904,14 +666,6 @@ int main(int argc, char ** argv) {
       press.rm("press", ts);
       c.rm("c", ts);
       tpr  .rm("tpr", ts);
-#ifdef VARIABLE
-      (tsat.tif).rm("tif",ts);
-#endif
-#ifdef USE_NUCLEATION
-      nucl .rm("nucl", ts);
-#endif
-      boil::plot->plot(uvw,c,tpr,kappa,mdot,(*(conc.topo.adens))
-                      ,"uvw-c-tpr-curv-mdot-adens",time.current_step());
 
       break;
     }

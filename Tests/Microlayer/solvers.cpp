@@ -15,6 +15,8 @@
   |  define solvers  |
   +-----------------*/
   Krylov * solver = new CG(d, Prec::ic2());
+  Krylov * solver_enth = solver;
+  //solver_enth = new BiCGS(d, Prec::di());
 
   /*-------------------+
   |  define equations  |
@@ -78,7 +80,7 @@
 
   /* enthalpy equation */
   EnthalpyFDaxisym enthFD(tpr, q, uvw, uvw_1, uvw_2,
-                          time, solver, &mixed, cht,
+                          time, solver_enth, &mixed, cht,
                           solid_ptr);
 
   enthFD.convection_set(TimeScheme::forward_euler());

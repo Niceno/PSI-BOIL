@@ -7,6 +7,7 @@
   |  time loop  |
   +------------*/
   for(time.start(); time.end(); time.increase()) {
+    cht.new_time_step();
 
 #ifdef USE_MOMEMTUM_SINGLE_PHASE
     /*-------------------+
@@ -47,7 +48,10 @@
     p = 0.0;
     if(multigrid.cycle(multigrid_cycle0,
                        multigrid_cycle1,
-                       multigrid_rr,multigrid_mi))
+                       multigrid_rt,
+                       multigrid_rr,
+                       multigrid_mi,
+                       multigrid_mstale))
       OMS(converged);
 
     p.exchange();

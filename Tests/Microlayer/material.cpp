@@ -34,13 +34,19 @@
   boil::oout << "Jal= "<<Jal<<boil::endl;
 
   /* heater */
+#if 1
   /* sapphire */
   const real rhosol = 3980.0;
-  const real trefsol = tsat0_K;
   //real cpsol = 0.9161e3; //D. A. Ditmars, et. al., J. Res. Nat. Bur. Stand., 87, (2), 159-163 (1982).
   real cpsol = 0.929e3;
-  cpsol *= rhosol;
   const real lambdasol = 25.12;
+#else
+  /* nickel */ 
+  const real rhosol = 8908.0;
+  real cpsol = 444.0;
+  const real lambdasol = 90.9;
+#endif
+  cpsol *= rhosol;
   const real alpsol = lambdasol/cpsol;
 #if 0
   /* ito */

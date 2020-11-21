@@ -31,7 +31,7 @@ EnthalpyFD::EnthalpyFD(const Scalar & PHI,
   assert(PHI.domain() == F.domain());
   assert(PHI.domain() == U.domain());
   laminar=true;
-  ao_conv = AccuracyOrder::Second();
+  ao_conv = AccuracyOrder::First();
 
   for_m(m) {
     flux_liq(m) = (*uliq)(m).shape();
