@@ -34,6 +34,10 @@
 
 #include "tpr_extrema.cpp"
 
+#ifdef USE_DYNCA
+  #include "dynamic_ca.cpp"
+#endif
+
 /**********************************************************************/
 
     /* store velocity & temperature */
