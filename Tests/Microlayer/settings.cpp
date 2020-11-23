@@ -6,7 +6,6 @@
   const real twall = tsat0 + deltat_wall;
   const real tout  = tsat0 + deltat_out;
   const real tnucl = tsat0 + deltat_nucl;
-  const real tsat0_K = IF97::Tsat97(prs);
 
   /* heater power */
   real qsrc;
@@ -39,7 +38,7 @@
   const int mSimple = 1;
 
   /* dt settings */
-  const real initdtcoef = 1./10.;
+  const real initdtcoef = 1./50.;
 
   /* only liquid beyond this (fractional height) */
   const real zmax_mult = 0.9;
@@ -61,7 +60,7 @@
   std::array<MaxIter,3> multigrid_mstale = {multigrid_mm_stale1,multigrid_mm_stale1,multigrid_mm_stale2};
 
   ResRat multigrid_rr = ResRat(-1.);
-  ResTol multigrid_rt = ResTol(5e-6);
+  ResTol multigrid_rt = ResTol(3e-5);
 
   const Cycle multigrid_cycle0 = Cycle::Z();
   const Cycle multigrid_cycle1 = Cycle::F();

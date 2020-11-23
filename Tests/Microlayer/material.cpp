@@ -1,5 +1,7 @@
 /******************************************************************************/
 /* ------------ material properties */
+#ifndef FC
+  const real tsat0_K = IF97::Tsat97(prs);
   const real Mv = IF97::get_MW();
   const real muv = IF97::viscvap_p(prs);
   const real rhov = IF97::rhovap_p(prs);
@@ -18,12 +20,37 @@
   const real betal = -(IF97::rholiq_p(1.01*prs)-IF97::rholiq_p(0.99*prs))
                      /(IF97::Tsat97(1.01*prs)-IF97::Tsat97(0.99*prs))/rhol;
 
+  boil::oout<<"properties at pressure "<<prs<<boil::endl;
+#else
+  /* FC-72 from Cao(2019) and FC-72 3M product sheet */
+  const real tsat0_K = 55.7+273.15;                      
+  const real Mv = 338e-3;
+  const real muv = 1.2e-5;
+  const real rhov = 13.33;
+  const real cpv = 894.*rhov;
+  const real lambdav = 0.0129;
+
+  const real mul = 4.4e-4;
+  const real rhol = 1740.-2.61*(tsat0_K-273.15);
+  const real cpl = (1014+1.554*(tsat0_K-273.15))*rhol;
+  const real lambdal = 0.06-0.00011*(tsat0_K-273.15);
+
+  const real sig = 7.9e-3;
+  const real latent = 76900.;
+
+  const real betal = 0.00156;
+
+  /* fit-correlation from Raj(2012) */
+  cangle = 9.37*std::pow(deltat_nucl,0.54);
+
+  boil::oout<<"properties for FC-72 (atmospheric)"<<prs<<boil::endl;
+#endif
+
   const real betav = 1./tsat0_K; /* ideal gas approximation */
 
   const real alpl = lambdal/cpl;
   const real alpv = lambdav/cpv;
 
-  boil::oout<<"properties at pressure "<<prs<<boil::endl;
   boil::oout<<"vapprop= "<<Mv<<" "<<muv<<" "<<rhov<<" "
                          <<cpv/rhov<<" "<<lambdav<<" "<<betav<<" "<<alpv<<boil::endl;
   boil::oout<<"liqprop= "<<Mv<<" "<<mul<<" "<<rhol<<" "
@@ -34,7 +61,7 @@
   boil::oout << "Jal= "<<Jal<<boil::endl;
 
   /* heater */
-#if 1
+#ifndef SAKASHITA
   /* sapphire */
   const real rhosol = 3980.0;
   //real cpsol = 0.9161e3; //D. A. Ditmars, et. al., J. Res. Nat. Bur. Stand., 87, (2), 159-163 (1982).
