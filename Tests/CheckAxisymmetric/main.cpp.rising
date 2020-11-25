@@ -118,7 +118,7 @@ int main(int argc, char * argv[]) {
   const real Rehadryb = whadryb*rhol*diameter/mul;
   boil::oout<<"Hadamard-Rybczynski= "<<whadryb<<" "<<Rehadryb<<boil::endl;
 
-  const real dtmult = 10.;
+  const real dtmult = 0.126;//10.;
   const real underrelax = 5e-3;
   const int ndt = 400000*gLevel*2;
   boil::oout<<"tparams= "<<dtmult<<" "<<ndt<<" "<<underrelax<<boil::endl;
@@ -225,8 +225,8 @@ int main(int argc, char * argv[]) {
   |  time step  |
   +------------*/
   const real dxmin = d.dxyz_min();
-  const real dt  = dtmult * pow(air.rho()->value()*pow(dxmin,3.0)
-                        /(2.0*3.1415*mixed.sigma()->value()),0.5);
+  const real dt  = dtmult * pow((air.rho()->value()+liquid.rho()->value())*pow(dxmin,3.0)
+                                /mixed.sigma()->value(),0.5);
   boil::oout<<"dt= "<<dt<<"\n";
   Times time(ndt, dt);
   const real tint = 5000*dt*gLevel/dtmult;
@@ -240,9 +240,27 @@ int main(int argc, char * argv[]) {
   Pressure pr(p, f, uvw, time, solver, &mixed);
   AC multigrid( &pr );
 
-  multigrid.min_cycles(1);  
-  multigrid.max_cycles(10);
-  multigrid.stop_if_diverging(false);
+  /* multigrid */
+  const bool multigrid_stop_if_diverging = false;//true;
+  const bool multigrid_use_linf = false;//true;
+  const int multigrid_min_cycles = 1;
+  const int multigrid_max_cycles = 20;
+  const Cycle multigrid_cycle0 = Cycle::Z();
+  const Cycle multigrid_cycle1 = Cycle::F();
+
+  MaxIter multigrid_mm_smooth = MaxIter(20);
+  MaxIter multigrid_mm_solve = MaxIter(100);
+  MaxIter multigrid_mm_stale = MaxIter(-1);
+  std::array<MaxIter,3> multigrid_mi = {multigrid_mm_smooth,multigrid_mm_smooth,multigrid_mm_solve};
+  std::array<MaxIter,3> multigrid_mstale = {multigrid_mm_stale,multigrid_mm_stale,multigrid_mm_stale};
+
+  ResRat multigrid_rr = ResRat(-1.);
+  ResTol multigrid_rt = ResTol(1e-7);
+
+  multigrid.stop_if_diverging(multigrid_stop_if_diverging);
+  multigrid.use_linf_error(multigrid_use_linf);
+  multigrid.min_cycles(multigrid_min_cycles);
+  multigrid.max_cycles(multigrid_max_cycles);
 
   VOFaxisym conc(c, g, kappa, uvw, time, solver);
   //conc.set_reconstruction_parameters(1e-5,conc.get_reconstruction_maxiter());
@@ -388,7 +406,15 @@ int main(int argc, char * argv[]) {
     ns.solve(ResRat(1e-6));
 
     p = 0.0;
-    multigrid.fcycle(ResRat(1e-4));
+    if(multigrid.cycle(multigrid_cycle0,
+                       multigrid_cycle1,
+                       multigrid_rt,
+                       multigrid_rr,
+                       multigrid_mi,
+                       multigrid_mstale))
+      OMS(converged);
+
+    p.exchange();
     ns.project(p);
     press += p;    // p_n+1 = p_n + dp
     press.exchange();
@@ -398,6 +424,7 @@ int main(int argc, char * argv[]) {
     conc.advance();
     conc.totalvol();
     conc.front_minmax();
+    conc.color_minmax();
 #endif
 #ifdef MOVING_FRAME
     real Re = wvel*rhol*diameter/mul;
@@ -470,7 +497,7 @@ int main(int argc, char * argv[]) {
     /*---------+
     |  exit ?  |
     +---------*/
-    if(conc.get_zmaxft()>=(LZ-diameter)*0.95){
+    if(conc.topo->get_zmaxft()>=(LZ-diameter)*0.95){
        std::cout<<"Bubble reaches to the top boundary. Exit."<<boil::endl;
        break;//exit(0);
     }

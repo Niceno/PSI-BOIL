@@ -83,20 +83,20 @@ int main(int argc, char ** argv) {
 
   /* multigrid */
   const bool multigrid_stop_if_diverging = true;
-  const bool multigrid_use_linf = false;//true;
+  const bool multigrid_use_linf = true;
   const int multigrid_min_cycles = 1;
   const int multigrid_max_cycles = 20;
 
-  MaxIter multigrid_mm_smooth1 = MaxIter(25);
-  MaxIter multigrid_mm_smooth2 = MaxIter(30);
-  MaxIter multigrid_mm_solve = MaxIter(100);
-  MaxIter multigrid_mm_stale1 = MaxIter(10);
+  MaxIter multigrid_mm_smooth1 = MaxIter(70);
+  MaxIter multigrid_mm_smooth2 = MaxIter(70);
+  MaxIter multigrid_mm_solve = MaxIter(200);
+  MaxIter multigrid_mm_stale1 = MaxIter(45);
   MaxIter multigrid_mm_stale2 = MaxIter(-1);
   std::array<MaxIter,3> multigrid_mi = {multigrid_mm_smooth1,multigrid_mm_smooth2,multigrid_mm_solve};
   std::array<MaxIter,3> multigrid_mstale = {multigrid_mm_stale1,multigrid_mm_stale1,multigrid_mm_stale2};
 
   ResRat multigrid_rr = ResRat(-1.);
-  ResTol multigrid_rt = ResTol(5e-5);
+  ResTol multigrid_rt = ResTol(0.5);
 
   const Cycle multigrid_cycle0 = Cycle::Z();
   const Cycle multigrid_cycle1 = Cycle::F();

@@ -1,8 +1,9 @@
   /*-------------------+
   |  time-integration  |
   +-------------------*/
-  real dt = surftens_dt_coef*pow(vapor.rho()->value()*pow(dxmin,3.0)
-                / (2.0*boil::pi*mixed.sigma()->value()),0.5);
+  real dt = surftens_dt_coef*pow((vapor.rho()->value()+liquid.rho()->value())
+                                 *pow(dxmin,3.0)
+                                 /mixed.sigma()->value(),0.5);
   if(case_flag==0) {
     dt = 10.*dxmin;
   }

@@ -60,6 +60,27 @@ int main(int argc, char * argv[]) {
   +--------------------------------*/
   boil::plot = new PlotTEC();
   //boil::plot = new PlotTEC(AsNodes::no(), Buffers::yes());
+  
+
+  /* multigrid */
+  const bool multigrid_stop_if_diverging = true;
+  const bool multigrid_use_linf = false;//true;
+  const int multigrid_min_cycles = 1;
+  const int multigrid_max_cycles = 20;
+
+  MaxIter multigrid_mm_smooth1 = MaxIter(50);
+  MaxIter multigrid_mm_smooth2 = MaxIter(50);
+  MaxIter multigrid_mm_solve = MaxIter(100);
+  MaxIter multigrid_mm_stale1 = MaxIter(-1);
+  MaxIter multigrid_mm_stale2 = MaxIter(-1);
+  std::array<MaxIter,3> multigrid_mi = {multigrid_mm_smooth1,multigrid_mm_smooth2,multigrid_mm_solve};
+  std::array<MaxIter,3> multigrid_mstale = {multigrid_mm_stale1,multigrid_mm_stale1,multigrid_mm_stale2};
+
+  ResRat multigrid_rr = ResRat(-1.);
+  ResTol multigrid_rt = ResTol(1e-11);
+
+  const Cycle multigrid_cycle0 = Cycle::Z();
+  const Cycle multigrid_cycle1 = Cycle::F();
 
   /*----------+
   |  grid(s)  |
@@ -232,7 +253,10 @@ int main(int argc, char * argv[]) {
   Pressure pr(p, f, uvw, time, solver, &mixed);
 
   AC multigrid( &pr );
-  multigrid.min_cycles(1);  // 6
+  multigrid.stop_if_diverging(multigrid_stop_if_diverging);
+  multigrid.use_linf_error(multigrid_use_linf);
+  multigrid.min_cycles(multigrid_min_cycles);
+  multigrid.max_cycles(multigrid_max_cycles);
 
   //conc.init();
   //conc.test_reconstruction(conc.color(),c);
@@ -274,13 +298,19 @@ int main(int argc, char * argv[]) {
     ns.solve(ResRat(1e-8));
 
     p=0.0;
-    if (multigrid.fcycle(ResRat(2e-5))) OMS(converged);
+    if(multigrid.cycle(multigrid_cycle0,
+                       multigrid_cycle1,
+                       multigrid_rt,
+                       multigrid_rr,
+                       multigrid_mi,
+                       multigrid_mstale))
+      OMS(converged);
 
     ns.project(p);
     press += p;
     press.exchange();
 
-    //ns.cfl_max();
+    ns.cfl_max();
 
     conc.advance();
     conc.totalvol();
@@ -290,6 +320,7 @@ int main(int argc, char * argv[]) {
 
     /* post-process */
     conc.front_minmax();
+    conc.color_minmax();
 
     /* shift pressure */
     real pmin=1.0e+300;

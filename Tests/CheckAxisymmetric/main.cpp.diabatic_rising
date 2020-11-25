@@ -436,7 +436,7 @@ int main(int argc, char ** argv) {
     ns.solve(ResRat(1e-14));
 
     p = 0.0;
-    if (multigrid.fcycle(ResTol(3e-5))) OMS(converged);
+    if (multigrid.fcycle(ResTol(3e-6))) OMS(converged);
     //pr.solve(ResRat(1e-6));
     p.exchange();
     ns.project(p);

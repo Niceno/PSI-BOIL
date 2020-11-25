@@ -27,7 +27,7 @@ real VOFaxisym::calc_flux_axisymmetric(const real gg,
     /* in the Cartesian limit etaf->inf, g & ratio become gg */
     if(gg>0.0) {
       etaf = eta2;
-#if 0
+#if 1
       g =  etaf - sqrt(etaf*etaf-2.*etaf*gg);
       //g =  etaf - sqrt(etaf*etaf-(eta1+eta2)*gg);
 #else
@@ -41,7 +41,7 @@ real VOFaxisym::calc_flux_axisymmetric(const real gg,
       eta00 = eta0/absg;
     } else {
       etaf = eta1;
-#if 0
+#if 1
       g =  etaf - sqrt(etaf*etaf-2.*etaf*gg);
       //g =  etaf - sqrt(etaf*etaf-(eta1+eta2)*gg);
 #else

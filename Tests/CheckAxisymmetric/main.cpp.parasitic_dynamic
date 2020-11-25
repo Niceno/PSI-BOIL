@@ -96,6 +96,8 @@ int main(int argc, char * argv[]) {
   Axisymmetric d(gx,gz,DX);
 #endif
 
+  //const real rhog = 1000.;
+  //const real mug = 1e-3;
   const real rhog = 1.;
   const real mug = 1e-5;
   const real rhol = rhog*rhorat;
@@ -167,13 +169,17 @@ int main(int argc, char * argv[]) {
   real cfllim = 0.2;
   real dxmin = d.dxyz_min();
   const real dt = std::min(cfllim*dxmin/wvel,
-                           dtmult * pow(std::min(air.rho()->value(),water.rho()->value())*pow(dxmin,3.0)
-                             /(2.0*3.1415*mixed.sigma()->value()),0.5));
+                           dtmult * pow((air.rho()->value()+water.rho()->value())*pow(dxmin,3.0)
+                             /(std::pow(2.0*3.1415,3.)*mixed.sigma()->value()),0.5)
+                           );
   const real tend = 5*std::max(tsig,tmu);
   const int ndt = tend/dt;
   const int nint = ndt/10;
   Times time(ndt, dt); 
 
+  boil::oout<<"gasprop= "<<mug<<" "<<rhog<<" "<<boil::endl;
+  boil::oout<<"liqprop= "<<mul<<" "<<rhol<<" "<<boil::endl;
+  boil::oout<<"twoprop= "<<sig<<" "<<boil::endl;
   boil::oout<<"wvel= "<<wvel<<" "<<wvel/usig<<boil::endl;
   boil::oout<<"times= "<<cfllim*dxmin/wvel<<" "<<dtmult * pow(std::min(air.rho()->value(),water.rho()->value())*pow(dxmin,3.0)
                              /(2.0*3.1415*mixed.sigma()->value()),0.5)<<" "<<dt<<" "<<ndt<<boil::endl;
