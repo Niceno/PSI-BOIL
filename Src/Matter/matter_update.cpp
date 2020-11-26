@@ -14,6 +14,7 @@ void Matter::look_up(const Set & s, const Scalar & sca,
   if(s == Set::gamma ()) diff->look_up(sca,tab,col0,col1);
   if(s == Set::beta  ()) texp->look_up(sca,tab,col0,col1);
   if(s == Set::mmass ()) molm->look_up(sca,tab,col0,col1);
+  if(s == Set::mmass ()) sige->look_up(sca,tab,col0,col1);
   if(s == Set::sigma ()) 
     if(tens == NULL) {
       boil::oout << "# Fatal: using surface tension makes ";

@@ -22,6 +22,7 @@ class Set {
     static const Set mmass() {return Set( 8);}
     static const Set sigma() {return Set( 9);}
     static const Set latent(){return Set(10);}
+    static const Set sigma_e(){return Set(11);}
 
     //! Operators.
     bool operator == (const Set & o) const {return val == o.val;}
