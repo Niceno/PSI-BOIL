@@ -116,6 +116,16 @@ class Matter {
                 }
     real mmass (const int comp) const {return molm->value_comp(comp);}
 
+    real sigma_e (const int i,
+                const int j,
+                const int k) const {return sige->value(i,j,k);}
+    real sigma_e (const Comp & m,
+                const int i,
+                const int j,
+                const int k) const {
+                    return sige->value(m,i,j,k);
+                }
+    real sigma_e (const int comp) const {return sige->value_comp(comp);}
 
     real sigma (const int i,
                 const int j,
@@ -147,6 +157,7 @@ class Matter {
     void gamma (const real & v) {diff->value(v);}
     void beta  (const real & v) {texp->value(v);}
     void mmass (const real & v) {molm->value(v);}
+    void sigma_e(const real & v) {sige->value(v);}
 
     void sigma (const real & v) {
       if(tens == NULL) {
@@ -175,6 +186,7 @@ class Matter {
     const Property * gamma()  const {return diff;}
     const Property * beta()   const {return texp;}
     const Property * mmass()  const {return molm;}
+    const Property * sigma_e()  const {return sige;}
 
     const Property * sigma()  const {return tens;}
     const Property * latent() const {return heat;}
@@ -208,6 +220,7 @@ class Matter {
     Property * diff;
     Property * texp;
     Property * molm;
+    Property * sige;
     Property * tens;
     Property * heat;
 

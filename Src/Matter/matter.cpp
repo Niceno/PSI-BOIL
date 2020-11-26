@@ -26,6 +26,7 @@ Matter::Matter(const Domain & d, const char * nm) {
   prname = sumnam + "diffusivity";  diff = new Property(prname.c_str());
   prname = sumnam + "t_expansion";  texp = new Property(prname.c_str());
   prname = sumnam + "molar_mass";   molm = new Property(prname.c_str());
+  prname = sumnam + "electric conductivity";  sige = new Property(prname.c_str());
   tens = NULL;
   heat = NULL;
 
@@ -55,6 +56,7 @@ Matter::Matter(const Matter & a,
   assert(a.diff != NULL);
   assert(a.texp != NULL);
   assert(a.molm != NULL);
+  assert(a.sige != NULL);
   assert(a.tens == NULL);
   assert(a.heat == NULL);
   assert(b.dens != NULL);
@@ -64,6 +66,7 @@ Matter::Matter(const Matter & a,
   assert(b.diff != NULL);
   assert(b.texp != NULL);
   assert(b.molm != NULL);
+  assert(b.sige != NULL);
   assert(b.tens == NULL);
   assert(b.heat == NULL);
   if( ca->bc().count() == 0 ) {
@@ -78,6 +81,7 @@ Matter::Matter(const Matter & a,
   diff = new PropertyMix(a.diff, b.diff, ca, cda, cdb);
   texp = new PropertyMix(a.texp, b.texp, ca, cda, cdb);
   molm = new PropertyMix(a.molm, b.molm, ca, cda, cdb);
+  sige = new PropertyMix(a.sige, b.sige, ca, cda, cdb);
   tens = new Property("surface-tension");
   heat = new Property("latent-heat");
 
@@ -122,6 +126,7 @@ Matter::Matter(const Matter & a,
   assert(a.diff != NULL);
   assert(a.texp != NULL);
   assert(a.molm != NULL);
+  assert(a.sige != NULL);
   assert(a.tens == NULL);
   assert(a.heat == NULL);
   assert(b.dens != NULL);
@@ -131,6 +136,7 @@ Matter::Matter(const Matter & a,
   assert(b.diff != NULL);
   assert(b.texp != NULL);
   assert(b.molm != NULL);
+  assert(b.sige != NULL);
   assert(b.tens == NULL);
   assert(b.heat == NULL);
   if( ca->bc().count() == 0 ) {
@@ -145,6 +151,7 @@ Matter::Matter(const Matter & a,
   diff = new PropertyMix(a.diff, b.diff, ca, bdca, cda, cdb);
   texp = new PropertyMix(a.texp, b.texp, ca, bdca, cda, cdb);
   molm = new PropertyMix(a.molm, b.molm, ca, bdca, cda, cdb);
+  sige = new PropertyMix(a.sige, b.sige, ca, bdca, cda, cdb);
   tens = new Property("surface-tension");
   heat = new Property("latent-heat");
 
