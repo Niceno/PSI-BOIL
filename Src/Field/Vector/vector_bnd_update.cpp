@@ -9,6 +9,7 @@ void Vector::bnd_update_nooutlet() {
   Formula F;
 
   /* check boundary conditions */
+#if 0
   for_m(m)
     for( int b=0; b<bc(m).count(); b++ ) {
  
@@ -19,6 +20,7 @@ void Vector::bnd_update_nooutlet() {
         exit(0);
       }
     }
+#endif
 
   /* set-up the symmetry in a better way */
   for_m(m)
@@ -56,7 +58,8 @@ void Vector::bnd_update_nooutlet() {
       if( bc(m).exists(b) ) {
 
         if( bc(m).type(b) == BndType::inlet() ||
-            bc(m).type(b) == BndType::wall() ) {
+            bc(m).type(b) == BndType::wall()  ||
+            bc(m).type(b) == BndType::dirichlet() ) {
 
           /* formula is defined */
           if( bc(m).formula(b,m) ) {
