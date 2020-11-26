@@ -11,6 +11,7 @@ SUBDIRS = Equation/Staggered/Momentum                              \
           Solver/Linear/Krylov                                     \
           Solver/Linear                                            \
           Solver/Preconditioner                                    \
+          Equation/Centered/ElectPoten                             \
           Equation/Centered/Enthalpy                               \
           Equation/Centered/EnthalpyFD/EnthalpyFDaxisym            \
           Equation/Centered/EnthalpyFD                             \
@@ -84,6 +85,7 @@ LDADD = Custom/IF97/libIF97.a                                                 \
         Solver/Preconditioner/libPreconditioner.a                             \
         Equation/Staggered/Momentum/libMomentum.a                             \
         Equation/Staggered/libStaggered.a                                     \
+        Equation/Centered/ElectPoten/libElectPoten.a                          \
         Equation/Centered/Enthalpy/libEnthalpy.a                              \
         Equation/Centered/EnthalpyFD/EnthalpyFDaxisym/libEnthalpyFDaxisym.a   \
         Equation/Centered/EnthalpyFD/libEnthalpyFD.a                          \
