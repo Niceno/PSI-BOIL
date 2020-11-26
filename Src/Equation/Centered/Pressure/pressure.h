@@ -11,9 +11,9 @@
 *
 *  The eqation is discretized in integral form:                       
 *  \f[
-*        \int_S \frac{\nabla p}{\rho} \, dS
+*       -\int_S \frac{\nabla p}{\rho} \, dS
 *      =          
-*        \frac{1}{\Delta t}
+*       -\frac{1}{\Delta t}
 *        \int_S {\bf u} \, dS
 *      \; \; \; \;
 *      [\frac{m^3}{s^2}]
