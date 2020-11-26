@@ -14,6 +14,7 @@ libGlobal_a_SOURCES = global_approx.h         \
                       global_realistic.h      \
                       global_split_string.h   \
                       global_swap.h           \
+                      global_vectorproduct.h  \
                       global_approx.cpp       \
                       global_buffer_width.cpp \
                       global_constants.cpp    \
@@ -25,6 +26,7 @@ libGlobal_a_SOURCES = global_approx.h         \
                       global_name_file.cpp    \
                       global_random.cpp       \
                       global_split_string.cpp \
-                      global_swap.cpp
+                      global_swap.cpp         \
+                      global_vectorproduct.cpp
 
 INCLUDE = -I@top_srcdir@/
