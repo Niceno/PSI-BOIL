@@ -197,6 +197,7 @@ class Scalar {
                real * nx, real * ny, real * nz) const;
     void grad_abs( const int i, const int j, const int k,
                    real * nx, real * ny, real * nz) const;
+    real grad_face(Comp m, const int i, const int j, const int k);
 
     void bnd_update();
     void bnd_update_nowall();
