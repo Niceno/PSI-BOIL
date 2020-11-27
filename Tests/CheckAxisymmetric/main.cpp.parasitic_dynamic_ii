@@ -1,7 +1,6 @@
 #include "Include/psi-boil.h"
 #include <fstream>
 #include <iostream>
-#include "test_reconstruction.cpp"
 #include <fenv.h>
 //#define USE_CARTESIAN
 //#define SETUP_ONLY

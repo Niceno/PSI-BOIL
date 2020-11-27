@@ -1,6 +1,6 @@
 /******************************************************************************/
 /* ------------ material properties */
-#ifndef FC
+#if CASE == 0
   const real tsat0_K = IF97::Tsat97(prs);
   const real Mv = IF97::get_MW();
   const real muv = IF97::viscvap_p(prs);
@@ -21,7 +21,7 @@
                      /(IF97::Tsat97(1.01*prs)-IF97::Tsat97(0.99*prs))/rhol;
 
   boil::oout<<"properties at pressure "<<prs<<boil::endl;
-#else
+#elif CASE == 1
   /* FC-72 from Cao(2019) and FC-72 3M product sheet */
   const real tsat0_K = 55.7+273.15;                      
   const real Mv = 338e-3;
@@ -43,7 +43,45 @@
   /* fit-correlation from Raj(2012) */
   cangle = 9.37*std::pow(deltat_nucl,0.54);
 
-  boil::oout<<"properties for FC-72 (atmospheric)"<<prs<<boil::endl;
+  boil::oout<<"properties for FC-72 (atmospheric)"<<boil::endl;
+#elif CASE == 2
+  /* ethanol */
+  boil::oout<<"Underdevelopment. Exiting."<<boil::endl;
+  exit(0);
+#elif CASE == 3
+  /* sodium */
+  boil::oout<<"Underdevelopment. Exiting."<<boil::endl;
+  exit(0);
+#elif CASE == 4
+  /* prototype */
+  const real tsat0_K = 400.;
+  const real Mv = 40e-3;
+
+  const real rhorat = 100.;
+  const real murat = 100.;
+  const real kpl = 1000.;
+  const real kprat = 1.;
+  const real Prl = 1.;
+  const real Jacoeff = 1.;
+
+  const real rhol = 1000.;
+  const real mul = 1e-3;
+  const real cpl = kpl*rhol;
+  const real lambdal = mul*cpl/Prl;
+
+  const real rhov = rhol/rhorat;
+  const real muv = mul/murat;
+  const real cpv = kpl/kprat*rhov;
+  const real lambdav = 1e-2;
+
+  const real latent = rhorat*kpl/Jacoeff;
+  const real sig = 1e-2;
+
+  const real betal = 1e-3;
+
+  boil::oout<<"properties for prototype fluid"<<boil::endl;
+#else
+  boil::oout<<"Underdevelopment. Exiting."<<boil::endl;
 #endif
 
   const real betav = 1./tsat0_K; /* ideal gas approximation */

@@ -33,7 +33,7 @@ void VOFaxisym::reconstruct_geometry(Scalar & scp) {
 
   /* doing the reconstruction in the whole domain is unstable; therefore,
      only a band around the presumed interface is considered */
-  const int nlayer = 4;
+  const int nlayer = 2; //4
   set_reconstruction_flag(scp,tempflag,nlayer);
 
 #if 1
