@@ -67,7 +67,7 @@
   const real rhol = 1000.;
   const real mul = 1e-3;
   const real cpl = kpl*rhol;
-  const real lambdal = mul*cpl/Prl;
+  const real lambdal = mul*kpl/Prl;
 
   const real rhov = rhol/rhorat;
   const real muv = mul/murat;
