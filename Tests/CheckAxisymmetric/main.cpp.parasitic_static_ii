@@ -1,7 +1,9 @@
 #include "Include/psi-boil.h"
+#include "test_reconstruction.cpp"
 #include <fstream>
 #include <iostream>
 #include <fenv.h>
+#define SYM
 //#define USE_CARTESIAN
 //#define SETUP_ONLY
 #define _GNU_SOURCE 1
@@ -19,9 +21,9 @@ int main(int argc, char * argv[]) {
 
   boil::timer.start();
 
-  if(argc<=10){
-    boil::oout<<"Ten command line arguments required!"<<"\n";
-    boil::oout<<"./Boil wmin La rhorat murat gridlevel radius-mult dt-mult wvel inverted msimple"<<boil::endl;
+  if(argc<=9){
+    boil::oout<<"Nine command line arguments required!"<<"\n";
+    boil::oout<<"./Boil wmin La rhorat murat gridlevel radius-mult dt-mult inverted msimple"<<boil::endl;
     boil::oout<<"(wmin::wall time in minute)"<<"\n";
     exit(0);
   }
@@ -47,22 +49,23 @@ int main(int argc, char * argv[]) {
   const real dtmult = atof(argv[7]);
   boil::oout<<"dtmult= "<<dtmult<<"\n";
 
-  real wvel = atof(argv[8]);
-  boil::oout<<"wvel= "<<wvel<<"\n";
-
-  const bool inverted = atoi(argv[9]);
+  const bool inverted = atoi(argv[8]);
   boil::oout<<"inverted= "<<inverted<<"\n";
 
-  const int mSimple = atoi(argv[10]);
+  const int mSimple = atoi(argv[9]);
   boil::oout<<"mSimple= "<<mSimple<<"\n";
 
   /* computed parameters */
   const int NX = 16*gLevel;
-  const int NZ = 4*NX;
+#ifdef SYM
+  const int NZ = NX;
+#else
+  const int NZ = 2*NX;
+#endif
 
   /* domain dimensions (given by problem) */
   const real LX =   4.0e-3;
-  const real LZ =   2.*LX;
+  const real LZ =   LX;
   const real DX =   0.5*LX/real(NX);
 
   const bool partial = false;
@@ -83,7 +86,12 @@ int main(int argc, char * argv[]) {
   +----------*/
   Grid1D gx( Range<real>(0.0,0.5*LX), NX, Periodic::no(),
              BndGrid::symmetry(), BndGrid::wall() );
-  Grid1D gz( Range<real>(-0.5*LZ,0.5*LZ), NZ, Periodic::yes() );
+#ifdef SYM
+  Grid1D gz( Range<real>(0.0,0.5*LZ), NZ, Periodic::no(),
+             BndGrid::symmetry(), BndGrid::wall() );
+#else
+  Grid1D gz( Range<real>(-0.5*LZ,0.5*LZ), NZ, Periodic::no() );
+#endif
 
   /*---------+
   |  domain  |
@@ -94,30 +102,6 @@ int main(int argc, char * argv[]) {
 #else
   Axisymmetric d(gx,gz,DX);
 #endif
-
-  //const real rhog = 1000.;
-  //const real mug = 1e-3;
-  const real rhog = 1.;
-  const real mug = 1e-5;
-  const real rhol = rhog*rhorat;
-  const real mul = mug*murat;
-
-  const real rhoinside = inverted ? rhog : rhol;
-  const real muinside = inverted ? mug : mul;
-
-  const real tmu = rhoinside/muinside*radius*radius*4.;
-  boil::oout<<"tmu.scale= "<<tmu<<boil::endl;
-
-  const real sig = muinside*muinside/rhoinside*La/(2.*radius);
-  boil::oout<<"sigma= "<<sig<<boil::endl;
-
-  const real usig = sqrt(sig/(2.*radius*rhoinside));
-  boil::oout<<"vel.scale= "<<usig<<boil::endl;
-
-  const real tsig = sqrt(rhoinside*pow(2.*radius,3.)/sig);
-  boil::oout<<"tsig.scale= "<<tsig<<boil::endl;
- 
-  wvel *= usig;
 
   /*------------------+
   |  define unknowns  |
@@ -132,18 +116,28 @@ int main(int argc, char * argv[]) {
   +-----------------------------*/
   for_m(m) {
     uvw.bc(m).add( BndCnd( Dir::imin(), BndType::symmetry() ) );
-    uvw.bc(m).add( BndCnd( Dir::imax(), BndType::wall(), 0.0, 0.0, wvel ) );
-    uvw.bc(m).add( BndCnd( Dir::kmin(), BndType::periodic() ) );
-    uvw.bc(m).add( BndCnd( Dir::kmax(), BndType::periodic() ) );
+    uvw.bc(m).add( BndCnd( Dir::imax(), BndType::outlet() ) );
+#ifdef SYM
+    uvw.bc(m).add( BndCnd( Dir::kmin(), BndType::symmetry() ) );
+    uvw.bc(m).add( BndCnd( Dir::kmax(), BndType::outlet() ) );
+#else
+    uvw.bc(m).add( BndCnd( Dir::kmin(), BndType::outlet() ) );
+    uvw.bc(m).add( BndCnd( Dir::kmax(), BndType::outlet() ) );
+#endif
     uvw.bc(m).add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
     uvw.bc(m).add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
     uvw_old(m)=uvw(m).shape();
   }
 
   c.bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
-  c.bc().add( BndCnd( Dir::imax(), BndType::neumann() ) );
-  c.bc().add( BndCnd( Dir::kmin(), BndType::periodic() ) );
-  c.bc().add( BndCnd( Dir::kmax(), BndType::periodic() ) );
+  c.bc().add( BndCnd( Dir::imax(), BndType::outlet() ) );
+#ifdef SYM
+  c.bc().add( BndCnd( Dir::kmin(), BndType::symmetry() ) );
+  c.bc().add( BndCnd( Dir::kmax(), BndType::outlet() ) );
+#else
+  c.bc().add( BndCnd( Dir::kmin(), BndType::outlet() ) );
+  c.bc().add( BndCnd( Dir::kmax(), BndType::outlet() ) );
+#endif
   c.bc().add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
   c.bc().add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
 
@@ -154,35 +148,39 @@ int main(int argc, char * argv[]) {
   cold=c.shape();
 
   Matter air(d), water(d);
-  air  .mu    (mug);
-  air  .rho   (rhog);
-  water.mu    (mul);
-  water.rho   (rhol);
+  air  .mu    (1.0000e-5);
+  air  .rho   (1.0000e+0);
+  water.mu    (air.mu()->value()*murat);
+  water.rho   (air.rho()->value()*rhorat);
+
+  const real rhoinside = inverted ? air.rho()->value() : water.rho()->value();
+  const real muinside = inverted ? air.mu()->value() : water.mu()->value();
+
+  const real tmu = rhoinside/muinside*radius*radius*4.;
+  boil::oout<<"tmu.scale= "<<tmu<<boil::endl;
+
+  const real sig = muinside*muinside/rhoinside*La/(2.*radius);
+  boil::oout<<"sigma= "<<sig<<boil::endl;
 
   Matter mixed(water, air, &c);
   mixed.sigma(sig);
 
+  const real usig = sqrt(mixed.sigma()->value()/(2.*radius*rhoinside));
+  boil::oout<<"vel.scale= "<<usig<<boil::endl;
+
+  const real tsig = sqrt(rhoinside*pow(2.*radius,3.)/mixed.sigma()->value());
+  boil::oout<<"tsig.scale= "<<tsig<<boil::endl;
+
   /*-------------------+
   |  time-integration  |
   +-------------------*/
-  real cfllim = 0.2;
   real dxmin = d.dxyz_min();
-  const real dt = std::min(cfllim*dxmin/wvel,
-                           dtmult * pow((air.rho()->value()+water.rho()->value())*pow(dxmin,3.0)
-                             /(std::pow(2.0*3.1415,3.)*mixed.sigma()->value()),0.5)
-                           );
+  const real dt = dtmult * pow((air.rho()->value()+water.rho()->value())*pow(dxmin,3.0)
+                           /mixed.sigma()->value(),0.5);
   const real tend = 4*std::max(tsig,tmu);
   const int ndt = tend/dt;
-  const int nint = 2e5;
-  const int n_per_backup = 5e5;
+  const int nint = ndt/10;
   Times time(ndt, dt); 
-
-  boil::oout<<"gasprop= "<<mug<<" "<<rhog<<" "<<boil::endl;
-  boil::oout<<"liqprop= "<<mul<<" "<<rhol<<" "<<boil::endl;
-  boil::oout<<"twoprop= "<<sig<<" "<<boil::endl;
-  boil::oout<<"wvel= "<<wvel<<" "<<wvel/usig<<boil::endl;
-  boil::oout<<"times= "<<cfllim*dxmin/wvel<<" "<<dtmult * pow(std::min(air.rho()->value(),water.rho()->value())*pow(dxmin,3.0)
-                             /(2.0*3.1415*mixed.sigma()->value()),0.5)<<" "<<dt<<" "<<ndt<<boil::endl;
 	
 
   /*----------------+
@@ -195,7 +193,6 @@ int main(int argc, char * argv[]) {
   VOF conc(c, g, kappa, uvw, time, solver);
 #else
   VOFaxisym conc(c, g, kappa, uvw, time, solver);
-  #endif
   //conc.set_reconstruction_parameters(1e-5,conc.get_reconstruction_maxiter());
 #endif
   conc.set_curv_method(CurvMethod::HF());  // height function
@@ -246,17 +243,6 @@ int main(int argc, char * argv[]) {
     /*--------------------+
     |  initial condition  |
     +--------------------*/
-    for_m(m)
-      for_avmijk(uvw,m,i,j,k)
-        uvw[m][i][j][k]=0.0;
-
-    Comp mcom = Comp::w();
-    for_avmijk(uvw,mcom,i,j,k) {
-      uvw[mcom][i][j][k] += wvel;
-    }
-
-    cold = 0.0;
-
     boil::setup_circle_xz(cold,radius,xcent,ycent);
     if(inverted) {
       for_avijk(cold,i,j,k)
@@ -279,7 +265,12 @@ int main(int argc, char * argv[]) {
     conc.init();
   }
 
-#ifndef SETUP_ONLY
+  std::vector<real> nl1, nli, kl1, kli;
+  std::vector<NormMethod> nmv;
+
+  NormMethod nm = NormMethod::ElviraXZ();
+  nmv.push_back(nm);
+
   for(time.start(); time.end(); time.increase()) {
 
     /* store velocity */
@@ -310,10 +301,10 @@ int main(int argc, char * argv[]) {
       if(mSimple>1)
         ns.convection();
       ns.grad(press);
-      ns.solve(ResRat(1e-14));
+      ns.solve(ResRat(1e-8));
 
       p=0.0;
-      if(multigrid.fcycle(ResRat(1e-8))) OMS(converged);
+      if (multigrid.vcycle(ResRat(1e-6))) OMS(converged);
 
       ns.project(p);
       press += p;
@@ -326,48 +317,54 @@ int main(int argc, char * argv[]) {
     ns.cfl_max();
     /* post process */
     //velocity
-    real umax=0.0, vmax=0.0, wmax=0.0, wmax2=0.0;
-    real usum=0.0, vsum=0.0, wsum=0.0, wsum2=0.0;
+    real umax=0.0, vmax=0.0, wmax=0.0;
+    real usum=0.0, vsum=0.0, wsum=0.0;
     int icount=0;
     for_vijk(c,i,j,k) {
       real utmp=fabs(0.5*(uvw[Comp::u()][i][j][k]+uvw[Comp::u()][i+1][j][k]))/usig;
       real vtmp=fabs(0.5*(uvw[Comp::v()][i][j][k]+uvw[Comp::v()][i][j+1][k]))/usig;
-      real wtmp=fabs(0.5*(uvw[Comp::w()][i][j][k]+uvw[Comp::w()][i][j][k+1])-wvel)/usig;
-      real wtmp2=fabs(0.5*(uvw[Comp::w()][i][j][k]+uvw[Comp::w()][i][j][k+1]))/usig;
+      real wtmp=fabs(0.5*(uvw[Comp::w()][i][j][k]+uvw[Comp::w()][i][j][k+1]))/usig;
       if (umax<utmp) umax=utmp;
       if (vmax<vtmp) vmax=vtmp;
       if (wmax<wtmp) wmax=wtmp;
-      if (wmax2<wtmp2) wmax2=wtmp2;
       usum += utmp;
       vsum += vtmp;
       wsum += wtmp;
-      wsum2 += wtmp2;
       icount++;
     }
     boil::cart.max_real(&umax);
     boil::cart.max_real(&vmax);
     boil::cart.max_real(&wmax);
-    boil::cart.max_real(&wmax2);
     boil::cart.sum_real(&usum);
     boil::cart.sum_real(&vsum);
     boil::cart.sum_real(&wsum);
-    boil::cart.sum_real(&wsum2);
     boil::cart.sum_int(&icount);
     usum /= real(icount);
     vsum /= real(icount);
     wsum /= real(icount);
     boil::oout<<"velocity= "<<time.current_time()<<" "
-                <<umax<<" "<<vmax<<" "<<wmax<<" "<<wmax2<<" "
-                <<usum<<" "<<vsum<<" "<<wsum<<" "<<wsum2<<"\n";
+                <<umax<<" "<<vmax<<" "<<wmax<<" "
+                <<usum<<" "<<vsum<<" "<<wsum<<"\n";
+
+    /* curvature */
+    NormMethod nm = NormMethod::ElviraXZ();
+    nmv.push_back(nm);
+#ifndef USE_CARTESIAN
+    test_reconstruction_sphere(partial,conc,conc.color(),cold,kappa,inverted,radius,0.,0.,0.,nm,nl1,nli,kl1,kli);
+#else
+    test_reconstruction_circle_xz(conc,c,cold,kappa,inverted,radius,0.,0.,nm,nl1,nli,kl1,kli);
+#endif
+    boil::oout<<"main::curv: "<<time.current_time()<<" "<<kl1[time.current_step()-1]<<" "<<kli[time.current_step()-1]<<boil::endl;
 
     if(time.current_step() % nint == 0 || time.current_step()==1 ) {
       boil::plot->plot(uvw, c, press,"uvw-c-press",  time.current_step());
+      //boil::plot->plot(xyz, conc.color(), kappa,"xyz-c-kappa",  time.current_step());
     }
 
     /*--------------+
     |  backup data  |
     +--------------*/
-    if(time.current_step() % n_per_backup == 0) {
+    if(time.current_step() % nint == 0) {
       boil::save_backup(time.current_step(), 0, time,
                         load_scalars, load_scalar_names,
                         load_vectors, load_vector_names);
@@ -390,7 +387,6 @@ int main(int argc, char * argv[]) {
       break;
     }
   }
-#endif
 
   boil::oout << "finished" << boil::endl;
 

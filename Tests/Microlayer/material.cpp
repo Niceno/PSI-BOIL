@@ -61,7 +61,7 @@
   const real murat = 100.;
   const real kpl = 1000.;
   const real kprat = 1.;
-  const real Prl = 1.;
+  const real Prl = 10.;
   const real Jacoeff = 1.;
 
   const real rhol = 1000.;

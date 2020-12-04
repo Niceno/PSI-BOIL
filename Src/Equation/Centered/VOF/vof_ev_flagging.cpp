@@ -26,8 +26,28 @@ void VOF::ev_flagging(const Scalar & scp, const ScalarInt & iflag,
       otpflag[i][j][k] = 4;
   }
 
+#if 0
+  /* further extension */
   for_ijk(i,j,k) {
-    if(abs(otpflag[i][j][k])!=1) { /* cells next to the interface */
+    if(  iflag[i][j][k] != -1000
+       &&iflag[i][j][k]*sig<0
+       &&abs(otpflag[i][j][k])!=1) { /* cells next to the interface, gas side */
+      if(  abs(otpflag[i-1][j][k])==1
+         ||abs(otpflag[i+1][j][k])==1
+         ||abs(otpflag[i][j-1][k])==1
+         ||abs(otpflag[i][j+1][k])==1
+         ||abs(otpflag[i][j][k-1])==1
+         ||abs(otpflag[i][j][k+1])==1)
+        otpflag[i][j][k] = -1;
+    }
+  }
+
+  otpflag.exchange();
+#endif
+
+  for_ijk(i,j,k) {
+    if(  iflag[i][j][k] != -1000
+       &&abs(otpflag[i][j][k])!=1) { /* cells next to the interface */
       if(  abs(otpflag[i-1][j][k])==1
          ||abs(otpflag[i+1][j][k])==1
          ||abs(otpflag[i][j-1][k])==1
