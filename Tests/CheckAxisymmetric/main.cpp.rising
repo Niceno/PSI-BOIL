@@ -9,8 +9,8 @@
 #include <fenv.h>
 #define INVERTED
 #define _GNU_SOURCE 1
-//#define MORTON_EOTVOS
-#define WATER_GLYCERIN
+#define MORTON_EOTVOS
+//#define WATER_GLYCERIN
 //#define MOVING_FRAME
 #if 1
 static void __attribute__ ((constructor)) trapfpe(void)
@@ -229,7 +229,7 @@ int main(int argc, char * argv[]) {
                                 /mixed.sigma()->value(),0.5);
   boil::oout<<"dt= "<<dt<<"\n";
   Times time(ndt, dt);
-  const real tint = 5000*dt*gLevel/dtmult;
+  const real tint = 50*dt*gLevel/dtmult;
   const int nint= 25000*gLevel;
   const real cfl_limit=0.25;
 
@@ -443,12 +443,12 @@ int main(int argc, char * argv[]) {
       //iint++;
       boil::plot->plot(uvw,c,press,kappa, "uvw-c-press-kappa",iint);
 
-      // subtract gravity just for visualization
+      /* subtract gravity just for visualization
       for_vmijk(xyz,m,i,j,k) {
         xyz[m][i][j][k] -= -gravity*xyz.dV(m,i,j,k)*mixed.rho(m,i,j,k);
       }
       xyz.exchange();
-      boil::plot->plot(xyz,c,kappa, "xyz-c-kappa",iint);
+      boil::plot->plot(xyz,c,kappa, "xyz-c-kappa",iint); */
       iint = int(time.current_time()/tint) + 1;
     }
 

@@ -3,6 +3,18 @@
 
 /******************************************************************************/
 void Momentum::solve(const ResTol & toler, const ResRat & factor) {
+  solve_wo_outlet(toler,factor);
+
+  /*---------------------------------+
+  |  scale velocities at the outlet  |
+  +---------------------------------*/
+  outlet();
+
+  return;
+}
+
+/******************************************************************************/
+void Momentum::solve_wo_outlet(const ResTol & toler, const ResRat & factor) {
 
   boil::timer.start("momentum solver");
 
@@ -98,8 +110,5 @@ void Momentum::solve(const ResTol & toler, const ResRat & factor) {
   // boil::plot->plot(fnew, "uvw-fnew", time->current_step());
   // boil::plot->plot(cnew, "uvw-cnew", time->current_step());
 
-  /*---------------------------------+
-  |  scale velocities at the outlet  |
-  +---------------------------------*/
-  outlet();
+  return;
 }

@@ -18,6 +18,7 @@ libMomentum_a_SOURCES = momentum.h                               \
                         momentum_pressure_outlet.cpp             \
                         momentum_project.cpp                     \
                         momentum_project_ghost.cpp               \
+                        momentum_project_w_outlet.cpp            \
                         momentum_save.cpp                        \
                         momentum_scale_outlet_velocity.cpp       \
                         momentum_solve.cpp                       \

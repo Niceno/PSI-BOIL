@@ -547,7 +547,7 @@ int main(int argc, char ** argv) {
     |  solve transport equation  |
     +---------------------------*/
     conc.new_time_step();
-    conc.advance_with_extrapolation(true,ResTol(1e-6),uvw,f,
+    conc.advance_with_extrapolation(true,ResTol(1e-7),uvw,f,
                                     &liquid,&uvw_1,&vapor,&uvw_2);
 #if CASE == 3
   #ifdef USE_MG

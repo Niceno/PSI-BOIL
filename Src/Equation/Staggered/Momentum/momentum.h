@@ -79,6 +79,9 @@ class Momentum : public Staggered {
     void solve(const ResTol & toler, const ResRat & fact);
     void solve(const ResTol & toler) { solve(toler,ResRat(-1.)); };
     void solve(const ResRat & fact) { solve(ResTol(boil::atto),fact); };
+    void solve_wo_outlet(const ResTol & toler, const ResRat & fact);
+    void solve_wo_outlet(const ResTol & toler) { solve_wo_outlet(toler,ResRat(-1.)); };
+    void solve_wo_outlet(const ResRat & fact) { solve_wo_outlet(ResTol(boil::atto),fact); };
     real bulk(const Comp & m, const real & coord) const;
 
     void get_eps(Scalar * src);
@@ -86,6 +89,8 @@ class Momentum : public Staggered {
     void project(const Scalar & frc);
     void project(const Scalar & frc, Vector & veloc);
     void project_ghost(const Scalar & frc, const Scalar & c, const Scalar & k);
+    void project_w_outlet(const Scalar & frc);
+    void project_w_outlet(const Scalar & frc, Vector & veloc);
     void new_time_step(const Scalar * prs = NULL);
     void new_time_step(const Vector & v, const Scalar * prs = NULL);
     void grad(Scalar & p);
