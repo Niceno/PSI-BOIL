@@ -27,7 +27,7 @@
   const int ndt = 10e6; /* inconsequential */
   
   /* plot every */
-  real t_per_plot = 0.005*1e-3;
+  real t_per_plot = 5e-6;
   if(case_flag==0)
     t_per_plot = 0.1;
 
@@ -51,9 +51,9 @@
   const int multigrid_min_cycles = 1;
   const int multigrid_max_cycles = 20;
 
-  MaxIter multigrid_mm_smooth1 = MaxIter(25);
-  MaxIter multigrid_mm_smooth2 = MaxIter(30);
-  MaxIter multigrid_mm_solve = MaxIter(100);
+  MaxIter multigrid_mm_smooth1 = MaxIter(35);
+  MaxIter multigrid_mm_smooth2 = MaxIter(40);
+  MaxIter multigrid_mm_solve = MaxIter(110);
   MaxIter multigrid_mm_stale1 = MaxIter(10);
   MaxIter multigrid_mm_stale2 = MaxIter(-1);
   std::array<MaxIter,3> multigrid_mi = {multigrid_mm_smooth1,multigrid_mm_smooth2,multigrid_mm_solve};

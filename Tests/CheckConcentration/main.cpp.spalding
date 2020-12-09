@@ -11,12 +11,12 @@ static void __attribute__ ((constructor)) trapfpe(void)
 }
 #endif
 
-//#define STANDARD
+#define STANDARD
 #define SYM
 //#define SETUP_ONLY
 //#define STATIC
 #define RADIAL
-#define CASE 3
+#define CASE 1
 /* case 1 = axisymmetric
         2 = cartesian 2D
         3 = cartesian 3D
@@ -106,9 +106,12 @@ int main(int argc, char ** argv) {
   /* tifmodel */
   const real ur = 0.01;
 
+  /* limit vfrac for ctp */
+  const real limitvf = 0.001;
+
   /* phase change - 4 version */
-  const bool use_second_order_accuracy = true;
-  const bool discard_points_near_interface = true;
+  const AccuracyOrder accuracy_order = AccuracyOrder::FourthUpwind();
+  const bool discard_points_near_interface = false;
   const bool use_unconditional_extrapolation = false;
 
 /******************************************************************************/
@@ -564,28 +567,31 @@ int main(int argc, char ** argv) {
   Clapeyron tsat(Tref,conc.topo,eps,mmassv,latent);
   tsat.set_ur(ur);
 #endif
-#if CASE > 1
-  EnthalpyFD enthFD      (tpr, q, uvw, time, solver  , &mixed,
-                          conc.topo, tsat);
-#else
-  EnthalpyFDaxisym enthFD(tpr, q, uvw, time, solver  , &mixed,
-                          conc.topo, tsat);
-#endif
+  CommonHeatTransfer cht(tpr,conc.topo,tsat,&mixed);
 
+  Vector & uvwenth1 = uvw_1;
+  Vector & uvwenth2 = uvw_2;
+#if CASE > 1
+  EnthalpyFD enthFD      (tpr, q, uvw, uvwenth1, uvwenth2, time, solver  , &mixed,
+                          cht);
+#else
+  EnthalpyFDaxisym enthFD(tpr, q, uvw, uvwenth1, uvwenth2, time, solver  , &mixed,
+                          cht);
+#endif
   enthFD.convection_set(TimeScheme::forward_euler());
   enthFD.diffusion_set (TimeScheme::backward_euler());
 
   /* phase change */
-  PhaseChange4 pc(mdot, mflx, tpr, q, c, g, f, uvw, conc.topo,
-                  tsat, time, &mixed);
-  pc.set_second_order_accuracy(use_second_order_accuracy);
+  PhaseChange4 pc(mdot, mflx, q, g , f , uvw, cht,
+                  time, &mixed);
+  pc.set_accuracy_order(accuracy_order);
   pc.set_discard_points_near_interface(discard_points_near_interface);
   pc.set_unconditional_extrapolation(use_unconditional_extrapolation);
 
   /* ng transport */
   ConcentrationTP ngtransp(eps,mdot_eps,uvw,
                            conc.flow(),conc.heaviside(),conc.topo,
-                           time, solverCGdi, &gas,0.01);
+                           time, solverCGdi, &gas,limitvf);
 
   /*---------------------------------------------------------------+
   |                     start computation                          |
@@ -804,7 +810,7 @@ int main(int argc, char ** argv) {
       ns.solve(ResRat(1e-14));
 
       p = 0.0;
-      if (multigrid.fcycle(ResRat(1e-4))) OMS(converged);
+      if (multigrid.fcycle(ResTol(1e-7))) OMS(converged);
       p.exchange();
       ns.project(p);
       press += p;
@@ -835,7 +841,8 @@ int main(int argc, char ** argv) {
       /*-----------------------+
       |  solve color equation  |
       +-----------------------*/
-      conc.extrapolate_velocity(conc.color(),f,&liquid,uvw,uvw_1,ResRat(1e-9),Sign::pos(),true);
+      conc.extrapolate_velocity(conc.color(),f,&liquid,uvw,uvw_1,ResTol(1e-7),Sign::pos(),true);
+      conc.extrapolate_velocity(conc.color(),f,&gas,uvw,uvw_2,ResTol(1e-7),Sign::neg(),false);
       conc.advance_geometric(cold);
 #endif
     }
