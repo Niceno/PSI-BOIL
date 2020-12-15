@@ -18,7 +18,8 @@
   +-----------------------------*/
   for_m(m) {
     uvw.bc(m).add( BndCnd( Dir::imin(), BndType::symmetry() ) );
-    uvw.bc(m).add( BndCnd( Dir::imax(), BndType::wall() ) );
+    //uvw.bc(m).add( BndCnd( Dir::imax(), BndType::wall() ) );
+    uvw.bc(m).add( BndCnd( Dir::imax(), BndType::outlet() ) );
     uvw.bc(m).add( BndCnd( Dir::kmin(), BndType::wall() ) );
     uvw.bc(m).add( BndCnd( Dir::kmax(), BndType::outlet() ) );
     uvw.bc(m).add( BndCnd( Dir::jmin(), BndType::pseudo() ) );

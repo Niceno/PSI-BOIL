@@ -34,7 +34,7 @@ int main(int argc, char * argv[]) {
   const real LZ = DX*real(NZ);
 
   const real xint = 0.002205323668813564;
-  const real x0 = xint-2.01*DX;
+  const real x0 = xint-10.01*DX*Level;
 
   const real Tout=5.;
   const real Tsat=0.;
@@ -72,10 +72,18 @@ int main(int argc, char * argv[]) {
   +----------------*/
   Krylov * solver = new CG(d, Prec::di());
 
+  MaxIter multigrid_mm_smooth1 = MaxIter(35);
+  MaxIter multigrid_mm_smooth2 = MaxIter(40);
+  MaxIter multigrid_mm_solve = MaxIter(110);
+  MaxIter multigrid_mm_stale1 = MaxIter(-1);
+  MaxIter multigrid_mm_stale2 = MaxIter(-1);
+  std::array<MaxIter,3> multigrid_mi = {multigrid_mm_smooth1,multigrid_mm_smooth2,multigrid_mm_solve};
+  std::array<MaxIter,3> multigrid_mstale = {multigrid_mm_stale1,multigrid_mm_stale1,multigrid_mm_stale2};
+
   /*------------------+
   |  define unknowns  |
   +------------------*/
-  Vector uvw(d), xyz(d), uvw_1(d); // vel
+  Vector uvw(d), xyz(d), uvw_1(d), uvw_2(d); // vel
   Scalar p  (d), f  (d); // pressure
   Scalar c  (d), g  (d), kappa(d), cold(d); // concentration
   Scalar press(d);
@@ -102,6 +110,7 @@ int main(int argc, char * argv[]) {
     uvw.bc(m).add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
 #endif
     uvw_1(m) = uvw(m).shape();
+    uvw_2(m) = uvw(m).shape();
   }
 
   p.bc().add( BndCnd( Dir::imin(), BndType::neumann() ) );
@@ -201,10 +210,10 @@ int main(int argc, char * argv[]) {
   for_vijk(c,i,j,k)
     c[i][j][k] = 1.0;
   for_vijk(c,i,j,k) {
-    if(c.xc(i)-x0<2.*c.dxc(i)) {
+    if(c.xn(i+1)<xint) {
       c[i][j][k]=0.0;
-    } else if(c.xc(i)-x0<3.*c.dxc(i)) {
-      c[i][j][k]=0.99; /* approximately two cells */
+    } else if(c.xn(i)<xint) {
+      c[i][j][k]=1.-(xint-c.xn(i))/c.dxc(i);
     } else {
       c[i][j][k] = 1.0;
     }
@@ -256,18 +265,18 @@ int main(int argc, char * argv[]) {
   conc.init();
   c.exchange_all();
   conc.ancillary();
-  conc.front_minmax();
   conc.totalvol();
 
   TIF tsat(Tsat);
   CommonHeatTransfer cht(tpr,conc.topo,tsat,&mixed);
-  EnthalpyFD enthFD(tpr, q, uvw, uvw_1, uvw, time, solver, &mixed, cht);
+  EnthalpyFD enthFD(tpr, q, uvw, uvw_1, uvw_2, time, solver, &mixed, cht);
   enthFD.convection_set(TimeScheme::forward_euler());
   enthFD.diffusion_set(TimeScheme::backward_euler());
   enthFD.set_no_solid_acceleration(false);
   enthFD.set_flux_accuracy_order(AccuracyOrder::First());
   PhaseChange4 pc(mdot, mflx, q, g , f , uvw, cht,
                   time, &mixed);
+  //pc.set_accuracy_order(AccuracyOrder::SecondUpwind());
   pc.set_accuracy_order(AccuracyOrder::FourthUpwind());
   pc.set_unconditional_extrapolation(false);
   pc.set_discard_points_near_interface(false);
@@ -308,7 +317,14 @@ int main(int argc, char * argv[]) {
     ns.solve(ResRat(1e-14));
 
     p = 0.0;
-    if (multigrid.fcycle(ResTol(1e-7))) OMS(converged);
+    //if (multigrid.fcycle(ResTol(1e-7))) OMS(converged);
+    if(multigrid.cycle(Cycle::Z(),
+                       Cycle::F(),
+                       ResTol(1e-7),
+                       ResRat(-1.),
+                       multigrid_mi,
+                       multigrid_mstale))
+        OMS(converged);
     p.exchange();
     ns.project(p);
     press += p;
@@ -324,7 +340,7 @@ int main(int argc, char * argv[]) {
 
     cold=c;
     conc.advance_with_extrapolation(true,ResTol(1e-7),uvw,f,
-                                    &liquid,&uvw_1);
+                                    &liquid,&uvw_1,&vapor,&uvw_2);
  
     conc.front_minmax();
     conc.totalvol();
