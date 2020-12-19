@@ -25,6 +25,11 @@ int main(int argc, char * argv[]) {
   const real LX = 0.001; //Hardt
   const real DX = LX/real(NX);
 
+  const real betasol = 0.06694560396502779;
+  const real t0 = 30e-3;
+  const real xint = 105.32888985625091e-6;
+  const real x0 = xint-5.01*DX*Level;
+
   const real Twall=110;
   const real Tsat=100;
 
@@ -44,7 +49,7 @@ int main(int argc, char * argv[]) {
   /*----------+
   |  grid(s)  |
   +----------*/
-  Grid1D gx( Range<real>(-0.0*LX,1.0*LX), NX, Periodic::no() );
+  Grid1D gx( Range<real>(0.0*LX+x0,1.0*LX+x0), NX, Periodic::no() );
 #ifndef USE_VOF
   Grid1D gz( Range<real>( 0.0,LZ), NZ, Periodic::yes() );
 #else
@@ -146,15 +151,27 @@ int main(int argc, char * argv[]) {
   /*----------------------+
   |  physical properties  |
   +----------------------*/
+  const real mul = 0.28e-3;
+  const real rhol = 958.4;
+  const real lambdal = 0.679;
+  const real cpl = 4215.9*rhol;
+  const real alpl = lambdal/cpl;
+
+  const real muv = 1.255e-5;
+  const real rhov = 0.597;
+  const real lambdav = 0.025;
+  const real cpv = 2030.*rhov;
+  const real alpv = lambdav/cpv;
+
   Matter vapor(d), liquid(d);
-  vapor  .mu    (1.255e-5);
-  vapor  .rho   (0.597);
-  vapor  .cp    (2030*0.597);
-  vapor  .lambda(0.025);
-  liquid.mu    (0.28e-3);
-  liquid.rho   (958.4);
-  liquid.cp    (4215.9*958.4);
-  liquid.lambda(0.679);
+  vapor  .mu    (muv);
+  vapor  .rho   (rhov);
+  vapor  .cp    (cpv);
+  vapor  .lambda(lambdav);
+  liquid.mu    (mul);
+  liquid.rho   (rhol);
+  liquid.cp    (cpl);
+  liquid.lambda(lambdal);
 
 #ifndef USE_VOF
   Matter mixed(liquid, vapor,& step); //c=1: full of liquid, c=0: full of vapor
@@ -169,7 +186,7 @@ int main(int argc, char * argv[]) {
   +-------------------*/
   const int  ndt = 5000*Level;
   const int  nint = 100;
-  const real dt  = 2.0e-5/real(Level);
+  const real dt  = 11e-3/9./2./real(Level);
 
   Times time(ndt, dt);
 
@@ -190,10 +207,10 @@ int main(int argc, char * argv[]) {
   for_vijk(c,i,j,k)
     c[i][j][k] = 1.0;
   for_vijk(c,i,j,k) {
-    if(i==boil::BW&&(c.xc(boil::BW)<2.*c.dxc(boil::BW))) {
+    if(c.xn(i+1)<xint) {
       c[i][j][k]=0.0;
-    } else if(i==1+boil::BW&&(c.xc(boil::BW)<2.*c.dxc(boil::BW))) {
-      c[i][j][k]=0.99; /* approximately one cell */
+    } else if(c.xn(i)<xint) {
+      c[i][j][k]=1.-(xint-c.xn(i))/c.dxc(i);
     } else {
       c[i][j][k] = 1.0;
     }
@@ -201,21 +218,23 @@ int main(int argc, char * argv[]) {
   c.bnd_update();
   c.exchange_all();
 
-  for_vijk(tpr,i,j,k){
-    if(i==1+boil::BW&&(c.xc(boil::BW)<2.*c.dxc(boil::BW))) {
+  /* temperature */
+  const real gamma = rhov*sqrt(alpv)/rhol/sqrt(alpl);
+  auto tsol = [&](const real x, const real t) {
+    return Twall + (Tsat-Twall)/erf(betasol)*erf(x/2./sqrt(alpv*t));
+  };
+  for_vijk(tpr,i,j,k) {
+    real xtmp=tpr.xc(i);
+    if(xtmp>=xint) {
       tpr[i][j][k] = Tsat;
-    } else if(i==boil::BW&&(c.xc(boil::BW)<2.*c.dxc(boil::BW))) {
-      tpr[i][j][k] = c.xc(i)/(1.01*c.dxc(i)); /* approximately one cell and linear profile */
     } else {
-      tpr[i][j][k] = c[i][j][k]*Tsat
-                   + (1.0-c[i][j][k])*Twall;
+      tpr[i][j][k] = tsol(xtmp,t0);
     }
   }
+  tpr.bnd_update();
+  tpr.exchange_all();
 
-  for_avijk(c,i,j,k){
-    step[i][j][k]=c[i][j][k];
-  }
-
+  step=c;
 
   /*-----------------+
   |  define solvers  |
@@ -238,8 +257,8 @@ int main(int argc, char * argv[]) {
   conc.init();
   c.exchange_all();
   conc.ancillary();
-  conc.front_minmax();
-  conc.totalvol();
+  //conc.front_minmax();
+  //conc.totalvol();
 
   TIF tsat(Tsat);
   CommonHeatTransfer cht(tpr,conc.topo,tsat,&mixed);
@@ -283,7 +302,6 @@ int main(int argc, char * argv[]) {
     pr.discretize();
 
     /* momentum */
-    ns.cfl_max();
     ns.new_time_step();
 
     for_m(m)
@@ -309,6 +327,7 @@ int main(int argc, char * argv[]) {
     press.exchange();
 
     //exit(0);
+    ns.cfl_max();
 
     /*---------------------------+
     |  solve transport equation  |
@@ -341,6 +360,9 @@ int main(int argc, char * argv[]) {
     if(time.current_step() % ndt == 0 ||time.current_step()==1) {
       boil::plot->plot(uvw,c,tpr,mdot,"uvw-c-tpr-mdot",time.current_step());
     }
+
+    if(conc.topo->get_xmaxft()>500e-6)
+      break;
   }
 
   boil::oout << "finished" << boil::endl;

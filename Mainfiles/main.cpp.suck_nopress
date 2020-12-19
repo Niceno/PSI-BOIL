@@ -1,9 +1,6 @@
 #include "Include/psi-boil.h"
 
 #define USE_VOF
-//#define USE_FULL
-
-const int NZ = 4;
 
 /******************************************************************************/
 int main(int argc, char * argv[]) {
@@ -25,15 +22,19 @@ int main(int argc, char * argv[]) {
   boil::oout<<"level= "<<Level<<"\n";
 
   /* computed parameters */
-  const int dtLevel = 1; // 1 or 2
   const int NX = 2*40*Level;
   const int mSimple = 1;
+
+  /* dt settings */
+  const real initdtcoef = 1./10.;
+  const real cfl_limit = 1e-1;//5e-3;
 
   /* domain dimensions (given by problem) */
   const real LX = 8.0e-3;
   const real DX = LX/real(NX);
-  const real LZ = DX*real(NZ);
 
+  const real betasol = 0.7677282527146145;
+  const real t0 = 0.1;
   const real xint = 0.002205323668813564;
   const real x0 = xint-10.01*DX*Level;
 
@@ -57,8 +58,8 @@ int main(int argc, char * argv[]) {
   |  grid(s)  |
   +----------*/
   Grid1D gx( Range<real>(0.0*LX+x0,1.0*LX+x0), NX, Periodic::no() );
-#ifdef USE_FULL
-  Grid1D gz( Range<real>(0.0,LZ), NZ, Periodic::yes() );
+#ifndef USE_VOF
+  Grid1D gz( Range<real>( 0.0,LZ), NZ, Periodic::yes() );
 #else
   Grid1D gz(DX);
 #endif
@@ -71,10 +72,11 @@ int main(int argc, char * argv[]) {
   /*----------------+
   |  linear solver  |
   +----------------*/
-  Krylov * solver = new CG(d, Prec::di());
+  //Krylov * solver = new CG(d, Prec::ic2());
+  Linear * solver = new Jacobi(d);
 
-  MaxIter multigrid_mm_smooth1 = MaxIter(35);
-  MaxIter multigrid_mm_smooth2 = MaxIter(40);
+  MaxIter multigrid_mm_smooth1 = MaxIter(110);
+  MaxIter multigrid_mm_smooth2 = MaxIter(110);
   MaxIter multigrid_mm_solve = MaxIter(110);
   MaxIter multigrid_mm_stale1 = MaxIter(-1);
   MaxIter multigrid_mm_stale2 = MaxIter(-1);
@@ -88,10 +90,10 @@ int main(int argc, char * argv[]) {
   Scalar p  (d), f  (d); // pressure
   Scalar c  (d), g  (d), kappa(d), cold(d); // concentration
   Scalar press(d);
-  Scalar tpr(d), q  (d), step(d); // temperature
+  Scalar tpr(d), q  (d), tprold(d); // temperature
   Scalar mdot(d);        // phase-change
   Scalar mflx(d);        // phase-change
-  Scalar tprold(d);
+  Scalar sflag(d);        // phase-change
 
   /*-----------------------------+ 
   |  insert boundary conditions  |
@@ -99,7 +101,7 @@ int main(int argc, char * argv[]) {
   for_m(m) {
     uvw.bc(m).add( BndCnd( Dir::imin(), BndType::wall() ) );
     uvw.bc(m).add( BndCnd( Dir::imax(), BndType::outlet() ) );
-#ifdef USE_FULL
+#ifndef USE_VOF
     uvw.bc(m).add( BndCnd( Dir::kmin(), BndType::periodic() ) );
     uvw.bc(m).add( BndCnd( Dir::kmax(), BndType::periodic() ) );
     uvw.bc(m).add( BndCnd( Dir::jmin(), BndType::periodic() ) );
@@ -117,7 +119,7 @@ int main(int argc, char * argv[]) {
 
   p.bc().add( BndCnd( Dir::imin(), BndType::neumann() ) );
   p.bc().add( BndCnd( Dir::imax(), BndType::outlet() ) );
-#ifdef USE_FULL
+#ifndef USE_VOF
   p.bc().add( BndCnd( Dir::kmin(), BndType::periodic() ) );
   p.bc().add( BndCnd( Dir::kmax(), BndType::periodic() ) );
   p.bc().add( BndCnd( Dir::jmin(), BndType::periodic() ) );
@@ -138,12 +140,12 @@ int main(int argc, char * argv[]) {
 
   c = p.shape();
   g = c.shape();
-  step = c.shape();
   cold = c.shape();
+  sflag = c.shape();
 
   tpr.bc().add( BndCnd( Dir::imin(), BndType::dirichlet(), Tsat ) );
   tpr.bc().add( BndCnd( Dir::imax(), BndType::dirichlet(), Tout ) );
-#ifdef USE_FULL
+#ifndef USE_VOF
   tpr.bc().add( BndCnd( Dir::kmin(), BndType::periodic() ) );
   tpr.bc().add( BndCnd( Dir::kmax(), BndType::periodic() ) );
   tpr.bc().add( BndCnd( Dir::jmin(), BndType::periodic() ) );
@@ -192,11 +194,13 @@ int main(int argc, char * argv[]) {
   /*-------------------+
   |  time-integration  |
   +-------------------*/
-  const int  ndt =500*Level*dtLevel;
-  const int  nint = 100*Level*dtLevel;
-  const real dt  = 1.0e-3/real(Level*dtLevel);
+  const int  ndt =50000*Level;
+  const int  nint = ndt;
+  const real dt  = cfl_limit/11./real(Level);
 
   Times time(ndt, dt);
+  time.set_coef_dec(0.75);
+  time.set_dt(dt*initdtcoef);
 
   OPR(  NX );
   OPR(  LX );
@@ -212,7 +216,6 @@ int main(int argc, char * argv[]) {
   /*--------------------+
   |  initial condition  |
   +--------------------*/
-  /* color function */
   for_vijk(c,i,j,k)
     c[i][j][k] = 1.0;
   for_vijk(c,i,j,k) {
@@ -228,8 +231,6 @@ int main(int argc, char * argv[]) {
   c.exchange_all();
 
   /* temperature */
-  const real betasol = 0.7677282527146145;
-  const real t0 = 0.1;
   const real gamma = rhov*sqrt(alpv)/rhol/sqrt(alpl);
   auto tsol = [&](const real x, const real t) {
     return (Tout-Tsat)-(Tout-Tsat)/erfc(betasol*gamma)*
@@ -240,17 +241,11 @@ int main(int argc, char * argv[]) {
     if(xtmp<=xint) {
       tpr[i][j][k] = Tsat;
     } else {
-      tpr[i][j][k] = tsol(xtmp,t0); 
+      tpr[i][j][k] = tsol(xtmp,t0);
     }
   }
   tpr.bnd_update();
   tpr.exchange_all();
-
-  boil::plot->plot(uvw, c, tpr, mdot, "uvw-c-tpr-mdot", 0);
-
-  for_avijk(c,i,j,k){
-    step[i][j][k]=c[i][j][k];
-  }
 
   /*-----------------+
   |  define solvers  |
@@ -261,7 +256,6 @@ int main(int argc, char * argv[]) {
   else
     ns.convection_set(TimeScheme::forward_euler());
   ns.diffusion_set(TimeScheme::backward_euler());
-
   Pressure pr(p, f, uvw, time, solver, &mixed);
 #ifndef USE_VOF
   CIPCSL2 conc  (c,  g, kappa, uvw, time, solver);
@@ -277,7 +271,8 @@ int main(int argc, char * argv[]) {
   conc.init();
   c.exchange_all();
   conc.ancillary();
-  conc.totalvol();
+  //conc.front_minmax();
+  //conc.totalvol();
 
   TIF tsat(Tsat);
   CommonHeatTransfer cht(tpr,conc.topo,tsat,&mixed);
@@ -286,18 +281,15 @@ int main(int argc, char * argv[]) {
   enthFD.diffusion_set(TimeScheme::backward_euler());
   enthFD.set_no_solid_acceleration(false);
   enthFD.set_flux_accuracy_order(AccuracyOrder::First());
-  //enthFD.set_flux_accuracy_order(AccuracyOrder::Second());
-  //enthFD.convection_set(ConvScheme::central());
   PhaseChange4 pc(mdot, mflx, q, g , f , uvw, cht,
                   time, &mixed);
-  //pc.set_accuracy_order(AccuracyOrder::SecondUpwind());
   pc.set_accuracy_order(AccuracyOrder::FourthUpwind());
+  //pc.set_accuracy_order(AccuracyOrder::Second());
   pc.set_unconditional_extrapolation(false);
   pc.set_discard_points_near_interface(false);
 
   boil::plot->plot(uvw, c, tpr, mdot, "uvw-c-tpr-mdot", 0);
 
-  conc.new_time_step();
   /*------------+
   |  time loop  |
   +------------*/
@@ -319,14 +311,16 @@ int main(int argc, char * argv[]) {
       |  phase change  |
       +---------------*/
       pc.update();
+
+      ns.vol_phase_change(&f);
       real massflux_heat = pc.get_smdot();
       massflux_heat /= conc.topo->get_totarea();
       boil::oout<<"mflux= "<<time.current_time()<<" "
                            <<massflux_heat<<" "
                            <<boil::endl;
 
-      ns.vol_phase_change(&f);
 
+#if 0
       /* essential for moving front */
       ns.discretize();
       pr.discretize();
@@ -338,6 +332,10 @@ int main(int argc, char * argv[]) {
       } else {
         ns.new_time_step(&f);
       }
+
+      for_m(m)
+        for_avmijk(xyz,m,i,j,k)
+          xyz[m][i][j][k]=0.0;
 
       ns.grad(press);
       ns.solve(ResRat(1e-14));
@@ -351,20 +349,43 @@ int main(int argc, char * argv[]) {
                          multigrid_mi,
                          multigrid_mstale))
           OMS(converged);
+
       p.exchange();
       ns.project(p);
       press += p;
       press.exchange();
- 
+#else
+      Comp m = Comp::u();
+      real xpos = conc.topo->get_xmaxft();
+      for_vmijk(uvw,m,i,j,k) {
+        if(uvw.xc(m,i)>xpos) {
+          uvw[m][i][j][k] = massflux_heat*(1./rhov-1./rhol);
+        } else {
+          uvw[m][i][j][k] = 0.0;
+        }
+      }
+      uvw.bnd_update_nooutlet();
+      ns.outlet();
+      uvw.exchange_all();
+      for_avmijk(uvw,m,i,j,k) {
+        uvw_1[m][i][j][k] = massflux_heat*(1./rhov-1./rhol);
+        uvw_2[m][i][j][k] = 0.0;
+      }
+#endif
+
       /*---------------------------+
       |  solve transport equation  |
       +---------------------------*/
-      conc.advance_with_extrapolation(conc.topo->vfold,
-                                      true,ResTol(1e-7),uvw,f,
-                                      &liquid,&uvw_1,&vapor,&uvw_2);
+#ifndef USE_VOF
+      conc.advance();
+#else
+      //conc.advance_with_extrapolation(conc.topo->vfold,true,ResTol(1e-7),uvw,
+      //                                &liquid,&uvw_1,&vapor,&uvw_2);
+      conc.advance(conc.topo->vfold);
+#endif
 
 #ifndef USE_VOF
-      step=c;
+      step = c;
       pc.modify_vel(uvw,c,conc.topo->vfold);
 #endif
 
@@ -375,13 +396,12 @@ int main(int argc, char * argv[]) {
         tpr = tprold;
       enthFD.discretize();
       enthFD.new_time_step();
-      enthFD.solve(ResRat(1e-14),"enthFD");
+      enthFD.solve(ResRat(1e-8),"enthFD");
     }
-
-    ns.cfl_max();
 
     conc.front_minmax();
     conc.totalvol();
+    time.control_dt(ns.cfl_max(),cfl_limit,dt);
 
     for_vijk(tpr,i,j,k) {
       if(conc.topo->interface(i,j,k)) {
@@ -392,6 +412,11 @@ int main(int argc, char * argv[]) {
 
     if(time.current_step() % (nint)==0 ||time.current_step()==1) {
       boil::plot->plot(uvw,c,tpr,mdot,"uvw-c-tpr-mdot",time.current_step());
+    }
+
+    if(conc.topo->get_xmaxft()>5.45e-3) {
+      boil::plot->plot(uvw,c,tpr,mdot,"uvw-c-tpr-mdot",time.current_step());
+      break;
     }
   }
 
