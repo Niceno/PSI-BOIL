@@ -54,7 +54,7 @@
   MaxIter multigrid_mm_smooth1 = MaxIter(35);
   MaxIter multigrid_mm_smooth2 = MaxIter(40);
   MaxIter multigrid_mm_solve = MaxIter(110);
-  MaxIter multigrid_mm_stale1 = MaxIter(10);
+  MaxIter multigrid_mm_stale1 = MaxIter(15);
   MaxIter multigrid_mm_stale2 = MaxIter(-1);
   std::array<MaxIter,3> multigrid_mi = {multigrid_mm_smooth1,multigrid_mm_smooth2,multigrid_mm_solve};
   std::array<MaxIter,3> multigrid_mstale = {multigrid_mm_stale1,multigrid_mm_stale1,multigrid_mm_stale2};

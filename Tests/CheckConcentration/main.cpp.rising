@@ -66,11 +66,11 @@ int main(int argc, char ** argv) {
   const real t_per_plot = 0.01;
 
   /* dt settings */
-  const real surftens_dt_coef = 10.;
+  const real surftens_dt_coef = 0.126;
   const real initdtcoef = 1e-4;
 
   /* cfl limit */
-  const real cfl_limit = 0.05;
+  const real cfl_limit = 0.1;//0.15;//0.05;
 
 /* ------------ optional simulation settings */
 
@@ -81,7 +81,8 @@ int main(int argc, char ** argv) {
   const int multigrid_min_cycles = 1;
   const int multigrid_max_cycles = 20;
 
-  ResTol rt = ResTol(1e-7);
+  ResTol rt = ResTol(-1.);
+  ResRat rr = ResRat(1e-5);
 
   MaxIter multigrid_mm_smooth1 = MaxIter(35);
   MaxIter multigrid_mm_smooth2 = MaxIter(40);
@@ -99,7 +100,7 @@ int main(int argc, char ** argv) {
 
   const bool use_fs_interp = false;
   const bool store_pressure_extrap = true;
-  const int niter_pressure_extrap = 3000;
+  const int niter_pressure_extrap = 8000;
 
   /* enthalpy fd */
   const bool no_solid_acceleration = true;
@@ -410,8 +411,8 @@ int main(int argc, char ** argv) {
   |  time-integration  |
   +-------------------*/
   const real dt = surftens_dt_coef
-                * pow(gas.rho()->value()*pow(dxmin,3.0)
-                / (2.0*boil::pi*mixed.sigma()->value()),0.5);
+                * pow(std::max(gas.rho()->value(),liquid.rho()->value())*pow(dxmin,3.0)
+                / mixed.sigma()->value(),0.5);
 
   boil::oout<<"main:dxmin= "<<dxmin<<" "<<boil::cart.iam()<<" "<<dt<<"\n";
   boil::oout<<"main:nparams= "<<t_per_plot<<" "<<n_per_backup<<"\n";
@@ -455,6 +456,7 @@ int main(int argc, char ** argv) {
   conc.set_wall_curv_method(wall_curv_method);
   conc.set_use_interp(use_fs_interp);
   conc.set_pressure_extrapolation_parameters(store_pressure_extrap,niter_pressure_extrap);
+  //conc.set_advection_method(AdvectionMethod::ReconstructedSplit());
 
   /* enthalpy equation */
 #ifndef VARIABLE
@@ -694,7 +696,7 @@ int main(int argc, char ** argv) {
     ns.solve(ResRat(1e-14));
 
     p = 0.;
-    if(multigrid.cycle(Cycle::Z(),Cycle::F(),rt,ResRat(-1.),multigrid_mi,multigrid_mstale)) OMS(converged);
+    if(multigrid.cycle(Cycle::Z(),Cycle::F(),rt,rr,multigrid_mi,multigrid_mstale)) OMS(converged);
     p.exchange();
     ns.project(p);
     press += p;

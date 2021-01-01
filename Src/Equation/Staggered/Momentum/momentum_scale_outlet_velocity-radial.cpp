@@ -68,6 +68,7 @@ void Momentum::scale_outlet_velocity(const real ubo, const real ratio) {
           /* imin */
           if( m == Comp::u() && d == Dir::imin() ){
             for_vjk(u.bc(m).at(b),j,k){
+              if( dom->ibody().off(si(m),j,k)) continue;
               real xx = u.xc(m,si(m)-1);
               real yy = u.yc(m,j);
               real zz = u.zc(m,k);
@@ -98,6 +99,7 @@ void Momentum::scale_outlet_velocity(const real ubo, const real ratio) {
           /* imax */
           if( m == Comp::u() && d == Dir::imax() ){
             for_vjk(u.bc(m).at(b),j,k){
+              if( dom->ibody().off(ei(m),j,k)) continue;
               real xx = u.xc(m,ei(m)+1);
               real yy = u.yc(m,j);
               real zz = u.zc(m,k);
@@ -128,6 +130,7 @@ void Momentum::scale_outlet_velocity(const real ubo, const real ratio) {
           /* jmin */
           if( m == Comp::v() && d == Dir::jmin() ){
             for_vik(u.bc(m).at(b),i,k){
+              if( dom->ibody().off(i,sj(m),k)) continue;
               real xx = u.xc(m,i);
               real yy = u.yc(m,sj(m)-1);
               real zz = u.zc(m,k);
@@ -159,6 +162,7 @@ void Momentum::scale_outlet_velocity(const real ubo, const real ratio) {
           /* jmax */
           if( m == Comp::v() && d == Dir::jmax() ){
             for_vik(u.bc(m).at(b),i,k){
+              if( dom->ibody().off(i,ej(m),k)) continue;
               real xx = u.xc(m,i);
               real yy = u.yc(m,ej(m)+1);
               real zz = u.zc(m,k);
@@ -188,6 +192,7 @@ void Momentum::scale_outlet_velocity(const real ubo, const real ratio) {
           /* kmin */
           if( m == Comp::w() && d == Dir::kmin() ){
             for_vij(u.bc(m).at(b),i,j){
+              if( dom->ibody().off(i,j,sk(m))) continue;
               real xx = u.xc(m,i);
               real yy = u.yc(m,j);
               real zz = u.zc(m,sk(m)-1);
@@ -220,6 +225,7 @@ void Momentum::scale_outlet_velocity(const real ubo, const real ratio) {
           /* kmax */
           if( m == Comp::w() && d == Dir::kmax() ){
             for_vij(u.bc(m).at(b),i,j){
+              if( dom->ibody().off(i,j,ek(m))) continue;
               real xx = u.xc(m,i);
               real yy = u.yc(m,j);
               real zz = u.zc(m,ek(m)+1);

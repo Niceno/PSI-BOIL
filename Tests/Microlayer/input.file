@@ -1,11 +1,11 @@
-10 - surftens dt coef [-]
-0.03 - CFL limit [-]
+0.063 - surftens dt coef [-]
+0.02 - CFL limit [-]
 0 - wall superheat [K]
 0 - outlet superheat [K]
 12.55 - nucleation superheat [K]
 425e3 - heat flux [W/m2], will be converted to vol. source
 0.5 - cangle [deg]
-1 - accommodation coefficient [-]
+0.035 - accommodation coefficient [-]
 1 - pressure [atm]
 10 - initradius [um]
 1000 - LZsolid [um]
@@ -20,6 +20,6 @@
 20 - transitional no. cells in sol [.int.]
 20 - transitional no. cells in X [.int.]
 20 - transitional no. cells in Z [.int.]
-4 - domain decomposition factor in X [.int.]
+1 - domain decomposition factor in X [.int.]
 1 - domain decomposition factor in Z [.int.]
 2 - case flag [.int.], indicates initialisation and time loop
