@@ -80,6 +80,7 @@
   const int niter_pressure_extrap = 1000;
 
   /* enthalpy */
+  const ConvScheme cs_enth = ConvScheme::superbee();
   const AccuracyOrder ao_efd_conv = AccuracyOrder::First();//Second();//Third();
   //const AccuracyOrder ao_efd_conv = AccuracyOrder::Third();
   const bool use_wall_resistance = true;

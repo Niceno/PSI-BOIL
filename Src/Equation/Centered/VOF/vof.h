@@ -92,8 +92,8 @@ class VOF : public Centered {
       return;
     }
 
-    void tension(Vector * vec, const Matter matt);
-    void tension(Vector * vec, const Matter matt, const Scalar & scp);
+    void tension(Vector * vec, const Matter & matt);
+    void tension(Vector * vec, const Matter & matt, const Scalar & scp);
     real totalvol(real * vaps = NULL);
     void front_minmax();
     void front_minmax( Range<real> xr

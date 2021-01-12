@@ -1,9 +1,7 @@
   /*-------------------+
   |  time-integration  |
   +-------------------*/
-  real dt = surftens_dt_coef*pow((vapor.rho()->value()+liquid.rho()->value())
-                                 *pow(dxmin,3.0)
-                                 /mixed.sigma()->value(),0.5);
+  real dt = Topology::capillary_ts(mixed,dxmin,surftens_dt_coef);
   if(case_flag==0) {
     dt = 10.*dxmin;
   }
@@ -85,6 +83,7 @@
                           solid_ptr);
 
   enthFD.convection_set(TimeScheme::forward_euler());
+  enthFD.convection_set(cs_enth);
   enthFD.diffusion_set(TimeScheme::backward_euler());
   enthFD.set_flux_accuracy_order(ao_efd_conv);
 

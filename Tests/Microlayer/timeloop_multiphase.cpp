@@ -82,6 +82,18 @@
       |  phase change  |
       +---------------*/
       pc.update();
+
+      /* initial averaging */
+      if(conc.topo->get_xmaxft()<100e-6) {
+        real massflow_heat = pc.get_smdot();
+        real massflux_heat = massflow_heat/conc.topo->get_totarea();
+
+        mflx = massflux_heat;
+        mflx.bnd_update();
+        mflx.exchange();
+        pc.finalize();
+      }
+
       ns.vol_phase_change(&f);
 
       /*--------------------------+
@@ -161,7 +173,11 @@
                       Range<real>(-LX0,LX0),
                       Range<real>(0.  ,LZ1));
 
+    real cap_ts = conc.topo->capillary_ts(mixed,uvw_1,uvw_2,surftens_dt_coef);
     time.control_dt(ns.cfl_max(),cfl_limit,dt);
+    boil::oout<<"cap_ts= "<<time.current_time()<<" "
+              <<cap_ts<<" "<<time.dt()<<boil::endl;
+    time.control_dt(time.dt(),cap_ts,dt);
 
     /*---------------------+
     |  stopping criterion  |

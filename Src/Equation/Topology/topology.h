@@ -3,6 +3,7 @@
 
 #include "../../Parallel/mpi_macros.h"
 #include "../../Global/global_realistic.h"
+#include "../../Matter/matter.h"
 #include "../../Field/Scalar/scalar.h"
 #include "../../Field/ScalarInt/scalarint.h"
 #include "../../Field/Vector/vector.h"
@@ -49,8 +50,8 @@ class Topology {
     }
 
     /* capillary time step, coef is approx 1/sqrt(2pi) by default */
-    real capillary_ts(const Matter & mixed,
-                      const real coef = 0.3989) const;
+    static real capillary_ts(const Matter & mixed, const real dx,
+                             const real coef = 0.3989);
     real capillary_ts(const Matter & mixed, const Vector & vel,
                       const real coef = 0.3989) const;
     real capillary_ts(const Matter & mixed, 
@@ -268,5 +269,7 @@ class Topology {
     
     ScalarInt stmp;
     Scalar delta, stmp2;
+
+    real dxmin;
 };
 #endif

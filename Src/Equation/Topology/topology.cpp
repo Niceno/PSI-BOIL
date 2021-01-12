@@ -32,6 +32,7 @@ Topology::Topology(Scalar * VF, Scalar * CLR,
     fsold(m) = (*FS)(m).shape();
   }
 
+  dxmin = domain()->dxyz_min();
   mmax_ext = 100;
   tol_ext = 1e-7; 
   close_to_cc = 1.0e-2;
