@@ -58,6 +58,9 @@ int main(int argc, char ** argv) {
   /* number of plot points */
   const int n_plot = 25;
 
+  /* in-time step iteration */
+  const int mSimple = 2;
+
   /* dt settings */
   const real surftens_dt_coef = 10.;
 
@@ -153,7 +156,7 @@ int main(int argc, char ** argv) {
   /*------------------+
   |  define unknowns  |
   +------------------*/
-  Vector uvw(d), xyz(d);           // vel
+  Vector uvw(d), uvw_old(d),xyz(d);// vel
   Vector uvw_1(d), uvw_2(d);       // phasic vel
   Scalar p  (d), f  (d), press(d); // pressure
   Scalar c  (d), g  (d), kappa(d); // concentration
@@ -198,6 +201,7 @@ int main(int argc, char ** argv) {
 #endif
     uvw_1(m)=uvw(m).shape();
     uvw_2(m)=uvw(m).shape();
+    uvw_old(m)=uvw(m).shape();
   }
 
 #if CASE == 1
@@ -323,7 +327,10 @@ int main(int argc, char ** argv) {
   +-------------------*/
   /* momentum equation */
   Momentum ns( uvw, xyz, time, solver, &mixed);
-  ns.convection_set(TimeScheme::forward_euler());
+  if(mSimple>1)
+    ns.convection_set(TimeScheme::backward_euler()); //ns.convection is mandatory
+  else
+    ns.convection_set(TimeScheme::forward_euler());
   ns.diffusion_set(TimeScheme::backward_euler());
 
   /* pressure solver */
@@ -361,6 +368,7 @@ int main(int argc, char ** argv) {
 #endif
   enthFD.convection_set(TimeScheme::forward_euler());
   enthFD.diffusion_set(TimeScheme::backward_euler());
+  //enthFD.convection_set(ConvScheme::minmod());
   enthFD.set_flux_accuracy_order(AccuracyOrder::First());
 
   enthFD.set_no_solid_acceleration(no_solid_acceleration);
@@ -482,79 +490,87 @@ int main(int argc, char ** argv) {
   exit(0);
 #endif
 
+  MaxIter multigrid_mm_smooth1 = MaxIter(70);
+  MaxIter multigrid_mm_smooth2 = MaxIter(70);
+  MaxIter multigrid_mm_solve = MaxIter(110);
+  MaxIter multigrid_mm_stale1 = MaxIter(-1);
+  MaxIter multigrid_mm_stale2 = MaxIter(-1);
+  std::array<MaxIter,3> multigrid_mi = {multigrid_mm_smooth1,multigrid_mm_smooth2,multigrid_mm_solve};
+  std::array<MaxIter,3> multigrid_mstale = {multigrid_mm_stale1,multigrid_mm_stale1,multigrid_mm_stale2};
+
   /*------------+
   |  time loop  |
   +------------*/
   for(time.start(); time.end(); time.increase()) {
 
-    /*---------------+
-    |  phase change  |
-    +---------------*/
-    pc.update();
-    ns.vol_phase_change(&f);
-
-    /* reset body force */
-    for_m(m)
-      for_avmijk(xyz,m,i,j,k)
-        xyz[m][i][j][k]=0.0;
-
-    /* surface tension */
-    conc.tension(&xyz, mixed,conc.color());
-
-    /*--------------------------+
-    |  solve momentum equation  |
-    +--------------------------*/
-    /* essential for moving front */
-    ns.discretize();
-    pr.discretize();
-    pr.coarsen();
-
-    /* momentum */
-    ns.new_time_step(&f);
-
-    ns.grad(press);
-    ns.solve(ResRat(1e-14));
-
-    p = 0.0;
-    if (multigrid.fcycle(ResTol(1e-6))) OMS(converged);
-    //pr.solve(ResRat(1e-6));
-    p.exchange();
-    ns.project(p);
-    press += p;
-
-    /* shift pressure */
-    real pmin=1.0e+300;
-    for_vijk(press,i,j,k){
-      if(d.ibody().on(i,j,k)){
-        if(pmin>press[i][j][k]) pmin=press[i][j][k];
-      }
-    }
-    boil::cart.min_real(&pmin);
-
-    for_vijk(press,i,j,k){
-      if(d.ibody().on(i,j,k)){
-        press[i][j][k] -= pmin;
-      } else {
-        press[i][j][k] = 0.0;
-      }
-    }
-    press.bnd_update();
-    press.exchange_all();
-
-    ns.cfl_max();
-
-    /*---------------------------+
-    |  solve transport equation  |
-    +---------------------------*/
     conc.new_time_step();
-    conc.advance_with_extrapolation(true,ResTol(1e-7),uvw,f,
-                                    &liquid,&uvw_1,&vapor,&uvw_2);
+
+    /* store velocity & temperature */
+    if(mSimple>1) {
+      for_m(m)
+        uvw_old(m) = uvw(m);
+      tprold = tpr;
+    }
+
+    /* inner loop */
+    for(int mloop=0; mloop<mSimple; mloop++) {
+      /*---------------+
+      |  phase change  |
+      +---------------*/
+      pc.update();
+      ns.vol_phase_change(&f);
+
+      /* reset body force */
+      for_m(m)
+        for_avmijk(xyz,m,i,j,k)
+          xyz[m][i][j][k]=0.0;
+
+      /* surface tension */
+      conc.tension(&xyz, mixed,conc.color());
+
+      /*--------------------------+
+      |  solve momentum equation  |
+      +--------------------------*/
+      /* essential for moving front */
+      ns.discretize();
+      pr.discretize();
+      pr.coarsen();
+
+      /* momentum */
+      if(mSimple>1) {
+        ns.new_time_step(uvw_old,&f);
+        ns.convection();
+      } else {
+        ns.new_time_step(&f);
+      }
+
+      ns.grad(press);
+      ns.solve(ResRat(1e-14));
+
+      p = 0.0;
+      //if (multigrid.wcycle(ResTol(1e-6))) OMS(converged);
+      if(multigrid.cycle(Cycle::Z(),
+                         Cycle::F(),
+                         ResTol(-1.),
+                         ResRat(1e-6),
+                         multigrid_mi,
+                         multigrid_mstale))
+          OMS(converged);
+      //pr.solve(ResRat(1e-6));
+      p.exchange();
+      ns.project(p);
+      press += p;
+
+      /*---------------------------+
+      |  solve transport equation  |
+      +---------------------------*/
+      conc.advance_with_extrapolation(conc.topo->vfold,true,ResTol(1e-9),uvw,
+                                      &liquid,&uvw_1,&vapor,&uvw_2);
 #if CASE == 3
   #ifdef USE_MG
-    conc.heaviside()->marker_gradient(*conc.topo->adens);
+      conc.heaviside()->marker_gradient(*conc.topo->adens);
   #endif
 #endif
-    conc.totalvol();
 #if 0
     real sum = 0.0;
     int count = 0;
@@ -568,13 +584,15 @@ int main(int argc, char ** argv) {
     boil::oout<<"Evaluate_adens "<<count<<" "<<sum<<" "<<4.*boil::pi*radius*radius/8.<<boil::endl;
 #endif
 
-    /*------------------------+
-    |  solve energy equation  |
-    +------------------------*/
+      /*------------------------+
+      |  solve energy equation  |
+      +------------------------*/
 #if 1
-    enthFD.discretize();
-    enthFD.new_time_step();
-    enthFD.solve(ResRat(1e-16),"enthFD");
+      if(mloop>0)
+        tpr = tprold;
+      enthFD.discretize();
+      enthFD.new_time_step();
+      enthFD.solve(ResRat(1e-16),"enthFD");
 #else
     tprold = tpr;
     enthFD.discretize();
@@ -599,6 +617,30 @@ int main(int argc, char ** argv) {
       }
     }
 #endif
+    }
+
+    conc.totalvol();
+
+    /* shift pressure */
+    real pmin=1.0e+300;
+    for_vijk(press,i,j,k){
+      if(d.ibody().on(i,j,k)){
+        if(pmin>press[i][j][k]) pmin=press[i][j][k];
+      }
+    }
+    boil::cart.min_real(&pmin);
+
+    for_vijk(press,i,j,k){
+      if(d.ibody().on(i,j,k)){
+        press[i][j][k] -= pmin;
+      } else {
+        press[i][j][k] = 0.0;
+      }
+    }
+    press.bnd_update();
+    press.exchange_all();
+
+    ns.cfl_max();
 
     /*-------------+
     |  dt control  |

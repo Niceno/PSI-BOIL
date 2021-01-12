@@ -10,9 +10,9 @@ int main(int argc, char * argv[]) {
 
   boil::timer.start();
 
-  if(argc<3) {
-    boil::oout<<"Two command line arguments required!"<<"\n";
-    boil::oout<<"./Boil wmin level (wmin::wall time in minute)"<<"\n";
+  if(argc<4) {
+    boil::oout<<"Three command line arguments required!"<<"\n";
+    boil::oout<<"./Boil wmin level cfl (wmin::wall time in minute)"<<"\n";
     exit(0);
   }
   int wmin=atoi(argv[1]);
@@ -21,22 +21,24 @@ int main(int argc, char * argv[]) {
   const int Level=atoi(argv[2]);
   boil::oout<<"level= "<<Level<<"\n";
 
+  const real cfl_limit=atof(argv[3]);
+  boil::oout<<"cfllim= "<<cfl_limit<<"\n";
+
   /* computed parameters */
-  const int NX = 2*40*Level;
+  const int NX = 100*Level;
   const int mSimple = 1;
 
   /* dt settings */
   const real initdtcoef = 1./10.;
-  const real cfl_limit = 1e-1;//5e-3;
 
   /* domain dimensions (given by problem) */
-  const real LX = 8.0e-3;
+  const real LX = 10.0e-3;
   const real DX = LX/real(NX);
 
   const real betasol = 0.7677282527146145;
   const real t0 = 0.1;
   const real xint = 0.002205323668813564;
-  const real x0 = xint-10.01*DX*Level;
+  const real x0 = 0.0;
 
   const real Tout=5.;
   const real Tsat=0.;
@@ -73,7 +75,8 @@ int main(int argc, char * argv[]) {
   |  linear solver  |
   +----------------*/
   //Krylov * solver = new CG(d, Prec::ic2());
-  Linear * solver = new Jacobi(d);
+  //Linear * solver = new Jacobi(d);
+  Krylov * solver = new BiCGS(d, Prec::di());
 
   MaxIter multigrid_mm_smooth1 = MaxIter(110);
   MaxIter multigrid_mm_smooth2 = MaxIter(110);

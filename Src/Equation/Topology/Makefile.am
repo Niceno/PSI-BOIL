@@ -1,6 +1,7 @@
 noinst_LIBRARIES = libTopology.a
 libTopology_a_SOURCES = topology.h                    \
                         topology.cpp                  \
+                        topology_capillary_ts.cpp     \
 			topology_first_difference.cpp \
                         topology_distance.cpp         \
                         topology_distance_old.cpp     \

@@ -48,6 +48,15 @@ class Topology {
       boil::oout<<"Topology::close_to_cc: "<<close_to_cc<<"\n";
     }
 
+    /* capillary time step, coef is approx 1/sqrt(2pi) by default */
+    real capillary_ts(const Matter & mixed,
+                      const real coef = 0.3989) const;
+    real capillary_ts(const Matter & mixed, const Vector & vel,
+                      const real coef = 0.3989) const;
+    real capillary_ts(const Matter & mixed, 
+                      const Vector & vel1, const Vector & vel2,
+                      const real coef = 0.3989) const;
+
     /* interface boolean */
     bool interface(const Sign dir, const Comp m,
                    const int i, const int j, const int k) const;

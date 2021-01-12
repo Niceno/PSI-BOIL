@@ -7,9 +7,9 @@ int main(int argc, char * argv[]) {
 
   boil::timer.start();
 
-  if(argc<3) {
-    boil::oout<<"Two command line arguments required!"<<"\n";
-    boil::oout<<"./Boil wmin level (wmin::wall time in minute)"<<"\n";
+  if(argc<4) {
+    boil::oout<<"Three command line arguments required!"<<"\n";
+    boil::oout<<"./Boil wmin level cfl (wmin::wall time in minute)"<<"\n";
     exit(0);
   }
   int wmin=atoi(argv[1]);
@@ -18,13 +18,15 @@ int main(int argc, char * argv[]) {
   const int Level=atoi(argv[2]);
   boil::oout<<"level= "<<Level<<"\n";
 
+  const real cfl_limit=atof(argv[3]);
+  boil::oout<<"cfllim= "<<cfl_limit<<"\n";
+
   /* computed parameters */
   const int NX = 50*Level;
   const int mSimple = 1;
 
   /* dt settings */
   const real initdtcoef = 1./10.;
-  const real cfl_limit = 1e-1;//5e-3;
 
   /* domain dimensions (given by problem) */
   const real LX = 0.001; //Hardt
@@ -33,7 +35,7 @@ int main(int argc, char * argv[]) {
   const real betasol = 0.06694560396502779;
   const real t0 = 30e-3;
   const real xint = 105.32888985625091e-6;
-  const real x0 = xint-5.01*DX*Level;
+  const real x0 = 0.0;//xint-5.01*DX*Level;
 
   const real Twall=110;
   const real Tsat=100;
