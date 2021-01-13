@@ -48,6 +48,7 @@ int main(int argc, char ** argv) {
     boil::oout<<"- transitional no. cells in Z [.int.]\n";
     boil::oout<<"- domain decomposition factor in X [.int.]\n";
     boil::oout<<"- domain decomposition factor in Z [.int.]\n";
+    boil::oout<<"- simple loop count [.int.]\n";
     boil::oout<<"- case flag [.int.], indicates initialisation and time loop\n";
 
     exit(0);
@@ -80,6 +81,7 @@ int main(int argc, char ** argv) {
   int NZsol(0), NXtot(0), NZtot(0);
   int NZsol_trans(0), NX_trans(0), NZ_trans(0);
   int factor_x(0), factor_z(0);
+  int mSimple(0);
   int case_flag(0);
 
   std::vector<real*> readreal({&surftens_dt_coef,
@@ -108,6 +110,7 @@ int main(int argc, char ** argv) {
                              &NZ_trans,
                              &factor_x,
                              &factor_z,
+                             &mSimple,
                              &case_flag
                             });
 

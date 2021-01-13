@@ -1,7 +1,7 @@
   /*-------------------+
   |  time-integration  |
   +-------------------*/
-  real dt = Topology::capillary_ts(mixed,dxmin,surftens_dt_coef);
+  real dt = surftens_dt_coef*Topology::capillary_ts(mixed,dxmin);
   if(case_flag==0) {
     dt = 10.*dxmin;
   }

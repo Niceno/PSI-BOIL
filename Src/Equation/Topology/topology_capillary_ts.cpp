@@ -1,5 +1,11 @@
 #include "topology.h"
 
+real Topology::wave_vel(const Matter & mixed,
+                        const real dx, const real coef) const {
+  return sqrt(mixed.sigma()->value()
+            /((mixed.rho(1)+mixed.rho(0))*dx))/coef;
+}
+
 /* static version, also a static member */
 real Topology::capillary_ts(const Matter & mixed,
                             const real dx, const real coef)  {
@@ -15,8 +21,9 @@ real Topology::capillary_ts(const Matter & mixed, const Vector & vel,
 *         Denner & van Wachem,JCP,285(2015),24-40
 *         Results: ts_limit
 *******************************************************************************/
-
-  real utmax(0.);
+  
+  //real inv_stat = 1./capillary_ts(mixed,dxmin,coef);
+  real umax(0.);
   for_vijk(vfold,i,j,k) {
     if(interface(i,j,k)) {
       real uval = 0.5*(vel[Comp::u()][i][j][k]+vel[Comp::u()][i+1][j][k]);
@@ -26,14 +33,32 @@ real Topology::capillary_ts(const Matter & mixed, const Vector & vel,
       real usq = uval*uval+vval*vval+wval*wval;
       real ut = std::max(usq-un*un,0.0); /* this should be guaranteed... */
       ut = sqrt(ut);
-      ut = ut/std::min(vfold.dxc(i),std::min(vfold.dyc(j),vfold.dzc(k)));
-      if(ut>utmax)
-        utmax = ut;
+      real dxloc = std::min(vfold.dxc(i),std::min(vfold.dyc(j),vfold.dzc(k)));
+#if 1
+      ut = (ut+wave_vel(mixed,dxloc))/dxloc;
+      if(ut>umax)
+        umax = ut;
+#else
+  #if 0
+      ut = ut/dxloc;
+      un = un/dxloc;
+      ut += inv_stat;
+      usq = ut*ut + un*un;
+      usq = sqrt(usq);
+  #else
+      ut += wave_vel(mixed,dxloc);
+      usq = ut*ut + un*un;
+      usq = sqrt(usq)/dxloc;
+  #endif
+      if(usq>umax)
+        umax = usq;
+#endif 
     }
   }
-  boil::cart.max_real(&utmax);
+  boil::cart.max_real(&umax);
 
-  return 1./(1./capillary_ts(mixed,dxmin,coef)+utmax);
+  //return 1./(inv_stat+umax);
+  return 1./umax;
 }
 
 /* phasic velocities */
@@ -42,7 +67,8 @@ real Topology::capillary_ts(const Matter & mixed, const Vector & vel1,
                             const Vector & vel2,  const real coef) const {
 /******************************************************************************/
 
-  real utmax(0.);
+  //real inv_stat = 1./capillary_ts(mixed,dxmin,coef);
+  real umax(0.);
   for_vijk(vfold,i,j,k) {
     if(interface(i,j,k)) {
       real uval1 = 0.5*(vel1[Comp::u()][i][j][k]+vel1[Comp::u()][i+1][j][k]);
@@ -57,14 +83,41 @@ real Topology::capillary_ts(const Matter & mixed, const Vector & vel1,
       real usq2 = uval2*uval2+vval2*vval2+wval2*wval2;
       real ut1 = std::max(usq1-un1*un1,0.0); /* this should be guaranteed... */
       real ut2 = std::max(usq2-un2*un2,0.0); 
-      real ut = sqrt(std::max(ut1,ut2));
-      ut = ut/std::min(vfold.dxc(i),std::min(vfold.dyc(j),vfold.dzc(k)));
-      if(ut>utmax)
-        utmax = ut;
+      ut1 = sqrt(ut1);
+      ut2 = sqrt(ut2);
+      real dxloc = std::min(vfold.dxc(i),std::min(vfold.dyc(j),vfold.dzc(k)));
+#if 1
+      real ut = std::max(ut1,ut2); 
+      ut = (ut+wave_vel(mixed,dxloc))/dxloc;
+      if(ut>umax)
+        umax = ut;
+#else
+  #if 0
+      ut1 = ut1/dxloc;
+      un1 = un1/dxloc;
+      ut2 = ut2/dxloc;
+      un2 = un2/dxloc;
+      ut1 += inv_stat;
+      ut2 += inv_stat;
+      usq1 = ut1*ut1 + un1*un1;
+      usq2 = ut2*ut2 + un2*un2;
+  #else
+      ut1 += wave_vel(mixed,dxloc);
+      ut2 += wave_vel(mixed,dxloc);
+      usq1 = ut1*ut1 + un1*un1;
+      usq2 = ut2*ut2 + un2*un2;
+      usq1 = sqrt(usq1)/dxloc;
+      usq2 = sqrt(usq2)/dxloc;
+  #endif
+      real usq = std::max(usq1,usq2);
+      if(usq>umax)
+        umax = usq;
+#endif
     }
   }
-  boil::cart.max_real(&utmax);
+  boil::cart.max_real(&umax);
 
-  return 1./(1./capillary_ts(mixed,dxmin,coef)+utmax);
+  //return 1./(inv_stat+umax);
+  return 1./umax;
 }
 

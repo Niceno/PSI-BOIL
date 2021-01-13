@@ -173,11 +173,13 @@
                       Range<real>(-LX0,LX0),
                       Range<real>(0.  ,LZ1));
 
-    real cap_ts = conc.topo->capillary_ts(mixed,uvw_1,uvw_2,surftens_dt_coef);
     time.control_dt(ns.cfl_max(),cfl_limit,dt);
+#if 0
+    real cap_ts = surftens_dt_coef*conc.topo->capillary_ts(mixed,uvw_1,uvw_2);
     boil::oout<<"cap_ts= "<<time.current_time()<<" "
               <<cap_ts<<" "<<time.dt()<<boil::endl;
     time.control_dt(time.dt(),cap_ts,dt);
+#endif
 
     /*---------------------+
     |  stopping criterion  |

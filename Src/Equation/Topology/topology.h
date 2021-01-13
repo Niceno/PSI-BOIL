@@ -52,6 +52,8 @@ class Topology {
     /* capillary time step, coef is approx 1/sqrt(2pi) by default */
     static real capillary_ts(const Matter & mixed, const real dx,
                              const real coef = 0.3989);
+    real wave_vel(const Matter & mixed,
+                  const real dx, const real coef = 0.3989) const;
     real capillary_ts(const Matter & mixed, const Vector & vel,
                       const real coef = 0.3989) const;
     real capillary_ts(const Matter & mixed, 
