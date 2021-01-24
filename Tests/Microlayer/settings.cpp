@@ -48,10 +48,10 @@
   const int multigrid_min_cycles = 1;
   const int multigrid_max_cycles = 20;
 
-  MaxIter multigrid_mm_smooth1 = MaxIter(45);
-  MaxIter multigrid_mm_smooth2 = MaxIter(50);
-  MaxIter multigrid_mm_solve = MaxIter(120);
-  MaxIter multigrid_mm_stale1 = MaxIter(20);
+  MaxIter multigrid_mm_smooth1 = MaxIter(35);
+  MaxIter multigrid_mm_smooth2 = MaxIter(40);
+  MaxIter multigrid_mm_solve = MaxIter(110);
+  MaxIter multigrid_mm_stale1 = MaxIter(15);
   MaxIter multigrid_mm_stale2 = MaxIter(-1);
   std::array<MaxIter,3> multigrid_mi = {multigrid_mm_smooth1,multigrid_mm_smooth2,multigrid_mm_solve};
   std::array<MaxIter,3> multigrid_mstale = {multigrid_mm_stale1,multigrid_mm_stale1,multigrid_mm_stale2};
@@ -77,6 +77,7 @@
   const int niter_pressure_extrap = 1000;
 
   /* enthalpy */
+  //const ConvScheme cs_enth = ConvScheme::minmod();//superbee();
   const ConvScheme cs_enth = ConvScheme::superbee();
   const AccuracyOrder ao_efd_conv = AccuracyOrder::First();//Second();//Third();
   //const AccuracyOrder ao_efd_conv = AccuracyOrder::Third();

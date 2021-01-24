@@ -247,6 +247,7 @@ void Microlayer::update(real & smdot_micro,
         (*mdot)[i][j][k] += mdot_micro;
         smdot_micro += mdot_micro*vol;
 
+#if 0 /* removed due to update-at-walls */
         /* enthalpy clean-up: sink due to microlayer */
         (*tprs)[i+iof][j+jof][k+kof] += -vol*mdot_micro*latent;
         if(in_vapor(i,j,k)) {
@@ -255,6 +256,7 @@ void Microlayer::update(real & smdot_micro,
                               //*(1.0/rhov-1.0/rhol)*mdot_micro*vol;
                               *1.0/rhov*mdot_micro*vol;
         }
+#endif
 
         /* microlayer thickness changes */
         dmicro[i][j][k]=dmicro_new;

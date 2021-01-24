@@ -84,7 +84,7 @@
       pc.update();
 
       /* initial averaging */
-      if(conc.topo->get_xmaxft()<100e-6) {
+      if(conc.topo->get_xmaxft()<150e-6) {
         real massflow_heat = pc.get_smdot();
         real massflux_heat = massflow_heat/conc.topo->get_totarea();
 

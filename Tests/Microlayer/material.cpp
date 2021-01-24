@@ -133,6 +133,15 @@
             (tsat0_K,rhov,Mv,latent,accommodation);
   } 
 
+  /* evaporative capillary number */
+  real nanoscale = 10e-9;
+  real Cae(0.0), thetahock(0.0);
+  if(resistance_liq>0.) {
+    Cae = mul*deltat_nucl/rhol/latent/resistance_liq/sig;
+    thetahock = std::pow(12*Cae*log(0.5*dxmin/nanoscale),0.25);
+  }
+  boil::oout<<"Cae= "<<Cae<<" "<<thetahock<<boil::endl;
+
   /*----------------------+
   |  physical properties  |
   +----------------------*/

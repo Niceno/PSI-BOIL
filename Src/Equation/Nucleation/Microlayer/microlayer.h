@@ -45,6 +45,16 @@ class Microlayer : public Nucleation {
             boil::oout<<"Microlayer:rmax is modified to "<<r<<"\n";};
     inline real get_rmax() const { return rmax;};
 
+    /* heat transfer resistance */
+    inline void set_hresis(const real h) {
+      hresis = h;
+      boil::oout<<"Microlayer::hresis= "<<hresis<<boil::endl;
+      return;
+    }
+    inline real get_hresis() const {
+      return hresis;
+    }
+
     /* heat flux */
     inline real get_hflux_micro(const Dir d) const {return hflux_micro[int(d)];}
     inline real get_hflux_area(const Dir d) const {return area_sum[int(d)];}
@@ -55,6 +65,9 @@ class Microlayer : public Nucleation {
 
     /* initial thickness */
     real d0(const int i, const int j, const int k);
+
+    /* clr & fs */
+    void update_at_walls(Scalar & clr, Vector & fs);
 
   protected:
     void area_effect();
