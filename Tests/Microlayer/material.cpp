@@ -45,9 +45,26 @@
 
   boil::oout<<"properties for FC-72 (atmospheric)"<<boil::endl;
 #elif CASE == 2
-  /* ethanol */
-  boil::oout<<"Underdevelopment. Exiting."<<boil::endl;
-  exit(0);
+  /* ethanol from Carey ISBN 978-1-59169-035-1 */
+  const real tsat0_K = 78.37+273.15;
+  const real Mv = 46.07e-3;
+  const real muv = 10.4e-6;
+  const real rhov = 1.435;
+  const real cpv = 1.83e3*rhov;
+  const real lambdav = 19.9e-3;
+
+  const real mul = 428.7e-6;
+  const real rhol = 757.0;
+  const real cpl = 3.0e3*rhol;
+  const real lambdal = 153.6e-3;
+
+  const real sig = 1.77e-2;
+  const real latent = 963.0e3;
+
+  /* val at 50 degC, from Sun et al. (1988), doi: 10.1080/00319108808078584 */
+  const real betal = 0.001151; /* value at 50 degC, r4in
+
+  boil::oout<<"properties for ethanol (atmospheric)"<<boil::endl;
 #elif CASE == 3
   /* sodium */
   boil::oout<<"Underdevelopment. Exiting."<<boil::endl;
