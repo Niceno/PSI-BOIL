@@ -64,7 +64,7 @@ class ElectPoten : public Centered {
     void update_vel();
 
     // Calculate Lorenz force
-    void ElectPoten::force_lorenz(Vector * v);
+    void force_lorenz(Vector * v);
 
   protected:
      
