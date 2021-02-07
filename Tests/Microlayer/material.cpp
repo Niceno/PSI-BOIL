@@ -62,7 +62,7 @@
   const real latent = 963.0e3;
 
   /* val at 50 degC, from Sun et al. (1988), doi: 10.1080/00319108808078584 */
-  const real betal = 0.001151; /* value at 50 degC, r4in
+  const real betal = 0.001151; 
 
   boil::oout<<"properties for ethanol (atmospheric)"<<boil::endl;
 #elif CASE == 3
@@ -74,25 +74,18 @@
   const real tsat0_K = 400.;
   const real Mv = 40e-3;
 
-  const real rhorat = 100.;
-  const real murat = 100.;
-  const real kpl = 1000.;
-  const real kprat = 1.;
-  const real Prl = 10.;
-  const real Jacoeff = 1.;
-
-  const real rhol = 1000.;
-  const real mul = 1e-3;
-  const real cpl = kpl*rhol;
-  const real lambdal = mul*kpl/Prl;
-
-  const real rhov = rhol/rhorat;
-  const real muv = mul/murat;
-  const real cpv = kpl/kprat*rhov;
+  const real muv = 1e-5;
+  const real rhov = 1.;
+  const real cpv = 2e3*rhov;
   const real lambdav = 1e-2;
 
-  const real latent = rhorat*kpl/Jacoeff;
+  const real mul = 1.25e-4;
+  const real rhol = 1000.0;
+  const real cpl = 4.0e3*rhol;
+  const real lambdal = 5e-2;
+
   const real sig = 1e-2;
+  const real latent = 1e3;
 
   const real betal = 1e-3;
 
@@ -113,7 +106,10 @@
   boil::oout<<"twoprop= "<<tsat0_K<<" "<<sig<<" "<<latent<<boil::endl;
 
   const real Jal = cpl*deltat_nucl/(latent*rhov);
-  boil::oout << "Jal= "<<Jal<<boil::endl;
+  boil::oout << "Jal= "<<Jal<<" "<<Jal*sqrt(alpl)<<boil::endl;
+
+  const real Prl = (mul/rhol)/alpl;
+  boil::oout << "Prl= "<<Prl<<boil::endl;
 
   /* heater */
 #ifndef SAKASHITA
