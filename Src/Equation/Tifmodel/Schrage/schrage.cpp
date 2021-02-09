@@ -37,7 +37,7 @@ real Schrage::calculate_heat_transfer_resistance(const real tr, const real rhov,
                                                  const real mmass,
                                                  const real latent,
                                                  const real accommodation) {
-  const real accomult = 2.*accommodation/(2.-accommodation);
+  const real accomult = accommodation;//2.*accommodation/(2.-accommodation);
   return std::pow(tr,1.5)/accomult/rhov/latent/latent
                          /sqrt(mmass/(2.0*boil::pi*boil::R));
 }
