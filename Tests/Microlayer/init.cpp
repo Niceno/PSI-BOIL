@@ -14,21 +14,22 @@
   std::vector<real*> store_reals = {};
   std::vector<int*>  store_ints  = { &iint };
 
+  const real heater_extent = 1.81e-3;
+  const real outer_factor = 0.;
+
   auto heatfunc = [&](const real x, const real y, const real c, const real v) {
     real h = qsrc*c*v;
     if(case_flag>0)
       return h;
 
-    real ext0 = 4.3e-3;
-    real ext1 = 4.3e-3;
-    real ext_tilde = 0.8e-3;
-    real b0 = 1.;
-    real a0 = -b0/ext0;
-    real q_tilde = a0*ext_tilde+b0;
-    real a1 = q_tilde/(ext_tilde-ext1);
-    real b1 = -a1*ext1;
-
-    h *= std::max(0.,std::min(a0*x+b0,a1*x+b1));
+#if 0
+    if(fabs(x)<=heater_extent&&fabs(y)<=heater_extent) {
+    } else {
+      h *= outer_factor;
+    }
+#else
+    h *= std::max(0.,(4.0e-3-x)/4.0e-3);
+#endif
   
     return h;
   };

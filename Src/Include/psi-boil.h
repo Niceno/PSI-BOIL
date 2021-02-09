@@ -29,7 +29,6 @@
 #include "../Equation/Heaviside/MarchingCubes/marching_cubes.h"
 #include "../Equation/Heaviside/MarchingSquares/MSaxisym/ms_axisym.h"
 #include "../Equation/Heaviside/MarchingSquares/marching_squares.h"
-#include "../Equation/IntegralPC/integralpc.h"
 #include "../Equation/Nucleation/Microlayer/microlayer.h"
 #include "../Equation/Tifmodel/Antoine/antoine.h"
 #include "../Equation/Tifmodel/Clapeyron/clapeyron.h"

@@ -29,13 +29,15 @@
   /* plot every */
   real t_per_plot = 5e-6;
   if(case_flag==0)
-    t_per_plot = 0.1;
+    t_per_plot = 0.025;
 
   /* steps per backup */
   const int n_per_backup = 5000;
 
   /* dt settings */
-  const real initdtcoef = 1./50.;
+  real initdtcoef = 1./50.;
+  if(case_flag==0)
+    initdtcoef = 1./10.;
 
   /* only liquid beyond this (fractional height) */
   const real zmax_mult = 0.9;

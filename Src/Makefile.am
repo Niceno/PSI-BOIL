@@ -32,7 +32,6 @@ SUBDIRS = Equation/Staggered/Momentum                              \
           Equation/Heaviside/MarchingSquares/MSaxisym              \
           Equation/Heaviside/MarchingSquares                       \
           Equation/Heaviside                                       \
-          Equation/IntegralPC                                      \
           Equation/Nucleation/Microlayer                           \
           Equation/Nucleation                                      \
           Equation/Tifmodel/Antoine                                \
@@ -75,7 +74,6 @@ SUBDIRS = Equation/Staggered/Momentum                              \
 
 LDADD = Custom/IF97/libIF97.a                                                 \
         Custom/libCustom.a                                                    \
-        Equation/IntegralPC/libIntegralPC.a                                   \
         Solver/Additive/libAdditive.a                                         \
         Solver/Linear/Gauss/libGauss.a                                        \
         Solver/Linear/Iterative/libIterative.a                                \

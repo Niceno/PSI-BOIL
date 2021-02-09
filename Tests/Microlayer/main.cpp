@@ -40,6 +40,7 @@ int main(int argc, char ** argv) {
     boil::oout<<"- multiplicative length in x [-]\n";
     boil::oout<<"- multiplicative length in z [-]\n";
     boil::oout<<"- max cell aspect ratio [-]\n";
+    boil::oout<<"- free real input [?]\n";
     boil::oout<<"- NZsolid [.int.]\n";
     boil::oout<<"- NXtot [.int.]\n";
     boil::oout<<"- NZtot [.int.]\n";
@@ -78,6 +79,7 @@ int main(int argc, char ** argv) {
   real LZsol(0.), LZheat(0.);
   real LXmult(0.), LZmult(0.), LZsolmult(0.);
   real AR(0.);
+  real freeinp(0.);
   int NZsol(0), NXtot(0), NZtot(0);
   int NZsol_trans(0), NX_trans(0), NZ_trans(0);
   int factor_x(0), factor_z(0);
@@ -99,7 +101,8 @@ int main(int argc, char ** argv) {
                                &LZsolmult,
                                &LXmult,
                                &LZmult,
-                               &AR
+                               &AR,
+                               &freeinp
                               });
 
   std::vector<int*> readint({&NZsol,
