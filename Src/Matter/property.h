@@ -19,8 +19,8 @@
 class Property : public Scalar {
 
   public:
-    Property()                : con(true), cval(0.0) {} 
-    Property(const char * nm) : con(true), cval(0.0) {nam=nm;} 
+    Property()                : con(true), cval(1.0) {} 
+    Property(const char * nm) : con(true), cval(1.0) {nam=nm;} 
 // ne treba: Property(const real & v) : con(true), mix(false), val(v)   {}
 
     real value() const;
