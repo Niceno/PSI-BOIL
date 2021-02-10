@@ -62,7 +62,6 @@ CIPCSL2::CIPCSL2(const Scalar & PHI,
   assert(PHI.domain() == F.domain());
 
   /* set constants */
-  pi=acos(-1.0);
   phimin = 0.0;
   phimax = 1.0;
   phisurf = 0.5*(phimin+phimax);
