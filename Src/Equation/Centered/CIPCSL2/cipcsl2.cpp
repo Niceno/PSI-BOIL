@@ -61,9 +61,8 @@ CIPCSL2::CIPCSL2(const Scalar & PHI,
   }
   assert(PHI.domain() == F.domain());
 
-
   /* set constants */
-  pi = acos(-1.0);
+  pi=acos(-1.0);
   phimin = 0.0;
   phimax = 1.0;
   phisurf = 0.5*(phimin+phimax);
@@ -82,7 +81,7 @@ CIPCSL2::CIPCSL2(const Scalar & PHI,
   nredist=1;
   itsharpen=4;
   ialpcal=0;
-  cangle=90.0/180.0*pi;
+  cangle=90.0/180.0*boil::pi;
   itsmear=10;
   eps_st=1.5;
   sum_outlet=0.0;
