@@ -83,7 +83,8 @@
       +---------------*/
       pc.update();
 
-#if 1
+#ifdef USE_SMOOTHEN_MASS_FLUX
+  #if 0
       /* initial averaging */
       if(conc.topo->get_xmaxft()<150e-6) {
         real massflow_heat = pc.get_smdot();
@@ -94,6 +95,10 @@
         mflx.exchange();
         pc.finalize();
       }
+  #elif 1
+     #include "smoothen_mflx.cpp"
+     pc.finalize();
+  #endif
 #endif
 
       ns.vol_phase_change(&f);

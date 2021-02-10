@@ -61,3 +61,15 @@
   tpr.bc().add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
 
   tprold = tpr.shape();
+
+#ifdef USE_SMOOTHEN_MASS_FLUX
+  /*----------------------+
+  |  auxilliary unknowns  |
+  +----------------------*/
+  Scalar stmp(d);
+  ScalarInt tempflag(d), tempflag2(d);
+
+  stmp = mflx.shape();
+  tempflag = p.shape();
+  tempflag2 = p.shape();
+#endif

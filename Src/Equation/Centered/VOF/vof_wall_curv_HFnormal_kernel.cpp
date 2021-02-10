@@ -77,14 +77,7 @@ real VOF::wall_curv_HFnormal_kernel(arr2D & heights,
 *
 *     output: kappa
 *******************************************************************************/
-#if 1  /* this is a simplistic method assuming a drop in height value based only
-          on contact-angle-based slope (CABS). Better way to approximate the
-          slope in any given direction is
-                           CABS * < (nx,ny) , (Dx,Dy) >,
-          where the latter term represents a scalar product of the normal vector
-          projection onto the boundary plane and a unit vector describing the
-          chosen direction */
-  
+#if 1  
   real & hmm = heights[0][0];
   real & hmc = heights[0][1];
   real & hmp = heights[0][2];
