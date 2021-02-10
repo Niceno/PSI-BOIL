@@ -279,7 +279,7 @@ class CIPCSL2 : public Centered {
     Matter jelly;   /* virtual fluid for level set transport */
     real xminft,xmaxft,yminft,ymaxft,zminft,zmaxft; /* xyz min&max of front */
     real tol_wall; /* wall tolerance for erroneous interfaces */
-    real pi,phimin,phimax,phisurf;
+    real phimin,phimax,phisurf;
     real dxmin,ww;
     real sum_outlet,sum_outletm,clrsum1,clrsum2;
     int nredist, itsharpen, nlayer, ialpcal, itsmear;
