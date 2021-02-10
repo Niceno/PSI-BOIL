@@ -79,7 +79,10 @@ class EnthalpyFD : public Centered {
     void convective_time_step(Scalar & sca);
     void convective_time_step();
     virtual void convection();
-    virtual void diffusion(const Scalar * diff_eddy = NULL);
+    virtual void diffusion(const Scalar * diff_eddy = NULL) {
+      evaluate_diffusion(Old::yes,diff_eddy);
+      return;
+    }
     virtual void solve(const ResTol & toler, const ResRat & fact,
                        const char * name = NULL);
     virtual void solve(const ResTol & toler, const char * name = NULL) {
@@ -107,13 +110,24 @@ class EnthalpyFD : public Centered {
 
   protected:
     typedef real (EnthalpyFD::*coef_gen)(const real,const real,const real);
+
+    void evaluate_diffusion(const Old old, const Scalar * diff_eddy = NULL);
     
     void create_system(const Scalar * diff_eddy = NULL);
     void create_system_innertial();
-    void create_system_diffusive(const Scalar * diff_eddy = NULL);
+    void create_system_diffusive(const Scalar * diff_eddy = NULL) {
+      evaluate_diffusion(Old::no,diff_eddy);
+      return;
+    }
     void create_system_bnd();
     real update_rhs();
     void convection(Scalar * sca);
+
+    void diffmatrix_kernel(const std::array<ConnectType,3> & ctype,
+                           const real cxm, const real cxp,
+                           const std::vector<StencilPoint> & stencil,
+                           real & Am, real & Ac, real & Ap, real & F);
+
     void diff_matrix(real & am, real & ac, real & ap
                 , real & tm, real & tc, real & tp
                 , bool & aflagm, bool & aflagp
@@ -172,5 +186,8 @@ class EnthalpyFD : public Centered {
     Scalar ftif;
     ScalarInt iflag,iflagold;
     bool laminar;
+
+    /* reference ctypes */
+    std::array<ConnectType,3> c_fff, c_iff, c_ffi, c_ifi;
 };	
 #endif

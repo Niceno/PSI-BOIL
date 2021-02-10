@@ -26,7 +26,11 @@ EnthalpyFD::EnthalpyFD(const Scalar & PHI,
   ugas(&Ugas),
   flux_liq( *U.domain() ),
   flux_gas( *U.domain() ),
-  bflag_struct(PHI)
+  bflag_struct(PHI),
+  c_fff({ ConnectType::fluid,     ConnectType::fluid, ConnectType::fluid }),
+  c_iff({ ConnectType::interface, ConnectType::fluid, ConnectType::fluid }),
+  c_ffi({ ConnectType::fluid,     ConnectType::fluid, ConnectType::interface }),
+  c_ifi({ ConnectType::interface, ConnectType::fluid, ConnectType::interface })
 {
   assert(PHI.domain() == F.domain());
   assert(PHI.domain() == U.domain());
