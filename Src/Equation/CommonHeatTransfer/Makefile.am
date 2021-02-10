@@ -7,8 +7,6 @@ libCommonHeatTransfer_a_SOURCES = commonheattransfer.h                     \
 				  commonheattransfer_derivative.cpp        \
 				  commonheattransfer_distance.cpp          \
 				  commonheattransfer_edge.cpp              \
-				  commonheattransfer_ghost_distance.cpp    \
-				  commonheattransfer_gradt_ib.cpp          \
 				  commonheattransfer_hflux_wall.cpp        \
 				  commonheattransfer_hflux_wall_ib.cpp     \
 				  commonheattransfer_lambda.cpp            \

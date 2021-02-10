@@ -82,10 +82,10 @@ real CommonHeatTransfer::distance_int_x(const Sign dir,
   real dist = topo->distance_int_x(dir,i,j,k,cell_marker);
   if(cell_marker < 0) {
     tint = Tint(i,j,k);
-    dist += ghost_distance(Comp::i(),cell_marker,i,j,k);
+    //dist += ghost_distance(Comp::i(),cell_marker,i,j,k);
   } else {
     tint = Tint(i+int(dir),j,k);
-    dist += ghost_distance(Comp::i(),cell_marker,i+int(dir),j,k);
+    //dist += ghost_distance(Comp::i(),cell_marker,i+int(dir),j,k);
   }
 
   return dist;
@@ -99,10 +99,10 @@ real CommonHeatTransfer::distance_int_y(const Sign dir,
   real dist = topo->distance_int_y(dir,i,j,k,cell_marker);
   if(cell_marker < 0) {
     tint = Tint(i,j,k);
-    dist += ghost_distance(Comp::j(),cell_marker,i,j,k);
+    //dist += ghost_distance(Comp::j(),cell_marker,i,j,k);
   } else {
     tint = Tint(i,j+int(dir),k);
-    dist += ghost_distance(Comp::j(),cell_marker,i,j+int(dir),k);
+    //dist += ghost_distance(Comp::j(),cell_marker,i,j+int(dir),k);
   }
 
   return dist;
@@ -116,10 +116,10 @@ real CommonHeatTransfer::distance_int_z(const Sign dir,
   real dist = topo->distance_int_z(dir,i,j,k,cell_marker);
   if(cell_marker < 0) {
     tint = Tint(i,j,k);
-    dist += ghost_distance(Comp::k(),cell_marker,i,j,k);
+    //dist += ghost_distance(Comp::k(),cell_marker,i,j,k);
   } else {
     tint = Tint(i,j,k+int(dir));
-    dist += ghost_distance(Comp::k(),cell_marker,i,j,k+int(dir));
+    //dist += ghost_distance(Comp::k(),cell_marker,i,j,k+int(dir));
   }
 
   return dist;
@@ -151,10 +151,10 @@ real CommonHeatTransfer::distance_int_x_old(const Sign dir,
   real dist = topo->distance_int_x_old(dir,i,j,k,cell_marker);
   if(cell_marker < 0) {
     tint = Tint_old(i,j,k);
-    dist += ghost_distance(Comp::i(),cell_marker,i,j,k);
+    //dist += ghost_distance(Comp::i(),cell_marker,i,j,k);
   } else {
     tint = Tint_old(i+int(dir),j,k);
-    dist += ghost_distance(Comp::i(),cell_marker,i+int(dir),j,k);
+    //dist += ghost_distance(Comp::i(),cell_marker,i+int(dir),j,k);
   }
 
   return dist;
@@ -168,10 +168,10 @@ real CommonHeatTransfer::distance_int_y_old(const Sign dir,
   real dist = topo->distance_int_y_old(dir,i,j,k,cell_marker);
   if(cell_marker < 0) {
     tint = Tint_old(i,j,k);
-    dist += ghost_distance(Comp::j(),cell_marker,i,j,k);
+    //dist += ghost_distance(Comp::j(),cell_marker,i,j,k);
   } else {
     tint = Tint_old(i,j+int(dir),k);
-    dist += ghost_distance(Comp::j(),cell_marker,i,j+int(dir),k);
+    //dist += ghost_distance(Comp::j(),cell_marker,i,j+int(dir),k);
   }
 
   return dist;
@@ -185,10 +185,10 @@ real CommonHeatTransfer::distance_int_z_old(const Sign dir,
   real dist = topo->distance_int_z_old(dir,i,j,k,cell_marker);
   if(cell_marker < 0) {
     tint = Tint_old(i,j,k);
-    dist += ghost_distance(Comp::k(),cell_marker,i,j,k);
+    //dist += ghost_distance(Comp::k(),cell_marker,i,j,k);
   } else {
     tint = Tint_old(i,j,k+int(dir));
-    dist += ghost_distance(Comp::k(),cell_marker,i,j,k+int(dir));
+    //dist += ghost_distance(Comp::k(),cell_marker,i,j,k+int(dir));
   }
 
   return dist;

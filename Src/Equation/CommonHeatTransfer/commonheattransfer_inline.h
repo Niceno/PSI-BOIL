@@ -129,12 +129,20 @@ inline real Tint_old(const int i, const int j, const int k) const {
  *  distance
 ******************************************************************************/
 inline real distance_int(const Sign dir, const Comp & m,
+                         const int i, const int j, const int k,
+                         real & tint, const Old old) const {
+  return (old==Old::yes) ?
+         distance_int_old(dir,m,i,j,k,tint) : distance_int(dir,m,i,j,k,tint);
+}
+
+#if 0
+inline real distance_int(const Sign dir, const Comp & m,
                          const int i, const int j, const int k, const Old old,
                          real & tint) const {
   return (old==Old::yes) ?
          distance_int_old(dir,m,i,j,k,tint) : distance_int(dir,m,i,j,k,tint);
 }
-
+#endif
 
 /***************************************************************************//**
  *  other

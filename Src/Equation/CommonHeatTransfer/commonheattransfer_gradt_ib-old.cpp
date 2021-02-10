@@ -7,15 +7,17 @@ real CommonHeatTransfer::gradt_ib(const Sign dir, const Comp & mcomp,
                                   Scalar & val) const {
 /***************************************************************************//**
 *  \brief calculate gradient of temperature near immersed bodies
+*         - used by convection-old
 *******************************************************************************/
 
   /* if ibody can co-exist with no conduction in solid, this needs to change */
   if(!solid())
     return 0.;
 
-  int of(+1), off(+1);
+  int off(+1);
+  //int of(+1), off(+1);
   if(dir<0) {
-    of = -1;
+    //of = -1;
     off = 0;
   }
 

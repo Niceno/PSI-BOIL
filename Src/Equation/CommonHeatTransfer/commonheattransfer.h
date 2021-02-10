@@ -29,13 +29,6 @@ class CommonHeatTransfer {
                        const int i, const int j, const int k) const;
 
     /* new distances to interface */
-    inline real distance_int(const Sign dir, const Comp & m,
-                             const int i, const int j, const int k,
-                             real & tint, const Old old) const {
-      return (old==Old::yes) ?
-             distance_int_old(dir,m,i,j,k,tint) :
-             distance_int(dir,m,i,j,k,tint);
-    };
     real distance_int(const Sign dir, const Comp & m,
                       const int i, const int j, const int k,
                       real & tint) const;
@@ -63,10 +56,6 @@ class CommonHeatTransfer {
                             const int i, const int j, const int k,
                             real & tint) const;
 
-    /* ghost distance */
-    real ghost_distance(const Comp & m, const Sign & cell_marker,
-                        const int i, const int j, const int k) const;
-
     /* test domain edge */
     bool edge(const Sign dir, const Comp & m,
               const int i, const int j, const int k) const;
@@ -87,10 +76,11 @@ class CommonHeatTransfer {
     real hflux_wall_ib(const Scalar & s, 
                        const Scalar * diff_eddy = NULL) const;
 
+    /* 
     real gradt_ib(const Sign dir, const Comp & mcomp,
                   const int i, const int j, const int k,
                   const Old old,
-                  Scalar & val) const;
+                  Scalar & val) const; */
 
     /* calculating a variable-stencil difference */
     real first_derivative(const bool is_solid, const Comp & m,
