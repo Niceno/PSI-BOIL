@@ -10,6 +10,7 @@ libCommonHeatTransfer_a_SOURCES = commonheattransfer.h                     \
 				  commonheattransfer_hflux_wall.cpp        \
 				  commonheattransfer_hflux_wall_ib.cpp     \
 				  commonheattransfer_lambda.cpp            \
-                                  commonheattransfer_node_temperature.cpp
+                                  commonheattransfer_node_temperature.cpp  \
+				  commonheattransfer_restint.cpp
 
 INCLUDE = -I@top_srcdir@/

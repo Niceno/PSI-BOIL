@@ -60,20 +60,19 @@ real CommonHeatTransfer::hflux_wall(const Scalar & val, const Dir din,
             } else {
               real lc=lambda_inv(i,j,k,diff_eddy);
               real ts;
-              if       (mcomp==Comp::i()) {
-                //alen = fabs(val.xc(i)-val.xc(i+iof))
-                //     - distance_int_x(-sig,i+iof,j+jof,k+kof,ts);
-                alen = distance_int_x(sig,i,j,k,ts);
-              } else if(mcomp==Comp::j()) {
-                //alen = fabs(val.yc(j)-val.yc(j+jof))
-                //     - distance_int_y(-sig,i+iof,j+jof,k+kof,ts);
-                alen = distance_int_y(sig,i,j,k,ts);
-              } else {
-                //alen = fabs(val.zc(k)-val.zc(k+kof))
-                //     - distance_int_z(-sig,i+iof,j+jof,k+kof,ts);
-                alen = distance_int_z(sig,i,j,k,ts);
+              alen = distance_int(sig,mcomp,i,j,k,ts,ResistEval::no,Old::no);
+              real totresist = alen/lc+wall_resistance(i+of,j+of,k+of);
+
+              /* only liquid resistance is considered */
+              if(use_int_resist) {
+                if(topo->below_interface(i+of,j+of,k+of)) {
+                  totresist += int_resistance_liq(i+of,j+of,k+of);
+                }
               }
-              hflux += (val[i][j][k]-ts)/(alen/lc+wall_resistance(i+of,j+of,k+of))*area;
+
+              /* sum */
+              hflux += (val[i][j][k]-ts)/totresist*area;
+
             } /* interface */
           } /* vijk */
         } /* d == din */

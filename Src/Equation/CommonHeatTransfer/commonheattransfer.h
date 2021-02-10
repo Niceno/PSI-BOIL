@@ -28,33 +28,27 @@ class CommonHeatTransfer {
     real distance_face(const Sign sig, const Comp & m,
                        const int i, const int j, const int k) const;
 
-    /* new distances to interface */
+    /* distances to interface */
     real distance_int(const Sign dir, const Comp & m,
                       const int i, const int j, const int k,
-                      real & tint) const;
+                      real & tint, const ResistEval re, const Old old) const;
     real distance_int_x(const Sign dir,
                         const int i, const int j, const int k,
-                        real & tint) const;
+                        real & tint, const ResistEval re, const Old old) const;
     real distance_int_y(const Sign dir,
                         const int i, const int j, const int k,
-                        real & tint) const;
+                        real & tint, const ResistEval re, const Old old) const;
     real distance_int_z(const Sign dir,
                         const int i, const int j, const int k,
-                        real & tint) const;
+                        real & tint, const ResistEval re, const Old old) const;
 
-    /* old distances to interface */
-    real distance_int_old(const Sign dir, const Comp & m,
-                          const int i, const int j, const int k,
-                          real & tint) const;
-    real distance_int_x_old(const Sign dir,
-                            const int i, const int j, const int k,
-                            real & tint) const;
-    real distance_int_y_old(const Sign dir,
-                            const int i, const int j, const int k,
-                            real & tint) const;
-    real distance_int_z_old(const Sign dir,
-                            const int i, const int j, const int k,
-                            real & tint) const;
+    /* effect of interfacial heat transfer resistance */
+    void resTint(const Sign & dir, const Comp & m,
+                 const int i0, const int j0, const int k0,
+                 const int ii, const int ji, const int ki,
+                 const int i1, const int j1, const int k1,
+                 const real dist, const Sign & cell_marker,
+                 real & tint, const Old old) const;
 
     /* test domain edge */
     bool edge(const Sign dir, const Comp & m,
@@ -134,9 +128,10 @@ class CommonHeatTransfer {
     real val_rhov,val_rhol,val_cpv,val_cpl,val_lambdav,val_lambdal;
     real turbP; /* turbulent Prandtl number */
     real dirac_wall_source_val; /* units W/m2 */ 
-    /* heat transfer resistance */
-    real wall_resistance_val;
-    real int_resistance_vap_val, int_resistance_liq_val; 
+    real wall_resistance_val; /* solid-fluid contact resistance */
+    /* heat transfer resistance, only for liquid */
+    real int_resistance_liq_val; 
+    bool use_int_resist;
 };
 
 #endif

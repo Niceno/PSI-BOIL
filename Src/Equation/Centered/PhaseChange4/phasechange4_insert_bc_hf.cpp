@@ -65,37 +65,49 @@ void PhaseChange4::insert_bc_hf(const Scalar * diff_eddy) {
             /* the temperature gradient for inverse phase is set 
              * extrapolation overwrites them though */
             if       (mcomp==Comp::i()) {
-              //dist = distance_int_x(sig,ii,jj,kk,ti);
-              //dist = distance_center(sig,mcomp,ii,jj,kk) - dist;
-              dist = cht.distance_int_x(-sig,i,j,k,ti);
+              dist = cht.distance_int_x(-sig,i,j,k,ti,ResistEval::no,Old::no);
+              real totresist = dist/lmb+cht.wall_resistance(ii,jj,kk);
               if(cht.topo->above_interface(ii,jj,kk)) {
-                txv[ii][jj][kk] = (tw-ti)/(dist/lmb+cht.wall_resistance(ii,jj,kk))*real(sig);
-                txv[i ][j ][k ] = (tw-ti)/(dist/lmb+cht.wall_resistance(ii,jj,kk))*real(sig);
+                txv[ii][jj][kk] = (tw-ti)/totresist*real(sig);
+                txv[i ][j ][k ] = (tw-ti)/totresist*real(sig);
               } else {
-                txl[ii][jj][kk] = (tw-ti)/(dist/lmb+cht.wall_resistance(ii,jj,kk))*real(sig);
-                txl[i ][j ][k ] = (tw-ti)/(dist/lmb+cht.wall_resistance(ii,jj,kk))*real(sig);
+
+                /* only liquid resistance is considered */
+                if(cht.use_int_resistance()) {
+                  totresist += cht.int_resistance_liq(ii,jj,kk);
+                }
+                txl[ii][jj][kk] = (tw-ti)/totresist*real(sig);
+                txl[i ][j ][k ] = (tw-ti)/totresist*real(sig);
               }
             } else if(mcomp==Comp::j()) {             
-              //dist = distance_int_y(sig,ii,jj,kk,ti);
-              //dist = distance_center(sig,mcomp,ii,jj,kk) - dist;
-              dist = cht.distance_int_y(-sig,i,j,k,ti);
+              dist = cht.distance_int_y(-sig,i,j,k,ti,ResistEval::no,Old::no);
+              real totresist = dist/lmb+cht.wall_resistance(ii,jj,kk);
               if(cht.topo->above_interface(ii,jj,kk)) {
-                tyv[ii][jj][kk] = (tw-ti)/(dist/lmb+cht.wall_resistance(ii,jj,kk))*real(sig);
-                tyv[i ][j ][k ] = (tw-ti)/(dist/lmb+cht.wall_resistance(ii,jj,kk))*real(sig);
+                tyv[ii][jj][kk] = (tw-ti)/totresist*real(sig);
+                tyv[i ][j ][k ] = (tw-ti)/totresist*real(sig);
               } else {
-                tyl[ii][jj][kk] = (tw-ti)/(dist/lmb+cht.wall_resistance(ii,jj,kk))*real(sig);
-                tyl[i ][j ][k ] = (tw-ti)/(dist/lmb+cht.wall_resistance(ii,jj,kk))*real(sig);
+
+                /* only liquid resistance is considered */
+                if(cht.use_int_resistance()) {
+                  totresist += cht.int_resistance_liq(ii,jj,kk);
+                }
+                tyl[ii][jj][kk] = (tw-ti)/totresist*real(sig);
+                tyl[i ][j ][k ] = (tw-ti)/totresist*real(sig);
               }
             } else {
-              //dist = distance_int_z(sig,ii,jj,kk,ti);
-              //dist = distance_center(sig,mcomp,ii,jj,kk) - dist;
-              dist = cht.distance_int_z(-sig,i,j,k,ti);
+              dist = cht.distance_int_z(-sig,i,j,k,ti,ResistEval::no,Old::no);
+              real totresist = dist/lmb+cht.wall_resistance(ii,jj,kk);
               if(cht.topo->above_interface(ii,jj,kk)) {
-                tzv[ii][jj][kk] = (tw-ti)/(dist/lmb+cht.wall_resistance(ii,jj,kk))*real(sig);
-                tzv[i ][j ][k ] = (tw-ti)/(dist/lmb+cht.wall_resistance(ii,jj,kk))*real(sig);
+                tzv[ii][jj][kk] = (tw-ti)/totresist*real(sig);
+                tzv[i ][j ][k ] = (tw-ti)/totresist*real(sig);
               } else {
-                tzl[ii][jj][kk] = (tw-ti)/(dist/lmb+cht.wall_resistance(ii,jj,kk))*real(sig);
-                tzl[i ][j ][k ] = (tw-ti)/(dist/lmb+cht.wall_resistance(ii,jj,kk))*real(sig);
+
+                /* only liquid resistance is considered */
+                if(cht.use_int_resistance()) {
+                  totresist += cht.int_resistance_liq(ii,jj,kk);
+                }
+                tzl[ii][jj][kk] = (tw-ti)/totresist*real(sig);
+                tzl[i ][j ][k ] = (tw-ti)/totresist*real(sig);
               }
             }
 

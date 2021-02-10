@@ -76,7 +76,7 @@ real EnthalpyFD::face_value(const Sign matter_sig, const Comp m, const real vel,
       ctm = StencilPoint(1);
       ctm.pos = stencil[1].pos
               - cht.distance_int(Sign::neg(),m,i-2*ofx,j-2*ofy,k-2*ofz,
-                                 ctm.val,old);
+                                 ctm.val,ResistEval::yes,old);
     } else if(stencil_min(m,i-2*ofx,j-2*ofy,k-2*ofz)) {
       ctm = StencilPoint(1);
       ctm.pos = stencil[0].pos;
@@ -93,7 +93,7 @@ real EnthalpyFD::face_value(const Sign matter_sig, const Comp m, const real vel,
       ctm = StencilPoint(2);
       ctm.pos = stencil[2].pos
               - cht.distance_int(Sign::neg(),m,i-ofx,j-ofy,k-ofz,
-                                 ctm.val,old);
+                                 ctm.val,ResistEval::yes,old);
     } else if(stencil_min(m,i-ofx,j-ofy,k-ofz)) {
       ctm = StencilPoint(2);
       ctm.pos = stencil[1].pos;
@@ -112,7 +112,7 @@ real EnthalpyFD::face_value(const Sign matter_sig, const Comp m, const real vel,
       ctm = StencilPoint(3);
       ctm.pos = stencil[3].pos
               - cht.distance_int(Sign::neg(),m,i,j,k,
-                                 ctm.val,old);
+                                 ctm.val,ResistEval::yes,old);
     }
 
   }
@@ -124,7 +124,7 @@ real EnthalpyFD::face_value(const Sign matter_sig, const Comp m, const real vel,
       ctp = StencilPoint(4);
       ctp.pos = stencil[4].pos
               + cht.distance_int(Sign::pos(),m,i+ofx,j+ofy,k+ofz,
-                                 ctp.val,old);
+                                 ctp.val,ResistEval::yes,old);
     } else if(stencil_max(m,i+ofx,j+ofy,k+ofz)) {
       ctp = StencilPoint(4);
       ctp.pos = stencil[5].pos;
@@ -141,7 +141,7 @@ real EnthalpyFD::face_value(const Sign matter_sig, const Comp m, const real vel,
       ctp = StencilPoint(3);
       ctp.pos = stencil[3].pos
               + cht.distance_int(Sign::pos(),m,i,j,k,
-                                 ctp.val,old);
+                                 ctp.val,ResistEval::yes,old);
     } else if(stencil_max(m,i,j,k)) {
       ctp = StencilPoint(3);
       ctp.pos = stencil[4].pos;
@@ -160,7 +160,7 @@ real EnthalpyFD::face_value(const Sign matter_sig, const Comp m, const real vel,
       ctp = StencilPoint(2);
       ctp.pos = stencil[2].pos
               + cht.distance_int(Sign::pos(),m,i-ofx,j-ofy,k-ofz,
-                                 ctp.val,old);
+                                 ctp.val,ResistEval::yes,old);
     }
   }
 

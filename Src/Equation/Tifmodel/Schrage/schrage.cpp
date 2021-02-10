@@ -25,6 +25,9 @@ Schrage::Schrage(const real Tref,
   boil::oout<<"Schrage: Transfer resistance= "<<hresis<<" "<<mresis<<boil::endl;
 
   variable_tif = true;
+
+  boil::oout<<"Schrage: obsolete class. Exiting."<<boil::endl;
+  exit(0);
   
   //tint_field();
 

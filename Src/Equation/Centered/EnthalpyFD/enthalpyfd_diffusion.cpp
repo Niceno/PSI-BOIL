@@ -48,14 +48,14 @@ void EnthalpyFD::diffusion(const Scalar * diff_eddy) {
         xm=phi.dxw(i);
         pm=phi[i-1][j][k];
       } else {
-        xm = cht.distance_int_x(Sign::neg(),i,j,k,pm);
+        xm = cht.distance_int_x(Sign::neg(),i,j,k,pm,ResistEval::no,Old::no);
         aflagm=1.0;
       }
       if(!cht.interface(Sign::pos(),Comp::i(),i,j,k)){
         xp=phi.dxe(i);
         pp=phi[i+1][j][k];
       } else {
-        xp = cht.distance_int_x(Sign::pos(),i,j,k,pp);
+        xp = cht.distance_int_x(Sign::pos(),i,j,k,pp,ResistEval::no,Old::no);
         aflagp=1.0;
       }
       real cxm = coef_x_m(xm,xp,phi.xc(i));
@@ -80,14 +80,14 @@ void EnthalpyFD::diffusion(const Scalar * diff_eddy) {
         ym=phi.dys(j);
         pm=phi[i][j-1][k];
       } else {
-        ym = cht.distance_int_y(Sign::neg(),i,j,k,pm);
+        ym = cht.distance_int_y(Sign::neg(),i,j,k,pm,ResistEval::no,Old::no);
         aflagm=1.0;
       }
       if(!cht.interface(Sign::pos(),Comp::j(),i,j,k)){
         yp=phi.dyn(j);
         pp=phi[i][j+1][k];
       } else {
-        yp = cht.distance_int_y(Sign::pos(),i,j,k,pp);
+        yp = cht.distance_int_y(Sign::pos(),i,j,k,pp,ResistEval::no,Old::no);
         aflagp=1.0;
       }
       real cym = coef_y_m(ym,yp,phi.yc(j));
@@ -112,14 +112,14 @@ void EnthalpyFD::diffusion(const Scalar * diff_eddy) {
         zm=phi.dzb(k);
         pm=phi[i][j][k-1];
       } else {
-        zm = cht.distance_int_z(Sign::neg(),i,j,k,pm);
+        zm = cht.distance_int_z(Sign::neg(),i,j,k,pm,ResistEval::no,Old::no);
         aflagm=1.0;
       }
       if(!cht.interface(Sign::pos(),Comp::k(),i,j,k)){
         zp=phi.dzt(k);
         pp=phi[i][j][k+1];
       } else {
-        zp = cht.distance_int_z(Sign::pos(),i,j,k,pp);
+        zp = cht.distance_int_z(Sign::pos(),i,j,k,pp,ResistEval::no,Old::no);
         aflagp=1.0;
       }
       real czm = coef_z_m(zm,zp,phi.zc(k));

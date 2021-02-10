@@ -30,9 +30,11 @@ inline real lambdav(const int i, const int j, const int k,
 inline real int_resistance_liq(const int i, const int j, const int k) const {
   return int_resistance_liq_val;
 }
+#if 0
 inline real int_resistance_vap(const int i, const int j, const int k) const {
   return int_resistance_vap_val;
 }
+#endif
 inline real wall_resistance(const int i, const int j, const int k) const {
   return wall_resistance_val;
 }
@@ -117,6 +119,11 @@ inline real Tint_old(const int dir, const Comp &mcomp, real frac,
   return tifmodel.Tint_old(dir,mcomp,frac,i,j,k);
 }
 
+inline real Tint(const int i, const int j, const int k, const Old old) const {
+  return (old==Old::yes) ?
+         tifmodel.Tint_old(i,j,k) : tifmodel.Tint(i,j,k);
+}
+
 inline real Tint(const int i, const int j, const int k) const {
   return tifmodel.Tint(i,j,k);
 }
@@ -124,25 +131,6 @@ inline real Tint(const int i, const int j, const int k) const {
 inline real Tint_old(const int i, const int j, const int k) const {
   return tifmodel.Tint_old(i,j,k);
 }
-
-/***************************************************************************//**
- *  distance
-******************************************************************************/
-inline real distance_int(const Sign dir, const Comp & m,
-                         const int i, const int j, const int k,
-                         real & tint, const Old old) const {
-  return (old==Old::yes) ?
-         distance_int_old(dir,m,i,j,k,tint) : distance_int(dir,m,i,j,k,tint);
-}
-
-#if 0
-inline real distance_int(const Sign dir, const Comp & m,
-                         const int i, const int j, const int k, const Old old,
-                         real & tint) const {
-  return (old==Old::yes) ?
-         distance_int_old(dir,m,i,j,k,tint) : distance_int(dir,m,i,j,k,tint);
-}
-#endif
 
 /***************************************************************************//**
  *  other
@@ -162,24 +150,32 @@ inline void set_dirac_wall_source(const real a) {
 }
 
 /* units [K/(W/m^2)] = [m/(W/mK)] */
+inline void set_int_resistance(const real re) {
+  //int_resistance_vap_val = re;
+  int_resistance_liq_val = re;
+  use_int_resist = true;
+  boil::oout<<"CommonHeatTransfer::int_resistance= "<<re<<"\n";
+}
+inline bool use_int_resistance() const {
+  return use_int_resist;
+}
+
+#if 0
 inline real get_int_resistance_vap() const { 
   return int_resistance_vap_val;
-}
-inline real get_int_resistance_liq() const { 
-  return int_resistance_liq_val;
-}
-inline void set_int_resistance(const real re) {
-  int_resistance_vap_val = re;
-  int_resistance_liq_val = re;
-  boil::oout<<"CommonHeatTransfer::int_resistance= "<<re<<"\n";
 }
 inline void set_int_resistance_vap(const real re) {
   int_resistance_vap_val = re;
   boil::oout<<"CommonHeatTransfer::int_resistance_vap= "
             <<re<<"\n";
 }
+#endif
+inline real get_int_resistance_liq() const { 
+  return int_resistance_liq_val;
+}
 inline void set_int_resistance_liq(const real re) {
   int_resistance_liq_val = re;
+  use_int_resist = true;
   boil::oout<<"CommonHeatTransfer::int_resistance_liq= "
             <<re<<"\n";
 }

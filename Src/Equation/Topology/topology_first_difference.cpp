@@ -48,39 +48,24 @@ real Topology::first_order_first(const std::vector<StencilPoint> & stencil)
 /***************************************************************************//**
 *  \brief Approximate first derivative using a first-order difference.
 *******************************************************************************/
-  real c0 =  1./(stencil[0].pos-stencil[1].pos);
+  std::vector<real> coefs;
+  first_order_first_coefs(coefs,stencil);
 
-  real c1 = -1./(stencil[0].pos-stencil[1].pos);
+  return coefs[0]*stencil[0].val+coefs[1]*stencil[1].val;
 
-  return c0*stencil[0].val+c1*stencil[1].val;
 }
 
-#if 1
 /******************************************************************************/
 real Topology::second_order_first(const std::vector<StencilPoint> & stencil)
                                                                          const {
 /***************************************************************************//**
 *  \brief Approximate first derivative using a second-order difference.
 *******************************************************************************/
-  real c0 = -(stencil[1].pos + stencil[2].pos)
-            /(stencil[0].pos*stencil[0].pos
-            - stencil[0].pos*stencil[1].pos
-            - stencil[0].pos*stencil[2].pos
-            + stencil[1].pos*stencil[2].pos);
+  std::vector<real> coefs;
+  second_order_first_coefs(coefs,stencil);
 
-  real c1 =  (stencil[0].pos + stencil[2].pos)
-            /(stencil[0].pos*stencil[1].pos
-            - stencil[0].pos*stencil[2].pos
-            - stencil[1].pos*stencil[1].pos
-            + stencil[1].pos*stencil[2].pos);
-
-  real c2 = -(stencil[0].pos + stencil[1].pos)
-            /(stencil[0].pos*stencil[1].pos
-            - stencil[0].pos*stencil[2].pos
-            - stencil[1].pos*stencil[2].pos
-            + stencil[2].pos*stencil[2].pos);
-
-  return c0*stencil[0].val+c1*stencil[1].val+c2*stencil[2].val;
+  return coefs[0]*stencil[0].val+coefs[1]*stencil[1].val
+        +coefs[2]*stencil[2].val;               
 }
 
 /******************************************************************************/
@@ -89,56 +74,11 @@ real Topology::third_order_first(const std::vector<StencilPoint> & stencil)
 /***************************************************************************//**
 *  \brief Approximate first derivative using a third-order difference.
 *******************************************************************************/
-  real c0 =  (stencil[1].pos*stencil[2].pos 
-            + stencil[1].pos*stencil[3].pos
-            + stencil[2].pos*stencil[3].pos)
-            /(stencil[0].pos*stencil[0].pos*stencil[0].pos
-            - stencil[0].pos*stencil[0].pos*stencil[1].pos
-            - stencil[0].pos*stencil[0].pos*stencil[2].pos
-            - stencil[0].pos*stencil[0].pos*stencil[3].pos
-            + stencil[0].pos*stencil[1].pos*stencil[2].pos
-            + stencil[0].pos*stencil[1].pos*stencil[3].pos
-            + stencil[0].pos*stencil[2].pos*stencil[3].pos
-            - stencil[1].pos*stencil[2].pos*stencil[3].pos);
+  std::vector<real> coefs;
+  third_order_first_coefs(coefs,stencil);
 
-  real c1 = -(stencil[0].pos*stencil[2].pos
-            + stencil[0].pos*stencil[3].pos
-            + stencil[2].pos*stencil[3].pos)
-            /(stencil[0].pos*stencil[1].pos*stencil[1].pos
-            - stencil[0].pos*stencil[1].pos*stencil[2].pos
-            - stencil[0].pos*stencil[1].pos*stencil[3].pos
-            + stencil[0].pos*stencil[2].pos*stencil[3].pos
-            - stencil[1].pos*stencil[1].pos*stencil[1].pos
-            + stencil[1].pos*stencil[1].pos*stencil[2].pos
-            + stencil[1].pos*stencil[1].pos*stencil[3].pos
-            - stencil[1].pos*stencil[2].pos*stencil[3].pos);
-
-  real c2 =  (stencil[0].pos*stencil[1].pos
-            + stencil[0].pos*stencil[3].pos
-            + stencil[1].pos*stencil[3].pos)
-            /(stencil[0].pos*stencil[1].pos*stencil[2].pos
-            - stencil[0].pos*stencil[1].pos*stencil[3].pos
-            - stencil[0].pos*stencil[2].pos*stencil[2].pos
-            + stencil[0].pos*stencil[2].pos*stencil[3].pos
-            - stencil[1].pos*stencil[2].pos*stencil[2].pos
-            + stencil[1].pos*stencil[2].pos*stencil[3].pos
-            + stencil[2].pos*stencil[2].pos*stencil[2].pos
-            - stencil[2].pos*stencil[2].pos*stencil[3].pos);
-
-  real c3 = -(stencil[0].pos*stencil[1].pos
-            + stencil[0].pos*stencil[2].pos
-            + stencil[1].pos*stencil[2].pos)
-            /(stencil[0].pos*stencil[1].pos*stencil[2].pos
-            - stencil[0].pos*stencil[1].pos*stencil[3].pos
-            - stencil[0].pos*stencil[2].pos*stencil[3].pos
-            + stencil[0].pos*stencil[3].pos*stencil[3].pos
-            - stencil[1].pos*stencil[2].pos*stencil[3].pos
-            + stencil[1].pos*stencil[3].pos*stencil[3].pos
-            + stencil[2].pos*stencil[3].pos*stencil[3].pos
-            - stencil[3].pos*stencil[3].pos*stencil[3].pos);
-  
-  return c0*stencil[0].val+c1*stencil[1].val
-        +c2*stencil[2].val+c3*stencil[3].val;
+  return coefs[0]*stencil[0].val+coefs[1]*stencil[1].val
+        +coefs[2]*stencil[2].val+coefs[3]*stencil[3].val;
 }
 
 /******************************************************************************/
@@ -147,210 +87,10 @@ real Topology::fourth_order_first(const std::vector<StencilPoint> & stencil)
 /***************************************************************************//**
 *  \brief Approximate first derivative using a fourth-order difference.
 *******************************************************************************/
-  real c0 = -(stencil[1].pos*stencil[2].pos*stencil[3].pos
-            + stencil[1].pos*stencil[2].pos*stencil[4].pos
-            + stencil[1].pos*stencil[3].pos*stencil[4].pos
-            + stencil[2].pos*stencil[3].pos*stencil[4].pos)
-            /(stencil[0].pos*stencil[0].pos*stencil[0].pos*stencil[0].pos
-            - stencil[0].pos*stencil[0].pos*stencil[0].pos*stencil[1].pos
-            - stencil[0].pos*stencil[0].pos*stencil[0].pos*stencil[2].pos
-            - stencil[0].pos*stencil[0].pos*stencil[0].pos*stencil[3].pos
-            - stencil[0].pos*stencil[0].pos*stencil[0].pos*stencil[4].pos
-            + stencil[0].pos*stencil[0].pos*stencil[1].pos*stencil[2].pos
-            + stencil[0].pos*stencil[0].pos*stencil[1].pos*stencil[3].pos
-            + stencil[0].pos*stencil[0].pos*stencil[1].pos*stencil[4].pos
-            + stencil[0].pos*stencil[0].pos*stencil[2].pos*stencil[3].pos
-            + stencil[0].pos*stencil[0].pos*stencil[2].pos*stencil[4].pos
-            + stencil[0].pos*stencil[0].pos*stencil[3].pos*stencil[4].pos
-            - stencil[0].pos*stencil[1].pos*stencil[2].pos*stencil[3].pos
-            - stencil[0].pos*stencil[1].pos*stencil[2].pos*stencil[4].pos
-            - stencil[0].pos*stencil[1].pos*stencil[3].pos*stencil[4].pos 
-            - stencil[0].pos*stencil[2].pos*stencil[3].pos*stencil[4].pos
-            + stencil[1].pos*stencil[2].pos*stencil[3].pos*stencil[4].pos);
-
-  real c1 =  (stencil[0].pos*stencil[2].pos*stencil[3].pos
-            + stencil[0].pos*stencil[2].pos*stencil[4].pos
-            + stencil[0].pos*stencil[3].pos*stencil[4].pos
-            + stencil[2].pos*stencil[3].pos*stencil[4].pos)
-            /(stencil[0].pos*stencil[1].pos*stencil[1].pos*stencil[1].pos
-            - stencil[0].pos*stencil[1].pos*stencil[1].pos*stencil[2].pos
-            - stencil[0].pos*stencil[1].pos*stencil[1].pos*stencil[3].pos
-            - stencil[0].pos*stencil[1].pos*stencil[1].pos*stencil[4].pos
-            + stencil[0].pos*stencil[1].pos*stencil[2].pos*stencil[3].pos
-            + stencil[0].pos*stencil[1].pos*stencil[2].pos*stencil[4].pos
-            + stencil[0].pos*stencil[1].pos*stencil[3].pos*stencil[4].pos
-            - stencil[0].pos*stencil[2].pos*stencil[3].pos*stencil[4].pos
-            - stencil[1].pos*stencil[1].pos*stencil[1].pos*stencil[1].pos
-            + stencil[1].pos*stencil[1].pos*stencil[1].pos*stencil[2].pos
-            + stencil[1].pos*stencil[1].pos*stencil[1].pos*stencil[3].pos
-            + stencil[1].pos*stencil[1].pos*stencil[1].pos*stencil[4].pos
-            - stencil[1].pos*stencil[1].pos*stencil[2].pos*stencil[3].pos
-            - stencil[1].pos*stencil[1].pos*stencil[2].pos*stencil[4].pos
-            - stencil[1].pos*stencil[1].pos*stencil[3].pos*stencil[4].pos
-            + stencil[1].pos*stencil[2].pos*stencil[3].pos*stencil[4].pos);
-
-  real c2 = -(stencil[0].pos*stencil[1].pos*stencil[3].pos
-            + stencil[0].pos*stencil[1].pos*stencil[4].pos
-            + stencil[0].pos*stencil[3].pos*stencil[4].pos
-            + stencil[1].pos*stencil[3].pos*stencil[4].pos)
-            /(stencil[0].pos*stencil[1].pos*stencil[2].pos*stencil[2].pos
-            - stencil[0].pos*stencil[1].pos*stencil[2].pos*stencil[3].pos
-            - stencil[0].pos*stencil[1].pos*stencil[2].pos*stencil[4].pos
-            + stencil[0].pos*stencil[1].pos*stencil[3].pos*stencil[4].pos
-            - stencil[0].pos*stencil[2].pos*stencil[2].pos*stencil[2].pos
-            + stencil[0].pos*stencil[2].pos*stencil[2].pos*stencil[3].pos
-            + stencil[0].pos*stencil[2].pos*stencil[2].pos*stencil[4].pos
-            - stencil[0].pos*stencil[2].pos*stencil[3].pos*stencil[4].pos
-            - stencil[1].pos*stencil[2].pos*stencil[2].pos*stencil[2].pos
-            + stencil[1].pos*stencil[2].pos*stencil[2].pos*stencil[3].pos
-            + stencil[1].pos*stencil[2].pos*stencil[2].pos*stencil[4].pos
-            - stencil[1].pos*stencil[2].pos*stencil[3].pos*stencil[4].pos
-            + stencil[2].pos*stencil[2].pos*stencil[2].pos*stencil[2].pos
-            - stencil[2].pos*stencil[2].pos*stencil[2].pos*stencil[3].pos
-            - stencil[2].pos*stencil[2].pos*stencil[2].pos*stencil[4].pos
-            + stencil[2].pos*stencil[2].pos*stencil[3].pos*stencil[4].pos);
-
-  real c3 =  (stencil[0].pos*stencil[1].pos*stencil[2].pos
-            + stencil[0].pos*stencil[1].pos*stencil[4].pos
-            + stencil[0].pos*stencil[2].pos*stencil[4].pos
-            + stencil[1].pos*stencil[2].pos*stencil[4].pos)
-            /(stencil[0].pos*stencil[1].pos*stencil[2].pos*stencil[3].pos
-            - stencil[0].pos*stencil[1].pos*stencil[2].pos*stencil[4].pos
-            - stencil[0].pos*stencil[1].pos*stencil[3].pos*stencil[3].pos
-            + stencil[0].pos*stencil[1].pos*stencil[3].pos*stencil[4].pos
-            - stencil[0].pos*stencil[2].pos*stencil[3].pos*stencil[3].pos
-            + stencil[0].pos*stencil[2].pos*stencil[3].pos*stencil[4].pos
-            + stencil[0].pos*stencil[3].pos*stencil[3].pos*stencil[3].pos
-            - stencil[0].pos*stencil[3].pos*stencil[3].pos*stencil[4].pos
-            - stencil[1].pos*stencil[2].pos*stencil[3].pos*stencil[3].pos
-            + stencil[1].pos*stencil[2].pos*stencil[3].pos*stencil[4].pos
-            + stencil[1].pos*stencil[3].pos*stencil[3].pos*stencil[3].pos
-            - stencil[1].pos*stencil[3].pos*stencil[3].pos*stencil[4].pos
-            + stencil[2].pos*stencil[3].pos*stencil[3].pos*stencil[3].pos
-            - stencil[2].pos*stencil[3].pos*stencil[3].pos*stencil[4].pos
-            - stencil[3].pos*stencil[3].pos*stencil[3].pos*stencil[3].pos
-            + stencil[3].pos*stencil[3].pos*stencil[3].pos*stencil[4].pos);
-
-  real c4 = -(stencil[0].pos*stencil[1].pos*stencil[2].pos
-            + stencil[0].pos*stencil[1].pos*stencil[3].pos
-            + stencil[0].pos*stencil[2].pos*stencil[3].pos
-            + stencil[1].pos*stencil[2].pos*stencil[3].pos)
-            /(stencil[0].pos*stencil[1].pos*stencil[2].pos*stencil[3].pos
-            - stencil[0].pos*stencil[1].pos*stencil[2].pos*stencil[4].pos
-            - stencil[0].pos*stencil[1].pos*stencil[3].pos*stencil[4].pos
-            + stencil[0].pos*stencil[1].pos*stencil[4].pos*stencil[4].pos
-            - stencil[0].pos*stencil[2].pos*stencil[3].pos*stencil[4].pos
-            + stencil[0].pos*stencil[2].pos*stencil[4].pos*stencil[4].pos
-            + stencil[0].pos*stencil[3].pos*stencil[4].pos*stencil[4].pos
-            - stencil[0].pos*stencil[4].pos*stencil[4].pos*stencil[4].pos
-            - stencil[1].pos*stencil[2].pos*stencil[3].pos*stencil[4].pos
-            + stencil[1].pos*stencil[2].pos*stencil[4].pos*stencil[4].pos
-            + stencil[1].pos*stencil[3].pos*stencil[4].pos*stencil[4].pos
-            - stencil[1].pos*stencil[4].pos*stencil[4].pos*stencil[4].pos
-            + stencil[2].pos*stencil[3].pos*stencil[4].pos*stencil[4].pos
-            - stencil[2].pos*stencil[4].pos*stencil[4].pos*stencil[4].pos
-            - stencil[3].pos*stencil[4].pos*stencil[4].pos*stencil[4].pos
-            + stencil[4].pos*stencil[4].pos*stencil[4].pos*stencil[4].pos);
+  std::vector<real> coefs;
+  fourth_order_first_coefs(coefs,stencil);
   
-  return c0*stencil[0].val+c1*stencil[1].val
-        +c2*stencil[2].val+c3*stencil[3].val+c4*stencil[4].val;
+  return coefs[0]*stencil[0].val+coefs[1]*stencil[1].val
+        +coefs[2]*stencil[2].val+coefs[3]*stencil[3].val
+        +coefs[4]*stencil[4].val;
 }
-
-#else /* the functions below assume that zeroth point has stencil[0].pos = 0 */ 
-/******************************************************************************/
-real Topology::second_order_first(const std::vector<StencilPoint> & stencil)
-                                                                         const {
-/***************************************************************************//**
-*  \brief Approximate first derivative using a second-order difference.
-*******************************************************************************/
-  real c0 = -1./stencil[1].pos - 1./stencil[2].pos;
-  real c1 = -stencil[2].pos/(stencil[1].pos*(stencil[1].pos-stencil[2].pos));
-  real c2 =  stencil[1].pos/(stencil[2].pos*(stencil[1].pos-stencil[2].pos));
-
-  return c0*stencil[0].val+c1*stencil[1].val+c2*stencil[2].val;
-}
-
-/******************************************************************************/
-real Topology::third_order_first(const std::vector<StencilPoint> & stencil)
-                                                                         const {
-/***************************************************************************//**
-*  \brief Approximate first derivative using a third-order difference.
-*******************************************************************************/
-  real c0 = -1./stencil[1].pos - 1./stencil[2].pos - 1./stencil[3].pos; 
-  
-  real c1 =  stencil[2].pos*stencil[3].pos
-           /(stencil[1].pos*(stencil[1].pos*stencil[1].pos
-                       - stencil[1].pos*stencil[2].pos
-                       - stencil[1].pos*stencil[3].pos
-                       + stencil[2].pos*stencil[3].pos));
-
-  real c2 = -stencil[1].pos*stencil[3].pos
-           /(stencil[2].pos*(stencil[1].pos*stencil[2].pos
-                       - stencil[1].pos*stencil[3].pos
-                       - stencil[2].pos*stencil[2].pos
-                       + stencil[2].pos*stencil[3].pos));
-
-  real c3 =  stencil[1].pos*stencil[2].pos
-           /(stencil[3].pos*(stencil[1].pos*stencil[2].pos
-                       - stencil[1].pos*stencil[3].pos
-                       - stencil[2].pos*stencil[3].pos
-                       + stencil[3].pos*stencil[3].pos));
-
-  return c0*stencil[0].val+c1*stencil[1].val
-        +c2*stencil[2].val+c3*stencil[3].val;
-}
-
-/******************************************************************************/
-real Topology::fourth_order_first(const std::vector<StencilPoint> & stencil)
-                                                                         const {
-/***************************************************************************//**
-*  \brief Approximate first derivative using a fourth-order difference.
-*******************************************************************************/
-  
-  real c0 = -1./stencil[1].pos - 1./stencil[2].pos
-           - 1./stencil[3].pos - 1./stencil[4].pos; 
-
-  real c1 = -stencil[2].pos*stencil[3].pos*stencil[4].pos
-           /(stencil[1].pos*(stencil[1].pos*stencil[1].pos*stencil[1].pos
-                       - stencil[1].pos*stencil[1].pos*stencil[2].pos
-                       - stencil[1].pos*stencil[1].pos*stencil[3].pos
-                       - stencil[1].pos*stencil[1].pos*stencil[4].pos
-                       + stencil[1].pos*stencil[2].pos*stencil[3].pos
-                       + stencil[1].pos*stencil[2].pos*stencil[4].pos
-                       + stencil[1].pos*stencil[3].pos*stencil[4].pos
-                       - stencil[2].pos*stencil[3].pos*stencil[4].pos));
-
-  real c2 =  stencil[1].pos*stencil[3].pos*stencil[4].pos
-           /(stencil[2].pos*(stencil[1].pos*stencil[2].pos*stencil[2].pos
-                       - stencil[1].pos*stencil[2].pos*stencil[3].pos
-                       - stencil[1].pos*stencil[2].pos*stencil[4].pos
-                       + stencil[1].pos*stencil[3].pos*stencil[4].pos
-                       - stencil[2].pos*stencil[2].pos*stencil[2].pos
-                       + stencil[2].pos*stencil[2].pos*stencil[3].pos
-                       + stencil[2].pos*stencil[2].pos*stencil[4].pos
-                       - stencil[2].pos*stencil[3].pos*stencil[4].pos));
-
-  real c3 = -stencil[1].pos*stencil[2].pos*stencil[4].pos
-           /(stencil[3].pos*(stencil[1].pos*stencil[2].pos*stencil[3].pos
-                       - stencil[1].pos*stencil[2].pos*stencil[4].pos
-                       - stencil[1].pos*stencil[3].pos*stencil[3].pos
-                       + stencil[1].pos*stencil[3].pos*stencil[4].pos
-                       - stencil[2].pos*stencil[3].pos*stencil[3].pos
-                       + stencil[2].pos*stencil[3].pos*stencil[4].pos
-                       + stencil[3].pos*stencil[3].pos*stencil[3].pos
-                       - stencil[3].pos*stencil[3].pos*stencil[4].pos));
-
-  real c4 =  stencil[1].pos*stencil[2].pos*stencil[3].pos
-           /(stencil[4].pos*(stencil[1].pos*stencil[2].pos*stencil[3].pos
-                       - stencil[1].pos*stencil[2].pos*stencil[4].pos
-                       - stencil[1].pos*stencil[3].pos*stencil[4].pos
-                       + stencil[1].pos*stencil[4].pos*stencil[4].pos
-                       - stencil[2].pos*stencil[3].pos*stencil[4].pos
-                       + stencil[2].pos*stencil[4].pos*stencil[4].pos
-                       + stencil[3].pos*stencil[4].pos*stencil[4].pos
-                       - stencil[4].pos*stencil[4].pos*stencil[4].pos));
-  
-  return c0*stencil[0].val+c1*stencil[1].val
-        +c2*stencil[2].val+c3*stencil[3].val+c4*stencil[4].val;
-}
-#endif

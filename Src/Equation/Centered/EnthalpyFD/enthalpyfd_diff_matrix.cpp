@@ -97,7 +97,8 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
         /* removed from system matrix */
         aflagm = false;
         /* tm is changed to the saturation temperature */
-        real dxfull = cht.distance_int(Sign::neg(),m,i,j,k,tm);
+        real dxfull = cht.distance_int(Sign::neg(),m,i,j,k,tm,
+                                       ResistEval::no,Old::no);
         dxm = dxm * fdm;
         /* lambdaf is inverted */
         if(clm>0) {
@@ -150,7 +151,8 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
         /* removed from system matrix */
         aflagp = false;
         /* tp is changed to the saturation temperature */
-        real dxfull = cht.distance_int(Sign::pos(),m,i,j,k,tp);
+        real dxfull = cht.distance_int(Sign::pos(),m,i,j,k,tp,
+                                       ResistEval::no,Old::no);
         dxp = dxp * fdp;
         /* lambdaf is inverted */
         if(clp>0){
@@ -212,7 +214,7 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
       if(!cht.interface(Sign::neg(),m,i,j,k)){
         dxm=dxm;
       } else {
-        dxm = cht.distance_int(Sign::neg(),m,i,j,k,tm);
+        dxm = cht.distance_int(Sign::neg(),m,i,j,k,tm,ResistEval::no,Old::no);
         aflagm=false;
 #ifdef DEBUG
 	std::cout<<"aflagm=false: " <<i<<" "<<j<<" "<<k<<" "<<clc<<"\n";
@@ -221,7 +223,7 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
       if(!cht.interface(Sign::pos(),m,i,j,k)){
         dxp=dxp;
       } else {
-        dxp = cht.distance_int(Sign::pos(),m,i,j,k,tp);
+        dxp = cht.distance_int(Sign::pos(),m,i,j,k,tp,ResistEval::no,Old::no);
         aflagp=false;
 #ifdef DEBUG
 	std::cout<<"aflagp=false: " <<i<<" "<<j<<" "<<k<<" "<<clc<<"\n";
@@ -254,7 +256,7 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
       if(!cht.interface(Sign::pos(),m,i,j,k)){
         dxp=dxp;
       } else {
-        dxp = cht.distance_int(Sign::pos(),m,i,j,k,tp);
+        dxp = cht.distance_int(Sign::pos(),m,i,j,k,tp,ResistEval::no,Old::no);
         aflagp=false;
       }
       if(cht.interface(Sign::neg(),m,i,j,k)) {
@@ -262,7 +264,7 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
         aflagm = false;
         /* dxm is corrected to account for interface position */
         /* tm is changed to the saturation temperature */
-        dxm = cht.distance_int(Sign::neg(),m,i,j,k,tm);
+        dxm = cht.distance_int(Sign::neg(),m,i,j,k,tm,ResistEval::no,Old::no);
         /* FDM */
         am = lc * vol * (this->*coef_m)(dxm,dxp,x0);
         ap = lc * vol * (this->*coef_p)(dxm,dxp,x0);
@@ -302,7 +304,7 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
       if(!cht.interface(Sign::neg(),m,i,j,k)){
         dxm=dxm;
       } else {
-        dxm = cht.distance_int(Sign::neg(),m,i,j,k,tm);
+        dxm = cht.distance_int(Sign::neg(),m,i,j,k,tm,ResistEval::no,Old::no);
         aflagm=false;
       }
       if(cht.interface(Sign::pos(),m,i,j,k)) {
@@ -310,7 +312,7 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
         aflagp = false;
         /* dxp is corrected to account for interface position */
         /* tp is changed to the saturation temperature */
-        dxp = cht.distance_int(Sign::pos(),m,i,j,k,tp);
+        dxp = cht.distance_int(Sign::pos(),m,i,j,k,tp,ResistEval::no,Old::no);
         /* FDM */
         am = lc * vol * (this->*coef_m)(dxm,dxp,x0);
         ap = lc * vol * (this->*coef_p)(dxm,dxp,x0);
