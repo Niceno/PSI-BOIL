@@ -85,10 +85,6 @@ int main(int argc, char ** argv) {
   const bool store_pressure_extrap = true;
   const int niter_pressure_extrap = 1000;
 
-  /* enthalpy fd */
-  //const bool no_solid_acceleration = true;
-  const bool no_solid_acceleration = false;
-
 /******************************************************************************/
 /* ------------ material properties */
   const real muv = 1.255e-5;
@@ -370,8 +366,6 @@ int main(int argc, char ** argv) {
   enthFD.diffusion_set(TimeScheme::backward_euler());
   //enthFD.convection_set(ConvScheme::minmod());
   enthFD.set_flux_accuracy_order(AccuracyOrder::First());
-
-  enthFD.set_no_solid_acceleration(no_solid_acceleration);
 
   /* phase change */
   PhaseChange4 pc(mdot, mflx, q, g , f , uvw, cht,

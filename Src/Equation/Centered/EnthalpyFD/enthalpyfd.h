@@ -142,15 +142,22 @@ class EnthalpyFD : public Centered {
                           const real dSm, const real dSp,
                           const ResistEval re, const Old old,
                           const real tscn, const real tscm,
-                          std::vector<StencilPoint> & stencil,
                           real & Aw, real & Ac, real & Ae, real & F,
                           const Scalar * diff_eddy);
 
-    void kernel_fluid(const std::array<ConnectType,3> & ctype,
-                      const real cxm, const real cxp,
-                      std::vector<StencilPoint> & stencil,
-                      const real resinvm, const real resinvp,
-                      real & Am, real & Ac, real & Ap, real & F);
+    void kernel_fluid1(const std::array<ConnectType,3> & ctype,
+                       const real cxm, const real cxp,
+                       std::vector<StencilPoint> & stencil,
+                       const real resinvm, const real resinvp,
+                       real & Am, real & Ac, real & Ap, real & F);
+
+    void kernel_fluid2(const std::array<ConnectType,3> & ctype,
+                       const real cxm, const real cxp,
+                       std::vector<StencilPoint> & stencil,
+                       const real resinvm, const real resinvp,
+                       const std::array<real,3> resistvals,
+                       const real dwsrcm, const real dwsrcp,
+                       real & Am, real & Ac, real & Ap, real & F);
 
     void kernel_solid(const std::array<ConnectType,3> & ctype,
                       const real cxm, const real cxp,
@@ -158,22 +165,6 @@ class EnthalpyFD : public Centered {
                       const std::array<real,3> resistvals,
                       const real dwsrcm, const real dwsrcp,
                       real & Am, real & Ac, real & Ap, real & F);
-
-    void diff_matrix(real & am, real & ac, real & ap
-                , real & tm, real & tc, real & tp
-                , bool & aflagm, bool & aflagp
-                , real & sourceterm
-                , const real x0, const coef_gen coef_m, const coef_gen coef_p
-                , const real vol, const real aream, const real areap
-                , const bool onm, const bool onc, const bool onp
-                , const bool ofm, const bool ofc, const bool ofp
-                , const real lsm, const real lsc, const real lsp
-                , const real lvm, const real lvc, const real lvp
-                , const real llm, const real llc, const real llp
-                , const int clm, const int clc, const int clp
-                , real dxm, real dxp
-                , real fdm, real fdp, real fdms, real fdps
-                , const int i, const int j, const int k, const Comp m);
 
     /* needed in diffusion kernels */
     inline real resistance_multiplier(const real res0,

@@ -4,11 +4,11 @@
 *  Cell-wise construction of diff matrix based on local structure (no solid)
 *  - interfacial resistance is considered only in liquid 
 *******************************************************************************/
-void EnthalpyFD::kernel_fluid(const std::array<ConnectType,3> & ctype,
-                              const real cxm, const real cxp,
-                              std::vector<StencilPoint> & stencil,
-                              const real resinvm, const real resinvp,
-                              real & Am, real & Ac, real & Ap, real & F) {
+void EnthalpyFD::kernel_fluid1(const std::array<ConnectType,3> & ctype,
+                               const real cxm, const real cxp,
+                               std::vector<StencilPoint> & stencil,
+                               const real resinvm, const real resinvp,
+                               real & Am, real & Ac, real & Ap, real & F) {
 
   /*------------------------+
   |  fluid - fluid - fluid  |
@@ -27,6 +27,7 @@ void EnthalpyFD::kernel_fluid(const std::array<ConnectType,3> & ctype,
     Ap = cxp;
     Ac += cxm + cxp;
 
+    /* do we use interfacial heat transfer resistance? */
     if(boil::realistic(resinvm)) {
       /* correct for upwind scheme */
       stencil[2].pos -= stencil[0].pos;
@@ -54,6 +55,7 @@ void EnthalpyFD::kernel_fluid(const std::array<ConnectType,3> & ctype,
     Ap = 0.;
     Ac += cxm + cxp;
 
+    /* do we use interfacial heat transfer resistance? */
     if(boil::realistic(resinvp)) {
       /* reverse the stencil */
       std::reverse(stencil.begin(),stencil.end());

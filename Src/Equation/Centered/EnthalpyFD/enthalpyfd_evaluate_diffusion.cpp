@@ -71,28 +71,20 @@ void EnthalpyFD::evaluate_diffusion(const Old old, const Scalar * diff_eddy) {
         }
       }
 
-      /* center in solid */
-      if(dom->ibody().off(i,j,k)) {
-        cell_diffusion_solid(m,i,j,k,ox,oy,oz,phi.xc(i),
-                             coef_m,coef_p,dSm,dSp,re,old,
+      /* center in fluid */
+      if(dom->ibody().on(i,j,k)) {
+        cell_diffusion_fluid(m,i,j,k,ox,oy,oz,phi.xc(i),
+                             coef_m,coef_p,re,old,
                              tscn,tscm,stencil,
                              *Am,*Ac,*Ap,*Ff,
                              diff_eddy);
       } else {
-        /* fluid on all sides */
-        if(dom->ibody().on(i-ox,j-oy,k-oz)&&dom->ibody().on(i+ox,j+oy,k+oz)) {
-          cell_diffusion_fluid(m,i,j,k,ox,oy,oz,phi.xc(i),
-                               coef_m,coef_p,re,old,
-                               tscn,tscm,stencil,
-                               *Am,*Ac,*Ap,*Ff,
-                               diff_eddy);
-
-        /* fluid near walls */
-        } else {
-
-        }
-
-      } /* solid vs  fluid */
+        cell_diffusion_solid(m,i,j,k,ox,oy,oz,phi.xc(i),
+                             coef_m,coef_p,dSm,dSp,re,old,
+                             tscn,tscm,
+                             *Am,*Ac,*Ap,*Ff,
+                             diff_eddy);
+      } /* solid vs fluid */
 
     } /* ijk */
   } /* m */

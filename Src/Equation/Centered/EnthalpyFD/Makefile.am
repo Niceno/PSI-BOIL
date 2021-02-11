@@ -8,12 +8,12 @@ libEnthalpyFD_a_SOURCES = enthalpyfd.h                        \
                           enthalpyfd_create_system.cpp        \
                           enthalpyfd_convection.cpp           \
                           enthalpyfd_convective_time_step.cpp \
-                          enthalpyfd_diff_matrix.cpp          \
                           enthalpyfd_evaluate_diffusion.cpp   \
                           enthalpyfd_extrapolate_values.cpp   \
                           enthalpyfd_face_value.cpp           \
                           enthalpyfd_inertial.cpp             \
-                          enthalpyfd_kernel_fluid.cpp         \
+                          enthalpyfd_kernel_fluid1.cpp        \
+                          enthalpyfd_kernel_fluid2.cpp        \
                           enthalpyfd_kernel_solid.cpp         \
                           enthalpyfd_new_time_step.cpp        \
                           enthalpyfd_solve.cpp                \

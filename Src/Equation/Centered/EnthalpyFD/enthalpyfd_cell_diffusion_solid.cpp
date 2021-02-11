@@ -13,12 +13,10 @@ void EnthalpyFD::cell_diffusion_solid(const Comp m,
                           const real dSm, const real dSp,
                           const ResistEval re, const Old old, 
                           const real tscn, const real tscm,
-                          std::vector<StencilPoint> & stencil,
                           real & Aw, real & Ac, real & Ae, real & F,
                           const Scalar * diff_eddy) {
 
   Sign dummy; /* dummy sign */
-  stencil.clear();
   std::array<ConnectType,3> ctype = { ConnectType::solid,
                                       ConnectType::solid,
                                       ConnectType::solid };
@@ -26,7 +24,8 @@ void EnthalpyFD::cell_diffusion_solid(const Comp m,
   real lc = cht.lambda(i,j,k,diff_eddy);
   real lcm, lcp;
   const real vol = phi.dV(i,j,k);
-  real xm,xp,pm,pp;
+  real xm,xp;
+  real new_pm,new_pp;
   real old_pm,old_pp;
   real dwsrcm, dwsrcp;
 
@@ -37,8 +36,8 @@ void EnthalpyFD::cell_diffusion_solid(const Comp m,
 
   /* solid also in west? */
   if(dom->ibody().off(i-ox,j-oy,k-oz)) {
-    xm=cht.distance_center(Sign::neg(),m,i,j,k);
-    old_pm=pm=phi[i-ox][j-oy][k-oz];
+    xm = cht.distance_center(Sign::neg(),m,i,j,k);
+    old_pm = new_pm = phi[i-ox][j-oy][k-oz];
     lcm = 0.5*(lc+cht.lambda(i-ox,j-oy,k-oz,diff_eddy));
     ctype[0] = ConnectType::solid;
   } else {
@@ -47,10 +46,10 @@ void EnthalpyFD::cell_diffusion_solid(const Comp m,
     old_pm = cht.node_tmp_sol()[m][i][j][k];
     dwsrcm = cht.dirac_wall_source(i-ox,j-oy,k-oz);
 
-    /* is there an interface? */
+    /* is there no interface? */
     if(!cht.interface(Sign::neg(),m,i,j,k)) {
       real dxfull = cht.distance_center(Sign::neg(),m,i,j,k);
-      pm=phi[i-ox][j-oy][k-oz];
+      new_pm = phi[i-ox][j-oy][k-oz];
       ctype[0] = ConnectType::fluid;
 
       /* evaluate fluid side resistance */
@@ -59,7 +58,7 @@ void EnthalpyFD::cell_diffusion_solid(const Comp m,
 
     } else {
       /* evaluate distance to interface */
-      real dxfull = cht.distance_int(Sign::neg(),m,i,j,k,pm,dummy,
+      real dxfull = cht.distance_int(Sign::neg(),m,i,j,k,new_pm,dummy,
                                      ResistEval::no,old);
       ctype[0] = ConnectType::interface;
  
@@ -77,8 +76,8 @@ void EnthalpyFD::cell_diffusion_solid(const Comp m,
 
   /* solid also in east? */
   if(dom->ibody().off(i+ox,j+oy,k+oz)) {
-    xp=cht.distance_center(Sign::pos(),m,i,j,k);
-    old_pp=pp=phi[i+ox][j+oy][k+oz];
+    xp = cht.distance_center(Sign::pos(),m,i,j,k);
+    old_pp = new_pp = phi[i+ox][j+oy][k+oz];
     lcp = 0.5*(lc+cht.lambda(i+ox,j+oy,k+oz,diff_eddy));
     ctype[2] = ConnectType::solid;
   } else {
@@ -87,10 +86,10 @@ void EnthalpyFD::cell_diffusion_solid(const Comp m,
     old_pp = cht.node_tmp_sol()[m][i+ox][j+oy][k+oz];
     dwsrcp = cht.dirac_wall_source(i+ox,j+oy,k+oz);
 
-    /* is there an interface? */
+    /* is there no interface? */
     if(!cht.interface(Sign::pos(),m,i,j,k)) {
       real dxfull = cht.distance_center(Sign::pos(),m,i,j,k);
-      pp=phi[i+ox][j+oy][k+oz];
+      new_pp = phi[i+ox][j+oy][k+oz];
       ctype[2] = ConnectType::fluid;
 
       /* evaluate fluid side resistance */
@@ -99,7 +98,7 @@ void EnthalpyFD::cell_diffusion_solid(const Comp m,
 
     } else {
       /* evaluate distance to interface */
-      real dxfull = cht.distance_int(Sign::pos(),m,i,j,k,pp,dummy,
+      real dxfull = cht.distance_int(Sign::pos(),m,i,j,k,new_pp,dummy,
                                      ResistEval::no,old);
       ctype[2] = ConnectType::interface;
 
@@ -124,7 +123,7 @@ void EnthalpyFD::cell_diffusion_solid(const Comp m,
 #endif
 
   if(old==Old::no) {
-    kernel_solid(ctype,tscn*cxm,tscn*cxp,pm,pp,
+    kernel_solid(ctype,tscn*cxm,tscn*cxp,new_pm,new_pp,
                  resistvals,tscn*dwsrcm,tscn*dwsrcp,
                  Aw,Ac,Ae,F);
   } else {
