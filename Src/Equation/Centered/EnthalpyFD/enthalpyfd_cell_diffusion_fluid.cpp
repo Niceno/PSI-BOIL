@@ -35,24 +35,8 @@ void EnthalpyFD::cell_diffusion_fluid(const Comp m,
                                     cht.distance_face(Sign::neg(),m,i,j,k)/lc,
                                     boil::unreal };
 
-  /* is there no interface in west? */
-  if(!cht.interface(Sign::neg(),m,i,j,k,old)) {
-    xm = cht.distance_center(Sign::neg(),m,i,j,k);
-    old_pm = new_pm = phi[i-ox][j-oy][k-oz];
-    ctype[0] = ConnectType::fluid;
-  /* is there a wall in the west? */
-  } else if(dom->ibody().off(i-ox,j-oy,k-oz)) {
-    xm = cht.distance_face(Sign::neg(),m,i,j,k);
-    new_pm = phi[i-ox][j-oy][k-oz];
-    old_pm = cht.node_tmp_flu()[m][i][j][k];
-    dwsrcm = cht.dirac_wall_source(i,j,k);
-    ctype[0] = ConnectType::solid;
-
-    /* evaluate solid side resistance */
-    real dxfull = cht.distance_center(Sign::neg(),m,i,j,k);
-    resistvals[0] = (dxfull-xm)/cht.lambda(i-ox,j-oy,k-oz,diff_eddy)
-                  + cht.wall_resistance(i,j,k);
-  } else {
+  /* is there an interface in west? */
+  if(cht.interface(Sign::neg(),m,i,j,k,old)) {
     xm = cht.distance_int(Sign::neg(),m,i,j,k,new_pm,markerm,re,old);
     old_pm = new_pm;
     ctype[0] = ConnectType::interface;
@@ -64,26 +48,27 @@ void EnthalpyFD::cell_diffusion_fluid(const Comp m,
                 cht.evaluate_resinv(m,i   ,j   ,k) :
                 cht.evaluate_resinv(m,i-ox,j-oy,k-oz);
     }
-  }
-
-  /* is there no interface in east? */
-  if(!cht.interface(Sign::pos(),m,i,j,k,old)) {
-    xp = cht.distance_center(Sign::pos(),m,i,j,k);
-    old_pp = new_pp = phi[i+ox][j+oy][k+oz];
-    ctype[2] = ConnectType::fluid;
-  /* is there a wall in the east */
-  } else if(dom->ibody().off(i+ox,j+oy,k+oz)) {
-    xp = cht.distance_face(Sign::pos(),m,i,j,k);
-    new_pp = phi[i+ox][j+oy][k+oz];
-    old_pp = cht.node_tmp_flu()[m][i+ox][j+oy][k+oz];
-    dwsrcp = cht.dirac_wall_source(i,j,k);
-    ctype[2] = ConnectType::solid;
+  /* is there a wall in west? */
+  } else if(dom->ibody().off(i-ox,j-oy,k-oz)) {
+    xm = cht.distance_face(Sign::neg(),m,i,j,k);
+    new_pm = phi[i-ox][j-oy][k-oz];
+    old_pm = cht.node_tmp_flu()[m][i][j][k];
+    dwsrcm = cht.dirac_wall_source(i,j,k);
+    ctype[0] = ConnectType::solid;
 
     /* evaluate solid side resistance */
-    real dxfull = cht.distance_center(Sign::pos(),m,i,j,k);
-    resistvals[2] = (dxfull-xp)/cht.lambda(i+ox,j+oy,k+oz,diff_eddy)
-                    + cht.wall_resistance(i,j,k);
+    real dxfull = cht.distance_center(Sign::neg(),m,i,j,k);
+    resistvals[0] = (dxfull-xm)/cht.lambda(i-ox,j-oy,k-oz,diff_eddy)
+                  + cht.wall_resistance(i,j,k);
+  /* no interface, no wall */
   } else {
+    xm = cht.distance_center(Sign::neg(),m,i,j,k);
+    old_pm = new_pm = phi[i-ox][j-oy][k-oz];
+    ctype[0] = ConnectType::fluid;
+  }
+
+  /* is there an interface in east? */
+  if(cht.interface(Sign::pos(),m,i,j,k,old)) {
     xp = cht.distance_int(Sign::pos(),m,i,j,k,new_pp,markerp,re,old);
     old_pp = new_pp;
     ctype[2] = ConnectType::interface;
@@ -95,6 +80,23 @@ void EnthalpyFD::cell_diffusion_fluid(const Comp m,
                 cht.evaluate_resinv(m,i   ,j   ,k) :
                 cht.evaluate_resinv(m,i+ox,j+oy,k+oz);
     }
+  /* is there a wall in east */
+  } else if(dom->ibody().off(i+ox,j+oy,k+oz)) {
+    xp = cht.distance_face(Sign::pos(),m,i,j,k);
+    new_pp = phi[i+ox][j+oy][k+oz];
+    old_pp = cht.node_tmp_flu()[m][i+ox][j+oy][k+oz];
+    dwsrcp = cht.dirac_wall_source(i,j,k);
+    ctype[2] = ConnectType::solid;
+
+    /* evaluate solid side resistance */
+    real dxfull = cht.distance_center(Sign::pos(),m,i,j,k);
+    resistvals[2] = (dxfull-xp)/cht.lambda(i+ox,j+oy,k+oz,diff_eddy)
+                    + cht.wall_resistance(i,j,k);
+  /* no interface, no wall */
+  } else {
+    xp = cht.distance_center(Sign::pos(),m,i,j,k);
+    old_pp = new_pp = phi[i+ox][j+oy][k+oz];
+    ctype[2] = ConnectType::fluid;
   }
 
   /* matrix coefficients */
