@@ -102,7 +102,7 @@ void EnthalpyFD::kernel_fluid2(const std::array<ConnectType,3> & ctype,
       Am +=  cxp * mult * fact;
       Ac += -cxp * (coefs[1]/deno + mult*fact2);
       F += cxp*stencil[0].val*resinvp/deno
-         + dwsrcm * cxp * mult * fact * resistvals[2]; 
+         + dwsrcm * cxp * mult * fact * resistvals[0]; 
 
     } else {
       /* here the stencil is not reversed */
