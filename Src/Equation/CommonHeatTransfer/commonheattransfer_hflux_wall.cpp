@@ -53,7 +53,7 @@ real CommonHeatTransfer::hflux_wall(const Scalar & val, const Dir din,
               real lc = solid()->lambda(i,j,k);
               hflux += lc*(val[i][j][k]-val[i+iof][j+jof][k+kof])/alen*area;
 
-            } else if(!interface(-sig,mcomp,i+iof,j+jof,k+kof)) {
+            } else if(!interface(-sig,mcomp,i+iof,j+jof,k+kof,Old::no)) {
               real lc=lambda(i,j,k,diff_eddy);
               hflux += lc*(val[i][j][k]-val[i+iof][j+jof][k+kof])/alen*area;
 
@@ -66,7 +66,7 @@ real CommonHeatTransfer::hflux_wall(const Scalar & val, const Dir din,
 
               /* only liquid resistance is considered */
               if(use_int_resist) {
-                if(topo->below_interface(i+of,j+of,k+of)) {
+                if(below_interface(i+of,j+of,k+of,Old::no)) {
                   totresist += int_resistance_liq(i+of,j+of,k+of);
                 }
               }

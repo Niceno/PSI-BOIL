@@ -22,12 +22,12 @@ void EnthalpyFD::cell_diffusion_solid(const Comp m,
                                       ConnectType::solid };
 
   real lc = cht.lambda(i,j,k,diff_eddy);
-  real lcm, lcp;
+  real lcm(boil::unreal), lcp(boil::unreal);
   const real vol = phi.dV(i,j,k);
-  real xm,xp;
-  real new_pm,new_pp;
-  real old_pm,old_pp;
-  real dwsrcm, dwsrcp;
+  real xm(boil::unreal),xp(boil::unreal);
+  real new_pm(boil::unreal),new_pp(boil::unreal);
+  real old_pm(boil::unreal),old_pp(boil::unreal);
+  real dwsrcm(boil::unreal), dwsrcp(boil::unreal);
 
   std::array<real,3> resistvals = { boil::unreal,
                                     /* distance to both faces is identical */
@@ -47,7 +47,7 @@ void EnthalpyFD::cell_diffusion_solid(const Comp m,
     dwsrcm = cht.dirac_wall_source(i-ox,j-oy,k-oz);
 
     /* is there no interface? */
-    if(!cht.interface(Sign::neg(),m,i,j,k)) {
+    if(!cht.interface(Sign::neg(),m,i,j,k,old)) {
       real dxfull = cht.distance_center(Sign::neg(),m,i,j,k);
       new_pm = phi[i-ox][j-oy][k-oz];
       ctype[0] = ConnectType::fluid;
@@ -62,13 +62,14 @@ void EnthalpyFD::cell_diffusion_solid(const Comp m,
                                      ResistEval::no,old);
       ctype[0] = ConnectType::interface;
  
-      /* evaluate fluid side resistance, note the inversion of lambda */
+      /* evaluate fluid side resistance, note the inversion of lambda,
+       * normal vector assumed to be perpendicular to solid for simplicity */
       resistvals[0] = (dxfull-xm)/cht.lambda_inv(i-ox,j-oy,k-oz,diff_eddy)
                     + cht.wall_resistance(i-ox,j-oy,k-oz);
 
       /* interfacial resistance addition */
       if(  cht.use_int_resistance()
-         &&cht.topo->below_interface(i-ox,j-oy,k-oz)) {
+         &&cht.below_interface(i-ox,j-oy,k-oz,old)) {
          resistvals[0] += cht.int_resistance_liq(i-ox,j-oy,k-oz); 
        }
     } 
@@ -87,7 +88,7 @@ void EnthalpyFD::cell_diffusion_solid(const Comp m,
     dwsrcp = cht.dirac_wall_source(i+ox,j+oy,k+oz);
 
     /* is there no interface? */
-    if(!cht.interface(Sign::pos(),m,i,j,k)) {
+    if(!cht.interface(Sign::pos(),m,i,j,k,old)) {
       real dxfull = cht.distance_center(Sign::pos(),m,i,j,k);
       new_pp = phi[i+ox][j+oy][k+oz];
       ctype[2] = ConnectType::fluid;
@@ -102,13 +103,14 @@ void EnthalpyFD::cell_diffusion_solid(const Comp m,
                                      ResistEval::no,old);
       ctype[2] = ConnectType::interface;
 
-      /* evaluate fluid side resistance, note the inversion of lambda */
+      /* evaluate fluid side resistance, note the inversion of lambda,
+       * normal vector assumed to be perpendicular to solid for simplicity */
       resistvals[2] = (dxfull-xp)/cht.lambda_inv(i+ox,j+oy,k+oz,diff_eddy)
                     + cht.wall_resistance(i+ox,j+oy,k+oz);
 
       /* interfacial resistance addition */
       if(  cht.use_int_resistance()
-         &&cht.topo->below_interface(i+ox,j+oy,k+oz)) {
+         &&cht.below_interface(i+ox,j+oy,k+oz,old)) {
          resistvals[2] += cht.int_resistance_liq(i+ox,j+oy,k+oz);
        }
     }
@@ -130,8 +132,7 @@ void EnthalpyFD::cell_diffusion_solid(const Comp m,
     Aw = tscm * cxm;
     Ac = tscm * (cxm+cxp);
     Ae = tscm * cxp;
-    F += Aw*old_pm - Ac*phi[i][j][k] + Ae*old_pp
-       + tscm*(dwsrcm+dwsrcp);
+    F += Aw*old_pm - Ac*phi[i][j][k] + Ae*old_pp;
   }
 
   return;

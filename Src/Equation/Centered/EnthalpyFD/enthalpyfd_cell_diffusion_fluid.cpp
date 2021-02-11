@@ -23,12 +23,12 @@ void EnthalpyFD::cell_diffusion_fluid(const Comp m,
 
   real lc = cht.lambda(i,j,k,diff_eddy);
   const real vol = phi.dV(i,j,k);
-  real xm,xp;
-  real new_pm,new_pp;
-  real old_pm,old_pp;
+  real xm(boil::unreal),xp(boil::unreal);
+  real new_pm(boil::unreal),new_pp(boil::unreal);
+  real old_pm(boil::unreal),old_pp(boil::unreal);
   Sign markerm, markerp;
   real resinvm(boil::unreal), resinvp(boil::unreal);
-  real dwsrcm, dwsrcp;
+  real dwsrcm(boil::unreal), dwsrcp(boil::unreal);
 
   std::array<real,3> resistvals = { boil::unreal,
                                     /* distance to both faces is identical */
@@ -36,7 +36,7 @@ void EnthalpyFD::cell_diffusion_fluid(const Comp m,
                                     boil::unreal };
 
   /* is there no interface in west? */
-  if(!cht.interface(Sign::neg(),m,i,j,k)) {
+  if(!cht.interface(Sign::neg(),m,i,j,k,old)) {
     xm = cht.distance_center(Sign::neg(),m,i,j,k);
     old_pm = new_pm = phi[i-ox][j-oy][k-oz];
     ctype[0] = ConnectType::fluid;
@@ -58,7 +58,7 @@ void EnthalpyFD::cell_diffusion_fluid(const Comp m,
     ctype[0] = ConnectType::interface;
     /* interfacial resistance plays a role only for liquid */
     if(  cht.use_int_resistance()&&old==Old::no
-       &&cht.topo->above_interface(i,j,k)) {
+       &&cht.above_interface(i,j,k,old)) {
       /* evaluate resistance in the correct cell */
       resinvm = markerm < 0 ?
                 cht.evaluate_resinv(m,i   ,j   ,k) :
@@ -67,7 +67,7 @@ void EnthalpyFD::cell_diffusion_fluid(const Comp m,
   }
 
   /* is there no interface in east? */
-  if(!cht.interface(Sign::pos(),m,i,j,k)) {
+  if(!cht.interface(Sign::pos(),m,i,j,k,old)) {
     xp = cht.distance_center(Sign::pos(),m,i,j,k);
     old_pp = new_pp = phi[i+ox][j+oy][k+oz];
     ctype[2] = ConnectType::fluid;
@@ -89,7 +89,7 @@ void EnthalpyFD::cell_diffusion_fluid(const Comp m,
     ctype[2] = ConnectType::interface;
     /* interfacial resistance plays a role only for liquid */
     if(  cht.use_int_resistance()&&old==Old::no
-       &&cht.topo->above_interface(i,j,k)) {
+       &&cht.above_interface(i,j,k,old)) {
       /* evaluate resistance in the correct cell */
       resinvp = markerp < 0 ?
                 cht.evaluate_resinv(m,i   ,j   ,k) :

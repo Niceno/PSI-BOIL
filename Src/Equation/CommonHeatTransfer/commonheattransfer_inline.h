@@ -76,18 +76,6 @@ inline real temperature_node(const real Q,
  *  Checks if the given cell is at (or next to) an interface
 ******************************************************************************/
 inline bool interface(const Sign dir, const Comp m,
-                      const int i, const int j, const int k) const {
-
-  return topo->interface(dir,m,i,j,k);
-}
-
-inline bool interface_old(const Sign dir, const Comp m,
-                          const int i, const int j, const int k) const {
-
-  return topo->interface_old(dir,m,i,j,k);
-}
-
-inline bool interface(const Sign dir, const Comp m,
                       const int i, const int j, const int k, const Old old)
                       const {
 
@@ -104,6 +92,12 @@ inline bool above_interface(const int i, const int j, const int k,
                             const Old old) const {
   return (old==Old::yes) ?
          topo->above_interface_old(i,j,k) : topo->above_interface(i,j,k);
+}
+
+inline bool below_interface(const int i, const int j, const int k,
+                            const Old old) const {
+  return (old==Old::yes) ?
+         topo->below_interface_old(i,j,k) : topo->below_interface(i,j,k);
 }
 
 /***************************************************************************//**

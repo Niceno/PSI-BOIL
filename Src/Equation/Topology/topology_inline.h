@@ -25,6 +25,20 @@
     inline bool below_interface_old(const int i, const int j, const int k)
       const { return clrold[i][j][k]<clrsurf; }
 
+    inline bool above_interface(const int i, const int j, const int k,
+                                const Old old) const {
+      return (old==Old::yes) ?
+             above_interface_old(i,j,k) :
+             above_interface(i,j,k);
+    }
+ 
+    inline bool below_interface(const int i, const int j, const int k,
+                                const Old old) const {
+      return (old==Old::yes) ?
+             below_interface_old(i,j,k) :
+             below_interface(i,j,k);
+    }
+
     /* <0: below interface, >0 above interface */
     inline Sign sign_interface(const real c) const {
       return above_interface(c) ? Sign::pos() : Sign::neg();

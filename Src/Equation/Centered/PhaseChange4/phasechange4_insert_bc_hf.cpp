@@ -55,7 +55,7 @@ void PhaseChange4::insert_bc_hf(const Scalar * diff_eddy) {
           int kk = k+ofz;
           
           /* is there an interface between cell centre and wall? */
-          if(cht.interface(sig,mcomp,ii,jj,kk)) {
+          if(cht.interface(sig,mcomp,ii,jj,kk,Old::no)) {
 
             /* wall temperature */
             real tw = cht.tmp()[i][j][k];
@@ -70,7 +70,7 @@ void PhaseChange4::insert_bc_hf(const Scalar * diff_eddy) {
               dist = cht.distance_int_x(-sig,i,j,k,ti,dummy,
                                         ResistEval::no,Old::no);
               real totresist = dist/lmb+cht.wall_resistance(ii,jj,kk);
-              if(cht.topo->above_interface(ii,jj,kk)) {
+              if(cht.above_interface(ii,jj,kk,Old::no)) {
                 txv[ii][jj][kk] = (tw-ti)/totresist*real(sig);
                 txv[i ][j ][k ] = (tw-ti)/totresist*real(sig);
               } else {
@@ -86,7 +86,7 @@ void PhaseChange4::insert_bc_hf(const Scalar * diff_eddy) {
               dist = cht.distance_int_y(-sig,i,j,k,ti,dummy,
                                         ResistEval::no,Old::no);
               real totresist = dist/lmb+cht.wall_resistance(ii,jj,kk);
-              if(cht.topo->above_interface(ii,jj,kk)) {
+              if(cht.above_interface(ii,jj,kk,Old::no)) {
                 tyv[ii][jj][kk] = (tw-ti)/totresist*real(sig);
                 tyv[i ][j ][k ] = (tw-ti)/totresist*real(sig);
               } else {
@@ -102,7 +102,7 @@ void PhaseChange4::insert_bc_hf(const Scalar * diff_eddy) {
               dist = cht.distance_int_z(-sig,i,j,k,ti,dummy,
                                         ResistEval::no,Old::no);
               real totresist = dist/lmb+cht.wall_resistance(ii,jj,kk);
-              if(cht.topo->above_interface(ii,jj,kk)) {
+              if(cht.above_interface(ii,jj,kk,Old::no)) {
                 tzv[ii][jj][kk] = (tw-ti)/totresist*real(sig);
                 tzv[i ][j ][k ] = (tw-ti)/totresist*real(sig);
               } else {
