@@ -49,15 +49,7 @@ void CommonHeatTransfer::resTint(const Sign & dir, const Comp & m,
     stencil.push_back(StencilPoint(1,tpr[i0][j0][k0],dist));
 
     /* resistance ghost distance */
-    real res = int_resistance_liq(ii,ji,ki)*lambdal(ii,ji,ki);
-    real resinv;
-    if(m==Comp::i()) {
-      resinv = fabs(topo->get_nx()[ii][ji][ki])/res;
-    } else if(m==Comp::j()) {
-      resinv = fabs(topo->get_ny()[ii][ji][ki])/res;
-    } else {
-      resinv = fabs(topo->get_nz()[ii][ji][ki])/res;
-    }
+    real resinv = evaluate_resinv(m,ii,ji,ki);
 
     /* is there interface to the other side? */
     if(interface(dir,m,i0,j0,k0,old)) {
@@ -93,4 +85,20 @@ void CommonHeatTransfer::resTint(const Sign & dir, const Comp & m,
   } /* are we in liquid? */
 
   return;
+}
+
+/******************************************************************************/
+real CommonHeatTransfer::evaluate_resinv(const Comp & m,
+                                  const int i, const int j, const int k) const {
+  real res = int_resistance_liq(i,j,k)*lambdal(i,j,k);
+  real resinv;
+  if(m==Comp::i()) {
+    resinv = fabs(topo->get_nx()[i][j][k])/res;
+  } else if(m==Comp::j()) {
+    resinv = fabs(topo->get_ny()[i][j][k])/res;
+  } else {
+    resinv = fabs(topo->get_nz()[i][j][k])/res;
+  }
+
+  return resinv;
 }

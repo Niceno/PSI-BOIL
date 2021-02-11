@@ -20,7 +20,8 @@ bool CommonHeatTransfer::add_point(const int i0, const int j0, const int k0,
     interface_reached = true;
 
     real tgamma;
-    real dist_int = distance_int(dir,m,i0,j0,k0,tgamma,ResistEval::yes,old);
+    Sign dmy; /* dummy sign */
+    real dist_int = distance_int(dir,m,i0,j0,k0,tgamma,dmy,ResistEval::yes,old);
 
     StencilPoint sp(stencil.size(),tgamma,dist_int);
     /* directional choice */

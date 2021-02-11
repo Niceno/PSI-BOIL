@@ -91,13 +91,14 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
       /* f-s-s */
       real fact;
       real resist_f, resist_s;
+      Sign dummy; /* dummy sign */
 
       /* fluid resistance */
       if(cht.interface(Sign::neg(),m,i,j,k)) {
         /* removed from system matrix */
         aflagm = false;
         /* tm is changed to the saturation temperature */
-        real dxfull = cht.distance_int(Sign::neg(),m,i,j,k,tm,
+        real dxfull = cht.distance_int(Sign::neg(),m,i,j,k,tm,dummy,
                                        ResistEval::no,Old::no);
         dxm = dxm * fdm;
         /* lambdaf is inverted */
@@ -145,13 +146,14 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
       /* s-s-f */
       real fact;
       real resist_f, resist_s;
+      Sign dummy; /* dummy sign */
 
       /* fluid resistance */
       if(cht.interface(Sign::pos(),m,i,j,k)) {
         /* removed from system matrix */
         aflagp = false;
         /* tp is changed to the saturation temperature */
-        real dxfull = cht.distance_int(Sign::pos(),m,i,j,k,tp,
+        real dxfull = cht.distance_int(Sign::pos(),m,i,j,k,tp,dummy,
                                        ResistEval::no,Old::no);
         dxp = dxp * fdp;
         /* lambdaf is inverted */
@@ -209,12 +211,15 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
   |  center in fluid  |
   +------------------*/
   } else {
+    Sign cell_marker;
+
     if(onm && onp){
       /* f-f-f */
       if(!cht.interface(Sign::neg(),m,i,j,k)){
         dxm=dxm;
       } else {
-        dxm = cht.distance_int(Sign::neg(),m,i,j,k,tm,ResistEval::no,Old::no);
+        dxm = cht.distance_int(Sign::neg(),m,i,j,k,tm,cell_marker,
+                               ResistEval::no,Old::no);
         aflagm=false;
 #ifdef DEBUG
 	std::cout<<"aflagm=false: " <<i<<" "<<j<<" "<<k<<" "<<clc<<"\n";
@@ -223,7 +228,8 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
       if(!cht.interface(Sign::pos(),m,i,j,k)){
         dxp=dxp;
       } else {
-        dxp = cht.distance_int(Sign::pos(),m,i,j,k,tp,ResistEval::no,Old::no);
+        dxp = cht.distance_int(Sign::pos(),m,i,j,k,tp,cell_marker,
+                               ResistEval::no,Old::no);
         aflagp=false;
 #ifdef DEBUG
 	std::cout<<"aflagp=false: " <<i<<" "<<j<<" "<<k<<" "<<clc<<"\n";
@@ -256,7 +262,8 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
       if(!cht.interface(Sign::pos(),m,i,j,k)){
         dxp=dxp;
       } else {
-        dxp = cht.distance_int(Sign::pos(),m,i,j,k,tp,ResistEval::no,Old::no);
+        dxp = cht.distance_int(Sign::pos(),m,i,j,k,tp,cell_marker,
+                               ResistEval::no,Old::no);
         aflagp=false;
       }
       if(cht.interface(Sign::neg(),m,i,j,k)) {
@@ -264,7 +271,8 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
         aflagm = false;
         /* dxm is corrected to account for interface position */
         /* tm is changed to the saturation temperature */
-        dxm = cht.distance_int(Sign::neg(),m,i,j,k,tm,ResistEval::no,Old::no);
+        dxm = cht.distance_int(Sign::neg(),m,i,j,k,tm,cell_marker,
+                               ResistEval::no,Old::no);
         /* FDM */
         am = lc * vol * (this->*coef_m)(dxm,dxp,x0);
         ap = lc * vol * (this->*coef_p)(dxm,dxp,x0);
@@ -304,7 +312,8 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
       if(!cht.interface(Sign::neg(),m,i,j,k)){
         dxm=dxm;
       } else {
-        dxm = cht.distance_int(Sign::neg(),m,i,j,k,tm,ResistEval::no,Old::no);
+        dxm = cht.distance_int(Sign::neg(),m,i,j,k,tm,cell_marker,
+                               ResistEval::no,Old::no);
         aflagm=false;
       }
       if(cht.interface(Sign::pos(),m,i,j,k)) {
@@ -312,7 +321,8 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
         aflagp = false;
         /* dxp is corrected to account for interface position */
         /* tp is changed to the saturation temperature */
-        dxp = cht.distance_int(Sign::pos(),m,i,j,k,tp,ResistEval::no,Old::no);
+        dxp = cht.distance_int(Sign::pos(),m,i,j,k,tp,cell_marker,
+                               ResistEval::no,Old::no);
         /* FDM */
         am = lc * vol * (this->*coef_m)(dxm,dxp,x0);
         ap = lc * vol * (this->*coef_p)(dxm,dxp,x0);
@@ -360,12 +370,4 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
 #endif
 
   return;
-}
-
-/***************************************************************************//**
-* Effect of flux continuity 
-*******************************************************************************/
-inline real EnthalpyFD::resistance_multiplier(const real resistminus,
-                                              const real resistplus) const {
-  return resistminus / (resistminus + resistplus);
 }

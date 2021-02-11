@@ -60,7 +60,8 @@ real CommonHeatTransfer::hflux_wall(const Scalar & val, const Dir din,
             } else {
               real lc=lambda_inv(i,j,k,diff_eddy);
               real ts;
-              alen = distance_int(sig,mcomp,i,j,k,ts,ResistEval::no,Old::no);
+              Sign dmmy;
+              alen = distance_int(sig,mcomp,i,j,k,ts,dmmy,ResistEval::no,Old::no);
               real totresist = alen/lc+wall_resistance(i+of,j+of,k+of);
 
               /* only liquid resistance is considered */

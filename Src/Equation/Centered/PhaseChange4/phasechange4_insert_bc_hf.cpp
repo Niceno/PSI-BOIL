@@ -7,6 +7,8 @@ void PhaseChange4::insert_bc_hf(const Scalar * diff_eddy) {
 *         N.B. fluid values are also updated but will be overwritten during
 *         extrapolation, since extrapolation also 'looks' into buffer cells.
 *******************************************************************************/
+  Sign dummy; /* dummy sign */
+
   for(int b = 0; b < cht.tmp().bc().count(); b++) {
 
     if(cht.tmp().bc().type_decomp(b))
@@ -65,7 +67,8 @@ void PhaseChange4::insert_bc_hf(const Scalar * diff_eddy) {
             /* the temperature gradient for inverse phase is set 
              * extrapolation overwrites them though */
             if       (mcomp==Comp::i()) {
-              dist = cht.distance_int_x(-sig,i,j,k,ti,ResistEval::no,Old::no);
+              dist = cht.distance_int_x(-sig,i,j,k,ti,dummy,
+                                        ResistEval::no,Old::no);
               real totresist = dist/lmb+cht.wall_resistance(ii,jj,kk);
               if(cht.topo->above_interface(ii,jj,kk)) {
                 txv[ii][jj][kk] = (tw-ti)/totresist*real(sig);
@@ -80,7 +83,8 @@ void PhaseChange4::insert_bc_hf(const Scalar * diff_eddy) {
                 txl[i ][j ][k ] = (tw-ti)/totresist*real(sig);
               }
             } else if(mcomp==Comp::j()) {             
-              dist = cht.distance_int_y(-sig,i,j,k,ti,ResistEval::no,Old::no);
+              dist = cht.distance_int_y(-sig,i,j,k,ti,dummy,
+                                        ResistEval::no,Old::no);
               real totresist = dist/lmb+cht.wall_resistance(ii,jj,kk);
               if(cht.topo->above_interface(ii,jj,kk)) {
                 tyv[ii][jj][kk] = (tw-ti)/totresist*real(sig);
@@ -95,7 +99,8 @@ void PhaseChange4::insert_bc_hf(const Scalar * diff_eddy) {
                 tyl[i ][j ][k ] = (tw-ti)/totresist*real(sig);
               }
             } else {
-              dist = cht.distance_int_z(-sig,i,j,k,ti,ResistEval::no,Old::no);
+              dist = cht.distance_int_z(-sig,i,j,k,ti,dummy,
+                                        ResistEval::no,Old::no);
               real totresist = dist/lmb+cht.wall_resistance(ii,jj,kk);
               if(cht.topo->above_interface(ii,jj,kk)) {
                 tzv[ii][jj][kk] = (tw-ti)/totresist*real(sig);

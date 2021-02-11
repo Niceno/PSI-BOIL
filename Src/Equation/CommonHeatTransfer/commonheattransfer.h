@@ -31,24 +31,24 @@ class CommonHeatTransfer {
     /* distances to interface */
     real distance_int(const Sign dir, const Comp & m,
                       const int i, const int j, const int k,
-                      real & tint, const ResistEval re, const Old old) const;
+                      real & tint, Sign & cell_marker,
+                      const ResistEval re, const Old old) const;
     real distance_int_x(const Sign dir,
                         const int i, const int j, const int k,
-                        real & tint, const ResistEval re, const Old old) const;
+                        real & tint, Sign & cell_marker,
+                        const ResistEval re, const Old old) const;
     real distance_int_y(const Sign dir,
                         const int i, const int j, const int k,
-                        real & tint, const ResistEval re, const Old old) const;
+                        real & tint, Sign & cell_marker,
+                        const ResistEval re, const Old old) const;
     real distance_int_z(const Sign dir,
                         const int i, const int j, const int k,
-                        real & tint, const ResistEval re, const Old old) const;
+                        real & tint, Sign & cell_marker,
+                        const ResistEval re, const Old old) const;
 
-    /* effect of interfacial heat transfer resistance */
-    void resTint(const Sign & dir, const Comp & m,
-                 const int i0, const int j0, const int k0,
-                 const int ii, const int ji, const int ki,
-                 const int i1, const int j1, const int k1,
-                 const real dist, const Sign & cell_marker,
-                 real & tint, const Old old) const;
+    /* inverse interfacial heat transfer resistance */
+    real evaluate_resinv(const Comp & m,
+                         const int i, const int j, const int k) const;
 
     /* test domain edge */
     bool edge(const Sign dir, const Comp & m,
@@ -95,14 +95,6 @@ class CommonHeatTransfer {
                            const bool discard_points,
                            const Old old) const;
 
-    bool add_point(const int i0, const int j0, const int k0,
-                   const int i1, const int j1, const int k1,
-                   const Sign dir, const Comp & m,
-                   const bool is_solid, bool & terminate,
-                   bool & interface_reached,
-                   std::vector<StencilPoint> & stencil,
-                   const Old old) const;
-
     /* calculate solid wall temperature */
     void calculate_node_temperature(const Scalar * diff_eddy = NULL);
 
@@ -119,6 +111,24 @@ class CommonHeatTransfer {
     Vector & node_tmp_flu() {return bndtpr_flu;}
 
   private:
+    /* effect of interfacial heat transfer resistance */
+    void resTint(const Sign & dir, const Comp & m,
+                 const int i0, const int j0, const int k0,
+                 const int ii, const int ji, const int ki,
+                 const int i1, const int j1, const int k1,
+                 const real dist, const Sign & cell_marker,
+                 real & tint, const Old old) const;
+
+    /* one point for difference stencil construction */
+    bool add_point(const int i0, const int j0, const int k0,
+                   const int i1, const int j1, const int k1,
+                   const Sign dir, const Comp & m,
+                   const bool is_solid, bool & terminate,
+                   bool & interface_reached,
+                   std::vector<StencilPoint> & stencil,
+                   const Old old) const;
+
+
     Scalar tpr;
     Vector bndtpr_sol, bndtpr_flu;
 

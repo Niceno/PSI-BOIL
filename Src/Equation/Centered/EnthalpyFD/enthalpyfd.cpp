@@ -27,10 +27,32 @@ EnthalpyFD::EnthalpyFD(const Scalar & PHI,
   flux_liq( *U.domain() ),
   flux_gas( *U.domain() ),
   bflag_struct(PHI),
-  c_fff({ ConnectType::fluid,     ConnectType::fluid, ConnectType::fluid }),
-  c_iff({ ConnectType::interface, ConnectType::fluid, ConnectType::fluid }),
+
+  c_fff({ ConnectType::fluid,     ConnectType::fluid, ConnectType::fluid     }),
+  c_sss({ ConnectType::solid,     ConnectType::solid, ConnectType::solid     }),
+
+  c_iff({ ConnectType::interface, ConnectType::fluid, ConnectType::fluid     }),
   c_ffi({ ConnectType::fluid,     ConnectType::fluid, ConnectType::interface }),
-  c_ifi({ ConnectType::interface, ConnectType::fluid, ConnectType::interface })
+  c_ifi({ ConnectType::interface, ConnectType::fluid, ConnectType::interface }),
+
+  c_sff({ ConnectType::solid,     ConnectType::fluid, ConnectType::fluid     }),
+  c_ffs({ ConnectType::fluid,     ConnectType::fluid, ConnectType::solid     }),
+  c_sfs({ ConnectType::solid,     ConnectType::fluid, ConnectType::solid     }),
+
+  c_sfi({ ConnectType::solid,     ConnectType::fluid, ConnectType::interface }),
+  c_ifs({ ConnectType::interface, ConnectType::fluid, ConnectType::solid     }),
+
+  c_ssf({ ConnectType::solid,     ConnectType::solid, ConnectType::fluid     }),
+  c_fss({ ConnectType::fluid,     ConnectType::solid, ConnectType::solid     }),
+  c_fsf({ ConnectType::fluid,     ConnectType::solid, ConnectType::fluid     }),
+
+  c_ssi({ ConnectType::solid,     ConnectType::solid, ConnectType::interface }),
+  c_iss({ ConnectType::interface, ConnectType::solid, ConnectType::solid     }),
+  c_isi({ ConnectType::interface, ConnectType::solid, ConnectType::interface }),
+
+  c_fsi({ ConnectType::fluid,     ConnectType::solid, ConnectType::interface }),
+  c_isf({ ConnectType::interface, ConnectType::solid, ConnectType::fluid     })
+
 {
   assert(PHI.domain() == F.domain());
   assert(PHI.domain() == U.domain());
@@ -45,10 +67,8 @@ EnthalpyFD::EnthalpyFD(const Scalar & PHI,
   /* see header for explanation */
   if(solid()) {
     safe_solid = solid();
-    accelerated_no_solid = false;
   } else {
     safe_solid = fluid();
-    accelerated_no_solid = true;
   }
 
   ftif = phi.shape();

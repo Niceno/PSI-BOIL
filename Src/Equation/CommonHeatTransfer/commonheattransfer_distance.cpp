@@ -61,14 +61,15 @@ real CommonHeatTransfer::distance_face(const Sign sig, const Comp & m,
 /* generic */
 real CommonHeatTransfer::distance_int(const Sign dir, const Comp & m,
                                       const int i, const int j, const int k,
-                                      real & tint, const ResistEval re,
+                                      real & tint, Sign & cell_marker,
+                                      const ResistEval re,
                                       const Old old) const {
   if        (m==Comp::i()) {
-    return distance_int_x(dir,i,j,k,tint,re,old);
+    return distance_int_x(dir,i,j,k,tint,cell_marker,re,old);
   } else if (m==Comp::j()) {
-    return distance_int_y(dir,i,j,k,tint,re,old);
+    return distance_int_y(dir,i,j,k,tint,cell_marker,re,old);
   } else {
-    return distance_int_z(dir,i,j,k,tint,re,old);
+    return distance_int_z(dir,i,j,k,tint,cell_marker,re,old);
   }
 
   return 0.0;
@@ -78,9 +79,9 @@ real CommonHeatTransfer::distance_int(const Sign dir, const Comp & m,
 /* x-direction */
 real CommonHeatTransfer::distance_int_x(const Sign dir, 
                                         const int i, const int j, const int k,
-                                        real & tint, const ResistEval re,
+                                        real & tint, Sign & cell_marker, 
+                                        const ResistEval re,
                                         const Old old) const {
-  Sign cell_marker;
   real dist = topo->distance_int_x(dir,i,j,k,cell_marker,old);
   if(cell_marker < 0) {
     tint = Tint(i,j,k,old);
@@ -106,9 +107,9 @@ real CommonHeatTransfer::distance_int_x(const Sign dir,
 /* y-direction */
 real CommonHeatTransfer::distance_int_y(const Sign dir, 
                                         const int i, const int j, const int k,
-                                        real & tint, const ResistEval re,
+                                        real & tint, Sign & cell_marker, 
+                                        const ResistEval re,
                                         const Old old) const {
-  Sign cell_marker;
   real dist = topo->distance_int_y(dir,i,j,k,cell_marker,old);
   if(cell_marker < 0) {
     tint = Tint(i,j,k,old);
@@ -134,9 +135,9 @@ real CommonHeatTransfer::distance_int_y(const Sign dir,
 /* z-direction */
 real CommonHeatTransfer::distance_int_z(const Sign dir, 
                                         const int i, const int j, const int k,
-                                        real & tint, const ResistEval re,
+                                        real & tint, Sign & cell_marker, 
+                                        const ResistEval re,
                                         const Old old) const {
-  Sign cell_marker;
   real dist = topo->distance_int_z(dir,i,j,k,cell_marker,old);
   if(cell_marker < 0) {
     tint = Tint(i,j,k,old);
