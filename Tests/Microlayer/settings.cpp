@@ -27,7 +27,11 @@
   const int ndt = 10e6; /* inconsequential */
   
   /* plot every */
+#ifdef SAKASHITA
+  real t_per_plot = 5e-4;
+#else
   real t_per_plot = 5e-6;
+#endif
   if(case_flag==0)
     t_per_plot = 0.025;
 
