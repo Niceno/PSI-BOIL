@@ -75,20 +75,22 @@ real EnthalpyFD::face_value(const Sign matter_sig, const Comp m, const real vel,
   /* west */
   if(west_above) {
     /* m3 */
-    if(cht.interface(Sign::neg(),m,i-2*ofx,j-2*ofy,k-2*ofz,old)) {
-      ctm = StencilPoint(1);
-      ctm.pos = stencil[1].pos
-              - cht.distance_int(Sign::neg(),m,i-2*ofx,j-2*ofy,k-2*ofz,
-                                 ctm.val,dummy,ResistEval::yes,old);
-    } else if(stencil_min(m,i-2*ofx,j-2*ofy,k-2*ofz)) {
-      ctm = StencilPoint(1);
-      ctm.pos = stencil[0].pos;
-      ctm.val = stencil[0].val;
-    } else if(dom->ibody().off(i-3*ofx,j-3*ofy,k-3*ofz)) {
-      ctm = StencilPoint(1);
-      ctm.pos = stencil[1].pos
-              - cht.distance_face(Sign::neg(),m,i-2*ofx,j-2*ofy,k-2*ofz);
-      ctm.val = cht.node_tmp_flu()[m][i-2*ofx][j-2*ofy][k-2*ofz]; 
+    if(dom->ibody().on(i-2*ofx,j-2*ofy,k-2*ofz)) {
+      if(cht.interface(Sign::neg(),m,i-2*ofx,j-2*ofy,k-2*ofz,old)) {
+        ctm = StencilPoint(1);
+        ctm.pos = stencil[1].pos
+                - cht.distance_int(Sign::neg(),m,i-2*ofx,j-2*ofy,k-2*ofz,
+                                   ctm.val,dummy,ResistEval::yes,old);
+      } else if(stencil_min(m,i-2*ofx,j-2*ofy,k-2*ofz)) {
+        ctm = StencilPoint(1);
+        ctm.pos = stencil[0].pos;
+        ctm.val = stencil[0].val;
+      } else if(dom->ibody().off(i-3*ofx,j-3*ofy,k-3*ofz)) {
+        ctm = StencilPoint(1);
+        ctm.pos = stencil[1].pos
+                - cht.distance_face(Sign::neg(),m,i-2*ofx,j-2*ofy,k-2*ofz);
+        ctm.val = cht.node_tmp_flu()[m][i-2*ofx][j-2*ofy][k-2*ofz]; 
+      }
     }
 
     /* m2 */
@@ -123,20 +125,22 @@ real EnthalpyFD::face_value(const Sign matter_sig, const Comp m, const real vel,
   /* east */
   if(east_above) {
     /* p3 */
-    if(cht.interface(Sign::pos(),m,i+ofx,j+ofy,k+ofz,old)) {
-      ctp = StencilPoint(4);
-      ctp.pos = stencil[4].pos
-              + cht.distance_int(Sign::pos(),m,i+ofx,j+ofy,k+ofz,
-                                 ctp.val,dummy,ResistEval::yes,old);
-    } else if(stencil_max(m,i+ofx,j+ofy,k+ofz)) {
-      ctp = StencilPoint(4);
-      ctp.pos = stencil[5].pos;
-      ctp.val = stencil[5].val;
-    } else if(dom->ibody().off(i+2*ofx,j+2*ofy,k+2*ofz)) {
-      ctp = StencilPoint(4);
-      ctp.pos = stencil[4].pos
-             + cht.distance_face(Sign::pos(),m,i+ofx,j+ofy,k+ofz);
-      ctp.val = cht.node_tmp_flu()[m][i+2*ofx][j+2*ofy][k+2*ofz];
+    if(dom->ibody().on(i+ofx,j+ofy,k+ofz)) {
+      if(cht.interface(Sign::pos(),m,i+ofx,j+ofy,k+ofz,old)) {
+        ctp = StencilPoint(4);
+        ctp.pos = stencil[4].pos
+                + cht.distance_int(Sign::pos(),m,i+ofx,j+ofy,k+ofz,
+                                   ctp.val,dummy,ResistEval::yes,old);
+      } else if(stencil_max(m,i+ofx,j+ofy,k+ofz)) {
+        ctp = StencilPoint(4);
+        ctp.pos = stencil[5].pos;
+        ctp.val = stencil[5].val;
+      } else if(dom->ibody().off(i+2*ofx,j+2*ofy,k+2*ofz)) {
+        ctp = StencilPoint(4);
+        ctp.pos = stencil[4].pos
+               + cht.distance_face(Sign::pos(),m,i+ofx,j+ofy,k+ofz);
+        ctp.val = cht.node_tmp_flu()[m][i+2*ofx][j+2*ofy][k+2*ofz];
+      }
     }
 
     /* p2 */
