@@ -1,8 +1,8 @@
-#include "heaviside.h"
+#include "topology.h"
 
 /******************************************************************************/
-void Heaviside::fs_bnd_1D(const Scalar & scp, Vector & fs, 
-                          const real & tol_wall, const Sign & sig) {
+void Topology::fs_bnd_1D(const Scalar & scp, Vector & fs, 
+                         const real & tol_wall, const Sign & sig) {
 /***************************************************************************//**
 *  \brief Corrects fs at boundaries.
 *         scalar_exchange(_all) should take account of periodic condition.
@@ -112,38 +112,38 @@ void Heaviside::fs_bnd_1D(const Scalar & scp, Vector & fs,
   /*--------------+
   | immersed body |
   +--------------*/
-  for(int cc=0; cc<dom->ibody().nccells(); cc++) {
+  for(int cc=0; cc<domain()->ibody().nccells(); cc++) {
     int i,j,k;
     Comp mcomp;
     /* cell[i][j][k] is wall adjacent cell in fluid domain */
-    dom->ibody().ijk(cc,&i,&j,&k);
+    domain()->ibody().ijk(cc,&i,&j,&k);
          
     /* erroneous interfaces */
     real scpscp = scp[i][j][k];
     bool errint = (scpscp<tol_wall||scpscp-1.0>-tol_wall);
     bool test = (sig == Sign::pos()) ? (scpscp >= clrsurf) : (scpscp <= clrsurf);
     if(errint||test) {
-      if(dom->ibody().off(i-1,j,k)) {
+      if(domain()->ibody().off(i-1,j,k)) {
         mcomp = Comp::i();
         fs[mcomp][i  ][j][k] = boil::unreal;
       }
-      if(dom->ibody().off(i+1,j,k)) {
+      if(domain()->ibody().off(i+1,j,k)) {
         mcomp = Comp::i();
         fs[mcomp][i+1][j][k] = boil::unreal;
       }
-      if(dom->ibody().off(i,j-1,k)) {
+      if(domain()->ibody().off(i,j-1,k)) {
         mcomp = Comp::j();
         fs[mcomp][i][j  ][k] = boil::unreal;
       }
-      if(dom->ibody().off(i,j+1,k)) {
+      if(domain()->ibody().off(i,j+1,k)) {
         mcomp = Comp::j();
         fs[mcomp][i][j+1][k] = boil::unreal;
       }
-      if(dom->ibody().off(i,j,k-1)) {
+      if(domain()->ibody().off(i,j,k-1)) {
         mcomp = Comp::k();
         fs[mcomp][i][j][k  ] = boil::unreal;
       }
-      if(dom->ibody().off(i,j,k+1)) {
+      if(domain()->ibody().off(i,j,k+1)) {
         mcomp = Comp::k();
         fs[mcomp][i][j][k+1] = boil::unreal;
       }
@@ -151,7 +151,7 @@ void Heaviside::fs_bnd_1D(const Scalar & scp, Vector & fs,
     }
 
     /* west is in solid domain */
-    if(dom->ibody().off(i-1,j,k)) {
+    if(domain()->ibody().off(i-1,j,k)) {
       mcomp = Comp::i();
       real & fsval = fs[mcomp][i  ][j][k];
       real sval = std::min(1.0,std::max(0.0,scpscp));
@@ -161,7 +161,7 @@ void Heaviside::fs_bnd_1D(const Scalar & scp, Vector & fs,
     }
 
     /* east */
-    if(dom->ibody().off(i+1,j,k)) {
+    if(domain()->ibody().off(i+1,j,k)) {
       mcomp = Comp::i();
       real & fsval = fs[mcomp][i+1][j][k];
       real sval = 1.0 - std::min(1.0,std::max(0.0,scpscp));
@@ -171,7 +171,7 @@ void Heaviside::fs_bnd_1D(const Scalar & scp, Vector & fs,
     }
 
     /* south */
-    if(dom->ibody().off(i,j-1,k)) {
+    if(domain()->ibody().off(i,j-1,k)) {
       mcomp = Comp::j();
       real & fsval = fs[mcomp][i][j  ][k];
       real sval = std::min(1.0,std::max(0.0,scpscp));
@@ -181,7 +181,7 @@ void Heaviside::fs_bnd_1D(const Scalar & scp, Vector & fs,
     }
 
     /* north */
-    if(dom->ibody().off(i,j+1,k)) {
+    if(domain()->ibody().off(i,j+1,k)) {
       mcomp = Comp::j();
       real & fsval = fs[mcomp][i][j+1][k];
       real sval = 1.0 - std::min(1.0,std::max(0.0,scpscp));
@@ -191,7 +191,7 @@ void Heaviside::fs_bnd_1D(const Scalar & scp, Vector & fs,
     }
 
     /* bottom */
-    if(dom->ibody().off(i,j,k-1)) {
+    if(domain()->ibody().off(i,j,k-1)) {
       mcomp = Comp::k();
       real & fsval = fs[mcomp][i][j][k  ];
       real sval = std::min(1.0,std::max(0.0,scpscp));
@@ -201,7 +201,7 @@ void Heaviside::fs_bnd_1D(const Scalar & scp, Vector & fs,
     }
 
     /* top */
-    if(dom->ibody().off(i,j,k+1)) {
+    if(domain()->ibody().off(i,j,k+1)) {
       mcomp = Comp::k();
       real & fsval = fs[mcomp][i][j][k+1];
       real sval = 1.0 - std::min(1.0,std::max(0.0,scpscp));

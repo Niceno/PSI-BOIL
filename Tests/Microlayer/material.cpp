@@ -142,8 +142,8 @@
   real resistance_liq(0.0);
   if(accommodation>0.0) {
     resistance_liq = 
-      Schrage::calculate_heat_transfer_resistance
-            (tsat0_K,rhov,Mv,latent,accommodation);
+      TIF::calculate_heat_transfer_resistance
+                     (tsat0_K,rhov,Mv,latent,accommodation);
   } 
 
   /* evaporative capillary number */

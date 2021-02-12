@@ -243,13 +243,13 @@ void VOF::cal_fs3(const Scalar & scp) {
 
   /* correct at boundaries */
   if       (subgrid_method == SubgridMethod::PLIC()) {
-    heavi->fs_bnd_geometric(scp,fs,tol_wall);
+    topo->fs_bnd_geometric(scp,fs,tol_wall);
   } else if(subgrid_method == SubgridMethod::None()) {
-    heavi->fs_bnd_nosubgrid(scp,fs,tol_wall);
+    topo->fs_bnd_nosubgrid(scp,fs,tol_wall);
   } else if(subgrid_method == SubgridMethod::SLICliquid()) {
-    heavi->fs_bnd_1D(scp,fs,tol_wall,Sign::pos());
+    topo->fs_bnd_1D(scp,fs,tol_wall,Sign::pos());
   } else if(subgrid_method == SubgridMethod::SLICgas()) {
-    heavi->fs_bnd_1D(scp,fs,tol_wall,Sign::neg());
+    topo->fs_bnd_1D(scp,fs,tol_wall,Sign::neg());
   } else {
     boil::oout<<"VOF::fs3: Subgrid method not set properly!"
               <<" Exiting."<<boil::endl;

@@ -40,7 +40,6 @@
   VOFaxisym conc(c, g, kappa, uvw_1, time, solver);
 
   conc.set_curv_method(curv_method);
-  conc.set_topo_method(topo_method);
   conc.set_use_interp(use_fs_interp);
   conc.set_pressure_extrapolation_parameters(store_pressure_extrap,niter_pressure_extrap);
   conc.set_advection_method(advect_method);

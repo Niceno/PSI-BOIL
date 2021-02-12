@@ -36,6 +36,17 @@ class Topology {
     void extrapolate(Scalar & sca, const Sign iext, const std::set<int> & testset);
     void extrapolate(Scalar & sca, const Sign iext, const std::set<int> & testset,
                      const ScalarInt & eflag);
+
+    /* fs position */
+     void cal_fs_interp(const Scalar & scp,Vector & fs,
+                       const real tol_wall, const bool use_subgrid);
+
+    void fs_bnd_nosubgrid(const Scalar & scp, Vector & fs,
+                          const real & tol_wall);
+    void fs_bnd_geometric(const Scalar & scp, Vector & fs,
+                          const real & tol_wall);
+    void fs_bnd_1D(const Scalar & scp, Vector & fs,
+                   const real & tol_wall, const Sign & sig);
     
     /* capillary time step, coef is approx 1/sqrt(2pi) by default */
     static real capillary_ts(const Matter & mixed, const real dx,
@@ -188,6 +199,8 @@ class Topology {
     
     ScalarInt stmp;
     Scalar delta, stmp2;
+
+    const BndFlag bflag_struct;
 
     real dxmin;
 };

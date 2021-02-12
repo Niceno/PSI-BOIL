@@ -19,6 +19,7 @@ Topology::Topology(Scalar * VF, Scalar * CLR,
   clrold(*CLR->domain()), 
   vfold(*VF->domain()),
   fsold(*FS->domain()),
+  bflag_struct(*CLR),
   clrsurf(CLRSURF) {
 
   stmp  = NX->shape();

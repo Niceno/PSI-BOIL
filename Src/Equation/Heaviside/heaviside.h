@@ -37,17 +37,8 @@ class Heaviside { /* this class is an abstract class! */
     /* test approach for adens */
     virtual void marker_gradient(Scalar & mga, const bool evalflag = true) {};
 
-    virtual void topology(Topology & topo, const real tol_wall, 
-                          const bool use_interp, const bool use_subgrid) = 0;
-    void cal_fs_interp(const Scalar & scp,Vector & fs,
-                       const real tol_wall, const bool use_subgrid);
-
-    void fs_bnd_nosubgrid(const Scalar & scp, Vector & fs,
-                          const real & tol_wall);
-    void fs_bnd_geometric(const Scalar & scp, Vector & fs, 
-                          const real & tol_wall);
-    void fs_bnd_1D(const Scalar & scp, Vector & fs, 
-                   const real & tol_wall, const Sign & sig);
+    //virtual void topology(Topology & topo, const real tol_wall, 
+    //                      const bool use_interp, const bool use_subgrid) = 0;
 
     real operator() (const int i, const int j, const int k) const {
       return (*phi)[i][j][k];
@@ -91,6 +82,8 @@ class Heaviside { /* this class is an abstract class! */
     real standing_square(const CELL2D & grid, const real & isolevel,
                          const real & totarea, std::vector<LINE> & lines);
   
+    /* old */
+  #if 0 
     void cal_fs_geom(const Scalar & scp, 
                      const Scalar & nx, const Scalar & ny,
                      const Scalar & nz, const Scalar & nalpha,
@@ -100,6 +93,7 @@ class Heaviside { /* this class is an abstract class! */
     real fs_val(const Comp m, const int i, const int j, const int k,
                 const Scalar & nx, const Scalar & ny,
                 const Scalar & nz, const Scalar & nalpha);
+  #endif
 };
 
 #endif

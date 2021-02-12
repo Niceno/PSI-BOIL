@@ -20,12 +20,13 @@ class MarchingCubes : public Heaviside {
     virtual real vf(const int i, const int j, const int k);
     virtual real ad(const int i, const int j, const int k);
 
+    /*
     virtual void topology(Topology & topo, const real tol_wall, 
                           const bool use_interp, const bool use_subgrid) {
       boil::oout<<"MarchingCubes::topology: Underdevelopment! "
                 <<"Exiting."<<boil::endl;
       exit(0);
-    }
+    } */
 
     virtual real surface(const Sign sig, const Comp & mcomp,
                          const int i, const int j, const int k);

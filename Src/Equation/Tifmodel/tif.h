@@ -57,6 +57,11 @@ class TIF {
 
     void set_weak_limiting(const real tmin, const real tmax);
 
+    static real calculate_heat_transfer_resistance(
+                                          const real tr, const real rhov,
+                                          const real mmass, const real latent,
+                                          const real accommodation);
+
   protected:
     real factor; /* under-relaxation factor */
     real tmin, tmax;

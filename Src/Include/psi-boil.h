@@ -32,7 +32,6 @@
 #include "../Equation/Nucleation/Microlayer/microlayer.h"
 #include "../Equation/Tifmodel/Antoine/antoine.h"
 #include "../Equation/Tifmodel/Clapeyron/clapeyron.h"
-#include "../Equation/Tifmodel/Schrage/schrage.h"
 #include "../Equation/Topology/topology.h"
 #include "../Timer/timer.h"
 #include "../Matter/TwoLevelMatter/twolevelmatter.h"

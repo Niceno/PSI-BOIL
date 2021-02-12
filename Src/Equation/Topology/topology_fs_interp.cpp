@@ -1,8 +1,8 @@
-#include "heaviside.h"
+#include "topology.h"
 
 /******************************************************************************/
-void Heaviside::cal_fs_interp(const Scalar & scp, Vector & fs,
-                              const real tol_wall, const bool use_subgrid) {
+void Topology::cal_fs_interp(const Scalar & scp, Vector & fs,
+                             const real tol_wall, const bool use_subgrid) {
 /***************************************************************************//**
  \brief Calculate free-surface position between cell centers
     if there is no interface in the cell, unreal=yotta (=1e+24) is stored.
@@ -61,7 +61,7 @@ void Heaviside::cal_fs_interp(const Scalar & scp, Vector & fs,
   for(int k=scp.sk(); k<=scp.ek(); k++) {
 
     /* degenerate cases */
-    if(dom->ibody().off(i-1,j,k)&&dom->ibody().off(i,j,k))
+    if(domain()->ibody().off(i-1,j,k)&&domain()->ibody().off(i,j,k))
       continue;
 
     real clrw = scp[i-1][j][k];
@@ -94,7 +94,7 @@ void Heaviside::cal_fs_interp(const Scalar & scp, Vector & fs,
   for(int k=scp.sk(); k<=scp.ek(); k++) {
 
     /* degenerate cases */
-    if(dom->ibody().off(i,j-1,k)&&dom->ibody().off(i,j,k))
+    if(domain()->ibody().off(i,j-1,k)&&domain()->ibody().off(i,j,k))
       continue;
 
     real clrs = scp[i][j-1][k];
@@ -127,7 +127,7 @@ void Heaviside::cal_fs_interp(const Scalar & scp, Vector & fs,
   for(int k=kbeg; k<=kend; k++) {
 
     /* degenerate cases */
-    if(dom->ibody().off(i,j,k-1)&&dom->ibody().off(i,j,k))
+    if(domain()->ibody().off(i,j,k-1)&&domain()->ibody().off(i,j,k))
       continue;
 
     real clrb = scp[i][j][k-1];

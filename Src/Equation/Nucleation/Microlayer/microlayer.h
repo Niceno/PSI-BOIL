@@ -2,7 +2,7 @@
 #define MICROLAYER_H
 
 #include "../nucleation.h"
-#include "../../Tifmodel/Schrage/schrage.h"
+#include "../../Tifmodel/tif.h"
 
 ////////////////////////
 //                    //

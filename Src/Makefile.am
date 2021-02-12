@@ -36,7 +36,6 @@ SUBDIRS = Equation/Staggered/Momentum                              \
           Equation/Nucleation                                      \
           Equation/Tifmodel/Antoine                                \
           Equation/Tifmodel/Clapeyron                              \
-          Equation/Tifmodel/Schrage                                \
           Equation/Tifmodel                                        \
           Equation/Topology                                        \
           Monitor/Rack                                             \
@@ -106,7 +105,6 @@ LDADD = Custom/IF97/libIF97.a                                                 \
 	Equation/Nucleation/libNucleation.a                                   \
         Equation/Tifmodel/Antoine/libAntoine.a                                \
         Equation/Tifmodel/Clapeyron/libClapeyron.a                            \
-        Equation/Tifmodel/Schrage/libSchrage.a                                \
         Equation/CommonHeatTransfer/libCommonHeatTransfer.a                   \
         Equation/Tifmodel/libTif.a                                            \
         Equation/Topology/libTopology.a                                       \

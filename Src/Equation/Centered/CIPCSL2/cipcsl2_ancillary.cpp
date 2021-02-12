@@ -13,7 +13,7 @@ void CIPCSL2::ancillary() {
 
   /* calculate free surface position,
      no subgrid interfaces near walls! */
-  heavi->cal_fs_interp(phi,fs,0.0,false);
+  topo->cal_fs_interp(phi,fs,0.0,false);
 
   /* normal vector */
   distfunc(phi,24); 

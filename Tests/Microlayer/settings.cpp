@@ -74,7 +74,6 @@
 
   const AdvectionMethod advect_method = AdvectionMethod::BoundedSplit();
   //const AdvectionMethod advect_method = AdvectionMethod::NaiveSplit();
-  const TopoMethod topo_method = TopoMethod::Hybrid();
 
   const bool detachment_model = false;
   const bool subgrid_method = true; /* use slic subgrid */

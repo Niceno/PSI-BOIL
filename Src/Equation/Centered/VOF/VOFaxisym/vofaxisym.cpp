@@ -23,7 +23,6 @@ VOFaxisym::VOFaxisym(const Scalar & phi,
 
   set_normal_vector_method_all(NormMethod::ElviraXZ());
   set_wall_curv_method(CurvMethod::HFnormalXZ(),Sign::neg());
-  set_topo_method(TopoMethod::Hybrid());
 
   reconstruction_tolerance = 1e-4;
   reconstruction_maxiter = 5;

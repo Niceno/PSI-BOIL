@@ -403,7 +403,6 @@ class VOF : public Centered {
     DetachmentModel detachment_model;
     CurvMethod bulk_curv_method, wall_curv_method;
     SubgridMethod subgrid_method;
-    TopoMethod topo_method;
     AdvectionMethod advect_method;
     HFset hf_set;
 

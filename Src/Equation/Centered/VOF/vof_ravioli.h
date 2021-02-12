@@ -88,41 +88,6 @@ class CurvMethod {
     explicit CurvMethod(const int m) {val = m;}
 };
 
-///////////////////////
-//                   //
-//  Topology method  //
-//                   //
-///////////////////////
-/* this is a ravioli class for topology method selection */
-class TopoMethod {
-  public:
-    TopoMethod() {val=-1;}
-
-    static const TopoMethod undefined() {return TopoMethod(-1);}
-    static const TopoMethod Hybrid()    {return TopoMethod( 1);}
-    static const TopoMethod Heaviside() {return TopoMethod( 2);}
-
-    //! Prints the components name.
-    friend std::ostream & operator << (std::ostream & ost, const TopoMethod & com) {
-      switch(com.val) {
-        case(-1): ost << "undefined"; break;
-        case( 1): ost << "Hybrid"; break;
-        case( 2): ost << "Heaviside"; break;
-      }
-
-      return ost;
-    }
-
-    bool operator == (const TopoMethod & o) const {return val == o.val;}
-    bool operator != (const TopoMethod & o) const {return val != o.val;}
-
-  private:
-    int val;
-
-    /* avoid implicit conversions of integer to Topo */
-    explicit TopoMethod(const int m) {val = m;}
-};
-
 //////////////////////
 //                  //
 //  Subgrid method  //

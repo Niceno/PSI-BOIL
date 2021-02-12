@@ -55,7 +55,6 @@ AC_OUTPUT(Makefile                                                             \
           Src/Equation/Nucleation/Makefile                                     \
           Src/Equation/Tifmodel/Antoine/Makefile                               \
           Src/Equation/Tifmodel/Clapeyron/Makefile                             \
-          Src/Equation/Tifmodel/Schrage/Makefile                               \
           Src/Equation/Tifmodel/Makefile                                       \
           Src/Equation/Topology/Makefile                                       \
           Src/Boundary/Makefile                                                \
