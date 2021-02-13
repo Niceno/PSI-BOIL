@@ -144,18 +144,16 @@ main(int argc, char * argv[]) {
 
   Pressure pr( p,   f,   uvw, time, solver, &mixed );
   Momentum ns( uvw, xyz,      time, solver, &mixed );
-  ns.diffusion_set (TimeScheme::backward_euler());
-  ns.convection_set(ConvScheme::upwind()); 
 
-#if 1
+#if 0
   CIPCSL2 conc(c, g, kappa, uvw, time, solver);
   conc.set_itsharpen(10);
   conc.set_globalSharpen();
   conc.set_nredist(1);
-  conc.set_cangle(0.0);
 #else
   VOF conc(c, g, kappa, uvw, time, solver);
 #endif
+  conc.set_cangle(0.0);
 
   boil::plot->plot(uvw,c,press,"uvw-c-press", 0);
 
