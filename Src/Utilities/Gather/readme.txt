@@ -1,8 +1,8 @@
 1. Compile gather.f90
- ifort -fpp gather.f90 ./tecio64.a -lm -lstdc++ -o gather.exe
- ifort -fpp -DZIP gather.f90 ./tecio64.a -lm -lstdc++ -o gather-zip.exe
- ifort -fpp -DVISIT gather.f90 ./tecio64.a -lm -lstdc++ -o gather-visit.exe
- ifort -fpp -DVISIT -DZIP gather.f90 ./tecio64.a -lm -lstdc++ -o gather-visit-zip.exe
+# ifort -fpp gather.f90 ./tecio64.a -lm -lstdc++ -o gather.exe
+# ifort -fpp -DZIP gather.f90 ./tecio64.a -lm -lstdc++ -o gather-zip.exe
+ ifort -fpp -DVISIT gather.f90 ./tecio64.a -lm -lstdc++ -o gather.exe
+ ifort -fpp -DVISIT -DZIP gather.f90 ./tecio64.a -lm -lstdc++ -o gather-zip.exe
 
 2. Compile preplot
  g++ preplot.cpp -DPLOT3D -DUNIXX -DLINUX -o preplot
