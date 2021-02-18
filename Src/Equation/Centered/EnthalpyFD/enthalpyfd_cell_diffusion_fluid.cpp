@@ -45,8 +45,8 @@ void EnthalpyFD::cell_diffusion_fluid(const Comp m,
        &&cht.above_interface(i,j,k,old)) {
       /* evaluate resistance in the correct cell */
       resinvm = markerm < 0 ?
-                cht.evaluate_resinv(m,i   ,j   ,k) :
-                cht.evaluate_resinv(m,i-ox,j-oy,k-oz);
+                cht.evaluate_resinv(Sign::neg(),m,i,j,k,i   ,j   ,k   ,xm) :
+                cht.evaluate_resinv(Sign::neg(),m,i,j,k,i-ox,j-oy,k-oz,xm);
     }
   /* is there a wall in west? */
   } else if(dom->ibody().off(i-ox,j-oy,k-oz)) {
@@ -77,8 +77,8 @@ void EnthalpyFD::cell_diffusion_fluid(const Comp m,
        &&cht.above_interface(i,j,k,old)) {
       /* evaluate resistance in the correct cell */
       resinvp = markerp < 0 ?
-                cht.evaluate_resinv(m,i   ,j   ,k) :
-                cht.evaluate_resinv(m,i+ox,j+oy,k+oz);
+                cht.evaluate_resinv(Sign::pos(),m,i,j,k,i   ,j   ,k   ,xp) :
+                cht.evaluate_resinv(Sign::pos(),m,i,j,k,i+ox,j+oy,k+oz,xp);
     }
   /* is there a wall in east */
   } else if(dom->ibody().off(i+ox,j+oy,k+oz)) {

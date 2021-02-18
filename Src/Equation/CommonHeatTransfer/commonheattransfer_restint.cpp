@@ -49,55 +49,72 @@ void CommonHeatTransfer::resTint(const Sign & dir, const Comp & m,
     stencil.push_back(StencilPoint(1,tpr[i0][j0][k0],dist));
 
     /* resistance ghost distance */
-    real resinv = evaluate_resinv(m,ii,ji,ki);
+    real resinv = evaluate_resinv(-dir,m,i0,j0,k0,ii,ji,ki,dist);
 
-    /* is there interface to the other side? */
-    if(interface(dir,m,i0,j0,k0,old)) {
+    if(boil::realistic(resinv)) {
 
-      /* default to first order for simplicity */
-      topo->nth_order_first_coefs(coefs,stencil,AccuracyOrder::First());
-      tint = (coefs[1]*stencil[1].val + resinv*tint)/(resinv - coefs[0]);
-      return;
+      /* is there interface to the other side? */
+      if(interface(dir,m,i0,j0,k0,old)) {
 
-    /* are we at a solid-fluid boundary? */
-    } else if(topo->domain()->ibody().off(i1,j1,k1)) {
-      real dist1 = dist + distance_face(dir,m,i0,j0,k0);
-      /* directional choice */
-      if(dir>0) {
-        stencil.push_back(StencilPoint(2,bndtpr_flu[m][i1][j1][k1],dist1));
+        /* default to first order for simplicity */
+        topo->nth_order_first_coefs(coefs,stencil,AccuracyOrder::First());
+        tint = (coefs[1]*stencil[1].val + resinv*tint)/(resinv - coefs[0]);
+        return;
+
+      /* are we at a solid-fluid boundary? */
+      } else if(topo->domain()->ibody().off(i1,j1,k1)) {
+        real dist1 = dist + distance_face(dir,m,i0,j0,k0);
+        /* directional choice */
+        if(dir>0) {
+          stencil.push_back(StencilPoint(2,bndtpr_flu[m][i1][j1][k1],dist1));
+        } else {
+          stencil.push_back(StencilPoint(2,bndtpr_flu[m][i0][j0][k0],dist1));
+        }
+
+      /* neither interface, nor boundary */
       } else {
-        stencil.push_back(StencilPoint(2,bndtpr_flu[m][i0][j0][k0],dist1));
+        real dist1 = dist + distance_center(dir,m,i0,j0,k0);
+        stencil.push_back(StencilPoint(2,tpr[i1][j1][k1],dist1));
       }
 
-    /* neither interface, nor boundary */
-    } else {
-      real dist1 = dist + distance_center(dir,m,i0,j0,k0);
-      stencil.push_back(StencilPoint(2,tpr[i1][j1][k1],dist1));
+      /* evaluate coefs */
+      topo->nth_order_first_coefs(coefs,stencil,AccuracyOrder::Second());
+
+      /* equation for resistance effect */
+      tint = (coefs[1]*stencil[1].val + coefs[2]*stencil[2].val + resinv*tint)
+           / (resinv - coefs[0]);
+
     }
-
-    /* evaluate coefs */
-    topo->nth_order_first_coefs(coefs,stencil,AccuracyOrder::Second());
-
-    /* equation for resistance effect */
-    tint = (coefs[1]*stencil[1].val + coefs[2]*stencil[2].val + resinv*tint)
-         / (resinv - coefs[0]);
-
   } /* are we in liquid? */
 
   return;
 }
 
 /******************************************************************************/
-real CommonHeatTransfer::evaluate_resinv(const Comp & m,
-                                  const int i, const int j, const int k) const {
-  real res = int_resistance_liq(i,j,k)*lambdal(i,j,k);
+real CommonHeatTransfer::evaluate_resinv(const Sign dir, const Comp & m,
+                                       const int i0, const int j0, const int k0,
+                                       const int ii, const int ji, const int ki,
+                                       const real dist) const {
   real resinv;
+  real res = int_resistance_liq(ii,ji,ki)*lambdal(ii,ji,ki);
+#if 0
+  real sigma = 2e-6;
+  real zpos = tpr.zc(k0);
+  if(m==Comp::k()) {
+    zpos += int(dir)*dist;
+  }
+  real xi = zpos/sigma;
+  res *= exp(-std::pow(xi,6.));
+  if(res<boil::pico)
+    return boil::unreal;
+  //res = std::max(res,boil::pico);
+#endif
   if(m==Comp::i()) {
-    resinv = fabs(topo->get_nx()[i][j][k])/res;
+    resinv = fabs(topo->get_nx()[ii][ji][ki])/res;
   } else if(m==Comp::j()) {
-    resinv = fabs(topo->get_ny()[i][j][k])/res;
+    resinv = fabs(topo->get_ny()[ii][ji][ki])/res;
   } else {
-    resinv = fabs(topo->get_nz()[i][j][k])/res;
+    resinv = fabs(topo->get_nz()[ii][ji][ki])/res;
   }
 
   return resinv;

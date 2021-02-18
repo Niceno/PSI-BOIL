@@ -47,8 +47,10 @@ class CommonHeatTransfer {
                         const ResistEval re, const Old old) const;
 
     /* inverse interfacial heat transfer resistance */
-    real evaluate_resinv(const Comp & m,
-                         const int i, const int j, const int k) const;
+    real evaluate_resinv(const Sign dir, const Comp & m,
+                         const int i0, const int j0, const int k0,
+                         const int ii, const int ji, const int ki,
+                         const real dist) const;
 
     /* test domain edge */
     bool edge(const Sign dir, const Comp & m,
