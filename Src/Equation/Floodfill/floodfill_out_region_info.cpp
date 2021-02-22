@@ -1,6 +1,6 @@
 #include "floodfill.h"
 #include "../../Plot/plot.h"
-//#define VERBOSE
+#define VERBOSE
 
 /***************************************************************************//**
 *  outputs region properties to a file    
