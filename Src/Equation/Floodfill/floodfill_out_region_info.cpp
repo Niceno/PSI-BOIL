@@ -29,9 +29,14 @@ void Floodfill::out_region_info() {
   for (int i=0; i<m_vectrgns.size(); i++) {
     Region & r = m_vectrgns[i];
     /* comuvw = dx(com)/dt over dt*50tsteps */
-    real cu = (r.x()-r.xold()) / odt;
-    real cv = (r.y()-r.yold()) / odt;
-    real cw = (r.z()-r.zold()) / odt;
+    real cu = 0.0;
+    real cv = 0.0;
+    real cw = 0.0;
+    if(odt!=0){
+      real cu = (r.x()-r.xold()) / odt;
+      real cv = (r.y()-r.yold()) / odt;
+      real cw = (r.z()-r.zold()) / odt;
+    }
     r.comuvw(cu,cv,cw);
     if (!(r.hiding()) ) { //do not output hidden regions
 #ifdef VERBOSE
