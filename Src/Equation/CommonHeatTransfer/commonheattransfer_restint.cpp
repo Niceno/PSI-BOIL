@@ -97,18 +97,6 @@ real CommonHeatTransfer::evaluate_resinv(const Sign dir, const Comp & m,
                                        const real dist) const {
   real resinv;
   real res = int_resistance_liq(ii,ji,ki)*lambdal(ii,ji,ki);
-#if 0
-  real sigma = 2e-6;
-  real zpos = tpr.zc(k0);
-  if(m==Comp::k()) {
-    zpos += int(dir)*dist;
-  }
-  real xi = zpos/sigma;
-  res *= exp(-std::pow(xi,6.));
-  if(res<boil::pico)
-    return boil::unreal;
-  //res = std::max(res,boil::pico);
-#endif
   if(m==Comp::i()) {
     resinv = fabs(topo->get_nx()[ii][ji][ki])/res;
   } else if(m==Comp::j()) {
