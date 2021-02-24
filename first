@@ -13,7 +13,8 @@ if [ $# -lt 1 ]; then
   echo "       " $0 "INTEL       -> configure for Intel-MPI with Intel compiler"
   echo "       " $0 "INTEL-PHI   -> configure for INTEL-PHI"
   echo "       " $0 "NOMPI       -> configure without MPI"
-  echo "       " $0 "NOMPI-INTEL -> configure without MPI, for Intel"
+  echo "       " $0 "INTEL-MPI-DEBUG -> configure for Intel with debug flag"
+  echo "       " $0 "INTEL-DEBUG -> configure without MPI, for Intel"
 else
   if [ $1 = "LAM" ] || [ $1 = "OPEN" ]; then
     aclocal
@@ -76,15 +77,22 @@ else
     autoconf
     autoheader
     automake --add-missing
-    #./configure CC=mpiicc CXX=mpiicpc CXXFLAGS='-O3 -opt-report=4'
     ./configure CC=mpiicc CXX=mpiicpc CXXFLAGS='-O3 -std=c++11'
     cd Src/Parallel; ln -f -s parallel.h mpi_macros.h; cd ../../
-  elif [ $1 = "NOMPI-INTEL" ]; then
+  elif [ $1 = "INTEL-MPI-DEBUG" ]; then
     aclocal
     autoconf
     autoheader
     automake --add-missing
-    ./configure CC=icpc CXX=icpc CXXFLAGS='-g -w2  -std=c++11 -debug full -O0 -std=c++11 -check=uninit -traceback -fstack-protector-all -fp-trap=common -fp-stack-check -check-pointers=rw'
+    ./configure CC=mpiicc CXX=mpiicpc CXXFLAGS='-g -w2 -std=c++11 -debug full -O0 -check=uninit -traceback -fstack-protector-all -fp-trap=common -fp-stack-check -check-pointers=rw'
+    #./configure CC=mpiicc CXX=mpiicpc CXXFLAGS='-O3 -std=c++11 -fstack-protector-all -fp-trap=common -fp-stack-check -check-pointers=rw'
+    cd Src/Parallel; ln -f -s parallel.h mpi_macros.h; cd ../../
+  elif [ $1 = "INTEL-DEBUG" ]; then
+    aclocal
+    autoconf
+    autoheader
+    automake --add-missing
+    ./configure CC=icpc CXX=icpc CXXFLAGS='-g -w2  -std=c++11 -debug full -O0 -check=uninit -traceback -fstack-protector-all -fp-trap=common -fp-stack-check -check-pointers=rw'
     cd Src/Parallel; ln -f -s sequential.h mpi_macros.h; cd ../../
   elif [ $1 = "INTEL-PHI" ]; then
     aclocal
@@ -105,8 +113,9 @@ else
     echo "       " $0 "MPICH       -> configure for MPICH"
     echo "       " $0 "INTEL       -> configure for Intel-MPI with Intel compiler"
     echo "       " $0 "INTEL-PHI   -> configure for Intel-PHI"
-    echo "       " $0 "NOMPI       -> configure without MPI"
     echo "       " $0 "NOMPI-INTEL -> configure without MPI, for Intel"
+    echo "       " $0 "INTEL-MPI-DEBUG -> configure for Intel with debug flag"
+    echo "       " $0 "INTEL-DEBUG -> configure without MPI, for Intel"
   fi
 fi
 
