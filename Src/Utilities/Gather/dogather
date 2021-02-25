@@ -40,8 +40,7 @@ for filename in *.dat; do
     keyword="$keyword$add"  # uvw-tpr-press -> uvw-tpr-press_p
     if [[ $procnum != "pall" ]] && [[ $procnum2 -eq 0 ]]; then
       # run gather with the given arguments for each file in folder
-      #printf '%s\n' "$numprocs" "6" "$step" "$step" "1" "$keyword" | gather.exe
-      printf '%s\n' "$numprocs" "6" "$step" "$step" "1" "$keyword" | gather-visit.exe
+      printf '%s\n' "$numprocs" "6" "$step" "$step" "1" "$keyword" | gather.exe
    fi
 done
 
