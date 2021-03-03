@@ -2,6 +2,16 @@
     struct XYZ {
       real x,y,z;
 
+      /* equal */
+      XYZ operator =(const XYZ & p) const {
+        XYZ pv;
+        pv.x = p.x;
+        pv.y = p.y;
+        pv.z = p.z;
+
+        return(pv);
+      }
+
       /* negation */
       XYZ operator -() const {
         XYZ nv;
