@@ -19,6 +19,7 @@ libVector_a_SOURCES = vector_browsing.h             \
                       vector_randomize.cpp          \
                       vector_rm.cpp                 \
                       vector_save.cpp               \
+                      vector_save_range.cpp         \
                       vector_shear.cpp              \
                       vector_shear_magn.cpp
 

@@ -37,6 +37,18 @@ Vector::Vector(const Domain & d) : aliav(false), vec() {
   vec[Comp::w()].dom    = dom;
 
   coordinate();
+
+  for_m(m) {
+    s_I[~m]=boil::BW;
+    s_J[~m]=boil::BW;
+    s_K[~m]=boil::BW;
+    e_I[~m]=boil::BW+dom->gii()-1;
+    e_J[~m]=boil::BW+dom->gij()-1;
+    e_K[~m]=boil::BW+dom->gik()-1;
+    if(m==Comp::u())e_I[~m]++;
+    if(m==Comp::v())e_J[~m]++;
+    if(m==Comp::w())e_K[~m]++;
+  }
 }	
 
 /******************************************************************************/
