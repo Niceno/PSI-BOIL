@@ -7,9 +7,11 @@
 #include <cmath>
 #include <array>
 #include "../../Parallel/communicator.h"
+#include "../../Domain/domain.h"
 #include "../../Domain/TwoLevel/twolevel.h"
 #include "../../Boundary/bndcnd.h"
 #include "scalar_browsing.h"
+#include "../../Global/global_constants.h"
 #include "../../Global/global_malloc.h"
 #include "../../Global/global_minmax.h"
 #include "../../Global/global_name_file.h"
@@ -58,6 +60,12 @@ class Scalar {
     int ei() const {return e_x;}      
     int ej() const {return e_y;}      
     int ek() const {return e_z;}      
+    int sI() const {return boil::BW;}
+    int eI() const {return boil::BW+dom->gii()-1;}
+    int sJ() const {return boil::BW;}
+    int eJ() const {return boil::BW+dom->gij()-1;}
+    int sK() const {return boil::BW;}
+    int eK() const {return boil::BW+dom->gik()-1;}
 
     /* change (set) offsets */
     void ox(const int o) {o_x=o;}      
@@ -138,9 +146,7 @@ class Scalar {
       if( dom->contains_IJK(i,j,k) ) {
         dom->locals(&i,&j,&k); // change i,j,k
         return val[i][j][k];   // with changed i,j,k
-      }
-      else
-        return miss;
+      } else { return miss;}
     }
     
     void save(const char *, const int);
@@ -148,6 +154,24 @@ class Scalar {
     void rm  (const char *, const int);
     void save(std::ofstream &);
     void load(std::ifstream &);
+
+    void save_range(const Range<int> ri, const int j, const int k,
+                    const char * nam, const int it);
+    void save_range(const int i, const Range<int> rj, const int k,
+                    const char * nam, const int it);
+    void save_range(const int i, const int j, const Range<int> rk,
+                    const char * nam, const int it);
+
+    void save_range(const int i, const Range<int> rj, const Range<int> rk,
+                    const char * nam, const int it);
+    void save_range(const Range<int> ri, const int j, const Range<int> rk,
+                    const char * nam, const int it);
+    void save_range(const Range<int> ri, const Range<int> rj, const int k,
+                    const char * nam, const int it);
+
+    void save_range(const Range<int> ri, const Range<int> rj,
+                    const Range<int> rk,
+                    const char * nam, const int it);
 
     /* min, max, ... */
     real min() const;
@@ -409,9 +433,7 @@ class Scalar {
     BndCnd * bndcnd;
 
     const bool alias;
-
-  private:
-    real miss; /* miss out of range variables in parallel version  */
+    real miss=0;
 
 };
 

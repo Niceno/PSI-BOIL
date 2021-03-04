@@ -20,6 +20,7 @@ libScalar_a_SOURCES = scalar.h                     \
                       scalar_one2all.cpp           \
                       scalar_rm.cpp                \
                       scalar_operators.cpp         \
-                      scalar_save.cpp
+                      scalar_save.cpp              \
+                      scalar_save_range.cpp
 
 INCLUDE = -I@top_srcdir@/
