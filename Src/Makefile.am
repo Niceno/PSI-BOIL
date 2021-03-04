@@ -133,6 +133,7 @@ LDADD = Custom/IF97/libIF97.a                                                 \
         Field/VectorBool/libVectorBool.a                                      \
         Field/ScalarBool/libScalarBool.a                                      \
         Field/ScalarInt/libScalarInt.a                                        \
+        Domain/libDomain.a                                                    \
         Timer/libTimer.a                                                      \
         Formula/libFormula.a                                                  \
         Profile/libProfile.a                                                  \
