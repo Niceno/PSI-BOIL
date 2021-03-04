@@ -18,6 +18,7 @@
 #include "../Ravioli/sign.h"
 #include "../Ravioli/decompose.h"
 #include "../Ravioli/enumerate.h"
+#include "../Ravioli/range.h"
 #include "../Global/global_swap.h"
 
 //////////////
@@ -206,9 +207,9 @@ class Domain {
     const Body & ibody() const {return * body;}
 
     /* these functions check the global cell range (excluding buffers) */
-    bool contains_I(int I) const {return cr_x.contains(I);}
-    bool contains_J(int J) const {return cr_y.contains(J);}
-    bool contains_K(int K) const {return cr_z.contains(K);}
+    bool contains_I(int I) const {return cr_x.contains(I-boil::BW+1);}
+    bool contains_J(int J) const {return cr_y.contains(J-boil::BW+1);}
+    bool contains_K(int K) const {return cr_z.contains(K-boil::BW+1);}
     bool contains_IJK(int I, int J, int K) const {
       return contains_I(I) && contains_J(J) && contains_K(K);
     } 
