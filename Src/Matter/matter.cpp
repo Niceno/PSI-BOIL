@@ -1,6 +1,9 @@
 #include "matter.h"
 
-#define USE_PROSPERETTI
+#define MIX_VISC 1
+/* 0 = linear 
+ * 1 = harmonic
+ * 2 = prosperetti */
 
 /*============================================================================*/
 Matter::Matter(const Domain & d, const char * nm) {
@@ -30,11 +33,12 @@ Matter::Matter(const Domain & d, const char * nm) {
   tens = NULL;
   heat = NULL;
 
-#ifdef USE_PROSPERETTI
+#if MIX_VISC == 1
+  /* one over viscosity */
+  one_o_visc = new PropertyInv(visc);
+#elif MIX_VISC == 2
   /* density over viscosity */
   dens_o_visc = new PropertyDiv(dens,visc);
-  /* one over viscosity */
-  //one_o_visc = new PropertyInv(visc);
 #endif
 }
 
@@ -85,20 +89,18 @@ Matter::Matter(const Matter & a,
   tens = new Property("surface-tension");
   heat = new Property("latent-heat");
 
-#ifndef USE_PROSPERETTI
+#if MIX_VISC == 0
   visc = new PropertyMix(a.visc, b.visc, ca, cda, cdb);
-#else /* force balance according to Prosperetti, 2002 */
-  #if 1
-  assert(a.dens_o_visc != NULL);
-  assert(b.dens_o_visc != NULL);
-  dens_o_visc = new PropertyMix(a.dens_o_visc,b.dens_o_visc,ca,cda,cdb);
-  visc = new PropertyDiv(dens,dens_o_visc);
-  #else
+#elif MIX_VISC == 1
   assert(a.one_o_visc != NULL);
   assert(b.one_o_visc != NULL);
   one_o_visc = new PropertyMix(a.one_o_visc,b.one_o_visc,ca,cda,cdb);
   visc = new PropertyInv(one_o_visc);
-  #endif
+#elif MIX_VISC == 2 /* force balance according to Prosperetti, 2002 */
+  assert(a.dens_o_visc != NULL);
+  assert(b.dens_o_visc != NULL);
+  dens_o_visc = new PropertyMix(a.dens_o_visc,b.dens_o_visc,ca,cda,cdb);
+  visc = new PropertyDiv(dens,dens_o_visc);
 #endif
 
   if( a.nam.length() > 0 && b.nam.length() > 0 )
