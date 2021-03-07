@@ -15,10 +15,7 @@ Floodfill::Floodfill(Scalar & colorf,
                      rgnid(srid), 
                      uvw(p_uvw),
                      time ( & t),
-                     //rgnid_old(*(srid.domain())) {
                      rgnid_old(*(srid.domain())),
-                     //m_dV(srid.dV(srid.si()+1,srid.sj()+1,srid.sk()+1)),
-                     //m_dxc(srid.dxc(srid.si()+1)) {
                      m_dV(srid.domain()->dV_min()),
                      m_dxc(srid.domain()->dxyz_min()) {
 
