@@ -1,4 +1,5 @@
 #include "enthalpyfd.h"
+#include "def.h"
 
 /***************************************************************************//**
 *  Cell-wise construction of diff matrix based on local structure (no solid)
@@ -36,10 +37,17 @@ void EnthalpyFD::kernel_fluid1(const std::array<ConnectType,3> & ctype,
 
       /* evaluate coefs */
       std::vector<real> coefs;
+#ifdef USE_FIRST_ORDER_INTRESIST
+      cht.topo->nth_order_first_coefs(coefs,stencil,AccuracyOrder::First());
+
+      /* correct matrix */
+      //Ap += 0.;
+#else
       cht.topo->nth_order_first_coefs(coefs,stencil,AccuracyOrder::Second());
 
       /* correct matrix */
       Ap +=  cxm*coefs[2]/(resinvm-coefs[0]);
+#endif
       Ac += -cxm*coefs[1]/(resinvm-coefs[0]);
       F += cxm*stencil[0].val*resinvm/(resinvm-coefs[0]);  
     } else {
@@ -69,10 +77,17 @@ void EnthalpyFD::kernel_fluid1(const std::array<ConnectType,3> & ctype,
 
       /* evaluate coefs */
       std::vector<real> coefs;
+#ifdef USE_FIRST_ORDER_INTRESIST
+      cht.topo->nth_order_first_coefs(coefs,stencil,AccuracyOrder::First());
+
+      /* correct matrix */
+      //Am +=  0.;
+#else
       cht.topo->nth_order_first_coefs(coefs,stencil,AccuracyOrder::Second());
 
       /* correct matrix */
       Am +=  cxp*coefs[2]/(resinvp-coefs[0]);
+#endif
       Ac += -cxp*coefs[1]/(resinvp-coefs[0]);
       F += cxp*stencil[0].val*resinvp/(resinvp-coefs[0]);
     } else {
@@ -80,6 +95,8 @@ void EnthalpyFD::kernel_fluid1(const std::array<ConnectType,3> & ctype,
       F += cxp*stencil[2].val;
     }
   }
+
+  /* this one is always first-order discretisation */
 
   /*--------------------------------+
   |  interface - fluid - interface  |
@@ -118,7 +135,7 @@ void EnthalpyFD::kernel_fluid1(const std::array<ConnectType,3> & ctype,
       /* correct matrix */
       Ac += -cxm*cms[1]/(resinvm-cms[0])
             -cxp*cps[1]/(resinvp-cps[0]);
-      F += cxm*sp[0].val*resinvm/(resinvm-cms[0])
+      F += cxm*sm[0].val*resinvm/(resinvm-cms[0])
          + cxp*sp[0].val*resinvp/(resinvp-cps[0]);
     } else {
       F += cxm*stencil[0].val+cxp*stencil[2].val;

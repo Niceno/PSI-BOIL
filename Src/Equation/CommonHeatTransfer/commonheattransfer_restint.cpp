@@ -48,7 +48,7 @@ void CommonHeatTransfer::resTint(const Sign & dir, const Comp & m,
     stencil.push_back(StencilPoint(0,tint,0.));
     stencil.push_back(StencilPoint(1,tpr[i0][j0][k0],dist));
 
-    /* resistance ghost distance */
+    /* resistance ghost distance (includes conductivity) */
     real resinv = evaluate_resinv(-dir,m,i0,j0,k0,ii,ji,ki,dist);
 
     if(boil::realistic(resinv)) {
@@ -78,11 +78,19 @@ void CommonHeatTransfer::resTint(const Sign & dir, const Comp & m,
       }
 
       /* evaluate coefs */
+#if 1
       topo->nth_order_first_coefs(coefs,stencil,AccuracyOrder::Second());
 
       /* equation for resistance effect */
       tint = (coefs[1]*stencil[1].val + coefs[2]*stencil[2].val + resinv*tint)
            / (resinv - coefs[0]);
+#else
+      topo->nth_order_first_coefs(coefs,stencil,AccuracyOrder::First());
+
+      /* equation for resistance effect */
+      tint = (coefs[1]*stencil[1].val + resinv*tint)
+           / (resinv - coefs[0]);
+#endif
 
     }
   } /* are we in liquid? */
@@ -96,6 +104,7 @@ real CommonHeatTransfer::evaluate_resinv(const Sign dir, const Comp & m,
                                        const int ii, const int ji, const int ki,
                                        const real dist) const {
   real resinv;
+  /* takes into account conductivity */
   real res = int_resistance_liq(ii,ji,ki)*lambdal(ii,ji,ki);
   if(m==Comp::i()) {
     resinv = fabs(topo->get_nx()[ii][ji][ki])/res;

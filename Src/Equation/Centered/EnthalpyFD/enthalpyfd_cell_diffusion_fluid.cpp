@@ -28,6 +28,7 @@ void EnthalpyFD::cell_diffusion_fluid(const Comp m,
   real old_pm(boil::unreal),old_pp(boil::unreal);
   Sign markerm, markerp;
   real resinvm(boil::unreal), resinvp(boil::unreal);
+  real reswallm(boil::unreal), reswallp(boil::unreal);
   real dwsrcm(boil::unreal), dwsrcp(boil::unreal);
 
   std::array<real,3> resistvals = { boil::unreal,
@@ -58,8 +59,9 @@ void EnthalpyFD::cell_diffusion_fluid(const Comp m,
 
     /* evaluate solid side resistance */
     real dxfull = cht.distance_center(Sign::neg(),m,i,j,k);
+    reswallm = cht.wall_resistance(i,j,k);
     resistvals[0] = (dxfull-xm)/cht.lambda(i-ox,j-oy,k-oz,diff_eddy)
-                  + cht.wall_resistance(i,j,k);
+                  + reswallm;
   /* no interface, no wall */
   } else {
     xm = cht.distance_center(Sign::neg(),m,i,j,k);
@@ -90,8 +92,9 @@ void EnthalpyFD::cell_diffusion_fluid(const Comp m,
 
     /* evaluate solid side resistance */
     real dxfull = cht.distance_center(Sign::pos(),m,i,j,k);
+    reswallp = cht.wall_resistance(i,j,k);
     resistvals[2] = (dxfull-xp)/cht.lambda(i+ox,j+oy,k+oz,diff_eddy)
-                    + cht.wall_resistance(i,j,k);
+                  + reswallp;
   /* no interface, no wall */
   } else {
     xp = cht.distance_center(Sign::pos(),m,i,j,k);
@@ -118,7 +121,8 @@ void EnthalpyFD::cell_diffusion_fluid(const Comp m,
     } else {
       kernel_fluid2(ctype,tscn*cxm,tscn*cxp,
                     stencil,resinvm,resinvp,
-                    resistvals,dwsrcm,dwsrcp,
+                    reswallm,reswallp,resistvals,
+                    dwsrcm,dwsrcp,
                     Aw,Ac,Ae,F);
     }
   } else {

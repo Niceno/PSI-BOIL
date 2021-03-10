@@ -1,0 +1,456 @@
+#include "Include/psi-boil.h"
+#include <fstream>
+//#define STRETCH
+//#define TWOD
+
+#define _GNU_SOURCE 1
+#include <fenv.h>
+#if 1
+static void __attribute__ ((constructor)) trapfpe(void)
+{
+  /* Enable some exceptions. At startup all exceptions are masked. */
+  feenableexcept(FE_INVALID|FE_DIVBYZERO|FE_OVERFLOW);
+}
+#endif
+
+void evaluate_adens(const std::string name,
+                    const Scalar & eval, real & sum, int & count);
+
+/******************************************************************************/
+int main(int argc, char * argv[]) {
+
+  boil::timer.start();
+
+  if(argc<4){
+    boil::oout<<"Three command line arguments required!"<<"\n";
+    boil::oout<<"./Boil wmin glevel mm"<<"\n";
+
+    exit(0);
+  }
+
+  int wmin=atoi(argv[1]);
+  boil::oout<<"wmin= "<<wmin<<"\n";
+
+  const int level = atoi(argv[2]);  /* domain dimensions */
+  boil::oout<<"glevel= "<<level<<"\n";
+
+  const int mm = atoi(argv[3]);  /* init sphere divisions */
+  boil::oout<<"mm= "<<mm<<"\n";
+  
+  
+  /* domain dimensions (given by problem) */
+  const real LX = 1.;//real(level);
+  const real LY = 1.;//LX;
+  const real LZ = 1.;//LX;
+
+  const real radius = 0.25*1.01*LX;
+
+
+  const int NX = 2*level;
+  const int NY = 2*level;
+  const int NZ = 2*level;
+
+  /*--------------------------------+
+  |  choose the output file format  |
+  +--------------------------------*/
+  boil::plot = new PlotTEC();
+
+  /*----------+
+  |  grid(s)  |
+  +----------*/
+#ifdef STRETCH
+
+  /* x */
+  real DX = LX/real(NX);
+
+  real DXs = DX/2.;
+  real DXw = 2.*DX;
+
+  int NXs = NX/4;
+  int NXw = NX/4;
+
+  Grid1D gx_s1(Range<real>( -LX/2., -LX/4. ),
+              Range<real>( DX, DXs  ),
+              NXs, Periodic::no());
+  Grid1D gx_s2(Range<real>( -LX/4., 0. ),
+              Range<real>( DXs, DX  ),
+              NXs, Periodic::no());
+  Grid1D gx_w1(Range<real>( 0., LX/4. ),
+              Range<real>( DX, DXw  ),
+              NXw, Periodic::no());
+  Grid1D gx_w2(Range<real>( LX/4., LX/2. ),
+              Range<real>( DXw, DX  ),
+              NXw, Periodic::no());
+
+  Grid1D gx_s(gx_s1,gx_s2, Periodic::no());
+  Grid1D gx_w(gx_w1,gx_w2, Periodic::no());
+
+  Grid1D gx(gx_s,gx_w, Periodic::yes());
+
+  /* y */
+  real DY = LY/real(NY);
+
+  real DYs = DY/2.;
+  real DYw = 2.*DY;
+
+  int NYs = NY/4;
+  int NYw = NY/4;
+
+  Grid1D gy_s1(Range<real>( -LY/2., -LY/4. ),
+              Range<real>( DY, DYs  ),
+              NYs, Periodic::no());
+  Grid1D gy_s2(Range<real>( -LY/4., 0. ),
+              Range<real>( DYs, DY  ),
+              NYs, Periodic::no());
+  Grid1D gy_w1(Range<real>( 0., LY/4. ),
+              Range<real>( DY, DYw  ),
+              NYw, Periodic::no());
+  Grid1D gy_w2(Range<real>( LY/4., LY/2. ),
+              Range<real>( DYw, DY  ),
+              NYw, Periodic::no());
+
+  Grid1D gy_s(gy_s1,gy_s2, Periodic::no());
+  Grid1D gy_w(gy_w1,gy_w2, Periodic::no());
+
+  Grid1D gy(gy_s,gy_w, Periodic::yes());
+
+  /* z */
+  real DZ = LZ/real(NZ);
+
+  real DZs = DZ/2.;
+  real DZw = 2.*DZ;
+
+  int NZs = NZ/4;
+  int NZw = NZ/4;
+
+  Grid1D gz_s1(Range<real>( -LZ/2., -LZ/4. ),
+              Range<real>( DZ, DZs  ),
+              NZs, Periodic::no());
+  Grid1D gz_s2(Range<real>( -LZ/4., 0. ),
+              Range<real>( DZs, DZ  ),
+              NZs, Periodic::no());
+  Grid1D gz_w1(Range<real>( 0., LZ/4. ),
+              Range<real>( DZ, DZw  ),
+              NZw, Periodic::no());
+  Grid1D gz_w2(Range<real>( LZ/4., LZ/2. ),
+              Range<real>( DZw, DZ  ),
+              NZw, Periodic::no());
+
+  Grid1D gz_s(gz_s1,gz_s2, Periodic::no());
+  Grid1D gz_w(gz_w1,gz_w2, Periodic::no());
+
+  Grid1D gz(gz_s,gz_w, Periodic::yes());
+
+#else
+  Grid1D gx( Range<real>( -LX/2.,LX/2.), NX, Periodic::yes() );
+  Grid1D gy( Range<real>( -LY/2.,LY/2.), NY, Periodic::yes() );
+  Grid1D gz( Range<real>( -LZ/2.,LZ/2.), NZ, Periodic::yes() );
+#endif
+
+  /*---------+
+  |  domain  |
+  +---------*/
+#ifdef TWOD
+  real DY = 1.0e-2;
+  //Grid1D gy_dummy(LY/real(NY));
+  Grid1D gy_dummy(DY);
+  Domain d(gx, gy_dummy, gz);
+#else
+  Domain d(gx, gy, gz);
+#endif
+
+  /*-------------------+
+  |  time-integration  |
+  +-------------------*/
+  const real dxmin = d.dxyz_min();
+  const real cfl = 0.05;
+  const real dt = 0.05 * dxmin;
+  const real velmag = dxmin/dt * cfl;
+
+#ifdef TWOD
+  const real Ltot = sqrt(LX*LX+LZ*LZ);
+#else
+  const real Ltot = sqrt(LX*LX+LY*LY+LZ*LZ);
+#endif
+  const real ttot = Ltot/velmag;
+
+  Times time(ttot, dt); 
+  const int nint = time.total_steps()/10;
+	
+  /*------------------+
+  |  define unknowns  |
+  +------------------*/
+  Vector uvw(d); // vel
+  Scalar c  (d), g  (d), kappa(d); // concentration
+  Scalar adensgeom(d);
+  Scalar grad0adens(d), gradAadens(d), gradBadens(d);
+  Scalar stmp(d);
+
+  /*-----------------------------+ 
+  |  insert boundary conditions  |
+  +-----------------------------*/
+  for_m(m) {
+    uvw.bc(m).add( BndCnd( Dir::imin(), BndType::periodic() ) );
+    uvw.bc(m).add( BndCnd( Dir::imax(), BndType::periodic() ) );
+    uvw.bc(m).add( BndCnd( Dir::kmin(), BndType::periodic() ) );
+    uvw.bc(m).add( BndCnd( Dir::kmax(), BndType::periodic() ) );
+#ifdef TWOD
+    uvw.bc(m).add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
+    uvw.bc(m).add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
+#else
+    uvw.bc(m).add( BndCnd( Dir::jmin(), BndType::periodic() ) );
+    uvw.bc(m).add( BndCnd( Dir::jmax(), BndType::periodic() ) );
+#endif
+  }
+
+  c.bc().add( BndCnd( Dir::imin(), BndType::periodic() ) );
+  c.bc().add( BndCnd( Dir::imax(), BndType::periodic() ) );
+  c.bc().add( BndCnd( Dir::kmin(), BndType::periodic() ) );
+  c.bc().add( BndCnd( Dir::kmax(), BndType::periodic() ) );
+#ifdef TWOD
+  c.bc().add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
+  c.bc().add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
+#else
+  c.bc().add( BndCnd( Dir::jmin(), BndType::periodic() ) );
+  c.bc().add( BndCnd( Dir::jmax(), BndType::periodic() ) );
+#endif
+ 
+  adensgeom = c.shape();
+  grad0adens = c.shape();
+  gradAadens = c.shape();
+  gradBadens = c.shape();
+  stmp = c.shape();
+
+  /*--------------------+
+  |  initial condition  |
+  +--------------------*/
+  real fact = sqrt(3.);
+#ifdef TWOD
+  fact = sqrt(2.);
+#endif
+
+  Comp m=Comp::u();
+  for_avmijk(uvw,m,i,j,k)
+    uvw[m][i][j][k]=velmag/fact;
+
+  m=Comp::w();
+  for_avmijk(uvw,m,i,j,k)
+    uvw[m][i][j][k]=velmag/fact;//0.5;
+
+#ifndef TWOD
+  m=Comp::v();
+  for_avmijk(uvw,m,i,j,k)
+    uvw[m][i][j][k]=velmag/fact;//0.0;
+#endif
+
+  //uvw.exchange();
+
+  for_vijk(c,i,j,k) 
+    c[i][j][k] = 0.0;
+
+  const real xcent = 0.;
+  const real ycent = 0.;
+  const real zcent = 0.;
+  int Realsum(0);
+
+#ifndef TWOD
+  for_vijk(c,i,j,k) {
+    real wsb_x = c.xc(i) - c.dxc(i)*0.5;
+    real wst_x = c.xc(i) - c.dxc(i)*0.5;
+    real wnb_x = c.xc(i) - c.dxc(i)*0.5;
+    real wnt_x = c.xc(i) - c.dxc(i)*0.5;
+    real esb_x = c.xc(i) + c.dxc(i)*0.5;
+    real est_x = c.xc(i) + c.dxc(i)*0.5;
+    real enb_x = c.xc(i) + c.dxc(i)*0.5;
+    real ent_x = c.xc(i) + c.dxc(i)*0.5;
+
+    real wsb_y = c.yc(j) - c.dyc(j)*0.5;
+    real wst_y = c.yc(j) - c.dyc(j)*0.5;
+    real wnb_y = c.yc(j) + c.dyc(j)*0.5;
+    real wnt_y = c.yc(j) + c.dyc(j)*0.5;
+    real esb_y = c.yc(j) - c.dyc(j)*0.5;
+    real est_y = c.yc(j) - c.dyc(j)*0.5;
+    real enb_y = c.yc(j) + c.dyc(j)*0.5;
+    real ent_y = c.yc(j) + c.dyc(j)*0.5;
+
+    real wsb_z = c.zc(k) - c.dzc(k)*0.5;
+    real wst_z = c.zc(k) + c.dzc(k)*0.5;
+    real wnb_z = c.zc(k) - c.dzc(k)*0.5;
+    real wnt_z = c.zc(k) + c.dzc(k)*0.5;
+    real esb_z = c.zc(k) - c.dzc(k)*0.5;
+    real est_z = c.zc(k) + c.dzc(k)*0.5;
+    real enb_z = c.zc(k) - c.dzc(k)*0.5;
+    real ent_z = c.zc(k) + c.dzc(k)*0.5;
+  
+    real wsb_dist = sqrt(pow(wsb_x-xcent,2.0)+pow(wsb_y-ycent,2.0)+pow(wsb_z-zcent,2.0));
+    real wst_dist = sqrt(pow(wst_x-xcent,2.0)+pow(wst_y-ycent,2.0)+pow(wst_z-zcent,2.0));
+    real wnb_dist = sqrt(pow(wnb_x-xcent,2.0)+pow(wnb_y-ycent,2.0)+pow(wnb_z-zcent,2.0));
+    real wnt_dist = sqrt(pow(wnt_x-xcent,2.0)+pow(wnt_y-ycent,2.0)+pow(wnt_z-zcent,2.0));
+    real esb_dist = sqrt(pow(esb_x-xcent,2.0)+pow(esb_y-ycent,2.0)+pow(esb_z-zcent,2.0));
+    real est_dist = sqrt(pow(est_x-xcent,2.0)+pow(est_y-ycent,2.0)+pow(est_z-zcent,2.0));
+    real enb_dist = sqrt(pow(enb_x-xcent,2.0)+pow(enb_y-ycent,2.0)+pow(enb_z-zcent,2.0));
+    real ent_dist = sqrt(pow(ent_x-xcent,2.0)+pow(ent_y-ycent,2.0)+pow(ent_z-zcent,2.0));
+ 
+    if(wsb_dist<radius&&wst_dist<radius&&wnb_dist<radius&&wnt_dist<radius&&
+       esb_dist<radius&&est_dist<radius&&enb_dist<radius&&ent_dist<radius) {
+       c[i][j][k] = 1.0;
+    } else if(wsb_dist<=radius||wst_dist<=radius||wnb_dist<=radius||wnt_dist<=radius||
+              esb_dist<=radius||est_dist<=radius||enb_dist<=radius||ent_dist<=radius) {
+       real x0=d.xn(i);
+       real y0=d.yn(j);
+       real z0=d.zn(k);
+       real ddx=d.dxc(i)/real(mm);
+       real ddy=d.dyc(j)/real(mm);
+       real ddz=d.dzc(k)/real(mm);
+       int itmp=0;
+       for (int ii=0; ii<mm; ii++){
+         for (int jj=0; jj<mm; jj++){
+           for (int kk=0; kk<mm; kk++){
+             real xxc=x0+0.5*ddx+real(ii)*ddx;
+             real yyc=y0+0.5*ddy+real(jj)*ddy;
+             real zzc=z0+0.5*ddz+real(kk)*ddz;
+             real dist=sqrt(pow(xxc-xcent,2.0)
+                           +pow(yyc-ycent,2.0)+pow(zzc-zcent,2.0));
+             if (dist<radius){
+               itmp=itmp+1;
+             }
+           }
+         }
+       }
+       if(itmp>0&&itmp<mm*mm*mm)
+         Realsum++;
+       c[i][j][k]=real(itmp)/real(mm*mm*mm);
+    }
+  }
+  c.exchange_all();
+
+  /* verification */
+  real Realarea = 4.*acos(-1.0)*radius*radius;
+#else
+  c = 0.0;
+  boil::setup_circle_xz(c,radius,xcent,zcent);
+
+  real Realarea = DY * 2.*boil::pi*radius;
+
+  for_vijk(c,i,j,k) {
+    if(c[i][j][k]>0.0&&c[i][j][k]<1.0) {
+      Realsum++;
+      stmp[i][j][k] = 1.0;
+    }
+  }
+#endif
+  boil::cart.sum_int(&Realsum);
+  boil::oout<<"Real: "<<Realsum<<" "<<Realarea<<boil::endl;
+
+  c.bnd_update();
+  c.exchange_all();
+
+  /*----------------+
+  |  linear solver  |
+  +----------------*/
+  Krylov * solver = new CG(d, Prec::di());
+  VOF conc(c, g, kappa, uvw, time, solver);
+#ifdef TWOD
+  conc.set_normal_vector_method_all(NormMethod::ElviraXZ());
+#endif
+  conc.init();
+  conc.totalvol();
+
+  std::vector<real> sum(6);
+  std::vector<int> cnt(6);
+
+  size_t idx(0);
+  conc.ancillary();
+
+  /* Gradient */
+  conc.cal_adens_gradclr(grad0adens,c);
+  conc.cal_adens_gradclr_2phi(gradAadens,c);
+  conc.cal_adens_gradclr_6phi(gradBadens,c);
+  evaluate_adens("Grad0",grad0adens,sum[idx],cnt[idx]);
+  idx++;
+  evaluate_adens("GradA",gradAadens,sum[idx],cnt[idx]);
+  idx++;
+  evaluate_adens("GradB",gradBadens,sum[idx],cnt[idx]);
+  idx++;
+
+  /* Geom */
+  conc.cal_adens_geom(adensgeom,c,false);
+  evaluate_adens("Geom",adensgeom,sum[idx],cnt[idx]);
+
+  idx++;
+  /* MC */
+  evaluate_adens("MC",*(conc.topo->adens),sum[idx],cnt[idx]);
+  idx++;
+
+  conc.cal_adens_geom(adensgeom,c);
+  evaluate_adens("Geom-ii",adensgeom,sum[idx],cnt[idx]);
+
+  boil::oout<<level<<" ";
+  for(auto s : sum) {
+    boil::oout<<s/Realarea-1.<<" ";
+  }
+  boil::oout<<boil::endl;
+
+  boil::plot->plot(uvw,c,stmp,*(conc.topo->adens),adensgeom,grad0adens, "uvw-c-marker-adens-adensgeom-adensgrad", 0);
+ 
+#if 1
+  for(time.start(); time.end(); time.increase()) {
+
+    conc.advance();
+    conc.totalvol();
+
+    real sum_MC, sum_AG, sum_AGvic;
+    int cnt_MC, cnt_AG, cnt_AGvic;
+
+    evaluate_adens("MC",*(conc.topo->adens),sum_MC,cnt_MC);
+
+    /* Geom */
+    conc.cal_adens_geom(adensgeom,c,false);
+    evaluate_adens("Geom",adensgeom,sum_AG,cnt_AG);
+
+    conc.cal_adens_geom(adensgeom,c);
+    evaluate_adens("Geom-ii",adensgeom,sum_AGvic,cnt_AGvic);
+
+    boil::oout<<"evalAbs= "<<Realarea<<" "<<Realsum<<" | "
+              <<sum_MC<<" "<<cnt_MC<<" | "
+              <<sum_AG<<" "<<cnt_AG<<" | "
+              <<sum_AGvic<<" "<<cnt_AGvic<<" | "
+              <<boil::endl;
+
+    boil::oout<<"evalRel= "<<1.0<<" "<<1.0<<" | "
+              <<100.*(sum_MC/Realarea-1.)<<" "<<100.*(real(cnt_MC)/real(Realsum)-1.)<<" | "
+              <<100.*(sum_AG/Realarea-1.)<<" "<<100.*(real(cnt_AG)/real(Realsum)-1.)<<" | "
+              <<100.*(sum_AGvic/Realarea-1.)<<" "<<100.*(real(cnt_AGvic)/real(Realsum)-1.)<<" | "
+              <<boil::endl;
+
+    if(time.current_step() % nint == 0) {
+      boil::plot->plot(uvw,c,stmp,*(conc.topo->adens),adensgeom,grad0adens, "uvw-c-marker-adens-adensgeom-adensgrad", time.current_step());
+    }
+
+  }
+#endif
+
+  boil::oout << "finished" << boil::endl;
+
+  boil::timer.stop();
+  boil::timer.report();
+
+}	
+
+/******************************************************************************/
+void evaluate_adens(const std::string name,
+                    const Scalar & eval, real & sum, int & count) {
+/******************************************************************************/
+  sum = 0.0;
+  count = 0;
+  for_vijk(eval,i,j,k) {
+    real sumplus = eval[i][j][k]*eval.dV(i,j,k);
+    if(sumplus>0.0) count++;
+    sum += sumplus;
+  }
+  boil::cart.sum_real(&sum);
+  boil::cart.sum_int(&count);
+  boil::oout<<"Evaluate_adens "<<name<<" "<<count<<" "<<sum<<boil::endl;
+
+  return;
+}

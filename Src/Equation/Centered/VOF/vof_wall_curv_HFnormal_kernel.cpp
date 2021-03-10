@@ -40,7 +40,7 @@ real VOF::wall_curv_HFnormal_kernel(const real x0,
 
   //boil::oout<<nxp<<" "<<nxm<<" "<<dc<<boil::endl;
 
-  /* droplets have positive curvature */
+  /* droplets have positive curvature, pay attention to mult */
   return (nxp-nxm)/dc;
 #else
   real hhm = hm;

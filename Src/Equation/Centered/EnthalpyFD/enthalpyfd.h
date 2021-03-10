@@ -155,6 +155,7 @@ class EnthalpyFD : public Centered {
                        const real cxm, const real cxp,
                        std::vector<StencilPoint> & stencil,
                        const real resinvm, const real resinvp,
+                       const real reswallm, const real reswallp,
                        const std::array<real,3> resistvals,
                        const real dwsrcm, const real dwsrcp,
                        real & Am, real & Ac, real & Ap, real & F);

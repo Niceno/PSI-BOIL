@@ -1,4 +1,5 @@
 #include "enthalpyfd.h"
+#include "def.h"
 
 /***************************************************************************//**
 *  Cell-wise construction of diff matrix based on local structure (fluid at sol)
@@ -8,6 +9,7 @@ void EnthalpyFD::kernel_fluid2(const std::array<ConnectType,3> & ctype,
                                const real cxm, const real cxp,
                                std::vector<StencilPoint> & stencil,
                                const real resinvm, const real resinvp,
+                               const real reswallm, const real reswallp,
                                const std::array<real,3> resistvals,
                                const real dwsrcm, const real dwsrcp,
                                real & Am, real & Ac, real & Ap, real & F) {
@@ -20,7 +22,7 @@ void EnthalpyFD::kernel_fluid2(const std::array<ConnectType,3> & ctype,
     Am = fact*cxm;
     Ap = cxp;
     Ac += fact*cxm + cxp;
-    F += dwsrcm*fact*cxm*resistvals[0];
+    F += dwsrcm*fact*cxm*(resistvals[0]-reswallm); // was [0]
   }
 
   /*------------------------+
@@ -31,7 +33,7 @@ void EnthalpyFD::kernel_fluid2(const std::array<ConnectType,3> & ctype,
     Am = cxm;
     Ap = fact*cxp;
     Ac += cxm + fact*cxp;
-    F += dwsrcp*fact*cxp*resistvals[2];
+    F += dwsrcp*fact*cxp*(resistvals[2]-reswallp); // was [2]
   }
 
   /*----------------------------+
@@ -42,7 +44,7 @@ void EnthalpyFD::kernel_fluid2(const std::array<ConnectType,3> & ctype,
     Am = 0.;
     Ap = fact*cxp;
     Ac += cxm + fact*cxp;
-    F += dwsrcp*fact*cxp*resistvals[2];
+    F += dwsrcp*fact*cxp*(resistvals[2]-reswallp); // was [2]
 
     /* do we use interfacial heat transfer resistance? */
     if(boil::realistic(resinvm)) {
@@ -53,6 +55,14 @@ void EnthalpyFD::kernel_fluid2(const std::array<ConnectType,3> & ctype,
 
       /* evaluate coefs */
       std::vector<real> coefs;
+#ifdef USE_FIRST_ORDER_INTRESIST
+      cht.topo->nth_order_first_coefs(coefs,stencil,AccuracyOrder::First());
+
+      /* correct matrix */
+      real deno = resinvm-coefs[0];
+      Ac += -cxm*coefs[1]/deno;
+      F += cxm*stencil[0].val*resinvm/deno;
+#else
       cht.topo->nth_order_first_coefs(coefs,stencil,AccuracyOrder::Second());
 
       /* correct matrix */
@@ -62,8 +72,8 @@ void EnthalpyFD::kernel_fluid2(const std::array<ConnectType,3> & ctype,
       Ap +=  cxm * mult * fact;
       Ac += -cxm * (coefs[1]/deno + mult*fact2);
       F += cxm*stencil[0].val*resinvm/deno
-         + dwsrcp * cxm * mult * fact * resistvals[2];
-
+         + dwsrcp * cxm * mult * fact * (resistvals[2]-reswallp); // was [2]
+#endif
     } else {
       F += cxm*stencil[0].val;
     }
@@ -77,7 +87,7 @@ void EnthalpyFD::kernel_fluid2(const std::array<ConnectType,3> & ctype,
     Am = fact*cxm;
     Ap = 0.;
     Ac += fact*cxm + cxp;
-    F += dwsrcm*fact*cxm*resistvals[0];
+    F += dwsrcm*fact*cxm*(resistvals[0]-reswallm); // was [0]
 
     /* do we use interfacial heat transfer resistance? */
     if(boil::realistic(resinvp)) {
@@ -93,6 +103,14 @@ void EnthalpyFD::kernel_fluid2(const std::array<ConnectType,3> & ctype,
 
       /* evaluate coefs */
       std::vector<real> coefs;
+#ifdef USE_FIRST_ORDER_INTRESIST
+      cht.topo->nth_order_first_coefs(coefs,stencil,AccuracyOrder::First());
+
+      /* correct matrix */
+      real deno = resinvp-coefs[0];
+      Ac += -cxp*coefs[1]/deno;
+      F += cxp*stencil[0].val*resinvp/deno;
+#else
       cht.topo->nth_order_first_coefs(coefs,stencil,AccuracyOrder::Second());
 
       /* correct matrix */
@@ -102,8 +120,8 @@ void EnthalpyFD::kernel_fluid2(const std::array<ConnectType,3> & ctype,
       Am +=  cxp * mult * fact;
       Ac += -cxp * (coefs[1]/deno + mult*fact2);
       F += cxp*stencil[0].val*resinvp/deno
-         + dwsrcm * cxp * mult * fact * resistvals[0]; 
-
+         + dwsrcm * cxp * mult * fact * (resistvals[0]-reswallm); // was [0]; 
+#endif
     } else {
       /* here the stencil is not reversed */
       F += cxp*stencil[2].val;
