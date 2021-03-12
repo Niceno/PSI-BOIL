@@ -122,6 +122,21 @@ class AC {
     void stop_if_diverging(const bool & s) {stop_if_div = s;}
     bool stop_if_diverging() const         {return stop_if_div;}
 
+    //! priority_min_cyc (against if diverging)
+    //    true: cycle at least min_cycle, even if solution diverges
+    //    false: stop even if cycle < min_cycle
+    //    default value = true
+    void priority_min_cycle(const bool & s) {priority_min_cyc = s;
+      if (priority_min_cyc) {
+        boil::oout<<"#additive: cycle at least min_cycle, even if diverges\n";
+	assert(stop_if_div == true);
+      } else {
+        boil::oout<<"#additive: stop iteration, even if cycle < min_cycle\n";
+	assert(stop_if_div == true);
+      }
+    } 
+    bool priority_min_cycle() {return priority_min_cyc;}
+
     //! Use linf error
     void use_linf_error(const bool & s) {use_linf = s;}
     bool use_linf_error() const         {return use_linf;}
@@ -183,7 +198,7 @@ class AC {
     int  min_cyc;
     ResTol restol_val;
     ResRat resrat_val;
-    bool stop_if_div, use_linf;
+    bool stop_if_div, priority_min_cyc, use_linf;
     std::array<MaxIter,3> mv_def, ms_def;
 };
 
