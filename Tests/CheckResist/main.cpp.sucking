@@ -67,6 +67,27 @@ int main(int argc, char * argv[]) {
     return 2.*betasol*sqrt(alpv*(t+t0));
   };
 
+  auto anainv = [&](const real x) {
+    return std::pow(x/(2.*betasol),2.)/alpv;
+  };
+
+
+  const real M = 0.4;
+
+  const real xmax = 5.45e-3;
+  const real t1 = anainv(xmax);
+  boil::oout<<"max "<<xmax<<" "<<t1<<boil::endl;
+
+  auto resistinteg = [&](const real t) {
+    return M*DX*DX/(betasol*sqrt(alpv))*(sqrt(t1)-sqrt(t0))/(t1-t0);
+  };
+
+
+  auto resist = [&](const real t) {
+    //return M*DX*DX/analytic(t);
+    return resistinteg(t);
+  };
+
   /*--------------------------------+
   |  choose the output file format  |
   +--------------------------------*/
@@ -284,7 +305,10 @@ int main(int argc, char * argv[]) {
 
   TIF tsat(Tsat);
   CommonHeatTransfer cht(tpr,conc.topo,tsat,&mixed);
-  EnthalpyFD enthFD(tpr, q, uvw, uvw_1, uvw_2, time, solver, &mixed, cht);
+
+  CommonHeatTransfer cht_2(tpr,conc.topo,tsat,&mixed);
+
+  EnthalpyFD enthFD(tpr, q, uvw, uvw_1, uvw_2, time, solver, &mixed, cht_2);
   enthFD.convection_set(TimeScheme::forward_euler());
   enthFD.diffusion_set(TimeScheme::backward_euler());
   enthFD.set_flux_accuracy_order(AccuracyOrder::First());
@@ -313,6 +337,7 @@ int main(int argc, char * argv[]) {
 
     /* new time step */
     conc.new_time_step();
+    cht_2.set_int_resistance_liq(resist(tcurr));
 
     /* inner loop */
     for(int mloop=0; mloop<mSimple; mloop++) {
@@ -423,7 +448,7 @@ int main(int argc, char * argv[]) {
       boil::plot->plot(uvw,c,tpr,mdot,"uvw-c-tpr-mdot",time.current_step());
     }
 
-    if(conc.topo->get_xmaxft()>5.45e-3) {
+    if(conc.topo->get_xmaxft()>xmax) {
       boil::plot->plot(uvw,c,tpr,mdot,"uvw-c-tpr-mdot",time.current_step());
       break;
     }

@@ -1,9 +1,10 @@
 #include "Include/psi-boil.h"
-#include "test_reconstruction.cpp"
+//#include "test_reconstruction.cpp"
 #include <fstream>
 #include <iostream>
 #include <fenv.h>
 #define SYM
+//#define USE_SOLID
 //#define USE_CARTESIAN
 #define _GNU_SOURCE 1
 #if 1
@@ -14,7 +15,7 @@ static void __attribute__ ((constructor)) trapfpe(void)
 }
 #endif
 
-#define CASE 3
+#define CASE 1
 /* 
    0 - no wall curv method
    1 - parallel curv method
@@ -28,6 +29,7 @@ int main(int argc, char * argv[]) {
 
   boil::timer.start();
 
+#if 0
   if(argc<=9){
     boil::oout<<"Nine command line arguments required!"<<"\n";
     boil::oout<<"./Boil wmin La rhorat murat gridlevel cangle dt-mult inverted msimple"<<boil::endl;
@@ -60,6 +62,30 @@ int main(int argc, char * argv[]) {
 
   const int mSimple = atoi(argv[9]);
   boil::oout<<"mSimple= "<<mSimple<<"\n";
+#else
+  if(argc<=3){
+    boil::oout<<"Nine command line arguments required!"<<"\n";
+    boil::oout<<"./Boil wmin La rhorat murat gridlevel cangle dt-mult inverted msimple"<<boil::endl;
+    exit(0);
+  }
+
+  const int wmin=atoi(argv[1]);
+  boil::oout<<"wmin= "<<wmin<<"\n";
+
+  const real La = 1000;
+  const real rhorat = 1;
+  const real murat = 1;
+
+  const int gLevel = atoi(argv[2]);
+  boil::oout<<"gLevel= "<<gLevel<<"\n";
+
+  real cangle = atof(argv[3]);
+  boil::oout<<"cangle= "<<cangle<<"\n";
+
+  const real dtmult = 4.45;
+  const bool inverted = 0;
+  const int mSimple = 1;
+#endif
 
   const real R0 = 1.;
   real radius, zcent, chord;
@@ -79,18 +105,30 @@ int main(int argc, char * argv[]) {
   const int xmult = 2;
 #endif
   const int NcellsPerRadius = 16*gLevel;
-  const int NXmult = 2;
-  const int NZmult = 2;
+  const real NXmult = 1.5;
+  const real NZmult = 2.;
   
   /* domain dimensions (given by problem) */
   const real DZ = radius/real(NcellsPerRadius);
-  real LZ = real(NZmult)*(zcent+radius);
-  const int NZ = int(LZ/DZ);
+  real LZ = real(NZmult)* ( (zcent>0.) ? radius : (radius + zcent) );
+  int NZ = int(LZ/DZ);
+  int power = 1;
+  while(power<NZ) 
+    power <<= 1;
+  NZ = power;
+  //const int NZ = powf(2., ceilf(log2f(int(LZ/DZ))));
   LZ = real(NZ)*DZ;
-  real LX = real(NXmult) * ( (zcent>0) ? radius : 0.5*chord );
-  const int NX = int(xmult*LX/DZ);
+  real LX = real(NXmult) * ( (zcent>0.) ? radius : 0.5*chord );
+  int NX = int(xmult*LX/DZ);
+  power = 1;
+  while(power<NX) 
+    power <<= 1;
+  NX = power;
+  //const int NX = powf(2., ceilf(log2f(int(xmult*LX/DZ))));
   LX = real(NX)*DZ/real(xmult);
   const int NY = 1;
+
+  boil::oout<<"dims= "<<LX<<" "<<LZ<<" "<<DZ<<" "<<NX<<" "<<NZ<<boil::endl;
 
   /*--------------------------------+
   |  choose the output file format  |
@@ -107,15 +145,26 @@ int main(int argc, char * argv[]) {
 #else
   Grid1D gx( Range<real>(-LX,LX), NX, Periodic::no() );
 #endif
+#ifdef USE_SOLID
+  Grid1D gz( Range<real>(-4.*DZ,LZ), NZ+4, Periodic::no(), BndGrid::extrapolate() );
+#else
   Grid1D gz( Range<real>(0.0,LZ), NZ, Periodic::no(), BndGrid::extrapolate() );
+#endif
+
   /*---------+
   |  domain  |
   +---------*/
+  Body floor("floor.stl");
+#ifdef USE_SOLID
+  Body * floor_ptr = &floor;
+#else
+  Body * floor_ptr = NULL;
+#endif
 #ifdef USE_CARTESIAN
   Grid1D gy(DZ);
-  Domain d(gx,gy,gz);
+  Domain d(gx,gy,gz,floor_ptr);
 #else
-  Axisymmetric d(gx,gz,DZ);
+  Axisymmetric d(gx,gz,DZ,floor_ptr);
 #endif
 
   /*------------------+
@@ -198,8 +247,8 @@ int main(int argc, char * argv[]) {
   |  time-integration  |
   +-------------------*/
   real dxmin = d.dxyz_min();
-  const real dt = dtmult * pow(std::min(air.rho()->value(),water.rho()->value())*pow(dxmin,3.0)
-                           /(2.0*3.1415*mixed.sigma()->value()),0.5);
+  const real dt = dtmult * pow((air.rho()->value()+water.rho()->value())*pow(dxmin,3.0)
+                               /(std::pow(2.0*3.1415,3.)*mixed.sigma()->value()),0.5);
   const real tend = std::max(tsig,tmu);
   const int ndt = tend/dt;
   const int nint = ndt/10;
@@ -237,16 +286,19 @@ int main(int argc, char * argv[]) {
   Krylov * solver = new CG(d, Prec::ic2());
   //Krylov * solver = new CG(d, Prec::di());
   Momentum ns( uvw, xyz, time, solver, &mixed);
-  ns.convection_set(TimeScheme::backward_euler()); //ns.convection is mandatory
+  if(mSimple>1)
+    ns.convection_set(TimeScheme::backward_euler()); //ns.convection is mandatory
+  else
+    ns.convection_set(TimeScheme::forward_euler());
   ns.diffusion_set(TimeScheme::backward_euler());
   Pressure pr(p, f, uvw, time, solver, &mixed);
 
   AC multigrid( &pr );
   if(mSimple>1) {
-    multigrid.min_cycles(4);  // 4
+    multigrid.min_cycles(1);  // 4
     multigrid.max_cycles(8); // 8
   } else {
-    multigrid.min_cycles(6);  // 6
+    multigrid.min_cycles(1);  // 6
   }
   multigrid.stop_if_diverging(true);
 
@@ -287,13 +339,17 @@ int main(int argc, char * argv[]) {
   conc.ancillary();
   conc.curvature();
 
-  boil::plot->plot(uvw,c,press,kappa,(*conc.topo.nx),(*conc.topo.nz), "uvw-c-press-kappa-nx-nz", 0);
+  boil::plot->plot(uvw,c,press,kappa,(*(conc.topo->nx)),(*(conc.topo->nz)), "uvw-c-press-kappa-nx-nz", 0);
 
   /* curvature */
   int cnt(0);
   real kap(0.);
   for_vijk(c,i,j,k) {
+#ifdef USE_SOLID
+    if(boil::realistic(kappa[i][j][k])&&d.ibody().off(i,j,k-1)) {
+#else
     if(boil::realistic(kappa[i][j][k])&&k==c.sk()) {
+#endif
       cnt++;
       kap += kappa[i][j][k];
     }
@@ -312,9 +368,10 @@ int main(int argc, char * argv[]) {
 #endif
                              <<boil::endl;
 
+#ifdef USE_REC
   std::vector<real> nl1, nli, kl1, kli;
   NormMethod nmv = NormMethod::ElviraXZ();
-#ifdef USE_CARTESIAN
+  #ifdef USE_CARTESIAN
   test_reconstruction_circle_xz(conc,c,ctest,
                                 kappa,inverted,radius,
                                 xcent,zcent,
@@ -323,7 +380,7 @@ int main(int argc, char * argv[]) {
                                 nli,
                                 kl1,
                                 kli);
-#else
+  #else
   test_reconstruction_sphere(false,
                              conc,c,ctest,
                              kappa,inverted,radius,
@@ -333,6 +390,7 @@ int main(int argc, char * argv[]) {
                              nli,
                              kl1,
                              kli);
+  #endif
 #endif
 
 
@@ -343,6 +401,7 @@ int main(int argc, char * argv[]) {
     for_m(m)
       uvw_old(m) = uvw(m);
     // store color function
+    conc.new_time_step();
     cold = c;
 
     /* inner loop */
@@ -354,12 +413,7 @@ int main(int argc, char * argv[]) {
           xyz[m][i][j][k]=0.0;
 
       /* surface tension */
-#ifdef USE_CARTESIAN
-      conc.tension(&xyz, mixed);
-#else
       conc.tension(&xyz, mixed,conc.color());
-      //conc.tension(&xyz, mixed);
-#endif
 
       /* essential for moving front */
       ns.discretize();
@@ -368,39 +422,43 @@ int main(int argc, char * argv[]) {
 
       /* momentum */
       ns.new_time_step(uvw_old);
-      ns.convection();
+      if(mSimple>1)
+        ns.convection();
       ns.grad(press);
-      ns.solve(ResRat(1e-8));
+      ns.solve(ResRat(1e-14));
 
       p=0.0;
-      if (multigrid.vcycle(ResRat(1e-6))) OMS(converged);
+      if (multigrid.fcycle(ResRat(1e-7))) OMS(converged);
 
       ns.project(p);
       press += p;
       press.exchange();
 
-      ns.cfl_max();
-
       conc.advance(cold);
-      conc.totalvol();
 
     }
+
+    conc.totalvol();
+    ns.cfl_max();
+
     /* post process */
     //velocity
     real umax=0.0, vmax=0.0, wmax=0.0;
     real usum=0.0, vsum=0.0, wsum=0.0;
     int icount=0;
     for_vijk(c,i,j,k) {
-      real utmp=fabs(0.5*(uvw[Comp::u()][i][j][k]+uvw[Comp::u()][i+1][j][k]))/usig;
-      real vtmp=fabs(0.5*(uvw[Comp::v()][i][j][k]+uvw[Comp::v()][i][j+1][k]))/usig;
-      real wtmp=fabs(0.5*(uvw[Comp::w()][i][j][k]+uvw[Comp::w()][i][j][k+1]))/usig;
-      if (umax<utmp) umax=utmp;
-      if (vmax<vtmp) vmax=vtmp;
-      if (wmax<wtmp) wmax=wtmp;
-      usum += utmp;
-      vsum += vtmp;
-      wsum += wtmp;
-      icount++;
+      if(d.ibody().on(i,j,k)) {
+        real utmp=fabs(0.5*(uvw[Comp::u()][i][j][k]+uvw[Comp::u()][i+1][j][k]))/usig;
+        real vtmp=fabs(0.5*(uvw[Comp::v()][i][j][k]+uvw[Comp::v()][i][j+1][k]))/usig;
+        real wtmp=fabs(0.5*(uvw[Comp::w()][i][j][k]+uvw[Comp::w()][i][j][k+1]))/usig;
+        if (umax<utmp) umax=utmp;
+        if (vmax<vtmp) vmax=vtmp;
+        if (wmax<wtmp) wmax=wtmp;
+        usum += utmp;
+        vsum += vtmp;
+        wsum += wtmp;
+        icount++;
+      }
     }
     boil::cart.max_real(&umax);
     boil::cart.max_real(&vmax);
@@ -420,21 +478,23 @@ int main(int argc, char * argv[]) {
     real err_k_l1(0.0),  err_k_linf(0.0);
     int knt(0);
     for_vijk(c,i,j,k) {
-      real kap = kappa[i][j][k];
-      if(boil::realistic(kap)) {
-        knt++;
+      if(d.ibody().on(i,j,k)) {
+        real kap = kappa[i][j][k];
+        if(boil::realistic(kap)) {
+          knt++;
 #ifdef USE_CARTESIAN
-        real kappa_real = 1./radius;
+          real kappa_real = 1./radius;
 #else
-        real kappa_real = 2./radius;
+          real kappa_real = 2./radius;
 #endif
-        if(inverted)
-          kappa_real = -kappa_real;
-        real err = fabs(kap-kappa_real)/fabs(kappa_real);
-        if(err>err_k_linf) {
-          err_k_linf = err;
+          if(inverted)
+            kappa_real = -kappa_real;
+          real err = fabs(kap-kappa_real)/fabs(kappa_real);
+          if(err>err_k_linf) {
+            err_k_linf = err;
+          }
+          err_k_l1 += err;
         }
-        err_k_l1 += err;
       }
     }
     boil::cart.max_real(&err_k_linf);
@@ -454,8 +514,9 @@ int main(int argc, char * argv[]) {
   }
 #endif
 
+#ifdef USE_REC
   nl1.clear(); nli.clear(); kl1.clear(); kli.clear();
-#ifdef USE_CARTESIAN
+  #ifdef USE_CARTESIAN
   test_reconstruction_circle_xz(conc,c,ctest,
                              kappa,inverted,radius,
                              xcent,zcent,
@@ -464,7 +525,7 @@ int main(int argc, char * argv[]) {
                              nli,
                              kl1,
                              kli);
-#else
+  #else
   test_reconstruction_sphere(false,
                              conc,c,ctest,
                              kappa,inverted,radius,
@@ -474,6 +535,7 @@ int main(int argc, char * argv[]) {
                              nli,
                              kl1,
                              kli);
+  #endif
 #endif
 
   boil::oout << "finished" << boil::endl;

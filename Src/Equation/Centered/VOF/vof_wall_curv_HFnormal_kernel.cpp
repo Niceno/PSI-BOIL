@@ -23,8 +23,8 @@ real VOF::wall_curv_HFnormal_kernel(const real x0,
     nxm = hxm/sqrt(1.+hxm*hxm)*-mult;
     nzm = -1./sqrt(1.+hxm*hxm)*-mult;
   } else {
-    //nxm = -mult*sin(cang);
-    nxm = -sin(cang);
+    nxm = -mult*sin(cang);
+    //nxm = -sin(cang);
     nzm =  cos(cang);
   }
 
@@ -33,8 +33,8 @@ real VOF::wall_curv_HFnormal_kernel(const real x0,
     nxp = hxp/sqrt(1.+hxp*hxp)*-mult;
     nzp = -1./sqrt(1.+hxp*hxp)*-mult;
   } else {
-    //nxp =  mult*sin(cang);
-    nxp =  sin(cang);
+    nxp =  mult*sin(cang);
+    //nxp =  sin(cang);
     nzp =  cos(cang);
   }
 
