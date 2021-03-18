@@ -12,7 +12,6 @@ static void __attribute__ ((constructor)) trapfpe(void)
 #endif
 
 #define SYM
-//#define FS_TEST
 //#define USE_MG
 #define CASE 1
 /* case 1 = axisymmetric
@@ -42,16 +41,28 @@ int main(int argc, char ** argv) {
 
 /******************************************************************************/
 /* ------------ boundary or initial conditions */
-  const real tsat0 = 373.15;
-  const real tout = tsat0+1.25;
+#if 0
+  const real deltat = 7.;
+  const real deltar = 6e-6;
+  const real betasol = 20.958380585083507;
+#elif 0
+  const real deltat = 10.;
+  const real deltar = 4.2e-6;
+  const real betasol = 29.779234365691938;
+#else
+  const real deltat = 4.;
+  const real deltar = 10.3e-6;
+  const real betasol = 12.146863062661879;
+#endif
 
-  const real betasol = 4.063399777477426;
+  const real tsat0 = 0.;
+  const real tout = tsat0+deltat;
 
 /******************************************************************************/
 /* ------------ numerical simulation settings */
 
   /* number of plot points */
-  const int n_plot = 25;
+  const int n_plot = 10;
 
   /* in-time step iteration */
   const int mSimple = 1;
@@ -97,18 +108,18 @@ int main(int argc, char ** argv) {
 
 /******************************************************************************/
 /* ------------ domain dimensions */
-  const int NX = 24*gLevel;
+  const int NX = 16*gLevel;
 #ifdef SYM
-  const int NZ = 24*gLevel;
+  const int NZ = 16*gLevel;
 #else
-  const int NZ = 48*gLevel;
+  const int NZ = 32*gLevel;
 #endif
 
-  const real LX = 187.5e-6;
+  const real LX = 1000e-6;
   const real LZ = LX;
 
   const real DX = LX/real(NX);
-  const real radius=50.0e-6;
+  const real radius=100.0e-6;
   const real xcent=0.0;
   const real ycent=0.0;
   const real zcent=0.0;
@@ -118,11 +129,18 @@ int main(int argc, char ** argv) {
   };
 
   const real t0 = anainv(radius);
-  const real tend = anainv(3.*radius);
+  const real tend = anainv(8.*radius);
 
   auto analytic = [&](const real t) {
     return 2.*betasol*sqrt(alpl*(t+t0));
   };
+
+  const real M = 0.025;
+
+  auto resist = [&](const real t) {
+    return M*2.*DX*DX/lambdal/sqrt(alpl)/(sqrt(t0)+sqrt(tend))*std::pow(2./gLevel,0.5);
+  };
+
 
 /******************************************************************************/
 /* ------------- setup finished */
@@ -360,15 +378,16 @@ int main(int argc, char ** argv) {
   /* enthalpy equation */
   TIF tsat(tsat0);
   CommonHeatTransfer cht(tpr,conc.topo,tsat,&mixed);
+  CommonHeatTransfer cht_2(tpr,conc.topo,tsat,&mixed);
 
   Vector & uvwenth1 = uvw_1;
   Vector & uvwenth2 = uvw_2;
 #if CASE > 1
   EnthalpyFD enthFD      (tpr, q, uvw, uvwenth1, uvwenth2, time, solver  , &mixed,
-                          cht);
+                          cht_2);
 #else
   EnthalpyFDaxisym enthFD(tpr, q, uvw, uvwenth1, uvwenth2, time, solver  , &mixed,
-                          cht);
+                          cht_2);
 #endif
   enthFD.convection_set(TimeScheme::forward_euler());
   enthFD.diffusion_set(TimeScheme::backward_euler());
@@ -428,6 +447,10 @@ int main(int argc, char ** argv) {
     conc.init();
     conc.totalvol();
 
+    auto tfit = [&](const real x, const real x0) {
+      return tout + (tout-tsat0)*pow((x-x0)/(x0-radius),3.);
+    };
+
     for_vijk(c,i,j,k) {
       real dist = pow(c.xc(i)-xcent,2.0)
 #if CASE == 3
@@ -436,19 +459,11 @@ int main(int argc, char ** argv) {
                  +pow(c.zc(k)-zcent,2.0);
       dist = sqrt(dist);
 
-      real radius2=70.0e-6;
-      real coef1 =  2.28023719E+05;
-      real coef2 = -8.71920915E+09;
-      real coef3 = -7.28351952E+14;
-      real coef4 =  6.46735617E+19;
-      real coef5 = -1.35949950E+24;
-      if (dist<=radius) {
+      real radius2 = radius + deltar;
+      if(dist<=radius) {
         tpr[i][j][k] = tsat0;
       } else if(dist<=radius2) {
-        real xi = dist - radius;
-        real ttmp = coef5*pow(xi,5.0) + coef4*pow(xi,4.0) + coef3*pow(xi,3.0)
-                  + coef2*pow(xi,2.0) + coef1*xi + tsat0;
-        tpr[i][j][k] = std::min(tout,ttmp);
+        tpr[i][j][k] = std::max(tsat0,std::min(tout,tfit(dist,radius2)));
       } else {
         tpr[i][j][k] = tout;
       }
@@ -462,32 +477,6 @@ int main(int argc, char ** argv) {
   /* set iint */
   int iint = int(time.current_time()/t_per_plot) + 1;
   boil::oout<<"iint= "<<iint<<"\n";
-
-#ifdef FS_TEST
-  #if 0
-  Comp mcomp = Comp::i();
-  #else
-  Comp mcomp = Comp::k();
-  #endif
-  for_vmijk((*conc.topo.fs),mcomp,i,j,k) {
-    real val = (*conc.topo.fs)[mcomp][i][j][k];
-  #if 0
-    real pos = (*conc.topo.fs).zc(mcomp,k);
-    real sig = 1.;
-  #else
-    real pos  = (*conc.topo.fs).xc(mcomp,i);
-    real pos2 = (*conc.topo.fs).zc(mcomp,k);
-    real sig = (pos2>0.)-(pos2<0.);
-  #endif
-    if(boil::realistic(val)) {
-      boil::oout<<i<<" "<<j<<" "<<k<<" "<<val<<" "<<sig*sqrt(radius*radius-pos*pos)
-                <<" | "<<val/sig/sqrt(radius*radius-pos*pos)-1.
-                <<boil::endl;
-    } 
-  }
-
-  exit(0);
-#endif
 
   MaxIter multigrid_mm_smooth1 = MaxIter(70);
   MaxIter multigrid_mm_smooth2 = MaxIter(70);
@@ -506,6 +495,7 @@ int main(int argc, char ** argv) {
     real tcurr = time.current_time();
 
     conc.new_time_step();
+    //cht_2.set_int_resistance_liq(resist(tcurr));
 
     /* store velocity & temperature */
     if(mSimple>1) {

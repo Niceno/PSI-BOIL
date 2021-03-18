@@ -158,6 +158,10 @@ class DetachmentModel {
       return detach;
     }
 
+    inline bool & detached() {
+      return detach;
+    }
+
     inline void test_detachment(const real eta) {
       etacurr = eta;
       bool test = (eta<=etacrit);

@@ -95,10 +95,15 @@ class VOF : public Centered {
     void tension(Vector * vec, const Matter & matt);
     void tension(Vector * vec, const Matter & matt, const Scalar & scp);
     real totalvol(real * vaps = NULL);
-    void front_minmax();
+    real totalvol(Range<real> xr
+                , Range<real> yr
+                , Range<real> zr
+                , real * vaps = NULL);
+    void front_minmax(const std::string & nm = "x-min-front=");
     void front_minmax( Range<real> xr
                      , Range<real> yr
-                     , Range<real> zr );
+                     , Range<real> zr
+                     , const std::string & nm = "x-min-front=");
 
     void init(){ ancillary(); is_initialized = true; };
 
@@ -144,6 +149,7 @@ class VOF : public Centered {
 
     Vector * bndclr;
     Topology * topo;
+    DetachmentModel detachment_model;
 
     Scalar nalpha;
     Scalar nx,ny,nz;/* normal to interface */
@@ -400,7 +406,6 @@ class VOF : public Centered {
     Heaviside * heavi;
     NormMethod norm_method_advance, norm_method_curvature;
     Comp mcomp_for_elvira;
-    DetachmentModel detachment_model;
     CurvMethod bulk_curv_method, wall_curv_method;
     SubgridMethod subgrid_method;
     AdvectionMethod advect_method;

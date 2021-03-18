@@ -79,7 +79,7 @@
   const real cpv = 2e3*rhov;
   const real lambdav = 1e-2;
 
-  const real mul = 1.25e-4;
+  const real mul = 3e-4;
   const real rhol = 1000.0;
   const real cpl = 4.0e3*rhol;
   const real lambdal = mul*cpl/rhol/freeinp;//5e-2;
