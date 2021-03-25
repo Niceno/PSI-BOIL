@@ -27,10 +27,10 @@ void Nucleation::replant () {
     if(sites[ns].zplant()<0.0) {   // crude code
       bheight = true;
     } else {
-      topo->front_minmax(Range<real>(sites[ns].x()-dxmin,sites[ns].x()+dxmin),
-                         Range<real>(sites[ns].y()-dxmin,sites[ns].y()+dxmin),
-                         Range<real>(-boil::unreal,boil::unreal),
-                         front_array);
+      cht->topo->front_minmax(Range<real>(sites[ns].x()-dxmin,sites[ns].x()+dxmin),
+                              Range<real>(sites[ns].y()-dxmin,sites[ns].y()+dxmin),
+                              Range<real>(-boil::unreal,boil::unreal),
+                              front_array);
       zft = front_array[4]; /* not optimal solution!!! */
 
       if(zft>sites[ns].zplant()){

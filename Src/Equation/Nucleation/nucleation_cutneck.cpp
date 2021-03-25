@@ -52,15 +52,15 @@ void Nucleation::cutneck (const real area_neck) {
       real ylast  = sites[ns].y() + rcut;
       real zfirst = zbtm;
       real zlast  = zbtm+dxmin;
-      for (int i=(*clr).si(); i<=(*clr).ei(); i++) {
-        if ((*clr).xc(i)<xfirst) continue;
-        if ((*clr).xc(i)>xlast ) continue;
-        for (int j=(*clr).sj(); j<=(*clr).ej(); j++) {
-          if ((*clr).yc(j)<yfirst) continue;
-          if ((*clr).yc(j)>ylast ) continue;
-	  for (int k=(*clr).sk(); k<=(*clr).ek(); k++) {
-            if ((*clr).zc(k)<zfirst) continue;
-            if ((*clr).zc(k)>zlast ) continue;
+      for (int i=vf->si(); i<=vf->ei(); i++) {
+        if (vf->xc(i)<xfirst) continue;
+        if (vf->xc(i)>xlast ) continue;
+        for (int j=vf->sj(); j<=vf->ej(); j++) {
+          if (vf->yc(j)<yfirst) continue;
+          if (vf->yc(j)>ylast ) continue;
+	  for (int k=vf->sk(); k<=vf->ek(); k++) {
+            if (vf->zc(k)<zfirst) continue;
+            if (vf->zc(k)>zlast ) continue;
             (*vf)[i][j][k]= (matter_sig>0) ? 1.0 : 0.0;
 	    //std::cout<<i<<" "<<j<<" "<<k<<"\n";
           }
@@ -78,15 +78,15 @@ void Nucleation::cutneck (const real area_neck) {
       real ylast  = dsites[nsd].y() + rcut;
       real zfirst = zbtm;
       real zlast  = zbtm+dxmin;
-      for (int i=(*clr).si(); i<=(*clr).ei(); i++) {
-        if ((*clr).xc(i)<xfirst) continue;
-        if ((*clr).xc(i)>xlast ) continue;
-        for (int j=(*clr).sj(); j<=(*clr).ej(); j++) {
-          if ((*clr).yc(j)<yfirst) continue;
-          if ((*clr).yc(j)>ylast ) continue;
-          for (int k=(*clr).sk(); k<=(*clr).ek(); k++) {
-            if ((*clr).zc(k)<zfirst) continue;
-            if ((*clr).zc(k)>zlast ) continue;
+      for (int i=vf->si(); i<=vf->ei(); i++) {
+        if (vf->xc(i)<xfirst) continue;
+        if (vf->xc(i)>xlast ) continue;
+        for (int j=vf->sj(); j<=vf->ej(); j++) {
+          if (vf->yc(j)<yfirst) continue;
+          if (vf->yc(j)>ylast ) continue;
+          for (int k=vf->sk(); k<=vf->ek(); k++) {
+            if (vf->zc(k)<zfirst) continue;
+            if (vf->zc(k)>zlast ) continue;
             (*vf)[i][j][k]= (matter_sig>0) ? 1.0 : 0.0;
           }
         }

@@ -9,9 +9,9 @@ void Microlayer::store_dSprev() {
 #endif
 
   int kk;
-  for(int cc=0; cc<dom->ibody().nccells(); cc++){
+  for(int cc=0; cc<cht->topo->domain()->ibody().nccells(); cc++){
     int i,j,k;
-    dom->ibody().ijk(cc,&i,&j,&k);
+    cht->topo->domain()->ibody().ijk(cc,&i,&j,&k);
     dSprev[i][j][k] = area_vapor(Sign::neg(),Comp::k(),i,j,k);
     kk=k;
   }

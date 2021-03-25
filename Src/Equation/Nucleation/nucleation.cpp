@@ -3,46 +3,43 @@
 /***************************************************************************//**
 *  nucleation site model
 *******************************************************************************/
-Nucleation::Nucleation ( Topology * TOPO, Heaviside * HEAVI,
-                         const Scalar * TPR,
-                         const Times * t, 
-                         Matter * f, const real rs, 
+Nucleation::Nucleation ( CommonHeatTransfer * CHT, Heaviside * HEAVI,
+                         const Times * t, const real rs, 
                          Scalar * QSRC, const Sign SIG) :
-  topo(TOPO),
+  cht(CHT),
   heavi(HEAVI),
-  flu(f),
   matter_sig(SIG)
 {
-  vf = TOPO->vf;
-  clr= TOPO->clr;
-  tpr=TPR;
+  vf = cht->topo->vf;
+  //clr= cht->topo->clr;
+  //tpr=TPR;
   qsrc=QSRC;
   time=t;
   rseed=rs;
 
   if(matter_sig==Sign::pos()) {
-    rhol = fluid()->rho(1);
-    rhov = fluid()->rho(0);
-    lambdal = fluid()->lambda(1);
-    lambdav = fluid()->lambda(0);
-    cpl = fluid()->cp(1);
-    cpv = fluid()->cp(0);
-    mmass = fluid()->mmass(0);
+    rhol = cht->fluid()->rho(1);
+    rhov = cht->fluid()->rho(0);
+    lambdal = cht->fluid()->lambda(1);
+    lambdav = cht->fluid()->lambda(0);
+    cpl = cht->fluid()->cp(1);
+    cpv = cht->fluid()->cp(0);
+    mmass = cht->fluid()->mmass(0);
   } else {
-    rhol = fluid()->rho(0);
-    rhov = fluid()->rho(1);
-    lambdal = fluid()->lambda(0);
-    lambdav = fluid()->lambda(1);
-    cpl = fluid()->cp(0);
-    cpv = fluid()->cp(1);
-    mmass = fluid()->mmass(1);
+    rhol = cht->fluid()->rho(0);
+    rhov = cht->fluid()->rho(1);
+    lambdal = cht->fluid()->lambda(0);
+    lambdav = cht->fluid()->lambda(1);
+    cpl = cht->fluid()->cp(0);
+    cpv = cht->fluid()->cp(1);
+    mmass = cht->fluid()->mmass(1);
   }
-  latent = fluid()->latent()->value();
+  latent = cht->fluid()->latent()->value();
 
   rcut = 4.*rseed;
   seed_period = 0.01;
   period_cut_replant = 0.0001;
-  dxmin = clr->domain()->dxyz_min();
+  dxmin = vf->domain()->dxyz_min();
   eps = 1.5*dxmin;
   bzoning = false;
   zbtm = 0.0;

@@ -252,7 +252,9 @@ namespace IF97
             /// Only valid for regions 2 and 5.  Will be overridden in Regions 1 and 3.
             /// Derived from IAPWS Revised Advisory Note No. 3 (See Table 2, Section 4.1 & 4.3)
             const double PI = p/p_star;
-            return (rhomass(T,p)/p) * ( (1.0 - PI*PI*d2gammar_dPI2(T,p)) / (1.0 + PI*dgammar_dPI(T,p)) );
+            double ret = (rhomass(T,p)/p)*(1.0 - PI*PI*d2gammar_dPI2(T,p));
+            ret /= (1.0 + PI*dgammar_dPI(T,p));
+            return ret;//(rhomass(T,p)/p) * ( (1.0 - PI*PI*d2gammar_dPI2(T,p)) / (1.0 + PI*dgammar_dPI(T,p)) );
         }
         double delTr(double rho) const{
             /// This is the IF97 correlation for drhodp at the reducing temperature, Tr
@@ -525,7 +527,8 @@ namespace IF97
             //double PI = p/p_star;
             /// This one is different as well...
             /// Derived from IAPWS Revised Advisory Note No. 3 (See Table 2, Section 4.1 & 4.2)
-            return -d2gammar_dPI2(T,p)/(pow(dgammar_dPI(T,p),2)*R*T)*(1000*R_fact/p_fact);
+            const double ret = -d2gammar_dPI2(T,p)/(pow(dgammar_dPI(T,p),2.)*R*T)*(1000.*R_fact/p_fact);
+            return ret;//-d2gammar_dPI2(T,p)/(pow(dgammar_dPI(T,p),2)*R*T)*(1000*R_fact/p_fact);
         }
         double TAUrterm(double T) const{
             return T_star/T - 1.222;
@@ -2456,7 +2459,8 @@ namespace IF97
         ///       are functions of (T,rho), and the work has already been done by the output()
         ///       function to convert p to rho @ T.
         {
-            return (rho/p(T,rho)) / ( 2.0 + delta2_d2phi_ddelta2(T,rho)/delta_dphi_ddelta(T,rho) );
+            const double ret = (rho/p(T,rho)) / ( 2.0 + delta2_d2phi_ddelta2(T,rho)/delta_dphi_ddelta(T,rho) );
+            return ret;//(rho/p(T,rho)) / ( 2.0 + delta2_d2phi_ddelta2(T,rho)/delta_dphi_ddelta(T,rho) );
         }
         double delTr(double rho) const{
             /// This is the IF97 correlation for drhodp at the reducing temperature, Tr

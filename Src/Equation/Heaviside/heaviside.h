@@ -18,7 +18,7 @@ class Heaviside { /* this class is an abstract class! */
     Heaviside(const Scalar * CLR, Scalar * PHI = NULL, Scalar * ADENS = NULL,
               const real CLRSURF = 0.5); 
 
-    ~Heaviside() {};
+    virtual ~Heaviside() {};
 
     const Domain * domain() const {return dom;}
     void calculate(const bool evalflag = true);

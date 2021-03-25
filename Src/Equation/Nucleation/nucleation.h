@@ -7,7 +7,7 @@
 #include "../../Global/global_realistic.h"
 #include "../../SimulationTime/simulation_time.h"
 #include "../../Matter/matter.h"
-#include "../Topology/topology.h"
+#include "../CommonHeatTransfer/commonheattransfer.h"
 #include "../Heaviside/heaviside.h"
 #include "site.h"
 
@@ -19,11 +19,10 @@
 class Nucleation {
 
   public:
-    Nucleation ( Topology * topo,
+    Nucleation ( CommonHeatTransfer * cht,
                  Heaviside * heavi,
-                 const Scalar * tpr,
                  const Times * t,
-                 Matter * f, const real rs,
+                 const real rs,
                  Scalar * qsrc = NULL, 
                  const Sign sig = Sign::pos() );
     /* sign positive -> liquid = 1 */
@@ -76,8 +75,8 @@ class Nucleation {
 
     std::vector<Site> sites, dsites;
 
-    const Matter * fluid() const {return flu;}
-    const Topology * topology() const {return topo;}
+    //const Matter * fluid() const {return flu;}
+    //const Topology * topology() const {return topo;}
 
   protected:
     void set_range(std::vector<Site> & s);
@@ -94,14 +93,15 @@ class Nucleation {
     void plant_site(const int ns, const bool seed_source = true);
     void plant_dummy_site(const int nsd);
 
-    Topology * topo;
+    //Topology * topo;
+    CommonHeatTransfer * cht;
     Heaviside * heavi;
 
     Scalar * vf;
-    const Scalar * clr;
-    const Scalar * tpr;
+    //const Scalar * clr;
+    //const Scalar * tpr;
     Scalar * qsrc;
-    Matter * flu;
+    //Matter * flu;
     const Times * time;
 
     real seed_period;

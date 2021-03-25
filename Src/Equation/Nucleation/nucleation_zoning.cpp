@@ -5,11 +5,11 @@ void Nucleation::zoning() {
 
   //boil::oout<<"nucleation:zoning\n";
 
-  real xmin = clr->xn(1);
-  real xmax = clr->xn(clr->ni());
+  real xmin = vf->xn(1);
+  real xmax = vf->xn(vf->ni());
   real lx = xmax-xmin;
-  real ymin = clr->yn(1);
-  real ymax = clr->yn(clr->nj());
+  real ymin = vf->yn(1);
+  real ymax = vf->yn(vf->nj());
   real ly = ymax-ymin;
 
   /* genuine sites */

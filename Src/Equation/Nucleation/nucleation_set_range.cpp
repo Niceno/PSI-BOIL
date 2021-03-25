@@ -15,16 +15,16 @@ void Nucleation::set_range(std::vector<Site> & s) {
   real ze = s[ns].z()+rng;
   //std::cout<<ns<<" "<<xs<<" "<<xe<<" "<<ys<<" "<<ye<<" "<<zs<<" "<<ze<<"\n";
 
-  int ic = clr->aim(s[ns].x(), boil::pico);
-  int jc = clr->ajm(s[ns].y(), boil::pico);
-  int kc = clr->akm(s[ns].z(), boil::pico);
+  int ic = vf->aim(s[ns].x(), boil::pico);
+  int jc = vf->ajm(s[ns].y(), boil::pico);
+  int kc = vf->akm(s[ns].z(), boil::pico);
 
-  int is = clr->aim(xs, boil::pico);
-  int ie = clr->aip(xe, boil::pico);
-  int js = clr->ajm(ys, boil::pico);
-  int je = clr->ajp(ye, boil::pico);
-  int ks = clr->akm(zs, boil::pico);
-  int ke = clr->akp(ze, boil::pico);
+  int is = vf->aim(xs, boil::pico);
+  int ie = vf->aip(xe, boil::pico);
+  int js = vf->ajm(ys, boil::pico);
+  int je = vf->ajp(ye, boil::pico);
+  int ks = vf->akm(zs, boil::pico);
+  int ke = vf->akp(ze, boil::pico);
   //std::cout<<ns<<" "<<ic<<" "<<jc<<" "<<kc<<"\n";
   //std::cout<<ns<<" "<<is<<" "<<ie<<" "<<js<<" "<<je<<" "<<ks<<" "<<ke<<"\n";
 

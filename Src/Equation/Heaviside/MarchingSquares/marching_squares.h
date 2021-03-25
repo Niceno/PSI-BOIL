@@ -13,7 +13,7 @@ class MarchingSquares : public Heaviside {
     MarchingSquares(const Comp & MCOMP, 
                     const Scalar * CLR, Scalar * PHI = NULL, 
                     Scalar * ADENS = NULL, const real CLRSURF = 0.5);
-    ~MarchingSquares() {};
+    virtual ~MarchingSquares() {};
 
     virtual void evaluate_nodes();
     virtual int status(const int i, const int j, const int k);

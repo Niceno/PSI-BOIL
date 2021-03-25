@@ -6,9 +6,9 @@
 real Nucleation::stratified_sphere(const int i, const int j, const int k,
                          const real xcent, const real ycent, const real zcent) {
 
-  real adist = sqrt( pow(clr->xc(i)-xcent,2.0)
-                   + pow(clr->yc(j)-ycent,2.0)
-                   + pow(clr->zc(k)-zcent,2.0))
+  real adist = sqrt( pow(vf->xc(i)-xcent,2.0)
+                   + pow(vf->yc(j)-ycent,2.0)
+                   + pow(vf->zc(k)-zcent,2.0))
                    - rseed;
 
   real cseed = 1.0;
@@ -20,12 +20,12 @@ real Nucleation::stratified_sphere(const int i, const int j, const int k,
                 + 1.0/(2.0*boil::pi)*sin(boil::pi*adist/eps);
 #else
      real mm=8;
-     real x0=clr->xn(i);
-     real y0=clr->yn(j);
-     real z0=clr->zn(k);
-     real ddx=clr->dxc(i)/real(mm);
-     real ddy=clr->dyc(j)/real(mm);
-     real ddz=clr->dzc(k)/real(mm);
+     real x0=vf->xn(i);
+     real y0=vf->yn(j);
+     real z0=vf->zn(k);
+     real ddx=vf->dxc(i)/real(mm);
+     real ddy=vf->dyc(j)/real(mm);
+     real ddz=vf->dzc(k)/real(mm);
      int itmp=0;
      for (int ii=0; ii<mm; ii++){
        for (int jj=0; jj<mm; jj++){

@@ -6,16 +6,16 @@ void Microlayer::area_effect() {
 *  \brief update microlayer thickness due to effect of bubble area change
 *******************************************************************************/
 
-  for(int cc=0; cc<dom->ibody().nccells(); cc++){
+  for(int cc=0; cc<cht->topo->domain()->ibody().nccells(); cc++){
     int i,j,k;
-    dom->ibody().ijk(cc,&i,&j,&k);
+    cht->topo->domain()->ibody().ijk(cc,&i,&j,&k);
 
     /* set direction */
     // (ux,uy,uz) points liquid to solid 
     // crude code!!!
-    real ux=dom->ibody().nwx(i,j,k);
-    real uy=dom->ibody().nwy(i,j,k);
-    real uz=dom->ibody().nwz(i,j,k);
+    real ux=cht->topo->domain()->ibody().nwx(i,j,k);
+    real uy=cht->topo->domain()->ibody().nwy(i,j,k);
+    real uz=cht->topo->domain()->ibody().nwz(i,j,k);
     Comp mcomp;
     Sign sig = Sign::neg();
     Dir d = Dir::undefined();

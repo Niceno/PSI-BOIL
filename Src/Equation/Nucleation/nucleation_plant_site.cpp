@@ -11,9 +11,9 @@ void Nucleation::plant_site(const int ns, const bool seed_source) {
   for(int i=sites[ns].is(); i<=sites[ns].ie(); i++) {
     for(int j=sites[ns].js(); j<=sites[ns].je(); j++) {
       for(int k=sites[ns].ks(); k<=sites[ns].ke(); k++) {
-        //if (i<clr->si() || clr->ei()<i ||
-        //    j<clr->sj() || clr->ej()<j) continue;
-        if(clr->domain()->ibody().fV(i,j,k)!=0.0) {  // R4
+        //if (i<vf->si() || vf->ei()<i ||
+        //    j<vf->sj() || vf->ej()<j) continue;
+        if(vf->domain()->ibody().fV(i,j,k)!=0.0) {  // R4
           real xcent=sites[ns].x();
           real ycent=sites[ns].y();
           real zcent=sites[ns].z();
@@ -27,9 +27,9 @@ void Nucleation::plant_site(const int ns, const bool seed_source) {
             (*vf)[i][j][k]=1.0-std::min(1.0-(*vf)[i][j][k],cseed);
           }
 
-          vol_seed += clr->dV(i,j,k) * (1.0-cseed);
-          if(clr->domain()->ibody().off(i,j,k-1)) {
-            area_base += clr->dSz(Sign::neg(),i,j,k) * (1.0-cseed);
+          vol_seed += vf->dV(i,j,k) * (1.0-cseed);
+          if(vf->domain()->ibody().off(i,j,k-1)) {
+            area_base += vf->dSz(Sign::neg(),i,j,k) * (1.0-cseed);
             kadj=k;
           }
         }
@@ -41,13 +41,6 @@ void Nucleation::plant_site(const int ns, const bool seed_source) {
   //std::cout<<"is,ie= "<<sites[ns].is()<<" "<<sites[ns].ie()<<"\n";
 
   if(qsrc&&seed_source) {
-
-    real rhov;
-    if(matter_sig==Sign::pos()) {
-      rhov = fluid()->rho(0);
-    } else {
-      rhov = fluid()->rho(1);
-    }
 
     /* set qsrc */
     for(int i=sites[ns].is(); i<=sites[ns].ie(); i++) {
@@ -62,11 +55,11 @@ void Nucleation::plant_site(const int ns, const bool seed_source) {
         if(matter_sig==Sign::neg()) {
           cseed = 1.-cseed;
         }
-        if (clr->domain()->ibody().off(i,j,k-1)) {
+        if (vf->domain()->ibody().off(i,j,k-1)) {
           if (area_base>0.0) {
-            (*qsrc)[i][j][k-1] -= rhov * vol_seed * flu->latent(i,j,k)
-                               / (area_base * time->dt() * clr->dzc(k-1)) 
-                               * (1.0-cseed) * clr->dV(i,j,k-1);
+            (*qsrc)[i][j][k-1] -= rhov * vol_seed * latent
+                               / (area_base * time->dt() * vf->dzc(k-1)) 
+                               * (1.0-cseed) * vf->dV(i,j,k-1);
           }
         }
       } /* loop per site cells */

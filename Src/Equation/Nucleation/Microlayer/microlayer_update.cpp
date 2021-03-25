@@ -82,7 +82,7 @@ void Microlayer::update(real & smdot_micro,
 
         for_vijk( dmicro.bc().at(b), i,j,k ){
           // skip solid cells
-          if(dom->ibody().off(i+iof,j+jof,k+kof)) continue;
+          if(cht->topo->domain()->ibody().off(i+iof,j+jof,k+kof)) continue;
 
           // only fluid cell comes here
           /*--------------------------------------------------+
@@ -120,7 +120,7 @@ void Microlayer::update(real & smdot_micro,
 	      real dmicro_new;
               dmicro_new = dmicro[ii][jj][kk]
                          - dt/rhol/latent
-                         * ((*tpr)[i][j][k] - tifmodel->Tint(i,j,k)) 
+                         * ((cht->tmp())[i][j][k] - cht->tifmodel.Tint(i,j,k)) 
                          / (dmicro[ii][jj][kk]/lambdal + hresis);
 	      dmicro_new = std::max(dmicro_new, dmicro_min);
 
@@ -146,16 +146,16 @@ void Microlayer::update(real & smdot_micro,
   /*-------------------------------------+
   |  calculate mdot on immersed boundary |
   +-------------------------------------*/
-  for(int cc=0; cc<dom->ibody().nccells(); cc++){
+  for(int cc=0; cc<cht->topo->domain()->ibody().nccells(); cc++){
     int i,j,k;
-    dom->ibody().ijk(cc,&i,&j,&k);
+    cht->topo->domain()->ibody().ijk(cc,&i,&j,&k);
 
     /* set direction */
     // (ux,uy,uz) points liquid to solid 
     // crude code!!!
-    real ux=dom->ibody().nwx(i,j,k);
-    real uy=dom->ibody().nwy(i,j,k);
-    real uz=dom->ibody().nwz(i,j,k);
+    real ux=cht->topo->domain()->ibody().nwx(i,j,k);
+    real uy=cht->topo->domain()->ibody().nwy(i,j,k);
+    real uz=cht->topo->domain()->ibody().nwz(i,j,k);
     Dir d = Dir::undefined();
     Sign sig;
     Comp mcomp;
@@ -186,10 +186,14 @@ void Microlayer::update(real & smdot_micro,
     }
 
     int iof=0, jof=0, kof=0;
+    int iofv=0, jofv=0, kofv=0;
     int ndir = 6;  // ibody()
-    if(d == Dir::imin()) iof--; if(d == Dir::imax()) iof++;
-    if(d == Dir::jmin()) jof--; if(d == Dir::jmax()) jof++;
-    if(d == Dir::kmin()) kof--; if(d == Dir::kmax()) kof++;
+    if(d == Dir::imin()) { iof--; }; 
+    if(d == Dir::imax()) { iof++; iofv++; };
+    if(d == Dir::jmin()) { jof--; }; 
+    if(d == Dir::jmax()) { jof++; jofv++; };
+    if(d == Dir::kmin()) { kof--; }; 
+    if(d == Dir::kmax()) { kof++; kofv++; };
 
     /*--------------------------------------------------+
     |  Note:  (i    , j    , k    ) is in fluid domain  |
@@ -211,10 +215,6 @@ void Microlayer::update(real & smdot_micro,
     int jj=j+jof;
     int kk=k+kof;
 
-    real dw = 0.5 * dmicro.dzc(kk);  // half cell size in wall
-    real df = 0.5 * dmicro.dzc(k);   // half cell size in fluid
-    real lambdas = solid()->lambda(ii,jj,kk);  // lambda solid
-
     if (area_vap == 0.0) {
     } else {//if ( approx (area_vap, area, area*boil::micro)) 
 
@@ -226,8 +226,9 @@ void Microlayer::update(real & smdot_micro,
         real dmicro_new;
         real dt = time->dt();
 
-        real qtmp = ((*tpr)[ii][jj][kk] - tifmodel->Tint(i,j,k))
-                  / ( dw/lambdas + dmicro[i][j][k]/lambdal + hresis); 
+        real qtmp = ((cht->node_tmp_flu())[mcomp][i+iofv][j+jofv][k+kofv]
+                    - cht->tifmodel.Tint(i,j,k))
+                  / ( dmicro[i][j][k]/lambdal + hresis ); 
 
         dmicro_new = dmicro[i][j][k] - dt / rhol * qtmp / latent;
         dmicro_new = std::max(dmicro_new, dmicro_min);
@@ -252,7 +253,7 @@ void Microlayer::update(real & smdot_micro,
         (*tprs)[i+iof][j+jof][k+kof] += -vol*mdot_micro*latent;
         if(in_vapor(i,j,k)) {
           /* additional effect due to heat-up in vapour */
-          (*tprs)[i][j][k] -= cpv *((*tpr)[i][j][k]-tifmodel->Tint(i,j,k))
+          (*tprs)[i][j][k] -= cpv *((cht->tmp())[i][j][k]-cht->tifmodel.Tint(i,j,k))
                               //*(1.0/rhov-1.0/rhol)*mdot_micro*vol;
                               *1.0/rhov*mdot_micro*vol;
         }
@@ -280,7 +281,7 @@ void Microlayer::update(real & smdot_micro,
   boil::cart.sum_real_n(hflux_micro,7);
 
 #ifdef DEBUG
-  boil::plot->plot(dmicro, *tpr, *mdot, "dmicro-tpr-mdot",  time->current_step());
+  boil::plot->plot(dmicro, (cht->tmp()), *mdot, "dmicro-tpr-mdot",  time->current_step());
 #endif
 
   boil::cart.sum_real(&smdot_micro);
@@ -295,7 +296,7 @@ void Microlayer::update(real & smdot_micro,
 
 
 #ifdef DEBUG
-  boil::plot->plot(*topo->clr, dmicro, *mdot, 
+  boil::plot->plot(*cht->topo->clr, dmicro, *mdot, 
                    "clr-dmicro-mdot",  time->current_step());
   exit(0);
 #endif

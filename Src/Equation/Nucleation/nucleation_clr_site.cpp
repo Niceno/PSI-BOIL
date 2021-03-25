@@ -12,9 +12,9 @@ real Nucleation::clr_site(const int ns ) {
   real zs = sites[ns].z();
   //std::cout<<"clr_site: "<<sites[ns].ic()<<" "<<sites[ns].jc()<<" "
   //         <<sites[ns].kc()<<" "<<boil::cart.iam()<<"\n";
-  if ( clr->domain()->contains_xyz( xs, ys, zs) ) {
+  if ( vf->domain()->contains_xyz( xs, ys, zs) ) {
     // seed is inside the decomposed domain
-    clr_seed = (*clr)[sites[ns].ic()][sites[ns].jc()][sites[ns].kc()];
+    clr_seed = (*(cht->topo->clr))[sites[ns].ic()][sites[ns].jc()][sites[ns].kc()];
   }
   boil::cart.max_real(&clr_seed);
 

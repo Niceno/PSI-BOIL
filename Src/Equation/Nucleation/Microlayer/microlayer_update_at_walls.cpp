@@ -87,18 +87,18 @@ void Microlayer::update_at_walls(Scalar & clr, Vector & fs) {
   /*--------------+
   | immersed body |
   +--------------*/
-  for(int cc=0; cc<dom->ibody().nccells(); cc++) {
+  for(int cc=0; cc<cht->topo->domain()->ibody().nccells(); cc++) {
     int i,j,k;
     Comp mcomp;
     /* cell[i][j][k] is wall adjacent cell in fluid domain */
-    dom->ibody().ijk(cc,&i,&j,&k);
+    cht->topo->domain()->ibody().ijk(cc,&i,&j,&k);
          
     real scpscp = dmicro[i][j][k];
     if ( scpscp <= dmicro_min*(1.+boil::pico) // depleted
       || !boil::realistic(scpscp)) {          // full vapor
     } else {
       /* west is in solid domain */
-      if(dom->ibody().off(i-1,j,k)) {
+      if(cht->topo->domain()->ibody().off(i-1,j,k)) {
         clr[i-1][j][k] = 1.0;
         mcomp = Comp::i();
         real & fsval = fs[mcomp][i  ][j][k];
@@ -107,7 +107,7 @@ void Microlayer::update_at_walls(Scalar & clr, Vector & fs) {
       }
 
       /* east */
-      if(dom->ibody().off(i+1,j,k)) {
+      if(cht->topo->domain()->ibody().off(i+1,j,k)) {
         clr[i+1][j][k] = 1.0;
         mcomp = Comp::i();
         real & fsval = fs[mcomp][i+1][j][k];
@@ -116,7 +116,7 @@ void Microlayer::update_at_walls(Scalar & clr, Vector & fs) {
       }
 
       /* south */
-      if(dom->ibody().off(i,j-1,k)) {
+      if(cht->topo->domain()->ibody().off(i,j-1,k)) {
         clr[i][j-1][k] = 1.0;
         mcomp = Comp::j();
         real & fsval = fs[mcomp][i][j  ][k];
@@ -125,7 +125,7 @@ void Microlayer::update_at_walls(Scalar & clr, Vector & fs) {
       }
 
       /* north */
-      if(dom->ibody().off(i,j+1,k)) {
+      if(cht->topo->domain()->ibody().off(i,j+1,k)) {
         clr[i][j+1][k] = 1.0;
         mcomp = Comp::j();
         real & fsval = fs[mcomp][i][j+1][k];
@@ -134,7 +134,7 @@ void Microlayer::update_at_walls(Scalar & clr, Vector & fs) {
       }
 
       /* bottom */
-      if(dom->ibody().off(i,j,k-1)) {
+      if(cht->topo->domain()->ibody().off(i,j,k-1)) {
         clr[i][j][k-1] = 1.0;
         mcomp = Comp::k();
         real & fsval = fs[mcomp][i][j][k  ];
@@ -143,7 +143,7 @@ void Microlayer::update_at_walls(Scalar & clr, Vector & fs) {
       }
 
       /* top */
-      if(dom->ibody().off(i,j,k+1)) {
+      if(cht->topo->domain()->ibody().off(i,j,k+1)) {
         clr[i][j][k+1] = 1.0;
         mcomp = Comp::k();
         real & fsval = fs[mcomp][i][j][k+1];

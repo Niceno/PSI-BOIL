@@ -21,14 +21,14 @@ void Nucleation::add(const Site & s) {
   real xo=stmp.x();
   real yo=stmp.y();
   real zo=stmp.z();
-  real LX = clr->domain()->global_max_x() - clr->domain()->global_min_x();
-  real LY = clr->domain()->global_max_y() - clr->domain()->global_min_y();
+  real LX = vf->domain()->global_max_x() - vf->domain()->global_min_x();
+  real LY = vf->domain()->global_max_y() - vf->domain()->global_min_y();
   real act = stmp.active_tpr();
   real zpl = stmp.zplant();
 
   int  sID=size()-1;
   /* i-direction */   // crude code
-  if (clr->bc().type( Dir::imin(), BndType::periodic())) {
+  if (vf->bc().type( Dir::imin(), BndType::periodic())) {
     dummy_add( Site(xo-LX, yo, zo, act, zpl) );
     set_range(dsites);
     dsites[dsites.size()-1].set_father(sID);
@@ -46,7 +46,7 @@ void Nucleation::add(const Site & s) {
   }
 
   /* j-direction */   // crude code
-  if (clr->bc().type( Dir::jmin(), BndType::periodic())) {
+  if (vf->bc().type( Dir::jmin(), BndType::periodic())) {
     dummy_add( Site(xo, yo-LY, zo, act, zpl) );
     set_range(dsites);
     dsites[dsites.size()-1].set_father(sID);
@@ -56,8 +56,8 @@ void Nucleation::add(const Site & s) {
   }
 
   /* i & j */  // crude code
-  if (clr->bc().type( Dir::imin(), BndType::periodic()) &&
-      clr->bc().type( Dir::jmin(), BndType::periodic())) {
+  if (vf->bc().type( Dir::imin(), BndType::periodic()) &&
+      vf->bc().type( Dir::jmin(), BndType::periodic())) {
     dummy_add( Site(xo-LX, yo-LY, zo, act, zpl) );
     set_range(dsites);
     dsites[dsites.size()-1].set_father(sID);

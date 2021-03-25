@@ -40,7 +40,10 @@ inline real wall_resistance(const int i, const int j, const int k) const {
 }
 
 inline real dirac_wall_source(const int i, const int j, const int k) const {
-  return dirac_wall_source_val;
+  if(!dirac_wall_source_variable)
+    return dirac_wall_source_val;
+  else
+    return dirac_wall_source_func(i,j,k);
 }
 
 /***************************************************************************//**
@@ -138,10 +141,19 @@ inline void set_turbP(const real a) {
 /* units W/m2 */
 inline real get_dirac_wall_source() const { return dirac_wall_source_val; }
 inline void set_dirac_wall_source(const real a) {
+  dirac_wall_source_variable = false;
   dirac_wall_source_val = a;
   boil::oout<<"CommonHeatTransfer::dirac_wall_source= "
             <<dirac_wall_source_val<<"\n";
 }
+inline void set_dirac_wall_source(
+    std::function<real(const int, const int, const int)> f) {
+  dirac_wall_source_variable = true;
+  dirac_wall_source_func = f;
+  boil::oout<<"CommonHeatTransfer::dirac_wall_source set variable"
+            <<"\n";
+}
+
 
 /* units [K/(W/m^2)] = [m/(W/mK)] */
 inline void set_int_resistance(const real re) {

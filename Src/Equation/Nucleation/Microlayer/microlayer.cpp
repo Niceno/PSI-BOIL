@@ -6,29 +6,23 @@
 Microlayer::Microlayer( Scalar & DM,
                         Scalar * MDOT,
                         Scalar * TPRS,
-                        const Scalar * tpr,
-                        Topology * topo,
+                        CommonHeatTransfer * CHT,
                         Heaviside * heavi,
-                        const TIF & TIFMODEL,
                         const Times * t,
-                        Matter * f, const real rs,
+                        const real rs,
                         const real dmin, const real dmax,
-                        Matter * s,
                         Scalar * qsrc,
                         const Sign sig ) :
-  Nucleation(topo,heavi,tpr,t,f,rs,qsrc,sig),
+  Nucleation(CHT,heavi,t,rs,qsrc,sig),
   dmicro(&DM),
-  sld(s),
   dSprev(*DM.domain())
 {
 
   mdot = MDOT;
   tprs = TPRS;
-  tifmodel = &TIFMODEL;
 
   dmicro_min = dmin;
   dmicro_max = dmax;
-  dom = dmicro.domain();
 
   dSprev = dmicro.shape();
   
@@ -36,7 +30,7 @@ Microlayer::Microlayer( Scalar & DM,
   exp_slope = 1.0;
   rmax = boil::unreal;
 
-  hresis = TIF::calculate_heat_transfer_resistance(tifmodel->tref(), 
+  hresis = TIF::calculate_heat_transfer_resistance(cht->tifmodel.tref(), 
                                                    rhov,mmass,latent,1.);
 
   str_dSprev = false;

@@ -39,7 +39,7 @@ real Nucleation::area_vapor(const Sign sig, const Comp & mcomp,
 *******************************************************************************/
 
   real frac = heavi->surface(Sign::neg(),Comp::k(),i,j,k);
-  real ds = clr->dSz(Sign::neg(),i,j,k);
+  real ds = vf->dSz(Sign::neg(),i,j,k);
 
   if(matter_sig==Sign::pos()) {
     return (1.0-frac) * ds;

@@ -2,7 +2,6 @@
 #define MICROLAYER_H
 
 #include "../nucleation.h"
-#include "../../Tifmodel/tif.h"
 
 ////////////////////////
 //                    //
@@ -14,17 +13,14 @@ class Microlayer : public Nucleation {
     Microlayer( Scalar & dmicro,
                 Scalar * mdot,
                 Scalar * tprs,
-                const Scalar * tpr,
-                Topology * topo,
+                CommonHeatTransfer * cht,
                 Heaviside * heavi,
-                const TIF & tifmodel,
                 const Times * t,
-                Matter * f, const real rs, 
+                const real rs, 
                 const real dmin, const real dmax = boil::unreal,
-                Matter * s = NULL,
                 Scalar * qsrc = NULL,
                 const Sign sig = Sign::pos() );
-    ~Microlayer() {}
+    ~Microlayer() {};
 
     virtual void init() { dmicro = boil::unreal; }
 
@@ -61,8 +57,6 @@ class Microlayer : public Nucleation {
     inline real get_hflux_area_l(const Dir d) const {return area_l[int(d)];}
     inline real get_hflux_area_v(const Dir d) const {return area_v[int(d)];}
 
-    inline const Matter * solid() const {return sld;}
-
     /* initial thickness */
     real d0(const int i, const int j, const int k);
 
@@ -76,9 +70,6 @@ class Microlayer : public Nucleation {
     Scalar dmicro;
     Scalar dSprev;
     Scalar * mdot, * tprs;
-    const Domain * dom;
-    const TIF * tifmodel;
-    Matter * sld;
 
     real hresis;
     real slope, exp_slope;
