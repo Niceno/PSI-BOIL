@@ -59,6 +59,9 @@ class ElectPoten : public Centered {
 
     // Calculate electric current
     void update_j();
+
+    // Output electric current
+    void output_j();
  
     // Calculate velocity at face center
     void update_vel();
