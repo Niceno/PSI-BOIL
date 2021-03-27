@@ -13,7 +13,8 @@ class MarchingCubes : public Heaviside {
   public:
     MarchingCubes(const Scalar * CLR, Scalar * PHI = NULL, 
                  Scalar * ADENS = NULL, const real CLRSURF = 0.5);
-    ~MarchingCubes() {};
+    virtual ~MarchingCubes() {};
+    //~MarchingCubes() {};
 
     virtual void evaluate_nodes();
     virtual int status(const int i, const int j, const int k);
