@@ -79,6 +79,10 @@ class VOF : public Centered {
     virtual void reconstruct_geometry();
     virtual void reconstruct_geometry(Scalar & scp);
 
+    real get_adens(const int i,const int j, const int k){
+      return adens[i][j][k];
+    }
+
     /* mainly used in VOFaxisym */
     virtual void color_to_vf(Scalar & color, Scalar & vf,
                              const bool nvec=true,const bool extalp=true,
