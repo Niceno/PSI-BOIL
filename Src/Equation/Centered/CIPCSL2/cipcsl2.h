@@ -182,6 +182,11 @@ class CIPCSL2 : public Centered {
     real maxval() {return maxclr;}
     void color_minmax(); 
 
+    /* adens */
+    real get_adens(const int i,const int j, const int k){
+      return adens[i][j][k];
+    }
+
     Topology * topo;
     void ancillary();
     Heaviside * heaviside() { return heavi; }
