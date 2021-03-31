@@ -14,10 +14,10 @@ int ScalarInt::min() const {
 
 /******************************************************************************/
 int ScalarInt::min_abs() const {
-  int vmin = fabs(val[1][1][1]);
+  int vmin = abs(val[1][1][1]);
   for_ijk(i,j,k) {
-    if( fabs(val[i][j][k]) < vmin ) {
-      vmin = fabs(val[i][j][k]);
+    if( abs(val[i][j][k]) < vmin ) {
+      vmin = abs(val[i][j][k]);
     }
   }
   boil::cart.min_int(&vmin);
@@ -60,10 +60,10 @@ int ScalarInt::max() const {
 
 /******************************************************************************/
 int ScalarInt::max_abs() const {
-  int vmax = fabs(val[1][1][1]);
+  int vmax = abs(val[1][1][1]);
   for_ijk(i,j,k) {
-    if( fabs(val[i][j][k]) > vmax ) {
-      vmax = fabs(val[i][j][k]);
+    if( abs(val[i][j][k]) > vmax ) {
+      vmax = abs(val[i][j][k]);
     }
   }
   boil::cart.max_int(&vmax);
