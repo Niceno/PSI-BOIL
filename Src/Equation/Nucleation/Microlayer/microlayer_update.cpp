@@ -95,9 +95,9 @@ void Microlayer::update(real & smdot_micro,
           real vol = dmicro.dV(ii,jj,kk);
 
           /* area */
-          real area = fabs(iof)*dmicro.dSx(sig,ii,jj,kk)
-                    + fabs(jof)*dmicro.dSy(sig,ii,jj,kk)
-                    + fabs(kof)*dmicro.dSz(sig,ii,jj,kk);
+          real area = fabs((real)iof)*dmicro.dSx(sig,ii,jj,kk)
+                    + fabs((real)jof)*dmicro.dSy(sig,ii,jj,kk)
+                    + fabs((real)kof)*dmicro.dSz(sig,ii,jj,kk);
           area_sum[ndir] += area;
 
           real area_vap = area_vapor(sig,mcomp,ii,jj,kk);
@@ -198,9 +198,9 @@ void Microlayer::update(real & smdot_micro,
     real vol = dmicro.dV(i,j,k);
 
     /* area */
-    real area = fabs(iof)*dmicro.dSx(sig,i,j,k)
-              + fabs(jof)*dmicro.dSy(sig,i,j,k)
-              + fabs(kof)*dmicro.dSz(sig,i,j,k);
+    real area = fabs((real)iof)*dmicro.dSx(sig,i,j,k)
+              + fabs((real)jof)*dmicro.dSy(sig,i,j,k)
+              + fabs((real)kof)*dmicro.dSz(sig,i,j,k);
     area_sum[ndir] += area;
 
     real area_vap = area_vapor(sig,mcomp,i,j,k);
