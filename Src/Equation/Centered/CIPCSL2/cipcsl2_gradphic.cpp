@@ -9,7 +9,7 @@ void CIPCSL2::gradphic(const Scalar & sca) {
 
   /* cell centered base */
   for_ijk(i,j,k) {
-    if(fabs(iflag[i][j][k])>real(nlayer-4)){
+    if(abs(iflag[i][j][k])>real(nlayer-4)){
       nx[i][j][k] = 0.0;
       ny[i][j][k] = 0.0;
       nz[i][j][k] = 0.0;
@@ -94,7 +94,7 @@ void CIPCSL2::gradphic(const Scalar & sca) {
 
   /* normalize */
   for_avijk(sca,i,j,k) {
-    if(fabs(iflag[i][j][k])>real(nlayer-4)){
+    if(abs(iflag[i][j][k])>real(nlayer-4)){
       nx[i][j][k] = 0.0;
       ny[i][j][k] = 0.0;
       nz[i][j][k] = 0.0;
