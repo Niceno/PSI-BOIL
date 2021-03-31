@@ -59,7 +59,7 @@ bool Topology::test_differences_first(const std::vector<real> & stenpos,
   
   real difference_1st = first_order_first(stencil);
 
-  flag = flag & fabs(derivative_1st-difference_1st)<boil::nano;
+  flag = flag & (fabs(derivative_1st-difference_1st)<boil::nano);
   boil::oout<<derivative_1st<<" "<<difference_1st<<" "<<flag<<boil::endl;
 
   /* second-order */
@@ -69,7 +69,7 @@ bool Topology::test_differences_first(const std::vector<real> & stenpos,
   real derivative_2nd = coefficients[1];
   real difference_2nd = second_order_first(stencil);
 
-  flag = flag & fabs(derivative_2nd-difference_2nd)<boil::nano;
+  flag = flag & (fabs(derivative_2nd-difference_2nd)<boil::nano);
   boil::oout<<derivative_2nd<<" "<<difference_2nd<<" "<<flag<<boil::endl;
 
   /* third-order */
@@ -79,7 +79,7 @@ bool Topology::test_differences_first(const std::vector<real> & stenpos,
   real derivative_3rd = coefficients[1];
   real difference_3rd = third_order_first(stencil);
 
-  flag = flag & fabs(derivative_3rd-difference_3rd)<boil::nano;
+  flag = flag & (fabs(derivative_3rd-difference_3rd)<boil::nano);
   boil::oout<<derivative_3rd<<" "<<difference_3rd<<" "<<flag<<boil::endl;
 
   /* fourth-order */
@@ -89,7 +89,7 @@ bool Topology::test_differences_first(const std::vector<real> & stenpos,
   real derivative_4th = coefficients[1];
   real difference_4th = fourth_order_first(stencil);
 
-  flag = flag & fabs(derivative_4th-difference_4th)<boil::nano;
+  flag = flag & (fabs(derivative_4th-difference_4th)<boil::nano);
   boil::oout<<derivative_4th<<" "<<difference_4th<<" "<<flag<<boil::endl;
 
 
