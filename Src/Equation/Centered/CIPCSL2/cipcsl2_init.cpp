@@ -154,13 +154,7 @@ void CIPCSL2::init() {
   plot_sxyz("sxyzk.dat",Comp::k());
 #endif
 
-#ifdef DEBUG
-  std::cout<<"init:ancillary \n";
-#endif
   ancillary();
-#ifdef DEBUG
-  std::cout<<"init:end \n";
-#endif
 
   return;
 }

@@ -1,5 +1,4 @@
 #include "cipcsl2.h"
-//#define DEBUG
 
 /***************************************************************************//**
 *  \brief Set flag for indicating near-interface region; used in enthalpy and
@@ -13,10 +12,6 @@
 *  intflag = -1000 solid cell
 *******************************************************************************/
 void CIPCSL2::interfacial_flagging(Scalar & scp) {
-
-#ifdef DEBUG
-  boil::oout<<"cipcsl2_interfacial_flaggin:begin\n";
-#endif
 
   for_aijk(i,j,k) {
     intflag[i][j][k]=-3;
@@ -85,9 +80,6 @@ void CIPCSL2::interfacial_flagging(Scalar & scp) {
 
   intflag.exchange();
 
-#ifdef DEBUG
-  boil::oout<<"cipcsl2_interfacial_flaggin:end\n";
-#endif
 }	
 
 /***************************************************************************//**
