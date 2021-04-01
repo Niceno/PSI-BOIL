@@ -27,6 +27,7 @@ int main(int argc, char * argv[]) {
   /* computed parameters */
   const int dtLevel = 1; // 1 or 2
   const int NX = 2*40*Level;
+  const int mSimple = 1;
 
   /* domain dimensions (given by problem) */
   const real LX = 8.0e-3;
@@ -34,7 +35,7 @@ int main(int argc, char * argv[]) {
   const real LZ = DX*real(NZ);
 
   const real xint = 0.002205323668813564;
-  const real x0 = xint-2.01*DX;
+  const real x0 = xint-10.01*DX*Level;
 
   const real Tout=5.;
   const real Tsat=0.;
@@ -72,17 +73,25 @@ int main(int argc, char * argv[]) {
   +----------------*/
   Krylov * solver = new CG(d, Prec::di());
 
+  MaxIter multigrid_mm_smooth1 = MaxIter(35);
+  MaxIter multigrid_mm_smooth2 = MaxIter(40);
+  MaxIter multigrid_mm_solve = MaxIter(110);
+  MaxIter multigrid_mm_stale1 = MaxIter(-1);
+  MaxIter multigrid_mm_stale2 = MaxIter(-1);
+  std::array<MaxIter,3> multigrid_mi = {multigrid_mm_smooth1,multigrid_mm_smooth2,multigrid_mm_solve};
+  std::array<MaxIter,3> multigrid_mstale = {multigrid_mm_stale1,multigrid_mm_stale1,multigrid_mm_stale2};
+
   /*------------------+
   |  define unknowns  |
   +------------------*/
-  Vector uvw(d), xyz(d), uvw_1(d); // vel
+  Vector uvw(d), xyz(d), uvw_1(d), uvw_2(d), uvw_old(d); // vel
   Scalar p  (d), f  (d); // pressure
   Scalar c  (d), g  (d), kappa(d), cold(d); // concentration
   Scalar press(d);
   Scalar tpr(d), q  (d), step(d); // temperature
   Scalar mdot(d);        // phase-change
   Scalar mflx(d);        // phase-change
-  Scalar tprold(d),tprap1(d),tprap2(d);
+  Scalar tprold(d);
 
   /*-----------------------------+ 
   |  insert boundary conditions  |
@@ -102,6 +111,8 @@ int main(int argc, char * argv[]) {
     uvw.bc(m).add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
 #endif
     uvw_1(m) = uvw(m).shape();
+    uvw_2(m) = uvw(m).shape();
+    uvw_old(m) = uvw(m).shape();
   }
 
   p.bc().add( BndCnd( Dir::imin(), BndType::neumann() ) );
@@ -143,8 +154,6 @@ int main(int argc, char * argv[]) {
   tpr.bc().add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
   tpr.bc().add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
 #endif
-  tprap1 = tpr.shape();
-  tprap2 = tpr.shape();
   tprold = tpr.shape();
 
   /*----------------------+
@@ -193,6 +202,12 @@ int main(int argc, char * argv[]) {
   OPR(  LX );
   OPR(  dt );
   OPR( ndt );
+
+  /*-------------------+
+  |  check if restart  |
+  +-------------------*/
+  boil::test_irun();
+  boil::set_irun(1);
  
   /*--------------------+
   |  initial condition  |
@@ -201,10 +216,10 @@ int main(int argc, char * argv[]) {
   for_vijk(c,i,j,k)
     c[i][j][k] = 1.0;
   for_vijk(c,i,j,k) {
-    if(c.xc(i)-x0<2.*c.dxc(i)) {
+    if(c.xn(i+1)<xint) {
       c[i][j][k]=0.0;
-    } else if(c.xc(i)-x0<3.*c.dxc(i)) {
-      c[i][j][k]=0.99; /* approximately two cells */
+    } else if(c.xn(i)<xint) {
+      c[i][j][k]=1.-(xint-c.xn(i))/c.dxc(i);
     } else {
       c[i][j][k] = 1.0;
     }
@@ -241,6 +256,12 @@ int main(int argc, char * argv[]) {
   |  define solvers  |
   +-----------------*/
   Momentum ns( uvw, xyz, time, solver, &mixed);
+  if(mSimple>1)
+    ns.convection_set(TimeScheme::backward_euler()); //ns.convection is mandatory
+  else
+    ns.convection_set(TimeScheme::forward_euler());
+  ns.diffusion_set(TimeScheme::backward_euler());
+
   Pressure pr(p, f, uvw, time, solver, &mixed);
 #ifndef USE_VOF
   CIPCSL2 conc  (c,  g, kappa, uvw, time, solver);
@@ -256,18 +277,20 @@ int main(int argc, char * argv[]) {
   conc.init();
   c.exchange_all();
   conc.ancillary();
-  conc.front_minmax();
   conc.totalvol();
 
   TIF tsat(Tsat);
   CommonHeatTransfer cht(tpr,conc.topo,tsat,&mixed);
-  EnthalpyFD enthFD(tpr, q, uvw, uvw_1, uvw, time, solver, &mixed, cht);
+  EnthalpyFD enthFD(tpr, q, uvw, uvw_1, uvw_2, time, solver, &mixed, cht);
   enthFD.convection_set(TimeScheme::forward_euler());
   enthFD.diffusion_set(TimeScheme::backward_euler());
   enthFD.set_no_solid_acceleration(false);
   enthFD.set_flux_accuracy_order(AccuracyOrder::First());
+  //enthFD.set_flux_accuracy_order(AccuracyOrder::Second());
+  //enthFD.convection_set(ConvScheme::central());
   PhaseChange4 pc(mdot, mflx, q, g , f , uvw, cht,
                   time, &mixed);
+  //pc.set_accuracy_order(AccuracyOrder::SecondUpwind());
   pc.set_accuracy_order(AccuracyOrder::FourthUpwind());
   pc.set_unconditional_extrapolation(false);
   pc.set_discard_points_near_interface(false);
@@ -280,52 +303,83 @@ int main(int argc, char * argv[]) {
   +------------*/
   for(time.start(); time.end(); time.increase()) {
 
-    /*---------------+
-    |  phase change  |
-    +---------------*/
-    pc.update();
-    real massflux_heat = pc.get_smdot();
-    massflux_heat /= conc.topo->get_totarea();
-    boil::oout<<"mflux= "<<time.current_time()<<" "
-                         <<massflux_heat<<" "
-                         <<boil::endl;
+    /* store velocity & temperature */
+    if(mSimple>1) {
+      for_m(m)
+        uvw_old(m) = uvw(m);
+      tprold = tpr;
+    }
 
-    ns.vol_phase_change(&f);
-
-    /* essential for moving front */
-    ns.discretize();
-    pr.discretize();
-
-    /* momentum */
-    ns.cfl_max();
-    ns.new_time_step();
-
-    for_m(m)
-      for_avmijk(xyz,m,i,j,k)
-	xyz[m][i][j][k]=0.0;
-
-    ns.grad(press);
-    ns.solve(ResRat(1e-14));
-
-    p = 0.0;
-    if (multigrid.fcycle(ResTol(1e-7))) OMS(converged);
-    p.exchange();
-    ns.project(p);
-    press += p;
-    press.exchange();
-
-    //exit(0);
-
-    /*---------------------------+
-    |  solve transport equation  |
-    +---------------------------*/
     /* new time step */
     conc.new_time_step();
 
-    cold=c;
-    conc.advance_with_extrapolation(true,ResTol(1e-7),uvw,f,
-                                    &liquid,&uvw_1);
+    /* inner loop */
+    for(int mloop=0; mloop<mSimple; mloop++) {
+      /*---------------+
+      |  phase change  |
+      +---------------*/
+      pc.update();
+      real massflux_heat = pc.get_smdot();
+      massflux_heat /= conc.topo->get_totarea();
+      boil::oout<<"mflux= "<<time.current_time()<<" "
+                           <<massflux_heat<<" "
+                           <<boil::endl;
+
+      ns.vol_phase_change(&f);
+
+      /* essential for moving front */
+      ns.discretize();
+      pr.discretize();
+
+      /* momentum */
+      if(mSimple>1) {
+        ns.new_time_step(uvw_old,&f);
+        ns.convection();
+      } else {
+        ns.new_time_step(&f);
+      }
+
+      ns.grad(press);
+      ns.solve(ResRat(1e-14));
+
+      p = 0.0;
+      //if (multigrid.fcycle(ResTol(1e-7))) OMS(converged);
+      if(multigrid.cycle(Cycle::Z(),
+                         Cycle::F(),
+                         ResTol(1e-7),
+                         ResRat(-1.),
+                         multigrid_mi,
+                         multigrid_mstale))
+          OMS(converged);
+      p.exchange();
+      ns.project(p);
+      press += p;
+      press.exchange();
  
+      /*---------------------------+
+      |  solve transport equation  |
+      +---------------------------*/
+      conc.advance_with_extrapolation(conc.topo->vfold,
+                                      true,ResTol(1e-7),uvw,f,
+                                      &liquid,&uvw_1,&vapor,&uvw_2);
+
+#ifndef USE_VOF
+      step=c;
+      pc.modify_vel(uvw,c,conc.topo->vfold);
+#endif
+
+      /*------------------------+
+      |  solve energy equation  |
+      +------------------------*/
+      if(mloop>0)
+        tpr = tprold;
+      enthFD.discretize();
+      enthFD.new_time_step();
+      enthFD.solve(ResRat(1e-14),"enthFD");
+    }
+
+    ns.cfl_max();
+
     conc.front_minmax();
     conc.totalvol();
 
@@ -335,21 +389,6 @@ int main(int argc, char * argv[]) {
       }
     }
     boil::oout<<"xpos= "<<time.current_time()<<" "<<conc.topo->get_xmaxft()-x0<<" "<<(conc.topo->get_xmaxft()-x0)/DX<<boil::endl;
-
-    for_avijk(c,i,j,k){
-      step[i][j][k]=c[i][j][k];
-    }
-
-#ifndef USE_VOF
-    pc.modify_vel(uvw,c,cold);
-#endif
-
-    /*------------------------+
-    |  solve energy equation  |
-    +------------------------*/
-    enthFD.discretize();
-    enthFD.new_time_step();
-    enthFD.solve(ResRat(1e-14));
 
     if(time.current_step() % (nint)==0 ||time.current_step()==1) {
       boil::plot->plot(uvw,c,tpr,mdot,"uvw-c-tpr-mdot",time.current_step());
