@@ -223,7 +223,7 @@ void EnthalpyFD::convection(Scalar * conv) {
       // dtdxm
       if(cht.interface(Sign::neg(),Comp::i(),i,j,k,old)) {
         real dxm, ts;
-        dxm = cht.distance_int(Sign::neg(),Comp::i(),i,j,k,ts,old);
+        dxm = cht.distance_int(Sign::neg(),Comp::i(),i,j,k,ts,ResistEval::yes,old);
         dtdxm = (phi[i][j][k]-ts)/dxm;
 #ifndef VERSION_STABLE
         umf = upf;
@@ -239,7 +239,7 @@ void EnthalpyFD::convection(Scalar * conv) {
       // dtdxp
       if(cht.interface(Sign::pos(),Comp::i(),i,j,k,old)) {
         real dxp, ts;
-        dxp = cht.distance_int(Sign::pos(),Comp::i(),i,j,k,ts,old);
+        dxp = cht.distance_int(Sign::pos(),Comp::i(),i,j,k,ts,ResistEval::yes,old);
         dtdxp = (ts-phi[i][j][k])/dxp;
 #ifndef VERSION_STABLE
         upf = umf;
@@ -255,7 +255,7 @@ void EnthalpyFD::convection(Scalar * conv) {
       // dtdym
       if(cht.interface(Sign::neg(),Comp::j(),i,j,k,old)) {
         real dym, ts;
-        dym = cht.distance_int(Sign::neg(),Comp::j(),i,j,k,ts,old);
+        dym = cht.distance_int(Sign::neg(),Comp::j(),i,j,k,ts,ResistEval::yes,old);
         dtdym = (phi[i][j][k]-ts)/dym;
 #ifndef VERSION_STABLE
         vmf = vpf;
@@ -271,7 +271,7 @@ void EnthalpyFD::convection(Scalar * conv) {
       // dtdyp
       if(cht.interface(Sign::pos(),Comp::j(),i,j,k,old)) {
         real dyp, ts;
-        dyp = cht.distance_int(Sign::pos(),Comp::j(),i,j,k,ts,old);
+        dyp = cht.distance_int(Sign::pos(),Comp::j(),i,j,k,ts,ResistEval::yes,old);
         dtdyp = (ts-phi[i][j][k])/dyp;
 #ifndef VERSION_STABLE
         vpf = vmf;
@@ -287,7 +287,7 @@ void EnthalpyFD::convection(Scalar * conv) {
       // dtdzm
       if(cht.interface(Sign::neg(),Comp::k(),i,j,k,old)) {
         real dzm, ts;
-        dzm = cht.distance_int(Sign::neg(),Comp::k(),i,j,k,ts,old);
+        dzm = cht.distance_int(Sign::neg(),Comp::k(),i,j,k,ts,ResistEval::yes,old);
         dtdzm = (phi[i][j][k]-ts)/dzm;
 #ifndef VERSION_STABLE
         wmf = wpf;
@@ -303,7 +303,7 @@ void EnthalpyFD::convection(Scalar * conv) {
       // dtdzp
       if(cht.interface(Sign::pos(),Comp::k(),i,j,k,old)) {
         real dzp, ts;
-        dzp = cht.distance_int(Sign::pos(),Comp::k(),i,j,k,ts,old);
+        dzp = cht.distance_int(Sign::pos(),Comp::k(),i,j,k,ts,ResistEval::yes,old);
         dtdzp = (ts-phi[i][j][k])/dzp;
 #ifndef VERSION_STABLE
         wpf = wmf;

@@ -12,14 +12,6 @@
                   <<ao<<"\n";
     }
 
-    inline bool get_no_solid_acceleration() const
-      { return accelerated_no_solid; }
-    inline void set_no_solid_acceleration(const bool flag) {
-      accelerated_no_solid = flag;
-      boil::oout<<"EnthalpyFD::no_solid_acceleration= "
-                <<accelerated_no_solid<<"\n";
-    }
-
     inline bool stencil_min(const Comp & m, 
                             const int i, const int j, const int k) const {
       return (m==Comp::i())*(i==si() && bflag_struct.iminc)

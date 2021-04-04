@@ -19,7 +19,7 @@ void EnthalpyFD::inertial(Scalar & sca, const bool cross_interface,
     for_ijk(i,j,k) {
       if(dom->ibody().on(i,j,k)){
         /* phase change: xor indicates change of phase */
-        if(cht.topo->above_interface_old(i,j,k) ^ cht.topo->above_interface(i,j,k)) {
+        if(cht.above_interface(i,j,k,Old::yes) ^ cht.above_interface(i,j,k,Old::no)) {
           sca[i][j][k] = cht.Tint(i,j,k);     /* crude code */
         }
       }

@@ -35,7 +35,7 @@ void EnthalpyFD::convective_time_step(Scalar & sca) {
   for_ijk(i,j,k){
     if(dom->ibody().on(i,j,k)){
       real c;
-      if(cht.topo->above_interface_old(i,j,k)) {
+      if(cht.above_interface(i,j,k,Old::yes)) {
         c = cht.cpl(i,j,k);
       } else {
         c = cht.cpv(i,j,k);
@@ -44,7 +44,7 @@ void EnthalpyFD::convective_time_step(Scalar & sca) {
 
 #if 1
       /* phase change: xor indicates change of phase */
-      if(cht.topo->above_interface_old(i,j,k) ^ cht.topo->above_interface(i,j,k)) {
+      if(cht.above_interface(i,j,k,Old::yes) ^ cht.above_interface(i,j,k,Old::no)) {
         //if( (phi[i][j][k]-cht.Tint(i,j,k))*(t_new-cht.Tint(i,j,k))<=0.0 ){
           t_new = cht.Tint(i,j,k);     /* crude code */
         //}
@@ -59,7 +59,7 @@ void EnthalpyFD::convective_time_step(Scalar & sca) {
 #endif
 
       phi [i][j][k] = t_new;
-      if(cht.topo->above_interface(i,j,k)) {
+      if(cht.above_interface(i,j,k,Old::no)) {
         c = cht.cpl(i,j,k);
       } else {
         c = cht.cpv(i,j,k);

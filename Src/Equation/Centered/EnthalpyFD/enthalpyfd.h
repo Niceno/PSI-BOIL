@@ -79,7 +79,10 @@ class EnthalpyFD : public Centered {
     void convective_time_step(Scalar & sca);
     void convective_time_step();
     virtual void convection();
-    virtual void diffusion(const Scalar * diff_eddy = NULL);
+    virtual void diffusion(const Scalar * diff_eddy = NULL) {
+      evaluate_diffusion(Old::yes,diff_eddy);
+      return;
+    }
     virtual void solve(const ResTol & toler, const ResRat & fact,
                        const char * name = NULL);
     virtual void solve(const ResTol & toler, const char * name = NULL) {
@@ -107,30 +110,68 @@ class EnthalpyFD : public Centered {
 
   protected:
     typedef real (EnthalpyFD::*coef_gen)(const real,const real,const real);
+
+    void evaluate_diffusion(const Old old, const Scalar * diff_eddy = NULL);
     
     void create_system(const Scalar * diff_eddy = NULL);
     void create_system_innertial();
-    void create_system_diffusive(const Scalar * diff_eddy = NULL);
+    void create_system_diffusive(const Scalar * diff_eddy = NULL) {
+      evaluate_diffusion(Old::no,diff_eddy);
+      return;
+    }
     void create_system_bnd();
     real update_rhs();
     void convection(Scalar * sca);
-    void diff_matrix(real & am, real & ac, real & ap
-                , real & tm, real & tc, real & tp
-                , bool & aflagm, bool & aflagp
-                , real & sourceterm
-                , const real x0, const coef_gen coef_m, const coef_gen coef_p
-                , const real vol, const real aream, const real areap
-                , const bool onm, const bool onc, const bool onp
-                , const bool ofm, const bool ofc, const bool ofp
-                , const real lsm, const real lsc, const real lsp
-                , const real lvm, const real lvc, const real lvp
-                , const real llm, const real llc, const real llp
-                , const int clm, const int clc, const int clp
-                , real dxm, real dxp
-                , real fdm, real fdp, real fdms, real fdps
-                , const int i, const int j, const int k, const Comp m);
 
-    inline real resistance_multiplier(const real res1, const real res2) const;
+    void cell_diffusion_fluid(const Comp m,
+                          const int i, const int j, const int k,
+                          const int ox, const int oy, const int oz,
+                          const real x0,
+                          const coef_gen coef_m, const coef_gen coef_p,
+                          const ResistEval re, const Old old,
+                          const real tscn, const real tscm,
+                          std::vector<StencilPoint> & stencil,
+                          real & Aw, real & Ac, real & Ae, real & F,
+                          const Scalar * diff_eddy);
+
+    void cell_diffusion_solid(const Comp m,
+                          const int i, const int j, const int k,
+                          const int ox, const int oy, const int oz,
+                          const real x0,
+                          const coef_gen coef_m, const coef_gen coef_p,
+                          const real dSm, const real dSp,
+                          const ResistEval re, const Old old,
+                          const real tscn, const real tscm,
+                          real & Aw, real & Ac, real & Ae, real & F,
+                          const Scalar * diff_eddy);
+
+    void kernel_fluid1(const std::array<ConnectType,3> & ctype,
+                       const real cxm, const real cxp,
+                       std::vector<StencilPoint> & stencil,
+                       const real resinvm, const real resinvp,
+                       real & Am, real & Ac, real & Ap, real & F);
+
+    void kernel_fluid2(const std::array<ConnectType,3> & ctype,
+                       const real cxm, const real cxp,
+                       std::vector<StencilPoint> & stencil,
+                       const real resinvm, const real resinvp,
+                       const real reswallm, const real reswallp,
+                       const std::array<real,3> resistvals,
+                       const real dwsrcm, const real dwsrcp,
+                       real & Am, real & Ac, real & Ap, real & F);
+
+    void kernel_solid(const std::array<ConnectType,3> & ctype,
+                      const real cxm, const real cxp,
+                      const real pm, const real pp,
+                      const std::array<real,3> resistvals,
+                      const real dwsrcm, const real dwsrcp,
+                      real & Am, real & Ac, real & Ap, real & F);
+
+    /* needed in diffusion kernels */
+    inline real resistance_multiplier(const real res0,
+                                      const real res1) const {
+      return res0 / (res0 + res1);
+    }
 
     virtual real coef_x_m(const real dxm, const real dxp, const real x0);
     virtual real coef_x_p(const real dxm, const real dxp, const real x0);
@@ -158,9 +199,6 @@ class EnthalpyFD : public Centered {
        So you can always dereference it without segfaults */
     const Matter * safe_solid; 
 
-    /* faster diffusion matrix and ftif construction */
-    bool accelerated_no_solid;
-
     const Vector * uliq, * ugas;
     Vector flux_liq, flux_gas;
     
@@ -172,5 +210,14 @@ class EnthalpyFD : public Centered {
     Scalar ftif;
     ScalarInt iflag,iflagold;
     bool laminar;
+
+    /* reference ctypes */
+    std::array<ConnectType,3> c_fff, c_sss,
+                              c_iff, c_ffi, c_ifi,
+                              c_sff, c_ffs, c_sfs,
+                              c_fss, c_ssf, c_fsf,
+                              c_iss, c_ssi, c_isi,
+                              c_fsi, c_isf,
+                              c_sfi, c_ifs;
 };	
 #endif
