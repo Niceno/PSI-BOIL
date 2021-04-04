@@ -39,7 +39,6 @@ VOF::VOF(const Scalar & PHI,
   bulk_curv_method(CurvMethod::HF()),
   wall_curv_method(CurvMethod::DivNorm()),
   subgrid_method(SubgridMethod::PLIC()),
-  topo_method(TopoMethod::Hybrid()),
   advect_method(AdvectionMethod::BoundedSplit()),
   hf_set(),
   bflag_struct(PHI)

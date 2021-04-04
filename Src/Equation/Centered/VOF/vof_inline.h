@@ -158,7 +158,7 @@ void set_wall_curv_method(const CurvMethod wcm,
     } else if(cangle>0.) {
       /* estimate */
       real cangrad = cangle*boil::pi/180.;
-      Nfilm_crit = std::max(4,(int)fabs(cos(cangrad)/sin(cangrad)));
+      Nfilm_crit = std::max(4,abs(int(cos(cangrad)/sin(cangrad))));
       boil::oout<<"Wall critical film length: "<<Nfilm_crit<<boil::endl;
     } else {
       Nfilm_crit = boil::unint;
@@ -178,17 +178,6 @@ inline CurvMethod get_wall_curv_method() const { return wall_curv_method;};
 
 /* getter for critical film length */
 inline int get_critical_film_length() const { return Nfilm_crit;};
-
-/* setter for topoogy method */
-void set_topo_method(const TopoMethod tpm) {
-  topo_method = tpm;
-  if(!boil::cart.iam())
-    boil::oout<<"Topology method: "<<tpm<<boil::endl;
-  return;
-}
-
-/* getter for topology method */
-inline TopoMethod get_topo_method() const { return topo_method;};
 
 /* setter for pressure extrapolation */
 void set_pressure_extrapolation_parameters(const bool eflag, const int eiter) {

@@ -65,6 +65,9 @@ void VOF::cal_fs3(const Scalar & scp) {
   for(int k=sk(); k<=ek(); k++) {
 
     /* degenerate cases */
+    if(dom->ibody().off(i-1,j,k)&&dom->ibody().off(i,j,k))
+      continue;
+
     real clrw = scp[i-1][j][k];
     real clre = scp[i  ][j][k];
 
@@ -124,6 +127,9 @@ void VOF::cal_fs3(const Scalar & scp) {
   for(int k=sk(); k<=ek(); k++) {
 
     /* degenerate cases */
+    if(dom->ibody().off(i,j-1,k)&&dom->ibody().off(i,j,k))
+      continue;
+
     real clrs = scp[i][j-1][k];
     real clrn = scp[i][j  ][k];
 
@@ -182,6 +188,9 @@ void VOF::cal_fs3(const Scalar & scp) {
   for(int k=kbeg; k<=kend; k++) {
 
     /* degenerate cases */
+    if(dom->ibody().off(i,j,k-1)&&dom->ibody().off(i,j,k))
+      continue;
+
     real clrb = scp[i][j][k-1];
     real clrt = scp[i][j][k  ];
 
@@ -234,13 +243,13 @@ void VOF::cal_fs3(const Scalar & scp) {
 
   /* correct at boundaries */
   if       (subgrid_method == SubgridMethod::PLIC()) {
-    heavi->fs_bnd_geometric(scp,fs,tol_wall);
+    topo->fs_bnd_geometric(scp,fs,tol_wall);
   } else if(subgrid_method == SubgridMethod::None()) {
-    heavi->fs_bnd_nosubgrid(scp,fs,tol_wall);
+    topo->fs_bnd_nosubgrid(scp,fs,tol_wall);
   } else if(subgrid_method == SubgridMethod::SLICliquid()) {
-    heavi->fs_bnd_1D(scp,fs,tol_wall,Sign::pos());
+    topo->fs_bnd_1D(scp,fs,tol_wall,Sign::pos());
   } else if(subgrid_method == SubgridMethod::SLICgas()) {
-    heavi->fs_bnd_1D(scp,fs,tol_wall,Sign::neg());
+    topo->fs_bnd_1D(scp,fs,tol_wall,Sign::neg());
   } else {
     boil::oout<<"VOF::fs3: Subgrid method not set properly!"
               <<" Exiting."<<boil::endl;

@@ -224,15 +224,17 @@ void VOF::update_phi(const Scalar & cellvol, Scalar & scp) {
     }
   } else {
     int ierr=0;
-    for_ijk(i,j,k){
-      scp[i][j][k] = cellvol[i][j][k] / dV(i,j,k);
-      if (scp[i][j][k]<-1.0||scp[i][j][k]>2.0) {
-        boil::aout<<"Error!!! Too small or too large phi in vof_advance. phi= "
-                  <<scp[i][j][k]<<"\n";
-        boil::aout<<"proc= "<<boil::cart.iam()
-                  <<" (i,j,k)= "<<i<<" "<<j<<" "<<k<<"\n";
-        boil::aout<<"(x,y,z)= "<<phi.xc(i)<<" "<<phi.yc(j)<<" "<<phi.zc(k)<<"\n";
-        ierr=1;
+    for_ijk(i,j,k) {
+      if(dom->ibody().on(i,j,k)) {
+        scp[i][j][k] = cellvol[i][j][k] / dV(i,j,k);
+        if(scp[i][j][k]<-1.0||scp[i][j][k]>2.0) {
+          boil::aout<<"Error!!! Too small or too large phi in vof_advance. phi= "
+                    <<scp[i][j][k]<<"\n";
+          boil::aout<<"proc= "<<boil::cart.iam()
+                    <<" (i,j,k)= "<<i<<" "<<j<<" "<<k<<"\n";
+          boil::aout<<"(x,y,z)= "<<phi.xc(i)<<" "<<phi.yc(j)<<" "<<phi.zc(k)<<"\n";
+          ierr=1;
+        }
       }
     }
     boil::cart.sum_int(&ierr);

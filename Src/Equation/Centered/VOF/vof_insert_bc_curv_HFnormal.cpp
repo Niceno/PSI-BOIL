@@ -144,7 +144,7 @@ void VOF::insert_bc_curv_HFnormal(const Scalar & scp,
     h.resize(hf_set.minorext);
   for(auto & d : distances)
     d.resize(hf_set.minorext);
-  real max_n; /* normal vector must be of good quality!!! */
+  real max_n,nnx,nny,dummy(0.); /* normal vector must be of good quality!!! */
   real mult;
   for_ijk(i,j,k) {
     if(dom->ibody().on(i,j,k)) {
@@ -161,12 +161,23 @@ void VOF::insert_bc_curv_HFnormal(const Scalar & scp,
         for(auto & h : heights)
           for(auto & val : h)
             val = 0.0;
+
+        /* n pointing from the fluid which we are constructing heights of */
         max_n = -nz[i][j][k];
         if(max_n<0.0) {
           mult = -1;
+          nnx  =  nx[i][j][k];
+          nny  =  ny[i][j][k];
         } else {
           mult =  1;
+          nnx  = -nx[i][j][k];
+          nny  = -ny[i][j][k];
         }
+
+        /* normalised projection on the x-y plane, dummy instead of z */
+        normalize(nnx,nny,dummy);
+
+        /* fill stencil */
 #ifdef USE_UPDATE_AT_WALLS
         for(int kk(-1); kk<=hf_set.mof; ++kk) { 
           real dz = scp.dzc(k+kk);
@@ -182,12 +193,14 @@ void VOF::insert_bc_curv_HFnormal(const Scalar & scp,
                           :     bounded_color(scp[i+ii][j+jj][k+kk]) );
         }
 
+        /* normalize stencil, so that zero appears at surface */
 #ifdef USE_UPDATE_AT_WALLS
         for(auto & h : heights)
           for(auto & val : h)
             val -= dz0;
 #endif
     
+        /* we need to be above tolerance to consider contact with wall */
         real & hcc = heights[hf_set.nof][hf_set.nof];
         if(tol_wall*dz0<hcc&&hcc<=dz0) {
           tempflag[i][j][k] = 1;
@@ -197,11 +210,41 @@ void VOF::insert_bc_curv_HFnormal(const Scalar & scp,
               if(val<tol_wall*dz0)
                 val = 0.;
 
+          /* distances for extrapolation of CA */
+#if 0
+          /* simple method, not taking into account x-y surface orientation,
+             thus only using drop of height based on the contact-angle-based
+             slope (CABS) */
           for(int ii(-hf_set.nof); ii<=hf_set.nof; ++ii)
             for(int jj(-hf_set.nof); jj<=hf_set.nof; ++jj)
               distances[ii+hf_set.nof][jj+hf_set.nof] = 
                 sqrt( (scp.xc(i+ii)-scp.xc(i))*(scp.xc(i+ii)-scp.xc(i))
                      +(scp.yc(j+jj)-scp.yc(j))*(scp.yc(j+jj)-scp.yc(j)) );
+#else
+          /* a slope in any given direction should take into account the
+             projection onto the boundary plane, calculating drop as 
+                           CABS * < (nx,ny) , (Dx,Dy) >,
+             where the latter term represents a scalar product of the normal
+             vector projection onto the boundary plane and a distance vector
+             in the chosen direction, n cdot D. Note that:
+                           n cdot D = ||n|| * ||d|| * cos(alpha), 
+              where ||n|| = 1 and alpha is the angle between the normal
+              vector and the distance vector. Thus, n cdot D is numerically
+              equal to the length of the projection of D in the n-dir */
+  
+          /* here we calculate < (nx,ny) , (Dx,Dy) > and store it to be used
+             by the kernel */
+          for(int ii(-hf_set.nof); ii<=hf_set.nof; ++ii)
+            for(int jj(-hf_set.nof); jj<=hf_set.nof; ++jj) {
+              real distx = (scp.xc(i+ii)-scp.xc(i))*nnx;
+              real disty = (scp.yc(j+jj)-scp.yc(j))*nny;
+
+              /* we disallow extrapolation in the negative sense, this would
+                 indicate corrupted normal vector */
+              distances[ii+hf_set.nof][jj+hf_set.nof] = 
+                std::max(0.,distx+disty);
+            }
+#endif
  
           kappa[i][j][k] = wall_curv_HFnormal_kernel(heights,
                                                      distances,

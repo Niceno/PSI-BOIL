@@ -1,5 +1,5 @@
 #include "vof.h"
-#include <list>
+#include <numeric>
 
 //#define USE_VICINITY
 //#define USE_TOLERANCE
@@ -38,6 +38,27 @@ XYZ PlusXYZ(const XYZ p1, const XYZ p2) {
   return(pv);
 }
 
+/* subtract two xyz vectors */
+XYZ MinusXYZ(const XYZ p1, const XYZ p2) {
+  XYZ pv;
+  pv.x = p1.x - p2.x;
+  pv.y = p1.y - p2.y;
+  pv.z = p1.z - p2.z;
+
+  return(pv);
+}
+
+XYZ Normalize(const XYZ p) {
+  XYZ n;
+  real norm = p.x*p.x + p.y*p.y + p.z*p.z;
+  norm = sqrt(norm);
+  n.x = p.x/norm;
+  n.y = p.y/norm;
+  n.z = p.z/norm;
+
+  return n;
+}
+
 real calc_area(const std::vector<XYZ> &vect, const XYZ norm) { 
   XYZ cross;
   cross.x = 0.0;
@@ -47,6 +68,27 @@ real calc_area(const std::vector<XYZ> &vect, const XYZ norm) {
     cross = PlusXYZ(cross,CrossProduct(vect[i],vect[(i+1) % vect.size()]));
   }
   return 0.5 * fabs(DotProduct(cross,norm));
+}
+
+/* https://stackoverflow.com/questions/17074324/how-can-i-sort-two-vectors-
+ *       in-the-same-way-with-criteria-that-uses-only-one-of */
+std::vector<std::size_t> sort_permutation(const std::vector<real>& vec) {
+  std::vector<std::size_t> p(vec.size());
+  std::iota(p.begin(), p.end(), 0);
+  std::sort(p.begin(), p.end(),
+      [&](std::size_t i, std::size_t j){ return vec[i]<vec[j]; });
+  return p;
+}
+
+template <typename T>
+std::vector<T> apply_permutation(
+    const std::vector<T>& vec,
+    const std::vector<std::size_t>& p)
+{
+    std::vector<T> sorted_vec(vec.size());
+    std::transform(p.begin(), p.end(), sorted_vec.begin(),
+        [&](std::size_t i){ return vec[i]; });
+    return sorted_vec;
 }
 
 /******************************************************************************/
@@ -150,6 +192,9 @@ void VOF::cal_adens_geom(Scalar & adensgeom, const Scalar & sca,
       /* standardized space alpha */
       real alpha = nalpha[i][j][k];
 
+      if(!boil::realistic(alpha))
+        continue;
+
       /* vn is positive and standardized */
       real vn1 = fabs(n1);
       real vn2 = fabs(n2);
@@ -242,7 +287,7 @@ void VOF::cal_adens_geom(Scalar & adensgeom, const Scalar & sca,
       normvector.z = vm3;
 
       /* for each edge of the cell, try to find an intersection */
-      std::list<XYZ> pointset;
+      std::vector<XYZ> pointset;
 
       bool xnorm_nonzero(vn1>boil::pico);
       bool ynorm_nonzero(vn2>boil::pico);
@@ -434,9 +479,8 @@ void VOF::cal_adens_geom(Scalar & adensgeom, const Scalar & sca,
       /* debugging */
       if(fabs(adens[i][j][k]-195111.)<1.0) {
         boil::oout<<int(pointset.size())<<" "<<vn1<<" "<<vn2<<" "<<vn3<<" | "<<n1<<" "<<n2<<" "<<n3;
-        for(std::list<XYZ>::iterator p = pointset.begin();
-            p != pointset.end(); ++p) {
-          boil::oout<<" | "<<(*p).x<<" "<<(*p).y<<" "<<(*p).z;
+        for(auto p : pointset) {
+          boil::oout<<" | "<<p.x<<" "<<p.y<<" "<<p.z;
         }
         boil::oout<<boil::endl;
         boil::oout<<boil::endl;
@@ -451,45 +495,52 @@ void VOF::cal_adens_geom(Scalar & adensgeom, const Scalar & sca,
 
       if(pointset.size()<3) {
         adensgeom[i][j][k] = 0.0;
-        //boil::oout<<"FS::caladensgeom: Warning, inconsistent geometry"<<boil::endl;
+        //boil::oout<<"FS::caladensgeom: Warning, inconsistent geometry "<<alpha<<boil::endl;
       } else {
         /* order points */
-        /* for a convex polygon, neighboring vertices are the closest ones */
         std::vector<XYZ> orderedset;
         int numpoints = pointset.size();
 
+        /* find centroid */
+        XYZ centroid;
+        centroid.x = centroid.y = centroid.z = 0.;
+        for(auto & p : pointset) {
+          centroid.x += p.x/numpoints;
+          centroid.y += p.y/numpoints;
+          centroid.z += p.z/numpoints;
+        }
+
         /* first point is arbitrary */ 
-        std::list<XYZ>::iterator b = pointset.begin(); 
+        auto b = pointset.begin(); 
         orderedset.push_back(*b);
         pointset.erase(b);
 
-        for(int idx = 0; idx != numpoints-2; ++idx) {
-          real distance(boil::yotta);
-          std::list<XYZ>::iterator n;
-          int newidx(0);
-          for(std::list<XYZ>::iterator p = pointset.begin();
-              p != pointset.end(); ++p) {
-            XYZ distvector;
-            distvector.x = (*p).x - orderedset[idx].x;
-            distvector.y = (*p).y - orderedset[idx].y;
-            distvector.z = (*p).z - orderedset[idx].z;
+        /* vector to first point */
+        XYZ vectfirst = MinusXYZ(orderedset[0],centroid);
 
-            real newdistance = distvector.x*distvector.x
-                             + distvector.y*distvector.y
-                             + distvector.z*distvector.z;
+        /* angles of remaining points */
+        std::vector<real> angles;
 
-            if(newdistance<distance) {
-              distance = newdistance;
-              n = p;
-            }
+        for(auto & p : pointset) {
+          XYZ vectp = MinusXYZ(p,centroid);
+          real angle = acos(std::min(1.,std::max(-1.,
+                                     DotProduct(Normalize(vectfirst),
+                                                Normalize(vectp))
+                           )));
+          XYZ cross = CrossProduct(vectfirst,vectp);
+          if(DotProduct(normvector,cross)<0.) {
+            angle = 2*boil::pi-angle;
           }
-          orderedset.push_back(*n);
-          pointset.erase(n);
+          angles.push_back(angle);
         }
-        /* last point is deterministic */
-        orderedset.push_back(*(pointset.begin()));
 
-    
+        /* sort according to angles */
+        auto per = sort_permutation(angles);
+        pointset = apply_permutation(pointset,per);
+
+        /* add to orderedset */
+        orderedset.insert(orderedset.end(),pointset.begin(),pointset.end());
+
         /* calculate area */ 
         real polyarea = calc_area(orderedset,normvector); 
 

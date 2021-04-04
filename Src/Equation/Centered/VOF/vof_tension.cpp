@@ -1,12 +1,12 @@
 #include "vof.h"
 #include <iomanip>
 
-void VOF::tension(Vector * vec, const Matter matt) {
+void VOF::tension(Vector * vec, const Matter & matt) {
   tension(vec,matt,phi);
 }
 
 /******************************************************************************/
-void VOF::tension(Vector * vec, const Matter matt, const Scalar & scp) {
+void VOF::tension(Vector * vec, const Matter & matt, const Scalar & scp) {
 /***************************************************************************//**
 *  \brief Calculate surface tension
 *         Algorithm

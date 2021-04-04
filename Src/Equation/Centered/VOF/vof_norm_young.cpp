@@ -89,9 +89,9 @@ void VOF::norm_young_kernel(real & nx_val, real & ny_val, real & nz_val,
   }}}
 
   /* average norm at corner */
-  nxave /= sum_jflag;
-  nyave /= sum_jflag;
-  nzave /= sum_jflag;
+  nxave /= real(sum_jflag);
+  nyave /= real(sum_jflag);
+  nzave /= real(sum_jflag);
 
 #if 0
   if (sum_jflag==0) {

@@ -23,8 +23,8 @@ real VOF::wall_curv_HFnormal_kernel(const real x0,
     nxm = hxm/sqrt(1.+hxm*hxm)*-mult;
     nzm = -1./sqrt(1.+hxm*hxm)*-mult;
   } else {
-    //nxm = -mult*sin(cang);
-    nxm = -sin(cang);
+    nxm = -mult*sin(cang);
+    //nxm = -sin(cang);
     nzm =  cos(cang);
   }
 
@@ -33,14 +33,14 @@ real VOF::wall_curv_HFnormal_kernel(const real x0,
     nxp = hxp/sqrt(1.+hxp*hxp)*-mult;
     nzp = -1./sqrt(1.+hxp*hxp)*-mult;
   } else {
-    //nxp =  mult*sin(cang);
-    nxp =  sin(cang);
+    nxp =  mult*sin(cang);
+    //nxp =  sin(cang);
     nzp =  cos(cang);
   }
 
   //boil::oout<<nxp<<" "<<nxm<<" "<<dc<<boil::endl;
 
-  /* droplets have positive curvature */
+  /* droplets have positive curvature, pay attention to mult */
   return (nxp-nxm)/dc;
 #else
   real hhm = hm;
@@ -77,14 +77,7 @@ real VOF::wall_curv_HFnormal_kernel(arr2D & heights,
 *
 *     output: kappa
 *******************************************************************************/
-#if 1  /* this is a simplistic method assuming a drop in height value based only
-          on contact-angle-based slope (CABS). Better way to approximate the
-          slope in any given direction is
-                           CABS * < (nx,ny) , (Dx,Dy) >,
-          where the latter term represents a scalar product of the normal vector
-          projection onto the boundary plane and a unit vector describing the
-          chosen direction */
-  
+#if 1  
   real & hmm = heights[0][0];
   real & hmc = heights[0][1];
   real & hmp = heights[0][2];
