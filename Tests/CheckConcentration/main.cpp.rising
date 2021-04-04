@@ -16,7 +16,6 @@ static void __attribute__ ((constructor)) trapfpe(void)
 #ifdef AXISYM
   #define SYM
 #endif
-#define USE_PHASE_VEL_VOF
 //#define SETUP_ONLY
 #define VARIABLE
 //#define MOVING_FRAME
@@ -67,11 +66,11 @@ int main(int argc, char ** argv) {
   const real t_per_plot = 0.01;
 
   /* dt settings */
-  const real surftens_dt_coef = 10.;
+  const real surftens_dt_coef = 0.126;
   const real initdtcoef = 1e-4;
 
   /* cfl limit */
-  const real cfl_limit = 0.05;
+  const real cfl_limit = 0.1;//0.15;//0.05;
 
 /* ------------ optional simulation settings */
 
@@ -82,25 +81,36 @@ int main(int argc, char ** argv) {
   const int multigrid_min_cycles = 1;
   const int multigrid_max_cycles = 20;
 
+  ResTol rt = ResTol(-1.);
+  ResRat rr = ResRat(1e-5);
+
+  MaxIter multigrid_mm_smooth1 = MaxIter(35);
+  MaxIter multigrid_mm_smooth2 = MaxIter(40);
+  MaxIter multigrid_mm_solve = MaxIter(110);
+  MaxIter multigrid_mm_stale1 = MaxIter(-1);
+  MaxIter multigrid_mm_stale2 = MaxIter(-1);
+  std::array<MaxIter,3> multigrid_mi = {multigrid_mm_smooth1,multigrid_mm_smooth2,multigrid_mm_solve};
+  std::array<MaxIter,3> multigrid_mstale = {multigrid_mm_stale1,multigrid_mm_stale1,multigrid_mm_stale2};
+
+
   /* vof */
   const CurvMethod curv_method = CurvMethod::HF();
-  const TopoMethod topo_method = TopoMethod::Hybrid();
   const CurvMethod wall_curv_method = CurvMethod::none();
 
   const bool use_fs_interp = false;
   const bool store_pressure_extrap = true;
-  const int niter_pressure_extrap = 3000;
-
-  /* enthalpy fd */
-  const bool no_solid_acceleration = true;
+  const int niter_pressure_extrap = 8000;
 
   /* phase change - 4 version */
-  const bool use_second_order_accuracy = true;
-  const bool discard_points_near_interface = true;
+  const AccuracyOrder pc_accord = AccuracyOrder::FourthUpwind();
+  const bool discard_points_near_interface = false;
   const bool use_unconditional_extrapolation = false;
 
   /* under-relaxation */
   const real ur = 0.01;
+
+  /* limit vfrac for ctp */
+  const real limitvf = 0.001;
 
   /* moving-frame */
   const real ur_vel = 0.1;
@@ -164,7 +174,11 @@ int main(int argc, char ** argv) {
 #ifdef MOVING_FRAME
   const int NZ = 2*NX;
 #else
+  #ifdef AXISYM
+  const int NZ = 32*NX1/4;
+  #else
   const int NZ = 32*NX1;
+  #endif
 #endif
 
   const real DX = real(LX1/real(NX1));
@@ -397,8 +411,8 @@ int main(int argc, char ** argv) {
   |  time-integration  |
   +-------------------*/
   const real dt = surftens_dt_coef
-                * pow(gas.rho()->value()*pow(dxmin,3.0)
-                / (2.0*boil::pi*mixed.sigma()->value()),0.5);
+                * pow(std::max(gas.rho()->value(),liquid.rho()->value())*pow(dxmin,3.0)
+                / mixed.sigma()->value(),0.5);
 
   boil::oout<<"main:dxmin= "<<dxmin<<" "<<boil::cart.iam()<<" "<<dt<<"\n";
   boil::oout<<"main:nparams= "<<t_per_plot<<" "<<n_per_backup<<"\n";
@@ -431,21 +445,17 @@ int main(int argc, char ** argv) {
   multigrid.max_cycles(multigrid_max_cycles);
 
   /* color function */
-#ifdef USE_PHASE_VEL_VOF
   Vector & uvwvof = uvw_1;
-#else
-  Vector & uvwvof = uvw;
-#endif
 #ifndef AXISYM
   VOF conc(c, g, kappa, uvwvof, time, solver);
 #else
   VOFaxisym conc(c, g, kappa, uvwvof, time, solver);
 #endif
   conc.set_curv_method(curv_method);
-  conc.set_topo_method(topo_method);
   conc.set_wall_curv_method(wall_curv_method);
   conc.set_use_interp(use_fs_interp);
   conc.set_pressure_extrapolation_parameters(store_pressure_extrap,niter_pressure_extrap);
+  //conc.set_advection_method(AdvectionMethod::ReconstructedSplit());
 
   /* enthalpy equation */
 #ifndef VARIABLE
@@ -466,31 +476,31 @@ int main(int argc, char ** argv) {
   //exit(0);
 #endif
 
-  Vector & uvwenth1 = uvw;
-  Vector & uvwenth2 = uvw;
+  CommonHeatTransfer cht(tpr,conc.topo,tsat,&mixed);
+
+  Vector & uvwenth1 = uvw_1;
+  Vector & uvwenth2 = uvw_2;
 #ifndef AXISYM
   EnthalpyFD enthFD      (tpr, q, uvw, uvwenth1, uvwenth2, time, solver  , &mixed,
-                          conc.topo, tsat);
+                          cht);
 #else
   EnthalpyFDaxisym enthFD(tpr, q, uvw, uvwenth1, uvwenth2, time, solver  , &mixed,
-                          conc.topo, tsat);
+                          cht);
 #endif
   enthFD.convection_set(TimeScheme::forward_euler());
   enthFD.diffusion_set(TimeScheme::backward_euler());
 
-  enthFD.set_no_solid_acceleration(no_solid_acceleration);
-
   /* phase change */
-  PhaseChange4 pc(mdot, mflx, tpr, q, c, g, f, uvw, conc.topo,
-                  tsat, time, &mixed);
-  pc.set_second_order_accuracy(use_second_order_accuracy);
+  PhaseChange4 pc(mdot, mflx, q, g , f , uvw, cht,
+                  time, &mixed);
+  pc.set_accuracy_order(pc_accord);
   pc.set_discard_points_near_interface(discard_points_near_interface);
   pc.set_unconditional_extrapolation(use_unconditional_extrapolation);
 
   /* ng transport */
   ConcentrationTP ngtransp(eps,mdot_eps,uvw,
                            conc.flow(),conc.heaviside(),conc.topo,
-                           time, solverCGdi, &gas);
+                           time, solverCGdi, &gas,limitvf);
 
   /*-------------------+
   |  check if restart  |
@@ -528,7 +538,7 @@ int main(int argc, char ** argv) {
 #ifdef MOVING_FRAME
     const real zcent=0.0*R0;
 #else
-    const real zcent=0.5*LX;
+    const real zcent=0.25*LX;
 #endif
 
 #ifdef AXISYM
@@ -617,7 +627,7 @@ int main(int argc, char ** argv) {
     zpos += (wvel+wv)*time.dt();
   
     real rad = vol;
-#ifndef AXISYMMETRIC
+#ifndef AXISYM
   #ifdef SYM
     rad *= 4.;
   #endif
@@ -682,14 +692,8 @@ int main(int argc, char ** argv) {
     ns.grad(press);
     ns.solve(ResRat(1e-14));
 
-    const int niter = 50;
-    MaxIter mm = MaxIter(niter);
-    std::array<MaxIter,3> mi = {mm,mm,mm};
-
-    ResRat rr = ResRat(1e-5);
-
     p = 0.;
-    if(multigrid.cycle(Cycle::Z(),Cycle::F(),rr,mi)) OMS(converged);
+    if(multigrid.cycle(Cycle::Z(),Cycle::F(),rt,rr,multigrid_mi,multigrid_mstale)) OMS(converged);
     p.exchange();
     ns.project(p);
     press += p;
@@ -719,12 +723,8 @@ int main(int argc, char ** argv) {
     |  solve transport equation  |
     +---------------------------*/
     conc.new_time_step();
-#ifdef USE_PHASE_VEL_VOF
-    conc.advance_with_extrapolation(false,ResRat(1e-9),uvw,f,
-                                    one,&uvw_1);
-#else
-    conc.advance(false);
-#endif
+    conc.advance_with_extrapolation(false,ResTol(1e-7),uvw,f,
+                                    one,&uvw_1,zero,&uvw_2);
 
     for_avk(c,k) {
       if(c.zc(k)>=zmax) {
