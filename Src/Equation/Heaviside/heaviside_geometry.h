@@ -1,15 +1,14 @@
     /* 3D */
     struct XYZ {
       real x,y,z;
+      
+      /* assignment */
+      XYZ & operator =(const XYZ & old) {
+        x = old.x;
+        y = old.y;
+        z = old.z;
 
-      /* equal */
-      XYZ operator =(const XYZ & p) const {
-        XYZ pv;
-        pv.x = p.x;
-        pv.y = p.y;
-        pv.z = p.z;
-
-        return(pv);
+        return *this;
       }
 
       /* negation */
@@ -96,6 +95,14 @@
       XY() {}
       XY(const real & a, const real & b) {
         x = a; y = b;
+      }
+
+      /* assignment */
+      XY & operator =(const XY & old) {
+        x = old.x;
+        y = old.y;
+
+        return *this;
       }
 
       /* negation */
