@@ -27,7 +27,12 @@ real VOFaxisym::calc_flux_axisymmetric(const real gg,
     /* in the Cartesian limit etaf->inf, g & ratio become gg */
     if(gg>0.0) {
       etaf = eta2;
+#if 1
       g =  etaf - sqrt(etaf*etaf-2.*etaf*gg);
+      //g =  etaf - sqrt(etaf*etaf-(eta1+eta2)*gg);
+#else
+      g = etaf*(1.-exp(-gg/etaf)); /* derived from cst velocity */
+#endif
       absg = fabs(g);
       eta0 = etaf-g;
       if(!(absg>0.0)) {
@@ -36,7 +41,12 @@ real VOFaxisym::calc_flux_axisymmetric(const real gg,
       eta00 = eta0/absg;
     } else {
       etaf = eta1;
+#if 1
       g =  etaf - sqrt(etaf*etaf-2.*etaf*gg);
+      //g =  etaf - sqrt(etaf*etaf-(eta1+eta2)*gg);
+#else
+      g = etaf*(1.-exp(-gg/etaf));
+#endif
       absg = fabs(g);
       if(!(absg>0.0)) {
         return 0.0;

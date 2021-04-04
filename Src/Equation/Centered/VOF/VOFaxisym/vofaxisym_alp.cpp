@@ -1,5 +1,7 @@
 #include "vofaxisym.h"
 
+//#define CRAY
+
 /***************************************************************************//**
  \brief Calculate the line constant alpha for given configuration. Moreover,
         some threshold value functions are included.
@@ -43,11 +45,19 @@ real VOFaxisym::phi_tr_small_neg(const real mmx,const real mmz,const real eta0) 
 }
 
 real VOFaxisym::phi_tr_large_pos(const real mmx,const real mmz,const real eta0) {
-  return mmz/2./mmx*(eta0+mmz/3./mmx)/(eta0+0.5);
+#ifndef CRAY
+   return mmz/2./mmx*(eta0+mmz/3./mmx)/(eta0+0.5);
+#else
+   return mmx>0.0 ? mmz/2./mmx*(eta0+mmz/3./mmx)/(eta0+0.5) : 0.0;
+#endif
 }
 
 real VOFaxisym::phi_tr_large_neg(const real mmx,const real mmz,const real eta0) {
-  return mmz/2./mmx*(eta0+1.-mmz/3./mmx)/(eta0+0.5);
+#ifndef CRAY
+   return mmz/2./mmx*(eta0+1.-mmz/3./mmx)/(eta0+0.5);
+#else
+   return mmx>0.0 ? mmz/2./mmx*(eta0+1.-mmz/3./mmx)/(eta0+0.5) : 0.0;
+#endif
 }
 
 real VOFaxisym::phi_crit_pos(const real mmx,const real mmz,const real eta0) {
