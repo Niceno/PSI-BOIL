@@ -111,13 +111,12 @@
   /*---------+
   |  domain  |
   +---------*/
-  Domain::set_decomposition_factors(factor_x,1,factor_z);
   Body floor("floor.stl");
   Body * floor_ptr = NULL;
   if(NZsol>0) {
     floor_ptr = &floor;
   }
-  Axisymmetric d(*gx,*gz,DX0,floor_ptr);
+  TwoLevelAxisymmetric d(*gx,*gz,DX0,floor_ptr);
 
-  const real dxmin = d.dxyz_min();
-  //boil::plot->plot(d,"domain");
+  const real dxmin = d.coarse().dxyz_min();
+  //boil::plot->plot(d.coarse(),"coarsedomain");

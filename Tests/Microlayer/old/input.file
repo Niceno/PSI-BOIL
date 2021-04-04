@@ -1,0 +1,20 @@
+0 - wall superheat [K]
+0 - outlet superheat [K]
+13 - nucleation superheat [K]
+425e3 - heat flux [W/m2], will be converted to vol. source
+1 - cangle [deg]
+1 - pressure [atm]
+10 - initradius [um]
+1000 - LZsolid [um]
+0.5 - LZheater[um], 0. indicates a Dirac heater
+9 - multiplicative length in sol [-]
+1.5 - multiplicative length in x [-]
+1.5 - multiplicative length in z [-]
+3.1 - max cell aspect ratio [-]
+780 - NZsolid [.int.]
+2560 - NXtot [.int.]
+3584 - NZtot [.int.]
+24 - transitional no. cells in sol [.int.]
+24 - transitional no. cells in X [.int.]
+24 - transitional no. cells in Z [.int.]
+1 - case flag [.int.], indicates initialisation and time loop

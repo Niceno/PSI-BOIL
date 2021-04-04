@@ -1,13 +1,12 @@
   /*---------------------------+
   |  solve transport equation  |
   +---------------------------*/
-  conc.new_time_step();
+  conc_coarse.new_time_step();
 
   /*------------+
   |  time loop  |
   +------------*/
   for(time.start(); time.end(); time.increase()) {
-    cht.new_time_step();
 
 #ifdef USE_MOMEMTUM_SINGLE_PHASE
     /*-------------------+
@@ -20,13 +19,13 @@
     /* gravity force */
     Comp m = Comp::w();
     for_vmijk(xyz,m,i,j,k) {
-      real phil=std::max(0.0,std::min(1.0,c[i][j][k]));
+      real phil=std::max(0.0,std::min(1.0,c.coarse[i][j][k]));
       real phiv=1.0-phil;
-      real deltmp=tpr[i][j][k]-tsat0;
-      real rhomix = phil*boil::rho(liquid.rho()->value(),
-                                   liquid.beta()->value(),deltmp)
-                  + phiv*boil::rho(vapor.rho()->value(),
-                                   vapor.beta()->value(),deltmp);
+      real deltmp=tpr.coarse[i][j][k]-tsat0;
+      real rhomix = phil*boil::rho(liquid.coarse.rho()->value(),
+                                   liquid.coarse.beta()->value(),deltmp)
+                  + phiv*boil::rho(vapor.coarse.rho()->value(),
+                                   vapor.coarse.beta()->value(),deltmp);
       if(xyz.domain()->ibody().on(m,i,j,k))
         xyz[m][i][j][k] += -gravity * xyz.dV(m,i,j,k) * rhomix;
     }
@@ -48,10 +47,7 @@
     p = 0.0;
     if(multigrid.cycle(multigrid_cycle0,
                        multigrid_cycle1,
-                       multigrid_rt,
-                       multigrid_rr,
-                       multigrid_mi,
-                       multigrid_mstale))
+                       multigrid_rr,multigrid_mi))
       OMS(converged);
 
     p.exchange();
@@ -83,9 +79,10 @@
     /*------------------------+
     |  solve energy equation  |
     +------------------------*/
-    enthFD.discretize();
-    enthFD.new_time_step();
-    enthFD.solve(ResRat(1e-16),"enthFD");
+    /* in the coarse space */
+    enthFD_coarse.discretize();
+    enthFD_coarse.new_time_step();
+    enthFD_coarse.solve(ResRat(1e-16),"enthFD");
 
     /*-------------+
     |  dt control  |
@@ -96,11 +93,11 @@
     |  stopping criterion  |
     +---------------------*/
     real tprtest(0.);
-    pc.update();
-    for_vmijk(cht.node_tmp_flu(),Comp::k(),i,j,k) {
-      if(fabs(cht.node_tmp_flu().zc(Comp::k(),k))<boil::atto) {
-        if(cht.node_tmp_flu().xc(Comp::k(),i)<dxmin) {
-          tprtest = cht.node_tmp_flu()[Comp::k()][i][j][k];
+    pc_coarse.update();
+    for_vmijk(cht_coarse.node_tmp_flu(),Comp::k(),i,j,k) {
+      if(fabs(cht_coarse.node_tmp_flu().zc(Comp::k(),k))<boil::atto) {
+        if(cht_coarse.node_tmp_flu().xc(Comp::k(),i)<dxmin) {
+          tprtest = cht_coarse.node_tmp_flu()[Comp::k()][i][j][k];
         }
       }
     }
@@ -108,43 +105,37 @@
     boil::oout<<"tprnucl= "<<time.current_time()<<" "<<tprtest<<boil::endl;
 
     if(tprtest>tnucl) {
-      /* cell-center velocities */
-      Scalar u(d), v(d), w(d);
-      boil::cell_center_velocities(uvw,u,v,w);
-      boil::save_backup(time.current_step(), 1, time,
-                        {&u,&v,&w}, {"u","v","w"});
-
       boil::save_backup(time.current_step(), 1, time,
                         load_scalars, load_scalar_names,
-                        load_vectors, load_vector_names,
-                        load_nucls,   load_nucl_names,
-                        load_cipcsls, load_cipcsl_names,
-                        store_reals,  store_ints);
+                        load_vectors, load_vector_names);
       boil::rm_backup(ts,
                       load_scalars, load_scalar_names,
-                      load_vectors, load_vector_names,
-                      load_nucls,   load_nucl_names,
-                      load_cipcsls, load_cipcsl_names,
-                      store_reals,  store_ints);
+                      load_vectors, load_vector_names);
 
       iint++;
-      boil::plot->plot(uvw,c,tpr,press,
+      boil::plot->plot(uvw.coarse,c.coarse,tpr.coarse,press,
                        "uvw-c-tpr-press",
                        iint);
 
+      /* cell-center velocities */
+      Scalar u(d.coarse()), v(d.coarse()), w(d.coarse());
+      boil::cell_center_velocities(uvw.coarse,u,v,w);
+      boil::save_backup(time.current_step(), 1, time,
+                        {&u,&v,&w}, {"u","v","w"});
+
       /* output temperature field */
       if(!boil::cart.iam())
-        output_to_file(tpr,cht.node_tmp_flu());
+        output_to_file(tpr.coarse,cht_coarse.node_tmp_flu());
 
       std::fstream output;
       std::stringstream ssb;
       ssb <<"bndtpr-"<<iint<<".txt";
       output.open(ssb.str(), std::ios::out);
       if(NZsol>0) {
-        boil::output_wall_heat_transfer_xz(cht,output,NXtot);
+        boil::output_wall_heat_transfer_xz(cht_coarse,output,NXtot/2);
       } else {
-        boil::output_wall_heat_transfer_xz(tpr,*(conc.topo),pc,
-                                           output,NXtot);
+        boil::output_wall_heat_transfer_xz(tpr.coarse,*(conc_coarse.topo),pc_coarse,
+                                           output,NXtot/2);
       }
       boil::cart.barrier();
       output.close();
@@ -158,7 +149,7 @@
     bool otpcond = time.current_time() / t_per_plot >= real(iint);
     if(otpcond) {
       iint++;
-      boil::plot->plot(uvw,c,tpr,press,
+      boil::plot->plot(uvw.coarse,c.coarse,tpr.coarse,press,
                        "uvw-c-tpr-press",
                        iint);
 
@@ -166,8 +157,8 @@
       std::stringstream ssb;
       ssb <<"bndtpr-"<<iint<<".txt";
       output.open(ssb.str(), std::ios::out);
-      pc.update();
-      boil::output_wall_heat_transfer_xz(cht,output,NXtot);
+      pc_coarse.update();
+      boil::output_wall_heat_transfer_xz(cht_coarse,output,NXtot/2);
       boil::cart.barrier();
       output.close();
     }
@@ -178,25 +169,16 @@
     if(time.current_step() % n_per_backup == 0) {
       boil::save_backup(time.current_step(), 0, time,
                         load_scalars, load_scalar_names,
-                        load_vectors, load_vector_names,
-                        load_nucls,   load_nucl_names,
-                        load_cipcsls, load_cipcsl_names,
-                        store_reals,  store_ints);
+                        load_vectors, load_vector_names);
     }
 
     if(boil::timer.current_min() > (wmin-30.0)) {
       boil::save_backup(time.current_step(), 1, time,
                         load_scalars, load_scalar_names,
-                        load_vectors, load_vector_names,
-                        load_nucls,   load_nucl_names,
-                        load_cipcsls, load_cipcsl_names,
-                        store_reals,  store_ints);
+                        load_vectors, load_vector_names);
       boil::rm_backup(ts,
                       load_scalars, load_scalar_names,
-                      load_vectors, load_vector_names,
-                      load_nucls,   load_nucl_names,
-                      load_cipcsls, load_cipcsl_names,
-                      store_reals,  store_ints);
+                      load_vectors, load_vector_names);
 
       boil::set_irun(0);
 

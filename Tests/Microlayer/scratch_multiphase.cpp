@@ -9,53 +9,36 @@
       const real xcent = 0.0;
       boil::droplet_parameters_3D(180.-cangle,V0,const_cast<const real&>(radius),zcent,chord);
 
-      boil::setup_circle_xz(conc_fine.color(),radius,xcent,zcent);
-      for_avijk(conc_fine.color(),i,j,k)
-        conc_fine.color()[i][j][k] = 1. - conc_fine.color()[i][j][k];
+      boil::setup_circle_xz(conc.color(),radius,xcent,zcent);
+      for_avijk(conc.color(),i,j,k)
+        conc.color()[i][j][k] = 1. - conc.color()[i][j][k];
 
-      conc_fine.color().bnd_update();
-      conc_fine.color().exchange_all();
+      conc.color().bnd_update();
+      conc.color().exchange_all();
  
-      conc_fine.color_to_vf();
-      conc_fine.init();
+      conc.color_to_vf();
+      conc.init();
       
-      c.restrict_volume_XZ();
-      conc_coarse.init();
-
       /* temperature */
-      if(case_flag==1||case_flag==3) {
-        for_coarsefine(l) {
-          tpr[l] = tout;
+      if(case_flag==1) {
+        tpr = tout;
 
-          for_vijk(tpr[l],i,j,k) {
-            if(tpr[l].domain()->ibody().off(i,j,k)) {
-              tpr[l][i][j][k] = twall;
-            } 
-          }
-          tpr[l].bnd_update();
-          tpr[l].exchange_all();
+        for_vijk(tpr,i,j,k) {
+          if(tpr.domain()->ibody().off(i,j,k)) {
+            tpr[i][j][k] = twall;
+          } 
         }
+        tpr.bnd_update();
+        tpr.exchange_all();
       } else {
-        for_coarsefine(l) {
-          tpr[l] = tout;
+        tpr = tout;
 
-          interpolate_from_file(tpr[l]);
+        interpolate_from_file(tpr);
 
-          tpr[l].bnd_update();
-          tpr[l].exchange_all();
-        }
+        tpr.bnd_update();
+        tpr.exchange_all();
       }
 
-      if(case_flag==1||case_flag==2) {
-        boil::plot->plot(uvw.coarse,c.coarse,tpr.coarse,mdot.coarse,mflx.coarse,press,
-                         "uvw-c-tpr-mdot-mflx-press",
-                         0);
-      } else {
-        boil::plot->plot(uvw.fine,conc_fine.color(),tpr.fine,mdot.fine,mflx.fine,
-                         "uvwf-clrf-tprf-mdot-mflx",
-                         0);
-
-        boil::plot->plot(uvw.coarse,c.coarse,press,
-                         "uvwc-cc-press",
-                         0);
-      }
+      boil::plot->plot(uvw,c,tpr,mdot,mflx,press,
+                       "uvw-c-tpr-mdot-mflx-press",
+                       0);

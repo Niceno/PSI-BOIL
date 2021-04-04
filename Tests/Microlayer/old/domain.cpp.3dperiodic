@@ -47,21 +47,18 @@
   /*----------+
   |  grid(s)  |
   +----------*/
-  Grid1D gx0( Range<real>(0.0,LX0), NX0, Periodic::no(),
-              BndGrid::symmetry(), BndGrid::wall() );
+  Grid1D gx0( Range<real>(0.0,LX0), NX0, Periodic::yes() );
   Grid1D * gxt, * gx1, * gx;
   if(NX_trans>0) {
     gxt = new Grid1D( Range<real>(LX0,LX_trans)
                     , Range<real>(1.0*DX0,AR*DX0)
-                    , NX_trans, Periodic::no() );
+                    , NX_trans, Periodic::yes() );
     if(NX1>0) {
-      gx1 = new Grid1D( Range<real>(LX_trans,LX1), NX1, Periodic::no() );
+      gx1 = new Grid1D( Range<real>(LX_trans,LX1), NX1, Periodic::yes() );
 
-      gx = new Grid1D(gx0, *gxt, *gx1, Periodic::no(), 
-                      BndGrid::symmetry(), BndGrid::wall() );
+      gx = new Grid1D(gx0, *gxt, *gx1, Periodic::yes()); 
     } else {
-      gx = new Grid1D(gx0, *gxt, Periodic::no(), 
-                      BndGrid::symmetry(), BndGrid::wall() );
+      gx = new Grid1D(gx0, *gxt, Periodic::yes());
     }
   } else {
     gx = &gx0;
@@ -111,13 +108,12 @@
   /*---------+
   |  domain  |
   +---------*/
-  Domain::set_decomposition_factors(factor_x,1,factor_z);
   Body floor("floor.stl");
   Body * floor_ptr = NULL;
   if(NZsol>0) {
     floor_ptr = &floor;
   }
-  Axisymmetric d(*gx,*gz,DX0,floor_ptr);
+  TwoLevelCartesian d(*gx,*gx,*gz,floor_ptr);
 
-  const real dxmin = d.dxyz_min();
-  //boil::plot->plot(d,"domain");
+  const real dxmin = d.coarse().dxyz_min();
+  //boil::plot->plot(d.coarse(),"coarsedomain");

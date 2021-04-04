@@ -5,25 +5,19 @@
       boil::print_line("######################");
 
       /* color */
-      for(auto l : c.levels)
-        *l = 1.0;
-
-      conc_coarse.init();
-      conc_fine.init();
+      c = 1.0;
+      conc.init();
 
       /* temperature */
-      for(auto l : tpr.levels) {
-        *l = tout;
-
-        for_vijk((*l),i,j,k) {
-          if(l->domain()->ibody().off(i,j,k)) {
-            (*l)[i][j][k] = twall;
-          }
+      tpr = tout;
+      for_vijk(tpr,i,j,k) {
+        if(tpr.domain()->ibody().off(i,j,k)) {
+          tpr[i][j][k] = twall;
         }
-        l->bnd_update();
-        l->exchange_all();
       }
+      tpr.bnd_update();
+      tpr.exchange_all();
 
-      boil::plot->plot(uvw.coarse,c.coarse,tpr.coarse,press,
+      boil::plot->plot(uvw,c,tpr,press,
                        "uvw-c-tpr-press",
                        0);

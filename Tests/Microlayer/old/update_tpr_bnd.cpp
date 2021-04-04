@@ -1,5 +1,5 @@
     /* reset boundary condition for temperature */
-    if(NZsol==0&&case_flag==2) {
+    if(NZsol==0&&(case_flag==2||case_flag==4)) {
       std::vector<real> C0 = {12.56791608260579,
                               -0.38231422424431977,
                               -2.5843730362760384,
@@ -32,5 +32,8 @@
       char *eqtpr = new char[fullstr.str().length()+1];
       std::strcpy(eqtpr, fullstr.str().c_str());
 
-      tpr.bc().modify( BndCnd( Dir::kmin(), BndType::dirichlet(), eqtpr) );
+      for(auto l : tpr.levels) {
+       l->bc().modify( BndCnd( Dir::kmin(), BndType::dirichlet(), eqtpr) );
+       l->bnd_update();
+     }
     }

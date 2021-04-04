@@ -6,6 +6,7 @@
   const real twall = tsat0 + deltat_wall;
   const real tout  = tsat0 + deltat_out;
   const real tnucl = tsat0 + deltat_nucl;
+  const real tsat0_K = IF97::Tsat97(prs);
 
   /* heater power */
   real qsrc;
@@ -27,21 +28,21 @@
   const int ndt = 10e6; /* inconsequential */
   
   /* plot every */
-#ifdef SAKASHITA
-  real t_per_plot = 5e-4;
-#else
-  real t_per_plot = 5e-6;
-#endif
+  real t_per_plot = 0.01*1e-3;
   if(case_flag==0)
-    t_per_plot = 0.025;
+    t_per_plot = 0.1;
 
   /* steps per backup */
   const int n_per_backup = 5000;
 
   /* dt settings */
-  real initdtcoef = 1./50.;
+  const real surftens_dt_coef = 1.;
+  const real initdtcoef = 1./10.;
+
+  /* cfl with and without interfaces */
+  real cfl_limit(0.1);
   if(case_flag==0)
-    initdtcoef = 1./10.;
+    cfl_limit = 0.2;
 
   /* only liquid beyond this (fractional height) */
   const real zmax_mult = 0.9;
@@ -54,16 +55,14 @@
   const int multigrid_min_cycles = 1;
   const int multigrid_max_cycles = 20;
 
-  MaxIter multigrid_mm_smooth1 = MaxIter(35);
-  MaxIter multigrid_mm_smooth2 = MaxIter(40);
-  MaxIter multigrid_mm_solve = MaxIter(110);
-  MaxIter multigrid_mm_stale1 = MaxIter(15);
-  MaxIter multigrid_mm_stale2 = MaxIter(-1);
-  std::array<MaxIter,3> multigrid_mi = {multigrid_mm_smooth1,multigrid_mm_smooth2,multigrid_mm_solve};
-  std::array<MaxIter,3> multigrid_mstale = {multigrid_mm_stale1,multigrid_mm_stale1,multigrid_mm_stale2};
+  MaxIter multigrid_mm_smooth = MaxIter(20);
+  MaxIter multigrid_mm_solve = MaxIter(100);
+  MaxIter multigrid_mm_stale = MaxIter(-1);
+  std::array<MaxIter,3> multigrid_mi = {multigrid_mm_smooth,multigrid_mm_smooth,multigrid_mm_solve};
+  std::array<MaxIter,3> multigrid_mstale = {multigrid_mm_stale,multigrid_mm_stale,multigrid_mm_stale};
 
   ResRat multigrid_rr = ResRat(-1.);
-  ResTol multigrid_rt = ResTol(3e-5);
+  ResTol multigrid_rt = ResTol(5e-5);
 
   const Cycle multigrid_cycle0 = Cycle::Z();
   const Cycle multigrid_cycle1 = Cycle::F();
@@ -74,6 +73,7 @@
 
   const AdvectionMethod advect_method = AdvectionMethod::BoundedSplit();
   //const AdvectionMethod advect_method = AdvectionMethod::NaiveSplit();
+  const TopoMethod topo_method = TopoMethod::Hybrid();
 
   const bool detachment_model = false;
   const bool subgrid_method = true; /* use slic subgrid */
@@ -82,8 +82,6 @@
   const int niter_pressure_extrap = 1000;
 
   /* enthalpy */
-  //const ConvScheme cs_enth = ConvScheme::minmod();//superbee();
-  const ConvScheme cs_enth = ConvScheme::superbee();
   const AccuracyOrder ao_efd_conv = AccuracyOrder::First();//Second();//Third();
   //const AccuracyOrder ao_efd_conv = AccuracyOrder::Third();
   const bool use_wall_resistance = true;
