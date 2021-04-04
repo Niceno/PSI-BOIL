@@ -41,39 +41,39 @@ real CommonHeatTransfer::hflux_wall(const Scalar & val, const Dir din,
           if(d == Dir::kmax()) { kof--; mcomp = Comp::k(); of = +1; sig = Sign::neg(); }
     
           for_vijk(val.bc().at(b),i,j,k){
-            real area = fabs((real)iof)*val.dSx(sig,i,j,k)
-                      + fabs((real)jof)*val.dSy(sig,i,j,k)
-                      + fabs((real)kof)*val.dSz(sig,i,j,k);
-            real alen = fabs(val.xc(i)-val.xc(i+iof))
-                      + fabs(val.yc(j)-val.yc(j+jof))
-                      + fabs(val.zc(k)-val.zc(k+kof));
+            real area = std::abs(iof)*val.dSx(sig,i,j,k)
+                      + std::abs(jof)*val.dSy(sig,i,j,k)
+                      + std::abs(kof)*val.dSz(sig,i,j,k);
+            real alen = std::abs(val.xc(i)-val.xc(i+iof))
+                      + std::abs(val.yc(j)-val.yc(j+jof))
+                      + std::abs(val.zc(k)-val.zc(k+kof));
 
             areaw += area;
             if       (val.domain()->ibody().off(i,j,k)) {
               real lc = solid()->lambda(i,j,k);
               hflux += lc*(val[i][j][k]-val[i+iof][j+jof][k+kof])/alen*area;
 
-            } else if(!interface(-sig,mcomp,i+iof,j+jof,k+kof)) {
+            } else if(!interface(-sig,mcomp,i+iof,j+jof,k+kof,Old::no)) {
               real lc=lambda(i,j,k,diff_eddy);
               hflux += lc*(val[i][j][k]-val[i+iof][j+jof][k+kof])/alen*area;
 
             } else {
               real lc=lambda_inv(i,j,k,diff_eddy);
               real ts;
-              if       (mcomp==Comp::i()) {
-                //alen = fabs(val.xc(i)-val.xc(i+iof))
-                //     - distance_int_x(-sig,i+iof,j+jof,k+kof,ts);
-                alen = distance_int_x(sig,i,j,k,ts);
-              } else if(mcomp==Comp::j()) {
-                //alen = fabs(val.yc(j)-val.yc(j+jof))
-                //     - distance_int_y(-sig,i+iof,j+jof,k+kof,ts);
-                alen = distance_int_y(sig,i,j,k,ts);
-              } else {
-                //alen = fabs(val.zc(k)-val.zc(k+kof))
-                //     - distance_int_z(-sig,i+iof,j+jof,k+kof,ts);
-                alen = distance_int_z(sig,i,j,k,ts);
+              Sign dmmy;
+              alen = distance_int(sig,mcomp,i,j,k,ts,dmmy,ResistEval::no,Old::no);
+              real totresist = alen/lc+wall_resistance(i+of,j+of,k+of);
+
+              /* only liquid resistance is considered */
+              if(use_int_resist) {
+                if(below_interface(i+of,j+of,k+of,Old::no)) {
+                  totresist += int_resistance_liq(i+of,j+of,k+of);
+                }
               }
-              hflux += (val[i][j][k]-ts)/(alen/lc+wall_resistance(i+of,j+of,k+of))*area;
+
+              /* sum */
+              hflux += (val[i][j][k]-ts)/totresist*area;
+
             } /* interface */
           } /* vijk */
         } /* d == din */

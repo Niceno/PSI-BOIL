@@ -30,15 +30,20 @@ inline real lambdav(const int i, const int j, const int k,
 inline real int_resistance_liq(const int i, const int j, const int k) const {
   return int_resistance_liq_val;
 }
+#if 0
 inline real int_resistance_vap(const int i, const int j, const int k) const {
   return int_resistance_vap_val;
 }
+#endif
 inline real wall_resistance(const int i, const int j, const int k) const {
   return wall_resistance_val;
 }
 
 inline real dirac_wall_source(const int i, const int j, const int k) const {
-  return dirac_wall_source_val;
+  if(!dirac_wall_source_variable)
+    return dirac_wall_source_val;
+  else
+    return dirac_wall_source_func(i,j,k);
 }
 
 /***************************************************************************//**
@@ -74,18 +79,6 @@ inline real temperature_node(const real Q,
  *  Checks if the given cell is at (or next to) an interface
 ******************************************************************************/
 inline bool interface(const Sign dir, const Comp m,
-                      const int i, const int j, const int k) const {
-
-  return topo->interface(dir,m,i,j,k);
-}
-
-inline bool interface_old(const Sign dir, const Comp m,
-                          const int i, const int j, const int k) const {
-
-  return topo->interface_old(dir,m,i,j,k);
-}
-
-inline bool interface(const Sign dir, const Comp m,
                       const int i, const int j, const int k, const Old old)
                       const {
 
@@ -104,6 +97,12 @@ inline bool above_interface(const int i, const int j, const int k,
          topo->above_interface_old(i,j,k) : topo->above_interface(i,j,k);
 }
 
+inline bool below_interface(const int i, const int j, const int k,
+                            const Old old) const {
+  return (old==Old::yes) ?
+         topo->below_interface_old(i,j,k) : topo->below_interface(i,j,k);
+}
+
 /***************************************************************************//**
  *  Call to tifmodel
 ******************************************************************************/
@@ -117,6 +116,11 @@ inline real Tint_old(const int dir, const Comp &mcomp, real frac,
   return tifmodel.Tint_old(dir,mcomp,frac,i,j,k);
 }
 
+inline real Tint(const int i, const int j, const int k, const Old old) const {
+  return (old==Old::yes) ?
+         tifmodel.Tint_old(i,j,k) : tifmodel.Tint(i,j,k);
+}
+
 inline real Tint(const int i, const int j, const int k) const {
   return tifmodel.Tint(i,j,k);
 }
@@ -124,17 +128,6 @@ inline real Tint(const int i, const int j, const int k) const {
 inline real Tint_old(const int i, const int j, const int k) const {
   return tifmodel.Tint_old(i,j,k);
 }
-
-/***************************************************************************//**
- *  distance
-******************************************************************************/
-inline real distance_int(const Sign dir, const Comp & m,
-                         const int i, const int j, const int k, const Old old,
-                         real & tint) const {
-  return (old==Old::yes) ?
-         distance_int_old(dir,m,i,j,k,tint) : distance_int(dir,m,i,j,k,tint);
-}
-
 
 /***************************************************************************//**
  *  other
@@ -148,30 +141,47 @@ inline void set_turbP(const real a) {
 /* units W/m2 */
 inline real get_dirac_wall_source() const { return dirac_wall_source_val; }
 inline void set_dirac_wall_source(const real a) {
+  dirac_wall_source_variable = false;
   dirac_wall_source_val = a;
   boil::oout<<"CommonHeatTransfer::dirac_wall_source= "
             <<dirac_wall_source_val<<"\n";
 }
+inline void set_dirac_wall_source(
+    std::function<real(const int, const int, const int)> f) {
+  dirac_wall_source_variable = true;
+  dirac_wall_source_func = f;
+  boil::oout<<"CommonHeatTransfer::dirac_wall_source set variable"
+            <<"\n";
+}
+
 
 /* units [K/(W/m^2)] = [m/(W/mK)] */
+inline void set_int_resistance(const real re) {
+  //int_resistance_vap_val = re;
+  int_resistance_liq_val = re;
+  use_int_resist = true;
+  boil::oout<<"CommonHeatTransfer::int_resistance= "<<re<<"\n";
+}
+inline bool use_int_resistance() const {
+  return use_int_resist;
+}
+
+#if 0
 inline real get_int_resistance_vap() const { 
   return int_resistance_vap_val;
-}
-inline real get_int_resistance_liq() const { 
-  return int_resistance_liq_val;
-}
-inline void set_int_resistance(const real re) {
-  int_resistance_vap_val = re;
-  int_resistance_liq_val = re;
-  boil::oout<<"CommonHeatTransfer::int_resistance= "<<re<<"\n";
 }
 inline void set_int_resistance_vap(const real re) {
   int_resistance_vap_val = re;
   boil::oout<<"CommonHeatTransfer::int_resistance_vap= "
             <<re<<"\n";
 }
+#endif
+inline real get_int_resistance_liq() const { 
+  return int_resistance_liq_val;
+}
 inline void set_int_resistance_liq(const real re) {
   int_resistance_liq_val = re;
+  use_int_resist = true;
   boil::oout<<"CommonHeatTransfer::int_resistance_liq= "
             <<re<<"\n";
 }

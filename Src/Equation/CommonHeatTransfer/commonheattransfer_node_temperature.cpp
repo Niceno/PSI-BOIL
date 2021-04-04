@@ -10,6 +10,8 @@ void CommonHeatTransfer::calculate_node_temperature(const Scalar * diff_eddy) {
   for_m(m)
     bndtpr_sol(m) = boil::unreal;
 
+  Sign dmmy; /* dummy sign */
+
   /*--------------+
   | immersed body |
   +--------------*/
@@ -39,11 +41,20 @@ void CommonHeatTransfer::calculate_node_temperature(const Scalar * diff_eddy) {
       real qmult = res_2a / res_2;
 
       /* inversion of fluid due to existence of interface */
-      if(interface(Sign::neg(),m,i,j,k)) {
+      if(interface(Sign::neg(),m,i,j,k,Old::no)) {
          lam_1 = lambda_inv(i,j,k,diff_eddy);
-         //len_1 -= distance_int_x(Sign::neg(),i,j,k,tpr_1);
-         len_1 = distance_int_x(Sign::pos(),i-1,j,k,tpr_1)-len_2;
+         len_1 = 
+           distance_int_x(Sign::pos(),i-1,j,k,tpr_1,dmmy,ResistEval::no,Old::no)
+           -len_2;
+
          res_1 = len_1/lam_1;
+         /* only liquid resistance is considered */
+         if(use_int_resist) {
+           if(topo->below_interface(i,j,k)) {
+             res_1 += int_resistance_liq(i,j,k);
+           }
+         }
+
       }
 
       bndtpr_flu[m][i][j][k] = temperature_node(
@@ -75,11 +86,20 @@ void CommonHeatTransfer::calculate_node_temperature(const Scalar * diff_eddy) {
       real qmult = res_2a / res_2;
 
       /* inversion of fluid due to existence of interface */
-      if(interface(Sign::pos(),m,i,j,k)) {
+      if(interface(Sign::pos(),m,i,j,k,Old::no)) {
          lam_1 = lambda_inv(i,j,k,diff_eddy);
-         //len_1 -= distance_int_x(Sign::pos(),i,j,k,tpr_1);
-         len_1 = distance_int_x(Sign::neg(),i+1,j,k,tpr_1)-len_2;
+         len_1 = 
+           distance_int_x(Sign::neg(),i+1,j,k,tpr_1,dmmy,ResistEval::no,Old::no)
+           -len_2;
+
          res_1 = len_1/lam_1;
+         /* only liquid resistance is considered */
+         if(use_int_resist) {
+           if(topo->below_interface(i,j,k)) {
+             res_1 += int_resistance_liq(i,j,k);
+           }
+         }
+
       }
 
       bndtpr_flu[m][i+1][j][k] = temperature_node(
@@ -113,11 +133,20 @@ void CommonHeatTransfer::calculate_node_temperature(const Scalar * diff_eddy) {
       real qmult = res_2a / res_2;
 
       /* inversion of fluid due to existence of interface */
-      if(interface(Sign::neg(),m,i,j,k)) {
+      if(interface(Sign::neg(),m,i,j,k,Old::no)) {
          lam_1 = lambda_inv(i,j,k,diff_eddy);
-         //len_1 -= distance_int_y(Sign::neg(),i,j,k,tpr_1);
-         len_1 = distance_int_y(Sign::pos(),i,j-1,k,tpr_1)-len_2;
+         len_1 = 
+           distance_int_y(Sign::pos(),i,j-1,k,tpr_1,dmmy,ResistEval::no,Old::no)
+           -len_2;
+
          res_1 = len_1/lam_1;
+         /* only liquid resistance is considered */
+         if(use_int_resist) {
+           if(topo->below_interface(i,j,k)) {
+             res_1 += int_resistance_liq(i,j,k);
+           }
+         }
+
       }
 
       bndtpr_flu[m][i][j][k] = temperature_node(
@@ -149,11 +178,20 @@ void CommonHeatTransfer::calculate_node_temperature(const Scalar * diff_eddy) {
       real qmult = res_2a / res_2;
 
       /* inversion of fluid due to existence of interface */
-      if(interface(Sign::pos(),m,i,j,k)) {
+      if(interface(Sign::pos(),m,i,j,k,Old::no)) {
          lam_1 = lambda_inv(i,j,k,diff_eddy);
-         //len_1 -= distance_int_y(Sign::pos(),i,j,k,tpr_1);
-         len_1 = distance_int_y(Sign::neg(),i,j+1,k,tpr_1)-len_2;
+         len_1 = 
+           distance_int_y(Sign::neg(),i,j+1,k,tpr_1,dmmy,ResistEval::no,Old::no)
+           -len_2;
+
          res_1 = len_1/lam_1;
+         /* only liquid resistance is considered */
+         if(use_int_resist) {
+           if(topo->below_interface(i,j,k)) {
+             res_1 += int_resistance_liq(i,j,k);
+           }
+         }
+
       }
 
       bndtpr_flu[m][i][j+1][k] = temperature_node(
@@ -187,11 +225,20 @@ void CommonHeatTransfer::calculate_node_temperature(const Scalar * diff_eddy) {
       real qmult = res_2a / res_2;
 
       /* inversion of fluid due to existence of interface */
-      if(interface(Sign::neg(),m,i,j,k)) {
+      if(interface(Sign::neg(),m,i,j,k,Old::no)) {
          lam_1 = lambda_inv(i,j,k,diff_eddy);
-         //len_1 -= distance_int_z(Sign::neg(),i,j,k,tpr_1);
-         len_1 = distance_int_z(Sign::pos(),i,j,k-1,tpr_1)-len_2;
+         len_1 = 
+           distance_int_z(Sign::pos(),i,j,k-1,tpr_1,dmmy,ResistEval::no,Old::no)
+           -len_2;
+
          res_1 = len_1/lam_1;
+         /* only liquid resistance is considered */
+         if(use_int_resist) {
+           if(topo->below_interface(i,j,k)) {
+             res_1 += int_resistance_liq(i,j,k);
+           }
+         }
+
       }
 
       bndtpr_flu[m][i][j][k] = temperature_node(
@@ -223,11 +270,20 @@ void CommonHeatTransfer::calculate_node_temperature(const Scalar * diff_eddy) {
       real qmult = res_2a / res_2;
 
       /* inversion of fluid due to existence of interface */
-      if(interface(Sign::pos(),m,i,j,k)) {
+      if(interface(Sign::pos(),m,i,j,k,Old::no)) {
          lam_1 = lambda_inv(i,j,k,diff_eddy);
-         //len_1 -= distance_int_z(Sign::pos(),i,j,k,tpr_1);
-         len_1 = distance_int_z(Sign::neg(),i,j,k+1,tpr_1)-len_2;
+         len_1 = 
+           distance_int_z(Sign::neg(),i,j,k+1,tpr_1,dmmy,ResistEval::no,Old::no)
+           -len_2;
+
          res_1 = len_1/lam_1;
+         /* only liquid resistance is considered */
+         if(use_int_resist) {
+           if(topo->below_interface(i,j,k)) {
+             res_1 += int_resistance_liq(i,j,k);
+           }
+         }
+
       }
 
       bndtpr_flu[m][i][j][k+1] = temperature_node(

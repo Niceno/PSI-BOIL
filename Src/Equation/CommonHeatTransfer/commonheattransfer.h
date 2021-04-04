@@ -1,6 +1,7 @@
 #ifndef CHTT_H
 #define CHTT_H
 
+#include <functional>
 #include "../Topology/topology.h"
 #include "../Tifmodel/tif.h"
 
@@ -28,44 +29,29 @@ class CommonHeatTransfer {
     real distance_face(const Sign sig, const Comp & m,
                        const int i, const int j, const int k) const;
 
-    /* new distances to interface */
-    inline real distance_int(const Sign dir, const Comp & m,
-                             const int i, const int j, const int k,
-                             real & tint, const Old old) const {
-      return (old==Old::yes) ?
-             distance_int_old(dir,m,i,j,k,tint) :
-             distance_int(dir,m,i,j,k,tint);
-    };
+    /* distances to interface */
     real distance_int(const Sign dir, const Comp & m,
                       const int i, const int j, const int k,
-                      real & tint) const;
+                      real & tint, Sign & cell_marker,
+                      const ResistEval re, const Old old) const;
     real distance_int_x(const Sign dir,
                         const int i, const int j, const int k,
-                        real & tint) const;
+                        real & tint, Sign & cell_marker,
+                        const ResistEval re, const Old old) const;
     real distance_int_y(const Sign dir,
                         const int i, const int j, const int k,
-                        real & tint) const;
+                        real & tint, Sign & cell_marker,
+                        const ResistEval re, const Old old) const;
     real distance_int_z(const Sign dir,
                         const int i, const int j, const int k,
-                        real & tint) const;
+                        real & tint, Sign & cell_marker,
+                        const ResistEval re, const Old old) const;
 
-    /* old distances to interface */
-    real distance_int_old(const Sign dir, const Comp & m,
-                          const int i, const int j, const int k,
-                          real & tint) const;
-    real distance_int_x_old(const Sign dir,
-                            const int i, const int j, const int k,
-                            real & tint) const;
-    real distance_int_y_old(const Sign dir,
-                            const int i, const int j, const int k,
-                            real & tint) const;
-    real distance_int_z_old(const Sign dir,
-                            const int i, const int j, const int k,
-                            real & tint) const;
-
-    /* ghost distance */
-    real ghost_distance(const Comp & m, const Sign & cell_marker,
-                        const int i, const int j, const int k) const;
+    /* inverse interfacial heat transfer resistance */
+    real evaluate_resinv(const Sign dir, const Comp & m,
+                         const int i0, const int j0, const int k0,
+                         const int ii, const int ji, const int ki,
+                         const real dist) const;
 
     /* test domain edge */
     bool edge(const Sign dir, const Comp & m,
@@ -87,10 +73,11 @@ class CommonHeatTransfer {
     real hflux_wall_ib(const Scalar & s, 
                        const Scalar * diff_eddy = NULL) const;
 
+    /* 
     real gradt_ib(const Sign dir, const Comp & mcomp,
                   const int i, const int j, const int k,
                   const Old old,
-                  Scalar & val) const;
+                  Scalar & val) const; */
 
     /* calculating a variable-stencil difference */
     real first_derivative(const bool is_solid, const Comp & m,
@@ -111,14 +98,6 @@ class CommonHeatTransfer {
                            const bool discard_points,
                            const Old old) const;
 
-    bool add_point(const int i0, const int j0, const int k0,
-                   const int i1, const int j1, const int k1,
-                   const Sign dir, const Comp & m,
-                   const bool is_solid, bool & terminate,
-                   bool & interface_reached,
-                   std::vector<StencilPoint> & stencil,
-                   const Old old) const;
-
     /* calculate solid wall temperature */
     void calculate_node_temperature(const Scalar * diff_eddy = NULL);
 
@@ -135,18 +114,40 @@ class CommonHeatTransfer {
     Vector & node_tmp_flu() {return bndtpr_flu;}
 
   private:
+    /* effect of interfacial heat transfer resistance */
+    void resTint(const Sign & dir, const Comp & m,
+                 const int i0, const int j0, const int k0,
+                 const int ii, const int ji, const int ki,
+                 const int i1, const int j1, const int k1,
+                 const real dist, const Sign & cell_marker,
+                 real & tint, const Old old) const;
+
+    /* one point for difference stencil construction */
+    bool add_point(const int i0, const int j0, const int k0,
+                   const int i1, const int j1, const int k1,
+                   const Sign dir, const Comp & m,
+                   const bool is_solid, bool & terminate,
+                   bool & interface_reached,
+                   std::vector<StencilPoint> & stencil,
+                   const Old old) const;
+
+
     Scalar tpr;
     Vector bndtpr_sol, bndtpr_flu;
 
     Matter * flu;
     Matter * sol;
 
+    std::function<real(const int,const int,const int)> dirac_wall_source_func;
+
     real val_rhov,val_rhol,val_cpv,val_cpl,val_lambdav,val_lambdal;
     real turbP; /* turbulent Prandtl number */
     real dirac_wall_source_val; /* units W/m2 */ 
-    /* heat transfer resistance */
-    real wall_resistance_val;
-    real int_resistance_vap_val, int_resistance_liq_val; 
+    real wall_resistance_val; /* solid-fluid contact resistance */
+    /* heat transfer resistance, only for liquid */
+    real int_resistance_liq_val; 
+    bool use_int_resist;
+    bool dirac_wall_source_variable;
 };
 
 #endif
