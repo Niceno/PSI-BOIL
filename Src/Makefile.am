@@ -33,12 +33,10 @@ SUBDIRS = Equation/Staggered/Momentum                              \
           Equation/Heaviside/MarchingSquares/MSaxisym              \
           Equation/Heaviside/MarchingSquares                       \
           Equation/Heaviside                                       \
-          Equation/IntegralPC                                      \
           Equation/Nucleation/Microlayer                           \
           Equation/Nucleation                                      \
           Equation/Tifmodel/Antoine                                \
           Equation/Tifmodel/Clapeyron                              \
-          Equation/Tifmodel/Schrage                                \
           Equation/Tifmodel                                        \
           Equation/Topology                                        \
           Monitor/Rack                                             \
