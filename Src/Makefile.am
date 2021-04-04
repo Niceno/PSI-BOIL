@@ -74,7 +74,6 @@ SUBDIRS = Equation/Staggered/Momentum                              \
 
 LDADD = Custom/IF97/libIF97.a                                                 \
         Custom/libCustom.a                                                    \
-        Equation/IntegralPC/libIntegralPC.a                                   \
         Solver/Additive/libAdditive.a                                         \
         Solver/Linear/Gauss/libGauss.a                                        \
         Solver/Linear/Iterative/libIterative.a                                \
@@ -108,7 +107,6 @@ LDADD = Custom/IF97/libIF97.a                                                 \
 	Equation/Nucleation/libNucleation.a                                   \
         Equation/Tifmodel/Antoine/libAntoine.a                                \
         Equation/Tifmodel/Clapeyron/libClapeyron.a                            \
-        Equation/Tifmodel/Schrage/libSchrage.a                                \
         Equation/CommonHeatTransfer/libCommonHeatTransfer.a                   \
         Equation/Tifmodel/libTif.a                                            \
         Equation/Topology/libTopology.a                                       \
