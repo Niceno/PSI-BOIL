@@ -6,10 +6,11 @@ if [ $# -lt 1 ]; then
   echo "       " $0 "OPEN        -> configure for OPEN MPI"
   echo "       " $0 "MPICH       -> configure for MPICH"
   echo "       " $0 "CSCS        -> configure for CSCS machine"
+  echo "       " $0 "CSCS-DEBUG  -> configure for CSCS debug mode"
   echo "       " $0 "NOMPI       -> configure without MPI"
   echo "       " $0 "INTEL       -> configure for Intel-MPI with Intel compiler"
-  echo "       " $0 "INTEL-MPI-DEBUG  -> configure for Intel with debug option, with MPI"
-  echo "       " $0 "INTEL-DEBUG -> configure for Intel with debug option wo MPI"
+  echo "       " $0 "INTEL-MPI-DEBUG  -> configure for Intel with debug mode, with MPI"
+  echo "       " $0 "INTEL-DEBUG -> configure for Intel with debug mode wo MPI"
   echo "       " $0 "INTEL-PHI   -> configure for Intel-phi"
 else
   if [ $1 = "LAM" ] || [ $1 = "OPEN" ]; then
@@ -33,6 +34,14 @@ else
     automake --add-missing
     ./configure CC=cc CXX=CC CXXFLAGS='-O2 -std=c++11'
     cd Src/Parallel; ln -f -s parallel.h mpi_macros.h; cd ../../
+  elif [ $1 = "CSCS-DEBUG" ]; then
+    aclocal
+    autoconf
+    autoheader
+    automake --add-missing
+    ./configure CC=cc CXX=CC CXXFLAGS='-G02 -std=c++11'
+    #./configure CC=craycc CXX=crayCC CXXFLAGS='-O2 -std=c++11'
+    cd Src/Parallel; ln -f -s sequential.h mpi_macros.h; cd ../../
   elif [ $1 = "NOMPI" ]; then
     aclocal
     autoconf
@@ -75,10 +84,11 @@ else
     echo "       " $0 "OPEN        -> configure for OPEN MPI"
     echo "       " $0 "MPICH       -> configure for MPICH"
     echo "       " $0 "CSCS        -> configure for CSCS machine"
+    echo "       " $0 "CSCS-DEBUG  -> configure for CSCS debug mode"
     echo "       " $0 "NOMPI       -> configure without MPI"
     echo "       " $0 "INTEL       -> configure for Intel-MPI with Intel compiler"
-    echo "       " $0 "INTEL-MPI-DEBUG  -> configure for Intel with debug option, with MPI"
-    echo "       " $0 "INTEL-DEBUG -> configure for Intel with debug option wo MPI"
+    echo "       " $0 "INTEL-MPI-DEBUG  -> configure for Intel with debug mode, with MPI"
+    echo "       " $0 "INTEL-DEBUG -> configure for Intel with debug mode wo MPI"
     echo "       " $0 "INTEL-PHI   -> configure for Intel-phi"
   fi
 fi
