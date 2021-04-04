@@ -52,12 +52,10 @@ AC_OUTPUT(Makefile                                                             \
           Src/Equation/Heaviside/MarchingSquares/MSaxisym/Makefile             \
           Src/Equation/Heaviside/MarchingSquares/Makefile                      \
           Src/Equation/Heaviside/Makefile                                      \
-          Src/Equation/IntegralPC/Makefile                                     \
           Src/Equation/Nucleation/Microlayer/Makefile                          \
           Src/Equation/Nucleation/Makefile                                     \
           Src/Equation/Tifmodel/Antoine/Makefile                               \
           Src/Equation/Tifmodel/Clapeyron/Makefile                             \
-          Src/Equation/Tifmodel/Schrage/Makefile                               \
           Src/Equation/Tifmodel/Makefile                                       \
           Src/Equation/Topology/Makefile                                       \
           Src/Boundary/Makefile                                                \
