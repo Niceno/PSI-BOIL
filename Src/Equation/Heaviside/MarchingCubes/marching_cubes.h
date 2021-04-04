@@ -13,20 +13,20 @@ class MarchingCubes : public Heaviside {
   public:
     MarchingCubes(const Scalar * CLR, Scalar * PHI = NULL, 
                  Scalar * ADENS = NULL, const real CLRSURF = 0.5);
-    virtual ~MarchingCubes() {};
-    //~MarchingCubes() {};
+    ~MarchingCubes() {};
 
     virtual void evaluate_nodes();
     virtual int status(const int i, const int j, const int k);
     virtual real vf(const int i, const int j, const int k);
     virtual real ad(const int i, const int j, const int k);
 
+    /*
     virtual void topology(Topology & topo, const real tol_wall, 
                           const bool use_interp, const bool use_subgrid) {
       boil::oout<<"MarchingCubes::topology: Underdevelopment! "
                 <<"Exiting."<<boil::endl;
       exit(0);
-    }
+    } */
 
     virtual real surface(const Sign sig, const Comp & mcomp,
                          const int i, const int j, const int k);
