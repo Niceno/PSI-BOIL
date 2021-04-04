@@ -1,0 +1,510 @@
+/*----------------------------------------------------------------------------+
+|  Rising air bubble in stagnant liquid                                       |
+|  Publication: Y.Sato, B.Niceno, Int J Numer Meth Fluids, 70 (2012) 441-467  |
+|  Case (d)-de/20 in Fig.23                                                   |
++----------------------------------------------------------------------------*/
+#include "Include/psi-boil.h"
+#include <fstream>
+#include <iostream>
+#include <fenv.h>
+#define INVERTED
+#define _GNU_SOURCE 1
+#define MORTON_EOTVOS
+//#define WATER_GLYCERIN
+//#define MOVING_FRAME
+#if 1
+static void __attribute__ ((constructor)) trapfpe(void)
+{
+  /* Enable some exceptions. At startup all exceptions are masked. */
+  feenableexcept(FE_INVALID|FE_DIVBYZERO|FE_OVERFLOW);
+}
+#endif
+
+/******************************************************************************/
+int main(int argc, char * argv[]) {
+
+  boil::timer.start();
+
+#ifdef MORTON_EOTVOS
+  if(argc<=6){
+    boil::oout<<"Six command line arguments required!"<<"\n";
+    boil::oout<<"./Boil wmin diameter gridlevel NZmult Mo Eo"<<boil::endl;
+#elif defined WATER_GLYCERIN
+  if(argc<=7){
+    boil::oout<<"Seven command line arguments required!"<<"\n";
+    boil::oout<<"./Boil wmin diameter gridlevel NZmult rho mu sig"<<boil::endl;
+#else
+  if(argc<=4){
+    boil::oout<<"Four command line arguments required!"<<"\n";
+    boil::oout<<"./Boil wmin diameter gridlevel NZmult"<<boil::endl;
+#endif
+    boil::oout<<"(wmin::wall time in minute)"<<"\n";
+    exit(0);
+  }
+
+  const int wmin=atoi(argv[1]);
+  boil::oout<<"wmin= "<<wmin<<"\n";
+
+  const real diameter = atof(argv[2]);
+  boil::oout<<"diameter= "<<diameter<<"\n";
+
+  const int gLevel = atoi(argv[3]);
+  boil::oout<<"gLevel= "<<gLevel<<"\n";
+
+  //real wvel = atof(argv[4]);
+  //boil::oout<<"wvel= "<<wvel<<"\n";
+
+  const int NZmult = atoi(argv[4]);
+  boil::oout<<"Nzmult= "<<NZmult<<"\n";
+  real wvel = 0.;
+
+#ifdef MORTON_EOTVOS
+  const real Mo = atof(argv[5]);
+  boil::oout<<"Mo= "<<Mo<<"\n";
+
+  const real Eo = atof(argv[6]);
+  boil::oout<<"Eo= "<<Eo<<"\n";
+#elif defined WATER_GLYCERIN
+  const real rhol = atof(argv[5]);
+  boil::oout<<"rhol= "<<rhol<<"\n";
+
+  const real mul = atof(argv[6]);
+  boil::oout<<"mul= "<<mul<<"\n";
+
+  const real sigma = atof(argv[7]);
+  boil::oout<<"sigma= "<<sigma<<"\n";
+#endif
+
+  const real radius = .5*diameter;
+  const int NcellsPerRadius = 11*gLevel;
+  const int NXmult = 8;
+  const int NX = NXmult*NcellsPerRadius;
+  const int NZ = NZmult*NcellsPerRadius;
+//#ifdef MOVING_FRAME
+//  const int NZ = 20*NcellsPerRadius;
+//#else
+//  const int NZ = 40*NcellsPerRadius;
+//#endif
+
+  const real LX = real(NXmult)*radius;
+  const real DX = LX/real(NX);
+  const real LZ = real(NZ)*DX; 
+
+  const real gravity = 9.81;
+
+  const real rhog = 1.204;
+  const real mug = 18.5e-6;
+
+#ifdef MORTON_EOTVOS
+  const real rhol = 1.35e3; 
+  const real sigma = rhol/(Eo/gravity/diameter/diameter);
+  boil::oout<<"sigma= "<<sigma<<" "<<boil::endl;
+
+  const real mul = std::pow(Mo*rhol*sigma*sigma*sigma/gravity,0.25);
+  boil::oout<<"mul= "<<mul<<" "<<mul/mug<<boil::endl;
+#elif defined WATER_GLYCERIN
+#else
+  const real sigma = 0.072;
+  const real rhol = 0.9982e3;
+  const real mul = 8.9e-4;
+#endif
+  boil::oout<<"numbers= "<<gravity*diameter*diameter*rhol/sigma
+            <<" "<<gravity*std::pow(mul,4.)/rhol/std::pow(sigma,3.)<<"\n";
+
+  const real xcent = 0.0;
+  const real zcent = 0.0;
+
+  const real whadryb = 2.*(rhol-rhog)*gravity*radius*radius/3./mul*(mul+mug)/(2.*mul+3.*mug);
+  const real Rehadryb = whadryb*rhol*diameter/mul;
+  boil::oout<<"Hadamard-Rybczynski= "<<whadryb<<" "<<Rehadryb<<boil::endl;
+
+  const real dtmult = 0.126;//10.;
+  const real underrelax = 5e-3;
+  const int ndt = 400000*gLevel*2;
+  boil::oout<<"tparams= "<<dtmult<<" "<<ndt<<" "<<underrelax<<boil::endl;
+
+  /*--------------------------------+
+  |  choose the output file format  |
+  +--------------------------------*/
+  boil::plot = new PlotTEC();
+
+  /*----------+
+  |  grid(s)  |
+  +----------*/
+  Grid1D gx( Range<real>(0.0,LX), NX, Periodic::no(),
+             BndGrid::symmetry(), BndGrid::wall() );
+#ifdef MOVING_FRAME
+  Grid1D gz( Range<real>(-LZ/2.,LZ/2.), NZ, Periodic::no(),
+             BndGrid::wall(), BndGrid::wall() );
+#else
+  Grid1D gz( Range<real>(-diameter,LZ-diameter), NZ, Periodic::no(),
+             BndGrid::wall(), BndGrid::wall() );
+#endif
+
+  /*---------+
+  |  domain  |
+  +---------*/
+  Axisymmetric d(gx, gz, DX);
+
+  /*----------------------+
+  |  physical properties  |
+  +----------------------*/
+  Matter air(d), liquid(d);
+  air.rho   (rhog);
+  air.mu    (mug);
+  liquid.rho(rhol);
+  liquid.mu (mul); 
+
+  /*----------------+
+  |  linear solver  |
+  +----------------*/
+  Krylov * solver = new CG(d, Prec::ic2());
+
+  /*------------------+
+  |  define unknowns  |
+  +------------------*/
+  Vector uvw(d), xyz(d); // vel
+  Scalar p  (d), f  (d), press(d); // pressure
+  Scalar c  (d), g  (d), kappa(d); // concentration
+  Scalar cold(d);
+
+  /*-----------------------------+ 
+  |  insert boundary conditions  |
+  +-----------------------------*/
+  for_m(m) {
+    uvw.bc(m).add( BndCnd( Dir::imin(), BndType::symmetry() ) );
+    uvw.bc(m).add( BndCnd( Dir::imax(), BndType::outlet() ) );
+#ifdef MOVING_FRAME
+    uvw.bc(m).add( BndCnd( Dir::kmin(), BndType::outlet() ) );
+    uvw.bc(m).add( BndCnd( Dir::kmax(), BndType::inlet(), 0., 0., -wvel ) );
+#else
+    uvw.bc(m).add( BndCnd( Dir::kmin(), BndType::wall() ) );
+    uvw.bc(m).add( BndCnd( Dir::kmax(), BndType::outlet() ) );
+#endif
+    uvw.bc(m).add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
+    uvw.bc(m).add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
+  }
+
+  p.bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
+  p.bc().add( BndCnd( Dir::imax(), BndType::outlet() ) );
+  p.bc().add( BndCnd( Dir::kmin(), BndType::outlet() ) );
+  p.bc().add( BndCnd( Dir::kmax(), BndType::neumann() ) );
+  p.bc().add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
+  p.bc().add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
+
+  c.bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
+  c.bc().add( BndCnd( Dir::imax(), BndType::outlet() ) );
+#ifdef MOVING_FRAME
+  c.bc().add( BndCnd( Dir::kmin(), BndType::outlet() ) );
+  #ifndef INVERTED
+  c.bc().add( BndCnd( Dir::kmax(), BndType::dirichlet(),1.0 ) );
+  #else
+  c.bc().add( BndCnd( Dir::kmax(), BndType::dirichlet(),0.0 ) );
+  #endif
+#else
+  c.bc().add( BndCnd( Dir::kmin(), BndType::wall() ) );
+  c.bc().add( BndCnd( Dir::kmax(), BndType::outlet() ) );
+#endif
+  c.bc().add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
+  c.bc().add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
+
+  g=p.shape();
+  press=p.shape();
+  p=p.shape();
+  kappa=p.shape();
+  cold=c.shape();
+
+#ifndef INVERTED
+  Matter mixed(liquid, air, & c);
+#else
+  Matter mixed(air, liquid, & c);
+#endif
+  mixed.sigma(sigma);
+
+  /*------------+
+  |  time step  |
+  +------------*/
+  const real dxmin = d.dxyz_min();
+  const real dt  = dtmult * pow((air.rho()->value()+liquid.rho()->value())*pow(dxmin,3.0)
+                                /mixed.sigma()->value(),0.5);
+  boil::oout<<"dt= "<<dt<<"\n";
+  Times time(ndt, dt);
+  const real tint = 50*dt*gLevel/dtmult;
+  const int nint= 25000*gLevel;
+  const real cfl_limit=0.25;
+
+  /*-----------------+
+  |  define solvers  |
+  +-----------------*/
+  Momentum ns( uvw, xyz, time, solver, &mixed);
+  Pressure pr(p, f, uvw, time, solver, &mixed);
+  AC multigrid( &pr );
+
+  /* multigrid */
+  const bool multigrid_stop_if_diverging = false;//true;
+  const bool multigrid_use_linf = false;//true;
+  const int multigrid_min_cycles = 1;
+  const int multigrid_max_cycles = 20;
+  const Cycle multigrid_cycle0 = Cycle::Z();
+  const Cycle multigrid_cycle1 = Cycle::F();
+
+  MaxIter multigrid_mm_smooth = MaxIter(20);
+  MaxIter multigrid_mm_solve = MaxIter(100);
+  MaxIter multigrid_mm_stale = MaxIter(-1);
+  std::array<MaxIter,3> multigrid_mi = {multigrid_mm_smooth,multigrid_mm_smooth,multigrid_mm_solve};
+  std::array<MaxIter,3> multigrid_mstale = {multigrid_mm_stale,multigrid_mm_stale,multigrid_mm_stale};
+
+  ResRat multigrid_rr = ResRat(-1.);
+  ResTol multigrid_rt = ResTol(1e-7);
+
+  multigrid.stop_if_diverging(multigrid_stop_if_diverging);
+  multigrid.use_linf_error(multigrid_use_linf);
+  multigrid.min_cycles(multigrid_min_cycles);
+  multigrid.max_cycles(multigrid_max_cycles);
+
+  VOFaxisym conc(c, g, kappa, uvw, time, solver);
+  //conc.set_reconstruction_parameters(1e-5,conc.get_reconstruction_maxiter());
+  conc.set_curv_method(CurvMethod::HF());  // height function
+  conc.set_wall_curv_method(CurvMethod::none());  // height function
+
+  /*-------------------+
+  |  check if restart  |
+  +-------------------*/
+  std::fstream input;
+  int irun = 0;
+  if(boil::cart.iam()==0){
+    input.open("run.txt", std::ios::in);
+    if( !input.fail() ) {
+      input >> irun;
+      boil::oout<<"read irun.  irun= "<<irun<<"\n";
+    }
+    input.close();
+  }
+  boil::cart.sum_int(&irun);
+  if (irun==1){
+    boil::oout<<"exit job due to irun=1"<<"\n";
+    exit(0);
+  }
+
+  if(boil::cart.iam()==0){
+    std::fstream output;
+    output.open("run.txt", std::ios::out);
+    output << 1 << boil::endl;
+    output.close();
+  }
+
+  int ts=0;
+  input.open("time.txt", std::ios::in);
+  if( !input.fail() ) {
+    real t,dtf;
+    input >> ts;
+    input >> t;
+    input >> dtf;
+    uvw.  load("uvw",   ts);
+    press.load("press",   ts);
+    c. load("c", ts);
+    time.first_step(ts);
+    time.current_time(t);
+    time.set_dt(dtf);
+  } else {
+    boil::oout << "######################" << boil::endl;
+    boil::oout << "#                    #" << boil::endl;
+    boil::oout << "# START FROM SCRATCH #" << boil::endl;
+    boil::oout << "#                    #" << boil::endl;
+    boil::oout << "######################" << boil::endl;
+
+    /*--------------------+
+    |  initial condition  |
+    +--------------------*/
+
+    boil::setup_circle_xz(cold,radius,xcent,zcent);
+#ifndef INVERTED
+    for_avijk(cold,i,j,k)
+      cold[i][j][k] = 1. - cold[i][j][k];
+#endif
+
+    cold.bnd_update();
+    cold.exchange_all();
+
+    conc.color_to_vf(cold,c);
+    conc.reconstruct_geometry();
+    conc.totalvol();
+
+    Comp mm = Comp::w();
+    for_vmijk(uvw,mm,i,j,k) 
+      uvw[mm][i][j][k] = 0.0; 
+    uvw.exchange_all();
+
+    boil::plot->plot(uvw,c,press,kappa, "uvw-c-press-kappa",0);
+    conc.front_minmax();
+  }
+  input.close();
+
+  /* set iint */
+  int iint = int(time.current_time()/tint) + 1;
+  boil::oout<<"iint= "<<iint<<"\n";
+
+  /*------------+
+  |  Time loop  |
+  +------------*/
+
+  for(time.start(); time.end(); time.increase()) {
+
+    /* calculate bubble velocity */
+    real vol(0.), wv(0.);
+    Comp m = Comp::w();
+    for_vijk(c,i,j,k) {
+#ifndef INVERTED
+      real vf = 1.-c[i][j][k];
+#else
+      real vf = c[i][j][k];
+#endif
+      vf *= cold.dV(i,j,k);
+      vol += vf;
+      wv += vf*0.5*(uvw[m][i][j][k+1]+uvw[m][i][j][k]);
+    }
+    boil::cart.sum_real(&vol);
+    boil::cart.sum_real(&wv);
+    wv /= vol;
+
+    boil::oout <<"Relative-vel= "<<time.current_time()<<" "<< wv << " "<< wvel<< boil::endl;
+#ifdef MOVING_FRAME
+    wvel += underrelax*wv;
+    for_m(m) {
+      uvw.bc(m).modify( BndCnd( Dir::kmax(), BndType::inlet(), 0., 0., -wvel ) );
+    }
+    for_vmijk(uvw,m,i,j,k)
+      uvw[m][i][j][k] -= underrelax*wv; 
+    uvw.exchange_all();
+#endif
+
+    /* body force */
+    for_m(m)
+      for_avmijk(xyz,m,i,j,k)
+        xyz[m][i][j][k]=0.0;
+ 
+    for_vmijk(xyz,m,i,j,k) {
+      /* gravity */
+      xyz[m][i][j][k] = -gravity*xyz.dV(m,i,j,k)*mixed.rho(m,i,j,k);
+      /* non-inertial forces */
+#ifdef MOVING_FRAME
+      xyz[m][i][j][k] += underrelax*wv*xyz.dV(m,i,j,k)*mixed.rho(m,i,j,k)*time.dti();
+#endif
+    }
+    xyz.exchange();
+
+    conc.tension(&xyz, mixed,conc.color());
+
+    /* essential for moving boundary */
+    ns.discretize();
+    pr.discretize();
+    pr.coarsen();
+
+    ns.new_time_step();
+    ns.grad(press);
+    //ns.convection();
+    ns.solve(ResRat(1e-6));
+
+    p = 0.0;
+    if(multigrid.cycle(multigrid_cycle0,
+                       multigrid_cycle1,
+                       multigrid_rt,
+                       multigrid_rr,
+                       multigrid_mi,
+                       multigrid_mstale))
+      OMS(converged);
+
+    p.exchange();
+    ns.project(p);
+    press += p;    // p_n+1 = p_n + dp
+    press.exchange();
+
+#if 1
+    /* advance */
+    conc.advance();
+    conc.totalvol();
+    conc.front_minmax();
+    conc.color_minmax();
+#endif
+#ifdef MOVING_FRAME
+    real Re = wvel*rhol*diameter/mul;
+    boil::oout<<"wvel= "<<time.current_time()<<" "<<wvel<<" "<<Re<<" "<<wvel/whadryb<<boil::endl; 
+#else
+    real Re = wv*rhol*diameter/mul;
+    boil::oout<<"wvel= "<<time.current_time()<<" "<<wv<<" "<<Re<<" "<<wv/whadryb<<boil::endl; 
+#endif
+
+    /* dt control */
+    time.control_dt(ns.cfl_max(), cfl_limit, dt);
+
+    if((time.current_time()) / (tint) >= real(iint) ) {
+    //if(true) {
+      iint = int(time.current_time() / tint);
+      //iint++;
+      boil::plot->plot(uvw,c,press,kappa, "uvw-c-press-kappa",iint);
+
+      /* subtract gravity just for visualization
+      for_vmijk(xyz,m,i,j,k) {
+        xyz[m][i][j][k] -= -gravity*xyz.dV(m,i,j,k)*mixed.rho(m,i,j,k);
+      }
+      xyz.exchange();
+      boil::plot->plot(xyz,c,kappa, "xyz-c-kappa",iint); */
+      iint = int(time.current_time()/tint) + 1;
+    }
+
+    if((time.current_step()) % (nint)==0 ) {
+      uvw  .save("uvw",   time.current_step());
+      press.save("press", time.current_step());
+      c .save("c",  time.current_step());
+      if( boil::cart.iam()==0) {
+        std::fstream output;
+        std::stringstream ss;
+        ss <<"time-"<<time.current_step()<<".txt";
+        std::string fname = ss.str();
+        int len = fname.length();
+        char * cfname = new char[len+1];
+        memcpy(cfname, fname.c_str(), len+1);
+        output << std::setprecision(16);
+        output.open(cfname, std::ios::out);
+        output << time.current_step() << "\n";
+        output << time.current_time()+time.dt() << "\n";
+        output << time.dt() << "\n";
+        output.close();
+      }
+    }
+    if( boil::timer.current_min() > wmin-12.0
+      || time.current_step()==time.total_steps()) {
+      uvw  .save("uvw",   time.current_step());
+      press.save("press", time.current_step());
+      c .save("c",  time.current_step());
+      std::fstream output;
+      output.open("time.txt", std::ios::out);
+      output << time.current_step() << boil::endl;
+      output << time.current_time()+time.dt() << boil::endl;
+      output << time.dt() << boil::endl;
+      output.close();
+      output.open("run.txt", std::ios::out);
+      output << 0 << boil::endl;
+      output.close();
+      boil::timer.stop();
+      boil::timer.report();
+      uvw  .rm("uvw", ts);
+      press.rm("press", ts);
+      c .rm("c", ts);
+      exit(0);
+    }
+
+    /*---------+
+    |  exit ?  |
+    +---------*/
+    if(conc.topo->get_zmaxft()>=(LZ-diameter)*0.95){
+       std::cout<<"Bubble reaches to the top boundary. Exit."<<boil::endl;
+       break;//exit(0);
+    }
+  }
+  boil::oout << "Finished." << boil::endl;
+
+  boil::timer.stop();
+  boil::timer.report();
+
+}
