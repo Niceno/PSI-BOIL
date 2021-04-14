@@ -19,10 +19,13 @@ void VOF::ev_flagging(const Scalar & scp, const ScalarInt & iflag,
   otpflag = -1000;
 
   for_aijk(i,j,k) {
-    if(  abs(iflag[i][j][k])==1 /* cells at the interface */
-       ||iflag[i][j][k]==-3*sig) /* bulk gas cell */
+    if(iflag[i][j][k]==-1000)
+      continue;
+    if(abs(iflag[i][j][k])==1) /* cells at the interface */
       otpflag[i][j][k] = iflag[i][j][k]*sig;
-    if(iflag[i][j][k]==3*sig) /* bulk liquid cell */
+    if(iflag[i][j][k]*sig<=-3) /* bulk gas cell */
+      otpflag[i][j][k] = -3;
+    if(iflag[i][j][k]*sig>=3) /* bulk liquid cell */
       otpflag[i][j][k] = 4;
   }
 
