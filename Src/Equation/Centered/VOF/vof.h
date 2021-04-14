@@ -416,6 +416,7 @@ class VOF : public Centered {
 
     int niter_pressure_extrap;
     int Nfilm_crit;
+    const int nlayer=5;
     real cangle;
     real mult_wall;
 };	
