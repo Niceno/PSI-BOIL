@@ -16,8 +16,6 @@ void VOFaxisym::curv_HF() {
 *
 *     modification: adapted for a 2D axisymmetric grid
 *
-*     in this method, normal vector and bnd values of color are destroyed!
-*
 *     output: kappa
 *******************************************************************************/
 
@@ -293,14 +291,9 @@ void VOFaxisym::curv_HF() {
   tempflag.exchange();
 
   /* near-wall calculations */
-  if       (wall_curv_method==CurvMethod::DivNorm()) {
-    boil::oout<<"VOFaxisym::curv_HF: Obsolete, underdeveloped code. Exiting."
-              <<boil::endl;
-    exit(0);
-    //bdcurv();
-  } else if(wall_curv_method==CurvMethod::HFmixedXZ()) {
+  /* if(wall_curv_method==CurvMethod::HFmixedXZ()) {
     insert_bc_curv_HFmixed(clr,Comp::i(),Comp::k(),Sign::neg());
-  } else if(wall_curv_method==CurvMethod::HFparallelXZ()) {
+  } else */ if(wall_curv_method==CurvMethod::HFparallelXZ()) {
     insert_bc_curv_HFparallel(clr,Comp::i(),Comp::k(),Sign::neg());
   } else if(wall_curv_method==CurvMethod::HFnormalXZ()) {
     insert_bc_curv_HFnormal(clr,Comp::i(),Comp::k(),Sign::neg());

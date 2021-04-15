@@ -3,6 +3,8 @@
 
 #include "../nucleation.h"
 
+#define USE_VOF
+
 ////////////////////////
 //                    //
 //  Microlayer model  //
@@ -22,12 +24,27 @@ class Microlayer : public Nucleation {
                 const Sign sig = Sign::pos() );
     ~Microlayer() {};
 
-    virtual void init() { dmicro = boil::unreal; }
+    virtual void init() { 
+      dmicro = boil::unreal;
+      upkeep_after_seeding();
+    }
 
     void update(real & smdot_micro,
                 real & smdot_pos_macro_overwrite,
                 real & smdot_neg_macro_overwrite);
-    virtual void upkeep_after_seeding();
+    virtual void upkeep_after_seeding() { 
+      upkeep_after_advance();
+    }
+
+    void upkeep_after_advance() {
+#ifdef USE_VOF
+      upkeep_after_advance_vof();
+#else
+      upkeep_after_advance_cip();
+#endif
+    }
+
+    void hide_vf();
 
     inline void set_slope(real r){ slope=r;
            boil::oout<<"Microlayer:slope is modified to "<<r<<"\n";};
@@ -64,19 +81,22 @@ class Microlayer : public Nucleation {
     void update_at_walls(Scalar & clr, Vector & fs);
 
   protected:
-    void area_effect();
+#ifdef USE_VOF
+    void upkeep_after_advance_vof();
+#else
+    void upkeep_after_advance_cip();
     void store_dSprev();
+    Scalar dSprev;
+    bool str_dSprev;
+#endif
 
     Scalar dmicro;
-    Scalar dSprev;
     Scalar * mdot, * tprs;
 
     real hresis;
     real slope, exp_slope;
     real rmax;
     real dmicro_min, dmicro_max;
-    
-    bool str_dSprev;
 
     real * hflux_micro;
     real * area_sum, * area_l, * area_v;

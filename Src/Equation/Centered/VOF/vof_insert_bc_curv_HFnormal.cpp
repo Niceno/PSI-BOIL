@@ -5,8 +5,8 @@
 /******************************************************************************/
 void VOF::insert_bc_curv_HFnormal(const Scalar & scp, 
                                   const Comp ctangential, const Comp cnormal,
-                                  const Sign sig,
-                                  const Range<int> ridx) {
+                                  const Sign sig) {
+                                  //const Range<int> ridx) {
 /***************************************************************************//**
 *  \brief Calculate curvature using hybrid height-function/divergence-of-normal
 *         approach in 2D geometry.
@@ -31,16 +31,18 @@ void VOF::insert_bc_curv_HFnormal(const Scalar & scp,
   assert(cnormal==Comp::k());
   assert(sig==Sign::neg());
 
+#if 0
   bool ranged(false);
   if(ridx.exists()) {
     ranged = true;
   }
+#endif
 
   real hm,hc,hp;
   real max_n; /* normal vector must be of good quality!!! */
   real mult;
   for_i(i) {
-    if(!ranged||ridx.contains(scp.domain()->global_I(i)-boil::BW+1)) {
+    if(true) {//!ranged||ridx.contains(scp.domain()->global_I(i)-boil::BW+1)) {
      for_jk(j,k) {
        if(dom->ibody().on(i,j,k)) {
          if(dom->ibody().off(i,j,k-1) || (k==sk() && bflag_struct.kminw)) {
@@ -88,11 +90,12 @@ void VOF::insert_bc_curv_HFnormal(const Scalar & scp,
              if(hp<tol_wall*dz0)
                hp = 0.;
 
+             real cangval = cangle(i,j,k);
              kappa[i][j][k] = wall_curv_HFnormal_kernel(scp.xc(i),
                                                         hm,hc,hp,
                                                         scp.dxw(i),
                                                         scp.dxc(i),scp.dxe(i),
-                                                        mult, cangle);
+                                                        mult, cangval);
 
              //boil::oout<<i<<" "<<j<<" "<<k<<" | "<<hm/dz0<<" "<<hc/dz0<<" "<<hp/dz0
              //          <<" | "<<mult<<" "<<max_n<<" "<<kappa[i][j][k]<<boil::endl;
@@ -246,6 +249,7 @@ void VOF::insert_bc_curv_HFnormal(const Scalar & scp,
             }
 #endif
  
+          real cangval = cangle(i,j,k);
           kappa[i][j][k] = wall_curv_HFnormal_kernel(heights,
                                                      distances,
                                                      { scp.dxw(i),
@@ -255,7 +259,7 @@ void VOF::insert_bc_curv_HFnormal(const Scalar & scp,
                                                        scp.dyc(j),
                                                        scp.dyn(j) },
                                                      bflag_struct.ifull, bflag_struct.jfull,
-                                                     mult, max_n, cangle);
+                                                     mult, max_n, cangval);
 
         } else {
           tempflag[i][j][k] = 0;

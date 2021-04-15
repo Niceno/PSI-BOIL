@@ -61,7 +61,7 @@ namespace boil {
   *******************************************************************************/
 
     bool ranged(false);
-    if(RX.exists()) {
+    if(RZ.exists()) {
       ranged = true;
     }
 

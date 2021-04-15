@@ -1,5 +1,4 @@
 #include "vof.h"
-#include <iomanip>
 
 void VOF::tension(Vector * vec, const Matter & matt) {
   tension(vec,matt,phi);

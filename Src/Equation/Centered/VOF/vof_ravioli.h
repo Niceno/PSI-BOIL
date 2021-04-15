@@ -53,12 +53,11 @@ class CurvMethod {
 
     static const CurvMethod undefined() {return CurvMethod(-1);}
     static const CurvMethod none()      {return CurvMethod( 0);}
-    static const CurvMethod DivNorm()   {return CurvMethod( 1);}
     static const CurvMethod HF()        {return CurvMethod( 2);}
     /* 2D methods, X = wall tangent, Z = wall normal dir */
     static const CurvMethod HFparallelXZ() {return CurvMethod( 3);}
     static const CurvMethod HFnormalXZ()   {return CurvMethod( 4);}
-    static const CurvMethod HFmixedXZ()    {return CurvMethod( 5);}
+    //static const CurvMethod HFmixedXZ()    {return CurvMethod( 5);}
     /* 3D methods, Z = wall normal dir */
     static const CurvMethod HFnormalZ()    {return CurvMethod( 6);}
 
@@ -67,11 +66,10 @@ class CurvMethod {
       switch(com.val) {
         case(-1): ost << "undefined"; break;
         case( 0): ost << "none"; break;
-        case( 1): ost << "DivNorm"; break;
         case( 2): ost << "HF"; break;
         case( 3): ost << "HFparallelXZ"; break;
         case( 4): ost << "HFnormalXZ"; break;
-        case( 5): ost << "HFmixedXZ"; break;
+        //case( 5): ost << "HFmixedXZ"; break;
         case( 6): ost << "HFnormalZ"; break;
       }
 
@@ -142,12 +140,12 @@ class DetachmentModel {
       etacurr(boil::unreal)
     {}
 
-    DetachmentModel(const real cangle) : 
+    DetachmentModel(const real cgl) : 
       init(true),
       detach(false),
       etacurr(boil::unreal)
     { 
-      set_detachment_params(cangle);
+      set_detachment_params(cgl);
     }
 
     inline bool initialized() const {
@@ -174,10 +172,10 @@ class DetachmentModel {
       return;
     }
 
-    void set_detachment_params(const real cangle) {
+    void set_detachment_params(const real cgl) {
       init = true;
-      cangleval = cangle;
-      real cval = std::max(boil::atto,std::min(cangle,90.));
+      cangleval = cgl;
+      real cval = std::max(boil::atto,std::min(cgl,90.));
       /* dimensionless detachment height */
       etacrit = 0.5*cos(cval*boil::pi/180.)/sin(cval*boil::pi/180.);
 

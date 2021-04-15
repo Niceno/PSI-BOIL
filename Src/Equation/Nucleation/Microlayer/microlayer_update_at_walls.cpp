@@ -55,6 +55,8 @@ void Microlayer::update_at_walls(Scalar & clr, Vector & fs) {
             || !boil::realistic(scpscp)) {          // full vapor
           } else {
             clr[i][j][k] = 1.0;
+            //(*vf)[ii][jj][kk] = scpscp/(2.*cht->distance_face(Sign::neg(),mcomp,ii,jj,kk));
+            //(*cht->topo->clr)[ii][jj][kk] = scpscp/(2.*cht->distance_face(Sign::neg(),mcomp,ii,jj,kk));
             if(mcomp==Comp::i()) {
               real & fsval = fs[mcomp][i+of][j][k];
               real refpos = dmicro.xn(i+of);
@@ -150,6 +152,10 @@ void Microlayer::update_at_walls(Scalar & clr, Vector & fs) {
         real sval = 1.0 - scpscp/dmicro.dzc(k); //1.1*tol_wall;
         fsval = dmicro.zn(k) + sval*dmicro.dzc(k);
       }
+
+      //(*vf)[i][j][k] = scpscp/(2.*cht->distance_face(Sign::neg(),mcomp,i,j,k));
+      //(*cht->topo->clr)[i][j][k] = scpscp/(2.*cht->distance_face(Sign::neg(),mcomp,i,j,k));
+
     } /* microlayer real */
   } /* cc */
 

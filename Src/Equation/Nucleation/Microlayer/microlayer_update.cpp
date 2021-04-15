@@ -14,8 +14,15 @@ void Microlayer::update(real & smdot_micro,
 
   const real dt = time->dt();
 
+#ifndef USE_VOF
   /* reset heat sink */
-  //*tprs = 0.0;
+  *tprs = 0.0;
+
+  /* store area of vapor to dSprev, if not stored */
+  if (!str_dSprev) {
+    store_dSprev();
+  }
+#endif
 
   /* initialize sum variables */
   smdot_micro = 0.0;
@@ -27,16 +34,6 @@ void Microlayer::update(real & smdot_micro,
     area_v[i]=0.0;
     hflux_micro[i]=0.0;
   }
-
-  /* store area of vapor to dSprev, if not stored */
-  if (!str_dSprev) {
-    store_dSprev();
-  }
-
-  /*---------------------+/
-  |  intermediate dmicro  |
-  +----------------------*/
-  area_effect();
 
   /*---------------------------------+
   |  calculate mdot on wall boundary |
@@ -105,9 +102,13 @@ void Microlayer::update(real & smdot_micro,
           area_l[ndir] += area - area_vap;
           area_v[ndir] += area_vap;
 
+#ifdef USE_VOF
           if(in_vapor(ii,jj,kk)) {
+#else
+          if(area_vap>0.) {
+#endif
  
-            /* micro region model */
+            /* micro layer model */
             if(!boil::realistic(dmicro[ii][jj][kk])) {
               dmicro[ii][jj][kk] = d0(ii,jj,kk);
             }
@@ -215,8 +216,18 @@ void Microlayer::update(real & smdot_micro,
     int jj=j+jof;
     int kk=k+kof;
 
-    if (area_vap == 0.0) {
-    } else {//if ( approx (area_vap, area, area*boil::micro)) 
+#ifdef USE_VOF
+    if(!in_vapor(i,j,k)) {
+#else
+    if(area_vap == 0.0) {
+#endif
+    } else {
+#ifndef USE_VOF
+      /* here, the area of the microlayer is not considered!!! 
+       * this would require correction */
+      exit(0);
+      //if ( approx (area_vap, area, area*boil::micro)) 
+#endif
 
       if ( dmicro[i][j][k] <= dmicro_min*(1.+boil::pico) // depleted
         || !boil::realistic(dmicro[i][j][k])) {          // full vapor
@@ -243,12 +254,19 @@ void Microlayer::update(real & smdot_micro,
         }
 
         /* overwrite mdot */
+#ifdef USE_VOF
+        real mdot_micro = - rhol * (dmicro_new - dmicro[i][j][k])
+                          / dt * area / vol;
+        (*mdot)[i][j][k] = mdot_micro;
+#else
         real mdot_micro = - rhol * (dmicro_new - dmicro[i][j][k])
                           / dt * area_vap / vol;
         (*mdot)[i][j][k] += mdot_micro;
+#endif
         smdot_micro += mdot_micro*vol;
 
-#if 0 /* removed due to update-at-walls */
+#ifndef USE_VOF
+        /* removed due to update-at-walls */
         /* enthalpy clean-up: sink due to microlayer */
         (*tprs)[i+iof][j+jof][k+kof] += -vol*mdot_micro*latent;
         if(in_vapor(i,j,k)) {
@@ -263,13 +281,13 @@ void Microlayer::update(real & smdot_micro,
         dmicro[i][j][k]=dmicro_new;
 
         /* heat flux */
-        // it doesn't take into account max(dmicro_new, dmicro_min)
+        /* it doesn't take into account max(dmicro_new, dmicro_min) */
         hflux_micro[ndir] += qtmp*area_vap;
-        // it does take into account max(dmicro_new, dmicro_min)
+        /* it does take into account max(dmicro_new, dmicro_min) */
         //hflux_micro[ndir] += (*mdot)[i][j][k] * vol * latent;
 
       } /* not zero microlayer thickness */
-    } /* area vapor non-zero */
+    } /* microlayer possible */
 
   } /* ibody cells */
 
@@ -301,8 +319,10 @@ void Microlayer::update(real & smdot_micro,
   exit(0);
 #endif
 
+#ifndef USE_VOF
   /* store area of vapor to dSprev */
   store_dSprev();
+#endif
 
   return;
 }

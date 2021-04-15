@@ -14,8 +14,8 @@ Microlayer::Microlayer( Scalar & DM,
                         Scalar * qsrc,
                         const Sign sig ) :
   Nucleation(CHT,heavi,t,rs,qsrc,sig),
-  dmicro(&DM),
-  dSprev(*DM.domain())
+  dmicro(&DM)//,
+  //dSprev(*DM.domain())
 {
 
   mdot = MDOT;
@@ -24,7 +24,7 @@ Microlayer::Microlayer( Scalar & DM,
   dmicro_min = dmin;
   dmicro_max = dmax;
 
-  dSprev = dmicro.shape();
+  //dSprev = dmicro.shape();
   
   slope = 4.46e-3;  // Utaka's coefficient for water
   exp_slope = 1.0;
@@ -33,7 +33,7 @@ Microlayer::Microlayer( Scalar & DM,
   hresis = TIF::calculate_heat_transfer_resistance(cht->tifmodel.tref(), 
                                                    rhov,mmass,latent,1.);
 
-  str_dSprev = false;
+  //str_dSprev = false;
 
   alloc1d ( & hflux_micro, 7);
   alloc1d ( & area_sum, 7);

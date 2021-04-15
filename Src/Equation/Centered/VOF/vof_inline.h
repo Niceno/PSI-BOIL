@@ -1,3 +1,32 @@
+/***************************************************************************//**
+ * cangle
+*******************************************************************************/
+inline real cangle(const int i, const int j, const int k) const {
+  if(!cangle_variable)
+    return cangle0;
+  else
+    return cangle_func(i,j,k)/180.0*boil::pi;
+}
+
+/* getter for cangle */
+inline real get_cangle() const { return(cangle0/boil::pi*180.0);};
+
+/* setter for cangle */
+inline void set_cangle(const real r) {
+  cangle_variable = false;
+  cangle0=r/180.0*boil::pi;
+  boil::oout<<"VOF::set_cangle: cangle= "<<r<<"\n";
+}
+
+inline void set_cangle(const boil::func_ijk_real & f) {
+  cangle_variable = true;
+  cangle_func = f;
+  boil::oout<<"VOF::cangle set variable"<<"\n";
+}
+
+/***************************************************************************//**
+ *  other
+*******************************************************************************/
 /* getter and setter for wall value tolerance */
 inline real get_tol_wall() const { return tol_wall; }
 inline void set_tol_wall(real tolnew) {
@@ -10,14 +39,10 @@ inline void set_tol_wall(real tolnew) {
 inline CurvMethod get_curv_method() const {return bulk_curv_method;}
 void set_curv_method(const CurvMethod cm) {
   bulk_curv_method=cm;
-  if(cm==CurvMethod::HF()){
+  if(cm==CurvMethod::HF()) {
     boil::oout<<"VOF: height function is used for curvature calculation.\n";
-  } else if(cm==CurvMethod::DivNorm()){
-    boil::oout<<"VOF: smoothed VOF is used for curvature calculation.\n";
-    boil::oout<<"Obsolete! Exiting."<<boil::endl;
-    exit(0);
   } else {
-    boil::oout<<"Curv method should be HF or DivNorm.\n";
+    boil::oout<<"Curv method should be HF.\n";
     boil::oout<<"Exiting."<<boil::endl;
     exit(0);
   }
@@ -30,14 +55,6 @@ void set_advection_method(const AdvectionMethod am) {
   if(!boil::cart.iam())
     boil::oout<<"VOF:::advection method: "<<am<<boil::endl;
 }
-
-/* setter for cangle */
-inline void set_cangle(const real r) {
-  cangle=r/180.0*boil::pi;
-  boil::oout<<"set_cangle: cangle= "<<r<<"\n";
-}
-/* getter for cangle */
-inline real get_cangle() const { return(cangle/boil::pi*180.0);};
 
 /* setter for limit_color */
 inline void set_limit_color(const bool b) {
@@ -126,12 +143,12 @@ inline NormMethod get_normal_vector_method_curvature() const {
 /* setter for near-wall curvature method */
 void set_wall_curv_method(const CurvMethod wcm,
                           const Sign sig = Sign::undefined(),
-                          const real cangle = -1.,
+                          const real cgl = -1.,
                           const int nfilm_crit = -1) {
   wall_curv_method = wcm;
   if(!boil::cart.iam())
     boil::oout<<"Wall curvature method: "<<wcm<<boil::endl;
-  if(wcm==CurvMethod::HFparallelXZ()||wcm==CurvMethod::HFmixedXZ()) {
+  if(wcm==CurvMethod::HFparallelXZ()) {//||wcm==CurvMethod::HFmixedXZ()) {
     if       (sig==Sign::pos()) {
       mult_wall =  1;
     } else if(sig==Sign::neg()) {
@@ -152,22 +169,24 @@ void set_wall_curv_method(const CurvMethod wcm,
       }
     }
   }
+#if 0
   if(wcm==CurvMethod::HFmixedXZ()) {
     if       (nfilm_crit>0) {
       Nfilm_crit = nfilm_crit;
-    } else if(cangle>0.) {
+    } else if(cgl>0.) {
       /* estimate */
-      real cangrad = cangle*boil::pi/180.;
+      real cangrad = cgl*boil::pi/180.;
       Nfilm_crit = std::max(4,abs(int(cos(cangrad)/sin(cangrad))));
       boil::oout<<"Wall critical film length: "<<Nfilm_crit<<boil::endl;
     } else {
       Nfilm_crit = boil::unint;
     }
   }
+#endif
 
   if(wcm==CurvMethod::HFparallelXZ()) {
-    if(cangle>0.) {
-      detachment_model.set_detachment_params(cangle);
+    if(cgl>0.) {
+      detachment_model.set_detachment_params(cgl);
     }
   }
   return;

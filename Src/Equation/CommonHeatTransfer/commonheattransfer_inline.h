@@ -146,8 +146,7 @@ inline void set_dirac_wall_source(const real a) {
   boil::oout<<"CommonHeatTransfer::dirac_wall_source= "
             <<dirac_wall_source_val<<"\n";
 }
-inline void set_dirac_wall_source(
-    std::function<real(const int, const int, const int)> f) {
+inline void set_dirac_wall_source(const boil::func_ijk_real & f) {
   dirac_wall_source_variable = true;
   dirac_wall_source_func = f;
   boil::oout<<"CommonHeatTransfer::dirac_wall_source set variable"

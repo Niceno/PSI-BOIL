@@ -37,7 +37,7 @@ VOF::VOF(const Scalar & PHI,
   norm_method_curvature(NormMethod::Young()),
   mcomp_for_elvira(Comp::undefined()), /* undefined for 3D */
   bulk_curv_method(CurvMethod::HF()),
-  wall_curv_method(CurvMethod::DivNorm()),
+  wall_curv_method(CurvMethod::none()),
   subgrid_method(SubgridMethod::PLIC()),
   advect_method(AdvectionMethod::BoundedSplit()),
   hf_set(),
@@ -158,13 +158,14 @@ VOF::VOF(const Scalar & PHI,
 
   epsnorm=1.0e-12;
   tol_wall = 0.01; /* tolerance 0.99 \approx 1.0 near walls */
-  cangle=90.0/180.0*boil::pi;
+  cangle0=90.0/180.0*boil::pi;
   mult_wall = 1.;
   Nfilm_crit = boil::unint;
   limit_color=false;
   use_interp=false;
   store_pressure_extrap=false;
   niter_pressure_extrap=1000;
+  cangle_variable = false;
 
   /* labelling of advection directions */
   label_adv = {0,1,2,3,4,5};

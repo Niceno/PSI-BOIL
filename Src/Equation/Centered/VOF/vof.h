@@ -7,6 +7,7 @@
 #include "../../Heaviside/MarchingCubes/marching_cubes.h"
 #include "../../Topology/topology.h"
 #include "../../../Global/global_realistic.h"
+#include "../../../Global/global_func.h"
 #include "../../../Parallel/communicator.h"
 #include "../../../Ravioli/restol.h"
 
@@ -187,20 +188,20 @@ class VOF : public Centered {
                    const int i, const int j, const int k);
     bool Interface(const int i, const int j, const int k);
 
-    void insert_bc_curv_divnorm();
-
     /* 2D-variants */
     void insert_bc_curv_HFnormal(const Scalar & scp,
                                  const Comp ctangential, const Comp cnormal,
-                                 const Sign sig, 
-                                 const Range<int> ridx = Range<int>(-1,-2)); 
+                                 const Sign sig);
+                                // const Range<int> ridx = Range<int>(-1,-2)); 
     void insert_bc_curv_HFparallel(const Scalar & scp,
                                    const Comp ctangential, const Comp cnormal,
-                                   const Sign sig,
-                                   const Range<int> ridx = Range<int>(-1,-2)); 
+                                   const Sign sig);
+                                   //const Range<int> ridx = Range<int>(-1,-2)); 
+#if 0
     void insert_bc_curv_HFmixed(const Scalar & scp,
                                 const Comp ctangential, const Comp cnormal,
                                 const Sign sig);
+#endif
 
     virtual real wall_curv_HFnormal_kernel(const real x0, const real hm,
                                            const real hc, const real hp,
@@ -305,10 +306,6 @@ class VOF : public Centered {
     void normalize_l1(real & nx_l1, real & ny_l1, real & nz_l1,
                       const real nx, const real ny, const real nz);
 
-    void nwall(const Scalar & g
-             , const real & r1, const real & r2, const real & r3
-             , const int & i1, const int & i2, const int &i3
-             , real r[] );
     void smooth(Scalar & sca, const int itnum);
     void true_norm_vect(const Scalar & nx,
                         const Scalar & ny,
@@ -316,7 +313,6 @@ class VOF : public Centered {
                         Scalar & mx, Scalar & my, Scalar & mz);
 
     void update_at_walls(Scalar & scp);
-    void wall_norm(const Scalar & sca);
     real kappa_ave(const real r1, const real r2);
     real kappa_ave(const real r1, const real r2, const int i1, const int i2);
 
@@ -411,13 +407,17 @@ class VOF : public Centered {
     AdvectionMethod advect_method;
     HFset hf_set;
 
+    boil::func_ijk_real cangle_func;
+
     /* labels for advection rotation */
     std::array<int,6> label_adv;
 
     int niter_pressure_extrap;
     int Nfilm_crit;
-    real cangle;
+    real cangle0;
     real mult_wall;
+
+    bool cangle_variable;
 };	
 #endif
 

@@ -33,10 +33,7 @@ libVof_a_SOURCES =      vof.h                              \
                         vof_fs3.cpp                        \
                         vof_fs_bnd_symmetry.cpp            \
                         vof_gradphi.cpp                    \
-                        vof_ib_norm.cpp                    \
-                        vof_insert_bc_curv_divnorm.cpp     \
                         vof_insert_bc_curv_HFnormal.cpp    \
-                        vof_insert_bc_curv_HFmixed.cpp     \
                         vof_insert_bc_curv_HFparallel.cpp  \
                         vof_insert_bc_gradphi.cpp          \
                         vof_interfacial_flagging.cpp       \
@@ -60,7 +57,6 @@ libVof_a_SOURCES =      vof.h                              \
                         vof_update_at_walls.cpp            \
                         vof_vf_limiter.cpp                 \
                         vof_wall_curv_HFnormal_kernel.cpp  \
-                        vof_wall_curv_HFparallel_kernel.cpp\
-                        vof_wall_norm.cpp
+                        vof_wall_curv_HFparallel_kernel.cpp
                 
 INCLUDE = -I@top_srcdir@/

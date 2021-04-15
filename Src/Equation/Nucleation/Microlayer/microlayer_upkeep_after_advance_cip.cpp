@@ -1,7 +1,7 @@
 #include "microlayer.h"
 
 /******************************************************************************/
-void Microlayer::area_effect() {
+void Microlayer::microlayer_upkeep_after_advance_cip() {
 /***************************************************************************//**
 *  \brief update microlayer thickness due to effect of bubble area change
 *******************************************************************************/
@@ -65,6 +65,8 @@ void Microlayer::area_effect() {
       /* initialize */
       if(!boil::realistic(dmicro[i][j][k])) {
         dmicro[i][j][k] = d0(i,j,k);
+        (*vf)[i][j][k] = dmicro[i][j][k]/(2.*cht->distance_face(sig,mcomp,i,j,k));
+        (*cht->topo->clr)[i][j][k] = dmicro[i][j][k]/(2.*cht->distance_face(sig,mcomp,i,j,k));
       }
 
       real area = dmicro.dSz(sig,i,j,k);
@@ -90,6 +92,7 @@ void Microlayer::area_effect() {
           dmicro[i][j][k] = std::max(d_new, dmicro_min);
         }
       }
+
     } else {
       dmicro[i][j][k] = boil::unreal;
     }/* area vapor ? 0.0 */

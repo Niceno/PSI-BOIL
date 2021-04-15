@@ -31,7 +31,7 @@ real VOFaxisym::wall_curv_HFparallel_kernel(const real hc, const real hp,
   return (nzp-nzm)/dc + 0.5*(nxp+nxm)/hc;
 #else
   real dm = dc;
-  real hm = hc + dm*mult*cos(cangle)/sin(cangle);
+  real hm = hc + dm*mult*cos(cang)/sin(cang);
   real h_1c = (hp-hm)/(dm+dp);
   real h_1u = (hp-hc)/dp;
   real h_1d = (hc-hm)/dm;

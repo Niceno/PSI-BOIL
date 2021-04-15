@@ -5,14 +5,12 @@
 /******************************************************************************/
 void VOF::curv_HF() {
 /***************************************************************************//**
-*  \brief Calculate curvature using height function in 2D axisymmetric.
+*  \brief Calculate curvature using height function in 3D cartesian.
 *     majorext x minorext x minorext stencil
 *     J.Lopez et al., Comput. Methods Appl. Mech. Engrg. 198 (2009) 2555-2564
 *
 *     modification: selection of cells where curvature is calculated is 
 *                   modified from Lopez et al.
-*
-*     in this method, normal vector and bnd values of color are destroyed!
 *
 *     output: kappa
 *******************************************************************************/
@@ -400,11 +398,9 @@ void VOF::curv_HF() {
   tempflag.exchange();
 
   /* near-wall calculations */
-  if       (wall_curv_method==CurvMethod::DivNorm()) {
-    insert_bc_curv_divnorm();
-  } else if(wall_curv_method==CurvMethod::HFmixedXZ()) {
+  /* if(wall_curv_method==CurvMethod::HFmixedXZ()) {
     insert_bc_curv_HFmixed(phi,Comp::i(),Comp::k(),Sign::neg());
-  } else if(wall_curv_method==CurvMethod::HFparallelXZ()) {
+  } else */ if(wall_curv_method==CurvMethod::HFparallelXZ()) {
     insert_bc_curv_HFparallel(phi,Comp::i(),Comp::k(),Sign::neg());
   } else if(wall_curv_method==CurvMethod::HFnormalXZ()) {
     insert_bc_curv_HFnormal(phi,Comp::i(),Comp::k(),Sign::neg());

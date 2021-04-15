@@ -1,7 +1,7 @@
 #ifndef CHTT_H
 #define CHTT_H
 
-#include <functional>
+#include "../../Global/global_func.h"
 #include "../Topology/topology.h"
 #include "../Tifmodel/tif.h"
 
@@ -138,7 +138,7 @@ class CommonHeatTransfer {
     Matter * flu;
     Matter * sol;
 
-    std::function<real(const int,const int,const int)> dirac_wall_source_func;
+    boil::func_ijk_real dirac_wall_source_func;
 
     real val_rhov,val_rhol,val_cpv,val_cpl,val_lambdav,val_lambdal;
     real turbP; /* turbulent Prandtl number */
