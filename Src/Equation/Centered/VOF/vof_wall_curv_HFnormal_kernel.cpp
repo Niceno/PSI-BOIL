@@ -78,30 +78,18 @@ real VOF::wall_curv_HFnormal_kernel(arr2D & heights,
 *     output: kappa
 *******************************************************************************/
 #if 1  
-  real & hmm = heights[0][0];
-  real & hmc = heights[0][1];
-  real & hmp = heights[0][2];
-  real & hcm = heights[1][0];
-  real & hcc = heights[1][1];
-  real & hcp = heights[1][2];
-  real & hpm = heights[2][0];
-  real & hpc = heights[2][1];
-  real & hpp = heights[2][2];
-
   for(int ii(-hf_set.nof); ii<=hf_set.nof; ++ii)
     for(int jj(-hf_set.nof); jj<=hf_set.nof; ++jj)
       if(heights[ii+hf_set.nof][jj+hf_set.nof]<=0.)
-        heights[ii+hf_set.nof][jj+hf_set.nof] = 
-          hcc - distances[ii+hf_set.nof][jj+hf_set.nof]*tan(mult*cang);
+        heights[ii+hf_set.nof][jj+hf_set.nof] = heights[hf_set.nof][hf_set.nof]
+          - distances[ii+hf_set.nof][jj+hf_set.nof]*tan(mult*cang);
 
   /* droplets have positive curvature */
-  return calculate_curvature_HF(hmm, hmc, hmp,
-                                hcm, hcc, hcp,
-                                hpm, hpc, hpp,
+  return calculate_curvature_HF(heights,
                                 dx[0], dx[1], dx[2],
                                 dy[0], dy[1], dy[2],
                                 truedir1, truedir2,
-                                mult, max_n); 
+                                mult, max_n,-1.); 
 #else
 
 #endif

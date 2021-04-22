@@ -1,4 +1,5 @@
 #include "nucleation.h"
+#include "header.h"
 
 /***************************************************************************//**
 *  plant nucleation site
@@ -69,6 +70,7 @@ void Nucleation::replant () {
       //std::cout<<"replant: Pattern2 "<<boil::cart.iam()<<"\n";
     }
 
+#ifndef USE_VOF
     /*---------------------------------------+ 
     |  continue replant during seed_period   |
     +---------------------------------------*/
@@ -77,6 +79,7 @@ void Nucleation::replant () {
       sites[ns].set_req_replant( true );
       //std::cout<<"replant: Pattern2 "<<boil::cart.iam()<<"\n";
     }
+#endif
 
     sites[ns].set_seed(bseed);
     //sites[ns].set_seed_prev(bseed);

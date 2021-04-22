@@ -23,3 +23,23 @@ bool Nucleation::in_vapor(const real c) const {
     return cht->topo->above_interface(c);
   }
 }
+
+/******************************************************************************/
+bool Nucleation::below_threshold(const real c) const {
+/***************************************************************************//**
+*  \brief test if c below the threshold
+*******************************************************************************/
+  if(matter_sig==Sign::pos()) {
+    return c<threshold_c;
+  } else {
+    return c>threshold_c;
+  }
+}
+
+/******************************************************************************/
+bool Nucleation::below_threshold(const int i, const int j, const int k) const {
+/***************************************************************************//**
+*  \brief test if color below threshold
+*******************************************************************************/
+  return below_threshold((*clr)[i][j][k]);
+}

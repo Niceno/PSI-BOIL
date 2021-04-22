@@ -1,5 +1,6 @@
 noinst_LIBRARIES = libNucleation.a
-libNucleation_a_SOURCES = site.h                           \
+libNucleation_a_SOURCES = header.h                         \
+                          site.h                           \
                           site.cpp                         \
                           nucleation.h                     \
                           nucleation.cpp                   \
@@ -7,7 +8,6 @@ libNucleation_a_SOURCES = site.h                           \
                           nucleation_area_vapor.cpp        \
                           nucleation_area_vapor_sum.cpp    \
                           nucleation_clr_site.cpp          \
-                          nucleation_cutneck.cpp           \
                           nucleation_distance_from_site.cpp\
                           nucleation_in_vapor.cpp          \
                           nucleation_load.cpp              \

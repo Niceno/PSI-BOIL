@@ -1,4 +1,5 @@
 #include "microlayer.h"
+#include "../header.h"
 
 /******************************************************************************/
 void Microlayer::update(real & smdot_micro,
@@ -103,7 +104,8 @@ void Microlayer::update(real & smdot_micro,
           area_v[ndir] += area_vap;
 
 #ifdef USE_VOF
-          if(in_vapor(ii,jj,kk)) {
+          //if(in_vapor(ii,jj,kk)) {
+          if(below_threshold(ii,jj,kk)) {
 #else
           if(area_vap>0.) {
 #endif
@@ -217,7 +219,8 @@ void Microlayer::update(real & smdot_micro,
     int kk=k+kof;
 
 #ifdef USE_VOF
-    if(!in_vapor(i,j,k)) {
+    //if(!in_vapor(i,j,k)) {
+    if(!below_threshold(i,j,k)) {
 #else
     if(area_vap == 0.0) {
 #endif

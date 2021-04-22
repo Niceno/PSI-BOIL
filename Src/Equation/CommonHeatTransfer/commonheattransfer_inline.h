@@ -35,8 +35,12 @@ inline real int_resistance_vap(const int i, const int j, const int k) const {
   return int_resistance_vap_val;
 }
 #endif
+
 inline real wall_resistance(const int i, const int j, const int k) const {
-  return wall_resistance_val;
+  if(!wall_resistance_variable)
+    return wall_resistance_val;
+  else
+    return wall_resistance_func(i,j,k);
 }
 
 inline real dirac_wall_source(const int i, const int j, const int k) const {
@@ -184,12 +188,20 @@ inline void set_int_resistance_liq(const real re) {
   boil::oout<<"CommonHeatTransfer::int_resistance_liq= "
             <<re<<"\n";
 }
+
 inline real get_wall_resistance() const {
   return wall_resistance_val;
 }
 inline void set_wall_resistance(const real re) {
+  wall_resistance_variable = false;
   wall_resistance_val = re;
   boil::oout<<"CommonHeatTransfer::wall_resistance= "<<re<<"\n";
+}
+inline void set_wall_resistance(const boil::func_ijk_real & f) {
+  wall_resistance_variable = true;
+  wall_resistance_func = f;
+  boil::oout<<"CommonHeatTransfer::wall_resistance set variable"
+            <<"\n";
 }
 
 /**************************/

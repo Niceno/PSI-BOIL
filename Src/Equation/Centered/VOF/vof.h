@@ -125,7 +125,7 @@ class VOF : public Centered {
     void interfacial_flagging(const Scalar & scp);
 
     real output_cangle_2d(const Comp ctangential, const Comp cnormal,
-                          const Sign sig);
+                          const Sign sig, const Sign mult_wall);
    
     real extract_cl_velocity_2d(const Comp ctangential, const Comp cnormal,
                                 const Sign sig,
@@ -188,6 +188,7 @@ class VOF : public Centered {
                    const int i, const int j, const int k);
     bool Interface(const int i, const int j, const int k);
 
+#if 0
     /* 2D-variants */
     void insert_bc_curv_HFnormal(const Scalar & scp,
                                  const Comp ctangential, const Comp cnormal,
@@ -197,11 +198,9 @@ class VOF : public Centered {
                                    const Comp ctangential, const Comp cnormal,
                                    const Sign sig);
                                    //const Range<int> ridx = Range<int>(-1,-2)); 
-#if 0
     void insert_bc_curv_HFmixed(const Scalar & scp,
                                 const Comp ctangential, const Comp cnormal,
                                 const Sign sig);
-#endif
 
     virtual real wall_curv_HFnormal_kernel(const real x0, const real hm,
                                            const real hc, const real hp,
@@ -229,11 +228,13 @@ class VOF : public Centered {
                                    const bool truedir1, const bool truedir2,
                                    const real mult, const real max_n,
                                    const real cang);
+#endif
     
     void flood(Scalar & scp,const real mult);
     void output_cangle_2d(const Scalar & scp,
                           const Comp ctangential, const Comp cnormal,
-                          const Sign sig, const Range<int> ridx,
+                          const Sign sig, const Sign mult_wall,
+                          const Range<int> ridx,
                           real & h0, real & h1, real & h2,
                           real & dzzt0, real & dzzc0,
                           real & dzzt1, real & dzzc1);
@@ -255,22 +256,25 @@ class VOF : public Centered {
            , const real & n4, const real & n5, const real & n6
            , real r[]);
     
-    virtual void curv_HF();
+    void curv_HF();
     void curv_HF_kernel(arr3D & stencil, const arr3D & gridstencil,
+                        const arr2D & wall_indicator, const Comp & mcomp,
                         const int imin, const int imax,
                         const real d1m, const real d1c, const real d1p,
                         const real d2m, const real d2c, const real d2p,
-                        const real max_n,
+                        const real cang_m, const real cang_p,
+                        const real max_n, const real nnj, const real nnk,
                         const bool truedir1, const bool truedir2,
-                        real & kap, int & flag);
-                        //const int i, const int j, const int k);
-    real calculate_curvature_HF(const real hmm, const real hmc, const real hmp,
-                                const real hcm, const real hcc, const real hcp,
-                                const real hpm, const real hpc, const real hpp,
+                        const real xcent,
+                        real & kap, int & flag
+                        //,const int i, const int j, const int k
+                       ) const;
+    virtual real calculate_curvature_HF(const arr2D & heights,
                                 const real d1m, const real d1c, const real d1p,
                                 const real d2m, const real d2c, const real d2p,
                                 const bool truedir1, const bool truedir2,
-                                const real mult, const real max_n);
+                                const real mult, const real max_n,
+                                const real xcent) const;
 
     virtual void norm(const Scalar & color, const NormMethod & nm,
                       const bool extalp);
@@ -401,8 +405,8 @@ class VOF : public Centered {
 
     Heaviside * heavi;
     NormMethod norm_method_advance, norm_method_curvature;
-    Comp mcomp_for_elvira;
-    CurvMethod bulk_curv_method, wall_curv_method;
+    Comp mcomp_for_elvira, wall_curv_dir;
+    CurvMethod bulk_curv_method;// wall_curv_method;
     SubgridMethod subgrid_method;
     AdvectionMethod advect_method;
     HFset hf_set;
@@ -413,9 +417,7 @@ class VOF : public Centered {
     std::array<int,6> label_adv;
 
     int niter_pressure_extrap;
-    int Nfilm_crit;
     real cangle0;
-    real mult_wall;
 
     bool cangle_variable;
 };	

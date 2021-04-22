@@ -71,6 +71,7 @@ class VOFaxisym : public VOF {
                           // ,int & i, int & j, int & k, bool & ebool
                            );
     
+#if 0
     virtual real wall_curv_HFnormal_kernel(const real x0, const real hm,
                                            const real hc, const real hp,
                                            const real dm,
@@ -85,6 +86,7 @@ class VOFaxisym : public VOF {
                                              const real dm,
                                              const real dc, const real dp,
                                              const real mult);
+#endif
 
     //virtual real calc_v(const real alpha, const real vma, const real vmb, const real vmc) const;
     real calc_v_axisymmetric(real nnx, real alp, real eta0, real & Kp);
@@ -97,7 +99,13 @@ class VOFaxisym : public VOF {
                                 const int i, const int j, const int k,
                                 const Comp & mcomp);
     
-    virtual void curv_HF();
+    //virtual void curv_HF();
+    virtual real calculate_curvature_HF(const arr2D & heights,
+                                const real d1m, const real d1c, const real d1p,
+                                const real d2m, const real d2c, const real d2p,
+                                const bool truedir1, const bool truedir2,
+                                const real mult, const real max_n,
+                                const real xcent) const;
 
 #if 1
     void fill_stencil_x(arr2D & stencil, arr2D & gridstencil,

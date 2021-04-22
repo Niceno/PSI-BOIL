@@ -23,8 +23,10 @@ void Nucleation::plant_site(const int ns, const bool seed_source) {
 
           if(matter_sig==Sign::pos()) {
             (*vf)[i][j][k]=std::min((*vf)[i][j][k],cseed);
+            (*clr)[i][j][k]=std::min((*clr)[i][j][k],cseed);
           } else {
             (*vf)[i][j][k]=1.0-std::min(1.0-(*vf)[i][j][k],cseed);
+            (*clr)[i][j][k]=1.0-std::min(1.0-(*clr)[i][j][k],cseed);
           }
 
           vol_seed += vf->dV(i,j,k) * (1.0-cseed);

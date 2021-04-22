@@ -25,6 +25,20 @@ inline void set_cangle(const boil::func_ijk_real & f) {
 }
 
 /***************************************************************************//**
+ * wall curvature height construction
+*******************************************************************************/
+/* getter for dir */
+inline Comp get_wall_curv_dir() const { return wall_curv_dir;};
+
+/* setter for dir */
+inline void set_wall_curv_dir(const Comp & m) {
+  wall_curv_dir = m;
+  if(!boil::cart.iam()) {
+    boil::oout<<"VOF::wall_curv_dir: "<<m<<"\n";
+  }
+}
+
+/***************************************************************************//**
  *  other
 *******************************************************************************/
 /* getter and setter for wall value tolerance */
@@ -140,6 +154,7 @@ inline NormMethod get_normal_vector_method_curvature() const {
   return norm_method_curvature;
 }
 
+#if 0
 /* setter for near-wall curvature method */
 void set_wall_curv_method(const CurvMethod wcm,
                           const Sign sig = Sign::undefined(),
@@ -197,6 +212,7 @@ inline CurvMethod get_wall_curv_method() const { return wall_curv_method;};
 
 /* getter for critical film length */
 inline int get_critical_film_length() const { return Nfilm_crit;};
+#endif
 
 /* setter for pressure extrapolation */
 void set_pressure_extrapolation_parameters(const bool eflag, const int eiter) {

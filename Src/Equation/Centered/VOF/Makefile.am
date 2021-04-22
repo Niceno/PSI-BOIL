@@ -18,6 +18,7 @@ libVof_a_SOURCES =      vof.h                              \
                         vof_color_minmax.cpp               \
                         vof_curvature.cpp                  \
                         vof_curv_HF.cpp                    \
+                        vof_curv_HF_kernel.cpp             \
                         vof_ev_complement.cpp              \
                         vof_ev_discretize.cpp              \
                         vof_ev_flagging.cpp                \
@@ -33,8 +34,6 @@ libVof_a_SOURCES =      vof.h                              \
                         vof_fs3.cpp                        \
                         vof_fs_bnd_symmetry.cpp            \
                         vof_gradphi.cpp                    \
-                        vof_insert_bc_curv_HFnormal.cpp    \
-                        vof_insert_bc_curv_HFparallel.cpp  \
                         vof_insert_bc_gradphi.cpp          \
                         vof_interfacial_flagging.cpp       \
                         vof_norm.cpp                       \
@@ -55,8 +54,6 @@ libVof_a_SOURCES =      vof.h                              \
 			vof_translate_v.cpp                \
                         vof_true_norm_vect.cpp             \
                         vof_update_at_walls.cpp            \
-                        vof_vf_limiter.cpp                 \
-                        vof_wall_curv_HFnormal_kernel.cpp  \
-                        vof_wall_curv_HFparallel_kernel.cpp
+                        vof_vf_limiter.cpp
                 
 INCLUDE = -I@top_srcdir@/

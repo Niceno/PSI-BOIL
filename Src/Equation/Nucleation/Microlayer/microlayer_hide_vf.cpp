@@ -46,7 +46,8 @@ void Microlayer::hide_vf() {
     }
 
     /* only cells with color < 0.5 */
-    if(in_vapor(i,j,k)) {
+    //if(in_vapor(i,j,k)) {
+    if(below_threshold(i,j,k)) {
 
       /* neighbouring cells */
       std::array< std::array<int,3>, 4> nbrs
@@ -77,7 +78,8 @@ void Microlayer::hide_vf() {
       bool cond = true;
       for(auto & nc : nbrs) {
         //boil::oout<<"HERE "<<i<<" "<<j<<" "<<k<<" "<<nc[0]<<" "<<nc[1]<<" "<<nc[2]<<boil::endl;
-        cond &= in_vapor(nc[0],nc[1],nc[2]);
+        //cond &= in_vapor(nc[0],nc[1],nc[2]);
+        cond &= below_threshold(nc[0],nc[1],nc[2]);
       }
       //boil::oout<<cond<<boil::endl;
       if(!cond)
@@ -86,12 +88,16 @@ void Microlayer::hide_vf() {
       /* hide microlayer */
       if(boil::realistic(dmicro[i][j][k])&&dmicro[i][j][k]>0.) {
         (*vf)[i][j][k] = 0.0;
-        (*cht->topo->clr)[i][j][k] = 0.0;
+        (*clr)[i][j][k] = 0.0;
         cht->topo->vfold[i][j][k] = 0.0;
       }
 
     }/* in vapor */
   } /* ibody cells */
+
+  vf->exchange();
+  clr->exchange();
+  cht->topo->vfold.exchange();
 
   return;
 }

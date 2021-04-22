@@ -1,4 +1,5 @@
 #include "nucleation.h"
+#include "header.h"
 
 /***************************************************************************//**
 *  nucleation site model
@@ -11,7 +12,7 @@ Nucleation::Nucleation ( CommonHeatTransfer * CHT, Heaviside * HEAVI,
   matter_sig(SIG)
 {
   vf = cht->topo->vf;
-  //clr= cht->topo->clr;
+  clr= cht->topo->clr;
   //tpr=TPR;
   qsrc=QSRC;
   time=t;
@@ -36,13 +37,16 @@ Nucleation::Nucleation ( CommonHeatTransfer * CHT, Heaviside * HEAVI,
   }
   latent = cht->fluid()->latent()->value();
 
+#ifndef USE_VOF
   rcut = 4.*rseed;
+#endif
   seed_period = 0.01;
   period_cut_replant = 0.0001;
   dxmin = vf->domain()->dxyz_min();
   eps = 1.5*dxmin;
   bzoning = false;
   zbtm = 0.0;
+  threshold_c = 0.5;
 
   limit_zoning = true;
   zoning_limit_multiplier = 0.2;

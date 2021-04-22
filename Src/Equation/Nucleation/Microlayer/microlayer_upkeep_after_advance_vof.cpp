@@ -57,7 +57,8 @@ void Microlayer::upkeep_after_advance_vof() {
     |         (i+iof, j+jof, k+kof) is in solid domain  |
     +--------------------------------------------------*/
     /* only cells with color < 0.5 */
-    if(in_vapor(i,j,k)) {
+    //if(in_vapor(i,j,k)) {
+    if(below_threshold(i,j,k)) {
 
       /* initialize */
       if(!boil::realistic(dmicro[i][j][k])) {
@@ -77,6 +78,8 @@ void Microlayer::upkeep_after_advance_vof() {
       dmicro[i][j][k] = boil::unreal;
     }/* in vapor */
   } /* ibody cells */
+
+  dmicro.exchange();
 
   return;
 }

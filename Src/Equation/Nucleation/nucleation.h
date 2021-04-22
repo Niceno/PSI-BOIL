@@ -10,6 +10,7 @@
 #include "../CommonHeatTransfer/commonheattransfer.h"
 #include "../Heaviside/heaviside.h"
 #include "site.h"
+#include "header.h"
 
 /////////////
 //         //
@@ -40,7 +41,13 @@ class Nucleation {
     void plant();
     void replant();
     virtual void init() {}
+
+#ifndef USE_VOF
     void cutneck(const real r);
+    inline void set_cutneck_mult(real cm){ rcut = rseed*cm; };
+    inline real get_cutneck_mult() const { return rcut; };
+#endif
+
     void add(const Site & s);
     void st_active();
     virtual void upkeep_after_seeding() {};
@@ -58,8 +65,8 @@ class Nucleation {
     inline void set_seed_period(real r){ seed_period=r; };
     inline real get_seed_period() const { return (seed_period); };
 
-    inline void set_cutneck_mult(real cm){ rcut = rseed*cm; };
-    inline real get_cutneck_mult() const { return rcut; };
+    inline void set_threshold_c(real c){ threshold_c = c; };
+    inline real get_threshold_c() const { return threshold_c; };
 
     inline void set_zoning_limiting(bool zl, real zlmult = 0.0) {
       limit_zoning = zl;
@@ -72,6 +79,8 @@ class Nucleation {
 
     bool in_vapor(const int i, const int j, const int k) const;
     bool in_vapor(const real c) const;
+    bool below_threshold(const int i, const int j, const int k) const;
+    bool below_threshold(const real c) const;
 
     std::vector<Site> sites, dsites;
 
@@ -98,7 +107,7 @@ class Nucleation {
     Heaviside * heavi;
 
     Scalar * vf;
-    //const Scalar * clr;
+    Scalar * clr;
     //const Scalar * tpr;
     Scalar * qsrc;
     //Matter * flu;
@@ -111,13 +120,18 @@ class Nucleation {
 
     real rhol, rhov, lambdal, lambdav, cpl, cpv, latent, mmass;
 
-    real rseed, rcut;
+    real rseed;
     bool bzoning;
     std::vector<int> id_nearRegion, idd_nearRegion;
     Sign matter_sig;
 
     bool limit_zoning;
     real zoning_limit_multiplier;
+    real threshold_c;
+
+#ifndef USE_VOF
+    real rcut;
+#endif
 };
 
 #endif

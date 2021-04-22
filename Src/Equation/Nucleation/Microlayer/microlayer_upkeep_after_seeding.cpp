@@ -1,4 +1,5 @@
 #include "microlayer.h"
+#include "../header.h"
 
 /***************************************************************************//**
 *  set dmicro for nucleation site

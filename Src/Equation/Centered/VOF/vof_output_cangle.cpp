@@ -2,7 +2,7 @@
 
 /******************************************************************************/
 real VOF::output_cangle_2d(const Comp ctangential, const Comp cnormal,
-                           const Sign sig) {
+                           const Sign sig, const Sign mult_wall) {
 
   real h0(0.0), h1(0.0), h2(0.0);
   real dzzt0(0.0), dzzc0(0.0), dzzt1(0.0), dzzc1(0.0); 
@@ -10,7 +10,7 @@ real VOF::output_cangle_2d(const Comp ctangential, const Comp cnormal,
   Range<int> ridx;
 
   output_cangle_2d(color(),ctangential,cnormal,
-                   sig,ridx,h0,h1,h2,
+                   sig,mult_wall,ridx,h0,h1,h2,
                    dzzt0,dzzc0,dzzt1,dzzc1);
 
   return h0;
@@ -20,7 +20,8 @@ real VOF::output_cangle_2d(const Comp ctangential, const Comp cnormal,
 /******************************************************************************/
 void VOF::output_cangle_2d(const Scalar & scp, 
                            const Comp ctangential, const Comp cnormal,
-                           const Sign sig, const Range<int> ridx,
+                           const Sign sig, const Sign mult_wall,
+                           const Range<int> ridx,
                            real & h0, real & h1, real & h2,
                            real & dzzt0, real & dzzc0,
                            real & dzzt1, real & dzzc1) {

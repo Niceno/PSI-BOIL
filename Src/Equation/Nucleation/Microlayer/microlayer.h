@@ -3,7 +3,7 @@
 
 #include "../nucleation.h"
 
-#define USE_VOF
+#include "../header.h"
 
 ////////////////////////
 //                    //
