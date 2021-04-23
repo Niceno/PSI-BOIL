@@ -1,10 +1,9 @@
 #include "microlayer.h"
 
 /******************************************************************************/
-real Microlayer::d0(const int i, const int j, const int k) {
+real Microlayer::d0(const int i, const int j, const int k) const {
 /***************************************************************************//**
 *  \brief calculate initial thickness of micro layer
-*  crude code: assume k-plane
 *******************************************************************************/
 #ifdef DEBUG
   std::cout<<"microlayer.d0: "<<boil::cart.iam()<<"\n";
@@ -23,4 +22,18 @@ real Microlayer::d0(const int i, const int j, const int k) {
   }
 
   return d_return;
+}
+
+/******************************************************************************/
+real Microlayer::d0max(const Comp mcomp, const int i, 
+                       const int j, const int k) const {
+/***************************************************************************//**
+*  \brief compare to vf limit
+*******************************************************************************/
+  /* the sign for face distance does not matter */
+  if(matter_sig==Sign::pos()) {
+    return threshold_c*2.*cht->distance_face(Sign::neg(),mcomp,i,j,k);
+  } else {
+    return (1.-threshold_c)*2.*cht->distance_face(Sign::neg(),mcomp,i,j,k);
+  }
 }

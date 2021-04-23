@@ -75,7 +75,8 @@ class Microlayer : public Nucleation {
     inline real get_hflux_area_v(const Dir d) const {return area_v[int(d)];}
 
     /* initial thickness */
-    real d0(const int i, const int j, const int k);
+    real d0(const int i, const int j, const int k) const;
+    real d0max(const Comp m, const int i, const int j, const int k) const;
 
     /* clr & fs */
     void update_at_walls(Scalar & clr, Vector & fs);

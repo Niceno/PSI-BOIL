@@ -63,8 +63,13 @@ void Microlayer::upkeep_after_advance_vof() {
       /* initialize */
       if(!boil::realistic(dmicro[i][j][k])) {
         dmicro[i][j][k] = d0(i,j,k);
-        (*vf)[i][j][k] = dmicro[i][j][k]/(2.*cht->distance_face(sig,mcomp,i,j,k));
-        (*cht->topo->clr)[i][j][k] = dmicro[i][j][k]/(2.*cht->distance_face(sig,mcomp,i,j,k));
+        if(boil::realistic(dmicro[i][j][k])) {
+          if(dmicro[i][j][k]>d0max(mcomp,i,j,k)) {
+            dmicro[i][j][k] = d0max(mcomp,i,j,k);
+          }
+          (*vf)[i][j][k] = dmicro[i][j][k]/(2.*cht->distance_face(sig,mcomp,i,j,k));
+          (*cht->topo->clr)[i][j][k] = dmicro[i][j][k]/(2.*cht->distance_face(sig,mcomp,i,j,k));
+        }
       /* finalize to prevent microlayer regeneration */
       } else if(dmicro[i][j][k]<=dmicro_min*(1.+boil::pico)) {
         dmicro[i][j][k] = 0.0;

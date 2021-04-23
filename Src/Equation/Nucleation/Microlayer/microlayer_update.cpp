@@ -110,10 +110,12 @@ void Microlayer::update(real & smdot_micro,
           if(area_vap>0.) {
 #endif
  
+#if 0
             /* micro layer model */
             if(!boil::realistic(dmicro[ii][jj][kk])) {
               dmicro[ii][jj][kk] = d0(ii,jj,kk);
             }
+#endif
 
             /* micro layer does not exist = dry patch */
             if(dmicro[ii][jj][kk] <= dmicro_min*(1.+boil::pico)) {
