@@ -317,6 +317,7 @@ class VOF : public Centered {
                         Scalar & mx, Scalar & my, Scalar & mz);
 
     void update_at_walls(Scalar & scp);
+    void update_at_walls_custom(Scalar & scp);
     real kappa_ave(const real r1, const real r2);
     real kappa_ave(const real r1, const real r2, const int i1, const int i2);
 
@@ -412,6 +413,7 @@ class VOF : public Centered {
     HFset hf_set;
 
     boil::func_ijk_real cangle_func;
+    boil::func_scijk_real update_at_walls_func;
 
     /* labels for advection rotation */
     std::array<int,6> label_adv;
@@ -419,7 +421,7 @@ class VOF : public Centered {
     int niter_pressure_extrap;
     real cangle0;
 
-    bool cangle_variable;
+    bool cangle_variable, update_at_walls_variable;
 };	
 #endif
 

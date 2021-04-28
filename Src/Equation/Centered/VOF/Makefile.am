@@ -54,6 +54,7 @@ libVof_a_SOURCES =      vof.h                              \
 			vof_translate_v.cpp                \
                         vof_true_norm_vect.cpp             \
                         vof_update_at_walls.cpp            \
+                        vof_update_at_walls_custom.cpp     \
                         vof_vf_limiter.cpp
                 
 INCLUDE = -I@top_srcdir@/

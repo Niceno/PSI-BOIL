@@ -27,6 +27,7 @@ CommonHeatTransfer::CommonHeatTransfer(const Scalar & TPR,
   wall_resistance_val = 0.0;
   //int_resistance_vap_val = 0.0;
   int_resistance_liq_val = 0.0;
+  int_resistance_liq_variable = false;
   use_int_resist = false;
   dirac_wall_source_variable = false;
   wall_resistance_variable = false;

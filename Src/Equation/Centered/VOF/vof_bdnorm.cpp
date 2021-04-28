@@ -12,7 +12,11 @@ void VOF::bdnorm(Scalar & scp) {
   for(int iter(0); iter<niter; ++iter) {
 
     /* prerequisite for marching cubes */
-    update_at_walls(scp);
+    if(update_at_walls_variable) {
+      update_at_walls_custom(scp);
+    } else {
+      update_at_walls(scp);
+    }
    
     /* calculate new normal vector near walls */
     normal_vector_near_bnd(scp,norm_method_advance);
@@ -20,6 +24,13 @@ void VOF::bdnorm(Scalar & scp) {
     /* calculate alpha in cells */
     //extract_alpha(scp);
     extract_alpha_near_bnd(scp);
+  }
+
+  /* prerequisite for marching cubes */
+  if(update_at_walls_variable) {
+    update_at_walls_custom(scp);
+  } else {
+    update_at_walls(scp);
   }
 
   return;

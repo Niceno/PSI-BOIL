@@ -25,6 +25,21 @@ inline void set_cangle(const boil::func_ijk_real & f) {
 }
 
 /***************************************************************************//**
+ * update at walls
+*******************************************************************************/
+inline void set_update_at_walls_variable(const boil::func_scijk_real & f) {
+  update_at_walls_variable = true;
+  update_at_walls_func = f;
+  boil::oout<<"VOF::update_at_walls set variable"<<"\n";
+}
+
+inline void set_update_at_walls_variable(const bool st) {
+  update_at_walls_variable = st;
+  assert(!st); /* this should be used for turning variability off only */
+  boil::oout<<"VOF::update_at_walls set variable "<<st<<"\n";
+}
+
+/***************************************************************************//**
  * wall curvature height construction
 *******************************************************************************/
 /* getter for dir */

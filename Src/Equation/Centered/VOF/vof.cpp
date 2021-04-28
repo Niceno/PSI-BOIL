@@ -165,6 +165,7 @@ VOF::VOF(const Scalar & PHI,
   store_pressure_extrap=false;
   niter_pressure_extrap=1000;
   cangle_variable = false;
+  update_at_walls_variable = false;
 
   /* labelling of advection directions */
   label_adv = {0,1,2,3,4,5};

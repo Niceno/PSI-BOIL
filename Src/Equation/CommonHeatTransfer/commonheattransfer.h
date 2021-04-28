@@ -138,7 +138,8 @@ class CommonHeatTransfer {
     Matter * flu;
     Matter * sol;
 
-    boil::func_ijk_real dirac_wall_source_func, wall_resistance_func;
+    boil::func_ijk_real dirac_wall_source_func, 
+                        int_resistance_func, wall_resistance_func;
 
     real val_rhov,val_rhol,val_cpv,val_cpl,val_lambdav,val_lambdal;
     real turbP; /* turbulent Prandtl number */
@@ -147,7 +148,8 @@ class CommonHeatTransfer {
     /* heat transfer resistance, only for liquid */
     real int_resistance_liq_val; 
     bool use_int_resist;
-    bool dirac_wall_source_variable, wall_resistance_variable;
+    bool dirac_wall_source_variable, 
+         int_resistance_liq_variable, wall_resistance_variable;
 };
 
 #endif

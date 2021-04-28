@@ -20,8 +20,10 @@ void VOF::reconstruct_geometry(Scalar & scp) {
   /* iterate boundary normal vector */
   bdnorm(scp);
 
+#if 0 /* included in bdnorm */
   /* prerequisite for marching cubes */
   update_at_walls(scp);
+#endif
 
   return;
 }

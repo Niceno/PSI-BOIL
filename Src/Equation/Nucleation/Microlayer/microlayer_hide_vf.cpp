@@ -86,7 +86,7 @@ void Microlayer::hide_vf() {
         continue;
 
       /* hide microlayer */
-      if(boil::realistic(dmicro[i][j][k])&&dmicro[i][j][k]>0.) {
+      if(boil::realistic(dmicro[i][j][k])&&dmicro[i][j][k]>dmicro_min) {
         (*vf)[i][j][k] = 0.0;
         (*clr)[i][j][k] = 0.0;
         cht->topo->vfold[i][j][k] = 0.0;

@@ -28,8 +28,12 @@ inline real lambdav(const int i, const int j, const int k,
  * Heat transfer resistance and wall source
 ******************************************************************************/
 inline real int_resistance_liq(const int i, const int j, const int k) const {
-  return int_resistance_liq_val;
+  if(!int_resistance_liq_variable)
+    return int_resistance_liq_val;
+  else
+    return int_resistance_func(i,j,k);
 }
+
 #if 0
 inline real int_resistance_vap(const int i, const int j, const int k) const {
   return int_resistance_vap_val;
@@ -179,14 +183,22 @@ inline void set_int_resistance_vap(const real re) {
             <<re<<"\n";
 }
 #endif
+
 inline real get_int_resistance_liq() const { 
   return int_resistance_liq_val;
 }
 inline void set_int_resistance_liq(const real re) {
   int_resistance_liq_val = re;
   use_int_resist = true;
+  int_resistance_liq_variable = false;
   boil::oout<<"CommonHeatTransfer::int_resistance_liq= "
             <<re<<"\n";
+}
+inline void set_int_resistance_liq(const boil::func_ijk_real & f) {
+  int_resistance_liq_variable = true;
+  int_resistance_func = f;
+  boil::oout<<"CommonHeatTransfer::int_resistance_liq set variable"
+            <<"\n";
 }
 
 inline real get_wall_resistance() const {
