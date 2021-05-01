@@ -1,10 +1,14 @@
 #include "electpoten.h"
+
+void ElectPoten::output_j() {
+  output_j(time->current_step());
+}
 /***************************************************************************//**
 *  Output electric current
 *    j_potential: -sigma_e.grad(pot)
 *    j_lorenz:  sigma_e.u x B
 *******************************************************************************/
-void ElectPoten::output_j() {
+void ElectPoten::output_j(int tout) {
 
   phi.bnd_update();
 
@@ -15,7 +19,7 @@ void ElectPoten::output_j() {
   }
   J.bnd_update_nooutlet();
   J.exchange_all();
-  boil::plot->plot(J,phi, "Jpotential-pot", time->current_step());
+  boil::plot->plot(J,phi, "Jpotential-pot", tout);
 
   for_m(m){
     for_vmijk(J,m,i,j,k){
@@ -30,7 +34,7 @@ void ElectPoten::output_j() {
   }
   J.bnd_update_nooutlet();
   J.exchange_all();
-  boil::plot->plot(J,phi, "Jlorenz-pot", time->current_step());
+  boil::plot->plot(J,phi, "Jlorenz-pot", tout);
 
 
   // recalculate j
