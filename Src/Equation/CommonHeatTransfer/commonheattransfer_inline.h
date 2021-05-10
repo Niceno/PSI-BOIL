@@ -196,6 +196,7 @@ inline void set_int_resistance_liq(const real re) {
 }
 inline void set_int_resistance_liq(const boil::func_ijk_real & f) {
   int_resistance_liq_variable = true;
+  use_int_resist = true;
   int_resistance_func = f;
   boil::oout<<"CommonHeatTransfer::int_resistance_liq set variable"
             <<"\n";
