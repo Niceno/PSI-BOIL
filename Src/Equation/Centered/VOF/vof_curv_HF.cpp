@@ -273,11 +273,32 @@ void VOF::curv_HF() {
           }
         }
 
+        /* minor extents */
+        real d1m = color().dys(j);
+        real d1c = color().dyc(j);
+        real d1p = color().dyn(j);
+        real d2m = color().dzb(k);
+        real d2c = color().dzc(k);
+        real d2p = color().dzt(k);
+
+        /* correct near walls */
+        if(wall_indicator[nof-1][nof]<0.5) {
+          d1m = d1c;          
+        }
+        if(wall_indicator[nof+1][nof]<0.5) {
+          d1p = d1c;
+        }
+        if(wall_indicator[nof][nof-1]<0.5) {
+          d2m = d2c;
+        }
+        if(wall_indicator[nof][nof+1]<0.5) {
+          d2p = d2c;
+        }
+
         /* calculate curvature */
         curv_HF_kernel(stencil,gridstencil,wall_indicator,
                        mMax,imin,imax,
-                       color().dys(j),color().dyc(j),color().dyn(j),
-                       color().dzb(k),color().dzc(k),color().dzt(k),
+                       d1m,d1c,d1p,d2m,d2c,d2p,
                        cang_m, cang_p, 
                        max_n,nny,nnz,
                        bflag_struct.jfull,bflag_struct.kfull,
@@ -386,11 +407,32 @@ void VOF::curv_HF() {
           }
         }
 
+        /* minor extents */
+        real d1m = color().dzb(k);
+        real d1c = color().dzc(k);
+        real d1p = color().dzt(k);
+        real d2m = color().dxw(i);
+        real d2c = color().dxc(i);
+        real d2p = color().dxe(i);
+
+        /* correct near walls */
+        if(wall_indicator[nof-1][nof]<0.5) {
+          d1m = d1c;
+        }
+        if(wall_indicator[nof+1][nof]<0.5) {
+          d1p = d1c;
+        }
+        if(wall_indicator[nof][nof-1]<0.5) {
+          d2m = d2c;
+        }
+        if(wall_indicator[nof][nof+1]<0.5) {
+          d2p = d2c;
+        }
+
         /* calculate curvature */
         curv_HF_kernel(stencil,gridstencil,wall_indicator,
                        mMax,jmin,jmax,
-                       color().dzb(k),color().dzc(k),color().dzt(k),
-                       color().dxw(i),color().dxc(i),color().dxe(i),
+                       d1m,d1c,d1p,d2m,d2c,d2p,
                        cang_m, cang_p, 
                        max_n,nnz,nnx,
                        bflag_struct.kfull,bflag_struct.ifull,
@@ -500,11 +542,32 @@ void VOF::curv_HF() {
           }
         }
 
+        /* minor extents */
+        real d1m = color().dxw(i);
+        real d1c = color().dxc(i);
+        real d1p = color().dxe(i);
+        real d2m = color().dys(j);
+        real d2c = color().dyc(j);
+        real d2p = color().dyn(j);
+
+        /* correct near walls */
+        if(wall_indicator[nof-1][nof]<0.5) {
+          d1m = d1c; 
+        }
+        if(wall_indicator[nof+1][nof]<0.5) {
+          d1p = d1c;
+        }
+        if(wall_indicator[nof][nof-1]<0.5) {
+          d2m = d2c;
+        }
+        if(wall_indicator[nof][nof+1]<0.5) {
+          d2p = d2c;
+        }
+
         /* calculate curvature */
         curv_HF_kernel(stencil,gridstencil,wall_indicator,
                        mMax,kmin,kmax,
-                       color().dxw(i),color().dxc(i),color().dxe(i),
-                       color().dys(j),color().dyc(j),color().dyn(j),
+                       d1m,d1c,d1p,d2m,d2c,d2p,
                        cang_m, cang_p, 
                        max_n,nnx,nny,
                        bflag_struct.ifull,bflag_struct.jfull,
