@@ -4,7 +4,7 @@
 //real outerY(int i, int j, int k, const Vector *v1, const Vector *v2);
 //real outerZ(int i, int j, int k, const Vector *v1, const Vector *v2);
 /******************************************************************************/
-void ElectPoten::force_lorenz(Vector * xyz) {
+void ElectPoten::force_lorentz(Vector * xyz) {
 
   for_m(m){
     for_vmijk((*xyz),m,i,j,k){
