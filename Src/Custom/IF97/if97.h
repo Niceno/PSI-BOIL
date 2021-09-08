@@ -2,6 +2,17 @@
 #define IF97HEADER_H
 
 /* CoolProps implementation of IAPWS-IF97 steam tables.
+ * (c) Ian Bell and the CoolProp team
+ * MIT-style license (see CoolProp/LICENSE)
+
+   Basically, you can do anything you like with the code. 
+   The MIT license is a very permissive license, allowing you to modify, 
+   distribute, sell, etc. the code. It is not a copy-left license, 
+   you can use this in commercial code.
+
+   You are strongly requested, but not required, 
+   to cite both this repository and that of CoolProp: www.coolprop.org
+
    Retrieved from https://github.com/CoolProp/IF97 on 01/07/20 */
 
 #include <vector>

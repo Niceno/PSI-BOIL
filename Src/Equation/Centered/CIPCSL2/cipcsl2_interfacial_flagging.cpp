@@ -79,6 +79,7 @@ void CIPCSL2::interfacial_flagging(Scalar & scp) {
   }
 
   intflag.exchange();
+
 }	
 
 /***************************************************************************//**

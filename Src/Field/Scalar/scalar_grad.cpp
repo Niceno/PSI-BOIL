@@ -25,3 +25,11 @@ void Scalar::grad_abs( const int i, const int j, const int k,
   *d_y = dy / d;  
   *d_z = dz / d;  
 }
+
+/******************************************************************************/
+real Scalar::grad_face(Comp m, const int i, const int j, const int k) {
+  if (m==Comp::u()) {return (val[i][j][k]-val[i-1][j][k])/dxw(i);}
+  else if (m==Comp::v()) {return (val[i][j][k]-val[i][j-1][k])/dys(j);}
+  else if (m==Comp::w()) {return (val[i][j][k]-val[i][j][k-1])/dzb(k);}
+  else {std::cout<<"Error in scalar_grad_face\n"; exit(0);}
+}

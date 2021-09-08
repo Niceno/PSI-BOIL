@@ -13,6 +13,7 @@ void Matter::variable(const Set & s) {
   if(s == Set::gamma ()) diff->varies(*dom);
   if(s == Set::beta  ()) texp->varies(*dom);
   if(s == Set::mmass ()) molm->varies(*dom);
+  if(s == Set::sigma_e ()) sige->varies(*dom);
   if(s == Set::sigma ()) {
     if(tens == NULL) {
       boil::oout << "# Fatal: using surface tension makes ";
@@ -46,6 +47,7 @@ void Matter::variable() {
   diff->varies(*dom);
   texp->varies(*dom);
   molm->varies(*dom);
+  sige->varies(*dom);
   if( tens!= NULL )
     tens->varies(*dom);
   if( heat!= NULL )

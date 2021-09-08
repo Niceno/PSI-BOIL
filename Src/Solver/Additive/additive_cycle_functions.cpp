@@ -69,14 +69,20 @@ int AC::converged(const ResTol & toler, const ResRat & factor,
     return 0;
   }
 
-  //if(stop_if_div)
-  if(stop_if_div && cycle >= min_cyc)
-    if(res_control >= res_0_control) {
+  bool check_if_div=stop_if_div;
+  if (priority_min_cyc) {
+    if (cycle < min_cyc) {
+      check_if_div=false;
+    }
+  }
+  if (check_if_div) {
+    if (res_control >= res_0_control) {
       L[0]->phi = L[0]->fold; /* restore last "good" solution */
       boil::oout << "Failed to conv. " << cycle << " cycles!" << boil::endl;
       return 1;
     }
-
+  }
+   
   return 2;
 }
 

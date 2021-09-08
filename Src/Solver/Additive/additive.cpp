@@ -10,6 +10,7 @@ AC::AC(Centered * cen, Linear * sol) {
   /* set variables which steer the cycle */
   max_cyc = 20;
   min_cyc =  0;
+  priority_min_cyc = true;
   use_linf = false;
   stop_if_div  = true;
   resrat_val = ResRat(boil::atto);

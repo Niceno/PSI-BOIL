@@ -28,6 +28,7 @@ AC_OUTPUT(Makefile                                                             \
           Src/Parallel/Out/Makefile                                            \
           Src/LookUpTable/Makefile                                             \
           Src/Makefile                                                         \
+          Src/Equation/Centered/ElectPoten/Makefile                            \
           Src/Equation/Centered/Enthalpy/Makefile                              \
           Src/Equation/Centered/EnthalpyFD/EnthalpyFDaxisym/Makefile           \
           Src/Equation/Centered/EnthalpyFD/Makefile                            \

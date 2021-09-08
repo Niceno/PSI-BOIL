@@ -182,6 +182,11 @@ class CIPCSL2 : public Centered {
     real maxval() {return maxclr;}
     void color_minmax(); 
 
+    /* adens */
+    real get_adens(const int i,const int j, const int k){
+      return adens[i][j][k];
+    }
+
     Topology * topo;
     void ancillary();
     Heaviside * heaviside() { return heavi; }
@@ -279,7 +284,7 @@ class CIPCSL2 : public Centered {
     Matter jelly;   /* virtual fluid for level set transport */
     real xminft,xmaxft,yminft,ymaxft,zminft,zmaxft; /* xyz min&max of front */
     real tol_wall; /* wall tolerance for erroneous interfaces */
-    real pi,phimin,phimax,phisurf;
+    real phimin,phimax,phisurf;
     real dxmin,ww;
     real sum_outlet,sum_outletm,clrsum1,clrsum2;
     int nredist, itsharpen, nlayer, ialpcal, itsmear;

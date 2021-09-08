@@ -194,7 +194,7 @@ CutCell * Body::cut_cell(const int poly_index,
       ccell->fdxw(0.5);
       int i=0;
       for(int j=0; j<2; j++)
-        for(int k=0; k<2; j++)
+        for(int k=0; k<2; k++)
           ccell->fE(0.0,i,j,k);
     }
     /* i-max */
@@ -209,7 +209,7 @@ CutCell * Body::cut_cell(const int poly_index,
       ccell->fdxe(0.5);
       int i=1;
       for(int j=0; j<2; j++)
-        for(int k=0; k<2; j++)
+        for(int k=0; k<2; k++)
           ccell->fE(0.0,i,j,k);
     }
     /* j-min */
@@ -223,8 +223,8 @@ CutCell * Body::cut_cell(const int poly_index,
       ccell->fS(0.0,S_N,0);
       ccell->fdys(0.5);
       int j=0;
-      for(int i=0; i<2; j++)
-        for(int k=0; k<2; j++)
+      for(int i=0; i<2; i++)
+        for(int k=0; k<2; k++)
           ccell->fE(0.0,i,j,k);
     }
     /* j-max */
@@ -238,7 +238,7 @@ CutCell * Body::cut_cell(const int poly_index,
       ccell->fS(0.0,S_N,1);
       ccell->fdyn(0.5);
       int j=1;
-      for(int i=0; i<2; j++)
+      for(int i=0; i<2; i++)
         for(int k=0; k<2; j++)
           ccell->fE(0.0,i,j,k);
     }

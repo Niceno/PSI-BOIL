@@ -64,6 +64,12 @@ class Vector {
     int ei(const Comp & m) const {return vec[m].e_x;}
     int ej(const Comp & m) const {return vec[m].e_y;}
     int ek(const Comp & m) const {return vec[m].e_z;}
+    int sI(const Comp & m) const {return s_I[~m];}
+    int sJ(const Comp & m) const {return s_J[~m];}
+    int sK(const Comp & m) const {return s_K[~m];}
+    int eI(const Comp & m) const {return e_I[~m];}
+    int eJ(const Comp & m) const {return e_J[~m];}
+    int eK(const Comp & m) const {return e_K[~m];}
 
     int & si(const Comp & m) {return vec[m].s_x;}
     int & sj(const Comp & m) {return vec[m].s_y;}
@@ -183,6 +189,14 @@ class Vector {
 	  
     real *** operator [] (const Comp & m) const {return vec[m].val;} //OK
     Scalar & operator () (const Comp & m) const {return vec[m];}     //OK
+
+    /* these functions check the global cell range (excluding buffers) */
+    bool contains_mI(Comp m, int I) const {return rx[~m].contains(I);}
+    bool contains_mJ(Comp m, int J) const {return ry[~m].contains(J);}
+    bool contains_mK(Comp m, int K) const {return rz[~m].contains(K);}
+    bool contains_mIJK(Comp m, int I, int J, int K) const {
+      return contains_mI(m,I) && contains_mJ(m,J) && contains_mK(m,K);
+    }
     
     void grad(const int i, const int j, const int k,
               real *, real *, real *,
@@ -245,6 +259,28 @@ class Vector {
     void rm  (const char *, const int);
     void save(std::ofstream &);
     void load(std::ifstream &);
+
+    void save_range(const Range<int> ri, const int j,
+                    const int k, const Comp m,
+                    const char * nam, const int it);
+    void save_range(const int i, const Range<int> rj,
+                    const int k, const Comp m,
+                    const char * nam, const int it);
+    void save_range(const int i, const int j,
+                    const Range<int> rk, const Comp m,
+                    const char * nam, const int it);
+    void save_range(const int i, const Range<int> rj,
+                    const Range<int> rk, const Comp m,
+                    const char * nam, const int it);
+    void save_range(const Range<int> ri, const int j,
+                    const Range<int> rk, const Comp m,
+                    const char * nam, const int it);
+    void save_range(const Range<int> ri, const Range<int> rj,
+                    const int k, const Comp m,
+                    const char * nam, const int it);
+    void save_range(const Range<int> ri, const Range<int> rj,
+                    const Range<int> rk, const Comp m,
+                    const char * nam, const int it);
 
     BndCnd & bc(const Comp & m) const {return * (vec[m].bndcnd);}
     void bc_add(const BndCnd & bc) {for_m(m) vec[m].bndcnd->add(bc);}
@@ -481,6 +517,9 @@ class Vector {
     const    Domain * dom;
 
     const bool aliav;
+
+    Range<int> rx[3], ry[3], rz[3];
+    int s_I[3],e_I[3],s_J[3],e_J[3],s_K[3],e_K[3];
 };
 
 #endif

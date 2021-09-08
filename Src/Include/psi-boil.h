@@ -14,6 +14,7 @@
 #include "../Field/Scalar/TwoLevelScalar/twolevelscalar.h"
 #include "../Field/Vector/TwoLevelVector/twolevelvector.h"
 #include "../Equation/Staggered/Momentum/momentum.h"
+#include "../Equation/Centered/ElectPoten/electpoten.h"
 #include "../Equation/Centered/Enthalpy/enthalpy.h"
 #include "../Equation/Centered/EnthalpyFD/EnthalpyFDaxisym/enthalpyfdaxisym.h"
 #include "../Equation/Centered/PhaseChange4/phasechange4.h"
