@@ -197,7 +197,7 @@ void Scalar::exchange(const int * ical, const int dir) const {
       for_ik(i,k) {
         int l = k*ni()+i;
         sbuff_e[l] = val[i][e_y - o_y - b][k];   // buffer j end
-        sbuff_s[l] = val[i][s_y + o_y + b][k];   // buffer j start
+        sbuff_s[l] = val[i][s_y + o_y + b][k];   // buffer j start 
       }
 
       if( dom->neighbour(Dir::jmax()) != par_proc_null ) {
@@ -255,7 +255,7 @@ void Scalar::exchange(const int * ical, const int dir) const {
         sbuff_s[l] = val[i][j][s_z + o_z + b];   // buffer k start
         rbuff_e[l] = val[i][j][e_z +  1  + b];
         rbuff_s[l] = val[i][j][s_z -  1  - b];
-
+      
         /* send last and receive first */
         boil::cart.sendrecv(&sbuff_e[0], &rbuff_s[0], ni()*nj(),
                             par_real, dom->neighbour(Dir::kmax()),
@@ -320,7 +320,7 @@ void Scalar::exchange(const int * ical, const int dir) const {
       }
     }
   }
-
+  
   }
 
   delete [] sbuff_s;

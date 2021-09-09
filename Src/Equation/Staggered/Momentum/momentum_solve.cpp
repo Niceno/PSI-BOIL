@@ -2,7 +2,19 @@
 #include "../../../Plot/plot.h"
 
 /******************************************************************************/
-void Momentum::solve(const ResRat & factor) {
+void Momentum::solve(const ResTol & toler, const ResRat & factor) {
+  solve_wo_outlet(toler,factor);
+
+  /*---------------------------------+
+  |  scale velocities at the outlet  |
+  +---------------------------------*/
+  outlet();
+
+  return;
+}
+
+/******************************************************************************/
+void Momentum::solve_wo_outlet(const ResTol & toler, const ResRat & factor) {
 
   boil::timer.start("momentum solver");
 
@@ -38,6 +50,7 @@ void Momentum::solve(const ResRat & factor) {
         if( dom->ibody().off(i,   j,   k   ) || 
             dom->ibody().off(i-ip,j-jp,k-kp) ) {
           fnew[m][i][j][k] = 0.0;
+          //fnew[m][i][j][k] = u[m][i][j][k];
         }
       }
     }
@@ -50,25 +63,46 @@ void Momentum::solve(const ResRat & factor) {
 
     Matrix * Am = A[~m];
 
-    if(m==Comp::u()) 
-      solver->solve(*Am, u(m), fnew(m), 
-                     MaxIter(10), "u", factor);
-    if(m==Comp::v()) 
-      solver->solve(*Am, u(m), fnew(m), 
-                     MaxIter(10), "v", factor);
-    if(m==Comp::w()) 
-      solver->solve(*Am, u(m), fnew(m), 
-                     MaxIter(10), "w", factor);
+    if(m==Comp::u()) {
+      if(ifull) {
+        solver->solve(*Am, u(m), fnew(m), 
+                       MaxIter(10), "u", factor,toler,scale*time->dti());
+      } else {
+        for_avmijk(u,m,i,j,k) 
+          u[m][i][j][k] = 0.0;
+      }
+    }
+    if(m==Comp::v()) { 
+      if(jfull) {
+        solver->solve(*Am, u(m), fnew(m), 
+                       MaxIter(10), "v", factor,toler,scale*time->dti());
+      } else {
+        for_avmijk(u,m,i,j,k) 
+          u[m][i][j][k] = 0.0;
+      }
+    }
+    if(m==Comp::w()) {
+      if(kfull) {
+        solver->solve(*Am, u(m), fnew(m), 
+                       MaxIter(10), "w", factor,toler,scale*time->dti());
+      } else {
+        for_avmijk(u,m,i,j,k) 
+          u[m][i][j][k] = 0.0;
+      }
+    }
   }
 
   /* set velocity in solid zero */
   if(dom->ibody().nccells() > 0) {
     for_m(m){
       for_mijk(m,i,j,k)
-        if(dom->ibody().off(m,i,j,k))u[m][i][j][k]=0.0;
+        if(dom->ibody().off(m,i,j,k)) {
+          u[m][i][j][k]=0.0;
+        }
     }
   }
 
+  u.bnd_update_nooutlet();
   u.exchange_all();
 
   boil::timer.stop("momentum solver");
@@ -76,9 +110,5 @@ void Momentum::solve(const ResRat & factor) {
   // boil::plot->plot(fnew, "uvw-fnew", time->current_step());
   // boil::plot->plot(cnew, "uvw-cnew", time->current_step());
 
-  /*---------------------------------+
-  |  scale velocities at the outlet  |
-  +---------------------------------*/
-  outlet();
-  scale_out();
+  return;
 }

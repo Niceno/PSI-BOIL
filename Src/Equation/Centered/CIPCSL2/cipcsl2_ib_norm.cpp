@@ -11,9 +11,6 @@ void CIPCSL2::ib_norm(const Scalar & sca) {
   /*--------------------------------+
   |  normal vector of free surface  |
   +--------------------------------*/
-  real nwlx, nwly, nwlz;
-  real nout[3];
-
   for(int cc=0; cc<dom->ibody().nccells(); cc++){
     int i,j,k;
     dom->ibody().ijk(cc,&i,&j,&k);

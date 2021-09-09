@@ -6,7 +6,8 @@
 *      [A] \cdot \{ \phi \}^N = \{ f \}
 *  \f] 
 *******************************************************************************/
-void Centered::solve(const ResRat & fact, const char * name) {
+void Centered::solve(const ResTol & toler, const ResRat & fact, 
+                     const char * name) {
 
   assert(solver);
 
@@ -22,7 +23,8 @@ void Centered::solve(const ResRat & fact, const char * name) {
 
   /* solve */
   update_rhs();
-  solver->solve(A, phi, fnew, MaxIter(20), name, fact);
+  solver->solve(A, phi, fnew, MaxIter(20), name, fact, toler,scale*time->dti());
+  phi.bnd_update();
 
   /* stop the timing */
   if( name ) 

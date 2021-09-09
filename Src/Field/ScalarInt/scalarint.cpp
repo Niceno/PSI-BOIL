@@ -87,7 +87,7 @@ ScalarInt::ScalarInt(const ScalarInt * s) : alias(true), nam(s->nam) {
 
 /******************************************************************************/
 void ScalarInt::allocate(int ni, int nj, int nk) {
-
+ 
   n_x = ni;
   n_y = nj;
   n_z = nk;

@@ -24,8 +24,8 @@
 /* defintions for double-precision */
 #define real     double
 #ifdef UseMPI
-  #define par_int  MPI::INT
-  #define par_real MPI::DOUBLE
-  #define par_bool MPI::BOOL
+  #define par_int  MPI_INT
+  #define par_real MPI_DOUBLE
+  #define par_bool MPI_CHAR //MPI::BOOL
   // #define par_bool MPI::CHAR  //for HPC in Imperial College London
 #endif

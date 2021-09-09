@@ -22,7 +22,7 @@ real Dispersed::interface_fraction(int i, int j, int k, int p,
                          (zc(k)-zb)*(zc(k)-zb)) - radius; 
 
   /* this is a bit case-dependent, means a uniform mesh should be used */
-  const real eps = 1.5 * dxc(2);
+  const real eps = 1.5 * dxc(boil::BW);
 
   if(dist < -eps) { 
 

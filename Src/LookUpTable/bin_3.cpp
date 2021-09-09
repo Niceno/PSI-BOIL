@@ -15,12 +15,17 @@
 ///////////
 class Get {
   public:
-    static const Get rho   () {return Get(2);}
-    static const Get mu    () {return Get(3);}
-    static const Get cp    () {return Get(4);}
-    static const Get lambda() {return Get(5);}
-    static const Get gamma () {return Get(6);}
-    static const Get sigma () {return Get(7);}
+    static const Get rho()   {return Get( 2);}
+    static const Get mu()    {return Get( 3);}
+    static const Get cp()    {return Get( 4);}
+    static const Get lambda(){return Get( 5);}
+    static const Get gamma() {return Get( 6);}
+    static const Get beta () {return Get( 7);}
+    static const Get mmass() {return Get( 8);}
+    static const Get sigma() {return Get( 9);}
+    static const Get latent(){return Get(10);}
+
+
 
     operator int () const {return val;}
 

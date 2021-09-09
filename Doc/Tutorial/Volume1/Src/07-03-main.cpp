@@ -4,7 +4,7 @@ const real L =  1.0;
 const int  N = 64; 
 
 /******************************************************************************/
-main(int argc, char * argv[]) {
+int main(int argc, char * argv[]) {
 
   boil::timer.start();
 
@@ -23,6 +23,8 @@ main(int argc, char * argv[]) {
 
   Matter solid(d);                                  /* matter */
   solid.lambda(0.5);
+  solid.rho(1.0);
+  solid.cp(1.0);
 
   Krylov * solver = new CG(d, Prec::di());          /* linear solver */
 

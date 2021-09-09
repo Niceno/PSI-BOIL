@@ -12,7 +12,7 @@ real Momentum::vol_phase_change(Scalar * psrc_old) {
 
   std::cout.setf(std::ios_base::scientific);
   std::cout<< std::setprecision(16);
-  boil::oout<<"v_phase_change= "<<v_phase_change<<"\n";
+  boil::oout<<"v_phase_change= "<<time->current_time()<<" "<<v_phase_change<<"\n";
   std::cout<< std::setprecision(8);
   std::cout.unsetf(std::ios_base::floatfield);
   return(v_phase_change);

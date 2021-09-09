@@ -6,14 +6,14 @@
 *  neighbouring coefficients depend on the inverse of physical property
 *  (density), a specialized function is written here. 
 *
-*  The only thing usefull from the parrent is handling of boundary conditions.
+*  The only thing useful from the parent is handling of boundary conditions.
 *******************************************************************************/
-void Pressure::discretize() {
+void Pressure::discretize(const Scalar * diff_eddy) {
 
   boil::timer.start("pressure discretize");
 
   Comp m;
-  real a_x, a_y, a_z;
+  real a_w, a_e, a_s, a_n, a_b, a_t;
   real rhom, rhop;
 
   /*----------------------------+
@@ -26,9 +26,10 @@ void Pressure::discretize() {
     /* linear */
     rhom = fluid()->rho(m,i,  j,k);
     rhop = fluid()->rho(m,i+1,j,k);
-    a_x = dSx(i,j,k);
-    A.w[i][j][k] = a_x / dxw(i) / rhom;
-    A.e[i][j][k] = a_x / dxe(i) / rhop;
+    a_w = dSx(Sign::neg(),i,j,k);
+    a_e = dSx(Sign::pos(),i,j,k);
+    A.w[i][j][k] = a_w / dxw(i) / rhom;
+    A.e[i][j][k] = a_e / dxe(i) / rhop;
   }
 
   /* coefficients in j direction (s and n) */
@@ -37,9 +38,10 @@ void Pressure::discretize() {
     /* linear */
     rhom = fluid()->rho(m,i,j,  k);
     rhop = fluid()->rho(m,i,j+1,k);
-    a_y = dSy(i,j,k);
-    A.s[i][j][k] = a_y / dys(j) / rhom;
-    A.n[i][j][k] = a_y / dyn(j) / rhop;
+    a_s = dSy(Sign::neg(),i,j,k);
+    a_n = dSy(Sign::pos(),i,j,k);
+    A.s[i][j][k] = a_s / dys(j) / rhom;
+    A.n[i][j][k] = a_n / dyn(j) / rhop;
   }
 
   /* coefficients in k direction (b and t) */
@@ -48,12 +50,21 @@ void Pressure::discretize() {
     /* linear */
     rhom = fluid()->rho(m,i,j,k);
     rhop = fluid()->rho(m,i,j,k+1);
-    a_z = dSz(i,j,k);
-    A.b[i][j][k] = a_z / dzb(k) / rhom;
-    A.t[i][j][k] = a_z / dzt(k) / rhop;
+    a_b = dSz(Sign::neg(),i,j,k);
+    a_t = dSz(Sign::pos(),i,j,k);
+    A.b[i][j][k] = a_b / dzb(k) / rhom;
+    A.t[i][j][k] = a_t / dzt(k) / rhop;
   }
 
-  Centered::create_system_bnd();
+  /*----------------------+
+  |  central coefficient  |
+  +----------------------*/
+  /* since solid and fluid cells are blended during coarsening,
+     it is necessary for the central coefficient to maintain
+     magnitude negligible wrt fluid ones (comment 1/2) */
+  for_ijk(i,j,k) A.c[i][j][k] = A.w[i][j][k] + A.e[i][j][k]
+                              + A.s[i][j][k] + A.n[i][j][k]
+                              + A.b[i][j][k] + A.t[i][j][k];
 
   /*-------------------------------+
   |  a "touch" from immersed body  |
@@ -61,6 +72,7 @@ void Pressure::discretize() {
   if(dom->ibody().nccells() > 0) {
     for(int cc=0; cc<dom->ibody().nccells(); cc++) {
       int i,j,k;
+      /* i,j,k is cell adjacent to solid */
       dom->ibody().ijk(cc,&i,&j,&k); // OPR(i); OPR(j); OPR(k);
 
       /* both cells in fluid, but partially in solid */
@@ -74,9 +86,10 @@ void Pressure::discretize() {
       }
 
       /* some cells are inside the immersed body 
-         (there seems to be  too many checks, each
+         (there seems to be too many checks, each
           face is checked twice, but it is needed) */
       if( dom->ibody().off_p(i,j,k) ) {
+        /* I really doubt this does anything (isnt ijk in fluid??) - Lubomir */
         A.w[i][j][k] = 0.0; A.e[i-1][j][k] = 0.0;
         A.e[i][j][k] = 0.0; A.w[i+1][j][k] = 0.0;
         A.s[i][j][k] = 0.0; A.n[i][j-1][k] = 0.0; 
@@ -93,31 +106,45 @@ void Pressure::discretize() {
       if(dom->ibody().off_p(i,j,k+1)) {A.t[i][j][k] = 0.0; A.b[i][j][k+1] = 0.0;}
     }
 
+    /*----------------------+
+    |  central coefficient  | -> correction for fluid cells 
+    +----------------------*/
+    for_ijk(i,j,k) 
+      /* not off = on or cut */
+      if(!dom->ibody().off_p(i,j,k))
+        A.c[i][j][k] = A.w[i][j][k] + A.e[i][j][k] 
+                     + A.s[i][j][k] + A.n[i][j][k]
+                     + A.b[i][j][k] + A.t[i][j][k];
+
   } /* is there an immersed body */
 
-  /*----------------------+
-  |  central coefficient  |
-  +----------------------*/
-  for_ijk(i,j,k) A.c[i][j][k] = A.w[i][j][k] + A.e[i][j][k] 
-                              + A.s[i][j][k] + A.n[i][j][k]
-                              + A.b[i][j][k] + A.t[i][j][k];
+  /*------------------------+
+  |  boundaries correction  |
+  +------------------------*/
+  /* 19-11-28: moved here to allow other bcs than zero-Neumann */
+  Centered::create_system_bnd();
 
   for_ijk(i,j,k) A.ci[i][j][k] = 1.0 / A.c[i][j][k];
 
   /*-------------------------------+
-  |  a "touch" from immersed body  | -> this should be necessary only for A.c 
+  |  a "touch" from immersed body  |
   +-------------------------------*/
   if(dom->ibody().nccells() > 0) 
     for_ijk(i,j,k) 
       if( dom->ibody().off_p(i,j,k) ) {
-        A.c[i][j][k]  = boil::pico;
+        /* since solid and fluid cells are blended during coarsening,
+           it is necessary for the central coefficient to maintain
+           magnitude negligible wrt fluid ones (comment 2/2) */
+        A.c[i][j][k]  *= boil::pico;
+        //A.c[i][j][k]  = boil::pico;
+        //A.ci[i][j][k] = 1.0;
+        //A.c[i][j][k]  = 1.0;
         A.w[i][j][k]  = 0.0;
         A.e[i][j][k]  = 0.0;
         A.s[i][j][k]  = 0.0;
         A.n[i][j][k]  = 0.0;
         A.b[i][j][k]  = 0.0;
         A.t[i][j][k]  = 0.0;
-        A.ci[i][j][k] = 1.0;
     }
 
   boil::timer.stop("pressure discretize");

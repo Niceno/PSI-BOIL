@@ -50,7 +50,7 @@ void CIPCSL2::insert_bc_flag(ScalarInt & val, const bool adj) {
         if(d == Dir::kmin() || d == Dir::kmax()){
           kst=ked=val.bc().at(b).sk();
         }
-        if(ist==-1 || jst==-1 || kst ==-1) continue;
+        //if(ist==si()-1 || jst==sj()-1 || kst ==sk()-1) continue;
 
         //for_vijk( val.bc().at(b), i,j,k ){
         for(int i=ist; i<=ied; i++){
@@ -75,7 +75,6 @@ void CIPCSL2::insert_bc_flag(ScalarInt & val, const bool adj) {
         if(d == Dir::imin()) iof++; if(d == Dir::imax()) iof--;
         if(d == Dir::jmin()) jof++; if(d == Dir::jmax()) jof--;
         if(d == Dir::kmin()) kof++; if(d == Dir::kmax()) kof--;
-
         int ist=val.bc().at(b).si()-1;
         int ied=val.bc().at(b).ei()+1;
         int jst=val.bc().at(b).sj()-1;

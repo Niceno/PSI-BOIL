@@ -27,6 +27,10 @@ void CIPCSL2::set_wflag2() {
   +-------------*/
   wflag = -1001;
 
+  /*----------------------------+
+  |  wall adjacent cell = 1001  |
+  |  otherwise = -1001          |
+  +----------------------------*/
   for( int b=0; b<phi.bc().count(); b++ ) {
     if(phi.bc().type_decomp(b)) continue;
     if( phi.bc().type(b) == BndType::wall() ) {
@@ -40,16 +44,27 @@ void CIPCSL2::set_wflag2() {
         if(d == Dir::imin()) iof++; if(d == Dir::imax()) iof--;
         if(d == Dir::jmin()) jof++; if(d == Dir::jmax()) jof--;
         if(d == Dir::kmin()) kof++; if(d == Dir::kmax()) kof--;
+
+        int abs_iof = abs(iof);
+        int abs_jof = abs(jof);
+        int abs_kof = abs(kof);
+
         for_vijk( phi.bc().at(b), i,j,k ){
+          if (i<si()-abs_iof) continue;
+          if (i>ei()+abs_iof) continue;
+          if (j<sj()-abs_jof) continue;
+          if (j>ej()+abs_jof) continue;
+          if (k<sk()-abs_kof) continue;
+          if (k>ek()+abs_kof) continue;
           wflag[i+iof][j+jof][k+kof]=1001;
         }
       }
     }
   }
 
-  /*-----------+
-  |  set flag  |
-  +-----------*/
+  /*-----------------------------------+
+  |  set flag for wall adjacent cells  |
+  +-----------------------------------*/
   for_ijk(i,j,k) {
     if (wflag[i][j][k]>1000) {
       if(clr[i][j][k]<phisurf){
@@ -79,20 +94,9 @@ void CIPCSL2::set_wflag2() {
   cout<<"set_wflag2: "<<wflag[4][17][1]<<" "<<clr[4][17][1]<<" "<<clr[3][17][1]<<"\n";
 #endif
 
-  /* EXTENDED BUFFERS HINT:
-   all lines with: 
-     for(int i=0; i<ni()-1; i++) or ...
-     for(int j=0; i<nj()-1; i++) or ...
-     for(int k=0; i<nk()-1; i++)
-   could probably be replaced with:
-     for(int i=si()-1; i<ei()+1; i++) and ...
-     for(int j=sj()-1; i<ej()+1; i++) and ...
-     for(int k=sk()-1; i<ek()+1; i++)
-  */
-
   /* next to free-surface (NFCell) */
   /* i-direction */
-  for(int i=0; i<ni()-1; i++){
+  for(int i=si()-1; i<ei()+1; i++){
     for_jk(j,k){
       if ((clr[i][j][k]-phisurf)*(clr[i+1][j][k]-phisurf)<=0.0) {
         if(wflag[i  ][j][k]>-1000 && wflag[i+1][j][k]>-1000) {
@@ -103,7 +107,7 @@ void CIPCSL2::set_wflag2() {
     }
   }
   /* j-direction */
-  for(int j=0; j<nj()-1; j++){
+  for(int j=sj()-1; j<ej()+1; j++){
     for_ik(i,k){
       if((clr[i][j][k]-phisurf)*(clr[i][j+1][k]-phisurf)<=0.0){
         if(wflag[i][j  ][k]>-1000 && wflag[i][j+1][k]>-1000) {
@@ -114,7 +118,7 @@ void CIPCSL2::set_wflag2() {
     }
   }
   /* k-direction */
-  for(int k=0; k<nk()-1; k++){
+  for(int k=sk()-1; k<ek()+1; k++){
     for_ij(i,j){
       if((clr[i][j][k]-phisurf)*(clr[i][j][k+1]-phisurf)<=0.0){
         if(wflag[i][j][k  ]>-1000 && wflag[i][j][k+1]>-1000) {
@@ -132,7 +136,7 @@ void CIPCSL2::set_wflag2() {
 
   for(int layer=1; layer<=nlayer; layer++){
     /* i-direction */
-    for(int i=0; i<ni()-1; i++){
+    for(int i=si()-1; i<ei()+1; i++){
       for_jk(j,k){
         if(int(abs(wflag[i  ][j][k]))==ifmax &&
            int(abs(wflag[i+1][j][k]))==(layer-1)){
@@ -146,7 +150,7 @@ void CIPCSL2::set_wflag2() {
       }
     }
     /* j-direction */
-    for(int j=0; j<nj()-1; j++){
+    for(int j=sj()-1; j<ej()+1; j++){
       for_ik(i,k){
         if(int(abs(wflag[i][j  ][k]))==ifmax &&
            int(abs(wflag[i][j+1][k]))==(layer-1)){
@@ -160,7 +164,7 @@ void CIPCSL2::set_wflag2() {
       }
     }
     /* k-direction */
-    for(int k=0; k<nk()-1; k++){
+    for(int k=sk()-1; k<ek()+1; k++){
       for_ij(i,j){
         if(int(abs(wflag[i][j][k  ]))==ifmax &&
            int(abs(wflag[i][j][k+1]))==(layer-1)){

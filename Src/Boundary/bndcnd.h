@@ -34,16 +34,17 @@
 ///////////////
 class BndType {
   public:
-    static const BndType undefined() {return BndType(0);} 
-    static const BndType dirichlet() {return BndType(1);} // p t
-    static const BndType neumann()   {return BndType(2);} // p t
-    static const BndType periodic()  {return BndType(3);} // m p t
-    static const BndType inlet()     {return BndType(4);} // m t
-    static const BndType outlet()    {return BndType(5);} // m t
-    static const BndType wall()      {return BndType(6);} // m
-    static const BndType symmetry()  {return BndType(7);} // m p t
-    static const BndType insert()    {return BndType(8);} // m p t
-    static const BndType convective(){return BndType(9);} // m p t
+    static const BndType undefined() {return BndType(0 );} 
+    static const BndType dirichlet() {return BndType(1 );} // p t
+    static const BndType neumann()   {return BndType(2 );} // p t
+    static const BndType periodic()  {return BndType(3 );} // m p t
+    static const BndType inlet()     {return BndType(4 );} // m t
+    static const BndType outlet()    {return BndType(5 );} // m t
+    static const BndType wall()      {return BndType(6 );} // m
+    static const BndType symmetry()  {return BndType(7 );} // m p t
+    static const BndType insert()    {return BndType(8 );} // m p t
+    static const BndType convective(){return BndType(9 );} // m p t
+    static const BndType pseudo()    {return BndType(10);} // m p t
     /* check << operator if above are changing */
     
     BndType(const BndType & bc) {val = bc.val;}
@@ -143,6 +144,13 @@ class BndCnd {
      {typ    = o.typ;
       val[0] = o.val[0]; val[1] = o.val[1]; val[2] = o.val[2];
       return * this;}
+
+    /* we also need the ability to copy section */
+    void replicate(BndCnd & o) {
+      for(int b=0; b<o.count(); b++) {
+        section.push_back(o.at(b));
+      }
+    }
 
     const Domain * domain() const {return dom;}
 

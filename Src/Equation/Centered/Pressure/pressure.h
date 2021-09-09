@@ -11,9 +11,9 @@
 *
 *  The eqation is discretized in integral form:                       
 *  \f[
-*        \int_S \frac{\nabla p}{\rho} \, dS
+*       -\int_S \frac{\nabla p}{\rho} \, dS
 *      =          
-*        \frac{1}{\Delta t}
+*       -\frac{1}{\Delta t}
 *        \int_S {\bf u} \, dS
 *      \; \; \; \;
 *      [\frac{m^3}{s^2}]
@@ -37,20 +37,20 @@ class Pressure : public Centered {
         \param f   - right hand side array,
         \param v   - velocity field, 
         \param t   - simulation (physical) time (\f${t}\f$),
-        \param sm  - Krylov subspace solver. It acts as a solver, or as a
-                     smoother for AC multirid.
+        \param sm  - Linear solver. It acts as a solver, or as a
+                     smoother for AC multigrid.
         \param mat - Holds fluid properties (\f$\rho\f$).
     */
     Pressure(const Scalar & phi, 
              const Scalar & f,  
              const Vector & v, 
              Times & t, 
-             Krylov * sm,
+             Linear * sm,
              Matter * mat);
     ~Pressure();
-	  
+
     //! Discretize the system of equations. 
-    void discretize(); 
+    virtual void discretize(const Scalar * diff_eddy = NULL);
 
     //! Computes right hand side (velocity diverence) for pressure equation.
     real update_rhs();
@@ -58,6 +58,10 @@ class Pressure : public Centered {
     // ghost fluid method
     void ghost(const Scalar & c, const Scalar & k);
   protected:
+     
+    void discretize_pressure(const Scalar * diff_eddy = NULL);
+    real update_rhs_pressure();
+
 };	
 
 #endif

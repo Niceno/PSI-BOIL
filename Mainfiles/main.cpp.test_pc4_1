@@ -1,0 +1,377 @@
+#include "Include/psi-boil.h"
+#include <fstream>
+#include <iostream>
+#include <fenv.h>
+#include <random>
+#define _GNU_SOURCE 1
+#if 1
+static void __attribute__ ((constructor)) trapfpe(void)
+{
+  /* Enable some exceptions. At startup all exceptions are masked. */
+  feenableexcept(FE_INVALID|FE_DIVBYZERO|FE_OVERFLOW);
+}
+#endif
+
+#define CASE 2
+#define TOP_DIRICHLET
+/* 0: x-dir, 1: y-dir, 2: z-dir */
+
+/******************************************************************************/
+int main(int argc, char ** argv) {
+
+/* ------------ input from command line */
+  int wmin=atoi(argv[1]);
+  boil::oout<<"wmin= "<<wmin<<"\n";
+
+  const int seed = atoi(argv[2]); /* rng seed */
+  boil::oout<<"seed= "<<seed<<"\n";
+
+  const bool snd_order = atoi(argv[3]); /* order of method */
+  boil::oout<<"snd_order= "<<snd_order<<"\n";
+
+  const int ord = atoi(argv[4]); /* order of polynomial (1,2,4)
+                                    1: neumann cannot be satisfied */
+  boil::oout<<"pol_order= "<<ord<<"\n";
+
+  if(ord!=1&&ord!=2&&ord!=4) exit(0);
+
+  const bool phase = atoi(argv[5]); /* 1: liquid and vice versa */
+
+  boil::timer.start();
+
+  const real tsat0 = 5.;
+  const real twall0 = 0.;
+  const real twall1 = twall0-10.;
+  const real rhov = 1.;
+  const real rhol = 1000.;
+  const real lambdav = 0.5;
+  const real lambdal = 0.6;
+  const real latent=2000*1000.0;
+  const real lambdasol = lambdav;//1.1;
+
+  const int NX1  = 10;
+  real LX1 = 0.1e-3;
+  real DX1 = LX1/15.;
+
+  /*--------------------------------+
+  |  choose the output file format  |
+  +--------------------------------*/
+  boil::plot = new PlotTEC();
+
+  /*----------+
+  |  grid(s)  |
+  +----------*/
+  Grid1D gx1( Range<real>(0.0,LX1)
+            , Range<real>(3.0*DX1,1.0*DX1)
+            , NX1, Periodic::no() );
+  Grid1D gx2( Range<real>(-LX1,0.0)
+            , Range<real>(1.0*DX1,3.0*DX1)
+            , NX1, Periodic::no() );
+#ifndef TOP_DIRICHLET
+  Grid1D gx(gx2,gx1, Periodic::no(), BndGrid::wall(), BndGrid::extrapolate() );
+#else
+  Grid1D gx(gx2,gx1, Periodic::no());
+#endif
+
+  /*---------+
+  |  domain  |
+  +---------*/
+  Comp m;
+#if CASE == 0
+  Body floor("floorx.stl");
+  m = Comp::i();
+  Domain d(gx , gx1, gx1, &floor);
+#elif CASE == 1
+  Body floor("floory.stl");
+  m = Comp::j();
+  Domain d(gx1, gx , gx1, &floor);
+#else
+  Body floor("floorz.stl");
+  m = Comp::k();
+  Domain d(gx1, gx1, gx , &floor);
+#endif
+
+  /*------------------+
+  |  define unknowns  |
+  +------------------*/
+  Vector uvw(d);           // vel
+  Scalar f  (d); // pressure
+  Scalar c  (d), g  (d), kappa(d); // concentration
+  Scalar tpr(d), q  (d);           // temperature
+  Scalar mdot(d), mflx(d);         // phase-change rate
+
+  /*-----------------------------+ 
+  |  insert boundary conditions  |
+  +-----------------------------*/
+  Dir d1(Dir::undefined()),d2(Dir::undefined()),d3(Dir::undefined()),
+      d4(Dir::undefined()),d5(Dir::undefined()),d6(Dir::undefined());
+#if CASE == 0
+  d1 = Dir::imin();
+  d2 = Dir::imax();
+  d3 = Dir::jmin();
+  d4 = Dir::jmax();
+  d5 = Dir::kmin();
+  d6 = Dir::kmax();
+#elif CASE == 1
+  d1 = Dir::jmin();
+  d2 = Dir::jmax();
+  d3 = Dir::imin();
+  d4 = Dir::imax();
+  d5 = Dir::kmin();
+  d6 = Dir::kmax();
+#else
+  d1 = Dir::kmin();
+  d2 = Dir::kmax();
+  d3 = Dir::imin();
+  d4 = Dir::imax();
+  d5 = Dir::jmin();
+  d6 = Dir::jmax();
+#endif 
+
+  for_m(m) {
+    uvw.bc(m).add( BndCnd( d1, BndType::wall() ) );
+    uvw.bc(m).add( BndCnd( d2, BndType::wall() ) );
+    uvw.bc(m).add( BndCnd( d3, BndType::wall() ) );
+    uvw.bc(m).add( BndCnd( d4, BndType::wall() ) );
+    uvw.bc(m).add( BndCnd( d5, BndType::wall() ) );
+    uvw.bc(m).add( BndCnd( d6, BndType::wall() ) );
+  }
+
+  c.bc().add( BndCnd( d1, BndType::neumann() ) );
+  c.bc().add( BndCnd( d2, BndType::neumann() ) );
+  c.bc().add( BndCnd( d3, BndType::neumann() ) );
+  c.bc().add( BndCnd( d4, BndType::neumann() ) );
+  c.bc().add( BndCnd( d5, BndType::neumann() ) );
+  c.bc().add( BndCnd( d6, BndType::neumann() ) );
+
+  /* copy b.c. from p */
+  f = c.shape();
+  mdot = c.shape();
+  mflx = c.shape();
+  q = c.shape();
+  kappa = c.shape();
+  g = c.shape();
+
+  tpr.bc().add( BndCnd( d1, BndType::dirichlet(), twall0 ) );
+#ifndef TOP_DIRICHLET
+  tpr.bc().add( BndCnd( d2, BndType::neumann() ) );
+#else
+  tpr.bc().add( BndCnd( d2, BndType::dirichlet(), twall1 ) );
+#endif
+  tpr.bc().add( BndCnd( d3, BndType::neumann() ) );
+  tpr.bc().add( BndCnd( d4, BndType::neumann() ) );
+  tpr.bc().add( BndCnd( d5, BndType::neumann() ) );
+  tpr.bc().add( BndCnd( d6, BndType::neumann() ) );
+
+  /*----------------------+
+  |  physical properties  |
+  +----------------------*/
+  Matter vapor(d), liquid(d), heater(d);
+  vapor  .lambda(lambdav);
+  vapor  .rho(rhov);
+  liquid.lambda(lambdal);
+  liquid.rho(rhol);
+
+  /* nickel */
+  heater.lambda (lambdasol);
+
+  Matter * zero = &vapor;
+  Matter * one = &liquid;
+  Matter mixed(*one,*zero, &c);
+  mixed.latent(latent);
+
+  /*-------------------+
+  |  time-integration  |
+  +-------------------*/
+  Times time(10,1.0);
+
+  /*-----------------+
+  |  define solvers  |
+  +-----------------*/
+  Krylov * solverCGic = new CG(d, Prec::ic2());
+  Krylov * solver = solverCGic;
+
+  /* color function */
+  VOF conc(c, g, kappa, uvw, time, solver);
+
+  /* enthalpy equation */
+  TIF tsat(tsat0);
+
+  /* phase change */
+  PhaseChange4 pc(mdot, mflx, tpr, q, c, g, f, uvw, conc.topo,
+                  tsat, time, &mixed, &heater);
+
+  if(snd_order) {
+    pc.set_second_order_accuracy(true);
+  }
+
+#if 0
+  /* test differences */
+  pc.test_differences(100);
+#else
+
+  /* set temperature: two polynomials, one in solid, other in fluid */
+  std::mt19937 rng(seed);
+  std::uniform_real_distribution<real> distR1(1.,10.);
+  std::uniform_real_distribution<real> distR2(-10.,10.);
+  std::uniform_int_distribution<int> distI(0,1);
+
+  real a0(0.),a1(0.),a2(0.),a3(0.),a4(0.);
+  real b0(0.),b1(0.),b2(0.),b3(0.),b4(0.);
+
+  a0 = distR2(rng);
+  if(ord==1) {
+    /* consistency with dirichlet bc */
+    a1 = (twall0 - a0)/(-LX1);
+  } else {
+    a1 = distR2(rng);
+    if(ord==2) {
+      /* consistency with dirichlet bc */
+      a2 = (twall0 - a0 - a1*(-LX1))/pow(-LX1,2.);
+    } else {
+      a2 = distR2(rng);
+      a3 = distR2(rng);
+      /* consistency with dirichlet bc */
+      a4 = (twall0 - a0 - a1*(-LX1) - a2*(-LX1)*(-LX1) - a3*pow(-LX1,3.))/pow(-LX1,4.);
+    }
+  }
+
+  b0 = a0; /* continuity of temperature */
+  if(phase)
+    b1 = lambdasol/lambdal*a1; /* continuity of fluxes */
+  else
+    b1 = lambdasol/lambdav*a1; /* continuity of fluxes */
+  if(ord>1) {
+    if(ord==2) {
+#ifndef TOP_DIRICHLET
+      /* consistency with neumann bc */
+      b2 = -b1/2./LX1;
+#else 
+      /* consistency with dirichlet bc */
+      b2 = (twall1 - b0 - b1*LX1)/pow(LX1,2.);
+#endif
+    } else {
+      b2 = distR2(rng);
+      b3 = distR2(rng);
+#ifndef TOP_DIRICHLET
+      /* consistency with neumann bc */
+      b4 = -(3.*b3*LX1*LX1+2.*b2*LX1+b1)/4./pow(LX1,3.);
+#else 
+      /* consistency with dirichlet bc */
+      b4 = (twall1 - b0 - b1*LX1 - b2*LX1*LX1 - b3*pow(LX1,3.))/pow(LX1,4.);
+#endif
+    }
+  }
+
+  if(phase)
+    c = 1.;
+  else
+    c = 0.;
+
+  for_vijk(tpr,i,j,k) {
+#if CASE == 0
+    real x = c.xc(i);
+#elif CASE == 1
+    real x = c.yc(j);
+#else
+    real x = c.zc(k);
+#endif
+    if(x<0)
+      tpr[i][j][k] = pc.evaluate_polynomial(ord,{a0,a1,a2,a3,a4},x);
+    else
+      tpr[i][j][k] = pc.evaluate_polynomial(ord,{b0,b1,b2,b3,b4},x);
+
+  }
+  tpr.bnd_update();
+
+  pc.update();
+
+#if CASE == 0
+    int ii = NX1+boil::BW;
+    int iii = ii-1;
+    int jj = boil::BW;
+    int jjj = jj;
+    int kk = boil::BW;
+    int kkk = kk;
+    real xpos = tpr.xn(ii);
+    real dxm = 0.5*tpr.dxc(iii);
+    real dxp = 0.5*tpr.dxc(ii);
+#elif CASE == 1
+    int ii = boil::BW;
+    int iii = ii;
+    int jj = NX1+boil::BW;
+    int jjj = jj-1;
+    int kk = boil::BW;
+    int kkk = kk;
+    real xpos = tpr.yn(jj);
+    real dxm = 0.5*tpr.dyc(jjj);
+    real dxp = 0.5*tpr.dyc(jj);
+#else
+    int ii = boil::BW;
+    int iii = ii;
+    int jj = boil::BW;
+    int jjj = jj;
+    int kk = NX1+boil::BW;
+    int kkk = kk-1;
+    real xpos = tpr.zn(kk);
+    real dxm = 0.5*tpr.dzc(kkk);
+    real dxp = 0.5*tpr.dzc(kk);
+#endif
+
+  /* test bnd temperature */
+  boil::oout<<xpos<<" | "<<pc.node_tmp()[m][ii][jj][kk]<<" "<<a0<<" | "
+             <<pc.lambda(iii,jjj,kkk)*(pc.node_tmp()[m][ii][jj][kk]-tpr[iii][jjj][kkk])/dxm<<" "
+             <<-pc.lambda(ii,jj,kk)*(pc.node_tmp()[m][ii][jj][kk]-tpr[ii][jj][kk])/dxp<<" "
+             <<pc.lambda(iii,jjj,kkk)*pc.evaluate_polynomial_derivative(ord,{a0,a1,a2,a3,a4},0)<<" "
+             <<pc.lambda(ii,jj,kk)*pc.evaluate_polynomial_derivative(ord,{b0,b1,b2,b3,b4},0)<<" "
+             <<pc.lambda(iii,jjj,kkk)<<" "
+             <<pc.lambda(ii,jj,kk)<<" "
+             <<d.ibody().on(iii,jjj,kkk)<<" "
+             <<d.ibody().on(ii,jj,kk)<<" "
+             <<boil::endl;
+
+  /* gradient testing */
+  std::vector<real> tv, tl;
+
+#if CASE == 0
+  int j0 = jj;
+  int k0 = kk;
+  for_vi(tpr,i0) {
+    real x = c.xc(i0);
+    boil::oout<<i0<<" "<<tpr[i0][j0][k0]<<" |";
+#elif CASE == 1
+  int i0 = ii;
+  int k0 = kk;
+  for_vj(tpr,j0) {
+    real x = c.yc(j0);
+    boil::oout<<j0<<" "<<tpr[i0][j0][k0]<<" |";
+#else
+  int i0 = ii;
+  int j0 = jj;
+  for_vk(tpr,k0) {
+    real x = c.zc(k0);
+    boil::oout<<k0<<" "<<tpr[i0][j0][k0]<<" |";
+#endif
+    pc.request_gradient(i0,j0,k0,tv,tl);
+    for(auto t : tv)
+      boil::oout<<" "<<t;
+    boil::oout<<" |";
+    for(auto t : tl)
+      boil::oout<<" "<<t;
+    boil::oout<<" |";
+    real ref;
+    if(x<0) {
+      ref = pc.lambda(i0,j0,k0)*pc.evaluate_polynomial_derivative(ord,{a0,a1,a2,a3,a4},x);
+    } else {
+      ref = pc.lambda(i0,j0,k0)*pc.evaluate_polynomial_derivative(ord,{b0,b1,b2,b3,b4},x);
+    }
+    boil::oout<<" "<<ref<<" "<<pc.lambda(i0,j0,k0)<<boil::endl;
+  }
+
+#endif
+
+  boil::oout << "finished" << boil::endl;
+  boil::timer.stop();
+  boil::timer.report();
+
+}

@@ -1,0 +1,122 @@
+#include "Include/psi-boil.h"
+#include <random> 
+#include <chrono>  /* time */
+
+const real LX =   0.2;
+const real LY =   0.2;
+const real LZ =   0.2;
+
+const int NX = 100;
+const int NY = 100;
+const int NZ = 100;
+
+const real radius = LX/4.;
+const real xcent = 0.;
+const real ycent = 0.;
+const real zcent = 0.;
+
+const int nrng = 10000; /* number of points for rng */
+
+typedef struct {
+  real x, y, z;
+} POINT;
+
+real MCvol(Scalar & c, const int i, const int j, const int k,
+           const POINT origin, const real radius, const int N) {
+
+  /* seed the rng */
+  std::mt19937_64 rng;
+  uint64_t timeSeed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+  std::seed_seq ss{uint32_t(timeSeed & 0xffffffff), uint32_t(timeSeed>>32)};
+  rng.seed(ss);
+
+  /* initialize a uniform distribution between 0 and 1 */
+  std::uniform_real_distribution<double> unif(0, 1);
+
+  POINT wsb;
+  wsb.x = c.xc(i) - c.dxc(i)/2.0;
+  wsb.y = c.yc(j) - c.dyc(j)/2.0;
+  wsb.z = c.zc(k) - c.dzc(k)/2.0;
+
+  POINT diff;
+  diff.x = c.dxc(i);
+  diff.y = c.dyc(j);
+  diff.z = c.dzc(k);
+
+  int inside(0);
+  for(int n = 0; n != N; n++) {
+
+    POINT rpoint;
+
+    /* generate x and y and z coords */
+    rpoint.x = wsb.x + unif(rng) * c.dxc(i);
+    rpoint.y = wsb.y + unif(rng) * c.dyc(j);
+    rpoint.z = wsb.z + unif(rng) * c.dzc(k);
+
+    /* calculate distance from origin */
+    POINT delta;
+   
+    delta.x = rpoint.x - origin.x;
+    delta.y = rpoint.y - origin.y;
+    delta.z = rpoint.z - origin.z;
+
+    real distance = delta.x*delta.x + delta.y*delta.y + delta.z*delta.z;
+    distance = sqrt(distance);
+
+    if(distance<radius) inside++;
+  }
+
+  return real(inside)/real(N);
+
+}
+
+main() {
+
+  /*--------------------------------+
+  |  choose the output file format  |
+  +--------------------------------*/
+  boil::plot = new PlotTEC();
+
+  /*----------+
+  |  grid(s)  |
+  +----------*/
+  Grid1D gx( Range<real>( -LX/2.,LX/2.), NX, Periodic::yes() );
+  Grid1D gy( Range<real>( -LY/2.,LY/2.), NY, Periodic::yes() );
+  Grid1D gz( Range<real>( -LZ/2.,LZ/2.), NZ, Periodic::yes() );
+
+  /*---------+
+  |  domain  |
+  +---------*/
+  Domain d(gx, gy, gz);     
+
+  Scalar c(d);
+
+  c.bc().add( BndCnd( Dir::imin(), BndType::periodic() ) );
+  c.bc().add( BndCnd( Dir::imax(), BndType::periodic() ) );
+  c.bc().add( BndCnd( Dir::jmin(), BndType::periodic() ) );
+  c.bc().add( BndCnd( Dir::jmax(), BndType::periodic() ) );
+  c.bc().add( BndCnd( Dir::kmin(), BndType::periodic() ) );
+  c.bc().add( BndCnd( Dir::kmax(), BndType::periodic() ) );
+
+  POINT origin;
+  origin.x = xcent;
+  origin.y = ycent;
+  origin.z = zcent;
+
+  for_vijk(c,i,j,k) {
+    c[i][j][k] = 0.0;
+    real dist = sqrt(pow(c.xc(i)-origin.x,2.0)
+                    +pow(c.yc(j)-origin.y,2.0)
+                    +pow(c.zc(k)-origin.z,2.0));
+
+    if(dist<.8*radius) {
+      c[i][j][k]=1.0;
+    } else if(dist<1.2*radius) {
+      c[i][j][k]=MCvol(c,i,j,k,origin,radius,nrng);
+    }  
+  }
+  c.bnd_update();
+
+  boil::plot->plot(c, "c", 0);
+  c.save("conc",0);
+}

@@ -21,47 +21,124 @@ void Body::cut_init(const Domain & dom) {
   vec = new Vector(dom); (*vec) = vin;
 
   /* set boundary condition */
-  if( dom.period(0) )  
-   {sca->bc().add( BndCnd( Dir::imin(), BndType::periodic() ) );
-    sca->bc().add( BndCnd( Dir::imax(), BndType::periodic() ) );}
-  else 
-   {sca->bc().add( BndCnd( Dir::imin(), BndType::neumann() ) );
-    sca->bc().add( BndCnd( Dir::imax(), BndType::neumann() ) );}
-  if( dom.period(1) )  
-   {sca->bc().add( BndCnd( Dir::jmin(), BndType::periodic() ) );
-    sca->bc().add( BndCnd( Dir::jmax(), BndType::periodic() ) );}
-  else 
-   {sca->bc().add( BndCnd( Dir::jmin(), BndType::neumann() ) );
-    sca->bc().add( BndCnd( Dir::jmax(), BndType::neumann() ) );}
-  if( dom.period(2) )  
-   {sca->bc().add( BndCnd( Dir::kmin(), BndType::periodic() ) );
-    sca->bc().add( BndCnd( Dir::kmax(), BndType::periodic() ) );}
-  else 
-   {sca->bc().add( BndCnd( Dir::kmin(), BndType::neumann() ) );
-    sca->bc().add( BndCnd( Dir::kmax(), BndType::neumann() ) );}
+  if       (dom.is_dummy(0)) {
+    sca->bc().add( BndCnd( Dir::imin(), BndType::pseudo() ) );
+    sca->bc().add( BndCnd( Dir::imax(), BndType::pseudo() ) );
+  } else if(dom.period(0)) {
+    sca->bc().add( BndCnd( Dir::imin(), BndType::periodic() ) );
+    sca->bc().add( BndCnd( Dir::imax(), BndType::periodic() ) );
+  } else {
+    if(dom.bnd_symmetry(Dir::imin())) {
+      sca->bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
+    } else {
+      sca->bc().add( BndCnd( Dir::imin(), BndType::neumann() ) );
+    }
+    if(dom.bnd_symmetry(Dir::imax())) {
+      sca->bc().add( BndCnd( Dir::imax(), BndType::symmetry() ) );
+    } else {
+      sca->bc().add( BndCnd( Dir::imax(), BndType::neumann() ) );
+    }
+  }
+
+  if       (dom.is_dummy(1)) {
+    sca->bc().add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
+    sca->bc().add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
+  } else if(dom.period(1)) {
+    sca->bc().add( BndCnd( Dir::jmin(), BndType::periodic() ) );
+    sca->bc().add( BndCnd( Dir::jmax(), BndType::periodic() ) );
+  } else {
+    if(dom.bnd_symmetry(Dir::jmin())) {
+      sca->bc().add( BndCnd( Dir::jmin(), BndType::symmetry() ) );
+    } else {
+      sca->bc().add( BndCnd( Dir::jmin(), BndType::neumann() ) );
+    }
+    if(dom.bnd_symmetry(Dir::jmax())) {
+      sca->bc().add( BndCnd( Dir::jmax(), BndType::symmetry() ) );
+    } else {
+      sca->bc().add( BndCnd( Dir::jmax(), BndType::neumann() ) );
+    }
+  }
+
+  if       (dom.is_dummy(2)) {
+    sca->bc().add( BndCnd( Dir::kmin(), BndType::pseudo() ) );
+    sca->bc().add( BndCnd( Dir::kmax(), BndType::pseudo() ) );
+  } else if(dom.period(2)) {
+    sca->bc().add( BndCnd( Dir::kmin(), BndType::periodic() ) );
+    sca->bc().add( BndCnd( Dir::kmax(), BndType::periodic() ) );
+  } else {
+    if(dom.bnd_symmetry(Dir::kmin())) {
+      sca->bc().add( BndCnd( Dir::kmin(), BndType::symmetry() ) );
+    } else {
+      sca->bc().add( BndCnd( Dir::kmin(), BndType::neumann() ) );
+    }
+    if(dom.bnd_symmetry(Dir::kmax())) {
+      sca->bc().add( BndCnd( Dir::kmax(), BndType::symmetry() ) );
+    } else {
+      sca->bc().add( BndCnd( Dir::kmax(), BndType::neumann() ) );
+    }
+  }
 
   (*bdist)=sca->shape();
 
   for_m(m) {
-    if( dom.period(0) )
-     {vec->bc(m).add( BndCnd( Dir::imin(), BndType::periodic() ) );
-      vec->bc(m).add( BndCnd( Dir::imax(), BndType::periodic() ) );}
-    else
-     {vec->bc(m).add( BndCnd( Dir::imin(), BndType::neumann() ) );
-      vec->bc(m).add( BndCnd( Dir::imax(), BndType::neumann() ) );}
-    if( dom.period(1) )
-     {vec->bc(m).add( BndCnd( Dir::jmin(), BndType::periodic() ) );
-      vec->bc(m).add( BndCnd( Dir::jmax(), BndType::periodic() ) );}
-    else
-     {vec->bc(m).add( BndCnd( Dir::jmin(), BndType::neumann() ) );
-      vec->bc(m).add( BndCnd( Dir::jmax(), BndType::neumann() ) );}
-    if( dom.period(2) )
-     {vec->bc(m).add( BndCnd( Dir::kmin(), BndType::periodic() ) );
-      vec->bc(m).add( BndCnd( Dir::kmax(), BndType::periodic() ) );}
-    else
-     {vec->bc(m).add( BndCnd( Dir::kmin(), BndType::neumann() ) );
-      vec->bc(m).add( BndCnd( Dir::kmax(), BndType::neumann() ) );}
-  }
+    if       (dom.is_dummy(0)) {
+      vec->bc(m).add( BndCnd( Dir::imin(), BndType::pseudo() ) );
+      vec->bc(m).add( BndCnd( Dir::imax(), BndType::pseudo() ) );
+    } else if(dom.period(0)) {
+      vec->bc(m).add( BndCnd( Dir::imin(), BndType::periodic() ) );
+      vec->bc(m).add( BndCnd( Dir::imax(), BndType::periodic() ) );
+    } else {
+      if(dom.bnd_symmetry(Dir::imin())) {
+        vec->bc(m).add( BndCnd( Dir::imin(), BndType::symmetry() ) );
+      } else {
+        vec->bc(m).add( BndCnd( Dir::imin(), BndType::neumann() ) );
+      }
+      if(dom.bnd_symmetry(Dir::imax())) {
+        vec->bc(m).add( BndCnd( Dir::imax(), BndType::symmetry() ) );
+      } else {
+        vec->bc(m).add( BndCnd( Dir::imax(), BndType::neumann() ) );
+      }
+    }
+
+    if       (dom.is_dummy(1)) {
+      vec->bc(m).add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
+      vec->bc(m).add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
+    } else if(dom.period(1)) {
+      vec->bc(m).add( BndCnd( Dir::jmin(), BndType::periodic() ) );
+      vec->bc(m).add( BndCnd( Dir::jmax(), BndType::periodic() ) );
+    } else {
+      if(dom.bnd_symmetry(Dir::jmin())) {
+        vec->bc(m).add( BndCnd( Dir::jmin(), BndType::symmetry() ) );
+      } else {
+        vec->bc(m).add( BndCnd( Dir::jmin(), BndType::neumann() ) );
+      }
+      if(dom.bnd_symmetry(Dir::jmax())) {
+        vec->bc(m).add( BndCnd( Dir::jmax(), BndType::symmetry() ) );
+      } else {
+        vec->bc(m).add( BndCnd( Dir::jmax(), BndType::neumann() ) );
+      }
+    }
+
+    if       (dom.is_dummy(2)) {
+      vec->bc(m).add( BndCnd( Dir::kmin(), BndType::pseudo() ) );
+      vec->bc(m).add( BndCnd( Dir::kmax(), BndType::pseudo() ) );
+    } else if(dom.period(2)) {
+      vec->bc(m).add( BndCnd( Dir::kmin(), BndType::periodic() ) );
+      vec->bc(m).add( BndCnd( Dir::kmax(), BndType::periodic() ) );
+    } else {
+      if(dom.bnd_symmetry(Dir::kmin())) {
+        vec->bc(m).add( BndCnd( Dir::kmin(), BndType::symmetry() ) );
+      } else {
+        vec->bc(m).add( BndCnd( Dir::kmin(), BndType::neumann() ) );
+      }
+      if(dom.bnd_symmetry(Dir::kmax())) {
+        vec->bc(m).add( BndCnd( Dir::kmax(), BndType::symmetry() ) );
+      } else {
+        vec->bc(m).add( BndCnd( Dir::kmax(), BndType::neumann() ) );
+      }
+    }
+
+  } /* for m */
 #ifdef DEBUG
   std::cout<<"body_cut_init::pass B.C.set. irank= "<<boil::cart.iam()<<"\n";
 #endif

@@ -13,12 +13,30 @@ void Grid1D::correct_boundaries() {
     x_node[nc_in + boil::BW + b + 1] = x_node[nc_in + boil::BW];
   }
 
-  for(int b=0; b<boil::BW; b++) {
-    real dx1 = x_node[boil::BW + b + 1] - x_node[boil::BW];
-    if(periodicN() == true) x_node[nc_in + boil::BW + b + 1] += dx1;
+  real dx1 = x_node[boil::BW + 1] - x_node[boil::BW];
+  real dxN = x_node[nc_in + boil::BW] - x_node[nc_in + boil::BW - 1];
 
-    real dxN = x_node[nc_in + boil::BW] - x_node[nc_in + boil::BW - b - 1];
-    if(periodic1() == true) x_node[boil::BW - b - 1] -= dxN;
+  for(int b=0; b<boil::BW; b++) {
+    real dx1b = x_node[boil::BW + b + 1] - x_node[boil::BW];
+    real dxNb = x_node[nc_in + boil::BW] - x_node[nc_in + boil::BW - b - 1];
+
+    if(periodicN() == true) {
+      x_node[nc_in + boil::BW + b + 1] += dx1b;
+    } else {
+      if     (bndgridN() == BndGrid::extrapolate())
+        x_node[nc_in + boil::BW + b + 1] += real(b+1)*dxN;
+      else if(bndgridN() == BndGrid::symmetry())
+        x_node[nc_in + boil::BW + b + 1] += dxNb;
+    }
+
+    if(periodic1() == true) {
+      x_node[boil::BW - b - 1] -= dxNb;
+    } else {
+      if     (bndgrid1() == BndGrid::extrapolate())
+        x_node[boil::BW - b - 1] -= real(b+1)*dx1;
+      else if(bndgrid1() == BndGrid::symmetry())
+        x_node[boil::BW - b - 1] -= dx1b;
+    }
   }
 
   /*--------------------------+            N = 4
@@ -42,8 +60,27 @@ void Grid1D::correct_boundaries() {
 
   dx_node[0]                  = 0;
   dx_node[nc_in + 2*boil::BW] = 0;
-  if(periodic1()==true) dx_node[0]   = x_cell[nc_in+2*boil::BW] 
-                                     - x_cell[nc_in+2*boil::BW-1];
-  if(periodicN()==true) dx_node[nc_in+2*boil::BW] = x_cell[boil::BW+1] 
-                                                  - x_cell[boil::BW];
+  if(periodic1()==true) {
+    /* previously in error (indexing past the array + referring to wrong cell)
+       dx_node[0] = x_cell[nc_in+2*boil::BW] - x_cell[nc_in+2*boil::BW-1]; */
+    /* node[0] \equiv node[boil::BW+nc_in - boil::BW] = node[nc_in] */
+    dx_node[0] = x_cell[nc_in] - x_cell[nc_in-1];
+  } else {
+    if     (bndgrid1() == BndGrid::extrapolate())
+      dx_node[0] = dx_node[1];
+    else if(bndgrid1() == BndGrid::symmetry())
+      dx_node[0] = x_cell[2*boil::BW] - x_cell[2*boil::BW-1];
+  }
+  if(periodicN()==true) {
+    /* previously in error (referring to wrong cell)
+       dx_node[nc_in+2*boil::BW] = x_cell[boil::BW+1] - x_cell[boil::BW]; */
+    dx_node[nc_in+2*boil::BW] = x_cell[2*boil::BW] - x_cell[2*boil::BW-1];
+  } else {
+    if     (bndgridN() == BndGrid::extrapolate())
+      dx_node[nc_in+2*boil::BW] = dx_node[nc_in+2*boil::BW-1];
+    else if(bndgridN() == BndGrid::symmetry())
+      dx_node[nc_in+2*boil::BW] = x_cell[nc_in] - x_cell[nc_in-1];
+  }
+
+  return;
 }

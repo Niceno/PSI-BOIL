@@ -28,8 +28,8 @@ class ScalrInt;
 ////////////
 class Plot {
   public:
-    Plot( const AsNodes asno=AsNodes::no(), 
-          const Buffers buff=Buffers::no() ) {}
+    Plot( const AsNodes asno=AsNodes::no(),
+          const Buffers buff=Buffers::no() ) {} 
 
     virtual void plot(Domain &, const char *, const int = -1) = 0;
     virtual void plot(Body &, const char *, const int = -1) = 0;
@@ -66,7 +66,6 @@ class Plot {
     virtual void plot(const Scalar &, const Scalar &, const Scalar &, 
                       const Scalar &, const Scalar &, const Scalar &,
                       const char *, const int) = 0;
-
   protected:
     const Domain * dom;
     int   sh;           /* shift */

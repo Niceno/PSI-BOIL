@@ -1,0 +1,222 @@
+#include "Include/psi-boil.h"
+
+#define INTERFACE
+
+/******************************************************************************/
+int main(int argc, char ** argv) {
+
+  boil::timer.start();
+
+  if(argc<4){
+    boil::oout<<"Three command line arguments required!"<<"\n";
+    boil::oout<<"./Boil wmin glevel phigamma"<<"\n";
+
+    exit(0);
+  }
+
+/******************************************************************************/
+/* ------------ input from command line */
+  int wmin=atoi(argv[1]);
+  boil::oout<<"wmin= "<<wmin<<"\n";
+
+  const int gLevel = atoi(argv[2]); /* domain dimensions */
+  boil::oout<<"glevel= "<<gLevel<<"\n";
+
+  const real phigamma = atof(argv[3]); /* interface cell volume fraction */
+  boil::oout<<"phigamma= "<<phigamma<<"\n";
+
+/******************************************************************************/
+  const int NX = 24*gLevel;
+  const int NZ = 1;
+
+  /* domain dimensions (given by problem) */
+  const real LX = 1.0;
+  const real DX = LX/real(NX);
+
+#ifndef INTERFACE
+  const real Lgamma = LX;
+#else
+  const real Lgamma = LX-phigamma*DX;
+#endif
+  
+  const real e0 = 0.7;
+  const real eout = 0.0;
+/******************************************************************************/
+
+  /*--------------------------------+
+  |  choose the output file format  |
+  +--------------------------------*/
+  boil::plot = new PlotTEC();
+  //boil::plot = new PlotTEC(AsNodes::no(),Buffers::yes());
+
+  /*----------+
+  |  grid(s)  |
+  +----------*/
+#ifndef INTERFACE
+  Grid1D gx( Range<real>(0.0,LX), NX, Periodic::no(),
+             BndGrid::symmetry(), BndGrid::wall() );
+#else
+  Grid1D gx( Range<real>(-DX*(1.+phigamma),LX-phigamma*DX), NX+1, Periodic::no(),
+             BndGrid::symmetry(), BndGrid::wall() );
+#endif
+  Grid1D gz(DX);
+
+  /*---------+
+  |  domain  |
+  +---------*/
+  Domain d(gx,gz,gz);
+
+  /*------------------+
+  |  define unknowns  |
+  +------------------*/
+  Vector uvw(d), xyz(d);           // vel
+  Scalar eps(d), mdot_eps (d);     // concentration
+  Scalar c(d), g(d), kappa(d);
+
+  /*-----------------------------+
+  |  insert boundary conditions  |
+  +-----------------------------*/
+  for_m(m) {
+    uvw.bc(m).add( BndCnd( Dir::imin(), BndType::symmetry() ) );
+    uvw.bc(m).add( BndCnd( Dir::imax(), BndType::wall() ) );
+    uvw.bc(m).add( BndCnd( Dir::kmin(), BndType::pseudo() ) );
+    uvw.bc(m).add( BndCnd( Dir::kmax(), BndType::pseudo() ) );
+    uvw.bc(m).add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
+    uvw.bc(m).add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
+  }
+
+  eps.bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
+  eps.bc().add( BndCnd( Dir::imax(), BndType::dirichlet(),eout ) );
+  eps.bc().add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
+  eps.bc().add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
+  eps.bc().add( BndCnd( Dir::kmin(), BndType::pseudo() ) );
+  eps.bc().add( BndCnd( Dir::kmax(), BndType::pseudo() ) );
+
+  c.bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
+  c.bc().add( BndCnd( Dir::imax(), BndType::neumann() ) );
+  c.bc().add( BndCnd( Dir::kmin(), BndType::pseudo() ) );
+  c.bc().add( BndCnd( Dir::kmax(), BndType::pseudo() ) );
+  c.bc().add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
+  c.bc().add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
+
+  kappa = c.shape();
+  g = c.shape();
+  mdot_eps = c.shape();
+
+  /*----------------------+
+  |  physical properties  |
+  +----------------------*/
+  Matter liquid(d), jello(d);
+
+  liquid.rho(1.0);
+  liquid.gamma(0.5);
+
+  Matter mixed(jello,liquid, &c);
+
+  /*-------------------+
+  |  time-integration  |
+  +-------------------*/
+  const real dt = 0.1*d.dxyz_min();
+  boil::oout<<DX<<" "<<d.dxyz_min()<<boil::endl;
+
+  Times time(0.5,dt);
+
+  /*-----------------+
+  |  define solvers  |
+  +-----------------*/
+  Krylov * solver = new CG(d, Prec::di());
+
+  VOF conc(c, g, kappa, uvw, time, solver);
+
+  ConcentrationTP ngtransp(eps,mdot_eps,uvw,
+                           c,conc.flow(),conc.heaviside(),&(conc.topo),
+                           time, solver, &liquid);
+
+  const real mmass = 18e-3;
+  const real latent_slp = -1e3;
+  const real Tref = 300.;
+  const real latent = 1e6-latent_slp*Tref;
+  Clapeyron tsat(Tref,conc.topo.adens,eps,mmass,latent);
+  tsat.set_ur(1.0);
+
+  /*--------------------+
+  |  initial condition  |
+  +--------------------*/
+  eps = e0;
+  c = 0.0;
+#ifdef INTERFACE
+  for_avjk(c,j,k) {
+    c[boil::BW  ][j][k] = 1.;
+    c[boil::BW+1][j][k] = phigamma;
+  }
+#endif
+  c.bnd_update();
+  c.exchange_all();
+
+  conc.init();
+  conc.front_minmax();
+  //exit(0);
+
+#ifndef INTERFACE
+  const int iref = boil::BW;
+#else
+  const int iref = boil::BW+1;
+#endif
+
+  /*------------+
+  |  time loop  |
+  +------------*/  
+  for(time.start(); time.end(); time.increase()) {
+    ngtransp.discretize();
+    ngtransp.new_time_step();
+    ngtransp.solve(ResRat(1e-16),"conc");
+    ngtransp.extrapolate();
+    
+    tsat.tint_field();
+
+    real xx = c.xc(iref);
+    real gamma = liquid.gamma()->value();
+    real etheor(0);
+    for(int m(0); m<200; ++m) {
+      real idx = 2.*m+1;
+      etheor +=  4.*e0/boil::pi*1./idx
+               * exp(-gamma*idx*idx*boil::pi*boil::pi/(4.*Lgamma*Lgamma)*time.current_time())
+               * sin(idx*boil::pi*(xx+Lgamma)/(2.*Lgamma));
+    }
+
+    boil::oout<<"centre: "<<time.current_time()<<" "
+              <<eps[iref][boil::BW][boil::BW]<<" "<<etheor<<" "<<(eps[iref][boil::BW][boil::BW]-etheor)/etheor<<" | "
+              <<tsat.Tint(iref,boil::BW,boil::BW)<<" "
+              //<<tsat.temperature(eps[iref][boil::BW][boil::BW])<<" "
+              //<<tsat.epsilon(tsat.Tint(iref,boil::BW,boil::BW))
+              <<boil::endl;
+
+  }
+
+  boil::plot->plot(eps, "eps");
+
+#if 1
+  for_vi(eps,i) {
+    int j = boil::BW;
+    int k = boil::BW;
+
+    real xx = eps.xc(i);
+    real gamma = liquid.gamma()->value();
+    real etheor(0);
+    for(int m(0); m<200; ++m) {
+      real idx = 2.*m+1;
+      etheor +=  4.*e0/boil::pi*1./idx
+               * exp(-gamma*idx*idx*boil::pi*boil::pi/(4.*Lgamma*Lgamma)*time.current_time())
+               * sin(idx*boil::pi*(xx+Lgamma)/(2.*Lgamma));
+    }
+    boil::oout<<"profile: "<<xx<<" "<<eps[i][j][k]<<" "<<etheor<<" "<<(eps[i][j][k]-etheor)/etheor<<" "
+              <<tsat.Tint(i,j,k)<<boil::endl;
+  }
+#endif
+
+  boil::oout << "Finished!" << boil::endl;
+
+  boil::timer.stop();
+  boil::timer.report();
+
+}	

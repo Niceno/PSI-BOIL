@@ -8,7 +8,7 @@ CIPCSL2::CIPCSL2(const Scalar & PHI,
                  const Scalar & K,
                  const Vector & U, 
                  Times & T,
-                 Krylov * S) :
+                 Linear * S) :
 /*---------------------+ 
 |  initialize parent   | NULL is for solid
 +---------------------*/
@@ -23,12 +23,17 @@ CIPCSL2::CIPCSL2(const Scalar & PHI,
   stmp  ( *PHI.domain() ),
   iflag ( *PHI.domain() ),
   wflag ( *PHI.domain() ),
+  intflag( *PHI.domain() ),
   scheme( PHI ),
   fn    ( *PHI.domain() ),
   dist  ( *PHI.domain() ),
   alp   ( *PHI.domain() ),
   sxyz  ( *U.domain() ),
+  fs    ( *U.domain() ),
+  adens ( *PHI.domain() ),
   kappa ( &K )
+  //heavi(&phi, NULL, &adens),
+  //topo(&phi,&phi,&nx,&ny,&nz,&adens,&fs,&intflag)
 
 /*------------------------------------------------------+
 |  this constructor is called only at the finest level  |
@@ -43,32 +48,39 @@ CIPCSL2::CIPCSL2(const Scalar & PHI,
   stmp    = phi.shape();
   iflag   = phi.shape();
   wflag   = phi.shape();
+  intflag = phi.shape();
   fn      = phi.shape();
   dist    = phi.shape();
   alp     = phi.shape();
+  adens   = phi.shape();
   kappa   = phi.shape();
 
   for_m(m){
     sxyz(m) = (*u)(m).shape();
+    fs(m)   = (*u)(m).shape();
   }
   assert(PHI.domain() == F.domain());
 
   /* set constants */
-  pi = acos(-1.0);
   phimin = 0.0;
   phimax = 1.0;
   phisurf = 0.5*(phimin+phimax);
   dxmin = dom->dxyz_min();
   ww=1.0*dxmin; // default value for ww
+  tol_wall = 0.01;
+
+  /* runtime polymorphism */
+  heavi = new MarchingCubes(&phi,NULL,&adens);
+  topo = new Topology(&phi,&phi,&nx,&ny,&nz,&adens,&fs,&intflag,phisurf);
 
   epsnorm=1.0e-12;
-  eps_clr = 1.0e-4; // epsiron for color function
+  eps_clr = 1.0e-4; // epsilon for color function
 
   /* set initial value */
   nredist=1;
   itsharpen=4;
   ialpcal=0;
-  cangle=90.0/180.0*pi;
+  cangle=90.0/180.0*boil::pi;
   itsmear=10;
   eps_st=1.5;
   sum_outlet=0.0;
@@ -89,6 +101,9 @@ CIPCSL2::CIPCSL2(const Scalar & PHI,
 #ifdef DEBUG
   std::cout<<"cipcsl2:discretize \n";
 #endif
+
+  /* set in init() */
+  is_initialized = false;
 
   init();
 #ifdef DEBUG

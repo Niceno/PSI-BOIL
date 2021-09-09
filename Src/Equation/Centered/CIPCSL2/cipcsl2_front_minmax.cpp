@@ -4,14 +4,14 @@ real frontPosition(real xyz1, real xyz2, real phi1, real phi2);
 
 /******************************************************************************/
 void CIPCSL2::front_minmax() {
-  front_minmax( Range<real>(-boil::exa, boil::exa)
-              , Range<real>(-boil::exa, boil::exa)
-              , Range<real>(-boil::exa, boil::exa) );
+  front_minmax(Range<real>(-boil::exa, boil::exa),
+               Range<real>(-boil::exa, boil::exa),
+               Range<real>(-boil::exa, boil::exa) );
 }
 /******************************************************************************/
-void CIPCSL2::front_minmax( Range<real> xr
-                          , Range<real> yr
-                          , Range<real> zr ) {
+void CIPCSL2::front_minmax(Range<real> xr,
+                           Range<real> yr,
+                           Range<real> zr ) {
 /***************************************************************************//**
 *  \brief Detect maximu and minimum of free surface position.
 *           results: xminft,xmaxft,yminft,ymaxft,zminft,zmaxft

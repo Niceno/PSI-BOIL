@@ -10,9 +10,9 @@ void CIPCSL2::CIPCSLy1(const Scalar & f, const Scalar & sy) {
 
    /* Define advection velocity: node */
    Comp m=Comp::v();
-   for(int i=1; i<=u->ni(m)-1; i++) {
-   for(int j=0; j<=u->nj(m)-1; j++) {
-   for(int k=1; k<=u->nk(m)-1; k++) {
+   for(int i=u->si(m);   i<=u->ei(m)+1; i++) {
+   for(int j=u->sj(m)-1; j<=u->ej(m)+1; j++) {
+   for(int k=u->sk(m);   k<=u->ek(m)+1; k++) {
      vel[i][j][k]=((*u)[m][i  ][j][k]+(*u)[m][i][j][k-1]+
                    (*u)[m][i-1][j][k]+(*u)[m][i][j][k-1])/4.0;
    }}}
@@ -24,9 +24,7 @@ void CIPCSL2::CIPCSLy1(const Scalar & f, const Scalar & sy) {
   */
 
   /* reset delrho */
-  for(int i=0; i<=ni(); i++)
-  for(int j=0; j<=nj(); j++)
-  for(int k=0; k<=nk(); k++)
+  for_aijk(i,j,k)
     delrho[i][j][k]=0.0;
   /* EXTENDED BUFFERS HINT:
      Lines 27-29 could probably be replaced with this:

@@ -21,6 +21,7 @@ void Times::print_current() const {
 |  prints information about the current time step                              |
 +-----------------------------------------------------------------------------*/
   if (print_cinfo) {
+#if 0
     boil::oout << "#############################################" << boil::endl;
     boil::oout << "#                                            " << boil::endl;
     boil::oout << "# STEP: " << current_step() << " / " 
@@ -34,5 +35,14 @@ void Times::print_current() const {
                                                                   << boil::endl;
     boil::oout << "#                                            " << boil::endl;
     boil::oout << "#############################################" << boil::endl;
+#else
+    boil::oout << "########################" << boil::endl;
+    boil::oout << "# TIME:      " << current_time() << boil::endl;
+    boil::oout << "# DT:        " << dt() << boil::endl;
+    boil::oout << "# TIME STEP: " << current_step()
+               << "/"             << total_steps() << boil::endl;
+    boil::oout << "# WTIME:     " << boil::timer.current_min() << boil::endl;
+    boil::oout << "########################" << boil::endl;
+#endif
   }
 }

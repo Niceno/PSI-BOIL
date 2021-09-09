@@ -1,8 +1,11 @@
 #include "momentum.h"
 
 /******************************************************************************/
-void Momentum::new_time_step() {
+void Momentum::new_time_step(const Scalar * prs) {
+  new_time_step(u,prs);
+}
 
+void Momentum::new_time_step(const Vector & vec, const Scalar * prs) {
   /*------------+
   |      dV  n  |
   |  f = -- u   |
@@ -11,7 +14,7 @@ void Momentum::new_time_step() {
   for_m(m) 
     for_mijk(m,i,j,k) {
       const real rho = fluid()->rho(m,i,j,k);
-      fold[m][i][j][k] = rho * dV(m,i,j,k) * u[m][i][j][k] * time->dti();
+      fold[m][i][j][k] = rho * dV(m,i,j,k) * vec[m][i][j][k] * time->dti();
     }
 
   /* correct for volumes in immersed boundary */
@@ -26,16 +29,19 @@ void Momentum::new_time_step() {
     }
   }
 
+#if 1
   /*------------+
   |        n-1  |
   |  f -= H     |
   |             |
   +------------*/
-  for_m(m) 
-    for_mijk(m,i,j,k) {
-                       /* conv_ts.Nm2() = -0.5 for adams-bashforth */
-      fold[m][i][j][k] += conv_ts.Nm2() * cold[m][i][j][k]; 
+  if (conv_ts.Nm2()!=0.0)  {
+    for_m(m) { 
+      for_mijk(m,i,j,k) { /* conv_ts.Nm2() = -0.5 for adams-bashforth */
+        fold[m][i][j][k] += conv_ts.Nm2() * cold[m][i][j][k]; 
+      }
     }
+  }
 
   /*------------+
   |       3  n  |
@@ -43,10 +49,15 @@ void Momentum::new_time_step() {
   |       2     |
   +------------*/
   /* a condition like: if(conv_ts != backward_euler()) would be good */
-  convection(&cold);
-  for_m(m)
-    for_mijk(m,i,j,k)
-      fold[m][i][j][k] += conv_ts.Nm1() * cold[m][i][j][k]; /*conv_ts.Nm1()=1.5*/
+  if (conv_ts.Nm1()==0.0 && conv_ts.Nm2()==0.0) {
+  } else {
+    convection(&cold,prs);
+    for_m(m) {
+      for_mijk(m,i,j,k) /*conv_ts.Nm1()=1.5*/
+        fold[m][i][j][k] += conv_ts.Nm1() * cold[m][i][j][k];
+    }
+  }
+#endif
     
   /*------------+ 
   |       1  n  |
@@ -54,5 +65,6 @@ void Momentum::new_time_step() {
   |       2     |
   +------------*/
   /* a condition like: if(diff_ts != backward_euler()) would be good */
-  diffusion();
+  if(diff_ts.Nm1() != 0.0)
+    diffusion();
 }

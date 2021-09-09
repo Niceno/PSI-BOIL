@@ -1,0 +1,9 @@
+1e-4    - res_wall
+1e-4  - res_liq
+1e5    - qflux
+100.  - t0
+100.    - t1
+0    - LZheat
+0.012  - LZfilm
+24    - NZsol
+0     - inverted

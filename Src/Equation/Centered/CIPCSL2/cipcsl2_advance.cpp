@@ -87,6 +87,10 @@ void CIPCSL2::advance() {
   }
 #endif
 
+  /* ancillary functions */
+  ancillary();
+
+
 #ifdef DEBUG
   boil::oout<<"cipcsl2_advance:end\n";
 #endif

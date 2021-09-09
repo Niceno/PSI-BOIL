@@ -80,6 +80,16 @@ VectorBool::VectorBool(const VectorBool * v) : aliav(true), vec(v->vec) {
     pnt_dyn[~m] = v->pnt_dyn[~m]; 
     pnt_dzb[~m] = v->pnt_dzb[~m];
     pnt_dzt[~m] = v->pnt_dzt[~m];
+
+    pnt_dSx[~m] = v->pnt_dSx[~m];
+    pnt_dSy[~m] = v->pnt_dSy[~m];
+    pnt_dSz[~m] = v->pnt_dSz[~m];
+
+    pnt_dSx_dir[~m] = v->pnt_dSx_dir[~m];
+    pnt_dSy_dir[~m] = v->pnt_dSy_dir[~m];
+    pnt_dSz_dir[~m] = v->pnt_dSz_dir[~m];
+
+    pnt_dV[~m] = v->pnt_dV[~m];
   }
 
   dom    = v->dom;
@@ -185,6 +195,38 @@ void VectorBool::coordinate() {
   pnt_dzt[1] = &VectorBool::dzt_nrm;
   pnt_dzt[2] = &VectorBool::dzt_staggered;
 	
+  /* dS */
+  pnt_dSx[0] = &VectorBool::dSx_xstaggered;
+  pnt_dSx[1] = &VectorBool::dSx_ystaggered;
+  pnt_dSx[2] = &VectorBool::dSx_zstaggered;
+
+  pnt_dSy[0] = &VectorBool::dSy_xstaggered;
+  pnt_dSy[1] = &VectorBool::dSy_ystaggered;
+  pnt_dSy[2] = &VectorBool::dSy_zstaggered;
+
+  pnt_dSz[0] = &VectorBool::dSz_xstaggered;
+  pnt_dSz[1] = &VectorBool::dSz_ystaggered;
+  pnt_dSz[2] = &VectorBool::dSz_zstaggered;
+
+  /* dS dir */
+  pnt_dSx_dir[0] = &VectorBool::dSx_dir_xstaggered;
+  pnt_dSx_dir[1] = &VectorBool::dSx_dir_ystaggered;
+  pnt_dSx_dir[2] = &VectorBool::dSx_dir_zstaggered;
+
+  pnt_dSy_dir[0] = &VectorBool::dSy_dir_xstaggered;
+  pnt_dSy_dir[1] = &VectorBool::dSy_dir_ystaggered;
+  pnt_dSy_dir[2] = &VectorBool::dSy_dir_zstaggered;
+
+  pnt_dSz_dir[0] = &VectorBool::dSz_dir_xstaggered;
+  pnt_dSz_dir[1] = &VectorBool::dSz_dir_ystaggered;
+  pnt_dSz_dir[2] = &VectorBool::dSz_dir_zstaggered;
+
+  /* dV */
+  pnt_dV[0] = &VectorBool::dV_xstaggered;
+  pnt_dV[1] = &VectorBool::dV_ystaggered;
+  pnt_dV[2] = &VectorBool::dV_zstaggered;
+
+  return;
 }	
 
 /******************************************************************************/

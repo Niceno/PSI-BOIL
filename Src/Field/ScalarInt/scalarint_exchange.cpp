@@ -336,7 +336,7 @@ void ScalarInt::exchange(const int dir) const {
     }
   }
   }
-
+  
   delete [] sbuff_s;
   delete [] sbuff_e;
   delete [] rbuff_s;

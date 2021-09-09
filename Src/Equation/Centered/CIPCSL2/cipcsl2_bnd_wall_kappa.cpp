@@ -26,6 +26,12 @@ void CIPCSL2::bnd_wall_kappa() {
           iof=1;
           if(d == Dir::imax()) iof=-1;
           for_vijk( phi.bc().at(b), i,j,k ){
+            if (i<=si()-2) continue;
+            if (i>=ei()+2) continue;
+            if (j<=sj()-1) continue;
+            if (j>=ej()+1) continue;
+            if (k<=sk()-1) continue;
+            if (k>=ek()+1) continue;
             int ii = i+iof;
             /* x direction */
             if(iof==1){   //  imin
@@ -39,11 +45,16 @@ void CIPCSL2::bnd_wall_kappa() {
             kappa[ii][j][k] -= (nz[ii][j][k+1]-nz[ii][j][k-1])/(dzb(k)+dzt(k));
           }
         }
-
         if(d == Dir::jmin() || d == Dir::jmax()){
           jof=1;
           if(d == Dir::jmax()) jof=-1;
           for_vijk( phi.bc().at(b), i,j,k ){
+            if (i<=si()-1) continue;
+            if (i>=ei()+1) continue;
+            if (j<=sj()-2) continue;
+            if (j>=ej()+2) continue;
+            if (k<=sk()-1) continue;
+            if (k>=ek()+1) continue;
             int jj=j+jof;
             /* x direction */
             kappa[i][jj][k] = -(nx[i+1][jj][k]-nx[i-1][jj][k])/(dxw(i)+dxe(i));
@@ -61,6 +72,12 @@ void CIPCSL2::bnd_wall_kappa() {
           kof=1;
           if(d == Dir::kmax()) kof=-1;
           for_vijk( phi.bc().at(b), i,j,k ){
+            if (i<=si()-1) continue;
+            if (i>=ei()+1) continue;
+            if (j<=sj()-1) continue;
+            if (j>=ej()+1) continue;
+            if (k<=sk()-2) continue;
+            if (k>=ek()+2) continue;
             int kk=k+kof;
             /* x direction */
             kappa[i][j][kk] = -(nx[i+1][j][kk]-nx[i-1][j][kk])/(dxw(i)+dxe(i));

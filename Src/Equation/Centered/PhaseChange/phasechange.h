@@ -4,9 +4,8 @@
 #include <cmath>
 #include "../centered.h"
 #include "../../../Parallel/communicator.h"
-#include "../../../Solver/Gauss/gauss.h"
 #include "../../../Timer/timer.h"
-#include "nucleation.h"
+#include "../../Nucleation/nucleation.h"
 
 #define IB
 

@@ -37,6 +37,18 @@ Vector::Vector(const Domain & d) : aliav(false), vec() {
   vec[Comp::w()].dom    = dom;
 
   coordinate();
+
+  for_m(m) {
+    s_I[~m]=boil::BW;
+    s_J[~m]=boil::BW;
+    s_K[~m]=boil::BW;
+    e_I[~m]=boil::BW+dom->gii()-1;
+    e_J[~m]=boil::BW+dom->gij()-1;
+    e_K[~m]=boil::BW+dom->gik()-1;
+    if(m==Comp::u())e_I[~m]++;
+    if(m==Comp::v())e_J[~m]++;
+    if(m==Comp::w())e_K[~m]++;
+  }
 }	
 
 /******************************************************************************/
@@ -88,12 +100,28 @@ Vector::Vector(const Vector * v) : aliav(true), vec(v->vec) {
     pnt_dyn[~m] = v->pnt_dyn[~m]; 
     pnt_dzb[~m] = v->pnt_dzb[~m];
     pnt_dzt[~m] = v->pnt_dzt[~m];
+
+    pnt_dSx[~m] = v->pnt_dSx[~m];
+    pnt_dSy[~m] = v->pnt_dSy[~m];
+    pnt_dSz[~m] = v->pnt_dSz[~m];
+
+    pnt_dSx_dir[~m] = v->pnt_dSx_dir[~m];
+    pnt_dSy_dir[~m] = v->pnt_dSy_dir[~m];
+    pnt_dSz_dir[~m] = v->pnt_dSz_dir[~m];
+
+    pnt_dV[~m] = v->pnt_dV[~m];
+
+    pnt_div[~m] = v->pnt_div[~m];
+    for_m(d)
+      pnt_div_stag[~m][~d] = v->pnt_div_stag[~m][~d];
   }
 
   dom    = v->dom;
 
   for_m(m)
     vec[m].bndcnd = v->vec[m].bndcnd;
+
+  return;
 }	
 
 /******************************************************************************/
@@ -223,6 +251,98 @@ void Vector::coordinate() {
   pnt_dzt[1] = &Vector::dzt_nrm;
   pnt_dzt[2] = &Vector::dzt_staggered;
 	
+  /* dS */
+  pnt_dSx[0] = &Vector::dSx_xstaggered;
+  pnt_dSx[1] = &Vector::dSx_ystaggered;
+  pnt_dSx[2] = &Vector::dSx_zstaggered;
+
+  pnt_dSy[0] = &Vector::dSy_xstaggered;
+  pnt_dSy[1] = &Vector::dSy_ystaggered;
+  pnt_dSy[2] = &Vector::dSy_zstaggered;
+
+  pnt_dSz[0] = &Vector::dSz_xstaggered;
+  pnt_dSz[1] = &Vector::dSz_ystaggered;
+  pnt_dSz[2] = &Vector::dSz_zstaggered;
+
+  /* dS dir */
+  pnt_dSx_dir[0] = &Vector::dSx_dir_xstaggered;
+  pnt_dSx_dir[1] = &Vector::dSx_dir_ystaggered;
+  pnt_dSx_dir[2] = &Vector::dSx_dir_zstaggered;
+
+  pnt_dSy_dir[0] = &Vector::dSy_dir_xstaggered;
+  pnt_dSy_dir[1] = &Vector::dSy_dir_ystaggered;
+  pnt_dSy_dir[2] = &Vector::dSy_dir_zstaggered;
+
+  pnt_dSz_dir[0] = &Vector::dSz_dir_xstaggered;
+  pnt_dSz_dir[1] = &Vector::dSz_dir_ystaggered;
+  pnt_dSz_dir[2] = &Vector::dSz_dir_zstaggered;
+
+  /* dV */
+  pnt_dV[0] = &Vector::dV_xstaggered;
+  pnt_dV[1] = &Vector::dV_ystaggered;
+  pnt_dV[2] = &Vector::dV_zstaggered;
+
+  /* divergence */
+  if(dom->is_dummy(0)) {
+    pnt_div[0] = &Vector::div_zero;
+    for_m(m) 
+      pnt_div_stag[~m][0] = &Vector::div_zero;
+  } else {
+    if(dom->is_axisymmetric()) {
+      pnt_div[0] = &Vector::div_x_axi;
+      pnt_div_stag[0][0] = &Vector::div_stag_x_x_axi;
+      pnt_div_stag[1][0] = &Vector::div_x_axi;
+      if(dom->is_dummy(2))
+        pnt_div_stag[2][0] = &Vector::div_x_axi;
+      else 
+        pnt_div_stag[2][0] = &Vector::div_stag_z_x_axi;
+    } else {
+      pnt_div[0] = &Vector::div_x_cart;
+      pnt_div_stag[0][0] = &Vector::div_stag_x_x_cart;
+      if(dom->is_dummy(1))
+        pnt_div_stag[1][0] = &Vector::div_x_cart;
+      else
+        pnt_div_stag[1][0] = &Vector::div_stag_y_x_cart;
+      if(dom->is_dummy(2))
+        pnt_div_stag[2][0] = &Vector::div_x_cart;
+      else
+        pnt_div_stag[2][0] = &Vector::div_stag_z_x_cart;
+    }
+  }
+  if(dom->is_dummy(1)) {
+    pnt_div[1] = &Vector::div_zero;
+    for_m(m) 
+      pnt_div_stag[~m][1] = &Vector::div_zero;
+  } else {
+    pnt_div[1] = &Vector::div_y_cart;
+    pnt_div_stag[1][1] = &Vector::div_stag_y_y_cart;
+    if(dom->is_dummy(0))
+      pnt_div_stag[0][1] = &Vector::div_y_cart;
+    else
+      pnt_div_stag[0][1] = &Vector::div_stag_x_y_cart;
+    if(dom->is_dummy(2))
+      pnt_div_stag[2][1] = &Vector::div_y_cart;
+    else
+      pnt_div_stag[2][1] = &Vector::div_stag_z_y_cart;
+  }
+  if(dom->is_dummy(2)) {
+    pnt_div[2] = &Vector::div_zero;
+    for_m(m) 
+      pnt_div_stag[~m][2] = &Vector::div_zero;
+  } else {
+    pnt_div[2] = &Vector::div_z_cart;
+    pnt_div_stag[2][2] = &Vector::div_stag_z_z_cart;
+    if(dom->is_dummy(0))
+      pnt_div_stag[0][2] = &Vector::div_z_cart;
+    else
+      pnt_div_stag[0][2] = &Vector::div_stag_x_z_cart;
+    if(dom->is_dummy(1))
+      pnt_div_stag[1][2] = &Vector::div_z_cart;
+    else
+      pnt_div_stag[1][2] = &Vector::div_stag_y_z_cart;
+  }
+
+  return;
 }	
 
 /******************************************************************************/

@@ -1,0 +1,2 @@
+#!/bin/bash
+for i in *dat; do preplot $i; done;

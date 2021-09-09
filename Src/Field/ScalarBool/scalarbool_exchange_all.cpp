@@ -128,7 +128,7 @@ void ScalarBool::exchange_all(const int dir) const {
 
     /* not decomposed in J direction */
     if( dom->dim(Comp::j()) == 1 ) {
-      if( bc().type(Dir::jmin(), BndType::periodic()) &&
+    if( bc().type(Dir::jmin(), BndType::periodic()) &&
           bc().type(Dir::jmax(), BndType::periodic()) )
         for_aik(i,k) {
           val[i][e_y + 1 + b][k] = val[i][s_y + o_y + b][k];
@@ -291,7 +291,7 @@ void ScalarBool::exchange_all(const int dir) const {
     }
   }
   }
-
+  
   delete [] sbuff_s;
   delete [] sbuff_e;
   delete [] rbuff_s;

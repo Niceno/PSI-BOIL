@@ -2,6 +2,7 @@
 #define CONSTANTS_H
 
 #include <cmath>
+#include <limits.h>
 #include "global_precision.h"
 
 #define DIM 3
@@ -26,11 +27,18 @@ namespace boil {
   extern real zepto;
   extern real yocto;
 
+  /* special */
+  extern real unreal;
+  extern int unint;
+
   /* pi */
   extern real pi;
 
   /* gravitational constant  */
   extern real g; 
+
+  /* universal gas constant */
+  extern real R;
 }
 
 #endif

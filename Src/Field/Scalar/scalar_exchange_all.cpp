@@ -7,7 +7,9 @@
 void Scalar::exchange_all(const int dir) const {
 	
   if( bc().count() == 0 ) {
-    OMS(Warning: exchanging a variable without boundary conditions);
+    //OMS(Warning: exchanging a variable without boundary conditions);
+    OMS(Fatal: exchanging a variable without boundary conditions);
+    exit(0);
   }
 
   /*-------------------------------+
@@ -196,7 +198,7 @@ void Scalar::exchange_all(const int dir) const {
         int l = k*ni()+i;
         assert(l < n*n);
         sbuff_e[l] = val[i][e_y - o_y - b][k];   // buffer j end
-        sbuff_s[l] = val[i][s_y + o_y + b][k];   // buffer j start
+        sbuff_s[l] = val[i][s_y + o_y + b][k];   // buffer j start 
       }
 
       if( dom->neighbour(Dir::jmax()) != par_proc_null ) {
@@ -331,13 +333,13 @@ void Scalar::exchange_all(const int dir) const {
         int l = j*ni()+i;
         assert(l < n*n);
         val[i][j][e_z + 1 + b] = rbuff_e[l] + v_max;   // buffer k end
-        val[i][j][s_z - 1 - b] = rbuff_s[l] + v_min;   // buffer k start
+        val[i][j][s_z - 1 - b] = rbuff_s[l] + v_min;   // buffer k start 
       }
     }
   }
-
+ 
   }
-
+ 
   delete [] sbuff_s;
   delete [] sbuff_e;
   delete [] rbuff_s;

@@ -44,11 +44,11 @@ void AC::interpolation(const Centered & H, Centered & h) const {
 
     for(int jH=H.sj(); jH<=H.ej(); jH++) {
 
-      /* create indexes */
-      jh[CJ] = jH*CJ - (H.sj() - 1) * (CJ - 1);
-      for(int j=1; j<=CJ; j++) jh[CJ-j] = jh[CJ]-j;
+    /* create indexes */
+     jh[CJ] = jH*CJ - (H.sj() - 1) * (CJ - 1);
+     for(int j=1; j<=CJ; j++) jh[CJ-j] = jh[CJ]-j;
 
-      for(int kH=H.sk(); kH<=H.ek(); kH++) {
+     for(int kH=H.sk(); kH<=H.ek(); kH++) {
 
         /* create indexes */
         kh[CK] = kH*CK - (H.sk() - 1) * (CK - 1);
@@ -57,7 +57,7 @@ void AC::interpolation(const Centered & H, Centered & h) const {
         for(int i=1; i<=CI; i++)
           for(int j=1; j<=CJ; j++)
             for(int k=1; k<=CK; k++)
-              h.phi[ih[i]][jh[j]][kh[k]] += H.phi[iH][jH][kH];
+            h.phi[ih[i]][jh[j]][kh[k]] += H.phi[iH][jH][kH];
       }
     }
   }

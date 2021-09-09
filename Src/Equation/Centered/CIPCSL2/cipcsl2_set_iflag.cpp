@@ -48,7 +48,7 @@ void CIPCSL2::set_iflag() {
 
   /* next to free-surface (NFCell) */
   /* i-direction */
-  for(int i=0; i<ni()-1; i++){
+  for(int i=si()-1; i<ei()+1; i++){
     for_jk(j,k){
       if ((clr[i][j][k]-phisurf)*(clr[i+1][j][k]-phisurf)<=0.0) {
         if(iflag[i  ][j][k]>-1000) iflag[i  ][j][k]=0;
@@ -57,7 +57,7 @@ void CIPCSL2::set_iflag() {
     }
   }
   /* j-direction */
-  for(int j=0; j<nj()-1; j++){
+  for(int j=sj()-1; j<ej()+1; j++){
     for_ik(i,k){
       if((clr[i][j][k]-phisurf)*(clr[i][j+1][k]-phisurf)<=0.0){
         if(iflag[i][j  ][k]>-1000) iflag[i][j  ][k]=0;
@@ -66,7 +66,7 @@ void CIPCSL2::set_iflag() {
     }
   }
   /* k-direction */
-  for(int k=0; k<nk()-1; k++){
+  for(int k=sk()-1; k<ek()+1; k++){
     for_ij(i,j){
       if((clr[i][j][k]-phisurf)*(clr[i][j][k+1]-phisurf)<=0.0){
         if(iflag[i][j][k  ]>-1000) iflag[i][j][k  ]=0;
@@ -79,7 +79,7 @@ void CIPCSL2::set_iflag() {
 
   for(int layer=1; layer<=nlayer; layer++){
     /* i-direction */
-    for(int i=0; i<ni()-1; i++){
+    for(int i=si()-1; i<ei()+1; i++){
       for_jk(j,k){
         if(int(abs(iflag[i  ][j][k]))==ifmax &&
            int(abs(iflag[i+1][j][k]))==(layer-1)){
@@ -93,7 +93,7 @@ void CIPCSL2::set_iflag() {
       }
     }
     /* j-direction */
-    for(int j=0; j<nj()-1; j++){
+    for(int j=sj()-1; j<ej()+1; j++){
       for_ik(i,k){
         if(int(abs(iflag[i][j  ][k]))==ifmax &&
            int(abs(iflag[i][j+1][k]))==(layer-1)){
@@ -107,7 +107,7 @@ void CIPCSL2::set_iflag() {
       }
     }
     /* k-direction */
-    for(int k=0; k<nk()-1; k++){
+    for(int k=sk()-1; k<ek()+1; k++){
       for_ij(i,j){
         if(int(abs(iflag[i][j][k  ]))==ifmax &&
            int(abs(iflag[i][j][k+1]))==(layer-1)){

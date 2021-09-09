@@ -5,14 +5,18 @@
 #include <sstream>
 #include <fstream>
 #include <cmath>
+#include <array>
 #include "../../Parallel/communicator.h"
 #include "../../Domain/domain.h"
+#include "../../Domain/TwoLevel/twolevel.h"
 #include "../../Boundary/bndcnd.h"
 #include "scalar_browsing.h"
+#include "../../Global/global_constants.h"
 #include "../../Global/global_malloc.h"
 #include "../../Global/global_minmax.h"
 #include "../../Global/global_name_file.h"
 #include "../../LookUpTable/lookuptable.h"  
+#include "../../Ravioli/sign.h"
 
 #include "scalar_acc.h"
 #include "scalar_aliases.h"
@@ -25,8 +29,7 @@
 class Scalar {
   public:
     /* global constructor */
-    explicit Scalar(const Domain & d);
-    explicit Scalar(const Domain & d, const char * n);
+    explicit Scalar(const Domain & d, const char * n = NULL);
     explicit Scalar(const Domain & d, BndCnd & b);
     explicit Scalar(const Scalar & s); 
     explicit Scalar(const Scalar * s); // this creates an alias
@@ -57,6 +60,12 @@ class Scalar {
     int ei() const {return e_x;}      
     int ej() const {return e_y;}      
     int ek() const {return e_z;}      
+    int sI() const {return boil::BW;}
+    int eI() const {return boil::BW+dom->gii()-1;}
+    int sJ() const {return boil::BW;}
+    int eJ() const {return boil::BW+dom->gij()-1;}
+    int sK() const {return boil::BW;}
+    int eK() const {return boil::BW+dom->gik()-1;}
 
     /* change (set) offsets */
     void ox(const int o) {o_x=o;}      
@@ -112,6 +121,13 @@ class Scalar {
     real dSz(const int i, const int j, const int k) const 
      {return dom->dSz(i,j,k);}
 
+    real dSx(const Sign sig, const int i, const int j, const int k) const 
+     {return dom->dSx(sig,i,j,k);}
+    real dSy(const Sign sig, const int i, const int j, const int k) const 
+     {return dom->dSy(sig,i,j,k);}
+    real dSz(const Sign sig, const int i, const int j, const int k) const 
+     {return dom->dSz(sig,i,j,k);}
+
     /* cell volume */
     real dV(const int i, const int j, const int k) const 
      {return dom->dV(i,j,k);}
@@ -130,9 +146,7 @@ class Scalar {
       if( dom->contains_IJK(i,j,k) ) {
         dom->locals(&i,&j,&k); // change i,j,k
         return val[i][j][k];   // with changed i,j,k
-      }
-      else
-        return miss;
+      } else { return miss;}
     }
     
     void save(const char *, const int);
@@ -141,6 +155,24 @@ class Scalar {
     void save(std::ofstream &);
     void load(std::ifstream &);
 
+    void save_range(const Range<int> ri, const int j, const int k,
+                    const char * nam, const int it);
+    void save_range(const int i, const Range<int> rj, const int k,
+                    const char * nam, const int it);
+    void save_range(const int i, const int j, const Range<int> rk,
+                    const char * nam, const int it);
+
+    void save_range(const int i, const Range<int> rj, const Range<int> rk,
+                    const char * nam, const int it);
+    void save_range(const Range<int> ri, const int j, const Range<int> rk,
+                    const char * nam, const int it);
+    void save_range(const Range<int> ri, const Range<int> rj, const int k,
+                    const char * nam, const int it);
+
+    void save_range(const Range<int> ri, const Range<int> rj,
+                    const Range<int> rk,
+                    const char * nam, const int it);
+
     /* min, max, ... */
     real min() const;
     real max() const;
@@ -148,6 +180,12 @@ class Scalar {
     real max_abs() const;
     real min_at() const;
     real max_at() const;
+    real min_voldiv() const;
+    real max_voldiv() const;
+    real min_abs_voldiv() const;
+    real max_abs_voldiv() const;
+    real min_at_voldiv() const;
+    real max_at_voldiv() const;
 
     /* capital letters mean global logical coordinates */
     real average_I(int I) const; 
@@ -183,8 +221,11 @@ class Scalar {
                real * nx, real * ny, real * nz) const;
     void grad_abs( const int i, const int j, const int k,
                    real * nx, real * ny, real * nz) const;
+    real grad_face(Comp m, const int i, const int j, const int k);
 
     void bnd_update();
+    void bnd_update_nowall();
+    void bnd_update_symmetry();
     void bnd_grad_update(const Comp &);
 
     void bnd_extract( const Dir d, real *** cp ) const;
@@ -199,6 +240,16 @@ class Scalar {
         val[i][j][k] = tab.look_up(sca[i][j][k], col0, col1);
      }
 
+    /* the same as below but bndcnds are copied */
+    Scalar & copy_shape(const Shape & a) {
+      n_x=a.n_i;n_y=a.n_j;n_z=a.n_k;  o_x=a.o_i;o_y=a.o_j;o_z=a.o_k;
+      s_x=a.s_i;s_y=a.s_j;s_z=a.s_k;  e_x=a.e_i;e_y=a.e_j;e_z=a.e_k;
+      dom=a.dm;
+      bc().replicate(*(a.bc));
+
+      return *this;
+    }
+
     /* operators */
     Scalar & operator = (const Shape & a)
      {n_x=a.n_i;n_y=a.n_j;n_z=a.n_k;  o_x=a.o_i;o_y=a.o_j;o_z=a.o_k;
@@ -210,6 +261,7 @@ class Scalar {
     /* = */
     const Scalar & operator = (const Scalar & s) 
      {for_aijk(i,j,k) val[i][j][k]=s.val[i][j][k]; return *this;}
+
     const Scalar & operator = (const real & d) 
      {for_aijk(i,j,k) val[i][j][k]=d; return *this;}
     const Scalar & operator = (const char * c); 
@@ -242,6 +294,53 @@ class Scalar {
     real dot(const Scalar & s) 
      {real d=0.0; for_ijk(i,j,k) d+=val[i][j][k]*s.val[i][j][k]; 
       boil::cart.sum_real(&d); return d;}
+
+    real dot_voldiv(const Scalar & s) {
+      real d=0.0; 
+      for_ijk(i,j,k) 
+        d+=val[i][j][k]*s.val[i][j][k]/dV(i,j,k)/dV(i,j,k);
+      boil::cart.sum_real(&d); return d;
+    }
+
+    real dot_avg(const Scalar & s)
+     {real d=0.0; int ntot(0);
+      for_ijk(i,j,k) {
+        d+=val[i][j][k]*s.val[i][j][k];
+        ntot++;
+      }
+      boil::cart.sum_real(&d);
+      boil::cart.sum_int(&ntot);
+      return d/real(ntot)/real(ntot);}
+
+    real dot_voldiv_avg(const Scalar & s) {
+      real d=0.0; int ntot(0);
+      for_ijk(i,j,k) {
+        d+=val[i][j][k]*s.val[i][j][k]/dV(i,j,k)/dV(i,j,k);
+        ntot++;
+      }
+      boil::cart.sum_real(&d); 
+      boil::cart.sum_int(&ntot);
+      return d/real(ntot)/real(ntot);
+    }
+
+    /*
+       sum */
+    real sum() {
+      real r(0.);
+      for_ijk(i,j,k)
+        r += val[i][j][k];
+      boil::cart.sum_real(&r);
+      return r;
+    }
+    /*
+       sum */
+    real sum_abs() {
+      real r(0.);
+      for_ijk(i,j,k)
+        r += fabs(val[i][j][k]);
+      boil::cart.sum_real(&r);
+      return r;
+    }
 
     /*-------------------------------------+
     |  accelerated mathematical operators  |
@@ -334,10 +433,10 @@ class Scalar {
     BndCnd * bndcnd;
 
     const bool alias;
-
-  private:
-    real miss; /* miss out of range variables in parallel version  */
+    real miss=0;
 
 };
+
+#include "bndshape.h"
 
 #endif

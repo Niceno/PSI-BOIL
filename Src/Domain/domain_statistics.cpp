@@ -20,10 +20,15 @@ void Domain::statistics(Body * body) {
   min_dV = FLT_MAX;
   min_dV = FLT_MAX;
   max_dV = 0.0;         
-  max_ar = 0.0;           
-  for(int i=boil::BW; i<ni()-boil::BW; i++) 
-    for(int j=boil::BW; j<nj()-boil::BW; j++) 
-      for(int k=boil::BW; k<nk()-boil::BW; k++) {
+  max_ar = 0.0;
+
+  int ibeg(boil::BW), iend(ni()-boil::BW);
+  int jbeg(boil::BW), jend(nj()-boil::BW);
+  int kbeg(boil::BW), kend(nk()-boil::BW);
+  
+  for(int i=ibeg; i<iend; i++) 
+    for(int j=jbeg; j<jend; j++) 
+      for(int k=kbeg; k<kend; k++) {         
         if(body){
           if((*body).off(i,j,k)) continue;
         }
@@ -64,6 +69,10 @@ void Domain::statistics(Body * body) {
   const real max_z = global_max_z();
   const real lz    = max_z - min_z;
 
+  int gnx(gi()-2*boil::BW);
+  int gny(gj()-2*boil::BW);
+  int gnz(gk()-2*boil::BW);
+
   char b[64];
   boil::oout << "+=========================";
   boil::oout << "==========================+" << boil::endl;
@@ -75,8 +84,8 @@ void Domain::statistics(Body * body) {
   }
   boil::oout << "+-------------------------";
   boil::oout << "--------------------------+" << boil::endl;
-  sprintf(b, "| resolution; nx, ny, nz = %6d, %6d, %6d.  |", 
-             gi()-2*boil::BW, gj()-2*boil::BW, gk()-2*boil::BW);
+  sprintf(b, "| Resolution: nx, ny, nz = %6d, %6d, %6d.  |", 
+             gnx, gny, gnz);
   boil::oout << b << boil::endl;
   boil::oout << "+-------------------------";
   boil::oout << "+-------------------------+" << boil::endl;

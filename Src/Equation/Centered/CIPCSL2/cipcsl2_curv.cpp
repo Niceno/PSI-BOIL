@@ -28,20 +28,14 @@ void CIPCSL2::curv(const Scalar & sca) {
       kappa[i][j][k]=-((ne-nw)/(sca.dxw(i)+sca.dxe(i))
                       +(nn-ns)/(sca.dys(j)+sca.dyn(j))
                       +(nt-nb)/(sca.dzb(k)+sca.dzt(k)));
-
     }
   }
 
 #if 0
-  boil::plot->plot(kappa,nx,ny,nz, "kappa-nx-ny-nz", time->current_step());
-  boil::plot->plot(sca,nx,ny,nz, "sca-nx-ny-nz", time->current_step());
+  boil::plot->plot(sca,nx,ny,nz, "dist-nx-ny-nz", time->current_step());
   boil::plot->plot(clr,sca,kappa, "clr-sca-kappa", time->current_step());
-  exit(0);
+  //exit(0);
 #endif
-
-  /* curvature for symmetric plane (adjacent cells)
-     exactly satisfy symmetricity */
-  bnd_sym_kappa();
 
   /* curvature for wall (adjacent cells and on boundary plane) 
      kappa in adjacent cell is necessary for interpolation, curv_interface() */
@@ -56,6 +50,7 @@ void CIPCSL2::curv(const Scalar & sca) {
                      time->current_step());
   boil::plot->plot(clr,sca,kappa, "clr-sca-kappa_beforeInter",
                      time->current_step());
+  exit(0);
 #endif
 
   /* interpolate curvature in interface cells */
@@ -65,6 +60,7 @@ void CIPCSL2::curv(const Scalar & sca) {
   boil::plot->plot(clr,sca,kappa, "clr-sca-kappa_afterInter",
                      time->current_step());
   boil::plot->plot(clr,iflag, "clr-iflag", time->current_step());
+  exit(0);
 #endif
 
   /* extpolate curvature from interface cells to others */
@@ -80,3 +76,4 @@ void CIPCSL2::curv(const Scalar & sca) {
   boil::timer.stop("cipcsl2 curv");
   return;
 }
+

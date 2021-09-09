@@ -3,11 +3,11 @@
 /***************************************************************************//**
 *  \brief Interface for calling new time step.
 *******************************************************************************/
-void Centered::new_time_step() {
+void Centered::new_time_step(const Scalar * diff_eddy) {
   if( !solid() ) 
-    new_time_step(flu->rho(), NULL);
+    new_time_step(flu->rho(), NULL,diff_eddy);
   else
-    new_time_step(flu->rho(), sol->rho());
+    new_time_step(flu->rho(), sol->rho(), diff_eddy);
 }
 
 /***************************************************************************//**
@@ -18,9 +18,13 @@ void Centered::new_time_step() {
 *
 *  Old convective and old diffusive terms are added by calling: 
 *  \code convection(&cold) \endcode and \code diffusion() \endcode 
-*  respectivelly.
+*  respectively.
+*
+*  Diff_eddy does nothing in this implementation, present to allow for proper
+*  child class virtualization.
 *******************************************************************************/
-void Centered::new_time_step(const Property * f_prop, const Property * s_prop) {
+void Centered::new_time_step(const Property * f_prop, const Property * s_prop,
+                             const Scalar * diff_eddy) {
 
   /*------------------------+
   |      dV  n-1    1  n-2  |

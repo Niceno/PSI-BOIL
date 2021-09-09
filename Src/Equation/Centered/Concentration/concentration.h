@@ -37,15 +37,15 @@ class Concentration : public Centered {
         \param f   - extarnal source array (\f$\dot{m}\f$),
         \param u   - convection velocity (\f${\bf u}\f$),
         \param t   - simulation (physical) time (\f${t}\f$),
-        \param sm - Krylov subspace solver. It acts as a solver, or as a
-                    smoother for AC multirid.
+        \param sm - Linear solver. It acts as a solver, or as a
+                    smoother for AC multigrid.
         \param flu - Holds all material properties (\f$\rho, \gamma\f$).
     */
     Concentration(const Scalar & phi, 
                   const Scalar & f,
                   const Vector & u, 
                   Times & t,
-                  Krylov * sm,
+                  Linear * sm,
                   Matter * flu);
     ~Concentration();
 	  

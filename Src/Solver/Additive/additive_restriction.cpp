@@ -98,7 +98,7 @@ void AC::restriction(const Centered & h, Centered & H) const {
                                 * h.phi[ih[i]][jh[CJ+1]][kh[k]];
             H.fnew[iH][jH][kH] += h.A.s[ih[i]][jh[1   ]][kh[k]] 
                                 * h.phi[ih[i]][jh[0   ]][kh[k]];
-
+                                
             for(int j=1; j< CJ; j++)
               D[i][j][k] -= (h.A.n[ih[i]][jh[j]][kh[k]]);
 
@@ -115,7 +115,7 @@ void AC::restriction(const Centered & h, Centered & H) const {
                                 * h.phi[ih[i]][jh[j]][kh[CK+1]];
             H.fnew[iH][jH][kH] += h.A.b[ih[i]][jh[j]][kh[1   ]]
                                 * h.phi[ih[i]][jh[j]][kh[0   ]];
-
+                
             for(int k=1; k< CK; k++)
               D[i][j][k] -= h.A.t[ih[i]][jh[j]][kh[k]];
 
@@ -128,9 +128,16 @@ void AC::restriction(const Centered & h, Centered & H) const {
         +---------------------------*/ 
         for(int i=1; i<=CI; i++)
           for(int j=1; j<=CJ; j++) 
-            for(int k=1; k<=CK; k++) 
+            for(int k=1; k<=CK; k++)
               H.fnew[iH][jH][kH] -= D[i][j][k] * h.phi[ih[i]][jh[j]][kh[k]];
+        }
       }
+    }
+
+  /* should be satisfied trivially, this is to avoid numerical errors */
+  for_vijk(H, iH, jH, kH) {
+    if(!H.aflag[iH][jH][kH]) {
+      H.fnew[iH][jH][kH] = 0.;
     }
   }
 
@@ -142,21 +149,29 @@ void AC::restriction(const Centered & h, Centered & H) const {
   |  get distorted r.h.s. on even coarser levels        |
   +----------------------------------------------------*/
   real sum = 0.0;
+  int ncell = 0;
+  //int ncell = (H.ni()-2*boil::BW)*(H.nj()-2*boil::BW)*(H.nk()-2*boil::BW);
   for(int i=H.si(); i<=H.ei(); i++)
     for(int j=H.sj(); j<=H.ej(); j++)
-      for(int k=H.sk(); k<=H.ek(); k++)
-        sum += H.fnew[i][j][k];
+      for(int k=H.sk(); k<=H.ek(); k++) {
+        if(H.aflag[i][j][k]) {
+          sum += H.fnew[i][j][k];
+          ncell++;
+        }
+      }
 
-  boil::cart.sum_real(& sum);
+  boil::cart.sum_real(&sum);
+  boil::cart.sum_int (&ncell);
 
-  int ncell = (H.ni()-2*boil::BW)*(H.nj()-2*boil::BW)*(H.nk()-2*boil::BW);
-  boil::cart.sum_int( & ncell );
-
-  sum /= (real)ncell;
+  sum /= real(ncell);
 
   for(int i=H.si(); i<=H.ei(); i++)
     for(int j=H.sj(); j<=H.ej(); j++)
-      for(int k=H.sk(); k<=H.ek(); k++)
-        H.fnew[i][j][k] -= sum;
+      for(int k=H.sk(); k<=H.ek(); k++) {
+        if(H.aflag[i][j][k]) {
+          H.fnew[i][j][k] -= sum;
+        }
+      }
 
+  return;
 }

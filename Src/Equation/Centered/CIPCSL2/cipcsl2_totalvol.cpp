@@ -27,7 +27,7 @@ void CIPCSL2::totalvol() {
    boil::cart.sum_real(&clrsum1);
    boil::cart.sum_real(&clrsum2);
 
-#if 0
+#if 1
    std::cout.setf(std::ios_base::scientific);
    std::cout<< std::setprecision(16);
    boil::oout << "cipcsl2_totalvol:time,clrsum1,clrsum2= " 

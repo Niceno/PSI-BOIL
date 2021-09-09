@@ -117,6 +117,8 @@ void CIPCSL2::ib_ext_scalar(Scalar & sca) {
       }
     } else {
       std::cout<<"cipcsl2_ib_ext_scalar: Underdevelopment!!!\n";
+      std::cout<<"ux,uy,uz= "<<ux<<" "<<uy<<" "<<uz<<"\n";
+      std::cout<<"i,j,k= "<<i-si()+1<<" "<<j-sj()+1<<" "<<k-sk()+1<<"\n";
       exit(0);
     }
 

@@ -2,7 +2,9 @@
 #include "../Global/global_approx.h"
 
 /******************************************************************************/
-Body::Body(const std::string name) {
+Body::Body(const std::string nm) {
+
+  name = nm;
 
   std::ifstream in;
 

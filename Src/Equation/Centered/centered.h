@@ -33,7 +33,7 @@
 *  \f[
 *      [A] \cdot \{ \phi \}^N = \{ f \}
 *  \f] 
-*  which can be solved with either one of the Krylov sub-space family of 
+*  which can be solved with either one of the Linear sub-space family of 
 *  solvers (CG, CGS, BiCGS), or the Additive Correction (AC) multigrid.
 *  The superscript \f$ N \f$ in the above equation denotes the new time
 *  step. All the terms without a superscript are time-averaged over 
@@ -70,93 +70,99 @@ class Centered : public Equation {
         \param t - simulation (physical) time (\f$ {t} \f$),
         \param flu - holds all material properties 
                      (\f$ \rho, B_{\phi}, \Gamma_{\phi} \f$),
-        \param sm - Krylov subspace solver. It acts as a solver, or as a
-                    smoother for AC multirid.
+        \param sm - Linear solver. It acts as a solver, or as a
+                    smoother for AC multigrid.
     */
     Centered(const Domain * d,
              const Scalar & s, const Scalar & g, 
              const Vector * v, const Times & t, 
              Matter * flu,
              Matter * sol,
-             Krylov * sm = NULL) 
-     : Equation(d, &t, flu, sol, sm), phi(&s), A(phi), fext(&g), u(v), 
-                    fold(*d), fnew(*d), fbnd(*d), 
-                    cold(*d), cnew(*d), buff(*d), 
-                    res(*d), 
-                    fnr(NULL), crsr(NULL) {
-                      fext=phi.shape();
-                      fold=phi.shape();  fnew=phi.shape();  fbnd=phi.shape();
-                      cold=phi.shape();  cnew=phi.shape();  buff=phi.shape();
-                      res =phi.shape();
-                    }
+             Linear * sm = NULL); 
 
     ~Centered() {};
 	  
     //! Cell volume.
-    real dV(const int i, const int j, const int k) const 
+    inline real dV(const int i, const int j, const int k) const 
      {return phi.dV(i,j,k);}
 
-    void discretize(const Scalar * diff_eddy = NULL) {};
+    virtual void discretize(const Scalar * diff_eddy = NULL) {};
 
     //! Start a new time step.
-    void new_time_step();
-
-    //! Advance in time for purely explicit schemes.
-    void advance();
+    virtual void new_time_step(const Scalar * diff_eddy = NULL);
 
     //! Solvers discretized system of equaions.
-    void solve(const ResRat & fact, const char * name = NULL); 
+    virtual void solve(const ResTol & toler, const ResRat & fact,
+                       const char * name = NULL); 
+    virtual void solve(const ResTol & toler, const char * name = NULL) {
+      solve(toler,ResRat(-1.),name);
+    } 
+    virtual void solve(const ResRat & fact, const char * name = NULL) {
+      solve(ResTol(boil::atto),fact,name);
+    }
     virtual real update_rhs();
 
-    void diffusion();
-    void convection();
+    virtual void diffusion(const Scalar * diff_eddy = NULL);
+    virtual void convection();
 
     void save(const char *, const int = -1);
     void load(const char *, const int = -1);
 
     //! Pointer to coarser level of the variable.
-    Centered * coarser() const {return crsr;}
+    inline Centered * coarser() const {return crsr;}
 
     //! Defines the variable at coarser levels. (Needed for AC).
     void  coarsen();     
 
-    const Scalar & val() const {return phi;}
+    inline const Scalar & val() const {return phi;}
+
+    void set_active_flag(ScalarInt & activeflag);
 
   friend class AC;
 
+    inline real signum(const real a, const real b) const { return a*((b>0.)-(b<0.)); }
+    inline int signum(const int a, const int b) const { return a*((b>0)-(b<0)); }
+
   protected:
-    int si() const {return phi.si();}
-    int sj() const {return phi.sj();}
-    int sk() const {return phi.sk();}
-    int ei() const {return phi.ei();}
-    int ej() const {return phi.ej();}
-    int ek() const {return phi.ek();}
+    inline int si() const {return phi.si();}
+    inline int sj() const {return phi.sj();}
+    inline int sk() const {return phi.sk();}
+    inline int ei() const {return phi.ei();}
+    inline int ej() const {return phi.ej();}
+    inline int ek() const {return phi.ek();}
 
     //! Constructor for coarser levels. 
     Centered(const Centered * fin, const Domain *, 
-             BndCnd & ubc, Krylov * sm);  
+             BndCnd & ubc, Linear * sm);  
 
-    int ni() const {return phi.ni();} 
-    int nj() const {return phi.nj();} 
-    int nk() const {return phi.nk();} 
+    inline int ni() const {return phi.ni();} 
+    inline int nj() const {return phi.nj();} 
+    inline int nk() const {return phi.nk();} 
 
     /* connection dimensions needed for discretization.
        keep i,j,k here instead of x,y,z to be more general. */
-    real dxw(const int i) const {return phi.dxw(i);}
-    real dxe(const int i) const {return phi.dxe(i);}
-    real dys(const int i) const {return phi.dys(i);}
-    real dyn(const int i) const {return phi.dyn(i);}
-    real dzb(const int i) const {return phi.dzb(i);}
-    real dzt(const int i) const {return phi.dzt(i);}
+    inline real dxw(const int i) const {return phi.dxw(i);}
+    inline real dxe(const int i) const {return phi.dxe(i);}
+    inline real dys(const int i) const {return phi.dys(i);}
+    inline real dyn(const int i) const {return phi.dyn(i);}
+    inline real dzb(const int i) const {return phi.dzb(i);}
+    inline real dzt(const int i) const {return phi.dzt(i);}
 
     /* needed for discretization.
        avoid dxc, dyc and dzc here, use dSx, dSy, dSz and dV instead. */
-    real dSx(const int i, const int j, const int k) const 
-     {return phi.dSx(i,j,k);}
-    real dSy(const int i, const int j, const int k) const 
-     {return phi.dSy(i,j,k);}
-    real dSz(const int i, const int j, const int k) const 
-     {return phi.dSz(i,j,k);}
+    inline real dSx(const int i, const int j, const int k) const 
+      {return phi.dSx(i,j,k);}
+    inline real dSy(const int i, const int j, const int k) const 
+      {return phi.dSy(i,j,k);}
+    inline real dSz(const int i, const int j, const int k) const 
+      {return phi.dSz(i,j,k);}
+
+    inline real dSx(const Sign sig, const int i, const int j, const int k) const
+      {return phi.dSx(sig,i,j,k);}
+    inline real dSy(const Sign sig, const int i, const int j, const int k) const
+      {return phi.dSy(sig,i,j,k);}
+    inline real dSz(const Sign sig, const int i, const int j, const int k) const
+      {return phi.dSz(sig,i,j,k);}
 
     void create_system_innertial(const Property * f_prop,  
                                  const Property * s_prop = NULL);
@@ -167,10 +173,12 @@ class Centered : public Equation {
 
     void convection(Scalar * conv, const Property * prop); 
     void new_time_step(const Property * f_prop,
-                       const Property * s_prop = NULL);
+                       const Property * s_prop = NULL,
+                       const Scalar * diff_eddy = NULL);
 
     Scalar phi;                    // can't be inherited if protected !?!?!?
     Scalar fold, fnew, fext, fbnd; // source
+    ScalarInt aflag;           // used in additive
     Matrix A;                      // matrix
     Scalar res;                
 

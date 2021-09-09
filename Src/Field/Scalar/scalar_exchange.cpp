@@ -7,7 +7,9 @@
 void Scalar::exchange(const int dir) const {
 
   if( bc().count() == 0 ) {
-    OMS(Warning: exchanging a variable without boundary conditions);
+    //OMS(Warning: exchanging a variable without boundary conditions);
+    OMS(Fatal: exchanging a variable without boundary conditions);
+    exit(0);
   }
 
   /*-------------------------------+
@@ -335,9 +337,9 @@ void Scalar::exchange(const int dir) const {
       }
     }
   }
-
+ 
   }
-
+ 
   delete [] sbuff_s;
   delete [] sbuff_e;
   delete [] rbuff_s;

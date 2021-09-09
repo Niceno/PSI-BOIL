@@ -124,9 +124,9 @@ void BndCnd::add(BndCnd bc) {
 
   bool fail;
 
-  /*-------------------------------------------------------------+
-  |  1. check consistency of (non) periodic boundary conditions  | 
-  +-------------------------------------------------------------*/
+  /*----------------------------------------------+
+  |  1. check consistency of boundary conditions  | 
+  +----------------------------------------------*/
   fail = false;
   if( bc.typ == BndType::periodic() ) {
     if( bc.dir == Dir::imin() && !dom->period(0) ) fail = true;
@@ -143,7 +143,7 @@ void BndCnd::add(BndCnd bc) {
   }
 
   fail = false;
-  if( bc.typ != BndType::periodic() ) {
+  if( bc.typ != BndType::periodic() && bc.typ != BndType::pseudo() ) {
     if( bc.dir == Dir::imin() && dom->period(0) ) fail = true;
     if( bc.dir == Dir::imax() && dom->period(0) ) fail = true;
     if( bc.dir == Dir::jmin() && dom->period(1) ) fail = true;
@@ -152,8 +152,70 @@ void BndCnd::add(BndCnd bc) {
     if( bc.dir == Dir::kmax() && dom->period(2) ) fail = true;
   }
   if( fail ) {
-    boil::oout << "Fatal: trying to define non-periodic b.c. " 
+    boil::oout << "Fatal: trying to define real non-periodic b.c. " 
                << "to a periodic domain. Exiting!" << boil::endl;
+    exit(0);
+  }
+
+#if 1
+  fail = false;
+  if( bc.typ == BndType::pseudo() ) {
+    if( bc.dir == Dir::imin() && !dom->is_dummy(0) ) fail = true;
+    if( bc.dir == Dir::imax() && !dom->is_dummy(0) ) fail = true;
+    if( bc.dir == Dir::jmin() && !dom->is_dummy(1) ) fail = true;
+    if( bc.dir == Dir::jmax() && !dom->is_dummy(1) ) fail = true;
+    if( bc.dir == Dir::kmin() && !dom->is_dummy(2) ) fail = true;
+    if( bc.dir == Dir::kmax() && !dom->is_dummy(2) ) fail = true;
+  }
+  if( fail ) {
+    boil::oout << "Fatal: trying to define a dummy b.c. "
+               << "in a real direction. Exiting!" << boil::endl;
+    exit(0);
+  }
+
+  fail = false;
+  if( bc.typ != BndType::pseudo() ) {
+    if( bc.dir == Dir::imin() && dom->is_dummy(0) ) fail = true;
+    if( bc.dir == Dir::imax() && dom->is_dummy(0) ) fail = true;
+    if( bc.dir == Dir::jmin() && dom->is_dummy(1) ) fail = true;
+    if( bc.dir == Dir::jmax() && dom->is_dummy(1) ) fail = true;
+    if( bc.dir == Dir::kmin() && dom->is_dummy(2) ) fail = true;
+    if( bc.dir == Dir::kmax() && dom->is_dummy(2) ) fail = true;
+  }
+  if( fail ) {
+    boil::oout << "Fatal: trying to define a real b.c. "
+               << "in a pseudo-direction. Exiting!" << boil::endl;
+    exit(0);
+  }
+#endif
+
+  fail = false;
+  if( bc.typ == BndType::symmetry() ) {
+    if( bc.dir == Dir::imin() && !dom->bnd_symmetry(Dir::imin()) ) fail = true;
+    if( bc.dir == Dir::imax() && !dom->bnd_symmetry(Dir::imax()) ) fail = true;
+    if( bc.dir == Dir::jmin() && !dom->bnd_symmetry(Dir::jmin()) ) fail = true;
+    if( bc.dir == Dir::jmax() && !dom->bnd_symmetry(Dir::jmax()) ) fail = true;
+    if( bc.dir == Dir::kmin() && !dom->bnd_symmetry(Dir::kmin()) ) fail = true;
+    if( bc.dir == Dir::kmax() && !dom->bnd_symmetry(Dir::kmax()) ) fail = true;
+  }
+  if( fail ) {
+    boil::oout << "Fatal: trying to define symmetry b.c. "
+               << "to a non-symmetric domain. Exiting!" << boil::endl;
+    exit(0);
+  }
+
+  fail = false;
+  if( bc.typ != BndType::symmetry() ) {
+    if( bc.dir == Dir::imin() && dom->bnd_symmetry(Dir::imin()) ) fail = true;
+    if( bc.dir == Dir::imax() && dom->bnd_symmetry(Dir::imax()) ) fail = true;
+    if( bc.dir == Dir::jmin() && dom->bnd_symmetry(Dir::jmin()) ) fail = true;
+    if( bc.dir == Dir::jmax() && dom->bnd_symmetry(Dir::jmax()) ) fail = true;
+    if( bc.dir == Dir::kmin() && dom->bnd_symmetry(Dir::kmin()) ) fail = true;
+    if( bc.dir == Dir::kmax() && dom->bnd_symmetry(Dir::kmax()) ) fail = true;
+  }
+  if( fail ) {
+    boil::oout << "Fatal: trying to define non-symmetric b.c. "
+               << "to a symmetric domain. Exiting!" << boil::endl;
     exit(0);
   }
 
@@ -184,6 +246,7 @@ void BndCnd::add(BndCnd bc) {
     return;
   }
 
+#if 0
   /*---------------------------------------------------+
   |  2. set range for directions explicitelly defined  | 
   +---------------------------------------------------*/
@@ -202,6 +265,8 @@ void BndCnd::add(BndCnd bc) {
   if(bc.dir == Dir::kmax()) {bc.kr.first(dom->nk()-boil::BW);
                              bc.kr.last (dom->nk()-boil::BW);}
 
+  boil::oout<<"Bnd after 2 "<<bc.dir<<" "<<bc.ir.first()<<" "<<bc.ir.last()<<" | "<<bc.kr.first()<<" "<<bc.kr.last()<<" || "<<boil::endl;
+
   /*--------------------------------------+
   |  3. set the range for the directions  |
   |         not explicitelly defined      |
@@ -210,6 +275,7 @@ void BndCnd::add(BndCnd bc) {
   Range<int> cyg = dom->cyg(); 
   Range<int> czg = dom->czg(); 
 
+  // What is this ??? (Yohei)
   if( bc.ir.first() == 0 && bc.ir.last() == -1 ) {
     bc.ir.first( cxg.first() + boil::BW - 1 ); // as sx()
     bc.ir.last ( cxg.last()  + boil::BW - 1 ); // as ex()
@@ -221,7 +287,117 @@ void BndCnd::add(BndCnd bc) {
   if( bc.kr.first() == 0 && bc.kr.last() == -1 ) {
     bc.kr.first( czg.first() + boil::BW - 1 ); // as sz()
     bc.kr.last ( czg.last()  + boil::BW - 1 ); // as ez()
+
   }
+
+  boil::oout<<"Bnd after 3 "<<bc.dir<<" "<<bc.ir.first()<<" "<<bc.ir.last()<<" | "<<bc.kr.first()<<" "<<bc.kr.last()<<" || "<<boil::endl;
+
+  /*---------------------------------------------------+
+  |  4. correct the range for directions defined by 3  |
+  +---------------------------------------------------*/
+  bool i = bc.dir==Dir::imin() || bc.dir==Dir::imax(), 
+       j = bc.dir==Dir::jmin() || bc.dir==Dir::jmax(),
+       k = bc.dir==Dir::kmin() || bc.dir==Dir::kmax();
+  bool b = bc.dir==Dir::ibody();                              
+
+  if( j || k || b ) {
+
+    /* if both outside the range - skip this b.c. */
+    if( bc.ir.first() < cxg.first()+boil::BW-1 && bc.ir.last() < cxg.first()+boil::BW-1 ||
+        bc.ir.first() > cxg.last()+boil::BW-1 && bc.ir.last() > cxg.last()+boil::BW-1 ) {
+      bc.ir.first( 0); bc.jr.first( 0); bc.kr.first( 0);
+      bc.ir.last (-1); bc.jr.last (-1); bc.kr.last (-1);
+    }
+    else {
+      if(cxg.contains(bc.ir.first()-boil::BW+1)) bc.ir.first(bc.ir.first()-cxg.first()+1);
+      else                          bc.ir.first(1);
+      if(cxg.contains(bc.ir.last()-boil::BW+1)) bc.ir.last(bc.ir.last()-cxg.first()+1);
+      else                         bc.ir.last(dom->ni()-boil::BW-1);
+    }
+  } /* j || k || b */
+
+  if( i || k || b ) {
+
+    /* if both outside the range - skip this b.c. */
+    if( bc.jr.first() < cyg.first()+boil::BW-1 && bc.jr.last() < cyg.first()+boil::BW-1 ||
+        bc.jr.first() > cyg.last()+boil::BW-1 && bc.jr.last() > cyg.last()+boil::BW-1 ) {
+      bc.ir.first( 0); bc.jr.first( 0); bc.kr.first( 0);
+      bc.ir.last (-1); bc.jr.last (-1); bc.kr.last (-1);
+    }
+    else {
+      if(cyg.contains(bc.jr.first()-boil::BW+1)) bc.jr.first(bc.jr.first()-cyg.first()+1);
+      else                          bc.jr.first(1);
+      if(cyg.contains(bc.jr.last()-boil::BW+1)) bc.jr.last(bc.jr.last()-cyg.first()+1);
+      else                          bc.jr.last(dom->nj()-boil::BW-1);
+    }
+  } /* i || k || b */
+
+  if( i || j || b ) {
+
+    /* if both outside the range - skip this b.c. */
+    if( bc.kr.first() < czg.first()+boil::BW-1 && bc.kr.last() < czg.first()+boil::BW-1 ||
+        bc.kr.first() > czg.last()+boil::BW-1 && bc.kr.last() > czg.last()+boil::BW-1 ) {
+      bc.ir.first( 0); bc.jr.first( 0); bc.kr.first( 0);
+      bc.ir.last (-1); bc.jr.last (-1); bc.kr.last (-1);
+    }
+    else {
+      if(czg.contains(bc.kr.first()-boil::BW+1)) bc.kr.first(bc.kr.first()-czg.first()+1);
+      else                          bc.kr.first(1);
+      if(czg.contains(bc.kr.last()-boil::BW+1)) bc.kr.last(bc.kr.last()-czg.first()+1);
+      else                          bc.kr.last(dom->nk()-boil::BW-1);
+    }
+  } /* i || j || b */
+#else
+  /*-------------------------------------------------+
+  |  2. set range for directions explicitly defined  | 
+  +-------------------------------------------------*/
+
+  /* this is correct: in the aligned direction,
+     the idx should be one just outside the domain in the given dir */
+  if(bc.dir == Dir::imin()) {bc.ir.first(boil::BW-1);
+                             bc.ir.last (boil::BW-1);}
+  if(bc.dir == Dir::imax()) {bc.ir.first(dom->ni()-boil::BW);
+                             bc.ir.last (dom->ni()-boil::BW);}
+
+  if(bc.dir == Dir::jmin()) {bc.jr.first(boil::BW-1);
+                             bc.jr.last (boil::BW-1);}
+  if(bc.dir == Dir::jmax()) {bc.jr.first(dom->nj()-boil::BW);
+                             bc.jr.last (dom->nj()-boil::BW);}
+
+  if(bc.dir == Dir::kmin()) {bc.kr.first(boil::BW-1);
+                             bc.kr.last (boil::BW-1);}
+  if(bc.dir == Dir::kmax()) {bc.kr.first(dom->nk()-boil::BW);
+                             bc.kr.last (dom->nk()-boil::BW);}
+
+  /*--------------------------------------+
+  |  3. set the range for the directions  |
+  |         not explicitly defined        |
+  +--------------------------------------*/
+  Range<int> cxg = dom->cxg(); 
+  Range<int> cyg = dom->cyg(); 
+  Range<int> czg = dom->czg(); 
+
+  /* c*g contains the indices on the given processor
+     on the global domain, w/o halo cells
+     e.g. (33,64) out of (1,64)                     */
+
+  if( bc.ir.first() == 0 && bc.ir.last() == -1 ) {
+    bc.ir.first(cxg.first()); // as sx()
+    bc.ir.last (cxg.last() ); // as ex()
+  }
+  if( bc.jr.first() == 0 && bc.jr.last() == -1 ) {
+    bc.jr.first(cyg.first()); // as sy()
+    bc.jr.last (cyg.last() ); // as ey()
+  }
+  if( bc.kr.first() == 0 && bc.kr.last() == -1 ) {
+    bc.kr.first(czg.first()); // as sz()
+    bc.kr.last (czg.last() ); // as ez()
+  }
+
+  /* now the non-aligned indices correspond exactly to the
+     c*g, provided that they were not user-specified 
+     and they have to be corrected = transformed to local
+     indices, accounting for halo cells */
 
   /*---------------------------------------------------+
   |  4. correct the range for directions defined by 3  |
@@ -240,10 +416,10 @@ void BndCnd::add(BndCnd bc) {
       bc.ir.last (-1); bc.jr.last (-1); bc.kr.last (-1);
     }
     else {
-      if(cxg.contains(bc.ir.first())) bc.ir.first(bc.ir.first()-cxg.first()+1);
-      else                          bc.ir.first(1);
-      if(cxg.contains(bc.ir.last())) bc.ir.last(bc.ir.last()-cxg.first()+1);
-      else                         bc.ir.last(dom->ni()-2);
+      if(cxg.contains(bc.ir.first())) bc.ir.first(bc.ir.first()-cxg.first()+boil::BW);
+      else                          bc.ir.first(boil::BW);
+      if(cxg.contains(bc.ir.last())) bc.ir.last(bc.ir.last()-cxg.first()+boil::BW);
+      else                         bc.ir.last(dom->ni()-boil::BW-1);
     }
   } /* j || k || b */
 
@@ -256,10 +432,10 @@ void BndCnd::add(BndCnd bc) {
       bc.ir.last (-1); bc.jr.last (-1); bc.kr.last (-1);
     }
     else {
-      if(cyg.contains(bc.jr.first())) bc.jr.first(bc.jr.first()-cyg.first()+1);
-      else                          bc.jr.first(1);
-      if(cyg.contains(bc.jr.last())) bc.jr.last(bc.jr.last()-cyg.first()+1);
-      else                         bc.jr.last(dom->nj()-2);
+      if(cyg.contains(bc.jr.first())) bc.jr.first(bc.jr.first()-cyg.first()+boil::BW);
+      else                          bc.jr.first(boil::BW);
+      if(cyg.contains(bc.jr.last())) bc.jr.last(bc.jr.last()-cyg.first()+boil::BW);
+      else                          bc.jr.last(dom->nj()-boil::BW-1);
     }
   } /* i || k || b */
 
@@ -272,14 +448,22 @@ void BndCnd::add(BndCnd bc) {
       bc.ir.last (-1); bc.jr.last (-1); bc.kr.last (-1);
     }
     else {
-      if(czg.contains(bc.kr.first())) bc.kr.first(bc.kr.first()-czg.first()+1);
-      else                          bc.kr.first(1);
-      if(czg.contains(bc.kr.last())) bc.kr.last(bc.kr.last()-czg.first()+1);
-      else                         bc.kr.last(dom->nk()-2);
+      if(czg.contains(bc.kr.first())) bc.kr.first(bc.kr.first()-czg.first()+boil::BW);
+      else                          bc.kr.first(boil::BW);
+      if(czg.contains(bc.kr.last())) bc.kr.last(bc.kr.last()-czg.first()+boil::BW);
+      else                          bc.kr.last(dom->nk()-boil::BW-1);
     }
   } /* i || j || b */
+#endif
+
+  //boil::oout<<"Bnd after 4 "<<bc.dir<<" "<<bc.ir.first()<<" "<<bc.ir.last()<<" | "<<bc.kr.first()<<" "<<bc.kr.last()<<" || "<<cxg.first()<<" "<<cxg.last()<<" | "<<czg.first()<<" "<<czg.last()<<boil::endl;
 
   section.push_back(bc);
+
+  /*-------------------------------------------------------------------+
+  |  Note: loop range for vector used for Momentum object is reset in: |
+  |  staggered_set_ranges.cpp                                          | 
+  +-------------------------------------------------------------------*/
 }
 
 /******************************************************************************/
@@ -470,6 +654,7 @@ std::ostream & operator << (std::ostream &ost, const BndType & bt) {
     case( 7): ost << "symmetry ";   break;
     case( 8): ost << "insert ";     break;
     case( 9): ost << "convective "; break;
+    case(10): ost << "pseudo ";     break;
   }
     
   return ost;

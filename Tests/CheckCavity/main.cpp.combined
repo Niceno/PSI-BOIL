@@ -1,0 +1,1087 @@
+#include "Include/psi-boil.h"
+#include <fstream>
+#include <iostream>
+#include <fenv.h>
+#define _GNU_SOURCE 1
+#if 1
+static void __attribute__ ((constructor)) trapfpe(void)
+{
+  /* Enable some exceptions. At startup all exceptions are masked. */
+  feenableexcept(FE_INVALID|FE_DIVBYZERO|FE_OVERFLOW);
+}
+#endif
+
+#define SYM
+#define CASE 1
+/* case 0 = axisymmetric 2D
+        1 = axisymmetric 3D
+        2 = cartesian 1D
+        3 = cartesian 2D
+        4 = cartesian 3D
+*/
+
+const real R0 = 10.27e-6;
+const real pinf = 0.0;
+const real sigmm = 0.0583;
+#if CASE == 0 or CASE == 3
+const real p0 = 0.1127e6 - 0./R0 - 1.013e5;
+#elif CASE == 1 or CASE == 4
+const real p0 = 0.1127e6 - 0./R0 - 1.013e5;
+#else
+const real p0 = 0.1127e6 - 1.013e5;
+#endif
+
+real phase_change_evaluation(Scalar & tpr, const Scalar & tpr_old,
+                             const Scalar & clr,
+                             TIF & tsat, EnthalpyFD & enthFD,
+                             PhaseChange4 & pc, Scalar & f,
+                             const real tval);
+
+real cavity_evaluation(Vector & uvw, const Vector & uvw_old, Vector & uvw_cav,
+                       Vector & xyz, ScalarInt & h_cav, Scalar & press,
+                       VOF & conc, CavityPressure & capr, AC & multigrid_cavity,
+                       Momentum & ns, Matter & mixed,
+                       const real pinf, const real R,
+                       const real tsat0, const real tval);
+
+real evaluate_point(const real tval,
+                    real & vpc_tpr, real & vpc_cav,
+                    const Times & time,
+                    Vector & uvw, const Vector & uvw_old, Vector & uvw_cav,
+                    Vector & xyz,
+                    Scalar & tpr, const Scalar & tpr_old,
+                    Scalar & f, Scalar & press,
+                    ScalarInt & h_cav,
+                    TIF & tsat, EnthalpyFD & enthFD, PhaseChange4 & pc,
+                    VOF & conc, CavityPressure & capr,
+                    AC & multigrid_cavity, Momentum & ns,
+                    Matter & mixed,
+                    const real pinf, const real r_0,
+                    const real tsat0);
+
+real regula_falsi_kernel(real & tm, real & tp, real & vpcm, real & vpcp,
+                         real & vpc_tpr_m, real & vpc_tpr_p,
+                         real & vpc_cav_m, real & vpc_cav_p,
+                         const Times & time,
+                         Vector & uvw, const Vector & uvw_old, Vector & uvw_cav,
+                         Vector & xyz,
+                         Scalar & tpr, const Scalar & tpr_old,
+                         Scalar & f, Scalar & press,
+                         ScalarInt & h_cav,
+                         TIF & tsat, EnthalpyFD & enthFD, PhaseChange4 & pc,
+                         VOF & conc, CavityPressure & capr,
+                         AC & multigrid_cavity, Momentum & ns,
+                         Matter & mixed,
+                         const real pinf, const real r_0,
+                         const real tsat0);
+
+/******************************************************************************/
+int main(int argc, char ** argv) {
+
+  boil::timer.start();
+
+  if(argc<4){
+    boil::oout<<"Three command line arguments required!"<<"\n";
+    boil::oout<<"./Boil wmin glevel gstage"<<"\n";
+
+    exit(0);
+  }
+
+/******************************************************************************/
+/* ------------ input from command line */
+  int wmin=atoi(argv[1]);
+  boil::oout<<"wmin= "<<wmin<<"\n";
+
+  const int gLevel = atoi(argv[2]); /* domain dimensions */ 
+  boil::oout<<"glevel= "<<gLevel<<"\n";
+
+  const int gStage = atoi(argv[3]); /* domain dimensions */ 
+  boil::oout<<"gstage= "<<gStage<<"\n";
+
+/******************************************************************************/
+/* ------------ rescaling factors */
+  const real xmult = 1e0;
+  const real tmult = 1e0;
+  const real mmult = xmult*tmult;
+
+/******************************************************************************/
+/* ------------ boundary or initial conditions */
+  const real tsat0 = 0.0;
+  const real tout = tsat0+3.;
+
+/******************************************************************************/
+/* ------------ numerical simulation settings */
+
+  /* total time */
+  const real tend = 1e-3;
+
+  /* number of backup points */
+  const int n_bck = 20;
+
+  /* number of plot points */
+  const int n_plot = 50;
+
+  /* plotting each t_per_plot seconds */
+  const real t_per_plot = tend/real(n_plot);
+
+  /* dt settings */
+  const real surftens_dt_coef = 10.;
+
+  /* cfl limit */
+  const real cfl_limit = 0.1;
+
+/* ------------ optional simulation settings */
+
+  /* multigrid */
+  const bool multigrid_stop_if_diverging = true;
+  //const bool multigrid_stop_if_diverging = false;
+
+  const int multigrid_min_cycles = 1;
+  const int multigrid_max_cycles = 20;
+
+  /* vof */
+  const CurvMethod curv_method = CurvMethod::HF();
+  const TopoMethod topo_method = TopoMethod::Hybrid();
+  const CurvMethod wall_curv_method = CurvMethod::none();
+
+  const bool use_fs_interp = false;
+  const bool store_pressure_extrap = true;
+  const int niter_pressure_extrap = 5000;
+
+  /* enthalpy fd */
+  const bool no_solid_acceleration = true;
+  //const bool no_solid_acceleration = false;
+
+/******************************************************************************/
+/* ------------ material properties */
+  const real muv = 1.255e-5;
+  const real rhov = 0.660;
+  const real cpv = 2030*rhov;
+  const real lambdav = 0.025;
+
+  const real mul = 0.28e-3;
+  const real rhol = 956.2;
+  const real lambdal = 680e-3;
+  const real cpl = lambdal/1.68e-7;
+
+  const real sig = sigmm;
+  const real latent = 2.248e6;
+
+/******************************************************************************/
+/* ------------ domain dimensions */
+  const int NX = 24*gLevel*gStage;
+#ifdef SYM
+  const int NZ = 24*gLevel*gStage;
+#else
+  const int NZ = 48*gLevel*gStage;
+#endif
+
+  const real radius=R0;
+  const real LX = .05e-3*gStage;
+  const real LZ = LX;
+
+  const real DX = LX/real(NX);
+
+  real polar = 1.0;
+  real azimuth = 1.0;
+#ifdef SYM
+  polar = 0.5;
+#endif
+
+#if CASE == 0
+  const real V0 = DX*0.5*azimuth*radius*radius;
+#elif CASE == 1
+  const real V0 = 2./3.*azimuth*polar*radius*radius*radius;
+#elif CASE == 2
+  const real V0 = DX*DX*radius;
+#elif CASE == 3
+  #ifdef SYM 
+  polar = 0.25;
+  #endif
+  const real V0 = DX *boil::pi*polar*radius*radius;
+#else
+  azimuth = 2.*boil::pi;
+  #ifdef SYM
+  azimuth = boil::pi/2.;
+  #endif
+  const real V0 = 2./3.*azimuth*polar*radius*radius*radius;
+#endif
+  boil::oout<<"V0= "<<V0<<" "<<boil::endl;
+  boil::oout<<"p0= "<<p0<<" "<<p0-pinf<<boil::endl;
+  boil::oout<<"cpl= "<<cpl<<" "<<cpl/rhol<<boil::endl;
+
+/******************************************************************************/
+/* ------------- setup finished */
+/******************************************************************************/
+/* below this line, NO VALUES AND SETTINGS CAN BE ENTERED! */
+/******************************************************************************/
+
+  /*--------------------------------+
+  |  choose the output file format  |
+  +--------------------------------*/
+  boil::plot = new PlotTEC();
+
+  /*----------+
+  |  grid(s)  |
+  +----------*/
+  Grid1D gx( Range<real>(0.0,LX), NX, Periodic::no(),
+             //BndGrid::symmetry(), BndGrid::wall() );
+             BndGrid::symmetry(), BndGrid::extrapolate() );
+#ifndef SYM
+  Grid1D gz( Range<real>(-LZ,LZ), NZ, Periodic::no(), 
+             BndGrid::extrapolate(), BndGrid::extrapolate() );
+#else
+  Grid1D gz( Range<real>(0.0,LZ), NZ, Periodic::no(), 
+             //BndGrid::symmetry(), BndGrid::wall() );
+             BndGrid::symmetry(), BndGrid::extrapolate() );
+#endif
+
+  /*---------+
+  |  domain  |
+  +---------*/
+#if CASE == 0
+  Grid1D gzz(DX);
+  Axisymmetric d(gx, gzz, DX);
+#elif CASE == 1
+  Axisymmetric d(gx, gz, DX);
+#elif CASE == 2
+  Grid1D gy(DX);
+  Domain d(gz,gy,gy);
+#elif CASE == 3
+  Grid1D gy(DX);
+  Domain d(gz,gy,gz);
+#else
+  Domain d(gz,gz,gz);
+#endif
+  const real dxmin = d.dxyz_min();
+
+  /*------------------+
+  |  define unknowns  |
+  +------------------*/
+  Vector uvw(d), xyz(d);           // vel
+  Vector uvw_1(d), uvw_2(d);       // phasic vel
+  Scalar p  (d), f  (d), press(d); // pressure
+  Scalar c  (d), g  (d), kappa(d); // concentration
+  Scalar tpr(d), q  (d);           // temperature
+  Scalar mdot(d), mflx(d);         // phase-change rate
+
+  Scalar p_cav(d), f_cav(d);       // cavity-pressure
+  Vector uvw_cav(d);               // cavity-velocity
+  ScalarInt h_cav(d);              // indicator function
+  
+  Scalar tpr_old(d);               // stored temperature
+  Vector uvw_old(d);               // stored velocity
+
+  /*-----------------------------+ 
+  |  insert boundary conditions  |
+  +-----------------------------*/
+  for_m(m) {
+#if CASE < 2
+    uvw.bc(m).add( BndCnd( Dir::imin(), BndType::symmetry() ) );
+    uvw.bc(m).add( BndCnd( Dir::imax(), BndType::outlet() ) );
+#else
+  #ifdef SYM
+    uvw.bc(m).add( BndCnd( Dir::imin(), BndType::symmetry() ) );
+    uvw.bc(m).add( BndCnd( Dir::imax(), BndType::outlet() ) );
+  #else
+    uvw.bc(m).add( BndCnd( Dir::imin(), BndType::outlet() ) );
+    uvw.bc(m).add( BndCnd( Dir::imax(), BndType::outlet() ) );
+  #endif
+#endif
+#if CASE == 0 or CASE == 2
+    uvw.bc(m).add( BndCnd( Dir::kmin(), BndType::pseudo() ) );
+    uvw.bc(m).add( BndCnd( Dir::kmax(), BndType::pseudo() ) );
+#else
+  #ifdef SYM
+    uvw.bc(m).add( BndCnd( Dir::kmin(), BndType::symmetry() ) );
+    uvw.bc(m).add( BndCnd( Dir::kmax(), BndType::outlet() ) );
+  #else
+    uvw.bc(m).add( BndCnd( Dir::kmin(), BndType::outlet() ) );
+    uvw.bc(m).add( BndCnd( Dir::kmax(), BndType::outlet() ) );
+  #endif
+#endif
+#if CASE < 4
+    uvw.bc(m).add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
+    uvw.bc(m).add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
+#else 
+  #ifdef SYM
+    uvw.bc(m).add( BndCnd( Dir::jmin(), BndType::symmetry() ) );
+    uvw.bc(m).add( BndCnd( Dir::jmax(), BndType::outlet() ) );
+  #else
+    uvw.bc(m).add( BndCnd( Dir::jmin(), BndType::outlet() ) );
+    uvw.bc(m).add( BndCnd( Dir::jmax(), BndType::outlet() ) );
+  #endif
+#endif
+    uvw_1(m)=uvw(m).shape();
+    uvw_2(m)=uvw(m).shape();
+    uvw_cav(m)=uvw(m).shape();
+    uvw_old(m)=uvw(m).shape();
+  }
+
+#if CASE < 2
+  c.bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
+  c.bc().add( BndCnd( Dir::imax(), BndType::outlet() ) );
+#else
+  #ifdef SYM
+  c.bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
+  c.bc().add( BndCnd( Dir::imax(), BndType::outlet() ) );
+  #else
+  c.bc().add( BndCnd( Dir::imin(), BndType::outlet() ) );
+  c.bc().add( BndCnd( Dir::imax(), BndType::outlet() ) );
+  #endif
+#endif
+#if CASE == 0 or CASE == 2
+  c.bc().add( BndCnd( Dir::kmin(), BndType::pseudo() ) );
+  c.bc().add( BndCnd( Dir::kmax(), BndType::pseudo() ) );
+#else
+  #ifdef SYM
+  c.bc().add( BndCnd( Dir::kmin(), BndType::symmetry() ) );
+  c.bc().add( BndCnd( Dir::kmax(), BndType::outlet() ) );
+  #else
+  c.bc().add( BndCnd( Dir::kmin(), BndType::outlet() ) );
+  c.bc().add( BndCnd( Dir::kmax(), BndType::outlet() ) );
+  #endif
+#endif
+#if CASE < 4
+  c.bc().add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
+  c.bc().add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
+#else
+  #ifdef SYM
+  c.bc().add( BndCnd( Dir::jmin(), BndType::symmetry() ) );
+  c.bc().add( BndCnd( Dir::jmax(), BndType::outlet() ) );
+  #else
+  c.bc().add( BndCnd( Dir::jmin(), BndType::outlet() ) );
+  c.bc().add( BndCnd( Dir::jmax(), BndType::outlet() ) );
+  #endif
+#endif
+
+  p=c.shape();
+  kappa=c.shape();
+
+  f = p.shape();
+  mdot = p.shape();
+  mflx = p.shape();
+  q = p.shape();
+  g = c.shape();
+
+  f_cav = f.shape();
+  h_cav = c.shape();
+
+#if CASE < 2
+  tpr.bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
+  tpr.bc().add( BndCnd( Dir::imax(), BndType::dirichlet(), tout ) );
+#else
+  #ifdef SYM
+  tpr.bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
+  tpr.bc().add( BndCnd( Dir::imax(), BndType::dirichlet(), tout ) );
+  #else
+  tpr.bc().add( BndCnd( Dir::imin(), BndType::dirichlet(), tout ) );
+  tpr.bc().add( BndCnd( Dir::imax(), BndType::dirichlet(), tout ) );
+  #endif
+#endif
+#if CASE == 0 or CASE == 2
+  tpr.bc().add( BndCnd( Dir::kmin(), BndType::pseudo() ) );
+  tpr.bc().add( BndCnd( Dir::kmax(), BndType::pseudo() ) );
+#else
+  #ifdef SYM
+  tpr.bc().add( BndCnd( Dir::kmin(), BndType::symmetry() ) );
+  tpr.bc().add( BndCnd( Dir::kmax(), BndType::dirichlet(), tout ) );
+  #else
+  tpr.bc().add( BndCnd( Dir::kmin(), BndType::dirichlet(), tout ) );
+  tpr.bc().add( BndCnd( Dir::kmax(), BndType::dirichlet(), tout ) );
+  #endif
+#endif
+#if CASE < 4
+  tpr.bc().add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
+  tpr.bc().add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
+#else
+  #ifdef SYM
+  tpr.bc().add( BndCnd( Dir::jmin(), BndType::symmetry() ) );
+  tpr.bc().add( BndCnd( Dir::jmax(), BndType::dirichlet(), tout ) );
+  #else
+  tpr.bc().add( BndCnd( Dir::jmin(), BndType::dirichlet(), tout ) );
+  tpr.bc().add( BndCnd( Dir::jmax(), BndType::dirichlet(), tout ) );
+  #endif
+#endif
+
+  tpr_old = tpr.shape();
+
+#if CASE < 2
+  p_cav.bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
+  p_cav.bc().add( BndCnd( Dir::imax(), BndType::dirichlet(), pinf ) );
+#else
+  #ifdef SYM
+  p_cav.bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
+  p_cav.bc().add( BndCnd( Dir::imax(), BndType::dirichlet(), pinf ) );
+  #else
+  p_cav.bc().add( BndCnd( Dir::imin(), BndType::dirichlet(), pinf ) );
+  p_cav.bc().add( BndCnd( Dir::imax(), BndType::dirichlet(), pinf ) );
+  #endif
+#endif
+#if CASE == 0 or CASE == 2
+  p_cav.bc().add( BndCnd( Dir::kmin(), BndType::pseudo() ) );
+  p_cav.bc().add( BndCnd( Dir::kmax(), BndType::pseudo() ) );
+#else
+  #ifdef SYM
+  p_cav.bc().add( BndCnd( Dir::kmin(), BndType::symmetry() ) );
+  p_cav.bc().add( BndCnd( Dir::kmax(), BndType::dirichlet(), pinf ) );
+  #else
+  p_cav.bc().add( BndCnd( Dir::kmin(), BndType::dirichlet(), pinf ) );
+  p_cav.bc().add( BndCnd( Dir::kmax(), BndType::dirichlet(), pinf ) );
+  #endif
+#endif
+#if CASE < 4
+  p_cav.bc().add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
+  p_cav.bc().add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
+#else
+  #ifdef SYM
+  p_cav.bc().add( BndCnd( Dir::jmin(), BndType::symmetry() ) );
+  p_cav.bc().add( BndCnd( Dir::jmax(), BndType::dirichlet(), pinf ) );
+  #else
+  p_cav.bc().add( BndCnd( Dir::jmin(), BndType::dirichlet(), pinf ) );
+  p_cav.bc().add( BndCnd( Dir::jmax(), BndType::dirichlet(), pinf ) );
+  #endif
+#endif
+
+  press=p_cav.shape();
+
+  /*----------------------+
+  |  physical properties  |
+  +----------------------*/
+  Matter vapor(d), liquid(d);
+  vapor  .mu    (muv);
+  vapor  .rho   (rhov);
+  vapor  .cp    (cpv);  // J/m3
+  vapor  .lambda(lambdav);
+  liquid.mu    (mul);
+  liquid.rho   (rhol);
+  liquid.cp    (cpl);   // J/m3
+  liquid.lambda(lambdal);
+
+  Matter mixed(liquid, vapor, & c);
+  mixed.sigma(sig);
+  mixed.latent(latent);
+
+  /*-------------------+
+  |  time-integration  |
+  +-------------------*/
+  const real dt = surftens_dt_coef*pow(vapor.rho()->value()*pow(dxmin,3.0)
+                / (2.0*boil::pi*mixed.sigma()->value()),0.5);
+  const int ndt = tend/dt;
+  const int n_per_backup = ndt/n_bck;
+
+  boil::oout<<"main:dxmin= "<<dxmin<<" "<<boil::cart.iam()<<" "<<dt<<"\n";
+  boil::oout<<"main:nparams= "<<n_per_backup<<"\n";
+  Times time(ndt, dt);
+  time.set_coef_dec(0.75);
+  time.set_dt(dt);
+
+  /*-----------------+
+  |  define solvers  |
+  +-----------------*/
+  Krylov * solverCGic = new CG(d, Prec::ic2());
+  Krylov * solverCGdi = new CG(d, Prec::di());
+  Krylov * solverBICG = new BiCGS(d, Prec::di());
+
+  Krylov * solver = solverCGic;
+
+  /*-------------------+
+  |  define equations  |
+  +-------------------*/
+  /* momentum equation */
+  Momentum ns( uvw, xyz, time, solver, &mixed);
+  ns.convection_set(TimeScheme::forward_euler());
+  ns.diffusion_set(TimeScheme::backward_euler());
+
+  /* pressure solver */
+#if CASE == 0 or CASE == 2
+  Pressure pr(p, f, uvw, time, solverCGdi, &mixed);
+#else
+  Pressure pr(p, f, uvw, time, solver, &mixed);
+#endif
+  AC multigrid( &pr );
+  multigrid.stop_if_diverging(multigrid_stop_if_diverging);
+  multigrid.min_cycles(multigrid_min_cycles);
+  multigrid.max_cycles(multigrid_max_cycles);
+
+  /* color function */
+  Vector & uvwvof = uvw_1;
+#if CASE > 1
+  VOF conc(c, g, kappa, uvwvof, time, solver);
+#else
+  VOFaxisym conc(c, g, kappa, uvwvof, time, solver);
+#endif
+  conc.set_curv_method(curv_method);
+  conc.set_topo_method(topo_method);
+  conc.set_wall_curv_method(wall_curv_method);
+  conc.set_use_interp(use_fs_interp);
+  conc.set_pressure_extrapolation_parameters(store_pressure_extrap,niter_pressure_extrap);
+
+  /* enthalpy equation */
+  TIF tsat(tsat0);
+  Vector & uvwenth1 = uvw;
+  Vector & uvwenth2 = uvw;
+
+#if CASE > 1
+  EnthalpyFD enthFD      (tpr, q, uvw, uvwenth1, uvwenth2, time, solver  , &mixed,
+                          conc.topo, tsat);
+#else
+  EnthalpyFDaxisym enthFD(tpr, q, uvw, uvwenth1, uvwenth2, time, solver  , &mixed,
+                          conc.topo, tsat);
+#endif
+  enthFD.convection_set(TimeScheme::forward_euler());
+  enthFD.diffusion_set(TimeScheme::backward_euler());
+
+  enthFD.set_no_solid_acceleration(no_solid_acceleration);
+
+  /* phase change */
+  PhaseChange4 pc(mdot, mflx, tpr, q, c, g , f , uvw, conc.topo,
+                  tsat, time, &mixed);
+  pc.set_second_order_accuracy(true);
+  pc.set_unconditional_extrapolation(false);
+  pc.set_discard_points_near_interface(true);
+
+  /* cavity pressure */
+#if CASE > 1
+  CavityPressure capr(press, f_cav, uvw_cav, time, solver, &liquid,
+                      conc.topo,mixed.sigma(),kappa);
+#else
+  CPaxisym       capr(press, f_cav, uvw_cav, time, solver, &liquid,
+                      conc.topo,mixed.sigma(),kappa);
+#endif
+#if VARIANT > 1
+  capr.set_cavity_pressure(p0);
+#endif
+
+  AC multigrid_cavity( &capr );
+  multigrid_cavity.stop_if_diverging(multigrid_stop_if_diverging);
+  multigrid_cavity.min_cycles(1);
+  multigrid_cavity.max_cycles(1);
+
+  /*-------------------+
+  |  check if restart  |
+  +-------------------*/
+  std::fstream input;
+  int irun = 0;
+  if(boil::cart.iam()==0){
+    input.open("run.txt", std::ios::in);
+    if( !input.fail() ) {
+      input >> irun;
+      boil::oout<<"read irun.  irun= "<<irun<<"\n";
+    }
+    input.close();
+  }
+  boil::cart.sum_int(&irun);
+  if (irun==1){
+    boil::oout<<"exit job due to irun=1"<<"\n";
+    exit(0);
+  }
+
+  if(boil::cart.iam()==0){
+    std::fstream output;
+    output.open("run.txt", std::ios::out);
+    output << 1 << boil::endl;
+    output.close();
+  }
+
+  int ts=0;
+  input.open("time.txt", std::ios::in);
+  if( !input.fail() ) {
+    real t,dtf;
+    input >> ts;
+    input >> t;
+    input >> dtf;
+    uvw.  load("uvw",ts);
+    c. load("c", ts);
+    tpr.  load("tpr", ts);
+    time.first_step(ts);
+    time.current_time(t);
+    time.set_dt(dtf);
+
+    conc.init();
+  } else {
+    boil::oout << "######################" << boil::endl;
+    boil::oout << "#                    #" << boil::endl;
+    boil::oout << "# START FROM SCRATCH #" << boil::endl;
+    boil::oout << "#                    #" << boil::endl;
+    boil::oout << "######################" << boil::endl;
+
+    /*--------------------+
+    |  initial condition  |
+    +--------------------*/
+    for_vijk(c,i,j,k) 
+      c[i][j][k] = 0.0;
+
+    const real xcent=0.0;
+    const real ycent=0.0;
+    const real zcent=0.0;
+#if CASE < 4
+    boil::setup_circle_xz(conc.color(), radius, xcent, zcent);
+#else
+    boil::setup_sphere(conc.color(), radius, xcent, ycent, zcent);
+#endif
+    conc.color().bnd_update();
+    conc.color().exchange_all();
+    conc.color_to_vf(conc.color(),c);
+    for_vijk(c,i,j,k)
+      c[i][j][k] = 1.0-c[i][j][k];
+
+    c.bnd_update();
+    c.exchange_all();
+    conc.init();
+    conc.totalvol();
+
+    tpr = tout;
+    boil::plot->plot(uvw,c,tpr,press,mdot,mflx,"uvw-c-tpr-press-mdot-mflx",0); 
+
+  }
+  input.close();
+
+  /* set iint */
+  int iint = int(time.current_time()/t_per_plot) + 1;
+  boil::oout<<"iint= "<<iint<<"\n";
+
+  /*------------+
+  |  time loop  |
+  +------------*/
+#if 1
+  real t_new(tout), t_old(tout), t_oold(tout), t_slp(boil::unreal);
+  for(time.start(); time.end(); time.increase()) {
+
+    /* store old temperature */
+    t_oold = t_old;
+    t_old = std::max(t_old,t_new);
+    
+    /* relative error */
+    real eps_rel = 1e-6;
+    real eps_calc = 1.0;
+
+    /* update geometry */
+    conc.new_time_step();
+
+    /* store velocity */
+    for_m(m)
+      uvw_old(m) = uvw(m);
+
+    /* store temperature */
+    tpr_old = tpr;
+
+    /* radius */
+    real V_cavity = 0.0;
+    for_vijk(h_cav,i,j,k)
+      if(h_cav[i][j][k]==0||h_cav[i][j][k]==-1)
+        V_cavity += (1.0-std::min(1.0,std::max(0.0,c[i][j][k])))*c.dV(i,j,k);
+
+    boil::cart.sum_real(&V_cavity);
+    real r_0 = std::pow(1.5*V_cavity/azimuth/polar,1./3.);
+
+    /* test old value */
+    real vpc_tpr_old,vpc_cav_old;
+    real vpc_old = evaluate_point(t_old,
+                                  vpc_tpr_old, vpc_cav_old,
+                                  time,
+                                  uvw, uvw_old, uvw_cav, xyz,
+                                  tpr, tpr_old, f, press,
+                                  h_cav,
+                                  tsat, enthFD, pc, conc, capr,
+                                  multigrid_cavity, ns,
+                                  mixed,
+                                  pinf, r_0, tsat0);
+
+    eps_calc = fabs(vpc_old/vpc_cav_old);
+    boil::oout<<"@@@@begin= "<<time.current_time();
+    std::cout<< std::setprecision(16);
+    boil::oout<<" "<<t_old<<" ";
+    std::cout<< std::setprecision(8);
+    boil::oout<<vpc_old<<" "<<vpc_cav_old<<" "<<vpc_tpr_old<<" "<<eps_calc<<boil::endl;
+    if(eps_calc>=eps_rel) {
+
+      /* find bounds */
+      real mult = vpc_old > 0. ? -1. : +1.;
+      real delta_t;
+      //if(boil::realistic(t_slp)) {
+      //  delta_t = t_slp * time.dt();
+      //} else {
+        delta_t = 0.01;
+      //} 
+    
+      t_new = t_old;
+      real vpc_tpr_new, vpc_cav_new, vpc_new;
+      do {
+        t_new = std::max(tsat0,std::min(tout,t_new + mult * delta_t));
+        vpc_new = evaluate_point(t_new,
+                                 vpc_tpr_new, vpc_cav_new,
+                                 time,
+                                 uvw, uvw_old, uvw_cav, xyz,
+                                 tpr, tpr_old, f, press,
+                                 h_cav,
+                                 tsat, enthFD, pc, conc, capr,
+                                 multigrid_cavity, ns,
+                                 mixed,
+                                 pinf, r_0, tsat0);
+      } while(vpc_new*vpc_old>0.0);
+
+      /* find root */
+      int niter(0);
+      eps_calc = std::min(fabs(vpc_old/vpc_cav_old),fabs(vpc_new/vpc_cav_new));
+      boil::oout<<"@@@@brackets= "<<time.current_time()<<" "<<niter<<" ";
+      std::cout<< std::setprecision(16);
+      boil::oout<<t_old<<" "<<t_new<<" ";
+      std::cout<< std::setprecision(8);
+      boil::oout<<eps_calc
+                <<" | "<<vpc_old<<" "<<vpc_cav_old<<" "<<vpc_tpr_old
+                <<" | "<<vpc_new<<" "<<vpc_cav_new<<" "<<vpc_tpr_new<<boil::endl;
+
+      while(eps_calc>eps_rel&&fabs(t_old-t_new)>1e-6) {
+        eps_calc = regula_falsi_kernel(t_old, t_new, vpc_old, vpc_new,
+                                       vpc_tpr_old, vpc_tpr_new, vpc_cav_old, vpc_cav_new,
+                                       time,
+                                       uvw, uvw_old, uvw_cav, xyz,
+                                       tpr, tpr_old, f, press,
+                                       h_cav,
+                                       tsat, enthFD, pc, conc, capr,
+                                       multigrid_cavity, ns,
+                                       mixed,
+                                       pinf, r_0, tsat0);
+
+        niter++;
+        boil::oout<<"@@@@vpc= "<<time.current_time()<<" "<<niter;
+        std::cout<< std::setprecision(16);
+        boil::oout<<" "<<t_old<<" "<<t_new<<" ";
+        std::cout<< std::setprecision(8);
+        boil::oout<<eps_calc
+                  <<" | "<<vpc_old<<" "<<vpc_cav_old<<" "<<vpc_tpr_old
+                  <<" | "<<vpc_new<<" "<<vpc_cav_new<<" "<<vpc_tpr_new<<boil::endl;
+
+      }
+      t_old = fabs(vpc_old/std::min(fabs(vpc_tpr_old),fabs(vpc_cav_old)))
+            > fabs(vpc_new/std::min(fabs(vpc_tpr_new),fabs(vpc_cav_new)))
+            ? t_new : t_old;
+
+      t_slp = (t_old-t_oold)/time.dt();
+    } 
+
+    /* reset velocity */
+    for_m(m)
+      uvw(m) = uvw_old(m);
+
+    /* proceed with the rest of the time step */
+    phase_change_evaluation(tpr,tpr_old,conc.color(),
+                            tsat,enthFD,
+                            pc,f,t_old)*time.dt();
+ 
+    ns.vol_phase_change(&f);
+
+    /*--------------------------+
+    |  solve momentum equation  |
+    +--------------------------*/
+
+    /* reset body force */
+    for_m(m)
+      for_avmijk(xyz,m,i,j,k)
+        xyz[m][i][j][k]=0.0;
+
+    /* surface tension */
+    conc.tension(&xyz, mixed,conc.color());
+
+    /* essential for moving front */
+    ns.discretize();
+
+    /* momentum */
+    ns.new_time_step(uvw_old);
+
+    ns.grad(press);
+    ns.solve(ResRat(1e-14));
+
+    const int niter = 50;
+    MaxIter mm = MaxIter(niter);
+    std::array<MaxIter,3> mi = {mm,mm,mm};
+
+    ResRat rr = ResRat(1e-6);
+
+    p = 0.0;
+    p.bnd_update();
+    pr.discretize();
+    pr.coarsen();
+
+    if (multigrid.cycle(Cycle::none(),Cycle::F(),rr,mi)) OMS(converged);
+    p.exchange();
+    ns.project(p);
+
+    ns.cfl_max();
+
+    /*---------------------------+
+    |  solve transport equation  |
+    +---------------------------*/
+    conc.advance_with_extrapolation(true,ResRat(1e-8),uvw,&liquid,&uvw_1);
+    conc.totalvol();
+
+    /*-------------+
+    |  dt control  |
+    +-------------*/
+    /* minimum color function */
+    conc.color_minmax();
+
+    /* front */
+    conc.front_minmax();
+
+    time.control_dt(ns.cfl_max(),cfl_limit,dt);
+
+    //exit(0);
+
+    /*--------------+
+    |  output data  |
+    +--------------*/
+    if((time.current_time()) / (t_per_plot) >= real(iint) || time.current_step()==1 ) {
+      boil::plot->plot(uvw,c,tpr,press,mdot,mflx,"uvw-c-tpr-press-mdot-mflx",iint);
+      iint++;
+    }
+
+    /*--------------+
+    |  backup data  |
+    +--------------*/
+    if(time.current_step() % n_per_backup == 0) {
+      uvw  .save("uvw",   time.current_step());
+      c    .save("c"   ,  time.current_step());
+      tpr  .save("tpr" ,  time.current_step());
+      if( boil::cart.iam()==0) {
+        std::fstream output;
+        std::stringstream ss;
+        ss <<"time-"<<time.current_step()<<".txt";
+        std::string fname = ss.str();
+        int len = fname.length();
+        char * cfname = new char[len+1];
+        memcpy(cfname, fname.c_str(), len+1);
+        output << std::setprecision(16);
+        output.open(cfname, std::ios::out);
+        output << time.current_step() << "\n";
+        output << time.current_time()+time.dt() << "\n";
+        output << time.dt() << "\n";
+        output.close();
+      }
+    }
+
+    if( boil::timer.current_min() > wmin-12.0
+      || time.current_step()==time.total_steps()) {
+      uvw  .save("uvw",   time.current_step());
+      c .save("c",  time.current_step());
+      tpr  .save("tpr",   time.current_step());
+      std::fstream output;
+      output.open("time.txt", std::ios::out);
+      output << time.current_step() << boil::endl;
+      output << time.current_time()+time.dt() << boil::endl;
+      output << time.dt() << boil::endl;
+      output.close();
+      output.open("run.txt", std::ios::out);
+      output << 0 << boil::endl;
+      output.close();
+      boil::timer.stop();
+      boil::timer.report();
+      uvw  .rm("uvw", ts);
+      c .rm("c", ts);
+      tpr  .rm("tpr", ts);
+
+      break;
+    }
+  }
+#endif
+
+  boil::oout << "finished" << boil::endl;
+
+  boil::timer.stop();
+  boil::timer.report();
+
+}	
+
+/******************************************************************************/
+real phase_change_evaluation(Scalar & tpr, const Scalar & tpr_old,
+                             const Scalar & clr,
+                             TIF & tsat, EnthalpyFD & enthFD,
+                             PhaseChange4 & pc, Scalar & f, const real tval) {
+
+  tpr = tpr_old;
+
+  for_vijk(tpr,i,j,k) {
+    if(clr[i][j][k]<0.5) {
+      tpr[i][j][k] = tval;
+    }
+  }
+  tpr.bnd_update();
+  tpr.exchange();
+
+  tsat.set_tref(tval);
+
+  enthFD.discretize();
+  enthFD.new_time_step();
+  enthFD.solve(ResRat(1e-16),"enthFD");
+
+  f = 0.0;
+  pc.update();
+  real vpc_tpr=0.0;
+  for_vijk(f,i,j,k)
+    vpc_tpr+=f[i][j][k];
+
+  boil::cart.sum_real(&vpc_tpr);
+
+  return vpc_tpr;
+}
+
+/******************************************************************************/
+real cavity_evaluation(Vector & uvw, const Vector & uvw_old, Vector & uvw_cav,
+                       Vector & xyz, ScalarInt & h_cav, Scalar & press,
+                       VOF & conc, CavityPressure & capr, AC & multigrid_cavity,
+                       Momentum & ns, Matter & mixed,
+                       const real pinf, const real R,
+                       const real tsat0, const real tval) {
+  /* reset velocity */
+  for_m(m)
+    uvw(m) = uvw_old(m);
+
+  const int niter = 1000;
+  MaxIter mm = MaxIter(niter);
+  std::array<MaxIter,3> mi = {mm,mm,mm};
+
+  ResRat rr = ResRat(1e-6);
+
+  /* step one: reset outflow velocity */
+  for_m(m)
+    for_avmijk(xyz,m,i,j,k)
+      uvw_cav[m][i][j][k]=0.0;
+
+  /* step two: label cells */
+  for_vijk(h_cav,i,j,k)
+    h_cav[i][j][k] = conc.heaviside()->status(i,j,k);
+
+  /* linearized clausius-clapeyron */
+  real pcc = mixed.rho(0)*mixed.latent()->value()*(tval-tsat0)/(tsat0+373.15)
+#if 1
+  #if CASE == 0 or CASE == 3
+           - mixed.sigma()->value()/R;
+  #elif CASE == 1 or CASE == 4
+           - 2.*mixed.sigma()->value()/R;
+  #else
+           ;
+  #endif
+#else
+           ;
+#endif
+  capr.set_cavity_pressure(pcc+pinf);
+
+  /* step three: solve cavity pressure */
+  press = pinf;
+  press.bnd_update();
+  capr.discretize();
+  capr.coarsen();
+  if (multigrid_cavity.cycle(Cycle::none(),Cycle::F(),ResRat(5e-5),mi)) OMS(converged);
+  press.exchange();
+
+  /* reset body force */
+  for_m(m)
+    for_avmijk(xyz,m,i,j,k)
+      xyz[m][i][j][k]=0.0;
+
+  /* surface tension */
+  conc.tension(&xyz, mixed,conc.color());
+
+  /*--------------------------+
+  |  solve momentum equation  |
+  +--------------------------*/
+  /* essential for moving front */
+  ns.discretize();
+
+  /* momentum */
+  ns.new_time_step(uvw_old);
+
+  ns.grad(press);
+  ns.solve(ResRat(1e-14));
+
+  /* step four: correct boundaries for velocity */
+  ns.vanishing_derivative_outlet(uvw);
+
+  /* step five: calculate outlet */
+  return -uvw.bnd_flow(BndType::outlet()); /* m3/s */
+}
+
+
+/******************************************************************************/
+real evaluate_point(const real tval,
+                    real & vpc_tpr, real & vpc_cav,
+                    const Times & time,
+                    Vector & uvw, const Vector & uvw_old, Vector & uvw_cav,
+                    Vector & xyz,
+                    Scalar & tpr, const Scalar & tpr_old,
+                    Scalar & f, Scalar & press,
+                    ScalarInt & h_cav,
+                    TIF & tsat, EnthalpyFD & enthFD, PhaseChange4 & pc,
+                    VOF & conc, CavityPressure & capr,
+                    AC & multigrid_cavity, Momentum & ns,
+                    Matter & mixed,
+                    const real pinf, const real r_0,
+                    const real tsat0) {
+
+  for_m(m)
+    uvw(m) = uvw_old(m);
+
+  vpc_tpr = phase_change_evaluation(tpr,tpr_old,conc.color(),
+                                    tsat,enthFD,
+                                    pc,f,tval)*time.dt();
+
+  vpc_cav = cavity_evaluation(uvw,uvw_old,uvw_cav,xyz,
+                              h_cav,press,
+                              conc,capr,multigrid_cavity,ns,
+                              mixed,
+                              pinf,r_0,
+                              tsat0,tval);
+
+  return vpc_cav-vpc_tpr;
+}
+
+/******************************************************************************/
+real regula_falsi_kernel(real & tm, real & tp, real & vpcm, real & vpcp,
+                         real & vpc_tpr_m, real & vpc_tpr_p,
+                         real & vpc_cav_m, real & vpc_cav_p,
+                         const Times & time,
+                         Vector & uvw, const Vector & uvw_old, Vector & uvw_cav,
+                         Vector & xyz,
+                         Scalar & tpr, const Scalar & tpr_old, 
+                         Scalar & f, Scalar & press,
+                         ScalarInt & h_cav,
+                         TIF & tsat, EnthalpyFD & enthFD, PhaseChange4 & pc,
+                         VOF & conc, CavityPressure & capr, 
+                         AC & multigrid_cavity, Momentum & ns,
+                         Matter & mixed,
+                         const real pinf, const real r_0,
+                         const real tsat0) {
+
+  /* regula falsi */
+  real t_next = (tm*vpcp-tp*vpcm)/(vpcp-vpcm);
+
+  real vpc_tpr_next,vpc_cav_next;
+  real vpc_next = evaluate_point(t_next,
+                                 vpc_tpr_next, vpc_cav_next,
+                                 time,
+                                 uvw, uvw_old, uvw_cav, xyz,
+                                 tpr, tpr_old, f, press,
+                                 h_cav,
+                                 tsat, enthFD, pc, conc, capr,
+                                 multigrid_cavity, ns,
+                                 mixed,
+                                 pinf, r_0, tsat0);
+
+  if(vpc_next*vpcm>0.) {
+    tm = t_next;
+    vpc_tpr_m = vpc_tpr_next;
+    vpc_cav_m = vpc_cav_next;
+    vpcm = vpc_next;
+  } else {
+    tp = t_next;
+    vpc_tpr_p = vpc_tpr_next;
+    vpc_cav_p = vpc_cav_next;
+    vpcp = vpc_next;
+  }
+
+  real eps_calc = std::min(fabs(vpcm/std::min(fabs(vpc_tpr_m),fabs(vpc_cav_m)))
+                          ,fabs(vpcp/std::min(fabs(vpc_tpr_p),fabs(vpc_cav_p))));
+
+  return eps_calc;
+}

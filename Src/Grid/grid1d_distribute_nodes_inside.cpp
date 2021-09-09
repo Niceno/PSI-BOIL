@@ -15,7 +15,7 @@ void Grid1D::distribute_nodes_inside(const real & x1, const real & xn,
 |                        |  | o |-O-+-O-| o |
 +------------------------+  0   1   2   3   4  */
   if(nc_in == 2) {
-    real dx = L*0.5; 
+    real dx = L*0.5;
 
     x_node[boil::BW]   = x1;
     x_node[boil::BW+2] = xn;
@@ -46,7 +46,7 @@ void Grid1D::distribute_nodes_inside(const real & x1, const real & xn,
 |                                                                |
 |     b nc_in + c nc_in^2 + d nc_in^3 = L                        |
 |                                                                |
-|  4. X(nc_in-1) = L - DN                                        |
+|  4. X(nc_in-1) = L - DN 
 |                                                                |
 |     b (nc_in-1) + c (nc_in-1)^2 + d (nc_in-1)^3 = L - DN       |
 |                                                                |

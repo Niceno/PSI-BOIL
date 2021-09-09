@@ -255,7 +255,7 @@ void ScalarInt::exchange(const int * ical, const int dir) const {
         sbuff_s[l] = val[i][j][s_z + o_z + b];   // buffer k start
         rbuff_e[l] = val[i][j][e_z +  1  + b];
         rbuff_s[l] = val[i][j][s_z -  1  - b];
-
+      
         /* send last and receive first */
         boil::cart.sendrecv(&sbuff_e[0], &rbuff_s[0], ni()*nj(),
                             par_int, dom->neighbour(Dir::kmax()),
@@ -321,7 +321,7 @@ void ScalarInt::exchange(const int * ical, const int dir) const {
     }
   }
   }
-
+  
   delete [] sbuff_s;
   delete [] sbuff_e;
   delete [] rbuff_s;

@@ -1,13 +1,8 @@
 #include "Include/psi-boil.h"
-
 #include <vector>
-//#include <cmath>
-//#include <cstdlib>
-//#include <limits>
-//#include <ctime>
 
 /* parameters */
-const int NX = 60;
+const int NX = 64;
 const int NY = NX;
 const int NZ = 4*NX;
 //const int NZ = NX;
@@ -92,6 +87,7 @@ main(int argc, char * argv[]) {
   p.bc().add( BndCnd( Dir::imin(), BndType::neumann() ) );
   p.bc().add( BndCnd( Dir::imax(), BndType::neumann() ) );
   press = p.shape();
+  kappa = p.shape();
 
   std::cout<<NX/2-NINJ/2<<" "<<NX/2+NINJ/2<<"\n";
   c.bc().add( BndCnd(Range<int>(NX/2+1-NINJ/2,NX/2+NINJ/2)
@@ -134,26 +130,29 @@ main(int argc, char * argv[]) {
 
   /* Time */
   const real dxmin = std::min(LX/NX,LZ/NZ);
-  const real dt  = 5.0*pow(0.5*pow(dxmin,3.0)/(2.0*3.1415*mixed.sigma()->value()),0.5);
+  const real dt  = 5.0*pow(0.5*air.rho()->value()*pow(dxmin,3.0)/(2.0*3.1415*mixed.sigma()->value()),0.5);
   boil::oout<<"dt= "<<dt<<"\n";
   const int nint=100;
 
   Times time(50000, dt); /* ndt, dt */
-  /*---------+
-  |  circle  |
-  +---------*/
+
+  /*------------------------------+
+  |  initial condition for color  |
+  +------------------------------*/
   for_avijk(c,i,j,k)
     c[i][j][k]=1.0;
 
   Pressure pr( p,   f,   uvw, time, solver, &mixed );
   Momentum ns( uvw, xyz,      time, solver, &mixed );
-  ns.diffusion_set (TimeScheme::backward_euler());
-  ns.convection_set(ConvScheme::upwind()); 
 
+#if 0
   CIPCSL2 conc(c, g, kappa, uvw, time, solver);
   conc.set_itsharpen(10);
   conc.set_globalSharpen();
   conc.set_nredist(1);
+#else
+  VOF conc(c, g, kappa, uvw, time, solver);
+#endif
   conc.set_cangle(0.0);
 
   boil::plot->plot(uvw,c,press,"uvw-c-press", 0);
@@ -163,28 +162,10 @@ main(int argc, char * argv[]) {
 
   for(time.start(); time.end(); time.increase()) {
 
-    boil::oout << "##################" << boil::endl;
-    boil::oout << "#                 " << boil::endl;
-    boil::oout << "# TIME:      " << time.current_time() << boil::endl;
-    boil::oout << "#                 " << boil::endl;
-    boil::oout << "# TIME STEP: " << time.current_step() << boil::endl;
-    boil::oout << "#                 " << boil::endl;
-    boil::oout << "##################" << boil::endl;
-
+    /* clear body force */
     for_m(m)
-      for_vmijk(xyz,m,i,j,k)
+      for_avmijk(xyz,m,i,j,k)
         xyz[m][i][j][k] = 0.0;
-
-    /* advance */
-    conc.new_time_step();
-    //conc.convection();
-    conc.advance();
-    //conc.sharpen();
-    conc.totalvol();
-    conc.tension(&xyz, mixed);
-
-    ns.discretize();
-    pr.discretize();
 
     /* gravity */
     Comp m=Comp::w();
@@ -198,9 +179,13 @@ main(int argc, char * argv[]) {
       xyz[m][i][j][k] -= gravity * xyz.dV(m,i,j,k)
                        * (mixed.rho(m,i,j,k)-water.rho()->value());
 #endif
+    /* surface tension */
+    conc.tension(&xyz, mixed);
 
     /* solve momentum */
-    ns.cfl_max();
+    ns.discretize();
+    pr.discretize();
+    pr.coarsen();
     ns.new_time_step();
     ns.grad(press);
     ns.solve(ResRat(1e-6));
@@ -211,15 +196,17 @@ main(int argc, char * argv[]) {
     p.exchange();
     ns.project(p);
     press += p;
-     press.exchange();
+    press.exchange();
   
+    /* update color function or VOF */
+    conc.new_time_step();
+    conc.advance();
+    conc.totalvol();
+
+    /* output */
     if( time.current_step() % nint == 0 ) {
       boil::plot->plot(uvw,c,press,"uvw-c-press", time.current_step());
     }
-//    if( time.current_step() % 500 == 0 ) {
-//      uvw.save("uvw", time.current_step());
-//      c.  save("c",   time.current_step());
-//    }
 
 #if 0
   std::ofstream fout;

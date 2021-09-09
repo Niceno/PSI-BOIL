@@ -1,0 +1,255 @@
+#include "Include/psi-boil.h"
+#include "setup_circle.cpp"
+#include <fstream>
+#define USE_VOF
+//#define AVEJ
+#define SYM
+//#define WLLX
+#define WLLY
+
+/* computed parameters */
+const int gLevel = 4;
+#ifdef SYM
+const int NX = 16*gLevel;
+#else
+const int NX = 32*gLevel;
+#endif
+const int NY = NX;
+const int NZ = 3;
+
+#ifdef USE_VOF
+const int mSimple = 4;
+#else
+const int mSimple = 1;
+#endif
+
+const real cangle0(180.0);
+const real cangle1(90.0);
+
+const real radius = 1e-3;
+
+const real xcent = 0.0;
+const real ycent = radius*(1.-cos(cangle0/180.0*acos(-1.0)))-radius;
+const real zcent = 0.0;
+
+/* domain dimensions (given by problem) */
+const real Area = radius*radius/2.*(2.*cangle0/180.0*acos(-1.0)-sin(cangle0/180.0*acos(-1.0)));
+const real equivrad = sqrt(Area/acos(-1.0));
+const real LX =   8.*equivrad;
+const real LY =   LX;
+#ifdef SYM
+const real LZ =   0.5*LX/real(NX)*real(NZ);
+#else
+const real LZ =   LX/real(NX)*real(NZ);
+#endif
+
+/******************************************************************************/
+main(int argc, char * argv[]) {
+
+  boil::timer.start();
+
+  /*--------------------------------+
+  |  choose the output file format  |
+  +--------------------------------*/
+  boil::plot = new PlotTEC();
+
+  /*----------+
+  |  grid(s)  |
+  +----------*/
+#ifdef SYM
+  #ifdef WLLX
+  Grid1D gx( Range<real>(0.0,0.5*LX), NX, Periodic::no(),
+             BndGrid::symmetry(), BndGrid::wall() );
+  #else
+  Grid1D gx( Range<real>(0.0,0.5*LX), NX, Periodic::no(), BndGrid::symmetry() );
+  #endif
+  #ifdef WLLY
+  Grid1D gy( Range<real>(0.0,0.5*LY), NY, Periodic::no(),
+             BndGrid::symmetry(), BndGrid::wall() );
+  #else
+  Grid1D gy( Range<real>(0.0,0.5*LY), NY, Periodic::no(), BndGrid::symmetry() );
+  #endif
+#else
+  Grid1D gx( Range<real>(-0.5*LX,0.5*LX), NX, Periodic::no() );
+  Grid1D gy( Range<real>(-0.5*LY,0.5*LY), NY, Periodic::no() );
+#endif
+  Grid1D gz( Range<real>(-0.5*LZ,0.5*LZ), NZ, Periodic::yes() );
+  /*---------+
+  |  domain  |
+  +---------*/
+  Domain d(gx, gy, gz);
+
+  /*------------------+
+  |  define unknowns  |
+  +------------------*/
+  Vector uvw(d), uvw_old(d); // vel
+  Vector xyz(d); // body force
+  Scalar c  (d), g  (d), kappa(d), cold(d); // concentration
+  Scalar press  (d), p(d), f  (d);
+
+
+  /*-----------------------------+ 
+  |  insert boundary conditions  |
+  +-----------------------------*/
+  for_m(m) {
+#ifdef SYM
+  #ifdef WLLX
+    uvw.bc(m).add( BndCnd( Dir::imin(), BndType::wall() ) );
+  #else
+    uvw.bc(m).add( BndCnd( Dir::imin(), BndType::symmetry() ) );
+  #endif
+    uvw.bc(m).add( BndCnd( Dir::imax(), BndType::outlet() ) );
+  #ifdef WLLY
+    uvw.bc(m).add( BndCnd( Dir::jmin(), BndType::wall() ) );
+  #else
+    uvw.bc(m).add( BndCnd( Dir::jmin(), BndType::symmetry() ) );
+  #endif
+    uvw.bc(m).add( BndCnd( Dir::jmax(), BndType::outlet() ) );
+#else
+    uvw.bc(m).add( BndCnd( Dir::imin(), BndType::outlet() ) );
+    uvw.bc(m).add( BndCnd( Dir::imax(), BndType::outlet() ) );
+    uvw.bc(m).add( BndCnd( Dir::jmin(), BndType::outlet() ) );
+    uvw.bc(m).add( BndCnd( Dir::jmax(), BndType::outlet() ) );
+#endif
+    uvw.bc(m).add( BndCnd( Dir::kmin(), BndType::periodic() ) );
+    uvw.bc(m).add( BndCnd( Dir::kmax(), BndType::periodic() ) );
+    uvw_old(m)=uvw(m).shape();
+  }
+
+#ifdef SYM
+  #ifdef WLLX
+  c.bc().add( BndCnd( Dir::imin(), BndType::wall() ) );
+  #else
+  c.bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
+  #endif
+  c.bc().add( BndCnd( Dir::imax(), BndType::outlet() ) );
+  #ifdef WLLY
+  c.bc().add( BndCnd( Dir::jmin(), BndType::wall() ) );
+  #else
+  c.bc().add( BndCnd( Dir::jmin(), BndType::symmetry() ) );
+  #endif
+  c.bc().add( BndCnd( Dir::jmax(), BndType::outlet() ) );
+#else
+  c.bc().add( BndCnd( Dir::imin(), BndType::outlet() ) );
+  c.bc().add( BndCnd( Dir::imax(), BndType::outlet() ) );
+  c.bc().add( BndCnd( Dir::jmin(), BndType::outlet() ) );
+  c.bc().add( BndCnd( Dir::jmax(), BndType::outlet() ) );
+#endif
+  c.bc().add( BndCnd( Dir::kmin(), BndType::periodic() ) );
+  c.bc().add( BndCnd( Dir::kmax(), BndType::periodic() ) );
+
+  press=c.shape();
+  p=c.shape();
+  kappa=c.shape();
+  cold=c.shape();
+
+  Matter air(d), water(d);
+#if 0
+  air  .mu    (1.0000e-3);
+  air  .rho   (1.0000e+0);
+  water.mu    (1.0000e-3);
+  water.rho   (1.0000e+0);
+
+  Matter mixed(water, air, &c);
+  mixed.sigma (0.01);
+#else
+  air  .mu    (1.0000e-5);
+  air  .rho   (1.2500e+0);
+  water.mu    (1.0000e-3);
+  water.rho   (1.0000e+3);
+
+  Matter mixed(water, air, &c);
+  mixed.sigma (0.07);
+#endif
+
+  /*-------------------+
+  |  time-integration  |
+  +-------------------*/
+  real dxmin = d.dxyz_min();
+  const real dt = 10.0 * pow(air.rho()->value()*pow(dxmin,3.0)
+                           /(2.0*3.1415*mixed.sigma()->value()),0.5);
+  const real tend = 0.1;
+  const int ndt = tend/dt;
+  const int nint = ndt/10;
+  Times time(ndt, dt); 
+	
+#if 1
+  boil::oout<<"si= "<<c.si()<<" ei= "<<c.ei()<<"\n";
+  boil::oout<<"sj= "<<c.sj()<<" ei= "<<c.ej()<<"\n";
+  boil::oout<<"sk= "<<c.sk()<<" ei= "<<c.ek()<<"\n";
+#endif
+
+  std::fstream input;
+  input.open("time.txt", std::ios::in);
+  bool restart = false;
+
+  if( !input.fail() ) {
+    restart=true;
+  }
+
+  if( restart ) {
+    int ts;
+    real t,dtf;
+    input >> ts;
+    input >> t;
+    input >> dtf;
+    time.first_step(ts);
+    time.current_time(t);
+    time.set_dt(dtf);
+    uvw   .load("uvw", ts);
+    press .load("press", ts);
+    c     .load("c", ts);
+  } else {
+
+  /*--------------------+
+  |  initial condition  |
+  +--------------------*/
+  for_m(m)
+    for_avmijk(uvw,m,i,j,k)
+      uvw[m][i][j][k]=0.0;
+
+  c = 0.0;
+
+  setup_circle(c,radius,xcent,ycent);
+#if 0
+  for_avijk(c,i,j,k)
+    c[i][j][k] = 1. - c[i][j][k];
+#endif
+
+  c.bnd_update();
+  c.exchange_all();
+  boil::plot->plot(uvw,c,press, "uvw-c-press", 0);
+
+  } // restart
+
+  /*----------------+
+  |  linear solver  |
+  +----------------*/
+  Krylov * solver = new CG(d, Prec::ic2());
+  //Krylov * solver = new CG(d, Prec::di());
+  Momentum ns( uvw, xyz, time, solver, &mixed);
+  ns.convection_set(TimeScheme::backward_euler()); //ns.convection is mandatory
+  ns.diffusion_set(TimeScheme::backward_euler());
+  Pressure pr(p, f, uvw, time, solver, &mixed);
+
+  AC multigrid( &pr );
+  multigrid.min_cycles(4);  // 4
+  multigrid.max_cycles(8); // 8
+  multigrid.stop_if_diverging(true);
+
+#ifdef USE_VOF
+  VOF conc  (c, g, kappa, uvw, time, solver);
+  conc.set_curv_method(0);  // height function
+  //conc.set_curv_method(1);  // smoothed VOF
+  conc.set_cangle(cangle1);
+  conc.ancillary();
+#else
+  CIPCSL2 conc  (c, g, kappa, uvw, time, solver);
+  conc.set_itsharpen(8);
+  conc.set_globalSharpen();
+#endif
+  conc.totalvol();
+
+  boil::plot->plot(uvw,c,press, "uvw-c-press", 0);
+
+}

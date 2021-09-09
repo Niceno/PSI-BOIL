@@ -94,7 +94,7 @@ void PlotVTK::plot(const Scalar & sca,
   plot_vtk_domain(*dom);
   out << "POINT_DATA " <<   (dom->ni()-2*boil::BW)
                           * (dom->nj()-2*boil::BW)
-                          * (dom->nk()-2*boil::BW)
+                          * (dom->nk()-2*boil::BW)                           
       << boil::endl;
   plot_vtk_scalar(*dom, sca, "a");
   plot_vtk_footer();
@@ -115,7 +115,7 @@ void PlotVTK::plot(const ScalarInt & sca,
   plot_vtk_domain(*dom);
   out << "POINT_DATA " <<   (dom->ni()-2*boil::BW)
                           * (dom->nj()-2*boil::BW)
-                          * (dom->nk()-2*boil::BW)
+                          * (dom->nk()-2*boil::BW)                           
       << boil::endl;
   plot_vtk_scalarint(*dom, sca, "a");
   plot_vtk_footer();
@@ -132,7 +132,6 @@ void PlotVTK::plot_vtk_domain(const Domain & dom) {
   out << "DIMENSIONS " << dom.ni()-2*boil::BW << " " 
                        << dom.nj()-2*boil::BW << " " 
                        << dom.nk()-2*boil::BW << boil::endl;
-
   out << "X_COORDINATES " << dom.ni()-2*boil::BW  << " float" << boil::endl;
   for(int i=boil::BW; i<dom.ni()-boil::BW; i++) 
     out << dom.xc(i) << boil::endl;

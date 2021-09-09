@@ -12,7 +12,7 @@ void CIPCSL2::curv_interface() {
 *     output: kappa
 *******************************************************************************/
   /* normal vector based on distance function*/
-  gradphic(dist);
+  //gradphic(dist);
 
   for_ijk(i,j,k) {
     if (iflag[i][j][k]==0) {

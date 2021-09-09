@@ -10,9 +10,9 @@ void CIPCSL2::CIPCSLy4(const Vector & f, const Scalar & sy) {
 
   /* Define advection velocity: j-face */
   Comp m=Comp::j();
-  for(int i=0; i<=u->ni(m)-1; i++) {
-  for(int j=0; j<=u->nj(m)-1; j++) {
-  for(int k=0; k<=u->nk(m)-1; k++) {
+  for(int i=u->si(m)-1; i<=u->ei(m)+1; i++) {
+  for(int j=u->sj(m)-1; j<=u->ej(m)+1; j++) {
+  for(int k=u->sk(m)-1; k<=u->ek(m)+1; k++) {
     vel[i][j][k]=(*u)[m][i][j][k];
   }}}
   /* EXTENDED BUFFERS HINT:
@@ -23,9 +23,7 @@ void CIPCSL2::CIPCSLy4(const Vector & f, const Scalar & sy) {
   */
 
   /* Reset delrho */
-  for(int i=0; i<=ni(); i++)
-  for(int j=0; j<=nj(); j++)
-  for(int k=0; k<=nk(); k++)
+  for_aijk(i,j,k)
     delrho[i][j][k]=0.0;
   /* EXTENDED BUFFERS HINT:
      Lines 26-28 could probably be replaced with this:
@@ -86,6 +84,12 @@ void CIPCSL2::CIPCSLy4(const Vector & f, const Scalar & sy) {
           jof=0; jof2=0;
         }
         for_vijk( clr.bc().at(b), i,j,k ) {
+          if (i<=si()-1) continue;
+          if (i>=ei()+1) continue;
+          if (j<=sj()-2) continue;
+          if (j>=ej()+2) continue;
+          if (k<=sk()-1) continue;
+          if (k>=ek()+1) continue;
           real dx=clr.dxc(i);
           real dz=clr.dzc(k);
           delrho[i][j+jof2][k]=phi[i][j][k]*vel[i][j+jof][k]*dt*dx*dz;
@@ -101,6 +105,12 @@ void CIPCSL2::CIPCSLy4(const Vector & f, const Scalar & sy) {
           jof=-1; jof2=0;
         }
         for_vijk( clr.bc().at(b), i,j,k ) {
+          if (i<=si()-1) continue;
+          if (i>=ei()+1) continue;
+          if (j<=sj()-2) continue;
+          if (j>=ej()+2) continue;
+          if (k<=sk()-1) continue;
+          if (k>=ek()+1) continue;
           real dy=clr.dyc(j+jof);
           delrho[i][j+jof2][k]=clr[i][j+jof][k]/dy*vel[i][j+jof2][k]*dt;
           sum_outlet += -real(jof)*delrho[i][j+jof2][k];

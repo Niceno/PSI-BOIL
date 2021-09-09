@@ -455,14 +455,23 @@ real PhaseChange::marching_cube(const int i, const int j, const int k){
                 +clr[ii][jj  ][kk+1]+clr[ii+1][jj  ][kk+1]
                 +clr[ii][jj+1][kk+1]+clr[ii+1][jj+1][kk+1])/8.0;
 
+#if 0
     if(fabs(grid.val[m] - phisurf) < 1.0e-11){
       grid.val[m]=phisurf+1.0e-11;
     }
+#else
+    if(fabs(grid.val[m] - phisurf) < boil::pico){
+      if( clr[i][j][k]>(1.0-boil::pico) && M[i][j][k]>0.0 ){
+        grid.val[m]=phisurf-boil::pico;
+      } else if ( clr[i][j][k]<(boil::pico) && M[i][j][k]<0.0 ){
+        grid.val[m]=phisurf+boil::pico;
+      } else {
+        grid.val[m]=phisurf+boil::pico;
+      }
+    }
+#endif
 
     if(grid.val[m]>phisurf)isum++;
-    //if(i==1&&j==1&&k==1){
-    //  std::cout<<grid.val[m]<<"\n";
-    //}
   }
 
   if(isum==0||isum==8)return(0.0);

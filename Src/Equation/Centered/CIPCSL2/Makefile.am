@@ -2,6 +2,7 @@ noinst_LIBRARIES = libCipcsl2.a
 libCipcsl2_a_SOURCES = cipcsl2.h                        \
                        cipcsl2.cpp                      \
                        cipcsl2_advance.cpp              \
+                       cipcsl2_ancillary.cpp            \
                        cipcsl2_bdcond.cpp               \
                        cipcsl2_bdcurv.cpp               \
                        cipcsl2_bdcurv_interface.cpp     \
@@ -10,7 +11,6 @@ libCipcsl2_a_SOURCES = cipcsl2.h                        \
                        cipcsl2_bdphiface_check.cpp      \
                        cipcsl2_bnd_insert.cpp           \
                        cipcsl2_bnd_extract.cpp          \
-                       cipcsl2_bnd_sym_kappa.cpp        \
                        cipcsl2_bnd_wall_kappa.cpp       \
                        cipcsl2_color_minmax.cpp         \
                        cipcsl2_CIPCSLx1.cpp             \
@@ -31,7 +31,7 @@ libCipcsl2_a_SOURCES = cipcsl2.h                        \
                        cipcsl2_curv_interface.cpp       \
                        cipcsl2_curv_interface_ext.cpp   \
                        cipcsl2_distfunc.cpp             \
-                       cipcsl2_ext_fs.cpp               \
+                       cipcsl2_ext_sca.cpp              \
                        cipcsl2_front_minmax.cpp         \
                        cipcsl2_funclxyz.cpp             \
                        cipcsl2_gradphi.cpp              \
@@ -48,6 +48,7 @@ libCipcsl2_a_SOURCES = cipcsl2.h                        \
                        cipcsl2_insert_bc_gradphic.cpp   \
                        cipcsl2_insert_bc_kappa.cpp      \
                        cipcsl2_insert_bc_norm.cpp       \
+                       cipcsl2_interfacial_flagging.cpp \
                        cipcsl2_load.cpp                 \
                        cipcsl2_normalize.cpp            \
                        cipcsl2_plotTEC.cpp              \
@@ -63,6 +64,7 @@ libCipcsl2_a_SOURCES = cipcsl2.h                        \
                        cipcsl2_tension.cpp              \
                        cipcsl2_totalvol.cpp             \
                        cipcsl2_update_node.cpp          \
+                       cipcsl2_update_at_walls.cpp      \
                        cipcsl2_wall_norm.cpp            \
                        scheme_bdcond.cpp
 
