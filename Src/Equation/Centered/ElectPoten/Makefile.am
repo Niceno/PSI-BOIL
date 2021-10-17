@@ -2,8 +2,8 @@ noinst_LIBRARIES = libElectPoten.a
 libElectPoten_a_SOURCES = electpoten.h                \
                         electpoten.cpp                \
                         electpoten_discretize.cpp     \
-                        electpoten_force_lorenz.cpp   \
-                        electpoten_output_j.cpp   \
+                        electpoten_force_lorentz.cpp  \
+                        electpoten_output_j.cpp       \
                         electpoten_set_indices.cpp    \
                         electpoten_set_ranges.cpp     \
                         electpoten_update_j.cpp       \
