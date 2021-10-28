@@ -80,7 +80,7 @@ for example:
 > module load mpi/mpich2-1.0.4-mpd
 \end{verbatim}
 %
-and try to find a compiler for {\tt MPI} again. 
+and try to find a compiler for {\tt MPI} again. If you can find {\tt mpi/openmpi}, then load it instead of {\tt mpi/mpich}.
 
 If you do not have a {\tt C++} compiler, you can not continue. Ask your system 
 administrator to install it for you. If you do not have a compiler for {\tt MPI} 
@@ -117,8 +117,15 @@ to create {\tt Makefile}s for {\tt LAM/MPI} or:
 > ./first MPICH
 \end{verbatim}
 %
-if you use {\tt MPICH} libraries. If you, unfortunately, do not a {\tt C++}
-compiler for {\tt MPI}, create {\tt Makefile}s with:
+if you use {\tt MPICH} libraries or:
+%
+\begin{verbatim}
+	> ./first OPEN
+\end{verbatim}
+%
+if you use {\tt OpenMPI} libraries. 
+
+If you, unfortunately, do not a {\tt C++} compiler for {\tt MPI}, create {\tt Makefile}s with:
 %
 \begin{verbatim}
 > ./first NOMPI

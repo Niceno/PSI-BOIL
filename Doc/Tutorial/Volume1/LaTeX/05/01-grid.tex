@@ -34,7 +34,7 @@ with the following program ({\tt 05-01-main.cpp}):
      11   /* non-periodic grid */
      12   Grid1D grid( Range<real>(-0.25*L, 0.75*L), N, Periodic::no());
      13
-     14   // grid.print();
+     14   grid.print();
      15   // grid.plot("grid.eps");
      16
      17   boil::timer.stop();
@@ -180,7 +180,7 @@ to {\tt Grid1D}'s constructor. It is illustrated by the following program
      16                N,
      17                Periodic::no());
      18
-     19   grid.plot("grid.eps");
+     19   grid.print();
      20
      21   boil::timer.stop();
      22   boil::timer.report();
