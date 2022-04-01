@@ -12,7 +12,7 @@ main(int argc, char * argv[]) {
   /*--------------------------------+
   |  choose the output file format  |
   +--------------------------------*/
-  boil::plot = new PlotGMV();
+  boil::plot = new PlotTEC();
 
   /*----------+
   |  grid(s)  |
@@ -34,7 +34,7 @@ main(int argc, char * argv[]) {
   +---------*/
   Domain d(gx, gy, gz);
 
-  Times time(20, 0.002); /* ndt, dt */
+  Times time(10000, 0.002); /* ndt, dt */
 	
   /*----------------+
   |  linear solver  |
@@ -99,17 +99,7 @@ main(int argc, char * argv[]) {
 
   AC multigrid( &pr );
 
-//uvw.load("uvw");
-
   for(time.start(); time.end(); time.increase()) {
-
-    boil::oout << "##################" << boil::endl;
-    boil::oout << "#                 " << boil::endl;
-    boil::oout << "# TIME:      " << time.current_time() << boil::endl;
-    boil::oout << "#                 " << boil::endl;
-    boil::oout << "# TIME STEP: " << time.current_step() << boil::endl;
-    boil::oout << "#                 " << boil::endl;
-    boil::oout << "##################" << boil::endl;
 
     t.look_up(h, CO2, Column(2), Column(0));
     fluid.look_up(Set::rho(), t, CO2, Column(0), Column(3));
@@ -128,11 +118,7 @@ main(int argc, char * argv[]) {
 
     ns.solve(ResRat(0.0001));
 
-    for(int i=0; i<p.ni(); i++)
-      for(int j=0; j<p.nj(); j++)
-        for(int k=0; k<p.nk(); k++)
-          p[i][j][k] = 0.0;
-    
+    p = 0.0;
     multigrid.vcycle(ResRat(1e-3));
     p.exchange();
     ns.project(p);
@@ -140,28 +126,15 @@ main(int argc, char * argv[]) {
     uvw.exchange();
 
     if(time.current_step() % 100 == 0) {
-      boil::plot->plot(uvw,   "uvw",   time.current_step());
-      boil::plot->plot(p,h,t, "p-h-t", time.current_step());
-      boil::plot->plot(*fluid.density(), "rho",  time.current_step());
+      boil::plot->plot(uvw,p,h,t,*fluid.rho(),
+            "uvw-p-h-t-rho",time.current_step());
     }
 
-    OPR(p.min());
-    OPR(p.max());
-    OPR(h.min());
-    OPR(h.max());
-    OPR(t.min());
-    OPR(t.max());
+    boil::oout<<"Min and max: "<<time.current_time()<<p.min()<<" "<<p.max()<<" "
+              <<h.min()<<" "<<h.max()<<" "<<t.min()<<" "<<t.max()<<"\n";
   }
 
-  boil::plot->plot(uvw,   "uvw",   time.current_step()-1);
-  boil::plot->plot(p,h,t, "p-h-t", time.current_step()-1);
-  boil::plot->plot(*fluid.density(), "rho",  time.current_step()-1);
-
   boil::oout << "finished" << boil::endl;
-
   boil::timer.stop();
   boil::timer.report();
-
-  /* used for testing only */
-  boil::plot->plot(p, "test", 0);
 }
