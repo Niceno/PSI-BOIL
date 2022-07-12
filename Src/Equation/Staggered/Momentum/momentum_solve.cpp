@@ -39,7 +39,7 @@ void Momentum::solve_wo_outlet(const ResTol & toler, const ResRat & factor) {
   |  a "touch" from immersed body  |
   +-------------------------------*/
   if(dom->ibody().nccells() > 0) {
-
+    if(!ib_trust_vel_wall) {
     /* a very crude cut-off */
     for_m(m) {
       int ip=0, jp=0, kp=0;
@@ -53,6 +53,7 @@ void Momentum::solve_wo_outlet(const ResTol & toler, const ResRat & factor) {
           //fnew[m][i][j][k] = u[m][i][j][k];
         }
       }
+    }
     }
   } /* is there an immersed body */
 
@@ -93,12 +94,14 @@ void Momentum::solve_wo_outlet(const ResTol & toler, const ResRat & factor) {
   }
 
   /* set velocity in solid zero */
-  if(dom->ibody().nccells() > 0) {
-    for_m(m){
-      for_mijk(m,i,j,k)
-        if(dom->ibody().off(m,i,j,k)) {
-          u[m][i][j][k]=0.0;
-        }
+  if(!ib_trust_vel_wall) {
+    if(dom->ibody().nccells() > 0) {
+      for_m(m){
+        for_mijk(m,i,j,k)
+          if(dom->ibody().off(m,i,j,k)) {
+            u[m][i][j][k]=0.0;
+          }
+      }
     }
   }
 

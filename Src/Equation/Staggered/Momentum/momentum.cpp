@@ -31,6 +31,7 @@ Momentum::Momentum(const Vector & U,
     }
 
   boil::oout<<"Momentum-full: "<<ifull<<" "<<jfull<<" "<<kfull<<boil::endl;
+  ib_trust_vel_wall = false;
 
   u.bnd_update_nooutlet();
 
