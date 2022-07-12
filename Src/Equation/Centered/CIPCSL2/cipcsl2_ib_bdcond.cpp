@@ -10,7 +10,7 @@ void CIPCSL2::ib_bdcond(const Scalar & sca) {
   if(sca.domain()->ibody().ncall() == 0) return;
 
   /* cell to face */
-
+#if 0
   for(int cc=0; cc<dom->ibody().nccells(); cc++){
 
     int i,j,k;
@@ -213,5 +213,5 @@ void CIPCSL2::ib_bdcond(const Scalar & sca) {
   scheme.sigx.exchange_all();
   scheme.sigy.exchange_all();
   scheme.sigz.exchange_all();
-
+#endif
 }

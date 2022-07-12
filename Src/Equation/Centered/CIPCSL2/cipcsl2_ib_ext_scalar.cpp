@@ -86,8 +86,8 @@ void CIPCSL2::ib_ext_scalar(Scalar & sca) {
           "ib_init-sca-ux-uy-uz", time->current_step());
     exit(0);
 #endif
-#else
-
+#endif
+#if 0
   // extrapolate clr  //crude 2014.01.16, Ver1.1.10.23R2
   for(int cc=0; cc<dom->ibody().nccells(); cc++){
     int i,j,k;
