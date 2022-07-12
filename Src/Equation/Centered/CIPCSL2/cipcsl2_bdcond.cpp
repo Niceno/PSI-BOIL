@@ -59,7 +59,7 @@ void CIPCSL2::bdcond(const Scalar & sca) {
       /*------------+
       |  direction  |
       +------------*/
-
+#if 0
       if( d == Dir::ibody() ) {
         for(int cc=0; cc<dom->ibody().nccells(); cc++) {
           int i,j,k;
@@ -97,8 +97,9 @@ void CIPCSL2::bdcond(const Scalar & sca) {
           if( dom->ibody().on(i,j,k+1) && dom->ibody().off(i,j,k) )
            sca[i][j][k] = sca[i][j][k+1];
         }
-
       } else if(d != Dir::undefined()) {
+#endif
+      if(d != Dir::undefined()) {
         if(d == Dir::imin()) iof++; if(d == Dir::imax()) iof--;
         if(d == Dir::jmin()) jof++; if(d == Dir::jmax()) jof--;
         if(d == Dir::kmin()) kof++; if(d == Dir::kmax()) kof--;
