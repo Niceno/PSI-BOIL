@@ -31,15 +31,17 @@ real Pressure::update_rhs() {
     real a_b = dSz(Sign::neg(),i,j,k) * time->dti(); 
     real a_t = dSz(Sign::pos(),i,j,k) * time->dti(); 
 
-    if(dom->ibody().nccells() > 0) 
-      if( dom->ibody().on_p(i,j,k) ) {
-        a_w *= dom->ibody().fSw(i,j,k);
-        a_e *= dom->ibody().fSe(i,j,k);
-        a_s *= dom->ibody().fSs(i,j,k);
-        a_n *= dom->ibody().fSn(i,j,k);
-        a_b *= dom->ibody().fSb(i,j,k);
-        a_t *= dom->ibody().fSt(i,j,k);
-      } 
+    if(!ib_trust_vel_wall) {
+      if(dom->ibody().nccells() > 0) 
+        if( dom->ibody().on_p(i,j,k) ) {
+          a_w *= dom->ibody().fSw(i,j,k);
+          a_e *= dom->ibody().fSe(i,j,k);
+          a_s *= dom->ibody().fSs(i,j,k);
+          a_n *= dom->ibody().fSn(i,j,k);
+          a_b *= dom->ibody().fSb(i,j,k);
+          a_t *= dom->ibody().fSt(i,j,k);
+        } 
+    }
 
     fnew[i][j][k] = 0.0;
     fnew[i][j][k] += a_w*(*u)[Comp::u()][i]  [j]  [k]  ; 
@@ -60,35 +62,36 @@ real Pressure::update_rhs() {
     /*-------------------------------+
     |  a "touch" from immersed body  |
     +-------------------------------*/
-    if(dom->ibody().nccells() > 0) {
-      fnew[i][j][k] = 0.0;
-      if( dom->ibody().on_p(i-1,j,k) ) {
-        fnew[i][j][k] += a_w*(*u)[Comp::u()][i]  [j]  [k]  ; 
-        tot_dia += fabs( a_w*(*u)[Comp::u()][i]  [j]  [k]  );
-      }
-      if( dom->ibody().on_p(i+1,j,k) ) {
-        fnew[i][j][k] -= a_e*(*u)[Comp::u()][i+1][j]  [k]  ;
-        tot_dia += fabs( a_e*(*u)[Comp::u()][i+1][j]  [k]  );
-      }
-      if( dom->ibody().on_p(i,j-1,k) ) {
-        fnew[i][j][k] += a_s*(*u)[Comp::v()][i]  [j]  [k]  ; 
-        tot_dia += fabs( a_s*(*u)[Comp::v()][i]  [j]  [k]  );
-      }
-      if( dom->ibody().on_p(i,j+1,k) ) {
-        fnew[i][j][k] -= a_n*(*u)[Comp::v()][i]  [j+1][k]  ;
-        tot_dia += fabs( a_n*(*u)[Comp::v()][i]  [j+1][k]  );
-      }
-      if( dom->ibody().on_p(i,j,k-1) ) {
-        fnew[i][j][k] += a_b*(*u)[Comp::w()][i]  [j]  [k]  ; 
-        tot_dia += fabs( a_b*(*u)[Comp::w()][i]  [j]  [k]  );
-      }
-      if( dom->ibody().on_p(i,j,k+1) ) {
-        fnew[i][j][k] -= a_t*(*u)[Comp::w()][i]  [j]  [k+1];
-        tot_dia += fabs( a_t*(*u)[Comp::w()][i]  [j]  [k+1]);
+    if(!ib_trust_vel_wall){
+      if(dom->ibody().nccells() > 0) {
+        fnew[i][j][k] = 0.0;
+        if( dom->ibody().on_p(i-1,j,k) ) {
+          fnew[i][j][k] += a_w*(*u)[Comp::u()][i]  [j]  [k]  ;
+          tot_dia += fabs( a_w*(*u)[Comp::u()][i]  [j]  [k]  );
+        }
+        if( dom->ibody().on_p(i+1,j,k) ) {
+          fnew[i][j][k] -= a_e*(*u)[Comp::u()][i+1][j]  [k]  ;
+          tot_dia += fabs( a_e*(*u)[Comp::u()][i+1][j]  [k]  );
+        }
+        if( dom->ibody().on_p(i,j-1,k) ) {
+          fnew[i][j][k] += a_s*(*u)[Comp::v()][i]  [j]  [k]  ;
+          tot_dia += fabs( a_s*(*u)[Comp::v()][i]  [j]  [k]  );
+        }
+        if( dom->ibody().on_p(i,j+1,k) ) {
+          fnew[i][j][k] -= a_n*(*u)[Comp::v()][i]  [j+1][k]  ;
+          tot_dia += fabs( a_n*(*u)[Comp::v()][i]  [j+1][k]  );
+        }
+        if( dom->ibody().on_p(i,j,k-1) ) {
+          fnew[i][j][k] += a_b*(*u)[Comp::w()][i]  [j]  [k]  ;
+          tot_dia += fabs( a_b*(*u)[Comp::w()][i]  [j]  [k]  );
+        }
+        if( dom->ibody().on_p(i,j,k+1) ) {
+          fnew[i][j][k] -= a_t*(*u)[Comp::w()][i]  [j]  [k+1];
+          tot_dia += fabs( a_t*(*u)[Comp::w()][i]  [j]  [k+1]);
+        }
       }
     }
   }
-
   /*-------------------------------+
   |  a "touch" from immersed body  |
   +-------------------------------*/

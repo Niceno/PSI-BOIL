@@ -14,6 +14,7 @@ Pressure::Pressure(const Scalar & PHI,
   assert(PHI.domain() == sm->domain());
 
   diffusion_set(TimeScheme::backward_euler());
+  ib_trust_vel_wall=false;
 
   phi.bnd_update();
   discretize();
