@@ -224,7 +224,7 @@ class Matter {
     Property * tens;
     Property * heat;
 
-    Property * one_o_visc;
+    Property * one_o_visc, * one_o_cond;
     Property * dens_o_visc;
 
     const Domain * dom;
