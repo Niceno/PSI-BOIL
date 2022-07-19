@@ -94,10 +94,10 @@ class EnthalpyFD : public Centered {
 
     //! Interface call to parent's discretization.
     void discretize(const Scalar * diff_eddy = NULL) {
-      boil::timer.start("enthalpy discretize");
+      boil::timer.start("enthalpyfd discretize");
       create_system(diff_eddy);
       if(diff_eddy != NULL)laminar=false;
-      boil::timer.stop("enthalpy discretize");
+      boil::timer.stop("enthalpyfd discretize");
     }
 
 #include "enthalpyfd_inline.h"
