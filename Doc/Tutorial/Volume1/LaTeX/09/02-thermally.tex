@@ -40,7 +40,7 @@ The governing equations in non-dimensional form read:
 %
 \be
          \int_{V^\s} \frac{\p \rho \uvw^\s}{\p t^\s} dV^\s
-       + \int_{S^\s} \uvw^\s \uvw^\s \, dS^\s
+       + \int_{S^\s} \rho \uvw^\s \uvw^\s \, dS^\s
        = Pr \int_{S^\s} \nabla \uvw \, dS^\s
        - \int_{V^\s} \nabla p^\s \, dV^\s
        + Ra Pr \int_{V^\s} {\bf d} \theta \, dV^\s
@@ -55,7 +55,7 @@ $T^\s = (T - T_C)/(T_H-T_C)$
 %
 This problem can be fully characterized with two non-dimensional numbers:
 the Rayleigh ($Ra = \rho g \beta \Delta T L^3 / \mu \alpha$) and the 
-Prandtl ($Pr =  \alpha \rho / \mu$) number. 
+Prandtl ($Pr = \mu / \alpha \rho$) number. 
 These two numbers are defined as a constants at the beginning of the
 program:
 %
