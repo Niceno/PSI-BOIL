@@ -41,7 +41,7 @@ Nucleation::Nucleation ( CommonHeatTransfer * CHT, Heaviside * HEAVI,
   rcut = 4.*rseed;
 #endif
   seed_period = 0.01;
-  period_cut_replant = 0.0001;
+  period_prevent_replant = 0.0;
   dxmin = vf->domain()->dxyz_min();
   eps = 1.5*dxmin;
   bzoning = false;

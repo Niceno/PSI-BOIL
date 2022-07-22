@@ -47,11 +47,13 @@ void Nucleation::replant () {
     |  and (5) avoid replant immediately after cutneck.              |
     +---------------------------------------------------------------*/
     bool clr_seed_cond = !in_vapor(clr_seed);
+    boil::oout<<"clr_seed,clr_seed_cond= "<<clr_seed<<" "<<clr_seed_cond<<"\n";
     if( tpr_seed > sites[ns].active_tpr() && 
         sites[ns].seed_prev()==false &&
         clr_seed_cond &&
         bheight &&
-        t_current > (sites[ns].time_cutneck() + period_cut_replant) ) {
+        //t_current > (sites[ns].time_cutneck() + period_prevent_replant) ) {
+        t_current > (sites[ns].time_seed() + period_prevent_replant) ) {
 
       /* check answers from outside of class to allow replant */
       if ( sites[ns].allow_replant() ){
@@ -86,9 +88,12 @@ void Nucleation::replant () {
 
     if (size()==1) {
       boil::oout<<"replant:printAll "<<ns<<" "<<t_current<<" "<<bseed<<" "
-        <<tpr_seed<<" "<<clr_seed<<" "<<sites[ns].time_seed()<<" "
-        <<sites[ns].time_cutneck()+period_cut_replant<<" "
-        <<sites[ns].allow_replant()<<" "<<sites[ns].req_replant()<<"\n"; 
+        <<tpr_seed<<" "<<sites[ns].active_tpr()<<" "<<clr_seed<<" "<<sites[ns].time_seed()<<" "
+        <<sites[ns].allow_replant()<<" "<<sites[ns].req_replant()<<" "<<sites[ns].seed_prev()<<"\n"; 
+      if(bseed) {
+         real xxx;
+        std::cin>>xxx;
+      }
     }
   }
 
@@ -111,7 +116,6 @@ void Nucleation::replant () {
     int ns=id_nearRegion[id];
     if (sites[ns].seed() ) {
       sites[ns].set_active(true);
-
       plant_site(ns,!sites[ns].seed_prev());
     }
     sites[ns].set_seed_prev(sites[ns].seed());

@@ -65,6 +65,9 @@ class Nucleation {
     inline void set_seed_period(real r){ seed_period=r; };
     inline real get_seed_period() const { return (seed_period); };
 
+    inline void set_prevent_replant_period(real r){ period_prevent_replant=r; };
+    inline real get_prevent_replant_period() const { return (period_prevent_replant); };
+
     inline void set_threshold_c(real c){ threshold_c = c; };
     inline real get_threshold_c() const { return threshold_c; };
 
@@ -114,7 +117,7 @@ class Nucleation {
     const Times * time;
 
     real seed_period;
-    real period_cut_replant;  // period of preventing replant after cutneck
+    real period_prevent_replant;  // period of preventing replant after cutneck
     real dxmin, eps;
     real zbtm;
 
