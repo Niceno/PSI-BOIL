@@ -98,6 +98,27 @@ and the name you want to associate with it ({\tt "dom"}). The plotting function
 Tecplot. The grid on the finest level, visualized by Tecplot is shown in 
 Fig.~\ref{fig_domain_l0}. 
 
+In case that you executed ./Boil using multiple processes, e.g. 
+{\tt> mpirun -np 4 ./Boil}, it is inconvenient to have multiple dat-files for the 
+visualization. In order to create single dat-file from multiple-files, an utility 
+program can be used.
+%
+{\small \begin{verbatim}
+> cd ~/Development/PSI-Boil/Src/Utility/Gather
+> ifort -fpp -DVISIT gather.f90 ./tecio64.a -lm -lstdc++ -o gather.exe
+> ifort -fpp -DVISIT -DZIP gather.f90 ./tecio64.a -lm -lstdc++ -o gather-zip.exe
+\end{verbatim}}
+%
+Copy {\tt gather.exe} and {\tt gather-zip.exe} in {\tt Src} directory or the directory
+where the path is set. {\tt gather.exe} read the dat-files, and exports a plt-file.
+Here plt-file is the binary format data file for Tecplot. In case of {\tt gather-zip.exe},
+the output file is zipped plt-file. Please note that the data of an immersed body 
+disappears during this file-format conversion.
+
+The open-source visualization software VisIt\footnote{https://visit-dav.github.io/visit-website/} 
+can import plt-file, and draw a similar picture as Fig.~\ref{fig_domain_l0}.
+Note that VisIt cannot import dat-file, which is output from {\tt psi-boil}.
+
 %----------%
 %          %
 %  Domain  %
