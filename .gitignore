@@ -21,6 +21,8 @@ Src/Utilities/Gather/execs
 **/*.o
 **/Boil
 Src/main.cpp*
+Src/main*.cpp
+Src/*.stl
 **/.deps/
 **/*.a
 *.dat
