@@ -245,7 +245,9 @@ real linear_interpolate(const real c1, const real c2, const real k1,
 
   real weight1 = (c2-0.5)/(c2-c1);
   real weight2 = (0.5-c1)/(c2-c1);
-  
+ 
+  if (weight1*k2 + weight2*k1==0.0) harmonic = false;
+
   if (harmonic) {
     return k1 * k2 / (weight1*k2 + weight2*k1);
   } else {

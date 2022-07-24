@@ -236,7 +236,6 @@ void VOF::insert_bc_curv_HFnormal(const Scalar & scp,
               equal to the length of the projection of D in the n-dir */
 
           /* this is wrong. see curv_HF_kernel on how to implement */
-          exit(0);
   
           /* here we calculate < (nx,ny) , (Dx,Dy) > and store it to be used
              by the kernel */

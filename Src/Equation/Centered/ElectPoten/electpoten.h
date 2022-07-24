@@ -5,7 +5,6 @@
 #include "../centered.h"
 #include "../../../Parallel/communicator.h"
 #include "../../../Parallel/Out/out.h"
-//#include "../../../Global/global_outerproduct.h"
 #include "../../../Global/global_vectorproduct.h"
 
 /***************************************************************************//**
@@ -67,7 +66,7 @@ class ElectPoten : public Centered {
     // Calculate velocity at face center
     void update_vel();
 
-    // Calculate Lorenz force
+    // Calculate Lorentz force
     void force_lorentz(Vector * v);
 
   protected:

@@ -62,7 +62,8 @@ void Microlayer::upkeep_after_advance_vof() {
 
       /* initialize */
       if(!boil::realistic(dmicro[i][j][k])) {
-        dmicro[i][j][k] = d0(i,j,k);
+        //dmicro[i][j][k] = d0(i,j,k);
+	dmicro[i][j][k] = std::min(d0(i,j,k),dmicro[i][j][k]); // Yohei 2022.07.24
         if(boil::realistic(dmicro[i][j][k])) {
           if(dmicro[i][j][k]>d0max(mcomp,i,j,k)) {
             dmicro[i][j][k] = d0max(mcomp,i,j,k);

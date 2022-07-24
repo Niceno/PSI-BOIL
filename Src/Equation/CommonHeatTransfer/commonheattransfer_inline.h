@@ -34,12 +34,6 @@ inline real int_resistance_liq(const int i, const int j, const int k) const {
     return int_resistance_func(i,j,k);
 }
 
-#if 0
-inline real int_resistance_vap(const int i, const int j, const int k) const {
-  return int_resistance_vap_val;
-}
-#endif
-
 inline real wall_resistance(const int i, const int j, const int k) const {
   if(!wall_resistance_variable)
     return wall_resistance_val;

@@ -78,6 +78,7 @@ real VOF::wall_curv_HFnormal_kernel(arr2D & heights,
 *     output: kappa
 *******************************************************************************/
 #if 1  
+
   for(int ii(-hf_set.nof); ii<=hf_set.nof; ++ii)
     for(int jj(-hf_set.nof); jj<=hf_set.nof; ++jj)
       if(heights[ii+hf_set.nof][jj+hf_set.nof]<=0.)

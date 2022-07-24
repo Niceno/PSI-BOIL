@@ -31,6 +31,7 @@ libCipcsl2_a_SOURCES = cipcsl2.h                        \
                        cipcsl2_curv_interface.cpp       \
                        cipcsl2_curv_interface_ext.cpp   \
                        cipcsl2_distfunc.cpp             \
+                       cipcsl2_enforce.cpp              \
                        cipcsl2_ext_sca.cpp              \
                        cipcsl2_front_minmax.cpp         \
                        cipcsl2_funclxyz.cpp             \

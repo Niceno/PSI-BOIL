@@ -106,6 +106,14 @@ class Momentum : public Staggered {
 
     void vanishing_derivative_outlet(Vector & veloc);
 
+    // trust velocities defined in solid (immersed boundary)
+    void set_trust_vel_wall(const bool b){
+           ib_trust_vel_wall=b; boil::oout<<"Momentum:trust_vel_wall= "<<b<<"\n";
+        };
+    bool get_trust_vel_wall(){return ib_trust_vel_wall;};
+
+    void set_volf_ib(real x) {volf_ib=x;};
+
     Matrix * A[3];
 
   private:
@@ -126,8 +134,9 @@ class Momentum : public Staggered {
     real bulk_j(const real & yp) const;
     real bulk_k(const real & zp) const;
 
-    real v_phase_change;
+    real v_phase_change,volf_ib;
     bool ifull, jfull, kfull;
+    bool ib_trust_vel_wall;
 
 };
 

@@ -412,7 +412,7 @@ void VOF::update_at_walls(Scalar & scp) {
   /*--------------+
   | immersed body |
   +--------------*/
-#if 1
+#if 0
   if(dom->ibody().nccells() > 0) {
     for_ijk(i,j,k) {
       if(dom->ibody().off(i,j,k)) {
@@ -474,8 +474,8 @@ void VOF::update_at_walls(Scalar & scp) {
       } /* center off */
     } /* ijk */
   } /* ibody exists */
-
-#else /* this is an old version, which doesnt work if
+#endif
+#if 0 /* this is an old version, which doesnt work if
          processor boundary = solid-fluid boundary */
   for(int cc=0; cc<dom->ibody().nccells(); cc++) {
     int i,j,k;

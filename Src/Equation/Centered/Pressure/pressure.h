@@ -57,10 +57,17 @@ class Pressure : public Centered {
  
     // ghost fluid method
     void ghost(const Scalar & c, const Scalar & k);
+
+    // trust velocities defined in solid (immersed boundary)
+    void set_trust_vel_wall(const bool b){
+           ib_trust_vel_wall=b; boil::oout<<"Pressure:trust_vel_wall= "<<b<<"\n";
+        };
+    bool get_trust_vel_wall(){return ib_trust_vel_wall;};
   protected:
      
     void discretize_pressure(const Scalar * diff_eddy = NULL);
     real update_rhs_pressure();
+    bool ib_trust_vel_wall;
 
 };	
 

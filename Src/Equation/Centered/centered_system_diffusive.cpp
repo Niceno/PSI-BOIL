@@ -70,7 +70,7 @@ void Centered::create_system_diffusive(const Property * f_prop,
       for(int cc=0; cc<dom->ibody().nccells(); cc++) {
         int i,j,k;
         dom->ibody().ijk(cc,&i,&j,&k); // OPR(i); OPR(j); OPR(k);
-  
+
         /* w */
         if( dom->ibody().on(i-1,j,k) ) {
           const real fSw  = dom->ibody().fSw(cc);
@@ -147,8 +147,8 @@ void Centered::create_system_diffusive(const Property * f_prop,
         lmf += 0.5 * ((*diff_eddy)[i][j][k] + (*diff_eddy)[i-1][j][k]);
         lpf += 0.5 * ((*diff_eddy)[i][j][k] + (*diff_eddy)[i+1][j][k]);
       }
-      const real lms = solid()->lambda(m,i  ,j,k);
-      const real lps = solid()->lambda(m,i+1,j,k);
+      const real lms = s_prop->value(m,i  ,j,k);
+      const real lps = s_prop->value(m,i+1,j,k);
       /* w */
       if( dom->ibody().on (i-1,j,k) && dom->ibody().on (i,j,k) )  
         A.w[i][j][k] = tsc * ( lmf*a_w + lms*(a_full_w-a_w) ) / dxw(i);
@@ -163,9 +163,9 @@ void Centered::create_system_diffusive(const Property * f_prop,
         if( dom->ibody().on(i,j,k) ) {
           lamc = f_prop->value(i,j,k);
           if (diff_eddy) lamc += (*diff_eddy)[i][j][k];
-          lamn = solid()->lambda(i,j,k);
+          lamn = s_prop->value(i,j,k);
         } else {
-          lamc = solid()->lambda(i,j,k);
+          lamc = s_prop->value(i,j,k);
           lamn = f_prop->value(i,j,k);
           if (diff_eddy) lamn += (*diff_eddy)[i][j][k];
         }
@@ -188,9 +188,9 @@ void Centered::create_system_diffusive(const Property * f_prop,
         if( dom->ibody().on(i,j,k) ) {
           lamc = f_prop->value(i,j,k);
           if (diff_eddy) lamc += (*diff_eddy)[i][j][k];
-          lamn = solid()->lambda(i,j,k);
+          lamn = s_prop->value(i,j,k);
         } else {
-          lamc = solid()->lambda(i,j,k);
+          lamc = s_prop->value(i,j,k);
           lamn = f_prop->value(i,j,k);
           if (diff_eddy) lamn += (*diff_eddy)[i][j][k];
         }
@@ -217,8 +217,8 @@ void Centered::create_system_diffusive(const Property * f_prop,
         lmf += 0.5 * ((*diff_eddy)[i][j][k] + (*diff_eddy)[i][j-1][k]);
         lpf += 0.5 * ((*diff_eddy)[i][j][k] + (*diff_eddy)[i][j+1][k]);
       }
-      const real lms = solid()->lambda(m,i,j  ,k);
-      const real lps = solid()->lambda(m,i,j+1,k);
+      const real lms = s_prop->value(m,i,j  ,k);
+      const real lps = s_prop->value(m,i,j+1,k);
       /* s */
       if( dom->ibody().on (i,j-1,k) && dom->ibody().on (i,j,k) )  
         A.s[i][j][k] = tsc * ( lmf*a_s + lms*(a_full_s-a_s) ) / dys(j);
@@ -233,9 +233,9 @@ void Centered::create_system_diffusive(const Property * f_prop,
         if( dom->ibody().on(i,j,k) ) {
           lamc = f_prop->value(i,j,k);
           if (diff_eddy) lamc += (*diff_eddy)[i][j][k];
-          lamn = solid()->lambda(i,j,k);
+          lamn = s_prop->value(i,j,k);
         } else {
-          lamc = solid()->lambda(i,j,k);
+          lamc = s_prop->value(i,j,k);
           lamn = f_prop->value(i,j,k);
           if (diff_eddy) lamn += (*diff_eddy)[i][j][k];
         }
@@ -258,9 +258,9 @@ void Centered::create_system_diffusive(const Property * f_prop,
         if( dom->ibody().on(i,j,k) ) {
           lamc = f_prop->value(i,j,k);
           if (diff_eddy) lamc += (*diff_eddy)[i][j][k];
-          lamn = solid()->lambda(i,j,k);
+          lamn = s_prop->value(i,j,k);
         } else {
-          lamc = solid()->lambda(i,j,k);
+          lamc = s_prop->value(i,j,k);
           lamn = f_prop->value(i,j,k);
           if (diff_eddy) lamn += (*diff_eddy)[i][j][k];
         }
@@ -287,8 +287,8 @@ void Centered::create_system_diffusive(const Property * f_prop,
         lmf += 0.5 * ((*diff_eddy)[i][j][k] + (*diff_eddy)[i][j][k-1]);
         lpf += 0.5 * ((*diff_eddy)[i][j][k] + (*diff_eddy)[i][j][k+1]);
       }
-      const real lms = solid()->lambda(m,i,j,k  );
-      const real lps = solid()->lambda(m,i,j,k+1);
+      const real lms = s_prop->value(m,i,j,k  );
+      const real lps = s_prop->value(m,i,j,k+1);
       /* b */
       if( dom->ibody().on(i,j,k-1) && dom->ibody().on(i,j,k) ) 
         A.b[i][j][k] = tsc * ( lmf*a_b + lms*(a_full_b-a_b) ) / dzb(k);
@@ -303,9 +303,9 @@ void Centered::create_system_diffusive(const Property * f_prop,
         if( dom->ibody().on(i,j,k) ) {
           lamc = f_prop->value(i,j,k);
           if (diff_eddy) lamc += (*diff_eddy)[i][j][k];
-          lamn = solid()->lambda(i,j,k);
+          lamn = s_prop->value(i,j,k);
         } else {
-          lamc = solid()->lambda(i,j,k);
+          lamc = s_prop->value(i,j,k);
           lamn = f_prop->value(i,j,k);
           if (diff_eddy) lamn += (*diff_eddy)[i][j][k];
         }
@@ -327,9 +327,9 @@ void Centered::create_system_diffusive(const Property * f_prop,
         if( dom->ibody().on(i,j,k) ) {
           lamc = f_prop->value(i,j,k);
           if (diff_eddy) lamc += (*diff_eddy)[i][j][k];
-          lamn = solid()->lambda(i,j,k);
+          lamn = s_prop->value(i,j,k);
         } else {
-          lamc = solid()->lambda(i,j,k);
+          lamc = s_prop->value(i,j,k);
           lamn = f_prop->value(i,j,k);
           if (diff_eddy) lamn += (*diff_eddy)[i][j][k];
         }

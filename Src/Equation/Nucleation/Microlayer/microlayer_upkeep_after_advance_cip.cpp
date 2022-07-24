@@ -64,7 +64,8 @@ void Microlayer::microlayer_upkeep_after_advance_cip() {
 
       /* initialize */
       if(!boil::realistic(dmicro[i][j][k])) {
-        dmicro[i][j][k] = d0(i,j,k);
+        //dmicro[i][j][k] = d0(i,j,k);
+	dmicro[i][j][k] = std::min(d0(i,j,k),dmicro[i][j][k]); // Yohei 2022.07.24
         (*vf)[i][j][k] = dmicro[i][j][k]/(2.*cht->distance_face(sig,mcomp,i,j,k));
         (*cht->topo->clr)[i][j][k] = dmicro[i][j][k]/(2.*cht->distance_face(sig,mcomp,i,j,k));
       }

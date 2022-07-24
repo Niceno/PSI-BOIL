@@ -152,10 +152,6 @@ void Microlayer::update_at_walls(Scalar & clr, Vector & fs) {
         real sval = 1.0 - scpscp/dmicro.dzc(k); //1.1*tol_wall;
         fsval = dmicro.zn(k) + sval*dmicro.dzc(k);
       }
-
-      //(*vf)[i][j][k] = scpscp/(2.*cht->distance_face(Sign::neg(),mcomp,i,j,k));
-      //(*cht->topo->clr)[i][j][k] = scpscp/(2.*cht->distance_face(Sign::neg(),mcomp,i,j,k));
-
     } /* microlayer real */
   } /* cc */
 

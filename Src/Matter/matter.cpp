@@ -1,9 +1,7 @@
 #include "matter.h"
 
-#define MIX_VISC 1
-/* 0 = linear 
- * 1 = harmonic
- * 2 = prosperetti */
+#define MIX_VISC 1    // 0 = linear; 1 = harmonic; 2 = prosperetti
+#define MIX_LAMBDA 1  // 0 = linear; 1 = harmonic
 
 /*============================================================================*/
 Matter::Matter(const Domain & d, const char * nm) {
@@ -34,11 +32,12 @@ Matter::Matter(const Domain & d, const char * nm) {
   heat = NULL;
 
 #if MIX_VISC == 1
-  /* one over viscosity */
-  one_o_visc = new PropertyInv(visc);
+  one_o_visc = new PropertyInv(visc); //one over viscosity
 #elif MIX_VISC == 2
-  /* density over viscosity */
-  dens_o_visc = new PropertyDiv(dens,visc);
+  dens_o_visc = new PropertyDiv(dens,visc);  // density over viscosity
+#endif
+#if MIX_LAMBDA == 1
+  one_o_cond = new PropertyInv(cond); //one over lambda
 #endif
 }
 
@@ -81,7 +80,7 @@ Matter::Matter(const Matter & a,
   }
   dens = new PropertyMix(a.dens, b.dens, ca, cda, cdb);
   capa = new PropertyMix(a.capa, b.capa, ca, cda, cdb);
-  cond = new PropertyMix(a.cond, b.cond, ca, cda, cdb);
+  //cond = new PropertyMix(a.cond, b.cond, ca, cda, cdb);
   diff = new PropertyMix(a.diff, b.diff, ca, cda, cdb);
   texp = new PropertyMix(a.texp, b.texp, ca, cda, cdb);
   molm = new PropertyMix(a.molm, b.molm, ca, cda, cdb);
@@ -101,6 +100,16 @@ Matter::Matter(const Matter & a,
   assert(b.dens_o_visc != NULL);
   dens_o_visc = new PropertyMix(a.dens_o_visc,b.dens_o_visc,ca,cda,cdb);
   visc = new PropertyDiv(dens,dens_o_visc);
+<<<<<<< HEAD
+=======
+#endif
+#if MIX_LAMBDA == 0
+  cond = new PropertyMix(a.cond, b.cond, ca, cda, cdb);
+#else
+  assert(a.one_o_cond != NULL);
+  assert(b.one_o_cond != NULL);
+  one_o_cond = new PropertyMix(a.one_o_cond,b.one_o_cond,ca,cda,cdb);
+  cond = new PropertyInv(one_o_cond);
 #endif
 
   if( a.nam.length() > 0 && b.nam.length() > 0 )
@@ -149,7 +158,7 @@ Matter::Matter(const Matter & a,
   }
   dens = new PropertyMix(a.dens, b.dens, ca, bdca, cda, cdb);
   capa = new PropertyMix(a.capa, b.capa, ca, bdca, cda, cdb);
-  cond = new PropertyMix(a.cond, b.cond, ca, bdca, cda, cdb);
+  //cond = new PropertyMix(a.cond, b.cond, ca, bdca, cda, cdb);
   diff = new PropertyMix(a.diff, b.diff, ca, bdca, cda, cdb);
   texp = new PropertyMix(a.texp, b.texp, ca, bdca, cda, cdb);
   molm = new PropertyMix(a.molm, b.molm, ca, bdca, cda, cdb);
@@ -159,6 +168,7 @@ Matter::Matter(const Matter & a,
 
 #if 1
   visc = new PropertyMix(a.visc, b.visc, ca, cda, cdb);
+  cond = new PropertyMix(a.cond, b.cond, ca, cda, cdb);
 #else /* force balance according to Prosperetti, 2002 */
   assert(a.dens_o_visc != NULL);
   assert(b.dens_o_visc != NULL);

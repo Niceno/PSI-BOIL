@@ -18,7 +18,7 @@
 *      + \dot{Q}
 *      \; \; \; \;
 *      [\frac{J}{s} = W]
-*  \f] 
+*  \f]
 *  where \f$T \; [K]\f$ is temperature, \f$\rho \; [\frac{kg}{m^3}]\f$ is 
 *  density, \f$C_p \; [\frac{J}{kgK}]\f$ is thermal capacity, \f${t} \; [s]\f$ 
 *  is time, \f${\bf u} \; [\frac{m}{s}]\f$ is convective velocity,
@@ -65,7 +65,35 @@ class Enthalpy : public Centered {
     }
 
     //! Discretization.
-    void discretize(const Scalar * mu_eddy = NULL);
+    void discretize(const Scalar * diff_eddy = NULL) {
+      boil::timer.start("enthalpy discretize");
+      create_system(diff_eddy);
+      boil::timer.stop("enthalpy discretize");
+    }
+
+    //void new_time_step(const Scalar * diff_eddy);
+    void new_time_step(const Scalar * diff_eddy = NULL);
+
+  protected:
+    void create_system(const Scalar * diff_eddy = NULL);
+    //void create_system_innertial();
+    //void create_system_diffusive(const Scalar * diff_eddy = NULL);
+    void create_system_innertial(const Property * f_prop,
+                                 const Property * s_prop = NULL);
+    //void create_system_diffusive(const Property * f_prop,
+    //                             const Property * s_prop = NULL,
+    //                             const Scalar * diff_eddy = NULL);
+    //void create_system_bnd(const Property * f_prop = NULL);
+
+    //void create_system_diffusive(const Scalar * diff_eddy = NULL) {
+    //  evaluate_diffusion(Old::no,diff_eddy);
+    //  return;
+    //}
+    //void create_system_bnd();
+  
+    void new_time_step(const Property * f_prop,
+                       const Property * s_prop = NULL,
+                       const Scalar * diff_eddy = NULL);
 };	
 
 #endif

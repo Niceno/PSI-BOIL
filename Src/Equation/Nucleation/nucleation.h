@@ -79,6 +79,10 @@ class Nucleation {
       zlmult = zoning_limit_multiplier;
       return limit_zoning;
     }
+    //void set_range_zoning(real r){ get_zoning_limiting(r);
+    //        boil::oout<<"nucleation:range_zoning is modified to "<<r<<"\n";};
+    //real get_range_zoning(){return (range_zoning);};
+
 
     bool in_vapor(const int i, const int j, const int k) const;
     bool in_vapor(const real c) const;
@@ -111,7 +115,6 @@ class Nucleation {
 
     Scalar * vf;
     Scalar * clr;
-    //const Scalar * tpr;
     Scalar * qsrc;
     //Matter * flu;
     const Times * time;

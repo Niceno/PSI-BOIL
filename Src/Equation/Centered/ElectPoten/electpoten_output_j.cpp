@@ -6,7 +6,8 @@ void ElectPoten::output_j() {
 /***************************************************************************//**
 *  Output electric current
 *    j_potential: -sigma_e.grad(pot)
-*    j_lorenz:  sigma_e.u x B
+*    j_lorentz:  sigma_e.u x B
+>>>>>>> origin/MHD
 *******************************************************************************/
 void ElectPoten::output_j(int tout) {
 
@@ -34,7 +35,7 @@ void ElectPoten::output_j(int tout) {
   }
   J.bnd_update_nooutlet();
   J.exchange_all();
-  boil::plot->plot(J,phi, "Jlorenz-pot", tout);
+  boil::plot->plot(J,phi, "Jlorentz-pot", tout);
 
 
   // recalculate j

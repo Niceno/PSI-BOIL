@@ -26,7 +26,8 @@ void Microlayer::upkeep_after_seeding() {
 #else
               if(area_vapor(Sign::neg(),Comp::k(),i,j,k)>0.0) {
 #endif
-                dmicro[i][j][k]=d0(i,j,k);
+                //dmicro[i][j][k]=d0(i,j,k);
+		dmicro[i][j][k]=min(d0(i,j,k),dmicro[i][j][k]); //Yohei 2022.07.24
               } else {
                 dmicro[i][j][k]=boil::unreal;
               }
@@ -54,7 +55,8 @@ void Microlayer::upkeep_after_seeding() {
 #else
               if(area_vapor(Sign::neg(),Comp::k(),i,j,k)>0.0) {
 #endif
-                dmicro[i][j][k]=d0(i,j,k);
+                //dmicro[i][j][k]=d0(i,j,k);
+		dmicro[i][j][k]=min(d0(i,j,k),dmicro[i][j][k]); //Yohei 2022.07.24
               } else {
                 dmicro[i][j][k]=boil::unreal;
               }

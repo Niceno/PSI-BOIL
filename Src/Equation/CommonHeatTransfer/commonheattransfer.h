@@ -2,6 +2,7 @@
 #define CHTT_H
 
 #include "../../Global/global_func.h"
+#include <functional>
 #include "../Topology/topology.h"
 #include "../Tifmodel/tif.h"
 

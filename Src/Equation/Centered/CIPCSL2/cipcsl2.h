@@ -98,6 +98,7 @@ class CIPCSL2 : public Centered {
     }
     void bnd_extract( const Dir d, real *** cp ) const;
     void bnd_insert ( const Dir d, real **  cp );
+    void enforce ( const int i, const int j, const int k, const real x);
 
     /* getter for front_minmax */
     real get_xminft() { return(xminft);};

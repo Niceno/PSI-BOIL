@@ -12,7 +12,7 @@ main(int argc, char * argv[]) {
   Grid1D grid( Range<real>(-0.25*L, 0.75*L), N, Periodic::yes());
 
   grid.print();
-  grid.plot("grid.eps");
+  //grid.plot("grid.eps");
 
   boil::timer.stop();
   boil::timer.report();

@@ -38,7 +38,7 @@ class Topology {
                      const ScalarInt & eflag);
 
     /* fs position */
-     void cal_fs_interp(const Scalar & scp,Vector & fs,
+    void cal_fs_interp(const Scalar & scp,Vector & fs,
                        const real tol_wall, const bool use_subgrid);
 
     void fs_bnd_nosubgrid(const Scalar & scp, Vector & fs,
@@ -166,6 +166,10 @@ class Topology {
     real evaluate_polynomial_derivative(const int order,
                              const std::vector<real> & coefficients,
                              const real x);
+
+    int intflag(const int i, const int j, const int k){
+      return (*iflag)[i][j][k];
+    };
 
     /* front functions */
     void front_minmax(real * store_arr = NULL);

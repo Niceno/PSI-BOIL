@@ -13,7 +13,6 @@ Nucleation::Nucleation ( CommonHeatTransfer * CHT, Heaviside * HEAVI,
 {
   vf = cht->topo->vf;
   clr= cht->topo->clr;
-  //tpr=TPR;
   qsrc=QSRC;
   time=t;
   rseed=rs;
