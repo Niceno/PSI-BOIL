@@ -74,18 +74,24 @@ class Enthalpy : public Centered {
     //void new_time_step(const Scalar * diff_eddy);
     void new_time_step(const Scalar * diff_eddy = NULL);
 
+    real get_turbPr(){return turbPr;}
+    void set_turbPr(real a){
+      turbPr=a;
+      boil::oout<<"EnthalpyFD:turbPr= "<<turbPr<<"\n";
+    }
+
+    real turb_diff(const Scalar * diff_eddy, const int i, const int j, const int k);
+
   protected:
     void create_system(const Scalar * diff_eddy = NULL);
-    //void create_system_innertial();
-    //void create_system_diffusive(const Scalar * diff_eddy = NULL);
     void create_system_innertial(const Property * f_prop,
                                  const Property * s_prop = NULL);
-    //void create_system_diffusive(const Property * f_prop,
-    //                             const Property * s_prop = NULL,
-    //                             const Scalar * diff_eddy = NULL);
+    void create_system_diffusive(const Property * f_prop,
+                                 const Property * s_prop = NULL,
+                                 const Scalar * diff_eddy = NULL);
+
     //void create_system_bnd(const Property * f_prop = NULL);
 
-    //void create_system_diffusive(const Scalar * diff_eddy = NULL) {
     //  evaluate_diffusion(Old::no,diff_eddy);
     //  return;
     //}
@@ -94,6 +100,8 @@ class Enthalpy : public Centered {
     void new_time_step(const Property * f_prop,
                        const Property * s_prop = NULL,
                        const Scalar * diff_eddy = NULL);
+
+    real turbPr; // turbulent Prandtl number
 };	
 
 #endif

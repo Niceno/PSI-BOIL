@@ -19,6 +19,8 @@ Enthalpy::Enthalpy(const Scalar & PHI,
   assert(PHI.domain() == F.domain());
   assert(PHI.domain() == U.domain());
 
+  turbPr = 0.9;  // default value of turbulent Prandtl number
+
   phi.bnd_update(); // must be called before discretization because of 
                     // dirichlet boundary condition etc.
 
