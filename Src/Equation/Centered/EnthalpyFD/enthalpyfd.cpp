@@ -67,6 +67,11 @@ EnthalpyFD::EnthalpyFD(const Scalar & PHI,
   /* see header for explanation */
   if(solid()) {
     safe_solid = solid();
+    if(cht.solid()==NULL) {
+      boil::oout<<"enthalpyFD:Error!!! Solid is defined for EnthalpyFD ";
+      boil::oout<<"but it is not defined for CommonHeat Transfer.\n";
+      exit(0);
+    }
   } else {
     safe_solid = fluid();
   }
@@ -78,4 +83,4 @@ EnthalpyFD::EnthalpyFD(const Scalar & PHI,
   diffusion_set(TimeScheme::backward_euler());
 
   discretize();
-}	
+}
