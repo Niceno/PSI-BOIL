@@ -36,7 +36,7 @@ Nucleation::Nucleation ( CommonHeatTransfer * CHT, Heaviside * HEAVI,
   }
   latent = cht->fluid()->latent()->value();
 
-#ifndef USE_VOF
+#ifndef USE_VOF_NUCL
   rcut = 4.*rseed;
 #endif
   seed_period = 0.01;

@@ -36,7 +36,7 @@ class Microlayer : public Nucleation {
     }
 
     void upkeep_after_advance() {
-#ifdef USE_VOF
+#ifdef USE_VOF_NUCL
       upkeep_after_advance_vof();
 #else
       upkeep_after_advance_cip();
@@ -81,7 +81,7 @@ class Microlayer : public Nucleation {
     void update_at_walls(Scalar & clr, Vector & fs);
 
   protected:
-#ifdef USE_VOF
+#ifdef USE_VOF_NUCL
     void upkeep_after_advance_vof();
 #else
     void upkeep_after_advance_cip();

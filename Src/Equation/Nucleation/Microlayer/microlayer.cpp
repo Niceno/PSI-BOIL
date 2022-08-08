@@ -16,7 +16,7 @@ Microlayer::Microlayer( Scalar & DM,
                         const Sign sig ) :
   Nucleation(CHT,heavi,t,rs,qsrc,sig),
   dmicro(&DM)
-#ifndef USE_VOF
+#ifndef USE_VOF_NUCL
   ,dSprev(*DM.domain())
 #endif
 {
@@ -35,7 +35,7 @@ Microlayer::Microlayer( Scalar & DM,
   hresis = 0.0;//TIF::calculate_heat_transfer_resistance(cht->tifmodel.tref(), 
                //                                    rhov,mmass,latent,1.);
 
-#ifndef USE_VOF
+#ifndef USE_VOF_NUCL
   dSprev = dmicro.shape();
   str_dSprev = false;
 #endif

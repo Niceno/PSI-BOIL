@@ -21,7 +21,7 @@ void Microlayer::upkeep_after_seeding() {
               if (i<vf->si() || vf->ei()<i ||
                   j<vf->sj() || vf->ej()<j) continue;
               //boil::oout<<"HERE "<<i<<" "<<k<<" "<<dmicro.dSz(Sign::neg(),i,j,k)<<" "<<area_vapor(Sign::neg(),Comp::k(),i,j,k)<<boil::endl;
-#ifdef USE_VOF
+#ifdef USE_VOF_NUCL
               if(in_vapor(i,j,k)) {
 #else
               if(area_vapor(Sign::neg(),Comp::k(),i,j,k)>0.0) {
@@ -50,7 +50,7 @@ void Microlayer::upkeep_after_seeding() {
             for(int j=dsites[nsd].js(); j<=dsites[nsd].je(); j++) {
               if (i<vf->si() || vf->ei()<i ||
                   j<vf->sj() || vf->ej()<j) continue;
-#ifdef USE_VOF
+#ifdef USE_VOF_NUCL
               if(in_vapor(i,j,k)) {
 #else
               if(area_vapor(Sign::neg(),Comp::k(),i,j,k)>0.0) {

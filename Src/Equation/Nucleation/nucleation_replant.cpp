@@ -72,7 +72,7 @@ void Nucleation::replant () {
       //std::cout<<"replant: Pattern2 "<<boil::cart.iam()<<"\n";
     }
 
-#ifndef USE_VOF
+#ifndef USE_VOF_NUCL
     /*---------------------------------------+ 
     |  continue replant during seed_period   |
     +---------------------------------------*/

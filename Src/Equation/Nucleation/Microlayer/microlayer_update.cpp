@@ -15,7 +15,7 @@ void Microlayer::update(real & smdot_micro,
 
   const real dt = time->dt();
 
-#ifndef USE_VOF
+#ifndef USE_VOF_NUCL
   /* reset heat sink */
   *tprs = 0.0;
 
@@ -103,7 +103,7 @@ void Microlayer::update(real & smdot_micro,
           area_l[ndir] += area - area_vap;
           area_v[ndir] += area_vap;
 
-#ifdef USE_VOF
+#ifdef USE_VOF_NUCL
           //if(in_vapor(ii,jj,kk)) {
           if(below_threshold(ii,jj,kk)) {
 #else
@@ -220,14 +220,14 @@ void Microlayer::update(real & smdot_micro,
     int jj=j+jof;
     int kk=k+kof;
 
-#ifdef USE_VOF
+#ifdef USE_VOF_NUCL
     //if(!in_vapor(i,j,k)) {
     if(!below_threshold(i,j,k)) {
 #else
     if(area_vap == 0.0) {
 #endif
     } else {
-#ifndef USE_VOF
+#ifndef USE_VOF_NUCL
       /* here, the area of the microlayer is not considered!!! 
        * this would require correction */
       exit(0);
@@ -259,7 +259,7 @@ void Microlayer::update(real & smdot_micro,
         }
 
         /* overwrite mdot */
-#ifdef USE_VOF
+#ifdef USE_VOF_NUCL
         real mdot_micro = - rhol * (dmicro_new - dmicro[i][j][k])
                           / dt * area / vol;
         (*mdot)[i][j][k] = mdot_micro;
@@ -270,7 +270,7 @@ void Microlayer::update(real & smdot_micro,
 #endif
         smdot_micro += mdot_micro*vol;
 
-#ifndef USE_VOF
+#ifndef USE_VOF_NUCL
         /* removed due to update-at-walls */
         /* enthalpy clean-up: sink due to microlayer */
         (*tprs)[i+iof][j+jof][k+kof] += -vol*mdot_micro*latent;
@@ -324,7 +324,7 @@ void Microlayer::update(real & smdot_micro,
   exit(0);
 #endif
 
-#ifndef USE_VOF
+#ifndef USE_VOF_NUCL
   /* store area of vapor to dSprev */
   store_dSprev();
 #endif

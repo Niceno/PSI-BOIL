@@ -1,1 +1,1 @@
-#define USE_VOF
+#define USE_VOF_NUCL

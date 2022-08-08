@@ -42,7 +42,7 @@ class Nucleation {
     void replant();
     virtual void init() {}
 
-#ifndef USE_VOF
+#ifndef USE_VOF_NUCL
     void cutneck(const real r);
     inline void set_cutneck_mult(real cm){ rcut = rseed*cm; };
     inline real get_cutneck_mult() const { return rcut; };
@@ -135,7 +135,7 @@ class Nucleation {
     real zoning_limit_multiplier;
     real threshold_c;
 
-#ifndef USE_VOF
+#ifndef USE_VOF_NUCL
     real rcut;
 #endif
 };
