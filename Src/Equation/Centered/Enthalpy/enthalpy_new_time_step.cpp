@@ -80,6 +80,11 @@ void Enthalpy::new_time_step(const Property * f_prop, const Property * s_prop,
   |       2       |
   +--------------*/
   /* a condition like: if(diff_ts != backward_euler()) would be good */
+  if( diff_eddy && !approx(diff_ts.N(),1.0)){
+    boil::oout<<"enthalpy_new_time_step: turbulent thermal diffusion with ";
+    boil::oout<<" forward_euler or Crank–Nicolson is not implemented yet\n";
+    exit(0);
+  }
   diffusion(diff_eddy);
 
 }

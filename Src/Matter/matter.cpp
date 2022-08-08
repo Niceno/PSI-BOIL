@@ -36,9 +36,6 @@ Matter::Matter(const Domain & d, const char * nm) {
 #elif MIX_VISC == 2
   dens_o_visc = new PropertyDiv(dens,visc);  // density over viscosity
 #endif
-#if MIX_LAMBDA == 1
-  one_o_cond = new PropertyInv(cond); //one over lambda
-#endif
 }
 
 /*============================================================================*/
@@ -106,10 +103,7 @@ Matter::Matter(const Matter & a,
 #if MIX_LAMBDA == 0
   cond = new PropertyMix(a.cond, b.cond, ca, cda, cdb);
 #else
-  assert(a.one_o_cond != NULL);
-  assert(b.one_o_cond != NULL);
-  one_o_cond = new PropertyMix(a.one_o_cond,b.one_o_cond,ca,cda,cdb);
-  cond = new PropertyInv(one_o_cond);
+  cond = new PropertyMixHarm(a.cond, b.cond, ca, cda, cdb);
 #endif
 
   if( a.nam.length() > 0 && b.nam.length() > 0 )

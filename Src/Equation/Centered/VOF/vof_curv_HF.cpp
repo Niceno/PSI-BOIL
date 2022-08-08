@@ -577,6 +577,12 @@ void VOF::curv_HF() {
                       );
 
       }
+#if 0
+      if(kappa[i][j][k]==boil::unreal) {
+        boil::aout<<"#Error!!! vof_curv_HF:kappa= "<<kappa[i][j][k]<<" "
+		<<i<<" "<<j<<" "<<k<<" "<<boil::cart.iam()<<"\n";
+      }
+#endif
 
     } /* tempflag = 1 */
   } /* for ijk */
@@ -607,6 +613,16 @@ boil::oout<<kappa[8][3][3]<<" "<<kappa[9][3][3]<<" "<<" "<<kappa[27][3][3]<<" "<
 boil::oout<<nz[8][3][3]<<" "<<nz[9][3][3]<<" "<<" "<<nz[27][3][3]<<" "<<nz[28][3][3]<<" "<<nz[29][3][3]<<boil::endl;
 #endif
 
+  /* detect too large kappa */
+  real kappa_max = 2.0/dom->dxyz_min();
+  for_ijk(i,j,k) {
+    if((tempflag[i][j][k]==1) && (kappa[i][j][k]>kappa_max)) {
+      boil::aout<<"vof_curv_HF:Error!  Too large kappa.\n";
+      boil::aout<<"kappa= "<<kappa[i][j][k]<<" kappa_max= "<<kappa_max<<" at "
+      <<i<<" "<<j<<" k "<<k<<" "<<boil::cart.iam()<<"\n";
+      exit(0);
+    }
+  }
 
   /* extrapolate kappa */
   stmp  = kappa;

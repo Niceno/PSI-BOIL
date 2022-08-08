@@ -96,6 +96,59 @@ class PropertyMix : public Property {
     const Scalar  * c_disp_b;
 };
 
+///////////////////////
+//                   //
+//  PropertyMixHarm  // -> combination of two properties; interpolation
+//                   //    using harmonic mean
+///////////////////////
+class PropertyMixHarm : public Property {
+
+  public:
+    PropertyMixHarm(const Property * pa,
+                const Property * pb,
+                const Scalar * coa,
+                const Scalar * cda,
+                const Scalar * cdb) {
+      assert(pa !=NULL);
+      assert(pb !=NULL);
+      assert(coa!=NULL);
+      a        = pa;
+      b        = pb;
+      c_a      = coa;
+      bndc_a   = NULL;
+      c_disp_a = cda;
+      c_disp_b = cdb;
+    }
+
+    PropertyMixHarm(const Property * pa,
+                const Property * pb,
+                const Scalar * coa,
+                const Vector * bdca,
+                const Scalar * cda,
+                const Scalar * cdb) {
+      assert(pa !=NULL);
+      assert(pb !=NULL);
+      assert(coa!=NULL);
+      assert(bdca!=NULL);
+      a        = pa;
+      b        = pb;
+      c_a      = coa;
+      bndc_a   = bdca;
+      c_disp_a = cda;
+      c_disp_b = cdb;
+    }
+
+    real value(const int i, const int j, const int k) const;
+    real value(const Comp & m,
+               const int i, const int j, const int k) const;
+
+  private:
+    const Scalar  * c_a;
+    const Vector  * bndc_a;
+    const Scalar  * c_disp_a;
+    const Scalar  * c_disp_b;
+};
+
 ///////////////////
 //               //
 //  PropertyInv  // -> 1/Property
