@@ -36,8 +36,22 @@ void VOF::curv_HF_kernel(arr3D & stencil, const arr3D & gridstencil,
                          const bool truedir1, const bool truedir2,
                          const real xcent,
                          real & kap, int & flag
-                         //,const int i, const int j, const int k
+                         ,const int i, const int j, const int k
                          ) const {
+
+#if 0
+  if (k==4+sk()&&j==2+sj()) {
+    std::cout<<"HF_kernel: "<<i<<" "<<j<<" "<<k<<" "<<"\n";
+    std::cout<<"cng_m "<<cng_m<<" cng_p "<<cng_p<<" max_n= "<<max_n<<" nn_j "<<nn_j<<" nn_k "<<nn_k<<" imin "<<imin<<" imax "<<imax<<"\n";
+  }
+#endif
+#if 0
+  if (k==4+sk()&&j==2+sj()&&i==117) {
+    std::cout<<"curv_HF_kernel:stencil: "<<stencil[1][1][2]<<" "<<stencil[1][1][3]<<" "
+    <<stencil[1][1][4]<<" "<<stencil[1][1][5]<<" "<<stencil[1][1][6]<<"\n";
+    std::cout<<"truedir1 "<<truedir1<<" truedir2 "<<truedir2<<"\n";
+  }
+#endif
 
   const int & mof = hf_set.mof;
   const int & nof = hf_set.nof;
@@ -99,6 +113,14 @@ void VOF::curv_HF_kernel(arr3D & stencil, const arr3D & gridstencil,
   }
 #endif
 
+#if 0
+  if (k==4+sk()&&j==2+sj()&&i==117) {
+    std::cout<<"curv_HF_kernel:stencil-invert: "<<stencil[1][1][2]<<" "<<stencil[1][1][3]<<" "
+    <<stencil[1][1][4]<<" "<<stencil[1][1][5]<<" "<<stencil[1][1][6]<<"\n";
+    std::cout<<"cang_m "<<cang_m<<" cang_p "<<cang_p<<"\n";
+  }
+#endif
+
   /* calculate hc_limit */
   real nhc_0(0.),nhc_1(gridstencil[nof][nof][mof]);
   for(int ii(imin); ii<0; ++ii) {
@@ -126,6 +148,18 @@ void VOF::curv_HF_kernel(arr3D & stencil, const arr3D & gridstencil,
   }
 
 #if 0
+  if (k==4+sk()&&j==2+sj()&&i==117) {
+    std::cout<<"Heights-0: ";
+    for(int jj(-nof); jj<=nof; ++jj) {
+      for(int kk(-nof); kk<=nof; ++kk) {
+        std::cout<<jj+nof<<" "<<kk+nof<<" "<<heights[jj+nof][kk+nof]<<" | ";
+      }
+    std::cout<<" || ";
+    }
+    std::cout<<"\n";
+  }
+#endif
+#if 0
   boil::oout<<"heights: ";
   for(int jj(-nof); jj<=nof; ++jj) {
     for(int kk(-nof); kk<=nof; ++kk) {
@@ -152,10 +186,32 @@ void VOF::curv_HF_kernel(arr3D & stencil, const arr3D & gridstencil,
   if(cang_m>-1.) {
     /* update at walls, otherwise should be zero */
     real height_min = gridstencil[nof][nof][imin+mof];
+	
+	/* avoid tangens of pi/2 */
+	real tancang_m = signum(1.0,sin(cang_m))*boil::unreal;
+	real signum_cos_m = signum(1.0,cos(cang_m));
+	if(std::abs(signum_cos_m)>0.5) {
+	  tancang_m *= signum_cos_m;
+	}
+	if(std::abs(cang_m-boil::pi/2.)>boil::pico) {
+	  tancang_m = tan(cang_m);  
+	}	
+
+#if 0
+      if (k==4+sk()&&j==2+sj()&&i==117) {
+        std::cout<<"tancang_m= "<<tancang_m<<" nof= "<<nof<<"\n";
+      }
+#endif
+
     for(int jj(-nof); jj<=nof; ++jj) {
       for(int kk(-nof); kk<=nof; ++kk) {
         if(jj==0&&kk==0)
           continue;
+#if 0
+        if (k==4+sk()&&j==2+sj()&&i==117) {
+          std::cout<<"heights= "<<heights[jj+nof][kk+nof]<<" "<<height_min<<" "<<jj<<" "<<kk<<"\n";
+        }
+#endif
         if(heights[jj+nof][kk+nof]<height_min) {
           /* only approximate for nof>1 */
           real distj = (jj>0) ? real(jj)*(d1p+d1c)/2. : real(jj)*(d1m+d1c)/2.;
@@ -166,7 +222,7 @@ void VOF::curv_HF_kernel(arr3D & stencil, const arr3D & gridstencil,
 
           /* we disallow extrapolation in the negative sense, this would
              indicate corrupted normal vector */
-          real diff = std::max(0., (distj+distk)*tan(cang_m) );
+          real diff = std::max(0., (distj+distk)*tancang_m );
           heights[jj+nof][kk+nof] = heights[nof][nof]-diff;
         }
       }
@@ -176,6 +232,17 @@ void VOF::curv_HF_kernel(arr3D & stencil, const arr3D & gridstencil,
   if(cang_p>-1.) {
     /* update at walls, otherwise should be zero */
     real height_max = 0.;
+	
+	/* avoid tangens of pi/2 */
+	real tancang_p = signum(1.0,sin(cang_p))*boil::unreal;
+	real signum_cos_p = signum(1.0,cos(cang_p));
+	if(std::abs(signum_cos_p)>0.5) {
+	  tancang_p *= signum_cos_p;
+	}
+	if(std::abs(cang_p-boil::pi/2.)>boil::pico) {
+	  tancang_p = tan(cang_p);  
+	}
+	
     for(int ii(imin); ii<imax; ++ii) {
       height_max += gridstencil[nof][nof][ii+mof];
     }
@@ -194,7 +261,7 @@ void VOF::curv_HF_kernel(arr3D & stencil, const arr3D & gridstencil,
           /* we disallow extrapolation in the positive sense, this would
              indicate corrupted normal vector */
           /* the tangens is negative, as well as the dist! */
-          real diff = std::max(0., (distj+distk)*tan(cang_p) );
+          real diff = std::max(0., (distj+distk)*tancang_p );
           heights[jj+nof][kk+nof] = heights[nof][nof]+diff;
         }
       }
@@ -205,6 +272,16 @@ void VOF::curv_HF_kernel(arr3D & stencil, const arr3D & gridstencil,
   real cang_c = wall_indicator[nof][nof];
   if(mult<0.) {
     cang_c = boil::pi-cang_c;
+  }
+
+  /* avoid cotangens of 0 */
+  real cotancang_c = signum(1.0,cos(cang_c))*boil::unreal;
+  real signum_sin_c = signum(1.0,sin(cang_c));
+  if(std::abs(signum_sin_c)>0.5) {
+	cotancang_c *= signum_sin_c;
+  }
+  if(std::abs(cang_c)>boil::pico && std::abs(cang_c-boil::pi)>boil::pico) {
+	cotancang_c = 1./tan(cang_c);  
   }
 
   for(int jj(-nof); jj<=nof; ++jj) {
@@ -220,12 +297,24 @@ void VOF::curv_HF_kernel(arr3D & stencil, const arr3D & gridstencil,
         distk *= nnk*mult;
         real dist = distj+distk;
 
-        heights[jj+nof][kk+nof] = heights[nof][nof] + fabs(dist)/tan(cang_c);
+        heights[jj+nof][kk+nof] = heights[nof][nof] + fabs(dist)*cotancang_c;
       }
     }
   }
 
-
+#if 0
+  if (k==4+sk()&&j==2+sj()&&i==117) {
+    std::cout<<"heghts10: ";
+    for(int jj(-nof); jj<=nof; ++jj) {
+      for(int kk(-nof); kk<=nof; ++kk) {
+        std::cout<<jj+nof<<" "<<kk+nof<<" "<<heights[jj+nof][kk+nof]<<" | ";
+      }
+    std::cout<<" || ";
+    }
+    std::cout<<"\n";
+    exit(0);
+  }
+#endif
   //if(nhc_limit<nhc && nhc<=(nhc_limit+1.0)) {
   if(nhc_0<heights[nof][nof] && heights[nof][nof]<=nhc_1) {
 
@@ -234,19 +323,17 @@ void VOF::curv_HF_kernel(arr3D & stencil, const arr3D & gridstencil,
                                  d2m, d2c, d2p,
                                  truedir1, truedir2,
                                  mult, max_n, xcent); 
-
-#if 0
-    boil::oout<<i<<" "<<j<<" "<<k<<" | "
-              //<<hmm<<" "<<hcm<<" "<<hpm<<" | "
-              //<<hmc<<" "<<hcc<<" "<<hpc<<" "
-              //<<hmp<<" "<<hcp<<" "<<hpp<<" "
-              //<<h_1<<" "<<h_2<<" "<<h_11<<" "<<h_22<<" "<<h_12
-              <<color()[i][j][k]<<" "<<kap
-              <<boil::endl;
-#endif
   } else {
     flag = 0;
   }
+
+#if 0
+    if(time->current_step()==305) {
+      if(i==25&&j==17&&k==4) {
+        std::cout<<"curv_HF_kernel:999:kap= "<<kap<<" "<<flag<<"\n";
+      }
+    }
+#endif
 
   return;
 } 
@@ -298,7 +385,7 @@ real VOF::calculate_curvature_HF(const arr2D & heights,
               )/d2p/d2m/(d2p+d2m)/(1.+2.*g);
 #endif
   real h_12 = truedir1*truedir2*(hpp-hpm-hmp+hmm)/(d1p+d1m)/(d2p+d2m);
-    
+
   /* under this convention, bubbles have negative curvature */
   return -mult
          * (h_11 + h_22 + h_11*h_2*h_2 + h_22*h_1*h_1 - 2.0*h_12*h_1*h_2)

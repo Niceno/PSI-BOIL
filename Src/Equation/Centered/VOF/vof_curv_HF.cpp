@@ -169,6 +169,11 @@ void VOF::curv_HF() {
           max_n = nny;
         } else {
           max_n = nnz;
+#if 0
+          std::cout<<"curv_HF:wall-ijk "<<i<<" "<<j<<" "<<k<<"\n";
+          std::cout<<"curv_HF:wall-norm "<<dom->ibody().nwx(i,j,k)<<" "<<dom->ibody().nwy(i,j,k)<<" "<<dom->ibody().nwz(i,j,k)<<"\n";
+          std::cout<<"curv_HF:wall-dist "<<dom->ibody().dist(i,j,k-1)<<" "<<dom->ibody().dist(i,j,k)<<"\n";
+#endif
         }
       }
 
@@ -253,10 +258,23 @@ void VOF::curv_HF() {
             for(int ii(imin); ii<=imax; ++ii) {
               gridstencil[jj+nof][kk+nof][ii+mof] = color().dxc(i+ii);
               stencil[jj+nof][kk+nof][ii+mof] = std::min(1.0,std::max(0.0,color()[i+ii][j+jj][k+kk]));
+#if 0
+              if(stencil[jj+nof][kk+nof][ii+mof]<0.0){
+                std::cout<<"vof_curv_HF:negative stencil: Error\n";
+                //exit(0);
+              }
+#endif
             }
           }
         }
 
+#if 0
+        if (k==4+sk()&&j==2+sj()&&i==117) {
+          std::cout<<"curv_HF:stencil: "<<stencil[0][0][-1]<<" "<<stencil[0][0][0]<<" "
+            <<stencil[0][0][1]<<" "<<stencil[0][0][2]<<" "<<stencil[0][0][3]<<"\n";
+          //exit(0);
+        }
+#endif
         /* correct grid stencil near solid/walls */
         if(imin_grid != imin) {
           for(int jj(-nof); jj<=nof; ++jj) {
@@ -304,7 +322,7 @@ void VOF::curv_HF() {
                        bflag_struct.jfull,bflag_struct.kfull,
                        color().xc(i),
                        kappa[i][j][k],tempflag[i][j][k]
-                       //,i,j,k
+                       ,i,j,k
                       );
 
       } else if(mMax==Comp::j()) {
@@ -438,7 +456,7 @@ void VOF::curv_HF() {
                        bflag_struct.kfull,bflag_struct.ifull,
                        color().xc(i),
                        kappa[i][j][k],tempflag[i][j][k]
-                       //,i,j,k
+                       ,i,j,k
                       );
 
       } else { 
@@ -519,13 +537,31 @@ void VOF::curv_HF() {
               gridstencil[ii+nof][jj+nof][kk+mof] = 0.0;
               stencil[ii+nof][jj+nof][kk+mof] = -1.0;
             }
+
             for(int kk(kmin); kk<=kmax; ++kk) {
               gridstencil[ii+nof][jj+nof][kk+mof] = color().dzc(k+kk);
               stencil[ii+nof][jj+nof][kk+mof] = std::min(1.0,std::max(0.0,color()[i+ii][j+jj][k+kk]));
+#if 0
+            if (k==4+sk()&&j==2+sj()&&i==117&&jj+nof==0) {
+              std::cout<<"curv_HF:stencil1: "<<ii+nof<<" "<<jj+nof<<" "<<kk+mof<<" "<<k+kk<<" "<<stencil[ii+nof][jj+nof][kk+mof]<<"\n";
             }
+#endif
+
+            }
+#if 0
+            if (k==4+sk()&&j==2+sj()&&i==117) {
+              std::cout<<"curv_HF:stencil1: "<<ii+nof<<" "<<jj+nof<<" "<<kmin<<" "<<kmax<<" "<<mof<<"\n";
+            }
+#endif
           }
         }
 
+#if 0
+        if (k==4+sk()&&j==2+sj()&&i==117) {
+          std::cout<<"curv_HF:stencil: "<<stencil[1][1][2]<<" "<<stencil[1][1][3]<<" "
+            <<stencil[1][1][4]<<" "<<stencil[1][1][5]<<" "<<stencil[1][1][6]<<"\n";
+        }
+#endif
         /* correct grid stencil near solid/walls */
         if(kmin_grid != kmin) {
           for(int ii(-nof); ii<=nof; ++ii) {
@@ -573,7 +609,7 @@ void VOF::curv_HF() {
                        bflag_struct.ifull,bflag_struct.jfull,
                        color().xc(i),
                        kappa[i][j][k],tempflag[i][j][k]
-                       //,i,j,k
+                       ,i,j,k
                       );
 
       }
@@ -611,6 +647,14 @@ void VOF::curv_HF() {
   }
 boil::oout<<kappa[8][3][3]<<" "<<kappa[9][3][3]<<" "<<" "<<kappa[27][3][3]<<" "<<kappa[28][3][3]<<" "<<kappa[29][3][3]<<boil::endl;
 boil::oout<<nz[8][3][3]<<" "<<nz[9][3][3]<<" "<<" "<<nz[27][3][3]<<" "<<nz[28][3][3]<<" "<<nz[29][3][3]<<boil::endl;
+#endif
+
+#if 1
+  /* enforce curvature in wall adjacent cells = -div.(norm) */
+  /* this is a temporal solution because HF doesn't work well in 3D */
+  if (wall_curv_method==CurvMethod::DivNorm()) {
+    insert_bc_curv_divnorm();
+  }
 #endif
 
   /* detect too large kappa */

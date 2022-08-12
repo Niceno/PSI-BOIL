@@ -169,6 +169,17 @@ inline NormMethod get_normal_vector_method_curvature() const {
   return norm_method_curvature;
 }
 
+#if 1
+/* setter for near-wall curvature method */
+void set_wall_curv_method(const CurvMethod wcm) {
+  wall_curv_method = wcm;
+  boil::oout<<"vof:set wall_curv_method= "<<wall_curv_method<<"\n";
+}
+CurvMethod get_wall_curv_method() {
+  return wall_curv_method;
+}
+#endif
+
 #if 0
 /* setter for near-wall curvature method */
 void set_wall_curv_method(const CurvMethod wcm,
@@ -246,3 +257,13 @@ inline int get_pressure_extrapolation_maxiter() const { return niter_pressure_ex
 inline real bounded_color(const real cval) const {
   return std::max(0.0,std::min(1.0,cval));
 }
+
+/* setter for extrapolate_ib */
+void set_extrapolate_ib(const bool b) {
+  extrapolate_ib=b;
+  boil::oout<<"cipcsl2:extrapolate_ib= "<<b<<"\n";
+  boil::oout<<"        true:  extrapolate color function into solid \n";
+  boil::oout<<"        false: no extrapolate color function into solid \n";
+}
+bool get_extrapolate_ib() { return (extrapolate_ib); };
+

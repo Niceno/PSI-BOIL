@@ -188,6 +188,13 @@ class VOF : public Centered {
                    const int i, const int j, const int k);
     bool Interface(const int i, const int j, const int k);
 
+    void insert_bc_curv_divnorm();
+    void wall_norm(const Scalar & sca);
+    void nwall(const Scalar & g,
+               const real & r1, const real & r2, const real & r3,
+               const int & i1, const int & i2, const int &i3,
+               real r[] );
+
 #if 0
     /* 2D-variants */
     void insert_bc_curv_HFnormal(const Scalar & scp,
@@ -267,7 +274,7 @@ class VOF : public Centered {
                         const bool truedir1, const bool truedir2,
                         const real xcent,
                         real & kap, int & flag
-                        //,const int i, const int j, const int k
+                        ,const int i, const int j, const int k
                        ) const;
     virtual real calculate_curvature_HF(const arr2D & heights,
                                 const real d1m, const real d1c, const real d1p,
@@ -407,7 +414,7 @@ class VOF : public Centered {
     Heaviside * heavi;
     NormMethod norm_method_advance, norm_method_curvature;
     Comp mcomp_for_elvira, wall_curv_dir;
-    CurvMethod bulk_curv_method;// wall_curv_method;
+    CurvMethod bulk_curv_method, wall_curv_method;
     SubgridMethod subgrid_method;
     AdvectionMethod advect_method;
     HFset hf_set;
@@ -421,7 +428,7 @@ class VOF : public Centered {
     int niter_pressure_extrap;
     real cangle0;
 
-    bool cangle_variable, update_at_walls_variable;
+    bool cangle_variable, update_at_walls_variable, extrapolate_ib;
 };	
 #endif
 

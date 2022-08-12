@@ -38,7 +38,7 @@ VOF::VOF(const Scalar & PHI,
   mcomp_for_elvira(Comp::undefined()), /* undefined for 3D */
   wall_curv_dir(Comp::undefined()), /* undefined: based on normal vector */
   bulk_curv_method(CurvMethod::HF()),
-  //wall_curv_method(CurvMethod::none()),
+  wall_curv_method(CurvMethod::none()),
   subgrid_method(SubgridMethod::PLIC()),
   advect_method(AdvectionMethod::BoundedSplit()),
   hf_set(),
@@ -166,6 +166,7 @@ VOF::VOF(const Scalar & PHI,
   niter_pressure_extrap=1000;
   cangle_variable = false;
   update_at_walls_variable = false;
+  extrapolate_ib = true;
 
   /* labelling of advection directions */
   label_adv = {0,1,2,3,4,5};
