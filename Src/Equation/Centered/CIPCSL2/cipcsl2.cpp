@@ -88,6 +88,7 @@ CIPCSL2::CIPCSL2(const Scalar & PHI,
   nlayer=16;
   localSharpen=true;
   use_dist_for_kappa=true;
+  extrapolate_ib=true;
 
   /* allocate array */
   alloc3d(& vel,    phi.ni()+1, phi.nj()+1, phi.nk()+1);

@@ -14,6 +14,20 @@
 #define IB
 //#define DEBUG
 
+/***************************************************************************//**
+*  \brief Discretizes and solves color function transport equation.
+*
+*  The eqation is discretized in integral form:
+*  \f[
+*        \int_V \frac{\partial \phi}{\partial t} dV
+*      + \int_S \phi {\bf u} \, dS
+*      =  g
+*      \; \; \; \;
+*      [\frac{m^{3}}{s}]
+*  \f]
+*  where \phi \; [-]\f$ is color function, \fg is source term.
+*******************************************************************************/
+
 //////////////
 //          //
 //  Scheme  //
@@ -156,7 +170,7 @@ class CIPCSL2 : public Centered {
       boil::oout<<"set_eps_st: eps_st= "<<eps_st<<boil::endl;
     }
     /* getter for eps_st */
-    real get_eps_st() { return(eps_st);};
+    real get_eps_st() { return (eps_st);};
 
     /* setter for itsmear */
     void set_itsmear(const int i) {
@@ -164,7 +178,7 @@ class CIPCSL2 : public Centered {
       boil::oout<<"itsmear: itsmear= "<<itsmear<<boil::endl;
     }
     /* getter for itsmear */
-    real get_itsmear() { return(itsmear);};
+    real get_itsmear() { return (itsmear);};
 
     /* getter for sum_outlet */
     real get_sum_outlet() { return (sum_outlet); };
@@ -177,6 +191,15 @@ class CIPCSL2 : public Centered {
 
     /* getter for clrsum2 */
     real get_clrsum2() { return (clrsum2); };
+
+    /* setter for extrapolate_ib */
+    void set_extrapolate_ib(const bool b) {
+      extrapolate_ib=b;
+      boil::oout<<"cipcsl2:extrapolate_ib= "<<b<<"\n";
+      boil::oout<<"        true:  extrapolate color function into solid \n";
+      boil::oout<<"        false: no extrapolate color function into solid \n";
+    }
+    bool get_extrapolate_ib() { return (extrapolate_ib); };
 
     /* min and max of color function in fluid domain */
     real minval() {return minclr;}
@@ -297,5 +320,6 @@ class CIPCSL2 : public Centered {
     real minclr, maxclr;
     bool localSharpen, use_dist_for_kappa;
     bool is_initialized;
+    bool extrapolate_ib;
 };
 #endif
