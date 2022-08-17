@@ -16,8 +16,13 @@ Grid1D::Grid1D(const Range<real> &  xr, const Range<real> & dxr,
 
 #if 1
    if(nc_in<boil::BW) {
-     boil::aout<<"At least as many cells as the buffer width ("<<boil::BW
+     boil::oout<<"Grid1D: At least as many cells as the buffer width ("<<boil::BW
                <<") are required in each direction. Exiting."<<boil::endl;
+     exit(0);
+   }
+   if(xr.first()>xr.last()){
+     boil::oout<<"Grid1D: Error in Range-x "<< xr.first() <<" must be smaller than "
+               <<xr.last()<<"\n";
      exit(0);
    }
 #endif
