@@ -29,7 +29,7 @@ class VOFaxisym : public VOF {
                              const bool bdn=true);
     virtual void color_to_vf(const bool nvec=true,const bool extalp=true,
                              const bool bdn=true) {
-       color_to_vf(color(),phi,nvec,extalp,bdn);
+       color_to_vf(color(),phi,nvec,extalp,bdn);  // phi is volume fraction
     }
     void vf_to_color(const Scalar & vf, Scalar & color);
 
