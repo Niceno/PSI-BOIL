@@ -261,9 +261,9 @@ inline real bounded_color(const real cval) const {
 /* setter for extrapolate_ib */
 void set_extrapolate_ib(const bool b) {
   extrapolate_ib=b;
-  boil::oout<<"cipcsl2:extrapolate_ib= "<<b<<"\n";
-  boil::oout<<"        true:  extrapolate color function into solid \n";
-  boil::oout<<"        false: no extrapolate color function into solid \n";
+  boil::oout<<"vof:extrapolate_ib= "<<b<<"\n";
+  boil::oout<<"     true:  extrapolate color function into solid \n";
+  boil::oout<<"     false: no extrapolate color function into solid \n";
 }
 bool get_extrapolate_ib() { return (extrapolate_ib); };
 
