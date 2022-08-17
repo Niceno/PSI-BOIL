@@ -169,11 +169,6 @@ void VOF::curv_HF() {
           max_n = nny;
         } else {
           max_n = nnz;
-#if 0
-          std::cout<<"curv_HF:wall-ijk "<<i<<" "<<j<<" "<<k<<"\n";
-          std::cout<<"curv_HF:wall-norm "<<dom->ibody().nwx(i,j,k)<<" "<<dom->ibody().nwy(i,j,k)<<" "<<dom->ibody().nwz(i,j,k)<<"\n";
-          std::cout<<"curv_HF:wall-dist "<<dom->ibody().dist(i,j,k-1)<<" "<<dom->ibody().dist(i,j,k)<<"\n";
-#endif
         }
       }
 
@@ -258,23 +253,10 @@ void VOF::curv_HF() {
             for(int ii(imin); ii<=imax; ++ii) {
               gridstencil[jj+nof][kk+nof][ii+mof] = color().dxc(i+ii);
               stencil[jj+nof][kk+nof][ii+mof] = std::min(1.0,std::max(0.0,color()[i+ii][j+jj][k+kk]));
-#if 0
-              if(stencil[jj+nof][kk+nof][ii+mof]<0.0){
-                std::cout<<"vof_curv_HF:negative stencil: Error\n";
-                //exit(0);
-              }
-#endif
             }
           }
         }
 
-#if 0
-        if (k==4+sk()&&j==2+sj()&&i==117) {
-          std::cout<<"curv_HF:stencil: "<<stencil[0][0][-1]<<" "<<stencil[0][0][0]<<" "
-            <<stencil[0][0][1]<<" "<<stencil[0][0][2]<<" "<<stencil[0][0][3]<<"\n";
-          //exit(0);
-        }
-#endif
         /* correct grid stencil near solid/walls */
         if(imin_grid != imin) {
           for(int jj(-nof); jj<=nof; ++jj) {
@@ -541,27 +523,10 @@ void VOF::curv_HF() {
             for(int kk(kmin); kk<=kmax; ++kk) {
               gridstencil[ii+nof][jj+nof][kk+mof] = color().dzc(k+kk);
               stencil[ii+nof][jj+nof][kk+mof] = std::min(1.0,std::max(0.0,color()[i+ii][j+jj][k+kk]));
-#if 0
-            if (k==4+sk()&&j==2+sj()&&i==117&&jj+nof==0) {
-              std::cout<<"curv_HF:stencil1: "<<ii+nof<<" "<<jj+nof<<" "<<kk+mof<<" "<<k+kk<<" "<<stencil[ii+nof][jj+nof][kk+mof]<<"\n";
             }
-#endif
-
-            }
-#if 0
-            if (k==4+sk()&&j==2+sj()&&i==117) {
-              std::cout<<"curv_HF:stencil1: "<<ii+nof<<" "<<jj+nof<<" "<<kmin<<" "<<kmax<<" "<<mof<<"\n";
-            }
-#endif
           }
         }
 
-#if 0
-        if (k==4+sk()&&j==2+sj()&&i==117) {
-          std::cout<<"curv_HF:stencil: "<<stencil[1][1][2]<<" "<<stencil[1][1][3]<<" "
-            <<stencil[1][1][4]<<" "<<stencil[1][1][5]<<" "<<stencil[1][1][6]<<"\n";
-        }
-#endif
         /* correct grid stencil near solid/walls */
         if(kmin_grid != kmin) {
           for(int ii(-nof); ii<=nof; ++ii) {
@@ -613,12 +578,6 @@ void VOF::curv_HF() {
                       );
 
       }
-#if 0
-      if(kappa[i][j][k]==boil::unreal) {
-        boil::aout<<"#Error!!! vof_curv_HF:kappa= "<<kappa[i][j][k]<<" "
-		<<i<<" "<<j<<" "<<k<<" "<<boil::cart.iam()<<"\n";
-      }
-#endif
 
     } /* tempflag = 1 */
   } /* for ijk */
@@ -645,8 +604,6 @@ void VOF::curv_HF() {
               <<" Exiting."<<boil::endl;
     exit(0);
   }
-boil::oout<<kappa[8][3][3]<<" "<<kappa[9][3][3]<<" "<<" "<<kappa[27][3][3]<<" "<<kappa[28][3][3]<<" "<<kappa[29][3][3]<<boil::endl;
-boil::oout<<nz[8][3][3]<<" "<<nz[9][3][3]<<" "<<" "<<nz[27][3][3]<<" "<<nz[28][3][3]<<" "<<nz[29][3][3]<<boil::endl;
 #endif
 
 #if 1
@@ -658,13 +615,12 @@ boil::oout<<nz[8][3][3]<<" "<<nz[9][3][3]<<" "<<" "<<nz[27][3][3]<<" "<<nz[28][3
 #endif
 
   /* detect too large kappa */
-  real kappa_max = 2.0/dom->dxyz_min();
+  real kappa_sphere = 2.0/dom->dxyz_min();
   for_ijk(i,j,k) {
-    if((tempflag[i][j][k]==1) && (kappa[i][j][k]>kappa_max)) {
-      boil::aout<<"vof_curv_HF:Error!  Too large kappa.\n";
-      boil::aout<<"kappa= "<<kappa[i][j][k]<<" kappa_max= "<<kappa_max<<" at "
-      <<i<<" "<<j<<" k "<<k<<" "<<boil::cart.iam()<<"\n";
-      exit(0);
+    if((tempflag[i][j][k]==1) && (kappa[i][j][k]>10*kappa_sphere)) {
+      boil::aout<<"vof_curv_HF:WARNING!!!  Large curvature: kappa= "<<kappa[i][j][k]
+                <<" dxyz_min= "<<dom->dxyz_min()<<" at i= "<<i<<" j= "<<j
+                <<" k= "<<k<<" proc= "<<boil::cart.iam()<<"\n";
     }
   }
 
@@ -701,16 +657,15 @@ boil::oout<<nz[8][3][3]<<" "<<nz[9][3][3]<<" "<<" "<<nz[27][3][3]<<" "<<nz[28][3
   }
   
 #if 0
-  if(time->current_step()==1) {
-  //if(time->current_step()%100==0) {
   /* visualize tempflag */
-  boil::plot->plot(color(),nx,ny,nz, "clr-nx-ny-nz", time->current_step());
-  for_ijk(i,j,k){
-    stmp[i][j][k]=tempflag[i][j][k];
+  if(time->current_step()==1) {
+     boil::plot->plot(color(),nx,ny,nz, "clr-nx-ny-nz", time->current_step());
+    for_ijk(i,j,k){
+      stmp[i][j][k]=tempflag[i][j][k];
+    }
+    boil::plot->plot(color(),kappa,stmp, "clr-kappa-tempflag", time->current_step());
+    exit(0);
   }
-  boil::plot->plot(color(),kappa,stmp, "clr-kappa-tempflag", time->current_step());
-  exit(0);
-  } 
 #endif
 
   return;

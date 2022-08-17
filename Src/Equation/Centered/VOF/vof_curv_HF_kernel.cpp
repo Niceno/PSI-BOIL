@@ -39,20 +39,6 @@ void VOF::curv_HF_kernel(arr3D & stencil, const arr3D & gridstencil,
                          ,const int i, const int j, const int k
                          ) const {
 
-#if 0
-  if (k==4+sk()&&j==2+sj()) {
-    std::cout<<"HF_kernel: "<<i<<" "<<j<<" "<<k<<" "<<"\n";
-    std::cout<<"cng_m "<<cng_m<<" cng_p "<<cng_p<<" max_n= "<<max_n<<" nn_j "<<nn_j<<" nn_k "<<nn_k<<" imin "<<imin<<" imax "<<imax<<"\n";
-  }
-#endif
-#if 0
-  if (k==4+sk()&&j==2+sj()&&i==117) {
-    std::cout<<"curv_HF_kernel:stencil: "<<stencil[1][1][2]<<" "<<stencil[1][1][3]<<" "
-    <<stencil[1][1][4]<<" "<<stencil[1][1][5]<<" "<<stencil[1][1][6]<<"\n";
-    std::cout<<"truedir1 "<<truedir1<<" truedir2 "<<truedir2<<"\n";
-  }
-#endif
-
   const int & mof = hf_set.mof;
   const int & nof = hf_set.nof;
 
@@ -148,18 +134,6 @@ void VOF::curv_HF_kernel(arr3D & stencil, const arr3D & gridstencil,
   }
 
 #if 0
-  if (k==4+sk()&&j==2+sj()&&i==117) {
-    std::cout<<"Heights-0: ";
-    for(int jj(-nof); jj<=nof; ++jj) {
-      for(int kk(-nof); kk<=nof; ++kk) {
-        std::cout<<jj+nof<<" "<<kk+nof<<" "<<heights[jj+nof][kk+nof]<<" | ";
-      }
-    std::cout<<" || ";
-    }
-    std::cout<<"\n";
-  }
-#endif
-#if 0
   boil::oout<<"heights: ";
   for(int jj(-nof); jj<=nof; ++jj) {
     for(int kk(-nof); kk<=nof; ++kk) {
@@ -197,21 +171,10 @@ void VOF::curv_HF_kernel(arr3D & stencil, const arr3D & gridstencil,
 	  tancang_m = tan(cang_m);  
 	}	
 
-#if 0
-      if (k==4+sk()&&j==2+sj()&&i==117) {
-        std::cout<<"tancang_m= "<<tancang_m<<" nof= "<<nof<<"\n";
-      }
-#endif
-
     for(int jj(-nof); jj<=nof; ++jj) {
       for(int kk(-nof); kk<=nof; ++kk) {
         if(jj==0&&kk==0)
           continue;
-#if 0
-        if (k==4+sk()&&j==2+sj()&&i==117) {
-          std::cout<<"heights= "<<heights[jj+nof][kk+nof]<<" "<<height_min<<" "<<jj<<" "<<kk<<"\n";
-        }
-#endif
         if(heights[jj+nof][kk+nof]<height_min) {
           /* only approximate for nof>1 */
           real distj = (jj>0) ? real(jj)*(d1p+d1c)/2. : real(jj)*(d1m+d1c)/2.;
@@ -302,19 +265,6 @@ void VOF::curv_HF_kernel(arr3D & stencil, const arr3D & gridstencil,
     }
   }
 
-#if 0
-  if (k==4+sk()&&j==2+sj()&&i==117) {
-    std::cout<<"heghts10: ";
-    for(int jj(-nof); jj<=nof; ++jj) {
-      for(int kk(-nof); kk<=nof; ++kk) {
-        std::cout<<jj+nof<<" "<<kk+nof<<" "<<heights[jj+nof][kk+nof]<<" | ";
-      }
-    std::cout<<" || ";
-    }
-    std::cout<<"\n";
-    exit(0);
-  }
-#endif
   //if(nhc_limit<nhc && nhc<=(nhc_limit+1.0)) {
   if(nhc_0<heights[nof][nof] && heights[nof][nof]<=nhc_1) {
 
@@ -326,14 +276,6 @@ void VOF::curv_HF_kernel(arr3D & stencil, const arr3D & gridstencil,
   } else {
     flag = 0;
   }
-
-#if 0
-    if(time->current_step()==305) {
-      if(i==25&&j==17&&k==4) {
-        std::cout<<"curv_HF_kernel:999:kap= "<<kap<<" "<<flag<<"\n";
-      }
-    }
-#endif
 
   return;
 } 
