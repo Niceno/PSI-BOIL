@@ -14,7 +14,7 @@ real Axisymmetric::dSx(const int i, const int j, const int k) const
 real Axisymmetric::dSy(const int i, const int j, const int k) const
   { return 0.0; } /* dummy direction */
 real Axisymmetric::dSz(const int i, const int j, const int k) const
-  { return 0.5*fabs(xn(i+1)*xn(i+1)-xn(i)*xn(i)); } 
+  { return 0.5*fabs(xn(i+1)*xn(i+1)-xn(i)*xn(i)); } // area of 1 rad
   /* truncated circular sector, angle of 1 rad */
 
 real Axisymmetric::dSx_xstag(const int i, const int j, const int k) const
@@ -34,6 +34,7 @@ real Axisymmetric::dSy_zstag(const int i, const int j, const int k) const
 
 real Axisymmetric::dSz_xstag(const int i, const int j, const int k) const
   /* this is so complicated to safeguard @ origin against 0 area */
+  // area of 1 rad
   { return 0.5*(fabs(xc(i)*xc(i)-xn(i)*xn(i))+fabs(xn(i)*xn(i)-xc(i-1)*xc(i-1))); }
 real Axisymmetric::dSz_ystag(const int i, const int j, const int k) const
   { return dSz(i,j,k); } /* pseudo-staggering */
