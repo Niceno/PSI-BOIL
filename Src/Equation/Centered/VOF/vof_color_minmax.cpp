@@ -41,7 +41,7 @@ void VOF::color_minmax() {
             <<cmin<<" "<<cmax<<"\n";
 
   if (cmin<-1.0 || cmax>2.0) {
-    boil::oout<<"cipcsl2_color_minmax: Stop calculation because of";
+    boil::oout<<"vof_color_minmax: Stop calculation because of";
     boil::oout<<" too small or too large color function.\n";
     if (cminLocal<-1.0 || cmaxLocal>2.0) { 
       boil::aout<<"proc= "<<boil::cart.iam()
