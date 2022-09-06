@@ -167,6 +167,7 @@ VOF::VOF(const Scalar & PHI,
   cangle_variable = false;
   update_at_walls_variable = false;
   extrapolate_ib = true;
+  verbose = false;
 
   /* labelling of advection directions */
   label_adv = {0,1,2,3,4,5};

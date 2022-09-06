@@ -428,7 +428,7 @@ class VOF : public Centered {
     int niter_pressure_extrap;
     real cangle0;
 
-    bool cangle_variable, update_at_walls_variable, extrapolate_ib;
+    bool cangle_variable, update_at_walls_variable, extrapolate_ib, verbose;
 };	
 #endif
 

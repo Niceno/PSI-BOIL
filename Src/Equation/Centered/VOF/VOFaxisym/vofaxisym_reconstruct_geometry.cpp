@@ -82,9 +82,11 @@ void VOFaxisym::reconstruct_geometry(Scalar & scp) {
 #endif
 
   if(iter<reconstruction_maxiter) {
-    boil::oout<<"VOFaxisym::reconstruct_geometry converged after "
-              <<iter<<" iterations! "
-              <<"Final error: "<<time->current_time()<<" "<<linferr<<boil::endl;
+    if(verbose) {
+      boil::oout<<"VOFaxisym::reconstruct_geometry converged after "
+                <<iter<<" iterations! "
+                <<"Final error: "<<time->current_time()<<" "<<linferr<<boil::endl;
+    }
   } else {
     boil::oout<<"VOFaxisym::reconstruct_geometry did not converge after "
               <<iter<<" iterations! "

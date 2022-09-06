@@ -111,8 +111,10 @@ bool VOF::ev_solve(const ScalarInt & pflag, const Matrix & A,
       if(linferr_first>0) {
         errrat = linferr/linferr_first;
       }
-      boil::oout<<"VOF::ev_solve converged after "<<n<<" steps, final abs./rel. error: "
-                <<linferr<<" "<<errrat<<"\n";
+      if(verbose) {
+        boil::oout<<"VOF::ev_solve converged after "<<n<<" steps, final abs./rel. error: "
+                  <<linferr<<" "<<errrat<<"\n";
+      }
 //#endif
       break;
     }

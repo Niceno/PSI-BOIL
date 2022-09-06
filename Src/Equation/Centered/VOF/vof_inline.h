@@ -267,3 +267,8 @@ void set_extrapolate_ib(const bool b) {
 }
 bool get_extrapolate_ib() { return (extrapolate_ib); };
 
+/* setter for verbose */
+void set_verbose(const bool b){ verbose = b; return; }
+/* getter for verbose */
+bool get_verbose(){ return verbose;}
+
