@@ -19,10 +19,12 @@ stamp-h1
 **/Boil
 **/.deps/
 **/*.a
+Src/*.bck
 Src/*.cpp
 Src/*.dat
 Src/*.mcr
 Src/*.lay
+Src/*.plt
 Src/*.stl
 Src/*.txt
 Src/main*.cpp*
