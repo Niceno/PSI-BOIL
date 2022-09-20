@@ -1,0 +1,9 @@
+ #pragma once
+#include "AltTecUtil.h"
+#include "DataSetWriter.h"
+#include "DataWriteStatisticsInterface.h"
+#include "FileDescription.h"
+#include "FileReaderInterface.h"
+#include "FileWriterInterface.h"
+#include "IJK.h"
+namespace tecplot { namespace ___3931 { ___372 ___1240( ___37&                   ___36, FileWriterInterface&          szpltFile, ___1386 const&        ___1385, ___372                     includeRevisionNumber, DataSetWriter&                dataSetWriter, ___3499                        vars, ___3499                        ___4669, ___934& ___933); ___372 writeIntermediateFiles( ___37&                   ___36, FileWriterInterface&          headerFile, FileWriterInterface&          zoneFile, FileWriterInterface&          auxDataFile, FileWriterInterface&          geometryFile, FileWriterInterface&          textFile, FileWriterInterface&          customLabelsFile, ___1386 const&        ___1385, uint64_t                      numHeadersInFile, uint32_t                      numAuxDataInFile, uint32_t                      numGeomsInFile, uint32_t                      numTextsInFile, uint32_t                      numCustomLabelsInFile, ___372                     includeRevisionNumber, DataSetWriter&                dataSetWriter, ___3499                        vars, ___3499                        ___4669, ___934& ___933); ___372 ___4514( FileWriterInterface& file, char const*          ___1405, uint32_t const       fileVersion, ___372            includeRevisionNumber, uint64_t             dataSetHeaderLocation); ___372 writeDataSetHeaders( FileWriterInterface&          szpltFile, ___372                     dataSetIsAvailable, std::string const&            dataSetTitle, ___4350                    ___2841, ___4634                   ___2844, ___3943&                  headerTagMap, ___4705 const&        ___4704, ___1390 const&           szpltZoneHeaderFileLocs, ___934& ___933); }}
