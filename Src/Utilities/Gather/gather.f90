@@ -107,7 +107,9 @@
 #ifdef ZIP
       call compress
 #endif
+#ifndef SZPLT
       call delfile
+#endif
       call dealloc
    ENDDO
 
@@ -423,8 +425,8 @@
    character*1 NULLCHR
    Integer*4   Debug,III,IIII,NPts,NElm
    Real*8    SolTime
-   Integer*4 VIsDouble
-   Integer*4 ZoneType,StrandID,ParentZn,IsBlock
+   Integer*4 VIsDouble, FileType, FileFormat
+   Integer*4 ZoneType,StrandID,unused,IsBlock
    Integer*4 ICellMax,JCellMax,KCellMax,NFConns,FNMode,ShrConn
    Integer*4 Valuelocation(nvariable+3)
    POINTER   (NullPtr,Null)
@@ -433,11 +435,17 @@
    NULLCHR = CHAR(0)
    NullPtr = 0
    Debug   = 0
+   FileType = 0
+#ifndef SZPLT
+   FileFormat = 0 ! 0 = PLT, 1 = SZPLT
+#else
+   FileFormat = 1 ! 0 = PLT, 1 = SZPLT
+#endif
    VIsDouble = 0
    ZoneType = 0
    SolTime = 0.0
    StrandID = 0
-   ParentZn = 0
+   unused = 0 ! ParentZone is no longer used
    IsBlock = 1
    ICellMax = 0
    JCellMax = 0
@@ -464,7 +472,11 @@
 !... Set output file name
 !
    call int2char(nt,ctmp,ndigit)
+#ifndef SZPLT
    fout=trim(fncommon)//"all_"//ctmp(1:ndigit)//".plt"
+#else
+   fout=trim(fncommon)//"all_"//ctmp(1:ndigit)
+#endif
    write(*,*)"Output to ",trim(fout)
 !
 !... Set variable name
@@ -478,19 +490,21 @@
 !... Open the file and write the tecplot datafile 
 !... header information.
 !
-   I = TecIni110('DATASET'//NULLCHR, &
+   I = TecIni142('DATASET'//NULLCHR, &
                  trim(cline)//NULLCHR, &
                  trim(fout)//NULLCHR, &
                  '.'//NULLCHR, &
+                 FileFormat, &
+                 FileType, &
                  Debug, &
                  VIsDouble)
 !
 !... Write the zone header information.
 !
 #ifndef VISIT
-   I = TecZne110(ctmp(1:ndigit)//NULLCHR, &
+   I = TecZne142(ctmp(1:ndigit)//NULLCHR, &
 #else
-   I = TecZne110('000000'//NULLCHR, &
+   I = TecZne142('000000'//NULLCHR, &
 #endif
                  ZoneType, &
                  inmax, &
@@ -501,10 +515,13 @@
                  KCellMax, &
                  SolTime, &
                  StrandID, &
-                 ParentZn, &
+                 unused, &
                  IsBlock, &
                  NFConns, &
                  FNMode, &
+                 0, &
+                 0, &
+                 0, &
                  Null, &
                  Valuelocation, &
                  Null, &
@@ -522,7 +539,7 @@
      ENDDO
      ENDDO
      ENDDO
-     I   = TecDat110(III,anode,0)
+     I   = TecDat142(III,anode,0)
    ENDDO
 
    IF(nodal==0)THEN
@@ -534,7 +551,7 @@
        ENDDO
        ENDDO
        ENDDO
-       I = TecDat110(IIII,acell,0)
+       I = TecDat142(IIII,acell,0)
      ENDDO
    ELSE
      DO m=1,nvariable
@@ -545,11 +562,11 @@
        ENDDO
        ENDDO
        ENDDO
-       I = TecDat110(III,anode,0)
+       I = TecDat142(III,anode,0)
      ENDDO
    ENDIF
 
-   I = TecEnd110()
+   I = TecEnd142()
 
    DEALLOCATE(anode,acell)
 
