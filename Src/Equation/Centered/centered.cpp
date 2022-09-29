@@ -22,6 +22,8 @@ Centered::Centered(const Domain * d,
   cold=phi.shape();  cnew=phi.shape();  buff=phi.shape();
   res =phi.shape();
   set_active_flag(aflag);
+
+  min_iter = MinIter(1);
 }
 
 
@@ -46,4 +48,6 @@ Centered::Centered(const Centered * fn, const Domain * d,
 
   if(dom->coarser() != NULL)
     crsr = new Centered( this, this->dom->coarser(), phi.bc(), solver ); 
+
+  min_iter = MinIter(1);
 }

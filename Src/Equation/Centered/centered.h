@@ -118,6 +118,12 @@ class Centered : public Equation {
 
     void set_active_flag(ScalarInt & activeflag);
 
+    void set_min_iteration(const int i){
+      min_iter = MinIter(i);
+      boil::oout<<"Momentum:min_iteration= "<<min_iter<<"\n";
+    }
+    int get_min_iteration() {return min_iter;}
+
   friend class AC;
 
     inline real signum(const real a, const real b) const { return a*((b>0.)-(b<0.)); }
@@ -188,6 +194,8 @@ class Centered : public Equation {
 
     const Centered * fnr;
           Centered * crsr;
+
+    MinIter min_iter;
 };
 
 #endif
