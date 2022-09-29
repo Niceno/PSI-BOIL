@@ -87,21 +87,21 @@ int AC::converged(const ResTol & toler, const ResRat & factor,
 }
 
 /******************************************************************************/
-bool AC::call_smoother(const int l, const MaxIter & mi, 
+bool AC::call_smoother(const int l, const MinIter & mini, const MaxIter & mi, 
                        const ResRat & res_rat, const ResTol & res_tol,
                        const MaxIter & ms, const int gi) {
 
   return L[l]->solver->solve(L[l]->A, L[l]->phi, L[l]->fnew,
-                             mi, sname, res_rat, res_tol, 
+                             mini, mi, sname, res_rat, res_tol, 
                              L[0]->time->dti()*L[0]->scale, int(ms));
 }
 
 /******************************************************************************/
-bool AC::call_solver(const int l, const MaxIter & mi, 
+bool AC::call_solver(const int l, const MinIter & mini, const MaxIter & mi, 
                      const ResRat & res_rat, const ResTol & res_tol,
                      const MaxIter & ms, const int gi) {
 
   return solver->solve(L[l]->A, L[l]->phi, L[l]->fnew,
-                       mi, sname, res_rat, res_tol, 
+                       mini, mi, sname, res_rat, res_tol, 
                        L[0]->time->dti()*L[0]->scale, int(ms));
 }

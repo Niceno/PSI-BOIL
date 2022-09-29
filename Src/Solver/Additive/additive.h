@@ -166,10 +166,10 @@ class AC {
                   const real & res_beg, const real & reslinf_beg,
                   const real & res0, const real & reslinf0,
                   int * ncyc);
-    bool call_smoother(const int l, const MaxIter & mi,
+    bool call_smoother(const int l, const MinIter & mini, const MaxIter & mi,
                        const ResRat & res_rat, const ResTol & res_tol,
                        const MaxIter & ms, const int gi); 
-    bool call_solver(const int l, const MaxIter & mi,
+    bool call_solver(const int l, const MinIter & mini, const MaxIter & mi,
                      const ResRat & res_rat, const ResTol & res_tol,
                      const MaxIter & ms, const int gi); 
 
