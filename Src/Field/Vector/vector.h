@@ -306,6 +306,9 @@ class Vector {
     /* bnd update */
     void bnd_update_nooutlet();
 
+    /* change grid resolution */
+    void change_grid(const Vector & v_origin);
+
   private:
     void     coordinate();
 

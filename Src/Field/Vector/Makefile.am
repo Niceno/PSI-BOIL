@@ -9,6 +9,7 @@ libVector_a_SOURCES = vector_browsing.h             \
                       vector_bnd_insert.cpp         \
                       vector_bnd_update.cpp         \
                       vector_central.cpp            \
+                      vector_change_grid.cpp        \
                       vector_copy.cpp               \
                       vector_exchange.cpp           \
                       vector_exchange_all.cpp       \

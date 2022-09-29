@@ -250,6 +250,8 @@ class Scalar {
       return *this;
     }
 
+    void change_grid(const Scalar & s_origin);
+
     /* operators */
     Scalar & operator = (const Shape & a)
      {n_x=a.n_i;n_y=a.n_j;n_z=a.n_k;  o_x=a.o_i;o_y=a.o_j;o_z=a.o_k;
@@ -323,8 +325,7 @@ class Scalar {
       return d/real(ntot)/real(ntot);
     }
 
-    /*
-       sum */
+    /* sum */
     real sum() {
       real r(0.);
       for_ijk(i,j,k)
@@ -332,8 +333,7 @@ class Scalar {
       boil::cart.sum_real(&r);
       return r;
     }
-    /*
-       sum */
+    /* sum */
     real sum_abs() {
       real r(0.);
       for_ijk(i,j,k)
