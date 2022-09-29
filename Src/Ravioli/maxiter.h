@@ -24,4 +24,19 @@ class MaxIter {
     int val;
 };
 
+///////////////
+//           //
+//  MinIter  // 
+//           //
+///////////////
+class MinIter {
+  public:
+    explicit MinIter()              : val(1) {};
+    explicit MinIter(const int & v) : val(v)  {};
+    operator int () const {return val;}
+
+  private:
+    int val;
+};
+
 #endif
