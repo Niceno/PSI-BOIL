@@ -1,4 +1,5 @@
 #include "scalar.h"
+#include <iomanip>
 //#include "../../Domain/domain.h"
 
 // Global I,J,K are used for the intex
@@ -81,8 +82,12 @@ void Scalar::save_range(const Range<int> RI, const Range<int> RJ,
         boil::cart.sum_real(&y);
         boil::cart.sum_real(&z);
         boil::cart.sum_real(&v);
-        if(boil::cart.iam()==0)
+        out.setf(std::ios_base::scientific);
+        out<< std::setprecision(16);
+	if(boil::cart.iam()==0)
           out<<x<<" "<<y<<" "<<z<<" "<<v<<"\n";
+        out.unsetf(std::ios_base::floatfield);
+        out<< std::setprecision(6);
       }
     }
   }
