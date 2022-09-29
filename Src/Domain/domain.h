@@ -29,7 +29,11 @@
 class Domain {
   public:
     Domain(const Grid1D & ogx, const Grid1D & ogy, const Grid1D & ogz,
-           Body * b = NULL, /* it will change, that is why it is pointer */ 
+           const std::string n="domain", const Decompose dec=Decompose::xyz(),
+           const bool print_statistics = true);
+
+    Domain(const Grid1D & ogx, const Grid1D & ogy, const Grid1D & ogz,
+           Body * b, /* it will change, that is why it is pointer */ 
            const std::string n="domain", const Decompose dec=Decompose::xyz(),
            const bool print_statistics = true);
  

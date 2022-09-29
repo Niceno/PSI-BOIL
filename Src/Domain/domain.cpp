@@ -4,6 +4,26 @@
 
 /******************************************************************************/
 Domain::Domain(const Grid1D & ogx, const Grid1D & ogy, const Grid1D & ogz,
+               const std::string n, const Decompose dec,
+               const bool print_statistics) :
+/*---------------------------------------------------------------+
+|  this constructor creates a domain globally on all processors  |
++---------------------------------------------------------------*/
+  lev(0),
+  cr_x(0,0), cr_y(0,0), cr_z(0,0),
+  grid_x_original(&ogx), grid_y_original(&ogy), grid_z_original(&ogz),
+  name(n), dc(dec) {
+
+  body = new Empty();
+
+  setup(dc);
+
+  if(print_statistics)
+    statistics();
+}
+
+/******************************************************************************/
+Domain::Domain(const Grid1D & ogx, const Grid1D & ogy, const Grid1D & ogz,
                Body * stl_body,  
                const std::string n, const Decompose dec,
                const bool print_statistics) :
@@ -15,22 +35,18 @@ Domain::Domain(const Grid1D & ogx, const Grid1D & ogy, const Grid1D & ogz,
   grid_x_original(&ogx), grid_y_original(&ogy), grid_z_original(&ogz),
   name(n), dc(dec) {
 
-  if(stl_body) {
-    body = stl_body;
-  } else {
-    body = new Empty();
-  }
+  body = stl_body;
 
   setup(dc);
 
   if(stl_body) {
     body->cut(*this);
 
-    if(print_statistics)
-      statistics(body);
+  if(print_statistics)
+    statistics(body);
   } else {
-    if(print_statistics)
-      statistics();
+  if(print_statistics)
+    statistics();
   }
 }
 
