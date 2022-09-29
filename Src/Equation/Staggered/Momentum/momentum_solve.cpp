@@ -66,7 +66,7 @@ void Momentum::solve_wo_outlet(const ResTol & toler, const ResRat & factor) {
 
     if(m==Comp::u()) {
       if(ifull) {
-        solver->solve(*Am, u(m), fnew(m), 
+        solver->solve(*Am, u(m), fnew(m), min_iter, 
                        MaxIter(10), "u", factor,toler,scale*time->dti());
       } else {
         for_avmijk(u,m,i,j,k) 
@@ -75,7 +75,7 @@ void Momentum::solve_wo_outlet(const ResTol & toler, const ResRat & factor) {
     }
     if(m==Comp::v()) { 
       if(jfull) {
-        solver->solve(*Am, u(m), fnew(m), 
+        solver->solve(*Am, u(m), fnew(m), min_iter,
                        MaxIter(10), "v", factor,toler,scale*time->dti());
       } else {
         for_avmijk(u,m,i,j,k) 
@@ -84,7 +84,7 @@ void Momentum::solve_wo_outlet(const ResTol & toler, const ResRat & factor) {
     }
     if(m==Comp::w()) {
       if(kfull) {
-        solver->solve(*Am, u(m), fnew(m), 
+        solver->solve(*Am, u(m), fnew(m), min_iter,
                        MaxIter(10), "w", factor,toler,scale*time->dti());
       } else {
         for_avmijk(u,m,i,j,k) 

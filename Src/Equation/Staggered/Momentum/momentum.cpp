@@ -38,6 +38,7 @@ Momentum::Momentum(const Vector & U,
   discretize();
 
   v_phase_change=0.0;
+  min_iter = MinIter(1);
 }
 
 /******************************************************************************/

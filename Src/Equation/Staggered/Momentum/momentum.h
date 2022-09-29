@@ -114,6 +114,12 @@ class Momentum : public Staggered {
 
     void set_volf_ib(real x) {volf_ib=x;};
 
+    void set_min_iteration(const int i){
+      min_iter = MinIter(i);
+      boil::oout<<"Momentum:min_iteration= "<<min_iter<<"\n";
+    }
+    int get_min_iteration() {return min_iter;}
+
     Matrix * A[3];
 
   private:
@@ -137,6 +143,7 @@ class Momentum : public Staggered {
     real v_phase_change,volf_ib;
     bool ifull, jfull, kfull;
     bool ib_trust_vel_wall;
+    MinIter min_iter;
 
 };
 
