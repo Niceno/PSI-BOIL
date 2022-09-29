@@ -6,7 +6,7 @@ void AC::v_cycle(const int l,const std::array<MaxIter,3> & mv,
 
   if(l!=nlevels-1) {
     /* pre-smooth */
-    call_smoother(l,mv[0],resrat_val,restol_val,ms[0],gi);
+    call_smoother(l,MinIter(1),mv[0],resrat_val,restol_val,ms[0],gi);
 
     /* restrict residual to coarser grid */
     //residual(*L[l]);
@@ -16,7 +16,7 @@ void AC::v_cycle(const int l,const std::array<MaxIter,3> & mv,
     v_cycle(l+1,mv,ms,gi);
  
     /* post-smooth */
-    call_solver(l,mv[2],resrat_val,restol_val,ms[2],gi);
+    call_solver(l,MinIter(1),mv[2],resrat_val,restol_val,ms[2],gi);
 
     /* prolongate to a finer level */
     if(l > 0)
@@ -24,7 +24,7 @@ void AC::v_cycle(const int l,const std::array<MaxIter,3> & mv,
 
   } else {
     /* solve 'precisely' at the coarsest level */
-    call_solver(l,MaxIter(100),ResRat(-1),restol_val,MaxIter(-1),gi);
+    call_solver(l,MinIter(1),MaxIter(100),ResRat(-1),restol_val,MaxIter(-1),gi);
 
     /* prolongate to a finer level */
     interpolation(*L[l], *L[l-1]);
@@ -39,7 +39,7 @@ void AC::f_cycle(const int l,const std::array<MaxIter,3> & mv,
 
   if(l!=nlevels-1) {
     /* pre-smooth */
-    call_smoother(l,mv[0],resrat_val,restol_val,ms[0],gi);
+    call_smoother(l,MinIter(1),mv[0],resrat_val,restol_val,ms[0],gi);
 
     /* restrict residual to coarser grid */
     //residual(*L[l]);
@@ -49,7 +49,7 @@ void AC::f_cycle(const int l,const std::array<MaxIter,3> & mv,
     f_cycle(l+1,mv,ms,gi);
 
     /* re-smooth */
-    call_smoother(l,mv[1],resrat_val,restol_val,ms[1],gi);
+    call_smoother(l,MinIter(1),mv[1],resrat_val,restol_val,ms[1],gi);
 
     /* restrict residual to coarser grid */
     //residual(*L[l]);
@@ -59,7 +59,7 @@ void AC::f_cycle(const int l,const std::array<MaxIter,3> & mv,
     v_cycle(l+1,mv,ms,gi);
 
     /* post-smooth */
-    call_solver(l,mv[2],resrat_val,restol_val,ms[2],gi);
+    call_solver(l,MinIter(1),mv[2],resrat_val,restol_val,ms[2],gi);
 
     /* prolongate to a finer level */
     if(l > 0)
@@ -67,7 +67,7 @@ void AC::f_cycle(const int l,const std::array<MaxIter,3> & mv,
 
   } else {
     /* solve 'precisely' at the coarsest level */
-    call_solver(l,MaxIter(100),ResRat(-1),restol_val,MaxIter(-1),gi);
+    call_solver(l,MinIter(1),MaxIter(100),ResRat(-1),restol_val,MaxIter(-1),gi);
 
     /* prolongate to a finer level */
     interpolation(*L[l], *L[l-1]);
@@ -82,7 +82,7 @@ void AC::w_cycle(const int l,const std::array<MaxIter,3> & mv,
 
   if(l!=nlevels-1) {
     /* pre-smooth */
-    call_smoother(l,mv[0],resrat_val,restol_val,ms[0],gi);
+    call_smoother(l,MinIter(1),mv[0],resrat_val,restol_val,ms[0],gi);
 
     /* restrict residual to coarser grid */
     //residual(*L[l]);
@@ -92,7 +92,7 @@ void AC::w_cycle(const int l,const std::array<MaxIter,3> & mv,
     w_cycle(l+1,mv,ms,gi);
 
     /* re-smooth */
-    call_smoother(l,mv[1],resrat_val,restol_val,ms[1],gi);
+    call_smoother(l,MinIter(1),mv[1],resrat_val,restol_val,ms[1],gi);
 
     /* restrict residual to coarser grid */
     //residual(*L[l]);
@@ -102,7 +102,7 @@ void AC::w_cycle(const int l,const std::array<MaxIter,3> & mv,
     w_cycle(l+1,mv,ms,gi);
 
     /* post-smooth */
-    call_solver(l,mv[2],resrat_val,restol_val,ms[2],gi);
+    call_solver(l,MinIter(1),mv[2],resrat_val,restol_val,ms[2],gi);
 
     /* prolongate to a finer level */
     if(l > 0)
@@ -110,7 +110,7 @@ void AC::w_cycle(const int l,const std::array<MaxIter,3> & mv,
 
   } else {
     /* solve 'precisely' at the coarsest level */
-    call_solver(l,MaxIter(100),ResRat(-1),restol_val,MaxIter(-1),gi);
+    call_solver(l,MinIter(1),MaxIter(100),ResRat(-1),restol_val,MaxIter(-1),gi);
 
     /* prolongate to a finer level */
     interpolation(*L[l], *L[l-1]);
@@ -143,12 +143,12 @@ void AC::full_cycle(const int l, const Cycle & cyc,
       flex_cycle(l,mv,ms,gi);
       /* just solve (shouldn't happen) */
     } else {
-      call_solver(l,MaxIter(100),ResRat(-1),restol_val,MaxIter(-1),gi);
+      call_solver(l,MinIter(1),MaxIter(100),ResRat(-1),restol_val,MaxIter(-1),gi);
     }
 
   } else {
     /* solve 'precisely' at the coarsest level */
-    call_solver(l,MaxIter(100),ResRat(-1),restol_val,MaxIter(-1),gi);
+    call_solver(l,MinIter(1),MaxIter(100),ResRat(-1),restol_val,MaxIter(-1),gi);
 
     /* prolongate to a finer level */
     interpolation(*L[l], *L[l-1]);
@@ -168,7 +168,7 @@ void AC::flex_cycle(const int l,const std::array<MaxIter,3> & mv,
 
   if(l!=nlevels-1) {
     /* smooth until convergence or stale */
-    if(call_smoother(l,mv[idx],resrat_val,restol_val,ms[idx],gi)) {
+    if(call_smoother(l,MinIter(1),mv[idx],resrat_val,restol_val,ms[idx],gi)) {
       if(l==0) {
         return;
       } else {
@@ -187,7 +187,7 @@ void AC::flex_cycle(const int l,const std::array<MaxIter,3> & mv,
     }
   } else {
     /* solve 'precisely' at the coarsest level */
-    call_solver(l,MaxIter(100),ResRat(-1),restol_val,MaxIter(-1),gi);
+    call_solver(l,MinIter(1),MaxIter(100),ResRat(-1),restol_val,MaxIter(-1),gi);
 
     /* prolongate to a finer level */
     interpolation(*L[l], *L[l-1]);
