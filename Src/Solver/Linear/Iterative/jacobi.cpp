@@ -7,7 +7,8 @@
 *
 *  \note The arguments are explained in the parent-parent, Linear.
 *******************************************************************************/
-bool Jacobi :: solve(Matrix & A, Scalar & x, Scalar & b, const MaxIter & mi,
+bool Jacobi :: solve(Matrix & A, Scalar & x, Scalar & b, const MinIter & mini,
+                     const MaxIter & mi,
                      const char * name,
                      const ResRat & res_rat, const ResTol & res_tol,
                      const real scale,
@@ -55,9 +56,9 @@ bool Jacobi :: solve(Matrix & A, Scalar & x, Scalar & b, const MaxIter & mi,
 #endif
 
     /* should res be scaled with A and x? */
-    if( sqrt(res) < res_tol ) { converged = true; break; }
+    if( sqrt(res) < res_tol && i >= mini-1 ) { converged = true; break; }
 
-    if( sqrt(res) < sqrt(res0) * res_rat ) { converged = true; break; } 
+    if( sqrt(res) < sqrt(res0) * res_rat && i >= mini-1 ) { converged = true; break; } 
   }
 
   /* for normalisation */
