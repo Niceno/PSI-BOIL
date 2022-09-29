@@ -24,7 +24,9 @@ void EnthalpyFD::solve(const ResTol & toler, const ResRat & fact,
   /* solve */
   update_rhs();
 
-  solver->solve(A, phi, fnew, MaxIter(1000), name, fact, toler,scale*time->dti());
+  //solver->solve(A, phi, fnew, MinIter(1), MaxIter(1000), 
+  solver->solve(A, phi, fnew, min_iter, MaxIter(1000), 
+                name, fact, toler,scale*time->dti());
 
   phi.bnd_update();
 

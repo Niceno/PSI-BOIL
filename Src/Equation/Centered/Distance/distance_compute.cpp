@@ -52,7 +52,7 @@ void Distance::compute() {
   |  solve  |
   +--------*/
   solver->solve(A, phi, fnew, 
-                MaxIter(1000), "distance", 
+                MinIter(1), MaxIter(1000), "distance", 
                 ResRat(boil::micro), ResTol(boil::pico));
 
   phi.bnd_update();

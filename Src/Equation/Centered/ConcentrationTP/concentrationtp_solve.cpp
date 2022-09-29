@@ -30,7 +30,8 @@ void ConcentrationTP::solve(const ResTol & toler, const ResRat & fact,
     }
   }
 
-  solver->solve(A, phi, fnew, MaxIter(20), name, fact, toler,scale*time->dti());
+  solver->solve(A, phi, fnew, MinIter(1), MaxIter(20), 
+                name, fact, toler,scale*time->dti());
   phi.bnd_update();
 
   /* stop the timing */
