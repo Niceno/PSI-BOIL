@@ -20,6 +20,7 @@ class Krylov : public Linear {
     virtual bool solve(Matrix & A,              
                        Scalar & x,               
                        Scalar & b,                
+                       const MinIter & mini,
                        const MaxIter & mi,
                        const char * var_name = NULL,
                        const ResRat & rr = ResRat(), 

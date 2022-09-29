@@ -6,7 +6,8 @@
 *
 *  \note The arguments are explained in the parent-parent, Linear.
 *******************************************************************************/
-bool BiCGS :: solve(Matrix & A, Scalar & x, Scalar & b, const MaxIter & mi, 
+bool BiCGS :: solve(Matrix & A, Scalar & x, Scalar & b, const MinIter & mini,
+                    const MaxIter & mi, 
                     const char * name,
                     const ResRat & res_rat, const ResTol & res_tol,
                     const real scale,
@@ -177,9 +178,9 @@ bool BiCGS :: solve(Matrix & A, Scalar & x, Scalar & b, const MaxIter & mi,
 #endif
 
     /* should res be scaled with A and u? */
-    if( res < res_tol ) { converged = true; break; }
+    if( res < res_tol && i >= mini-1) { converged = true; break; }
 
-    if( res < res0 * res_rat ) { converged = true; break; }
+    if( res < res0 * res_rat && i >= mini-1) { converged = true; break; }
 
     /*---------------------------------------------------+
     |  for continuation it is necessary that omega != 0  |

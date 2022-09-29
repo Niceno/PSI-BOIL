@@ -18,6 +18,7 @@ class CGS : public Krylov {
     CGS(const Domain & s)                  : Krylov(s)     {allocate(s);}
 
     virtual bool solve(Matrix & A, Scalar & x, Scalar & b, 
+                       const MinIter & mini,
                        const MaxIter & mi, const char * name = NULL,
                        const ResRat & rr = ResRat(),
                        const ResTol & rt = ResTol(),
