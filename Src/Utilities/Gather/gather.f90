@@ -483,7 +483,7 @@
 !
    cline=valname(1)
    DO m=2,nvariable+3
-     cline=trim(cline)//" "//valname(m)
+     cline=trim(cline)//", "//valname(m)
    ENDDO
    !WRITE(*,*)trim(cline)
 !
