@@ -7,6 +7,9 @@ if [ $# -lt 1 ]; then
   echo "       " $0 "MPICH       -> configure for MPICH"
   echo "       " $0 "CSCS        -> configure for CSCS machine"
   echo "       " $0 "CSCS-DEBUG  -> configure for CSCS debug mode"
+  echo "       " $0 "WISTERIA    -> configure for FUJITSU at WISTERIA machine"
+  echo "       " $0 "WISTERIA-DEBUG  -> configure for FUJITSU at WISTERIA machine"
+  echo "       " $0 "WISTERIA-NOMPI  -> configure for FUJITSU at WISTERIA machine"
   echo "       " $0 "NOMPI       -> configure without MPI"
   echo "       " $0 "INTEL       -> configure for Intel-MPI with Intel compiler"
   echo "       " $0 "INTEL-MPI-DEBUG  -> configure for Intel with debug mode, with MPI"
@@ -44,6 +47,29 @@ else
     automake --add-missing
     ./configure CC=cc CXX=CC CXXFLAGS='-G02 -std=c++11'
     #./configure CC=craycc CXX=crayCC CXXFLAGS='-O2 -std=c++11'
+    cd Src/Parallel; ln -f -s sequential.h mpi_macros.h; cd ../../
+  elif [ $1 = "WISTERIA" ]; then
+    aclocal
+    autoconf
+    autoheader
+    automake --add-missing
+    ###./configure CC=mpifccpx CXX=mpiFCCpx CXXFLAGS='-Kfast -std=c++11' --host=aarch64-unknown-linux-gnu
+    ./configure CC=mpifccpx CXX=mpiFCCpx CXXFLAGS='-O3 -Keval -Kfast_matmul -Kilfunc -Kmfunc -Ksimd_packed_promotion -Kfz -Kfp_contract -Komitfp -std=c++11' --host=aarch64-unknown-linux-gnu
+    cd Src/Parallel; ln -f -s parallel.h mpi_macros.h; cd ../../
+  elif [ $1 = "WISTERIA-DEBUG" ]; then
+    aclocal
+    autoconf
+    autoheader
+    automake --add-missing
+    ./configure CC=mpifccpx CXX=mpiFCCpx CXXFLAGS='-g -std=c++11' --host=aarch64-unknown-linux-gnu
+    ###./configure CC=mpifccpx CXX=mpiFCCpx CXXFLAGS='-g -Kfast -std=c++11' --host=aarch64-unknown-linux-gnu
+    cd Src/Parallel; ln -f -s parallel.h mpi_macros.h; cd ../../
+  elif [ $1 = "WISTERIA-NOMPI" ]; then
+    aclocal
+    autoconf
+    autoheader
+    automake --add-missing
+    ./configure CC=fccpx CXX=FCCpx CXXFLAGS='-Kfast -std=c++11' --host=aarch64-unknown-linux-gnu
     cd Src/Parallel; ln -f -s sequential.h mpi_macros.h; cd ../../
   elif [ $1 = "NOMPI" ]; then
     aclocal
@@ -89,6 +115,9 @@ else
     echo "       " $0 "MPICH       -> configure for MPICH"
     echo "       " $0 "CSCS        -> configure for CSCS machine"
     echo "       " $0 "CSCS-DEBUG  -> configure for CSCS debug mode"
+    echo "       " $0 "WISTERIA    -> configure for FUJITSU at WISTERIA machine"
+    echo "       " $0 "WISTERIA-DEBUG  -> configure for FUJITSU at WISTERIA machine"
+    echo "       " $0 "WISTERIA-NOMPI  -> configure for FUJITSU at WISTERIA machine"
     echo "       " $0 "NOMPI       -> configure without MPI"
     echo "       " $0 "INTEL       -> configure for Intel-MPI with Intel compiler"
     echo "       " $0 "INTEL-MPI-DEBUG  -> configure for Intel with debug mode, with MPI"
