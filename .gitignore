@@ -22,11 +22,15 @@ stamp-h1
 Src/*.bck
 Src/*.cpp
 Src/*.dat
+Src/*.gnu
 Src/*.mcr
 Src/*.lay
+Src/*.out
 Src/*.plt
+Src/*.png
 Src/*.stl
 Src/*.txt
+Src/*.TXT
 Src/main*.cpp*
 Src/Parallel/mpi_macros.h
 Src/Unstructured/Solver/Solver
