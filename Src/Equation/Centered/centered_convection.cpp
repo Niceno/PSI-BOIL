@@ -1,6 +1,6 @@
 #include "centered.h"
 
-#define NEW_CONSERVATIVE_FORM true
+#define NEW_CONSERVATIVE_FORM false
 
 /***************************************************************************//**
 *  \brief Interface for calling convection for new time step \f$\{C\}^{N}\f$.
@@ -75,7 +75,6 @@ void Centered::convection(Scalar * conv, const Property * prop) {
       a_e *= dom->ibody().fSe(i,j,k);
     }
 
-    #if !NEW_CONSERVATIVE_FORM
     const real rm = prop->value(Comp::u(),i  ,j,k);
     const real rp = prop->value(Comp::u(),i+1,j,k);
  
@@ -84,13 +83,6 @@ void Centered::convection(Scalar * conv, const Property * prop) {
 
     if(i==si() && imin) phim = rm*a_w*phi[i-1][j][k];
     if(i==ei() && imax) phip = rp*a_e*phi[i+1][j][k];
-    #else
-    phim = a_w*lim.limit(-umf, phi[i+1][j][k],phi[i][j][k],phi[i-1][j][k]);
-    phip = a_e*lim.limit(+upf, phi[i-1][j][k],phi[i][j][k],phi[i+1][j][k]);
-  
-    if(i==si() && imin) phim = a_w*phi[i-1][j][k];
-    if(i==ei() && imax) phip = a_e*phi[i+1][j][k];
-    #endif
 
     (*conv)[i]  [j][k] += (umf*phim - upf*phip);
     (*conv)[i+1][j][k] +=  upf*phip;
@@ -111,7 +103,6 @@ void Centered::convection(Scalar * conv, const Property * prop) {
       a_n *= dom->ibody().fSn(i,j,k);
     }
 
-    #if !NEW_CONSERVATIVE_FORM
     const real rm = prop->value(Comp::u(),i,j  ,k);
     const real rp = prop->value(Comp::u(),i,j+1,k);
     phim = rm*a_s*lim.limit(-vmf,phi[i][j+1][k],phi[i][j][k],phi[i][j-1][k]);
@@ -119,13 +110,6 @@ void Centered::convection(Scalar * conv, const Property * prop) {
 
     if(j==sj() && jmin) phim = rm*a_s*phi[i][j-1][k];
     if(j==ej() && jmax) phip = rp*a_n*phi[i][j+1][k];
-    #else
-    phim = a_s*lim.limit(-vmf, phi[i][j+1][k],phi[i][j][k],phi[i][j-1][k]);
-    phip = a_n*lim.limit(+vpf, phi[i][j-1][k],phi[i][j][k],phi[i][j+1][k]);
-
-    if(j==sj() && jmin) phim = a_s*phi[i][j-1][k];
-    if(j==ej() && jmax) phip = a_n*phi[i][j+1][k];
-    #endif
 
     (*conv)[i][j]  [k] += (vmf*phim - vpf*phip);
     (*conv)[i][j+1][k] +=  vpf*phip;
@@ -146,7 +130,6 @@ void Centered::convection(Scalar * conv, const Property * prop) {
       a_t *= dom->ibody().fSt(i,j,k);
     }
 
-    #if !NEW_CONSERVATIVE_FORM
     const real rm = prop->value(Comp::u(),i,j,k  );
     const real rp = prop->value(Comp::u(),i,j,k+1);
     phim = rm*a_b*lim.limit(-wmf,phi[i][j][k+1],phi[i][j][k],phi[i][j][k-1]);
@@ -154,13 +137,6 @@ void Centered::convection(Scalar * conv, const Property * prop) {
 
     if(k==sk() && kmin) phim = rm*a_b*phi[i][j][k-1];
     if(k==ek() && kmax) phip = rp*a_t*phi[i][j][k+1];
-    #else
-    phim = a_b*lim.limit(-wmf, phi[i][j][k+1], phi[i][j][k], phi[i][j][k-1]);
-    phip = a_t*lim.limit(+wpf, phi[i][j][k-1], phi[i][j][k], phi[i][j][k+1]);
-
-    if(k==sk() && kmin) phim = a_b*phi[i][j][k-1];
-    if(k==ek() && kmax) phip = a_t*phi[i][j][k+1];
-    #endif
 
     (*conv)[i][j][k]   += (wmf*phim - wpf*phip);
     (*conv)[i][j][k+1] +=  wpf*phip;
@@ -185,39 +161,6 @@ void Centered::convection(Scalar * conv, const Property * prop) {
   buff.exchange(0);
   for_jk(j,k) (*conv)[ei()][j][k] += buff[ei()+1][j][k]; 
   for_jk(j,k) (*conv)[si()][j][k] += buff[si()-1][j][k]; 
-
-  #if NEW_CONSERVATIVE_FORM
-  for_ijk(i,j,k) {
-
-    real a_w = dSx(Sign::neg(),i,j,k);
-    real a_e = dSx(Sign::pos(),i,j,k);
-    real a_s = dSy(Sign::neg(),i,j,k);
-    real a_n = dSy(Sign::pos(),i,j,k);
-    real a_b = dSz(Sign::neg(),i,j,k);
-    real a_t = dSz(Sign::pos(),i,j,k);
-
-    if(dom->ibody().cut(i,j,k)) {
-      a_w *= dom->ibody().fSw(i,j,k);
-      a_e *= dom->ibody().fSe(i,j,k);
-      a_b *= dom->ibody().fSb(i,j,k);
-      a_t *= dom->ibody().fSt(i,j,k);
-      a_s *= dom->ibody().fSs(i,j,k);
-      a_n *= dom->ibody().fSn(i,j,k);
-    }
-
-    real divu = - a_w * (*u)[Comp::u()][i]  [j]  [k]
-                + a_e * (*u)[Comp::u()][i+1][j]  [k]
-                - a_s * (*u)[Comp::v()][i]  [j]  [k]
-                + a_n * (*u)[Comp::v()][i]  [j+1][k]
-                - a_b * (*u)[Comp::w()][i]  [j]  [k]
-                + a_t * (*u)[Comp::w()][i]  [j]  [k+1];
-    (*conv)[i][j][k] += phi[i][j][k] * divu;
-  }
-
-  for_ijk(i,j,k) {
-    (*conv)[i][j][k] = prop->value(i,j,k) * (*conv)[i][j][k];
-  }
-  #endif
 
   //if(time->current_step() % 100 == 0)
   //  boil::plot->plot(*conv, "conv", time->current_step());
