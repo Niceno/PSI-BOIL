@@ -100,6 +100,8 @@ class Enthalpy : public Centered {
     void new_time_step(const Property * f_prop,
                        const Property * s_prop = NULL,
                        const Scalar * diff_eddy = NULL);
+    // convection
+    void convection(Scalar * conv, const Property * prop); 
 
     real turbPr; // turbulent Prandtl number
 };	
