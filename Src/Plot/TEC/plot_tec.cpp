@@ -367,6 +367,167 @@ void PlotTEC::plot(const Vector & vec,
 }
 
 /******************************************************************************/
+void PlotTEC::plot(const Vector & vec,
+                   const Scalar & sca,
+                   const Scalar & scb,
+                   const Scalar & scc,
+                   const Scalar & scd,
+                   const Scalar & sce,
+                   const Scalar & scf,
+                   const Scalar & scg,
+                   const char * nam,
+                   const int i) {
+
+  boil::timer.start("plotting");
+
+  dom = vec.domain(); // take it as a constant
+
+  std::vector<int> vars;
+  for(int v=4; v<=13; v++) vars.push_back(v);
+
+  std::vector<std::string> vnames;
+  vnames.push_back("X");
+  vnames.push_back("Y");
+  vnames.push_back("Z");
+  vnames.push_back("U");
+  vnames.push_back("V");
+  vnames.push_back("W");
+  vnames.push_back("A"); if(sca.name().length() > 0) vnames [6] = sca.name();
+  vnames.push_back("B"); if(scb.name().length() > 0) vnames [7] = scb.name();
+  vnames.push_back("C"); if(scc.name().length() > 0) vnames [8] = scc.name();
+  vnames.push_back("D"); if(scd.name().length() > 0) vnames [9] = scd.name();
+  vnames.push_back("E"); if(sce.name().length() > 0) vnames[10] = sce.name();
+  vnames.push_back("F"); if(scf.name().length() > 0) vnames[11] = scf.name();
+  vnames.push_back("G"); if(scg.name().length() > 0) vnames[12] = scg.name();
+
+  plot_tec_header(*dom, nam, i);
+  plot_tec_prologue(vnames);
+  plot_tec_domain(*dom);
+  plot_tec_vector(*dom, vec);
+  plot_tec_scalar(*dom, sca);
+  plot_tec_scalar(*dom, scb);
+  plot_tec_scalar(*dom, scc);
+  plot_tec_scalar(*dom, scd);
+  plot_tec_scalar(*dom, sce);
+  plot_tec_scalar(*dom, scf);
+  plot_tec_scalar(*dom, scg);
+  plot_tec_body(dom->ibody(),vars);
+  plot_tec_footer();
+
+  boil::timer.stop("plotting");
+}
+
+/******************************************************************************/
+void PlotTEC::plot(const Vector & vec,
+                   const Scalar & sca,
+                   const Scalar & scb,
+                   const Scalar & scc,
+                   const Scalar & scd,
+                   const Scalar & sce,
+                   const Scalar & scf,
+                   const Scalar & scg,
+                   const Scalar & sch,
+                   const char * nam,
+                   const int i) {
+
+  boil::timer.start("plotting");
+
+  dom = vec.domain(); // take it as a constant
+
+  std::vector<int> vars;
+  for(int v=4; v<=14; v++) vars.push_back(v);
+
+  std::vector<std::string> vnames;
+  vnames.push_back("X");
+  vnames.push_back("Y");
+  vnames.push_back("Z");
+  vnames.push_back("U");
+  vnames.push_back("V");
+  vnames.push_back("W");
+  vnames.push_back("A"); if(sca.name().length() > 0) vnames [6] = sca.name();
+  vnames.push_back("B"); if(scb.name().length() > 0) vnames [7] = scb.name();
+  vnames.push_back("C"); if(scc.name().length() > 0) vnames [8] = scc.name();
+  vnames.push_back("D"); if(scd.name().length() > 0) vnames [9] = scd.name();
+  vnames.push_back("E"); if(sce.name().length() > 0) vnames[10] = sce.name();
+  vnames.push_back("F"); if(scf.name().length() > 0) vnames[11] = scf.name();
+  vnames.push_back("G"); if(scg.name().length() > 0) vnames[12] = scg.name();
+  vnames.push_back("H"); if(sch.name().length() > 0) vnames[13] = sch.name();
+
+  plot_tec_header(*dom, nam, i);
+  plot_tec_prologue(vnames);
+  plot_tec_domain(*dom);
+  plot_tec_vector(*dom, vec);
+  plot_tec_scalar(*dom, sca);
+  plot_tec_scalar(*dom, scb);
+  plot_tec_scalar(*dom, scc);
+  plot_tec_scalar(*dom, scd);
+  plot_tec_scalar(*dom, sce);
+  plot_tec_scalar(*dom, scf);
+  plot_tec_scalar(*dom, scg);
+  plot_tec_scalar(*dom, sch);
+  plot_tec_body(dom->ibody(),vars);
+  plot_tec_footer();
+
+  boil::timer.stop("plotting");
+}
+
+/******************************************************************************/
+void PlotTEC::plot(const Vector & vec,
+                   const Scalar & sca,
+                   const Scalar & scb,
+                   const Scalar & scc,
+                   const Scalar & scd,
+                   const Scalar & sce,
+                   const Scalar & scf,
+                   const Scalar & scg,
+                   const Scalar & sch,
+                   const Scalar & sci,
+                   const char * nam,
+                   const int i) {
+
+  boil::timer.start("plotting");
+
+  dom = vec.domain(); // take it as a constant
+
+  std::vector<int> vars;
+  for(int v=4; v<=15; v++) vars.push_back(v);
+
+  std::vector<std::string> vnames;
+  vnames.push_back("X");
+  vnames.push_back("Y");
+  vnames.push_back("Z");
+  vnames.push_back("U");
+  vnames.push_back("V");
+  vnames.push_back("W");
+  vnames.push_back("A"); if(sca.name().length() > 0) vnames [6] = sca.name();
+  vnames.push_back("B"); if(scb.name().length() > 0) vnames [7] = scb.name();
+  vnames.push_back("C"); if(scc.name().length() > 0) vnames [8] = scc.name();
+  vnames.push_back("D"); if(scd.name().length() > 0) vnames [9] = scd.name();
+  vnames.push_back("E"); if(sce.name().length() > 0) vnames[10] = sce.name();
+  vnames.push_back("F"); if(scf.name().length() > 0) vnames[11] = scf.name();
+  vnames.push_back("G"); if(scg.name().length() > 0) vnames[12] = scg.name();
+  vnames.push_back("H"); if(sch.name().length() > 0) vnames[13] = sch.name();
+  vnames.push_back("I"); if(sci.name().length() > 0) vnames[14] = sci.name();
+
+  plot_tec_header(*dom, nam, i);
+  plot_tec_prologue(vnames);
+  plot_tec_domain(*dom);
+  plot_tec_vector(*dom, vec);
+  plot_tec_scalar(*dom, sca);
+  plot_tec_scalar(*dom, scb);
+  plot_tec_scalar(*dom, scc);
+  plot_tec_scalar(*dom, scd);
+  plot_tec_scalar(*dom, sce);
+  plot_tec_scalar(*dom, scf);
+  plot_tec_scalar(*dom, scg);
+  plot_tec_scalar(*dom, sch);
+  plot_tec_scalar(*dom, sci);
+  plot_tec_body(dom->ibody(),vars);
+  plot_tec_footer();
+
+  boil::timer.stop("plotting");
+}
+/******************************************************************************/
 void PlotTEC::plot(const Scalar & sca, 
                    const Scalar & scb, 
                    const char * nam, 

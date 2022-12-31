@@ -43,7 +43,16 @@ class PlotTEC : public Plot {
               const Scalar &, const Scalar &, const char *, const int);
     void plot(const Vector &, const Scalar &, const Scalar &, const Scalar &,
               const Scalar &, const Scalar &, const Scalar &,
-              const char *, const int);
+              const char *, const int); // Scalar 6
+    void plot(const Vector &, const Scalar &, const Scalar &, const Scalar &,
+              const Scalar &, const Scalar &, const Scalar &, const Scalar &,
+              const char *, const int); // Scalar 7
+    void plot(const Vector &, const Scalar &, const Scalar &, const Scalar &,
+              const Scalar &, const Scalar &, const Scalar &, const Scalar &,
+              const Scalar &, const char *, const int); // Scalar 8
+    void plot(const Vector &, const Scalar &, const Scalar &, const Scalar &,
+              const Scalar &, const Scalar &, const Scalar &, const Scalar &,
+              const Scalar &, const Scalar &, const char *, const int); // Scalar 9
     void plot(const Scalar &, const Scalar &, 
               const char *, const int);
     void plot(const Scalar &, const ScalarInt &,

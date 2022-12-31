@@ -50,7 +50,19 @@ class Plot {
                       const char *, const int) = 0;
     virtual void plot(const Vector &, const Scalar &, const Scalar &,
                       const Scalar &, const Scalar &, const Scalar &,
-                      const Scalar &, const char *, const int) = 0;
+                      const Scalar &, const char *, const int) = 0;  // Scalar 6
+    virtual void plot(const Vector &, const Scalar &, const Scalar &,
+                      const Scalar &, const Scalar &, const Scalar &,
+                      const Scalar &, const Scalar &,
+                      const char *, const int) = 0;                  // Scalar 7
+    virtual void plot(const Vector &, const Scalar &, const Scalar &,
+                      const Scalar &, const Scalar &, const Scalar &,
+                      const Scalar &, const Scalar &, const Scalar &,
+                      const char *, const int) = 0;                  // Scalar 8
+    virtual void plot(const Vector &, const Scalar &, const Scalar &,
+                      const Scalar &, const Scalar &, const Scalar &,
+                      const Scalar &, const Scalar &, const Scalar &,
+                      const Scalar &,const char *, const int) = 0;   // Scalar 9
     virtual void plot(const Scalar &, const Scalar &, 
                       const char *, const int = -1) = 0;
     virtual void plot(const Scalar &, const ScalarInt &, 
