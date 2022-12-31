@@ -93,12 +93,13 @@ class Centered : public Equation {
 
     //! Solvers discretized system of equaions.
     virtual void solve(const ResTol & toler, const ResRat & fact,
-                       const char * name = NULL); 
-    virtual void solve(const ResTol & toler, const char * name = NULL) {
-      solve(toler,ResRat(-1.),name);
+                       const char * name = NULL,
+                       int itmax = NULL); 
+    virtual void solve(const ResTol & toler, const char * name = NULL, int i = NULL) {
+      solve(toler,ResRat(-1.),name,i);
     } 
-    virtual void solve(const ResRat & fact, const char * name = NULL) {
-      solve(ResTol(boil::atto),fact,name);
+    virtual void solve(const ResRat & fact, const char * name = NULL, int i = NULL) {
+      solve(ResTol(boil::atto),fact,name,i);
     }
     virtual real update_rhs();
 
