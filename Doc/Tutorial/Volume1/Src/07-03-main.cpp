@@ -41,6 +41,8 @@ int main(int argc, char * argv[]) {
   for_vijk(q,i,j,k)                                 /* fill the source term */
     q[i][j][k] = 100.0*q.dV(i,j,k);
 
+  enth.new_time_step();                             /* calculate steady-state part etc */
+
   multigrid.vcycle(ResRat(1e-4));                   /* solve linear system */
 
   boil::plot = new PlotTEC();

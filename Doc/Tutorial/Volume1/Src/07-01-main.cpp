@@ -38,6 +38,8 @@ int main(int argc, char * argv[]) {
 
   t = 350.0;                                        /* initial "guess" */
 
+  enth.new_time_step();                             /* calculate steady-state part etc */
+
   multigrid.vcycle(ResRat(1e-4));                   /* solve linear system */
 
   boil::plot = new PlotTEC();

@@ -38,6 +38,8 @@ int main(int argc, char * argv[]) {
 
   t = 350.0;                                        /* initial "guess" */
 
+  enth.new_time_step();                             /* calculate steady-state part etc */
+
   enth.solve(ResRat(0.001), "enthalpy");                    /* solve linear system */
 
   boil::plot = new PlotTEC();
