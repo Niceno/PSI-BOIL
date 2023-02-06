@@ -159,8 +159,8 @@ bool CG :: solve(Matrix & A, Scalar & x, Scalar & b, const MinIter & mini,
       }
     }
 
-    if(i >= 30 && i%10 ==0)
-      boil::oout<<"iteration= "<<i<<" residual= "<<res<<" ratio= "<<res/res0<<"\n";
+    //if(i >= 30 && i%10 ==0)
+    //  boil::oout<<"iteration= "<<i<<" residual= "<<res<<" ratio= "<<res/res0<<"\n";
 
     /*----------------+
     |  rho_old = rho  |
