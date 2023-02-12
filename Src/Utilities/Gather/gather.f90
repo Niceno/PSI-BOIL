@@ -534,7 +534,7 @@
 #ifdef SZPLT
    I = TecZne142(ctmp(1:ndigit)//NULLCHR, &
 #else
-   I = TecZne110(1:ndigit)//NULLCHR, &
+   I = TecZne110(ctmp(1:ndigit)//NULLCHR, &
 #endif
 #else
 #ifdef SZPLT
