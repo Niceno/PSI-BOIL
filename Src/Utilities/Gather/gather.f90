@@ -108,7 +108,7 @@
       call compress
 #endif
 #ifndef SZPLT
-      call delfile
+      !call delfile
 #endif
       call dealloc
    ENDDO
@@ -239,6 +239,9 @@
    ENDDO
 
    DO m=1,nvariable+3
+#ifndef SZPLT
+      call del_spaces(valname(m))
+#endif
       WRITE(*,*)m,trim(valname(m))
    ENDDO
 
@@ -413,7 +416,11 @@
    SUBROUTINE output(nt)
    USE base_var
    IMPLICIT NONE
+#ifdef SZPLT
    INCLUDE 'tecio.f90'
+#else
+   INCLUDE 'tecio110.f90'
+#endif
    INTEGER::nt
    INTEGER::i,j,k,ifile,iline,idummy,m
    CHARACTER(len=128)::fout
@@ -426,7 +433,12 @@
    Integer*4   Debug,III,IIII,NPts,NElm
    Real*8    SolTime
    Integer*4 VIsDouble, FileType, FileFormat
-   Integer*4 ZoneType,StrandID,unused,IsBlock
+   Integer*4 ZoneType,StrandID,IsBlock
+#ifdef SZPLT
+   Integer*4 unused
+#else
+   Integer*4 ParentZn
+#endif
    Integer*4 ICellMax,JCellMax,KCellMax,NFConns,FNMode,ShrConn
    Integer*4 Valuelocation(nvariable+3)
    POINTER   (NullPtr,Null)
@@ -436,16 +448,19 @@
    NullPtr = 0
    Debug   = 0
    FileType = 0
-#ifndef SZPLT
+#ifdef SZPLT
    FileFormat = 0 ! 0 = PLT, 1 = SZPLT
+   unused = 0 ! ParentZone is no longer used
 #else
-   FileFormat = 1 ! 0 = PLT, 1 = SZPLT
+   !FileFormat = 1 ! 0 = PLT, 1 = SZPLT
+   ParentZn = 0
+   !FileFormat = 1 ! 0 = PLT, 1 = SZPLT
 #endif
    VIsDouble = 0
    ZoneType = 0
    SolTime = 0.0
    StrandID = 0
-   unused = 0 ! ParentZone is no longer used
+   !unused = 0 ! ParentZone is no longer used
    IsBlock = 1
    ICellMax = 0
    JCellMax = 0
@@ -475,7 +490,8 @@
 #ifndef SZPLT
    fout=trim(fncommon)//"all_"//ctmp(1:ndigit)//".plt"
 #else
-   fout=trim(fncommon)//"all_"//ctmp(1:ndigit)
+   !fout=trim(fncommon)//"all_"//ctmp(1:ndigit)
+   fout=trim(fncommon)//"all_"//ctmp(1:ndigit)//".plt"
 #endif
    write(*,*)"Output to ",trim(fout)
 !
@@ -483,13 +499,18 @@
 !
    cline=valname(1)
    DO m=2,nvariable+3
+#ifdef SZPLT
      cline=trim(cline)//", "//valname(m)
+#else
+     cline=trim(cline)//" "//valname(m)
+#endif
    ENDDO
    !WRITE(*,*)trim(cline)
 !
 !... Open the file and write the tecplot datafile 
 !... header information.
 !
+#ifdef SZPLT
    I = TecIni142('DATASET'//NULLCHR, &
                  trim(cline)//NULLCHR, &
                  trim(fout)//NULLCHR, &
@@ -498,13 +519,29 @@
                  FileType, &
                  Debug, &
                  VIsDouble)
+#else
+   I = TecIni110('DATASET'//NULLCHR, &
+                 trim(cline)//NULLCHR, &
+                 trim(fout)//NULLCHR, &
+                 '.'//NULLCHR, &
+                 Debug, &
+                 VIsDouble)
+#endif
 !
 !... Write the zone header information.
 !
 #ifndef VISIT
+#ifdef SZPLT
    I = TecZne142(ctmp(1:ndigit)//NULLCHR, &
 #else
+   I = TecZne110(ctmp(1:ndigit)//NULLCHR, &
+#endif
+#else
+#ifdef SZPLT
    I = TecZne142('000000'//NULLCHR, &
+#else
+   I = TecZne110('000000'//NULLCHR, &
+#endif
 #endif
                  ZoneType, &
                  inmax, &
@@ -515,13 +552,19 @@
                  KCellMax, &
                  SolTime, &
                  StrandID, &
+#ifdef SZPLT
                  unused, &
+#else
+                 ParentZn, &
+#endif
                  IsBlock, &
                  NFConns, &
                  FNMode, &
+#ifdef SZPLT
                  0, &
                  0, &
                  0, &
+#endif
                  Null, &
                  Valuelocation, &
                  Null, &
@@ -539,7 +582,11 @@
      ENDDO
      ENDDO
      ENDDO
+#ifdef SZPLT
      I   = TecDat142(III,anode,0)
+#else
+     I   = TecDat110(III,anode,0)
+#endif
    ENDDO
 
    IF(nodal==0)THEN
@@ -551,7 +598,11 @@
        ENDDO
        ENDDO
        ENDDO
+#ifdef SZPLT
        I = TecDat142(IIII,acell,0)
+#else
+       I = TecDat110(IIII,acell,0)
+#endif
      ENDDO
    ELSE
      DO m=1,nvariable
@@ -562,11 +613,19 @@
        ENDDO
        ENDDO
        ENDDO
-       I = TecDat142(III,anode,0)
+#ifdef SZPLT
+       I = TecDat142(III,acell,0)
+#else
+       I = TecDat110(III,acell,0)
+#endif
      ENDDO
    ENDIF
 
+#ifdef SZPLT
    I = TecEnd142()
+#else
+   I = TecEnd110()
+#endif
 
    DEALLOCATE(anode,acell)
 
@@ -587,3 +646,16 @@
    RETURN
    END SUBROUTINE delfile
 
+!-----------------------------------------------------------------------
+   subroutine del_spaces(s)
+    character (*), intent (inout) :: s
+    character (len=len(s)) tmp
+    integer i, j
+    j = 1
+    do i = 1, len(s)
+       if (s(i:i)==' ') cycle
+        tmp(j:j) = s(i:i)
+        j = j + 1
+    end do
+    s = tmp(1:j-1)
+end subroutine del_spaces

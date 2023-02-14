@@ -1,6 +1,6 @@
 #include "matter.h"
 
-#define MIX_VISC 1    // 0 = linear; 1 = harmonic; 2 = prosperetti
+#define MIX_VISC 0    // 0 = linear; 1 = harmonic; 2 = prosperetti
 #define MIX_LAMBDA 1  // 0 = linear; 1 = harmonic
 
 /*============================================================================*/

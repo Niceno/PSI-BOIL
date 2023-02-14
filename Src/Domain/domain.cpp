@@ -35,18 +35,22 @@ Domain::Domain(const Grid1D & ogx, const Grid1D & ogy, const Grid1D & ogz,
   grid_x_original(&ogx), grid_y_original(&ogy), grid_z_original(&ogz),
   name(n), dc(dec) {
 
-  body = stl_body;
+  if(stl_body) {
+    body = stl_body;
+  } else {
+    body = new Empty();
+  }
 
   setup(dc);
 
   if(stl_body) {
     body->cut(*this);
 
-  if(print_statistics)
-    statistics(body);
+    if(print_statistics)
+      statistics(body);
   } else {
-  if(print_statistics)
-    statistics();
+    if(print_statistics)
+      statistics();
   }
 }
 
