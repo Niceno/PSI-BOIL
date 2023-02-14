@@ -37,6 +37,7 @@ AC_OUTPUT(Makefile                                                             \
           Src/Equation/Centered/CavityPressure/CPaxisym/Makefile               \
           Src/Equation/Centered/CavityPressure/Makefile                        \
           Src/Equation/Centered/Pressure/Makefile                              \
+          Src/Equation/Centered/PhaseChange/Makefile                           \
           Src/Equation/Centered/PhaseChange4/Makefile                          \
           Src/Equation/Centered/CIPCSL2/Makefile                               \
           Src/Equation/Centered/VOF/VOFaxisym/Makefile                         \
