@@ -20,6 +20,7 @@ SUBDIRS = Equation/Staggered/Momentum                              \
           Equation/Centered/CavityPressure/CPaxisym                \
           Equation/Centered/CavityPressure                         \
           Equation/Centered/Pressure                               \
+          Equation/Centered/PhaseChange                            \
           Equation/Centered/PhaseChange4                           \
           Equation/Centered/CIPCSL2                                \
           Equation/Centered/VOF/VOFaxisym                          \
@@ -91,6 +92,7 @@ LDADD = Custom/IF97/libIF97.a                                                 \
         Equation/Centered/CavityPressure/CPaxisym/libCPaxisym.a               \
         Equation/Centered/CavityPressure/libCavityPressure.a                  \
         Equation/Centered/Pressure/libPressure.a                              \
+        Equation/Centered/PhaseChange/libPhaseChange.a                        \
         Equation/Centered/PhaseChange4/libPhaseChange4.a                      \
         Equation/Centered/CIPCSL2/libCipcsl2.a                                \
         Equation/Centered/VOF/VOFaxisym/libVOFaxisym.a                        \
