@@ -17,6 +17,7 @@
 #include "../Equation/Centered/ElectPoten/electpoten.h"
 #include "../Equation/Centered/Enthalpy/enthalpy.h"
 #include "../Equation/Centered/EnthalpyFD/EnthalpyFDaxisym/enthalpyfdaxisym.h"
+#include "../Equation/Centered/PhaseChange/phasechange.h"
 #include "../Equation/Centered/PhaseChange4/phasechange4.h"
 #include "../Equation/Centered/CIPCSL2/cipcsl2.h"
 #include "../Equation/Centered/VOF/VOFaxisym/vofaxisym.h"
