@@ -120,5 +120,8 @@ void CIPCSL2::update_node(Scalar & sca) {
   ib_bdcond(clr); 
 #endif
 
+  /* ancillary functions */
+  ancillary();
+
   return;
 }
