@@ -3,7 +3,6 @@ libCommonHeatTransfer_a_SOURCES = commonheattransfer.h                     \
                                   commonheattransfer_inline.h              \
                                   commonheattransfer.cpp                   \
                                   commonheattransfer_add_point.cpp         \
-                                  commonheattransfer_area_vapor.cpp        \
                                   commonheattransfer_construct_stencil.cpp \
                                   commonheattransfer_derivative.cpp        \
                                   commonheattransfer_distance.cpp          \
