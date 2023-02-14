@@ -37,7 +37,7 @@ cd CheckVOF/Result_tmp/Zalesak
 cp ../../../Boil .
 cp ../../../main.cpp .
 set sec0 = `date +%s`
-mpirun -np 8 Boil > log.txt
+mpiexec -np 8 Boil > log.txt
 set sec1 = `date +%s`
 @ difft = $sec1 - $sec0
 echo $difft sec.
@@ -74,7 +74,7 @@ cd CheckVOF/Result_tmp/CircleVortex
 cp ../../../Boil .
 cp ../../../main.cpp .
 set sec0 = `date +%s`
-mpirun -np 8 Boil > log.txt
+mpiexec -np 8 Boil > log.txt
 set sec1 = `date +%s`
 @ difft = $sec1 - $sec0
 echo $difft sec.
@@ -111,7 +111,7 @@ cd CheckVOF/Result_tmp/CornerFlow
 cp ../../../Boil .
 cp ../../../main.cpp .
 set sec0 = `date +%s`
-mpirun -np 8 Boil > log.txt
+mpiexec -np 8 Boil > log.txt
 set sec1 = `date +%s`
 @ difft = $sec1 - $sec0
 echo $difft sec.
@@ -148,7 +148,7 @@ cd CheckVOF/Result_tmp/Sliding_Sphare_nearWall
 cp ../../../Boil .
 cp ../../../main.cpp .
 set sec0 = `date +%s`
-mpirun -np 8 Boil > log.txt
+mpiexec -np 8 Boil > log.txt
 set sec1 = `date +%s`
 @ difft = $sec1 - $sec0
 echo $difft sec.
@@ -197,7 +197,7 @@ cp ../../../Boil .
 cp ../../../main.cpp .
 cp ../../floor.stl .
 set sec0 = `date +%s`
-mpirun -np 8 Boil > log.txt
+mpiexec -np 8 Boil > log.txt
 set sec1 = `date +%s`
 @ difft = $sec1 - $sec0
 echo $difft sec.
@@ -238,7 +238,7 @@ cd CheckVOF/Result_tmp/Tension2D
 cp ../../../Boil .
 cp ../../../main.cpp .
 set sec0 = `date +%s`
-mpirun -np 8 Boil > log.txt
+mpiexec -np 8 Boil > log.txt
 set sec1 = `date +%s`
 @ difft = $sec1 - $sec0
 echo $difft sec.
@@ -276,7 +276,7 @@ cd CheckVOF/Result_tmp/Tension3D
 cp ../../../Boil .
 cp ../../../main.cpp .
 set sec0 = `date +%s`
-mpirun -np 16 Boil > log.txt
+mpiexec -np 16 Boil > log.txt
 set sec1 = `date +%s`
 @ difft = $sec1 - $sec0
 echo $difft sec.
@@ -332,7 +332,7 @@ if ( $2 =~ "sbatch" ) then
   echo 'visit -cli -nowin -s enright.py >& /dev/null' >>post.sh
   chmod 777 post.sh
 else
-  mpirun -np 16 Boil > log.txt
+  mpiexec -np 16 Boil > log.txt
   set sec1 = `date +%s`
   @ difft = $sec1 - $sec0
   echo $difft sec.
@@ -393,7 +393,7 @@ if ( $2 =~ "sbatch" ) then
   echo 'visit -cli -nowin -s risingBubble-side.py >& /dev/null' >>post.sh
   chmod 777 post.sh
 else
-  mpirun -np 16 Boil > log.txt
+  mpiexec -np 16 Boil > log.txt
   set sec1 = `date +%s`
   @ difft = $sec1 - $sec0
   echo $difft sec.
