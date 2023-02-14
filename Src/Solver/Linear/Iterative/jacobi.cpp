@@ -30,18 +30,33 @@ bool Jacobi :: solve(Matrix & A, Scalar & x, Scalar & b, const MinIter & mini,
   OPR(res_tol);
   OPR(res_rat);
 #endif
+  boil::oout<<"Jacobi: iteration= 0  residual= "<<sqrt(res)<<" ratio= "
+            <<sqrt(res/res0)<<" mini= "<<mini<<" maxi= "<<mi<<" res_tol= "
+            <<res_tol<<"\n";
 
   /* should res be scaled with A and x? */
   if(sqrt(res) < res_tol) return true; // temporary meassure
 
   bool converged(false);
-  int i;
-  for(i=0; i<mi; i++) {
+  int it;
+  for(it=0; it<mi; it++) {
     
     /* perform one iteration step */
     for_vijk(x,i,j,k) {
-      x[i][j][k] = A.ci[i][j][k]*(r[i][j][k]+A.c[i][j][k]*x[i][j][k]);
+      // Lubomir: this must be Gauss-Seidel
+      //x[i][j][k] = A.ci[i][j][k]*(r[i][j][k]+A.c[i][j][k]*x[i][j][k]);
+      // Yohei
+      x[i][j][k] = A.ci[i][j][k]*(
+                       b[i][j][k]
+                     + A.w[i][j][k] * x[i-1][j][k]
+                     + A.e[i][j][k] * x[i+1][j][k]
+                     + A.s[i][j][k] * x[i][j-1][k]
+                     + A.n[i][j][k] * x[i][j+1][k]
+                     + A.b[i][j][k] * x[i][j][k-1]
+                     + A.t[i][j][k] * x[i][j][k+1]
+                    );
     }
+    //boil::oout<<"jacobi: "<<x[3][3][0+2]<<" "<<x[3][3][1+2]<<" "<<A.c[3][3][1+2]<<" "<<A.ci[3][3][3]<<" "<<A.t[3][3][1+2]<<" "<<b[3][3][1+2]<<"\n";
 
     /* exchange and compute residual */
     r = b - A * x;
@@ -54,11 +69,14 @@ bool Jacobi :: solve(Matrix & A, Scalar & x, Scalar & b, const MinIter & mini,
 #ifdef DEBUG
     OPR( sqrt(res) );
 #endif
+    if(it >= 30 && it%10 ==0)
+      boil::oout<<"iteration= "<<it<<" residual= "<<sqrt(res)
+                <<" ratio= "<<sqrt(res/res0)<<"\n";
 
     /* should res be scaled with A and x? */
-    if( sqrt(res) < res_tol && i >= mini-1 ) { converged = true; break; }
+    if( sqrt(res) < res_tol && it >= mini-1 ) { converged = true; break; }
 
-    if( sqrt(res) < sqrt(res0) * res_rat && i >= mini-1 ) { converged = true; break; } 
+    if( sqrt(res) < sqrt(res0) * res_rat && it >= mini-1 ) { converged = true; break; } 
   }
 
   /* for normalisation */
@@ -67,7 +85,7 @@ bool Jacobi :: solve(Matrix & A, Scalar & x, Scalar & b, const MinIter & mini,
   if(name!=NULL) boil::oout << name 
                             << ", residual = " << sqrt(res/r.dot(r)) 
                             << ", ratio = " << sqrt ( res/res0 )
-                            << ", iterations = " << i+1 
+                            << ", iterations = " << it+1 
                             << boil::endl;
 
   return converged;
