@@ -31,7 +31,7 @@ bool AC::init_cycles(const ResTol & toler, real & res_0, real & reslinf_0,
   res_0 = residual(*L[0],&reslinf_0);
   real & res_0_control = use_linf ? reslinf_0 : res_0;
   
-  boil::oout << "Initial res = " << res_0 <<" ; "<<reslinf_0<< boil::endl;
+  boil::oout << "Initial res= "<< res_0<<" ; resInf= "<<reslinf_0<< boil::endl;
 
   L[0]->fold = L[0]->phi; /* store "good" solution */
   if((res_0_control < real(toler) && min_cyc==0) || res_0==0.0) {
@@ -52,8 +52,8 @@ int AC::converged(const ResTol & toler, const ResRat & factor,
                   int * ncyc) {
   res1 = residual(*L[0],&reslinf1);
 
-  boil::oout << "Cycle " << cycle << "; res = " << res1 <<" ; "
-             << reslinf1<< boil::endl;
+  boil::oout <<"Cycle "<<cycle<<"; res= "<<res1<<" ;resInf= "
+             <<reslinf1<<boil::endl;
 
   real & res_control = use_linf ? reslinf1 : res1;
   const real & res_0_control = use_linf ? reslinf0 : res0;
