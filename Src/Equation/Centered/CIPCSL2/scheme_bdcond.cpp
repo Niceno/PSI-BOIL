@@ -191,10 +191,6 @@ void Scheme::bdcond_j(const Scalar & sca) {
         ||sca.bc().type(b) == BndType::wall()
         ||sca.bc().type(b) == BndType::outlet() ) {
 
-        int iof=1, kof=1;
-        if(d == Dir::imin() || d == Dir::imax()) iof=0;
-        if(d == Dir::kmin() || d == Dir::kmax()) kof=0;
-
         int iof2=0, kof2=0;
         if(d == Dir::imin()) iof2=1;
         if(d == Dir::kmin()) kof2=1;
@@ -230,10 +226,6 @@ void Scheme::bdcond_j(const Scalar & sca) {
     Dir d = sca.bc().direction(b);
     if(d != Dir::undefined() && d != Dir::jmin() && d != Dir::jmax()) {
       if( sca.bc().type(b) == BndType::insert() ) {
-        int iof=1, kof=1;
-        if(d == Dir::imin() || d == Dir::imax()) iof=0;
-        if(d == Dir::kmin() || d == Dir::kmax()) kof=0;
-
         int iof2=0, kof2=0;
         if(d == Dir::imin()) iof2=1;
         if(d == Dir::kmin()) kof2=1;
@@ -325,10 +317,6 @@ void Scheme::bdcond_k(const Scalar & sca) {
         ||sca.bc().type(b) == BndType::wall()
         ||sca.bc().type(b) == BndType::outlet() ) {
 
-        int iof=1, jof=1;
-        if(d == Dir::imin() || d == Dir::imax()) iof=0;
-        if(d == Dir::jmin() || d == Dir::jmax()) jof=0;
-
         int iof2=0, jof2=0;
         if(d == Dir::imin()) iof2=1;
         if(d == Dir::jmin()) jof2=1;
@@ -364,10 +352,6 @@ void Scheme::bdcond_k(const Scalar & sca) {
     Dir d = sca.bc().direction(b);
     if(d != Dir::undefined() && d != Dir::kmin() && d != Dir::kmax()) {
       if( sca.bc().type(b) == BndType::insert() ) {
-
-        int iof=1, jof=1;
-        if(d == Dir::imin() || d == Dir::imax()) iof=0;
-        if(d == Dir::jmin() || d == Dir::jmax()) jof=0;
 
         int iof2=0, jof2=0;
         if(d == Dir::imin()) iof2=1;
