@@ -42,8 +42,8 @@ void PhaseChange::update(const Scalar * diff_eddy) {
   boil::oout<<"phasechange_update: time= "<<time->current_time()
             <<" smdot_pos= "<<smdot_pos
             <<" smdot_neg= "<<smdot_neg<<"\n";
-  smdot_pos_macro=smdot_pos;
-  smdot_neg_macro=smdot_neg;
+  //smdot_pos_macro=smdot_pos;
+  //smdot_neg_macro=smdot_neg;
 
 #ifdef DEBUG
   boil::plot->plot(clr, tprs, clrs, "clr-tprs-clrs",  time->current_step());

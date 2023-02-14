@@ -84,18 +84,18 @@ PhaseChange::PhaseChange(const Scalar & MDOT,
   dxmin = dom->dxyz_min();
 
   /* set default values */
-  Mmicro = 2.78E-05;
-  Fmicro = -2.27E-02;
+  //Mmicro = 2.78E-05;
+  //Fmicro = -2.27E-02;
   use_int_res = false;
   resint = 0.0e0;
-
+#if 0
   alloc1d ( & hflux_total, 7);
   alloc1d ( & hflux_micro, 7);
   alloc1d ( & hflux_vapor, 7);
   alloc1d ( & area_sum, 7);
   alloc1d ( & area_l, 7);
   alloc1d ( & area_v, 7);
-
+#endif
 }	
 
 /******************************************************************************/

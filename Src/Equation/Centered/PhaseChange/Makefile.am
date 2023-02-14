@@ -3,7 +3,6 @@ libPhaseChange_a_SOURCES = phasechange.h                        \
                            phasechange.cpp                      \
                            phasechange_cal_gradt.cpp            \
                            phasechange_distfunc.cpp             \
-                           phasechange_dmicro_intermediate.cpp  \
                            phasechange_ext_gradt.cpp            \
                            phasechange_gradphic.cpp             \
                            phasechange_gradt.cpp                \
@@ -18,9 +17,6 @@ libPhaseChange_a_SOURCES = phasechange.h                        \
                            phasechange_iso_length.cpp           \
                            phasechange_m.cpp                    \
                            phasechange_marching_cube.cpp        \
-                           phasechange_micro.cpp                \
-                           phasechange_micro_coef.cpp           \
-                           phasechange_micro_shift.cpp          \
                            phasechange_mdot.cpp                 \
                            phasechange_mdot_cut.cpp             \
                            phasechange_modify_vel.cpp           \
@@ -30,6 +26,5 @@ libPhaseChange_a_SOURCES = phasechange.h                        \
                            phasechange_sources_fext.cpp         \
                            phasechange_sources_sum.cpp          \
                            phasechange_sources_tprs.cpp         \
-                           phasechange_str_dSprev.cpp           \
                            phasechange_update.cpp
 INCLUDE = -I@top_srcdir@/

@@ -28,14 +28,17 @@ class PhaseChange : public Centered {
  
     ~PhaseChange();
     void update(const Scalar * diff_eddy = NULL);
-    void micro(Vector * vec, const Scalar * diff_eddy = NULL);
+    //void micro(Vector * vec, const Scalar * diff_eddy = NULL);
     void modify_vel(Vector & vec, const Scalar & sa,const Scalar & sb);
+    inline void sources() { sources_fext(); sources_sum(); }
 
     // setter and getter for Mmicro and fmicro
+#if 0
     void set_Mmicro(real r){Mmicro=r;}
     void set_Fmicro(real r){Fmicro=r;}
     real get_Mmicro(){return Mmicro;}
     real get_Fmicro(){return Fmicro;}
+#endif
 
     // setter and getter for interfacial thermal resistance
     void use_interfacial_resistance(bool b) {
@@ -55,6 +58,7 @@ class PhaseChange : public Centered {
     }
 
     // heat flux
+#if 0
     real get_hflux(const Dir d){return hflux_total[int(d)];}
     real get_hflux_micro(const Dir d){return hflux_micro[int(d)];}
     real get_hflux_vapor(const Dir d){return hflux_vapor[int(d)];}
@@ -63,6 +67,10 @@ class PhaseChange : public Centered {
     real get_hflux_area_v(const Dir d){return area_v[int(d)];}
     real get_smdot_pos(){return smdot_pos;}
     real get_smdot_neg(){return smdot_neg;}
+#endif
+    inline real get_smdot_pos() const {return smdot_pos;}
+    inline real get_smdot_neg() const {return smdot_neg;}
+    inline real get_smdot() const {return smdot_pos+smdot_neg;}
 
     real get_turbP(){return turbP;}
     void set_turbP(real a){
@@ -123,11 +131,12 @@ class PhaseChange : public Centered {
     real latent, tsat, rhol, rhov, lambdal, lambdav, cpl, cpv;
     real rhoave, rhodlt;
     real epsl,epsnorm;
-    real Mmicro,Fmicro;
-    real smdot_pos, smdot_neg, smdot_pos_macro, smdot_neg_macro;
+    //real Mmicro,Fmicro;
+    real smdot_pos, smdot_neg;
+    //real smdot_pos_macro, smdot_neg_macro;
     real turbP;
-    real * hflux_total, * hflux_micro, * hflux_vapor;
-    real * area_sum, * area_l, * area_v;
+    //real * hflux_total, * hflux_micro, * hflux_vapor;
+    //real * area_sum, * area_l, * area_v;
     bool use_int_res;
     real resint;
 };	
