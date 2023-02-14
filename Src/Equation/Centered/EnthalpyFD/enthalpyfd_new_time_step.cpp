@@ -14,11 +14,11 @@
 void EnthalpyFD::new_time_step(const Scalar * diff_eddy) {
 
   if(conv_ts.Nm1()!=1.0){
-    std::cout<<"enthalpyfd_new_time_step, forward_euler should be used!\n";
+    boil::oout<<"enthalpyfd_new_time_step, forward_euler should be used!\n";
     exit(0);
   }
   if(diff_ts.Nm1()!=0.0){
-    std::cout<<"enthalpyfd_new_time_step, backward_euler should be used!\n";
+    boil::oout<<"enthalpyfd_new_time_step, backward_euler should be used!\n";
     exit(0);
   }
 
