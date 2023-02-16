@@ -272,3 +272,11 @@ void set_verbose(const bool b){ verbose = b; return; }
 /* getter for verbose */
 bool get_verbose(){ return verbose;}
 
+/* getter for front_minmax */
+real get_xminft() { return(topo->get_xminft());};
+real get_xmaxft() { return(topo->get_xmaxft());};
+real get_yminft() { return(topo->get_yminft());};
+real get_ymaxft() { return(topo->get_ymaxft());};
+real get_zminft() { return(topo->get_zminft());};
+real get_zmaxft() { return(topo->get_zmaxft());};
+
