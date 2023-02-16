@@ -261,6 +261,7 @@ int main(int argc, char * argv[]) {
 #ifndef USE_VOF
   CIPCSL2 conc  (c,  g, kappa, uvw, time, solver);
   conc.set_nredist(1);
+  conc.set_globalSharpen();
   conc.set_itsharpen(4);
 #else 
   VOF conc  (c,  g, kappa, uvw_1, time, solver);
@@ -319,8 +320,7 @@ int main(int argc, char * argv[]) {
                            <<massflux_heat<<" "
                            <<boil::endl;
 
-
-#if 0
+#if 1
       /* essential for moving front */
       ns.discretize();
       pr.discretize();
@@ -407,7 +407,7 @@ int main(int argc, char * argv[]) {
       boil::plot->plot(uvw,c,tpr,mdot,"uvw-c-tpr-mdot",time.current_step());
     }
 
-    if(conc.get_xmaxft()>500e-6) {
+    if(conc.get_xmaxft()>5.0e-4) {
       boil::plot->plot(uvw,c,tpr,mdot,"uvw-c-tpr-mdot",time.current_step());
       break;
     }
