@@ -98,10 +98,18 @@ class CIPCSL2 : public Centered {
     void totalvol( Range<real> xr
                  , Range<real> yr
                  , Range<real> zr );
+#if 0
     void front_minmax();
     void front_minmax( Range<real> xr
                      , Range<real> yr
                      , Range<real> zr );
+#else
+    void front_minmax(const std::string & nm = "x-min-front=");
+    void front_minmax( Range<real> xr
+                     , Range<real> yr
+                     , Range<real> zr
+                     , const std::string & nm = "x-min-front=");
+#endif
     void init();
     void update_node(Scalar & g);
     void save(const char *, const int);
@@ -115,12 +123,12 @@ class CIPCSL2 : public Centered {
     void enforce ( const int i, const int j, const int k, const real x);
 
     /* getter for front_minmax */
-    real get_xminft() { return(xminft);};
-    real get_xmaxft() { return(xmaxft);};
-    real get_yminft() { return(yminft);};
-    real get_ymaxft() { return(ymaxft);};
-    real get_zminft() { return(zminft);};
-    real get_zmaxft() { return(zmaxft);};
+    real get_xminft() { return(topo->get_xminft());};
+    real get_xmaxft() { return(topo->get_xmaxft());};
+    real get_yminft() { return(topo->get_yminft());};
+    real get_ymaxft() { return(topo->get_ymaxft());};
+    real get_zminft() { return(topo->get_zminft());};
+    real get_zmaxft() { return(topo->get_zmaxft());};
 
     /* setter for ww */
     void set_ww(const real a) {
