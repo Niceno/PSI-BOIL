@@ -253,10 +253,15 @@ void Body::distfunc(const Domain & dom) {
     (*bdist).exchange_all();
   }
 
+  for_vijk((*bdist),i,j,k){
+    if((*dflag)[i][j][k] >=  (nlayer/2+1)) (*bdist)[i][j][k] = boil::unreal;
+    if((*dflag)[i][j][k] <= -(nlayer/2+1)) (*bdist)[i][j][k] = -boil::unreal;
+  }
+  (*bdist).exchange_all();
+  //boil::plot->plot(*bdist,*stmp,*dflag,"bdist-stmp-dflag",0);
+
   /* release memory */
   delete stmp,dflag;
-
-  //boil::plot->plot(*bdist,"bdist");
 
   return;
 }
