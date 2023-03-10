@@ -13,7 +13,9 @@
 class Model {
 
   public:
-    void smagorinsky( const Momentum * m, Scalar * mu_t, real c_s ) const;
+    void smagorinsky( const Momentum * m, Scalar * mu_t, real c_s,
+                      const real * dist_max=NULL,
+                      const Scalar * dist = NULL, Scalar * yplus = NULL) const;
     void wale       ( const Momentum * m, Scalar * mu_t, real c_w ) const;
     void tau_wall   ( Momentum * m, const Scalar & dist,
                       Vector * fbnd, Scalar * y_plus = NULL) const;
