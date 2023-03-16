@@ -48,7 +48,7 @@ void Model::smagorinsky( const Momentum * mom, Scalar * mu_t, real c_s,
           real tx, ty, tz, tau_w, y_pl;
           wall_function( uvw, fluid, * dist, & tau_w, & y_pl,
                          i, j, k, &tx, &ty, &tz );
-          (*y_plus)[i][j][k] = y_pl;
+          if( y_plus) (*y_plus)[i][j][k] = y_pl;
           damp = sqrt(1.0 - exp(-pow(y_pl/25.0,3.0)));
           damp_sum += damp;
           damp_n++;
