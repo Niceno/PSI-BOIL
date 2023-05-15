@@ -139,13 +139,13 @@ int main(int argc, char * argv[]) {
   AC multigrid( &pr );
   multigrid.min_cycles(3);
 
-#if 1
+#if 0
   CIPCSL2 conc (c,  g, kappa, uvw, time, solver);
   conc.set_globalSharpen();
   conc.set_nredist(1);
   conc.set_itsharpen(10);
 #endif
-#if 0
+#if 1
   VOF conc (c,  g, kappa, uvw, time, solver);
   conc.set_wall_curv_method(CurvMethod::DivNorm());
 #endif
