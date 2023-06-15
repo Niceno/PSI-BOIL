@@ -3,6 +3,7 @@
 #include <string>
 #include <cstring>
 #include "update_step.cpp"
+#define USE_VOF
 
 #define _GNU_SOURCE 1
 #include <fenv.h>
@@ -11,6 +12,12 @@ static void __attribute__ ((constructor)) trapfpe(void)
   /* Enable some exceptions. At startup all exceptions are masked. */
   feenableexcept(FE_INVALID|FE_DIVBYZERO|FE_OVERFLOW);
 }
+
+/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+* Sato, Niceno, JCP 300 (2015) 20-52
+* Duan's case: Case 1 in Table 3
+* Grid: Grid e (gLevel=3) in Table 4
+*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
 /* domain dimensions */
 const real LX1 = 0.003;
@@ -37,7 +44,7 @@ const real gravity = 9.8;
 const real pi = acos(-1.0);
 
 /******************************************************************************/
-main(int argc, char ** argv) {
+int main(int argc, char ** argv) {
 
   boil::timer.start();
 
@@ -85,12 +92,15 @@ main(int argc, char ** argv) {
   +------------------*/
   Vector uvw(d), xyz(d);           // vel
   Scalar p  (d), f  (d), press(d); // pressure
-  Scalar c  (d), g  (d), kappa(d), cold(d); // color function
+  Scalar c  (d), g  (d), kappa(d); // color function
   Scalar tpr(d), q  (d), step(d), sflag(d); // temperature
   Scalar mdot(d);                  // phase-change rate
   Scalar dmicro(d);                // micro-layer film thickness
   Scalar mu_t(d);                  // eddy viscosity
-
+#ifdef USE_VOF
+  Vector uvw_1(d), uvw_2(d); // velocity field for VOF
+  Scalar mflx(d);  // mass flux [kg/m2s]?
+#endif
   /*-----------------------------+ 
   |  insert boundary conditions  |
   +-----------------------------*/
@@ -103,6 +113,10 @@ main(int argc, char ** argv) {
     uvw.bc(m).add( BndCnd( Dir::jmax(), BndType::wall() ) );
     uvw.bc(m).add( BndCnd( Dir::kmin(), BndType::wall() ) );
     uvw.bc(m).add( BndCnd( Dir::kmax(), BndType::outlet() ) );
+#ifdef USE_VOF
+    uvw_1(m) = uvw(m).shape();
+    uvw_2(m) = uvw(m).shape();
+#endif
   }
 
   p.bc().add( BndCnd( Dir::imin(), BndType::neumann() ) );
@@ -118,6 +132,10 @@ main(int argc, char ** argv) {
   mdot = p.shape();
   q = p.shape();
   mu_t = p.shape();
+  kappa = p.shape();
+#ifdef USE_VOF
+  mflx = p.shape();
+#endif
 
   c.bc().add( BndCnd( Dir::imin(), BndType::neumann() ) );
   c.bc().add( BndCnd( Dir::imax(), BndType::neumann() ) );
@@ -143,6 +161,7 @@ main(int argc, char ** argv) {
   for_vk(tpr,k){
     if(approx(tpr.zn(k+1),0.0)){
       qsrc=qflux/tpr.dzc(k);  // [W/m3]
+      //std::cout<<"main:k-max-soild= "<<k<<"\n";
     }
   }
   boil::oout<<"#qsrc= "<<qsrc<<"\n";
@@ -162,8 +181,9 @@ main(int argc, char ** argv) {
   sapphire.rho    (3980.0);
   sapphire.cp     (750.0*3980.0);
   sapphire.lambda (35.0);
-  const real latent=2258.0*1e3;
+  //const real latent=2258.0*1e3;
   Matter mixed(liquid, vapor, & step);
+  mixed.latent(2258.0*1e3); // New 2023
   mixed.sigma(5.9e-2);
   const real liquid_drhodt=-0.7;   //[kg/m3K]
   const real vapor_drhodt=-0.0017; //[kg/m3K]
@@ -172,9 +192,9 @@ main(int argc, char ** argv) {
   |  time-integration  |
   +-------------------*/
   const int  ndt = 500000;
-  const real tint = 1.0e-2;
+  const real tint = 1.0e-3;
   const real tint2 = 1.0e-2;
-  const int  nint2= 1000*gLevel;
+  const int  nint= 1000*gLevel;
   const real dxmin = d.dxyz_min();
   boil::oout<<"main:dxmin= "<<dxmin<<" "<<boil::cart.iam()<<"\n";
   const real dt  =10.0*pow(0.5*pow(dxmin,3.0)
@@ -192,10 +212,14 @@ main(int argc, char ** argv) {
   Krylov * solver2 = new CG(d, Prec::di());
 
   /* color function */
+#ifndef USE_VOF
   CIPCSL2 conc  (c,  g, kappa, uvw, time, solver);
   conc.set_globalSharpen();
   conc.set_nredist(1);
   conc.set_itsharpen(10);
+#else
+  VOF conc  (c,  g, kappa, uvw_1, time, solver);
+#endif
   conc.set_cangle(0.0);
 
   /* momentum equation */
@@ -209,8 +233,19 @@ main(int argc, char ** argv) {
   multigrid.min_cycles(3);
   multigrid.max_cycles(10);
 
+  /* common heat transfer */
+  TIF tsat_TIF(tsat);  // New 2023
+  CommonHeatTransfer cht(tpr,conc.topo,tsat_TIF,&mixed,&sapphire);  // New 2023
+
   /* enthalpy equation */
-  EnthalpyFD enthFD(tpr, q, c, uvw, time, solver2, & mixed ,tsat, & sapphire);
+  //EnthalpyFD enthFD(tpr, q, c, uvw, time, solver2, & mixed ,tsat, & sapphire);
+#ifdef USE_VOF
+  EnthalpyFD enthFD(tpr, q, uvw, uvw_1, uvw_2, time, solver2, &mixed, cht, &sapphire); // New 2023
+  enthFD.convection_set(ConvScheme::minmod());
+  enthFD.set_flux_accuracy_order(AccuracyOrder::First());
+#else
+  EnthalpyFD enthFD(tpr, q, uvw, time, solver2, &mixed, cht, &sapphire); // New 2023
+#endif
   enthFD.convection_set(TimeScheme::forward_euler());
   enthFD.diffusion_set(TimeScheme::backward_euler());
 
@@ -223,12 +258,25 @@ main(int argc, char ** argv) {
   real zplant=-1.0; // when bottom of bubble reaches zplant, next seed is set
   real tseed =109.0;  // when temp of nucleation site reaches tseed, next ...
   const real dmicro_min=1.0e-8;
-  Nucleation nucl( &c, &tpr, &q, &time, dmicro, &mixed, rseed,
-                   dmicro_min, latent, conc.get_cangle());
-  nucl.set_slope(1.0*4.46e-3);
+  //Nucleation nucl( &c, &tpr, &q, &time, dmicro, &mixed, rseed,
+  //                 dmicro_min, latent, conc.get_cangle());
+  //nucl.set_slope(1.0*4.46e-3);
+  real dmcr_max=1.0e-0;
+  Microlayer nucl(dmicro, &mdot, &q, &cht, conc.heaviside(), // New 2023
+                  &time, rseed, dmicro_min, dmcr_max);         // New 2023
+  nucl.set_slope(4.46e-3);
+
   /* phase change */
-  PhaseChange pc( mdot, tpr, q, c, g, f, step, uvw, time, &mixed , latent
-                , tsat, &sapphire, &nucl);
+#ifdef USE_VOF
+  PhaseChange4 pc(mdot, mflx, q, g , f , uvw, cht, time, &mixed);
+  pc.set_accuracy_order(AccuracyOrder::FourthUpwind());
+  //pc.set_accuracy_order(AccuracyOrder::Second());
+  pc.set_unconditional_extrapolation(false);
+  pc.set_discard_points_near_interface(false);
+#else
+  PhaseChange pc( mdot, tpr, q, c, g, f, step, uvw, time, & mixed,  // New 2023
+                  mixed.latent()->value(), tsat, & sapphire, & nucl); // New 2023
+#endif
 
   /*-------------------+
   |  check if restart  |
@@ -265,7 +313,11 @@ main(int argc, char ** argv) {
     input >> dtf;
     uvw.  load("uvw",   ts);
     press.load("press",   ts);
+#ifndef USE_VOF
     conc. load("conc", ts);
+#else
+    c.load("c", ts);
+#endif
     tpr.  load("tpr", ts);
     nucl. load("nucl", ts);
     dmicro.load("dmicro", ts);
@@ -353,6 +405,8 @@ main(int argc, char ** argv) {
     boil::oout << "# WTIME:     " << boil::timer.current_min() << boil::endl;
     boil::oout << "########################" << boil::endl;
 
+    conc.new_time_step(); // New 2023
+
     /*------------------+
     |  reset body force |
     +------------------*/
@@ -370,20 +424,48 @@ main(int argc, char ** argv) {
 	}
       }
     }
-
+#if 1
     /*---------------+
     |  phase change  |
     +---------------*/
     pc.update();
-    pc.micro(&xyz);
+    //pc.micro(&xyz);
+    cht.new_time_step(&mu_t); // necessary for Tw, which will be used in microlayer model New 2023
+    real smdot_micro, smdot_pos_macro, smdot_neg_macro;
+    // calculate micro layer  (=pc.micro())
+    //nucl.update(smdot_micro,&mu_t,&hflux,&warea); // mu_t is necessary for heat-flux calculation
+    nucl.update(smdot_micro,&mu_t); // mu_t is necessary for heat-flux calculation
+    // update c in wall and fs (free-surface position)
+    nucl.update_at_walls(c,*conc.topo->fs);
+    // calculate heat flux at wall
+    //cht.hflux_wall_micro_ib(dmicro,conc.heaviside());
+    pc.sources(); // clrs and fext are recomputed here!
+                  // smdot_pos and smdot_neg are recomputed here!
+
     update_step(c, step, sflag);  // 0119 need to update step for with IB
     ns.vol_phase_change(&f);
 
     /* bottom area */
-    real area_l=pc.get_hflux_area_l(Dir::ibody());
-    real area_v=pc.get_hflux_area_v(Dir::ibody());
-    boil::oout<<"area= "<<time.current_time()<<" "<<area_l<<" "<<area_v<<"\n";
-
+    /* smdot */
+    boil::oout<<"sum_mdot:[kg/s] "<<time.current_time()
+              <<" total(=macro+micro=pos+neg) "<<pc.get_smdot()
+              <<" pos "<<pc.get_smdot_pos()
+              <<" neg "<<pc.get_smdot_neg()
+              <<" micro "<<smdot_micro
+              <<" macro "<<pc.get_smdot()-smdot_micro<<"\n";
+    /* bottom area */
+    boil::oout<<"area= "<<time.current_time()<<" "
+              <<nucl.get_area_liquid(Dir::ibody())<<" "
+              <<nucl.get_area_vapor(Dir::ibody())<<" "
+              <<nucl.get_area_micro(Dir::ibody())<<"\n";
+    /* heat-flux partitioning */
+    boil::oout<<"hflux= "<<time.current_time()<<" "
+              <<nucl.get_hflux(Dir::ibody())-nucl.get_hflux_vapor(Dir::ibody())
+               -nucl.get_hflux_micro(Dir::ibody())<<" "
+              <<nucl.get_hflux_vapor(Dir::ibody())<<" "
+              <<nucl.get_hflux_micro(Dir::ibody())<<"\n";
+#endif
+#if 1
     /*--------------------------+
     |  solve momentum equation  |
     +--------------------------*/
@@ -398,9 +480,14 @@ main(int argc, char ** argv) {
       if(d.ibody().on(m,i,j,k))
         xyz[m][i][j][k] += -gravity * xyz.dV(m,i,j,k) * rhomix;
     }
-
+    xyz.exchange();
+#endif
     /* surface tension */
+#ifdef USE_VOF
+    conc.tension(&xyz, mixed);
+#else
     conc.tension(&xyz, mixed, step);
+#endif
     //boil::plot->plot(xyz,c,mdot,"bodyforce-xyz-c-mdot",1);
 
     /*--------------------------+
@@ -416,7 +503,7 @@ main(int argc, char ** argv) {
       if(c.zc(k)>z0){
         real coef=std::min((c.zc(k)-z0)/(z1-z0),1.0);
         for_avij(c,i,j){
-          mu_t[i][j][k]= coef * liquid.mu()->value() * 1000;
+          mu_t[i][j][k]= coef * liquid.mu()->value() * 100;
         }
       }
     }
@@ -438,14 +525,8 @@ main(int argc, char ** argv) {
     press += p;
 
     /* shift pressure */
-    real pmin=1.0e+300;
-    for_vijk(press,i,j,k){
-      if(d.ibody().on(i,j,k)){
-        if(pmin>press[i][j][k]) pmin=press[i][j][k];
-      }
-    }
+    real pmin=press.min();
     boil::cart.min_real(&pmin);
-
     for_vijk(press,i,j,k){
       if(d.ibody().on(i,j,k)){
         press[i][j][k] -= pmin;
@@ -459,11 +540,14 @@ main(int argc, char ** argv) {
     /*---------------------------+
     |  solve transport equation  |
     +---------------------------*/
-    cold = c;
+#ifdef VOF
     conc.advance();
+#else
+    //conc.advance_with_extrapolation(false,ResTol(1e-7),uvw,f,one,&uvw_1,zero,&uvw_2);
+    conc.advance_with_extrapolation(conc.topo->vfold,true,ResTol(1e-7),uvw,
+                                    &liquid,&uvw_1,&vapor,&uvw_2);
+#endif
     conc.totalvol();
-
-    pc.modify_vel(uvw,c,cold);
 
     /*---------------------------+
     |  replant seed or cut neck  |
@@ -524,21 +608,23 @@ main(int argc, char ** argv) {
     /* update clr in cipcsl2 after seed, cutneck and outlet-region */
     c.bnd_update();
     c.exchange_all();
+#ifndef USE_VOF
     conc.update_node(c);
+#endif
     update_step(c, step, sflag);
-
+#if 1
     /*------------------------+
     |  solve energy equation  |
     +------------------------*/
     enthFD.discretize();
     enthFD.new_time_step();
-    enthFD.solve(ResRat(1e-16),"enthFD");
+    enthFD.solve(ResRat(1e-16),MaxIter(20),"enthFD");  // New 2023
 
     boil::oout<<"hflux:time,_total[W],_micro[W] "
               <<time.current_time()<<"  "
-              <<pc.get_hflux(Dir::ibody())<<" "
-              <<pc.get_hflux_micro(Dir::ibody())<<"\n";
-
+              <<nucl.get_hflux(Dir::ibody())<<" "          // New 2023
+              <<nucl.get_hflux_micro(Dir::ibody())<<"\n";  // New 2023
+#endif
     /*-------------+
     |  dt control  |
     +-------------*/
@@ -648,7 +734,7 @@ main(int argc, char ** argv) {
     /* diameter */
     if(nucl.size()==1) {
       real dia=0.0;
-      if (area_v>0.0) {
+      if (nucl.get_area_vapor(Dir::ibody())>0.0) {
         real zft=0.006;
         conc.front_minmax( Range<real>(-LX2,LX2) ,Range<real>(-LX2,LX2)
                           ,Range<real>(0, zft));
@@ -661,10 +747,14 @@ main(int argc, char ** argv) {
     /*--------------+
     |  backup data  |
     +--------------*/
-    if((time.current_step()) % (nint2)==0 ) {
+    if((time.current_step()) % (nint)==0 ) {
       uvw  .save("uvw",   time.current_step());
       press.save("press", time.current_step());
+#ifndef USE_VOF
       conc .save("conc",  time.current_step());
+#else
+      c.save("c",  time.current_step());
+#endif
       tpr  .save("tpr",   time.current_step());
       nucl .save("nucl",   time.current_step());
       dmicro.save("dmicro",time.current_step());
@@ -688,7 +778,11 @@ main(int argc, char ** argv) {
       || time.current_step()==time.total_steps()) {
       uvw  .save("uvw",   time.current_step());
       press.save("press", time.current_step());
+#ifndef USE_VOF
       conc .save("conc",  time.current_step());
+#else
+      c.save("c",  time.current_step());
+#endif
       tpr  .save("tpr",   time.current_step());
       nucl .save("nucl",   time.current_step());
       dmicro.save("dmicro",time.current_step());
@@ -706,7 +800,11 @@ main(int argc, char ** argv) {
       boil::timer.report();
       uvw  .rm("uvw", ts);
       press.rm("press", ts);
+#ifndef USE_VOF
       conc .rm("conc", ts);
+#else
+      c.rm("c", ts);
+#endif
       tpr  .rm("tpr", ts);
       nucl .rm("nucl", ts);
       exit(0); 
