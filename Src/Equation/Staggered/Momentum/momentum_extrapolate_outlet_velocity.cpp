@@ -11,14 +11,14 @@ void Momentum::extrapolate_outlet_velocity(const real fubo, const real ratio) {
   |  use convective outflow  |
   +-------------------------*/
   if( valid.contains(ratio) ) {
-    boil::oout << "using convective outflow " << boil::endl;
+    boil::oout << "using convective outflow: ratio= "<<ratio<<"\n";
     convective_outlet(u,fubo);
 
   /*-----------------------------------+
   |  use vanishing derivative outflow  |
   +-----------------------------------*/
   } else {
-    boil::oout << "using vanishing derivative outflow " << boil::endl;
+    boil::oout << "using vanishing derivative outflow: ratio= "<<ratio<<"\n";
     vanishing_derivative_outlet(u);
   }
 
