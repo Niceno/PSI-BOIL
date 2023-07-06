@@ -88,6 +88,19 @@ PhaseChange::PhaseChange(const Scalar & MDOT,
   //Fmicro = -2.27E-02;
   use_int_res = false;
   resint = 0.0e0;
+
+  if(approx(latent,1.0)) {
+    boil::oout<<"phasechange.cpp: #############################################\n";
+    boil::oout<<"phasechange.cpp: ### WARNING: latent = 1.0 (default value) ###\n";
+    boil::oout<<"phasechange.cpp: #############################################\n";
+    exit(0);
+  }
+  if(tsat>373){
+    boil::oout<<"phasechange.cpp: #############################################\n";
+    boil::oout<<"phasechange.cpp: ### WARNING: tsat = " << tsat <<" ###\n";
+    boil::oout<<"phasechange.cpp: #############################################\n";
+    exit(0);
+  }
 #if 0
   alloc1d ( & hflux_total, 7);
   alloc1d ( & hflux_micro, 7);
