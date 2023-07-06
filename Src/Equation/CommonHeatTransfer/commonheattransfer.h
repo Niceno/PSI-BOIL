@@ -113,6 +113,7 @@ class CommonHeatTransfer {
     const Vector & node_tmp_flu() const {return bndtpr_flu;}
     Vector & node_tmp_sol() {return bndtpr_sol;}
     Vector & node_tmp_flu() {return bndtpr_flu;}
+    Scalar tpr;
 
   private:
     /* effect of interfacial heat transfer resistance */
@@ -133,7 +134,7 @@ class CommonHeatTransfer {
                    const Old old) const;
 
 
-    Scalar tpr;
+    //Scalar tpr;
     Vector bndtpr_sol, bndtpr_flu;
 
     Matter * flu;
