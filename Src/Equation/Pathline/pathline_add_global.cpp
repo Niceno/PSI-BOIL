@@ -3,9 +3,12 @@
 /***************************************************************************//**
 *  add pathline
 *******************************************************************************/
+#if 0
+void Pathline::add_global(const real x, const real y, const real z) {
+#else
 void Pathline::add_global(const real x, const real y, const real z,
-                          const real dia, const real den) {
-
+                          const real * dia, const real * den ) {
+#endif
 #if 0
   // check input
   real xx = x;
@@ -28,6 +31,7 @@ void Pathline::add_global(const real x, const real y, const real z,
   id_serial++;
 
   // create particle
+  //std::cout<<"add_global:100 "<<nval()<<" "<<dia<<" "<<den<<"\n";
   Particle p(x, y, z, nval(), dia, den);
 
   // give id to particle
