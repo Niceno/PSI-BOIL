@@ -7,7 +7,11 @@
 #include "particle.h"
 
 struct ParticleInit {
-    double x,y,z,diameter,density;
+  const real x;
+  const real y;
+  const real z;
+  const real *diameter;
+  const real *density;
 };
 
 ////////////////
@@ -32,10 +36,15 @@ class Pathline {
     void rm  (const char * nm, const int it);
 
     /* add particles */
+#if 1
     void add_global(const real x, const real y, const real z,
-                    const real dia=NULL, const real den=NULL );
+                    const real * dia=NULL, const real * den=NULL );
     void add_local(const real x, const real y, const real z,
-                    const real dia=NULL, const real den=NULL );
+                    const real * dia=NULL, const real * den=NULL );
+#else
+    void add_global(const real x, const real y, const real z);
+    void add_local(const real x, const real y, const real z); 
+#endif
     void exchange();
 
     /* number of current particles */

@@ -15,7 +15,7 @@ class Particle {
   public:
     //Particle(const real x, const real y, const real z, const int nval);
     Particle(const real x, const real y, const real z, const int nval,
-             const real di=NULL, const real de=NULL);
+             const real * di=NULL, const real * de=NULL);
 
     real x() const {return xpos;}
     real y() const {return ypos;}
