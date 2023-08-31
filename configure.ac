@@ -81,5 +81,6 @@ AC_OUTPUT(Makefile                                                             \
           Src/Unstructured/Solver/Makefile                                     \
           Src/Utilities/Connect/Makefile                                       \
           Src/Utilities/MovieScript/Makefile                                   \
+          Src/Utilities/ChangeGrid/Makefile                                    \
           Src/Utilities/ChangeProc/Makefile                                    \
           Src/Template/Makefile)
