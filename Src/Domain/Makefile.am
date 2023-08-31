@@ -9,6 +9,7 @@ libDomain_a_SOURCES = domain.h                   \
                       domain_ijk.cpp             \
                       domain_init.cpp            \
                       domain_locals.cpp          \
+                      domain_save.cpp            \
                       domain_setup.cpp           \
                       domain_statistics.cpp      \
                       domain_surfaces_volumes.cpp
