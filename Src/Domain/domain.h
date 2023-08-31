@@ -258,6 +258,8 @@ class Domain {
     static void set_decomposition_factors(const int fx, 
                                           const int fy, const int fz);
 
+    void save(const char * nm);
+
   //private:
   protected:
     Domain(const Grid1D * ogx, const Grid1D * ogy, const Grid1D * ogz,
