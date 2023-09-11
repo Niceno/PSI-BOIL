@@ -1,0 +1,14 @@
+g1.grid
+g2.grid
+4   
+8   
+20 
+c
+0
+1    
+uvw
+1  
+1  
+press
+0 
+0
