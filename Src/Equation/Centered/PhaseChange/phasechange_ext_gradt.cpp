@@ -77,13 +77,17 @@ void PhaseChange::ext_gradt(Scalar & sca, const int iext) {
       delta[i][j][k]=0.0;
 
     /* loop for implicit scheme */
-    for(int it=1; it<=4; it++){
+    //for(int it=1; it<=8; it++){
+    for(int it=0; it<=7; it++){
       int ist,ied,iinc;
       int jst,jed,jinc;
       int kst,ked,kinc;
       if(it%2==0){ist=si();ied=ei();iinc=1;}else{ist=ei();ied=si();iinc=-1;}
       if(it%2==0){jst=sj();jed=ej();jinc=1;}else{jst=ej();jed=sj();jinc=-1;}
       if(it%2==0){kst=sk();ked=ek();kinc=1;}else{kst=ek();ked=sk();kinc=-1;}
+      // don't use next two lines because two lines above are much efficient!
+      //if(it%4<=1){jst=sj();jed=ej();jinc=1;}else{jst=ej();jed=sj();jinc=-1;}
+      //if(it%8<=3){kst=sk();ked=ek();kinc=1;}else{kst=ek();ked=sk();kinc=-1;}
       for(int i=ist; i<=ied; i+=iinc){
       for(int j=jst; j<=jed; j+=jinc){
       for(int k=kst; k<=ked; k+=kinc){
