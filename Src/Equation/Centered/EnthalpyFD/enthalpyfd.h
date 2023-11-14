@@ -90,14 +90,16 @@ class EnthalpyFD : public Centered {
       solve(toler,ResRat(-1.),maxiter,name);
     } 
     virtual void solve(const ResTol & toler, const char * name = NULL) {
-      solve(toler,ResRat(-1.),MaxIter(1000),name);
+      //solve(toler,ResRat(-1.),MaxIter(1000),name);
+      solve(toler,ResRat(-1.),MaxIter(20),name);
     } 
     virtual void solve(const ResRat & fact, const MaxIter & maxiter,
                        const char * name = NULL) {
       solve(ResTol(boil::atto),fact,maxiter,name);
     }
     virtual void solve(const ResRat & fact, const char * name = NULL) {
-      solve(ResTol(boil::atto),fact,MaxIter(1000),name);
+      //solve(ResTol(boil::atto),fact,MaxIter(1000),name);
+      solve(ResTol(boil::atto),fact,MaxIter(20),name);
     }
 
     //! Interface call to parent's discretization.
