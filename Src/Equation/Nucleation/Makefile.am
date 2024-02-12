@@ -12,12 +12,10 @@ libNucleation_a_SOURCES = header.h                         \
                           nucleation_in_vapor.cpp          \
                           nucleation_load.cpp              \
                           nucleation_plant.cpp             \
-                          nucleation_plant_site.cpp        \
                           nucleation_replant.cpp           \
                           nucleation_rm.cpp                \
                           nucleation_save.cpp              \
                           nucleation_set_range.cpp         \
-                          nucleation_st_active.cpp         \
                           nucleation_stratified_sphere.cpp \
                           nucleation_tpr_site.cpp          \
                           nucleation_zoning.cpp          
