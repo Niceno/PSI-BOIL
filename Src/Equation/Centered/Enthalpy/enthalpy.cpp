@@ -8,7 +8,7 @@ Enthalpy::Enthalpy(const Scalar & PHI,
                    const Scalar & F,
                    const Vector & U, 
                    Times & T, 
-                   Linear * S,
+                   Krylov * S,
                    Matter * f,
                    Matter * s) :
 /*---------------------+ 
@@ -20,6 +20,7 @@ Enthalpy::Enthalpy(const Scalar & PHI,
   assert(PHI.domain() == U.domain());
 
   turbPr = 0.9;  // default value of turbulent Prandtl number
+  fvm_convection = true;
 
   phi.bnd_update(); // must be called before discretization because of 
                     // dirichlet boundary condition etc.

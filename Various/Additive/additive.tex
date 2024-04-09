@@ -1,0 +1,61 @@
+\documentclass{report} 
+
+\input{../commands.tex}
+
+\begin{document}  
+
+\be
+   a^P_1 \phi_1 = a^W_1 \phi_0 + a^E_1 \phi_2 + b_1
+\ee
+
+\be
+   a^P_2 \phi_2 = a^W_2 \phi_1 + a^E_2 \phi_3 + b_2
+\ee
+
+\noindent
+If we summ up the above equations:
+
+\be
+   a^P_1 \phi_1 + a^P_2 \phi_2 = a^W_1 \phi_0 + a^E_1 \phi_2 + b_1
+                               + a^W_2 \phi_1 + a^E_2 \phi_3 + b_2
+\ee
+
+\noindent
+or:
+
+\be
+   (a^P_1 - a^W_2 ) \phi_1 + (a^P_2 - a^E_1) \phi_2 
+  = a^W_1 \phi_0  
+  + a^E_2 \phi_3 + b_1 + b_2
+\ee
+
+\noindent
+If we introduce:
+
+\be
+   \phi_i = \tilde{\phi_i} + \delta_k
+\ee
+
+\bea
+      (a^P_1 - a^W_2) (\tilde{\phi_1} + \delta_k) 
+    + (a^P_2 - a^E_1) (\tilde{\phi_2} + \delta_k)
+  & = & \\
+       a^W_1 (\tilde{\phi_0} + \delta_{k-1})  
+    +  a^E_2 (\tilde{\phi_3} + \delta_{k+1})
+  & + & b_1 + b_2
+\eea
+
+\bea
+   (a^P_1 + a^P_2 - a^W_2 - a^E_1) \delta_k 
+  & = & a^W_1 \delta_{k-1}  
+    +   a^E_2 \delta_{k+1}   \\
+  & + & a^W_1 \tilde{\phi_0}  
+    +   a^E_2 \tilde{\phi_3} \\
+  & - &(a^P_1 - a^W_2) \tilde{\phi_1}
+    -  (a^P_2 - a^E_1) \tilde{\phi_2} \\
+  & + & b_1 + b_2
+\eea
+
+
+
+\end{document}

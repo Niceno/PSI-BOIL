@@ -9,9 +9,8 @@ void CIPCSL2::ib_bdcond(const Scalar & sca) {
 
   if(sca.domain()->ibody().ncall() == 0) return;
 
-  if(!extrapolate_ib) return;
-
   /* cell to face */
+
   for(int cc=0; cc<dom->ibody().nccells(); cc++){
 
     int i,j,k;
@@ -105,7 +104,6 @@ void CIPCSL2::ib_bdcond(const Scalar & sca) {
       exit(0);
     }
 
-    real area;
     Comp m;
     if(d == Dir::imin() || d == Dir::imax()) { 
       m = Comp::u();
@@ -214,4 +212,5 @@ void CIPCSL2::ib_bdcond(const Scalar & sca) {
   scheme.sigx.exchange_all();
   scheme.sigy.exchange_all();
   scheme.sigz.exchange_all();
+
 }

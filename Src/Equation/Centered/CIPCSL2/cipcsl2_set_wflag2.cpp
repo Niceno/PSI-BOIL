@@ -34,7 +34,6 @@ void CIPCSL2::set_wflag2() {
   for( int b=0; b<phi.bc().count(); b++ ) {
     if(phi.bc().type_decomp(b)) continue;
     if( phi.bc().type(b) == BndType::wall() ) {
-      int iof=0, jof=0, kof=0;
       Dir d      = phi.bc().direction(b);
       /*------------+
       |  direction  |

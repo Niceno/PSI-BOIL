@@ -27,32 +27,16 @@ void Vector::shear(const int i, const int j, const int k,
   /*----------------+
   |  compute shear  |
   +----------------*/
-  if(domain()->is_axisymmetric()) {
-    *s11 = 0.5 * (du_dx + du_dx);
-    *s12 = 0.0;
-    *s13 = 0.5 * (du_dz + dw_dx);
-
-    *s21 = *s12;
-    *s22 = 0.5 * (vec[Comp::u()][i][j][k]+vec[Comp::u()][i+1][j][k])
-               / domain()->xc(i);
-    *s23 = 0.0;
-
-    *s31 = *s13;
-    *s32 = *s23;
-    *s33 = 0.5 * (dw_dz + dw_dz);
-  } else {
-    *s11 = 0.5 * (du_dx + du_dx);
-    *s12 = 0.5 * (du_dy + dv_dx);
-    *s13 = 0.5 * (du_dz + dw_dx);
+  *s11 = 0.5 * (du_dx + du_dx);
+  *s12 = 0.5 * (du_dy + dv_dx);
+  *s13 = 0.5 * (du_dz + dw_dx);
  
-    *s21 = *s12;
-    *s22 = 0.5 * (dv_dy + dv_dy);
-    *s23 = 0.5 * (dv_dz + dw_dy);
+  *s21 = *s12;
+  *s22 = 0.5 * (dv_dy + dv_dy);
+  *s23 = 0.5 * (dv_dz + dw_dy);
   
-    *s31 = *s13;
-    *s32 = *s23;
-    *s33 = 0.5 * (dw_dz + dw_dz);
-  }
+  *s31 = *s13;
+  *s32 = *s23;
+  *s33 = 0.5 * (dw_dz + dw_dz);
   
-  return;
 }

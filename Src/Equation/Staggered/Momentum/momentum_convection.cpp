@@ -1,8 +1,10 @@
 #include "momentum.h"
 #include "../../../Plot/plot.h"
 
+#define NEW_CONSERVATIVE_FORM true
+
 /******************************************************************************/
-void Momentum::convection(Vector * conv, const Scalar * prs) {
+void Momentum::convection(Vector * conv) {
 /*------------+
 |       3  n  |
 |  f += - H   |
@@ -69,28 +71,15 @@ void Momentum::convection(Vector * conv, const Scalar * prs) {
     { 
     const Comp d = Comp::u(); /* transport by u */
 
-    real a_w = dSx(m,Sign::neg(),i,j,k); 
-    real a_e = dSx(m,Sign::pos(),i,j,k); 
-
-    /* continuity-based averaging for axisymmetric domains */
-    real umf, upf;
-#if 1
-    if(dom->is_cartesian()) {
-      umf = 0.5 * (u[d][i-1][j][k] + u[d][i  ][j][k]);      // u @ imin
-      upf = 0.5 * (u[d][i  ][j][k] + u[d][i+1][j][k]);      // u @ imax
-    } else {
-      umf = 0.5*(u[d][i-1][j][k]*dSx(m,i-1,j,k)+u[d][i  ][j][k]*dSx(m,i  ,j,k))/a_w;
-      upf = 0.5*(u[d][i  ][j][k]*dSx(m,i  ,j,k)+u[d][i+1][j][k]*dSx(m,i+1,j,k))/a_e;
-    }
-#else
-    umf = 0.5 * (u[d][i-1][j][k] + u[d][i  ][j][k]);      // u @ imin
-    upf = 0.5 * (u[d][i  ][j][k] + u[d][i+1][j][k]);      // u @ imax
-#endif
-
+    real a_w = dSx(m,i,j,k); 
+    real a_e = dSx(m,i,j,k); 
     if( dom->ibody().cut(m,i,j,k) ) {
       a_w *= dom->ibody().fSw(m,i,j,k);
       a_e *= dom->ibody().fSe(m,i,j,k);
     } 
+
+    real umf = 0.5 * (u[d][i-1][j][k] + u[d][i][j][k]);      // u @ imin
+    real upf = 0.5 * (u[d][i+1][j][k] + u[d][i][j][k]);      // u @ imax
     
     real um = lim.limit(-umf, u[m][i+1][j][k], u[m][i][j][k], u[m][i-1][j][k]);
     real up = lim.limit(+upf, u[m][i-1][j][k], u[m][i][j][k], u[m][i+1][j][k]);
@@ -122,8 +111,8 @@ void Momentum::convection(Vector * conv, const Scalar * prs) {
     { /* v */
     const Comp d = Comp::v(); /* transport by v */
 
-    real a_s = dSy(m,Sign::neg(),i,j,k); 
-    real a_n = dSy(m,Sign::pos(),i,j,k); 
+    real a_s = dSy(m,i,j,k); 
+    real a_n = dSy(m,i,j,k); 
     if( dom->ibody().cut(m,i,j,k) ) {
       a_s *= dom->ibody().fSs(m,i,j,k);
       a_n *= dom->ibody().fSn(m,i,j,k);
@@ -159,8 +148,8 @@ void Momentum::convection(Vector * conv, const Scalar * prs) {
     { 
     const Comp d = Comp::w(); /* transport by w */
 
-    real a_b = dSz(m,Sign::neg(),i,j,k); 
-    real a_t = dSz(m,Sign::pos(),i,j,k); 
+    real a_b = dSz(m,i,j,k); 
+    real a_t = dSz(m,i,j,k); 
     if( dom->ibody().cut(m,i,j,k) ) {
       a_b *= dom->ibody().fSb(m,i,j,k);
       a_t *= dom->ibody().fSt(m,i,j,k);
@@ -208,8 +197,8 @@ void Momentum::convection(Vector * conv, const Scalar * prs) {
     { 
     const Comp d = Comp::v(); /* transport by v */
 
-    real a_s = dSy(m,Sign::neg(),i,j,k); 
-    real a_n = dSy(m,Sign::pos(),i,j,k); 
+    real a_s = dSy(m,i,j,k); 
+    real a_n = dSy(m,i,j,k); 
     if( dom->ibody().cut(m,i,j,k) ) {
       a_s *= dom->ibody().fSs(m,i,j,k);
       a_n *= dom->ibody().fSn(m,i,j,k);
@@ -248,8 +237,8 @@ void Momentum::convection(Vector * conv, const Scalar * prs) {
     { 
     const Comp d = Comp::u(); /* transport by u */
 
-    real a_w = dSx(m,Sign::neg(),i,j,k); 
-    real a_e = dSx(m,Sign::pos(),i,j,k); 
+    real a_w = dSx(m,i,j,k); 
+    real a_e = dSx(m,i,j,k); 
     if( dom->ibody().cut(m,i,j,k) ) {
       a_w *= dom->ibody().fSw(m,i,j,k);
       a_e *= dom->ibody().fSe(m,i,j,k);
@@ -285,8 +274,8 @@ void Momentum::convection(Vector * conv, const Scalar * prs) {
     { 
     const Comp d = Comp::w(); /* transport by w */
 
-    real a_b = dSz(m,Sign::neg(),i,j,k); 
-    real a_t = dSz(m,Sign::pos(),i,j,k); 
+    real a_b = dSz(m,i,j,k); 
+    real a_t = dSz(m,i,j,k); 
     if( dom->ibody().cut(m,i,j,k) ) {
       a_b *= dom->ibody().fSb(m,i,j,k);
       a_t *= dom->ibody().fSt(m,i,j,k);
@@ -334,8 +323,8 @@ void Momentum::convection(Vector * conv, const Scalar * prs) {
     { 
     const Comp d = Comp::w(); /* transport by w */
 
-    real a_b = dSz(m,Sign::neg(),i,j,k); 
-    real a_t = dSz(m,Sign::pos(),i,j,k); 
+    real a_b = dSz(m,i,j,k); 
+    real a_t = dSz(m,i,j,k); 
     if( dom->ibody().cut(m,i,j,k) ) {
       a_b *= dom->ibody().fSb(m,i,j,k);
       a_t *= dom->ibody().fSt(m,i,j,k);
@@ -374,8 +363,8 @@ void Momentum::convection(Vector * conv, const Scalar * prs) {
     { 
     const Comp d = Comp::u(); /* transport by u */
 
-    real a_w = dSx(m,Sign::neg(),i,j,k); 
-    real a_e = dSx(m,Sign::pos(),i,j,k); 
+    real a_w = dSx(m,i,j,k); 
+    real a_e = dSx(m,i,j,k); 
     if( dom->ibody().cut(m,i,j,k) ) {
       a_w *= dom->ibody().fSw(m,i,j,k);
       a_e *= dom->ibody().fSe(m,i,j,k);
@@ -411,8 +400,8 @@ void Momentum::convection(Vector * conv, const Scalar * prs) {
     { 
     const Comp d = Comp::v(); /* transport by v */
 
-    real a_s = dSy(m,Sign::neg(),i,j,k); 
-    real a_n = dSy(m,Sign::pos(),i,j,k); 
+    real a_s = dSy(m,i,j,k); 
+    real a_n = dSy(m,i,j,k); 
     if( dom->ibody().cut(m,i,j,k) ) {
       a_s *= dom->ibody().fSs(m,i,j,k);
       a_n *= dom->ibody().fSn(m,i,j,k);
@@ -441,70 +430,65 @@ void Momentum::convection(Vector * conv, const Scalar * prs) {
    {(*conv)[m][i][ej(m)][k] += fnew[m][i][ej(m)+1][k];
     (*conv)[m][i][sj(m)][k] += fnew[m][i][sj(m)-1][k];}
 
-  if(!prs) {
-    /* yohei's correction in new form */
-    /* beware: it doesn't take care of immersed boundaries */
-#if 1
-    /* u.div(uvw) */
-    m=Comp::u();
-    for_mijk(m,i,j,k) {
-      real divuc = u.outflow(i  ,j,k);
-      real divum = u.outflow(i-1,j,k);
-      (*conv)[m][i][j][k] += u[m][i][j][k] * 0.5 * (divuc+divum);
-    }
-    /* v.div(uvw) */
-    m=Comp::v();
-    for_mijk(m,i,j,k) {
-      real divuc = u.outflow(i,j  ,k);
-      real divum = u.outflow(i,j-1,k);
-      (*conv)[m][i][j][k] += u[m][i][j][k] * 0.5 * (divuc+divum);
-    }
-    /* w.div(uvw) */
-    m=Comp::w();
-    for_mijk(m,i,j,k) {
-      real divuc = u.outflow(i,j,k  );
-      real divum = u.outflow(i,j,k-1);
-      (*conv)[m][i][j][k] += u[m][i][j][k] * 0.5 * (divuc+divum);
-    }
-#else
-    /* uvw.div(uvw) */
-    for_m(d)
-      for_mijk(d,i,j,k) {
-        (*conv)[d][i][j][k] += u[d][i][j][k]
-                             * u.divergence_staggered(d,i,j,k) * dV(d,i,j,k);
-    }
-#endif
-  } else {
-    real dt = time->dt();
-    /* u.div(uvw) */
-    m=Comp::u();
-    for_mijk(m,i,j,k) {
-      (*conv)[m][i][j][k] += u[m][i][j][k]
-                           * dt * 0.5 * dV(m,i,j,k)
-                           * ((*prs)[i-1][j][k]/prs->dV(i-1,j,k)
-                             +(*prs)[i  ][j][k]/prs->dV(i  ,j,k));
-    }
-    /* v.div(uvw) */
-    m=Comp::v();
-    for_mijk(m,i,j,k) {
-      (*conv)[m][i][j][k] += u[m][i][j][k]
-                           * dt * 0.5 * dV(m,i,j,k)
-                           * ((*prs)[i][j-1][k]/prs->dV(i,j-1,k)
-                             +(*prs)[i][j  ][k]/prs->dV(i,j  ,k));
-    }
-    /* w.div(uvw) */
-    m=Comp::w();
-    for_mijk(m,i,j,k) {
-      (*conv)[m][i][j][k] += u[m][i][j][k]
-                           * dt * 0.5 * dV(m,i,j,k)
-                           * ((*prs)[i][j][k-1]/prs->dV(i,j,k-1)
-                             +(*prs)[i][j][k  ]/prs->dV(i,j,k  ));
-    }
+  /* yohei's correction in new form */
+  /* beware: it doesn't take care of immersed boundaries */
+  #if NEW_CONSERVATIVE_FORM
+  /* u.div(uvw) */
+  m=Comp::u();
+  for_mijk(m,i,j,k) {
+    real divuc= - u.domain()->dSx(i  ,j,k)*u[Comp::u()][i]  [j]  [k]
+                + u.domain()->dSx(i  ,j,k)*u[Comp::u()][i+1][j]  [k]
+                - u.domain()->dSy(i  ,j,k)*u[Comp::v()][i]  [j]  [k]
+                + u.domain()->dSy(i  ,j,k)*u[Comp::v()][i]  [j+1][k]
+                - u.domain()->dSz(i  ,j,k)*u[Comp::w()][i]  [j]  [k]
+                + u.domain()->dSz(i  ,j,k)*u[Comp::w()][i]  [j]  [k+1];
+    real divum= - u.domain()->dSx(i-1,j,k)*u[Comp::u()][i-1][j]  [k]
+                + u.domain()->dSx(i-1,j,k)*u[Comp::u()][i]  [j]  [k]
+                - u.domain()->dSy(i-1,j,k)*u[Comp::v()][i-1][j]  [k]
+                + u.domain()->dSy(i-1,j,k)*u[Comp::v()][i-1][j+1][k]
+                - u.domain()->dSz(i-1,j,k)*u[Comp::w()][i-1][j]  [k]
+                + u.domain()->dSz(i-1,j,k)*u[Comp::w()][i-1][j]  [k+1];
+    (*conv)[m][i][j][k] += u[m][i][j][k] * 0.5 * (divuc+divum);
   }
+  /* v.div(uvw) */
+  m=Comp::v();
+  for_mijk(m,i,j,k) {
+    real divuc= - u.domain()->dSx(i,j  ,k)*u[Comp::u()][i]  [j]  [k]
+                + u.domain()->dSx(i,j  ,k)*u[Comp::u()][i+1][j]  [k]
+                - u.domain()->dSy(i,j  ,k)*u[Comp::v()][i]  [j]  [k]
+                + u.domain()->dSy(i,j  ,k)*u[Comp::v()][i]  [j+1][k]
+                - u.domain()->dSz(i,j  ,k)*u[Comp::w()][i]  [j]  [k]
+                + u.domain()->dSz(i,j  ,k)*u[Comp::w()][i]  [j]  [k+1];
+    real divum= - u.domain()->dSx(i,j-1,k)*u[Comp::u()][i]  [j-1][k]
+                + u.domain()->dSx(i,j-1,k)*u[Comp::u()][i+1][j-1][k]
+                - u.domain()->dSy(i,j-1,k)*u[Comp::v()][i]  [j-1][k]
+                + u.domain()->dSy(i,j-1,k)*u[Comp::v()][i]  [j  ][k]
+                - u.domain()->dSz(i,j-1,k)*u[Comp::w()][i]  [j-1][k]
+                + u.domain()->dSz(i,j-1,k)*u[Comp::w()][i]  [j-1][k+1];
+    (*conv)[m][i][j][k] += u[m][i][j][k] * 0.5 * (divuc+divum);
+  }
+  /* w.div(uvw) */
+  m=Comp::w();
+  for_mijk(m,i,j,k) {
+    real divuc= - u.domain()->dSx(i,j,k  )*u[Comp::u()][i]  [j]  [k]
+                + u.domain()->dSx(i,j,k  )*u[Comp::u()][i+1][j]  [k]
+                - u.domain()->dSy(i,j,k  )*u[Comp::v()][i]  [j]  [k]
+                + u.domain()->dSy(i,j,k  )*u[Comp::v()][i]  [j+1][k]
+                - u.domain()->dSz(i,j,k  )*u[Comp::w()][i]  [j]  [k]
+                + u.domain()->dSz(i,j,k  )*u[Comp::w()][i]  [j]  [k+1];
+    real divum= - u.domain()->dSx(i,j,k-1)*u[Comp::u()][i]  [j]  [k-1]
+                + u.domain()->dSx(i,j,k-1)*u[Comp::u()][i+1][j]  [k-1]
+                - u.domain()->dSy(i,j,k-1)*u[Comp::v()][i]  [j]  [k-1]
+                + u.domain()->dSy(i,j,k-1)*u[Comp::v()][i]  [j+1][k-1]
+                - u.domain()->dSz(i,j,k-1)*u[Comp::w()][i]  [j]  [k-1]
+                + u.domain()->dSz(i,j,k-1)*u[Comp::w()][i]  [j]  [k];
+    (*conv)[m][i][j][k] += u[m][i][j][k] * 0.5 * (divuc+divum);
+  }
+  #endif
 
+  /* God help me, pleae */
   for_m(m)
-    for_mijk(m,i,j,k) 
-      (*conv)[m][i][j][k] *= fluid()->rho(m,i,j,k);
+    for_mijk(m,i,j,k) (*conv)[m][i][j][k] *= fluid()->rho(m,i,j,k);
   
   //if(time->current_step() % 1000 == 0)
   //  boil::plot->plot(*conv, "conv", time->current_step());

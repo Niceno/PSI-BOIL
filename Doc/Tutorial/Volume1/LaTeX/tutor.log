@@ -1,0 +1,1056 @@
+This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2021/TeX Live for SUSE Linux) (preloaded format=latex 2022.8.16)  9 APR 2024 16:53
+entering extended mode
+ restricted \write18 enabled.
+ %&-line parsing enabled.
+**tutor.tex
+(./tutor.tex
+LaTeX2e <2020-10-01> patch level 4
+L3 programming layer <2021-02-18> (/usr/share/texmf/tex/latex/base/book.cls
+Document Class: book 2020/04/10 v1.4m Standard LaTeX document class
+(/usr/share/texmf/tex/latex/base/bk10.clo
+File: bk10.clo 2020/04/10 v1.4m Standard LaTeX file (size option)
+)
+\c@part=\count179
+\c@chapter=\count180
+\c@section=\count181
+\c@subsection=\count182
+\c@subsubsection=\count183
+\c@paragraph=\count184
+\c@subparagraph=\count185
+\c@figure=\count186
+\c@table=\count187
+\abovecaptionskip=\skip47
+\belowcaptionskip=\skip48
+\bibindent=\dimen138
+)
+(/usr/share/texmf/tex/latex/a4wide/a4wide.sty
+Package: a4wide 1994/08/30
+
+(/usr/share/texmf/tex/latex/ntgclass/a4.sty
+Package: a4 2020/02/18 v1.2g A4 based page layout
+))
+(/usr/share/texmf/tex/latex/base/makeidx.sty
+Package: makeidx 2014/09/29 v1.0m Standard LaTeX package
+)
+(/usr/share/texmf/tex/latex/fancyhdr/fancyhdr.sty
+Package: fancyhdr 2021/01/28 v4.0.1 Extensive control of page headers and foote
+rs
+\f@nch@headwidth=\skip49
+\f@nch@O@elh=\skip50
+\f@nch@O@erh=\skip51
+\f@nch@O@olh=\skip52
+\f@nch@O@orh=\skip53
+\f@nch@O@elf=\skip54
+\f@nch@O@erf=\skip55
+\f@nch@O@olf=\skip56
+\f@nch@O@orf=\skip57
+)
+(/usr/share/texmf/tex/latex/graphics/graphicx.sty
+Package: graphicx 2020/09/09 v1.2b Enhanced LaTeX Graphics (DPC,SPQR)
+
+(/usr/share/texmf/tex/latex/graphics/keyval.sty
+Package: keyval 2014/10/28 v1.15 key=value parser (DPC)
+\KV@toks@=\toks15
+)
+(/usr/share/texmf/tex/latex/graphics/graphics.sty
+Package: graphics 2020/08/30 v1.4c Standard LaTeX Graphics (DPC,SPQR)
+
+(/usr/share/texmf/tex/latex/graphics/trig.sty
+Package: trig 2016/01/03 v1.10 sin cos tan (DPC)
+)
+(/usr/share/texmf/tex/latex/graphics-cfg/graphics.cfg
+File: graphics.cfg 2016/06/04 v1.11 sample graphics configuration
+)
+Package graphics Info: Driver file: dvips.def on input line 105.
+
+(/usr/share/texmf/tex/latex/graphics-def/dvips.def
+File: dvips.def 2017/06/20 v3.1d Graphics/color driver for dvips
+))
+\Gin@req@height=\dimen139
+\Gin@req@width=\dimen140
+)
+(/usr/share/texmf/tex/latex/tools/multicol.sty
+Package: multicol 2019/12/09 v1.8y multicolumn formatting (FMi)
+\c@tracingmulticols=\count188
+\mult@box=\box47
+\multicol@leftmargin=\dimen141
+\c@unbalance=\count189
+\c@collectmore=\count190
+\doublecol@number=\count191
+\multicoltolerance=\count192
+\multicolpretolerance=\count193
+\full@width=\dimen142
+\page@free=\dimen143
+\premulticols=\dimen144
+\postmulticols=\dimen145
+\multicolsep=\skip58
+\multicolbaselineskip=\skip59
+\partial@page=\box48
+\last@line=\box49
+\maxbalancingoverflow=\dimen146
+\mult@rightbox=\box50
+\mult@grightbox=\box51
+\mult@gfirstbox=\box52
+\mult@firstbox=\box53
+\@tempa=\box54
+\@tempa=\box55
+\@tempa=\box56
+\@tempa=\box57
+\@tempa=\box58
+\@tempa=\box59
+\@tempa=\box60
+\@tempa=\box61
+\@tempa=\box62
+\@tempa=\box63
+\@tempa=\box64
+\@tempa=\box65
+\@tempa=\box66
+\@tempa=\box67
+\@tempa=\box68
+\@tempa=\box69
+\@tempa=\box70
+\@tempa=\box71
+\@tempa=\box72
+\@tempa=\box73
+\@tempa=\box74
+\@tempa=\box75
+\@tempa=\box76
+\@tempa=\box77
+\@tempa=\box78
+\@tempa=\box79
+\@tempa=\box80
+\@tempa=\box81
+\@tempa=\box82
+\@tempa=\box83
+\@tempa=\box84
+\@tempa=\box85
+\@tempa=\box86
+\@tempa=\box87
+\@tempa=\box88
+\@tempa=\box89
+\@tempa=\box90
+\c@minrows=\count194
+\c@columnbadness=\count195
+\c@finalcolumnbadness=\count196
+\last@try=\dimen147
+\multicolovershoot=\dimen148
+\multicolundershoot=\dimen149
+\mult@nat@firstbox=\box91
+\colbreak@box=\box92
+\mc@col@check@num=\count197
+)
+(/usr/share/texmf/tex/latex/graphics/color.sty
+Package: color 2020/02/24 v1.2b Standard LaTeX Color (DPC)
+
+(/usr/share/texmf/tex/latex/graphics-cfg/color.cfg
+File: color.cfg 2016/01/02 v1.6 sample color configuration
+)
+Package color Info: Driver file: dvips.def on input line 147.
+
+(/usr/share/texmf/tex/latex/graphics/dvipsnam.def
+File: dvipsnam.def 2016/06/17 v3.0m Driver-dependent file (DPC,SPQR)
+))
+(/usr/share/texmf/tex/latex/float/float.sty
+Package: float 2001/11/08 v1.3d Float enhancements (AL)
+\c@float@type=\count198
+\float@exts=\toks16
+\float@box=\box93
+\@float@everytoks=\toks17
+\@floatcapt=\box94
+)
+(/usr/share/texmf/tex/latex/base/textcomp.sty
+Package: textcomp 2020/02/02 v2.0n Standard LaTeX package
+)
+(/usr/share/texmf/tex/latex/base/alltt.sty
+Package: alltt 1997/06/16 v2.0g defines alltt environment
+) (./doxygen.sty
+Package: doxygen 
+
+(/usr/share/texmf/tex/latex/tools/calc.sty
+Package: calc 2017/05/25 v4.3 Infix arithmetic (KKT,FJ)
+\calc@Acount=\count199
+\calc@Bcount=\count266
+\calc@Adimen=\dimen150
+\calc@Bdimen=\dimen151
+\calc@Askip=\skip60
+\calc@Bskip=\skip61
+LaTeX Info: Redefining \setlength on input line 80.
+LaTeX Info: Redefining \addtolength on input line 81.
+\calc@Ccount=\count267
+\calc@Cskip=\skip62
+)
+(/usr/share/texmf/tex/latex/tools/array.sty
+Package: array 2020/10/01 v2.5c Tabular extension package (FMi)
+\col@sep=\dimen152
+\ar@mcellbox=\box95
+\extrarowheight=\dimen153
+\NC@list=\toks18
+\extratabsurround=\skip63
+\backup@length=\skip64
+\ar@cellbox=\box96
+)
+\tmplength=\skip65
+)
+(/usr/share/texmf/tex/latex/base/fontenc.sty
+Package: fontenc 2020/08/10 v2.0s Standard LaTeX package
+)
+\@indexfile=\write3
+\openout3 = `tutor.idx'.
+
+
+Writing index file tutor.idx
+(../../commands.tex
+\ii=\skip66
+ (/usr/share/texmf/tex/latex/psfrag/psfrag.sty
+Package: psfrag 1998/04/11 v3.04 PSfrag (MCG)
+\pfg@pcount=\count268
+\pfg@scount=\count269
+\pfg@temp=\write4
+)
+(/usr/share/texmf/tex/latex/amsfonts/amssymb.sty
+Package: amssymb 2013/01/14 v3.01 AMS font symbols
+
+(/usr/share/texmf/tex/latex/amsfonts/amsfonts.sty
+Package: amsfonts 2013/01/14 v3.01 Basic AMSFonts support
+\@emptytoks=\toks19
+\symAMSa=\mathgroup4
+\symAMSb=\mathgroup5
+LaTeX Font Info:    Redeclaring math symbol \hbar on input line 98.
+LaTeX Font Info:    Overwriting math alphabet `\mathfrak' in version `bold'
+(Font)                  U/euf/m/n --> U/euf/b/n on input line 106.
+)))
+(/usr/share/texmf/tex/latex/l3backend/l3backend-dvips.def
+File: l3backend-dvips.def 2021-03-18 L3 backend support: dvips
+\l__pdf_internal_box=\box97
+\g__pdf_backend_object_int=\count270
+\l__pdf_backend_content_box=\box98
+\l__pdf_backend_model_box=\box99
+\g__pdf_backend_annotation_int=\count271
+\g__pdf_backend_link_int=\count272
+\g__pdf_backend_link_sf_int=\count273
+) (./tutor.aux)
+\openout1 = `tutor.aux'.
+
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 20.
+LaTeX Font Info:    ... okay on input line 20.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 20.
+LaTeX Font Info:    ... okay on input line 20.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 20.
+LaTeX Font Info:    ... okay on input line 20.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 20.
+LaTeX Font Info:    ... okay on input line 20.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 20.
+LaTeX Font Info:    ... okay on input line 20.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 20.
+LaTeX Font Info:    ... okay on input line 20.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 20.
+LaTeX Font Info:    ... okay on input line 20.
+LaTeX Font Info:    Trying to load font information for T1+cmss on input line 3
+6.
+
+(/usr/share/texmf/tex/latex/base/t1cmss.fd
+File: t1cmss.fd 2019/12/16 v2.5j Standard LaTeX font definitions
+)
+LaTeX Font Info:    Trying to load font information for U+msa on input line 36.
+
+
+(/usr/share/texmf/tex/latex/amsfonts/umsa.fd
+File: umsa.fd 2013/01/14 v3.01 AMS symbols A
+)
+LaTeX Font Info:    Trying to load font information for U+msb on input line 36.
+
+
+(/usr/share/texmf/tex/latex/amsfonts/umsb.fd
+File: umsb.fd 2013/01/14 v3.01 AMS symbols B
+)
+LaTeX Font Info:    Trying to load font information for T1+cmtt on input line 3
+6.
+
+(/usr/share/texmf/tex/latex/base/t1cmtt.fd
+File: t1cmtt.fd 2019/12/16 v2.5j Standard LaTeX font definitions
+) [1
+
+
+] [2
+
+] (./tutor.toc [1
+
+])
+\tf@toc=\write5
+\openout5 = `tutor.toc'.
+
+ [2]
+Chapter 1.
+(./01/01-about.tex) [1
+
+
+] [2
+
+]
+Chapter 2.
+(./02/01-getting.tex [3] [4]
+Underfull \hbox (badness 10000) in paragraph at lines 178--178
+
+ []
+
+
+Overfull \hbox (0.72795pt too wide) in paragraph at lines 178--180
+[][] 
+ []
+
+) (./02/02-compiling.tex
+Underfull \vbox (badness 1102) has occurred while \output is active []
+
+ [5]
+[6] [7] [8]
+Underfull \hbox (badness 10000) in paragraph at lines 290--290
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 290--290
+
+ []
+
+)
+Overfull \hbox (0.72795pt too wide) in paragraph at lines 290--69
+[][]
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 290--69
+
+ []
+
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [9]
+[10]
+Chapter 3.
+(./03/01-standard.tex [11
+
+] [12]
+Underfull \hbox (badness 10000) in paragraph at lines 214--214
+
+ []
+
+
+Overfull \hbox (0.72795pt too wide) in paragraph at lines 214--216
+[][] 
+ []
+
+) (./03/02-development.tex
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [13]
+[14] [15]
+Underfull \hbox (badness 10000) in paragraph at lines 166--166
+
+ []
+
+)
+Overfull \hbox (0.72795pt too wide) in paragraph at lines 166--78
+[][]
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 166--78
+
+ []
+
+[16]
+Chapter 4.
+(./04/00-timing.tex) (./04/01-global.tex [17
+
+]
+Underfull \hbox (badness 10000) in paragraph at lines 112--112
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 112--112
+
+ []
+
+) (./04/02-local.tex
+Overfull \hbox (0.72795pt too wide) in paragraph at lines 112--1
+[][]
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 112--1
+
+ []
+
+
+Underfull \vbox (badness 1221) has occurred while \output is active []
+
+ [18]
+[19] [20]
+Underfull \hbox (badness 1237) in paragraph at lines 123--132
+\T1/cmr/m/n/10 call to \T1/cmtt/m/n/10 boil::timer.stop(char * name);\T1/cmr/m/
+n/10 . It does not have to mean that num-ber of
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 179--179
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 179--179
+
+ []
+
+)
+Overfull \hbox (0.72795pt too wide) in paragraph at lines 179--88
+[][]
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 179--88
+
+ []
+
+[21] [22
+
+]
+Chapter 5.
+(./05/00-domain.tex) (./05/01-grid.tex [23]
+File: Figures/05-01-grid.eps Graphic file (type eps)
+ <Figures/05-01-grid.eps> [24]
+File: Figures/05-02-grid.eps Graphic file (type eps)
+
+<Figures/05-02-grid.eps> [25]
+File: Figures/05-03-grid.eps Graphic file (type eps)
+ <Figures/05-03-grid.eps>) (./05/02-ravioli.tex
+Underfull \hbox (badness 10000) in paragraph at lines 60--60
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 60--60
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 60--60
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 60--60
+
+ []
+
+) (./05/03-domain.tex
+Overfull \hbox (0.72795pt too wide) in paragraph at lines 60--1
+[][]
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 60--1
+
+ []
+
+[26] [27]
+File: Figures/05-04-domain-l0.eps Graphic file (type eps)
+ <Figures/05-04-domain-l0.eps> [28]
+File: Figures/05-04-double-stretch.eps Graphic file (type eps)
+
+<Figures/05-04-double-stretch.eps>
+Underfull \hbox (badness 10000) in paragraph at lines 292--292
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 292--292
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 292--292
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 292--292
+
+ []
+
+) (./05/04-body.tex
+Overfull \hbox (0.72795pt too wide) in paragraph at lines 292--1
+[][]
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 292--1
+
+ []
+
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [29]
+[30] [31]
+File: Figures/05-06-body-before.eps Graphic file (type eps)
+ <Figures/05-06-body-before.eps>
+File: Figures/05-07-body-after.eps Graphic file (type eps)
+ <Figures/05-07-body-after.eps>
+File: Figures/05-08-domain.eps Graphic file (type eps)
+
+<Figures/05-08-domain.eps>
+File: Figures/05-09-sca.eps Graphic file (type eps)
+ <Figures/05-09-sca.eps>
+Underfull \hbox (badness 10000) in paragraph at lines 215--215
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 215--215
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 215--215
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 215--215
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 215--215
+
+ []
+
+) (./05/05-decomposition.tex
+Overfull \hbox (0.72795pt too wide) in paragraph at lines 215--1
+[][]
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 215--1
+
+ []
+
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [32]
+[33] [34]
+File: Figures/05-10-par-0.eps Graphic file (type eps)
+ <Figures/05-10-par-0.eps>
+File: Figures/05-10-par-1.eps Graphic file (type eps)
+ <Figures/05-10-par-1.eps> [35]
+Underfull \hbox (badness 10000) in paragraph at lines 155--155
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 155--155
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 155--155
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 155--155
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 155--155
+
+ []
+
+)
+Overfull \hbox (0.72795pt too wide) in paragraph at lines 155--101
+[][]
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 155--101
+
+ []
+
+[36]
+Chapter 6.
+(./06/00-introduction.tex) (./06/01-scalars.tex [37
+
+] [38]
+File: Figures/06-01-pressure.eps Graphic file (type eps)
+
+<Figures/06-01-pressure.eps>
+Underfull \hbox (badness 10000) in paragraph at lines 186--186
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 186--186
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 186--186
+
+ []
+
+) (./06/02-vectors.tex
+Overfull \hbox (0.72795pt too wide) in paragraph at lines 186--1
+[][]
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 186--1
+
+ []
+
+[39] [40]
+File: Figures/06-02-staggering.eps Graphic file (type eps)
+ <Figures/06-02-staggering.eps>
+File: Figures/06-03-velocity.eps Graphic file (type eps)
+ <Figures/06-03-velocity.eps> [41]
+[42]
+Underfull \hbox (badness 10000) in paragraph at lines 175--175
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 175--175
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 175--175
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 175--175
+
+ []
+
+)
+Overfull \hbox (0.72795pt too wide) in paragraph at lines 175--111
+[][]
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 175--111
+
+ []
+
+[43
+
+] [44
+
+]
+Chapter 7.
+(./07/00-introduction.tex) (./07/01-equations.tex
+Underfull \hbox (badness 3260) in paragraph at lines 33--36
+[]\T1/cmr/m/n/10 Class \T1/cmtt/m/n/10 Concentration \T1/cmr/m/n/10 is de-rived
+ from \T1/cmtt/m/n/10 Centered\T1/cmr/m/n/10 , which is a deriva-tion of \T1/cm
+tt/m/n/10 Equation\T1/cmr/m/n/10 .
+ []
+
+[45]
+Underfull \hbox (badness 1168) in paragraph at lines 55--57
+[]\T1/cmtt/m/n/10 Enthalpy \T1/cmr/m/n/10 is de-fined in \T1/cmtt/m/n/10 PSI-Bo
+il/Src/Equation/Centered/Enthalpy \T1/cmr/m/n/10 and is de-rived from
+ []
+
+
+Underfull \hbox (badness 2753) in paragraph at lines 88--94
+\T1/cmr/m/n/10 where $\OML/cmm/m/it/10 p \OT1/cmr/m/n/10 [[] = \OML/cmm/m/it/10
+ Pa\OT1/cmr/m/n/10 ]$ \T1/cmr/m/n/10 is the pres-sure. As all the other cell-ce
+ntered \T1/cmtt/m/n/10 Equation\T1/cmr/m/n/10 s,
+ []
+
+
+Underfull \hbox (badness 2012) in paragraph at lines 88--94
+\T1/cmtt/m/n/10 Pressure \T1/cmr/m/n/10 is de-rived from \T1/cmtt/m/n/10 Center
+ed \T1/cmr/m/n/10 and \T1/cmtt/m/n/10 Equation\T1/cmr/m/n/10 . It's def-i-ni-ti
+on can be found in:
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 139--139
+
+ []
+
+) (./07/02-conduction.tex
+Overfull \hbox (0.72795pt too wide) in paragraph at lines 139--1
+[][]
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 139--1
+
+ []
+
+[46] [47] [48] [49] [50] [51]
+File: Figures/07-01-temp.eps Graphic file (type eps)
+ <Figures/07-01-temp.eps>
+Underfull \vbox (badness 1168) has occurred while \output is active []
+
+ [52]
+Underfull \hbox (badness 10000) in paragraph at lines 457--457
+
+ []
+
+) (./07/03-source-term.tex
+Overfull \hbox (0.72795pt too wide) in paragraph at lines 457--1
+[][]
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 457--1
+
+ []
+
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [53]
+[54]
+File: Figures/07-03-temp.eps Graphic file (type eps)
+ <Figures/07-03-temp.eps> [55]
+Underfull \hbox (badness 10000) in paragraph at lines 134--134
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 134--134
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 134--134
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 134--134
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 134--134
+
+ []
+
+)
+Overfull \hbox (0.72795pt too wide) in paragraph at lines 134--122
+[][]
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 134--122
+
+ []
+
+[56]
+Chapter 8.
+(./08/01-structure.tex
+File: Figures/08-01-structure.eps Graphic file (type eps)
+ <Figures/08-01-structure.eps>
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [57
+
+]
+Underfull \hbox (badness 10000) in paragraph at lines 143--143
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 143--143
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 143--143
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 143--143
+
+ []
+
+)
+Overfull \hbox (0.72795pt too wide) in paragraph at lines 143--130
+[][]
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 143--130
+
+ []
+
+[58] [59] [60
+
+]
+Chapter 9.
+(./09/00-introduction.tex [61]) (./09/01-cylinder.tex
+File: Figures/09-01-domain.eps Graphic file (type eps)
+
+<Figures/09-01-domain.eps> [62]
+Overfull \hbox (10.00763pt too wide) in paragraph at lines 86--86
+[]     \T1/cmtt/m/n/9 32   Grid1D gx2( Range<real>( H,   L  ), Range<real>(dx, 
+8.0*dx), NX2, Periodic::no());[] 
+ []
+
+File: Figures/09-01-mesh.eps Graphic file (type eps)
+<Figures/09-01-mesh.eps> [63] [64] [65] [66] [67]
+File: Figures/09-01-monitor.eps Graphic file (type eps)
+ <Figures/09-01-monitor.eps>
+Underfull \hbox (badness 1436) in paragraph at lines 477--482
+[]\T1/cmr/m/n/10 These lines save re-sults for ve-loc-ity and pres-sure ev-ery 
+100 time steps in files called:
+ []
+
+File: Figures/09-01-pressure.eps Graphic file (type eps)
+<Figures/09-01-pressure.eps>
+File: Figures/09-01-streamlines.eps Graphic file (type eps)
+ <Figures/09-01-streamlines.eps> [68]
+Underfull \hbox (badness 10000) in paragraph at lines 571--571
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 571--571
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 571--571
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 571--571
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 571--571
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 571--571
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 571--571
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 571--571
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 571--571
+
+ []
+
+) (./09/02-thermally.tex
+Overfull \hbox (0.72795pt too wide) in paragraph at lines 571--1
+[][]
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 571--1
+
+ []
+
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [69]
+File: Figures/09-02-thermally.eps Graphic file (type eps)
+
+<Figures/09-02-thermally.eps> [70] [71]
+File: Figures/09-02-staggered-cell.eps Graphic file (type eps)
+ <Figures/09-02-staggered-cell.eps>
+[72]
+File: Figures/09-02-monitor.eps Graphic file (type eps)
+ <Figures/09-02-monitor.eps>
+File: Figures/09-02-velocity.eps Graphic file (type eps)
+ <Figures/09-02-velocity.eps>
+File: Figures/09-02-temperature.eps Graphic file (type eps)
+
+<Figures/09-02-temperature.eps> [73]
+File: Figures/09-02-u.eps Graphic file (type eps)
+ <Figures/09-02-u.eps>
+File: Figures/09-02-w.eps Graphic file (type eps)
+
+<Figures/09-02-w.eps> [74]
+File: Figures/09-02-cell-dimensions.eps Graphic file (type eps)
+ <Figures/09-02-cell-dimensions.eps>
+File: Figures/09-02-nusselt.eps Graphic file (type eps)
+
+<Figures/09-02-nusselt.eps> [75]
+Underfull \hbox (badness 10000) in paragraph at lines 433--433
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 433--433
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 433--433
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 433--433
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 433--433
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 433--433
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 433--433
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 433--433
+
+ []
+
+) (./09/03-matrix.tex
+Overfull \hbox (0.72795pt too wide) in paragraph at lines 433--1
+[][]
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 433--1
+
+ []
+
+[76]
+File: Figures/09-03-matrix-gray.eps Graphic file (type eps)
+ <Figures/09-03-matrix-gray.eps> [77] [78]
+File: Figures/09-03/plane_xy_20000.eps Graphic file (type eps)
+
+<Figures/09-03/plane_xy_20000.eps>
+File: Figures/09-03/plane_xz_20000.eps Graphic file (type eps)
+ <Figures/09-03/plane_xz_20000.eps>
+File: Figures/09-03/plane_xy_40000.eps Graphic file (type eps)
+
+<Figures/09-03/plane_xy_40000.eps>
+File: Figures/09-03/plane_xz_40000.eps Graphic file (type eps)
+ <Figures/09-03/plane_xz_40000.eps>
+File: Figures/09-03/plane_xy_60000.eps Graphic file (type eps)
+
+<Figures/09-03/plane_xy_60000.eps>
+File: Figures/09-03/plane_xz_60000.eps Graphic file (type eps)
+ <Figures/09-03/plane_xz_60000.eps>
+File: Figures/09-03/plane_xy_80000.eps Graphic file (type eps)
+
+<Figures/09-03/plane_xy_80000.eps>
+File: Figures/09-03/plane_xz_80000.eps Graphic file (type eps)
+ <Figures/09-03/plane_xz_80000.eps>
+File: Figures/09-03/plane_xy_100000.eps Graphic file (type eps)
+
+<Figures/09-03/plane_xy_100000.eps>
+File: Figures/09-03/plane_xz_100000.eps Graphic file (type eps)
+ <Figures/09-03/plane_xz_100000.eps>
+File: Figures/09-03/plane_xy_mirror_100000.eps Graphic file (type eps)
+
+<Figures/09-03/plane_xy_mirror_100000.eps>
+File: Figures/09-03/plane_xz_mirror_100000.eps Graphic file (type eps)
+
+<Figures/09-03/plane_xz_mirror_100000.eps> [79] [80]
+Underfull \vbox (badness 1226) has occurred while \output is active []
+
+ [81]
+[82]
+File: Figures/09-03/uu_xy.eps Graphic file (type eps)
+ <Figures/09-03/uu_xy.eps>
+File: Figures/09-03/uu_xz.eps Graphic file (type eps)
+ <Figures/09-03/uu_xz.eps>
+File: Figures/09-03/vv_xy.eps Graphic file (type eps)
+
+<Figures/09-03/vv_xy.eps>
+File: Figures/09-03/vv_xz.eps Graphic file (type eps)
+ <Figures/09-03/vv_xz.eps>
+File: Figures/09-03/ww_xy.eps Graphic file (type eps)
+ <Figures/09-03/ww_xy.eps>
+File: Figures/09-03/ww_xz.eps Graphic file (type eps)
+
+<Figures/09-03/ww_xz.eps>
+Underfull \hbox (badness 10000) in paragraph at lines 485--485
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 485--485
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 485--485
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 485--485
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 485--485
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 485--485
+
+ []
+
+)
+Overfull \hbox (0.72795pt too wide) in paragraph at lines 485--141
+[][]
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 485--141
+
+ []
+
+No file tutor.ind.
+[83] (./tutor.aux) ) 
+Here is how much of TeX's memory you used:
+ 2861 strings out of 480032
+ 40703 string characters out of 5884542
+ 330227 words of memory out of 5000000
+ 19974 multiletter control sequences out of 15000+600000
+ 431947 words of font info for 92 fonts, out of 8000000 for 9000
+ 475 hyphenation exceptions out of 8191
+ 68i,27n,74p,348b,452s stack positions out of 5000i,500n,10000p,200000b,80000s
+
+Output written on tutor.dvi (87 pages, 271816 bytes).

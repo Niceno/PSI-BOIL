@@ -16,7 +16,7 @@ class Distance : public Centered {
              const Scalar & f,   
              const Vector & u,   
              Times & t,
-             Linear * S);
+             Krylov * S);
     ~Distance();
 	  
     void compute();

@@ -23,6 +23,7 @@ void Body::vol_center(const Domain & dom, const Body & nf) {
   /* preparation for body-fill */
   stack_pointer = 0;
   stack_size    = 4 * dom.ni() * dom.nj() * dom.nk();
+  boil::oout<<"body_vol_center:alloc2d\n";
   alloc2d( & stack, stack_size, 3 );
 
   int iundef = 1;      // number of undefined cell

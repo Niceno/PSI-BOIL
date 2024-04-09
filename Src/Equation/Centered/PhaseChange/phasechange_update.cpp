@@ -40,8 +40,8 @@ void PhaseChange::update(const Scalar * diff_eddy) {
   //sources_tprs();
   sources_sum();
   boil::oout<<"phasechange_update: time= "<<time->current_time()
-            <<" smdot_pos= "<<smdot_pos
-            <<" smdot_neg= "<<smdot_neg<<"\n";
+            <<" smdot_pos[kg/s]= "<<smdot_pos
+            <<" smdot_neg[kg/s]= "<<smdot_neg<<"\n";
   smdot_pos_macro=smdot_pos;
   smdot_neg_macro=smdot_neg;
 

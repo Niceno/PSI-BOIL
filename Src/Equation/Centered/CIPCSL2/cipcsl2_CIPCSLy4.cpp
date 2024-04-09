@@ -15,21 +15,10 @@ void CIPCSL2::CIPCSLy4(const Vector & f, const Scalar & sy) {
   for(int k=u->sk(m)-1; k<=u->ek(m)+1; k++) {
     vel[i][j][k]=(*u)[m][i][j][k];
   }}}
-  /* EXTENDED BUFFERS HINT:
-     Lines 13-15 could probably be replaced with this:
-  for(int i=u->si(m)-1; i<=u->ei(m)+1; i++) {
-  for(int j=u->sj(m)-1; j<=u->ej(m)+1; j++) {
-  for(int k=u->sk(m)-1; k<=u->ek(m)+1; k++) {
-  */
 
   /* Reset delrho */
   for_aijk(i,j,k)
     delrho[i][j][k]=0.0;
-  /* EXTENDED BUFFERS HINT:
-     Lines 26-28 could probably be replaced with this:
-  for_aijk(i,j,k)
-    delrho[i][j][k]=0.0;
-  */
 
   /* CIPCSL 1D */
   const real dt= time->dt();

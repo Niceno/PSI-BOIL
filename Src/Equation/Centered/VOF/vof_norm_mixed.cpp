@@ -8,25 +8,22 @@ void VOF::norm_mixed(const Scalar & sca) {
 *         Results: nx, ny, nz
 *******************************************************************************/
 
-  real dummy; /* dummy from nalp calculations */
-
   for_ijk(i,j,k) {
 
     real nxx, nyy, nzz;
-    norm_mixed_kernel(nxx, nyy, nzz, dummy, i,j,k, sca);
+    norm_mixed(nxx, nyy, nzz, i,j,k, sca);
 
     nx[i][j][k] = nxx;
     ny[i][j][k] = nyy;
     nz[i][j][k] = nzz;
   }
 
-  /* boundaries treated using cc */
-  norm_cc_near_bnd(sca);
-
   /* normal vector on boundary plane */
   nx.bnd_update();
   ny.bnd_update();
   nz.bnd_update();
+  /* boundaries treated using cc */
+  insert_bc_norm_cc(sca);
 
   nx.exchange_all();
   ny.exchange_all();
@@ -38,34 +35,29 @@ void VOF::norm_mixed(const Scalar & sca) {
   return;
 }
 
-void VOF::norm_mixed_kernel(real & nx_val, real & ny_val, real & nz_val,
-                            real & dummy, /* unused */
-                            const int i, const int j, const int k,
-                            const Scalar & sca) {
+void VOF::norm_mixed(real & nx_val, real & ny_val, real & nz_val,
+                     const int i, const int j, const int k,
+                     const Scalar & sca) {
 
   /* normal vector from the CC method; mcomp indicates candidate selected */
   Comp mcomp;
   real nxx_cc, nyy_cc, nzz_cc;
-  norm_cc_kernel(nxx_cc, nyy_cc, nzz_cc, dummy, mcomp, i,j,k, sca);
+  norm_cc(nxx_cc, nyy_cc, nzz_cc, mcomp, i,j,k, sca);
 
   /* normal vector from the Young method */
   real nxx_young, nyy_young, nzz_young;
-  norm_young_kernel(nxx_young, nyy_young, nzz_young, dummy, i,j,k, sca);
+  norm_young(nxx_young, nyy_young, nzz_young, i,j,k, sca, false);
 
   /* selection according to Aulisa (9) */
-  bool nyoung = nxx_young*nxx_young+nyy_young*nyy_young+nzz_young*nzz_young < 0.5;
-  bool ncc    = nxx_cc*nxx_cc+nyy_cc*nyy_cc+nzz_cc*nzz_cc < 0.5;
-  if (nyoung || ncc) {
-    nx_val = real(!ncc)*nxx_cc+real(!nyoung)*nxx_young;
-    ny_val = real(!ncc)*nyy_cc+real(!nyoung)*nyy_young;
-    nz_val = real(!ncc)*nzz_cc+real(!nyoung)*nzz_young;
-  } else {
-    select_norm_myc(nx_val,ny_val,nz_val, 
-                    nxx_cc,nyy_cc,nzz_cc,
-                    nxx_young,nyy_young,nzz_young,
-                    mcomp);
-  }
+  real nxx, nyy, nzz;
+  select_norm_myc(nxx,nyy,nzz, 
+                  nxx_cc,nyy_cc,nzz_cc,
+                  nxx_young,nyy_young,nzz_young,
+                  mcomp);
 
+  nx_val = nxx;
+  ny_val = nyy;
+  nz_val = nzz;
 
   return;
 }

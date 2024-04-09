@@ -25,6 +25,7 @@ class PlotTEC : public Plot {
              const Buffers buff=Buffers::no() ) {
       nodal=0; if( asno == AsNodes::yes() ) nodal=1;
       sh=0;    if( buff == Buffers::yes() ) sh=1;
+      b_plot_body=true;
     }
 
     void plot(Domain &, const char *, const int);
@@ -43,16 +44,16 @@ class PlotTEC : public Plot {
               const Scalar &, const Scalar &, const char *, const int);
     void plot(const Vector &, const Scalar &, const Scalar &, const Scalar &,
               const Scalar &, const Scalar &, const Scalar &,
-              const char *, const int); // Scalar 6
+              const char *, const int);
     void plot(const Vector &, const Scalar &, const Scalar &, const Scalar &,
               const Scalar &, const Scalar &, const Scalar &, const Scalar &,
-              const char *, const int); // Scalar 7
+              const char *, const int);
     void plot(const Vector &, const Scalar &, const Scalar &, const Scalar &,
               const Scalar &, const Scalar &, const Scalar &, const Scalar &,
-              const Scalar &, const char *, const int); // Scalar 8
+              const Scalar &, const char *, const int);
     void plot(const Vector &, const Scalar &, const Scalar &, const Scalar &,
               const Scalar &, const Scalar &, const Scalar &, const Scalar &,
-              const Scalar &, const Scalar &, const char *, const int); // Scalar 9
+              const Scalar &, const Scalar &, const char *, const int);
     void plot(const Scalar &, const Scalar &, 
               const char *, const int);
     void plot(const Scalar &, const ScalarInt &,
@@ -67,6 +68,10 @@ class PlotTEC : public Plot {
     void plot(const Scalar &, const Scalar &, const Scalar &, 
               const Scalar &, const Scalar &, const Scalar &,
               const char *, const int);
+    void set_plot_body(bool b){
+      b_plot_body = b;
+      boil::oout<<"PlotTEC:set_plot_body= "<<b<<"\n";
+    }
 
   private:
     void plot_tec_header   (const Domain &, const char *, const int);
@@ -79,6 +84,7 @@ class PlotTEC : public Plot {
     void plot_tec_vector   (const Domain &, const Vector &);
     void plot_tec_footer   ();
     std::ofstream out;
+    bool b_plot_body;
 };
 
 #endif

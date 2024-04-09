@@ -92,9 +92,9 @@ void VOF::nib(const real & nwx, const real & nwy, const real & nwz
   normalize(ntanx, ntany, ntanz);
    
   // n_vector = nw_vector*cos(c) + nt_vector*sin(c): Eq.53
-  real nnx = nwx*cos(cangle0) + ntanx*sin(cangle0);
-  real nny = nwy*cos(cangle0) + ntany*sin(cangle0);
-  real nnz = nwz*cos(cangle0) + ntanz*sin(cangle0);
+  real nnx = nwx*cos(cangle) + ntanx*sin(cangle);
+  real nny = nwy*cos(cangle) + ntany*sin(cangle);
+  real nnz = nwz*cos(cangle) + ntanz*sin(cangle);
   normalize(nnx,nny,nnz);
   nout[0] = nnx;
   nout[1] = nny;

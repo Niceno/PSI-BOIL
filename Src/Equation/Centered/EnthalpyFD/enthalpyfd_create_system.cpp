@@ -8,7 +8,7 @@
 *  Finally, it also computes the inverse of the system matrix diagonal.
 *******************************************************************************/
 void EnthalpyFD::create_system(const Scalar * diff_eddy) {
-
+                             
   /*-----------------------------+ 
   |  create system in the core,  |
   |  correct at the boundaries.  |
@@ -21,12 +21,11 @@ void EnthalpyFD::create_system(const Scalar * diff_eddy) {
   exit(0);
 #endif
 
-  /*---------------------------------------------+ 
-  |  compute inverse of the central coefficient  |
-  +---------------------------------------------*/
+  /*----------------------------------------------+ 
+  |  compute invlerse of the central coefficient  |
+  +----------------------------------------------*/
   for_ijk(i,j,k) 
     A.ci[i][j][k] = 1.0 / A.c[i][j][k];
 
   A.ci.exchange();
 }
-

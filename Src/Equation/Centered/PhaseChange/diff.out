@@ -1,0 +1,45 @@
+phasechange_cal_gradt.cpp
+phasechange.cpp
+phasechange_distfunc.cpp
+phasechange_dmicro_intermediate.cpp
+phasechange_ext_gradt.cpp
+phasechange_gradphic.cpp
+phasechange_gradt5.cpp
+phasechange_gradt.cpp
+phasechange_ib_ext_scalar.cpp
+phasechange_ib_set_dflag.cpp
+phasechange_incl_no_interface.cpp
+phasechange_insert_bc_dist.cpp
+phasechange_insert_bc_flag.cpp
+phasechange_insert_bc_gradphic.cpp
+phasechange_insert_bc_norm.cpp
+phasechange_iso_length.cpp
+phasechange_marching_cube.cpp
+phasechange_m.cpp
+phasechange_mdot.cpp
+18a19,23
+> #if 0
+>         if(k==sk()+5-1){
+>           clr[i][j][k-1]=1.0;
+>         }
+> #endif
+21a27,31
+> #if 0
+>         if(k==sk()+5-1){
+>           std::cout<<"mdot: "<<i-si()+1<<" "<<j-sj()+1<<" clr= "<<clr[i][j][k]<<" clr_wall= "<<clr[i][j][k-1]<<" "<<phi[i][j][k]<<" "<<area<<"\n";
+>         }
+> #endif
+phasechange_mdot_cut.cpp
+phasechange_micro_coef.cpp
+phasechange_micro.cpp
+phasechange_micro_shift.cpp
+phasechange_modify_vel.cpp
+phasechange_normalize.cpp
+phasechange_setflag.cpp
+phasechange_sources_clrs.cpp
+phasechange_sources.cpp
+phasechange_sources_fext.cpp
+phasechange_sources_sum.cpp
+phasechange_sources_tprs.cpp
+phasechange_str_dSprev.cpp
+phasechange_update.cpp

@@ -1,9 +1,9 @@
 #include "vof.h"
 
 /******************************************************************************/
-void VOF::advance_x(const Scalar & scp, Scalar & cellvol) {
+void VOF::advance_x(Scalar & scp) {
   
-  /* advance in the x-direction */
+  // advance in the x-direction
 
   Comp m = Comp::u();
 
@@ -15,7 +15,6 @@ void VOF::advance_x(const Scalar & scp, Scalar & cellvol) {
 
     /* flux */
     real f;
-    Sign sig = Sign::neg();
 
     // upwind i-index
     int iup = i-1;
@@ -25,17 +24,17 @@ void VOF::advance_x(const Scalar & scp, Scalar & cellvol) {
 
     if (scp[iup][j][k] < boil::pico) {
 
-      f = scp[iup][j][k] * dSx(sig,i,j,k) * ((*u)[m][i][j][k]) * dt;
+      f = scp[iup][j][k] * dSx(i,j,k) * ((*u)[m][i][j][k]) * dt;
 
     } else if(scp[iup][j][k]>1.0-boil::pico) {
 
-      f = scp[iup][j][k] * dSx(sig,i,j,k) * ((*u)[m][i][j][k]) * dt;
+      f = scp[iup][j][k] * dSx(i,j,k) * ((*u)[m][i][j][k]) * dt;
 
     } else {
 
       if (scp.dxc(iup)==0.0 ) {
 
-        f = scp[iup][j][k] * dSx(sig,i,j,k) * ((*u)[m][i][j][k]) * dt;
+        f = scp[iup][j][k] * dSx(i,j,k) * ((*u)[m][i][j][k]) * dt;
 
       } else {
 
@@ -44,15 +43,13 @@ void VOF::advance_x(const Scalar & scp, Scalar & cellvol) {
         real scpup = scp[iup][j][k];
         f = dV(iup,j,k)*calc_flux(g,scpup,nx[iup][j][k],
                                           ny[iup][j][k],
-                                          nz[iup][j][k],
-                                          nalpha[iup][j][k]);
+                                          nz[iup][j][k]);
       }
     }
 
-    /* update cellvol */
-    cellvol[i-1][j][k] = cellvol[i-1][j][k] - f;
-    cellvol[i  ][j][k] = cellvol[i  ][j][k] + f;
-    vflow[m][i][j][k] = f;
+    // update stmp
+    stmp[i-1][j][k] = stmp[i-1][j][k] - f;
+    stmp[i  ][j][k] = stmp[i  ][j][k] + f;
 
   }
 

@@ -85,6 +85,7 @@ void Enthalpy::new_time_step(const Property * f_prop, const Property * s_prop,
     boil::oout<<" forward_euler or Crank–Nicolson is not implemented yet\n";
     exit(0);
   }
-  diffusion(diff_eddy);
+  diffusion();
+  //diffusion(diff_eddy);
 
 }

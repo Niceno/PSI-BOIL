@@ -11,7 +11,7 @@ const Domain * Domain::coarsen() const {
   /* to disable coarsening, uncomment the following line */
   //return NULL;
  
-  /* minimum resolution (with buffers) */
+  /* minimum resulution (with buffers) */
   const int min_n =  std::max(4,boil::BW) + 2*boil::BW;
 
   /* coarsening factors */
@@ -109,4 +109,4 @@ const Domain * Domain::coarsen() const {
   step_z = 1;
 
   return NULL;
-}
+}	

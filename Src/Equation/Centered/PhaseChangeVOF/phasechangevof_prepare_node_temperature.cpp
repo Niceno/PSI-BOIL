@@ -25,8 +25,8 @@ void PhaseChangeVOF::calculate_node_temperature(const Scalar * diff_eddy) {
       real tpr_1 = tpr[i][j][k];
       real tpr_2 = tpr[i-1][j][k];
 
-      real lam_1 = lambda(i,j,k,diff_eddy);
-      real lam_2 = lambda(i-1,j,k,diff_eddy);
+      real lam_1 = lambda(i,j,k);
+      real lam_2 = lambda(i-1,j,k);
 
       temp = temperature_node(len_1, lam_1, tpr_1, len_2, lam_2, tpr_2);
 #endif
@@ -50,8 +50,8 @@ void PhaseChangeVOF::calculate_node_temperature(const Scalar * diff_eddy) {
       real tpr_1 = tpr[i][j][k];
       real tpr_2 = tpr[i][j-1][k];
 
-      real lam_1 = lambda(i,j,k,diff_eddy);
-      real lam_2 = lambda(i,j-1,k,diff_eddy);
+      real lam_1 = lambda(i,j,k);
+      real lam_2 = lambda(i,j-1,k);
 
       temp = temperature_node(len_1, lam_1, tpr_1, len_2, lam_2, tpr_2);
 #endif
@@ -75,8 +75,8 @@ void PhaseChangeVOF::calculate_node_temperature(const Scalar * diff_eddy) {
       real tpr_1 = tpr[i][j][k];
       real tpr_2 = tpr[i][j][k-1];
 
-      real lam_1 = lambda(i,j,k,diff_eddy);
-      real lam_2 = lambda(i,j,k-1,diff_eddy);
+      real lam_1 = lambda(i,j,k);
+      real lam_2 = lambda(i,j,k-1);
 
       temp = temperature_node(len_1, lam_1, tpr_1, len_2, lam_2, tpr_2);
 #endif
@@ -90,16 +90,16 @@ void PhaseChangeVOF::calculate_node_temperature(const Scalar * diff_eddy) {
     if(i<10&&j<10&&k<10 && i>boil::BW&&j>boil::BW&&k>boil::BW) {
       boil::oout<<i<<" "<<j<<" "<<k<<" "<<adens[i][j][k]<<" | "<<tpr[i][j][k-1]<<" "<<tpr[i][j][k]<<" "<<tpr[i][j][k+1]<<" "
                 <<"| "<<bndtpr[Comp::w()][i][j][k]<<" "<<bndtpr[Comp::w()][i][j][k+1]<<" | "
-                <<(lambda(i,j,k-1,diff_eddy)*tpr[i][j][k-1]*0.5*phi.dzc(k)+lambda(i,j,k,diff_eddy)*tpr[i][j][k]*0.5*phi.dzc(k-1))/(lambda(i,j,k-1,diff_eddy)*0.5*phi.dzc(k)+lambda(i,j,k,diff_eddy)*0.5*phi.dzc(k-1))<<" "
-                <<(lambda(i,j,k+1,diff_eddy)*tpr[i][j][k+1]*0.5*phi.dzc(k)+lambda(i,j,k,diff_eddy)*tpr[i][j][k]*0.5*phi.dzc(k+1))/(lambda(i,j,k+1,diff_eddy)*0.5*phi.dzc(k)+lambda(i,j,k,diff_eddy)*0.5*phi.dzc(k+1))<<" | "
-                <<lambda(i,j,k+1,diff_eddy)*(tpr[i][j][k+1]-bndtpr[Comp::w()][i][j][k+1])/(0.5*phi.dzc(k+1))
-                 -lambda(i,j,k,diff_eddy)*(bndtpr[Comp::w()][i][j][k+1]-tpr[i][j][k])/(0.5*phi.dzc(k))
+                <<(lambda(i,j,k-1)*tpr[i][j][k-1]*0.5*phi.dzc(k)+lambda(i,j,k)*tpr[i][j][k]*0.5*phi.dzc(k-1))/(lambda(i,j,k-1)*0.5*phi.dzc(k)+lambda(i,j,k)*0.5*phi.dzc(k-1))<<" "
+                <<(lambda(i,j,k+1)*tpr[i][j][k+1]*0.5*phi.dzc(k)+lambda(i,j,k)*tpr[i][j][k]*0.5*phi.dzc(k+1))/(lambda(i,j,k+1)*0.5*phi.dzc(k)+lambda(i,j,k)*0.5*phi.dzc(k+1))<<" | "
+                <<lambda(i,j,k+1)*(tpr[i][j][k+1]-bndtpr[Comp::w()][i][j][k+1])/(0.5*phi.dzc(k+1))
+                 -lambda(i,j,k)*(bndtpr[Comp::w()][i][j][k+1]-tpr[i][j][k])/(0.5*phi.dzc(k))
                 <<" "
-                <<lambda(i,j,k,diff_eddy)*(tpr[i][j][k]-bndtpr[Comp::w()][i][j][k])/(0.5*phi.dzc(k))
-                 -lambda(i,j,k-1,diff_eddy)*(bndtpr[Comp::w()][i][j][k]-tpr[i][j][k-1])/(0.5*phi.dzc(k-1))
-                <<" | "<<lambda(i,j,k+1,diff_eddy)*(tpr[i][j][k+1]-bndtpr[Comp::w()][i][j][k+1])/(0.5*phi.dzc(k+1))<<" "<<lambda(i,j,k,diff_eddy)*(bndtpr[Comp::w()][i][j][k+1]-tpr[i][j][k])/(0.5*phi.dzc(k))
-<<" "<<lambda(i,j,k,diff_eddy)*(tpr[i][j][k]-bndtpr[Comp::w()][i][j][k])/(0.5*phi.dzc(k))<<" "<<lambda(i,j,k-1,diff_eddy)*(bndtpr[Comp::w()][i][j][k]-tpr[i][j][k-1])/(0.5*phi.dzc(k-1))
-                <<" | "<<lambda(i,j,k-1,diff_eddy)<<" "<<lambda(i,j,k,diff_eddy)<<" "<<lambda(i,j,k+1,diff_eddy)<<boil::endl;
+                <<lambda(i,j,k)*(tpr[i][j][k]-bndtpr[Comp::w()][i][j][k])/(0.5*phi.dzc(k))
+                 -lambda(i,j,k-1)*(bndtpr[Comp::w()][i][j][k]-tpr[i][j][k-1])/(0.5*phi.dzc(k-1))
+                <<" | "<<lambda(i,j,k+1)*(tpr[i][j][k+1]-bndtpr[Comp::w()][i][j][k+1])/(0.5*phi.dzc(k+1))<<" "<<lambda(i,j,k)*(bndtpr[Comp::w()][i][j][k+1]-tpr[i][j][k])/(0.5*phi.dzc(k))
+<<" "<<lambda(i,j,k)*(tpr[i][j][k]-bndtpr[Comp::w()][i][j][k])/(0.5*phi.dzc(k))<<" "<<lambda(i,j,k-1)*(bndtpr[Comp::w()][i][j][k]-tpr[i][j][k-1])/(0.5*phi.dzc(k-1))
+                <<" | "<<lambda(i,j,k-1)<<" "<<lambda(i,j,k)<<" "<<lambda(i,j,k+1)<<boil::endl;
     }
   }
   exit(0);

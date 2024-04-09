@@ -1,18 +1,15 @@
 #include "vof.h"
-
-void VOF::tension(Vector * vec, const Matter & matt) {
-  tension(vec,matt,phi);
-}
+#include <iomanip>
 
 /******************************************************************************/
-void VOF::tension(Vector * vec, const Matter & matt, const Scalar & scp) {
+void VOF::tension(Vector * vec, const Matter matt) {
 /***************************************************************************//**
 *  \brief Calculate surface tension
 *         Algorithm
 *           1st step: calculate curvature
 *           2nd step: calculate body force
 *         Variables
-*           color function          : scp
+*           color function          : phi
 *           curvature               : kappa
 *           body force              : vec
 *******************************************************************************/
@@ -31,83 +28,71 @@ void VOF::tension(Vector * vec, const Matter & matt, const Scalar & scp) {
 
   Comp m;
   if(rho_diff==0.0){
-    if(bflag_struct.ifull) {
-      m = Comp::u();
-      for_vmijk((*vec),m,i,j,k) {
-        if(dom->ibody().on(m,i,j,k)) {
-          (*vec)[m][i][j][k] += matt.sigma(m,i,j,k)
-                * kappa_ave(kappa[i-1][j][k],kappa[i][j][k])
-                //* kappa_ave(kappa[i-1][j][k],kappa[i][j][k],tempflag[i-1][j][k],tempflag[i][j][k])
-                * (scp[i][j][k] - scp[i-1][j][k])/vec->dxc(m,i)
-                * vec->dV(m,i,j,k);
-        }
+    m = Comp::u();
+    for_vmijk((*vec),m,i,j,k) {
+      if(dom->ibody().on(m,i,j,k)) {
+        (*vec)[m][i][j][k] += matt.sigma(m,i,j,k)
+              * kappa_ave(kappa[i-1][j][k],kappa[i][j][k])
+              //* kappa_ave(kappa[i-1][j][k],kappa[i][j][k],iflag[i-1][j][k],iflag[i][j][k])
+              * (phi[i][j][k] - phi[i-1][j][k])/vec->dxc(m,i)
+              * vec->dV(m,i,j,k);
       }
     }
-    if(bflag_struct.jfull) {
-      m = Comp::v();
-      for_vmijk((*vec),m,i,j,k) {
-        if(dom->ibody().on(m,i,j,k)) {
-          (*vec)[m][i][j][k] += matt.sigma(m,i,j,k)
-                * kappa_ave(kappa[i][j-1][k],kappa[i][j][k])
-                //* kappa_ave(kappa[i][j-1][k],kappa[i][j][k],tempflag[i][j-1][k],tempflag[i][j][k])
-                * (scp[i][j][k] - scp[i][j-1][k])/vec->dyc(m,j)
-                * vec->dV(m,i,j,k);
-        }
+    m = Comp::v();
+    for_vmijk((*vec),m,i,j,k) {
+      if(dom->ibody().on(m,i,j,k)) {
+        (*vec)[m][i][j][k] += matt.sigma(m,i,j,k)
+              * kappa_ave(kappa[i][j-1][k],kappa[i][j][k])
+              //* kappa_ave(kappa[i][j-1][k],kappa[i][j][k],iflag[i][j-1][k],iflag[i][j][k])
+              * (phi[i][j][k] - phi[i][j-1][k])/vec->dyc(m,j)
+              * vec->dV(m,i,j,k);
       }
     }
-    if(bflag_struct.kfull) {
-      m = Comp::w();
-      for_vmijk((*vec),m,i,j,k) {
-        if(dom->ibody().on(m,i,j,k)) {
-          (*vec)[m][i][j][k] += matt.sigma(m,i,j,k)
-                * kappa_ave(kappa[i][j][k-1],kappa[i][j][k])
-                //* kappa_ave(kappa[i][j][k-1],kappa[i][j][k],tempflag[i][j][k-1],tempflag[i][j][k])
-                * (scp[i][j][k] - scp[i][j][k-1])/vec->dzc(m,k)
-                * vec->dV(m,i,j,k);
-        }
+    m = Comp::w();
+    for_vmijk((*vec),m,i,j,k) {
+      if(dom->ibody().on(m,i,j,k)) {
+        (*vec)[m][i][j][k] += matt.sigma(m,i,j,k)
+              * kappa_ave(kappa[i][j][k-1],kappa[i][j][k])
+              //* kappa_ave(kappa[i][j][k-1],kappa[i][j][k],iflag[i][j][k-1],iflag[i][j][k])
+              * (phi[i][j][k] - phi[i][j][k-1])/vec->dzc(m,k)
+              * vec->dV(m,i,j,k);
       }
     }
   } else {
-    if(bflag_struct.ifull) {
-      m = Comp::u();
-      for_vmijk((*vec),m,i,j,k) {
-        if(dom->ibody().on(m,i,j,k)) {
-          (*vec)[m][i][j][k] += matt.sigma(m,i,j,k)
-                * kappa_ave(kappa[i-1][j][k],kappa[i][j][k])
-                //* kappa_ave(kappa[i-1][j][k],kappa[i][j][k],tempflag[i-1][j][k],tempflag[i][j][k])
-                * (matt.rho(i,j,k)-matt.rho(i-1,j,k))/vec->dxc(m,i)
-                / rho_diff * 0.5*(matt.rho(i,j,k)+matt.rho(i-1,j,k))
-                / rho_ave
-                * vec->dV(m,i,j,k);
-        }
+    m = Comp::u();
+    for_vmijk((*vec),m,i,j,k) {
+      if(dom->ibody().on(m,i,j,k)) {
+        (*vec)[m][i][j][k] += matt.sigma(m,i,j,k)
+              * kappa_ave(kappa[i-1][j][k],kappa[i][j][k])
+              //* kappa_ave(kappa[i-1][j][k],kappa[i][j][k],iflag[i-1][j][k],iflag[i][j][k])
+              * (matt.rho(i,j,k)-matt.rho(i-1,j,k))/vec->dxc(m,i)
+              / rho_diff * 0.5*(matt.rho(i,j,k)+matt.rho(i-1,j,k))
+              / rho_ave
+              * vec->dV(m,i,j,k);
       }
     }
-    if(bflag_struct.jfull) {
-      m = Comp::v();
-      for_vmijk((*vec),m,i,j,k) {
-        if(dom->ibody().on(m,i,j,k)) {
-          (*vec)[m][i][j][k] += matt.sigma(m,i,j,k)
-                * kappa_ave(kappa[i][j-1][k],kappa[i][j][k])
-                //* kappa_ave(kappa[i][j-1][k],kappa[i][j][k],tempflag[i][j-1][k],tempflag[i][j][k])
-                * (matt.rho(i,j,k)-matt.rho(i,j-1,k))/vec->dyc(m,j)
-                / rho_diff * 0.5*(matt.rho(i,j,k)+matt.rho(i,j-1,k))
-                / rho_ave
-                * vec->dV(m,i,j,k);
-        }
+    m = Comp::v();
+    for_vmijk((*vec),m,i,j,k) {
+      if(dom->ibody().on(m,i,j,k)) {
+        (*vec)[m][i][j][k] += matt.sigma(m,i,j,k)
+              * kappa_ave(kappa[i][j-1][k],kappa[i][j][k])
+              //* kappa_ave(kappa[i][j-1][k],kappa[i][j][k],iflag[i][j-1][k],iflag[i][j][k])
+              * (matt.rho(i,j,k)-matt.rho(i,j-1,k))/vec->dyc(m,j)
+              / rho_diff * 0.5*(matt.rho(i,j,k)+matt.rho(i,j-1,k))
+              / rho_ave
+              * vec->dV(m,i,j,k);
       }
     }
-    if(bflag_struct.kfull) {
-      m = Comp::w();
-      for_vmijk((*vec),m,i,j,k) {
-        if(dom->ibody().on(m,i,j,k)) {
-          (*vec)[m][i][j][k] += matt.sigma(m,i,j,k)
-                * kappa_ave(kappa[i][j][k-1],kappa[i][j][k])
-                //* kappa_ave(kappa[i][j][k-1],kappa[i][j][k],tempflag[i][j][k-1],tempflag[i][j][k])
-                * (matt.rho(i,j,k)-matt.rho(i,j,k-1))/vec->dzc(m,k)
-                / rho_diff * 0.5*(matt.rho(i,j,k)+matt.rho(i,j,k-1))
-                / rho_ave
-                * vec->dV(m,i,j,k);
-        }
+    m = Comp::w();
+    for_vmijk((*vec),m,i,j,k) {
+      if(dom->ibody().on(m,i,j,k)) {
+        (*vec)[m][i][j][k] += matt.sigma(m,i,j,k)
+              * kappa_ave(kappa[i][j][k-1],kappa[i][j][k])
+              //* kappa_ave(kappa[i][j][k-1],kappa[i][j][k],iflag[i][j][k-1],iflag[i][j][k])
+              * (matt.rho(i,j,k)-matt.rho(i,j,k-1))/vec->dzc(m,k)
+              / rho_diff * 0.5*(matt.rho(i,j,k)+matt.rho(i,j,k-1))
+              / rho_ave
+              * vec->dV(m,i,j,k);
       }
     }
   }

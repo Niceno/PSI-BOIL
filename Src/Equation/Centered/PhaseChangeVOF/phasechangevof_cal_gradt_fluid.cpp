@@ -15,9 +15,8 @@ void PhaseChangeVOF::cal_gradt_fluid(const Scalar * diff_eddy) {
 
     /* normal cell, 2nd order */
     real dtdx,dtdy,dtdz;
-    real clrc=clr[i][j][k];
     tpr.grad(i,j,k,&dtdx,&dtdy,&dtdz);
-    if(clrc>=clrsurf){
+    if(clr[i][j][k]>=clrsurf){
       txl[i][j][k]=dtdx;
       tyl[i][j][k]=dtdy;
       tzl[i][j][k]=dtdz;
@@ -34,12 +33,20 @@ void PhaseChangeVOF::cal_gradt_fluid(const Scalar * diff_eddy) {
     }
 
     /* interface cell, 2nd order */
+    real clrc=clr[i][j][k];
+    real clrw=clr[i-1][j][k];
+    real clre=clr[i+1][j][k];
+    real clrs=clr[i][j-1][k];
+    real clrn=clr[i][j+1][k];
+    real clrb=clr[i][j][k-1];
+    real clrt=clr[i][j][k+1];
     real txm, tym, tzm, txp, typ, tzp;
     int ii,jj,kk;
 
     ii=jj=kk=0;
 
     /* west */
+    //if((clrw-clrsurf)*(clrc-clrsurf)<=0.0){
     if(Interface(-1,Comp::i(),i,j,k)) {
       txp = gradtx(-1,i,j,k);
       if((clrc-clrsurf)<0.0){
@@ -52,6 +59,7 @@ void PhaseChangeVOF::cal_gradt_fluid(const Scalar * diff_eddy) {
       ii=1;
     }
     /* east */
+    //if((clre-clrsurf)*(clrc-clrsurf)<=0.0){
     if(Interface(+1,Comp::i(),i,j,k)) {
       txm = gradtx(+1,i,j,k);
       if((clrc-clrsurf)<0.0){
@@ -64,6 +72,7 @@ void PhaseChangeVOF::cal_gradt_fluid(const Scalar * diff_eddy) {
       ii+=1;
     }
     /* south */
+    //if((clrs-clrsurf)*(clrc-clrsurf)<=0.0){
     if(Interface(-1,Comp::j(),i,j,k)) {
       typ = gradty(-1,i,j,k);
       if((clrc-clrsurf)<0.0){
@@ -76,6 +85,7 @@ void PhaseChangeVOF::cal_gradt_fluid(const Scalar * diff_eddy) {
       jj=1;
     }
     /* north */
+    //if((clrn-clrsurf)*(clrc-clrsurf)<=0.0){
     if(Interface(+1,Comp::j(),i,j,k)) {
       tym = gradty(+1,i,j,k);
       if((clrc-clrsurf)<0.0){
@@ -88,6 +98,7 @@ void PhaseChangeVOF::cal_gradt_fluid(const Scalar * diff_eddy) {
       jj+=1;
     }
     /* bottom */
+    //if((clrb-clrsurf)*(clrc-clrsurf)<=0.0){
     if(Interface(-1,Comp::k(),i,j,k)) {
       tzp = gradtz(-1,i,j,k);
       if((clrc-clrsurf)<0.0){
@@ -100,6 +111,7 @@ void PhaseChangeVOF::cal_gradt_fluid(const Scalar * diff_eddy) {
       kk=1;
     }
     /* top */
+    //if((clrt-clrsurf)*(clrc-clrsurf)<=0.0){
     if(Interface(+1,Comp::k(),i,j,k)) {
       tzm = gradtz(+1,i,j,k);
       if((clrc-clrsurf)<0.0){

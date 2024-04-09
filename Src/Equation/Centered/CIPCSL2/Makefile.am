@@ -1,6 +1,7 @@
 noinst_LIBRARIES = libCipcsl2.a
 libCipcsl2_a_SOURCES = cipcsl2.h                        \
                        cipcsl2.cpp                      \
+                       cipcsl2_adens.cpp                \
                        cipcsl2_advance.cpp              \
                        cipcsl2_ancillary.cpp            \
                        cipcsl2_bdcond.cpp               \
@@ -31,9 +32,10 @@ libCipcsl2_a_SOURCES = cipcsl2.h                        \
                        cipcsl2_curv_interface.cpp       \
                        cipcsl2_curv_interface_ext.cpp   \
                        cipcsl2_distfunc.cpp             \
-                       cipcsl2_enforce.cpp              \
                        cipcsl2_ext_sca.cpp              \
                        cipcsl2_front_minmax.cpp         \
+                       cipcsl2_fs.cpp                   \
+                       cipcsl2_fs_bnd_nosubgrid.cpp     \
                        cipcsl2_funclxyz.cpp             \
                        cipcsl2_gradphi.cpp              \
                        cipcsl2_gradphic.cpp             \
@@ -49,7 +51,6 @@ libCipcsl2_a_SOURCES = cipcsl2.h                        \
                        cipcsl2_insert_bc_gradphic.cpp   \
                        cipcsl2_insert_bc_kappa.cpp      \
                        cipcsl2_insert_bc_norm.cpp       \
-                       cipcsl2_interfacial_flagging.cpp \
                        cipcsl2_load.cpp                 \
                        cipcsl2_normalize.cpp            \
                        cipcsl2_plotTEC.cpp              \

@@ -16,8 +16,8 @@ Floodfill::Floodfill(Scalar & colorf,
                      uvw(p_uvw),
                      time ( & t),
                      rgnid_old(*(srid.domain())),
-                     m_dV(srid.domain()->dV_min()),
-                     m_dxc(srid.domain()->dxyz_min()) {
+                     m_dV(srid.dV(srid.si()+1,srid.sj()+1,srid.sk()+1)),
+                     m_dxc(srid.dxc(srid.si()+1)) {
 
   new_seed_stack.reserve (BIG_BUFFER_SIZE);  /* sizes may be too small/big? */
   same_fill_stack.reserve(BIG_BUFFER_SIZE);
@@ -102,7 +102,7 @@ Region & Floodfill::getregion(int rid) {
 }
 
 /******************************************************************************/
-int Floodfill::mng_hidden_rgns() {
+void Floodfill::mng_hidden_rgns() {
   /*------------------------------------------------------------------+
   |  rgn erased after hidden for more than 100(why?) time steps       |
   +------------------------------------------------------------------*/
@@ -121,7 +121,6 @@ int Floodfill::mng_hidden_rgns() {
       }
     }
   }
-  return 0;
 }
 
 /******************************************************************************/
@@ -138,8 +137,8 @@ int Floodfill::hidden_rgnid(real ix, real iy, real iz) {
                 <<m_vectrgns[i].get_tsteps_hidden()<<" dist traveled in hiding "
                 <<dist<<" < 1.5dx "<<1.5*m_dxc<<std::endl;
         }
-        m_vectrgns[i].hiding(false);
-        return m_vectrgns[i].id();
+      m_vectrgns[i].hiding(false);
+      return m_vectrgns[i].id();
       }
     }
   }

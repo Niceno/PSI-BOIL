@@ -1,21 +1,33 @@
 #include "scalar.h"
 
 /******************************************************************************/
+Scalar::Scalar(const Domain & d) : alias(false) {
+/*--------------------------------------+
+|  creates a scalar for a given domain  |
++--------------------------------------*/
+
+  dom = & d;
+	
+  allocate(d.ni(), d.nj(), d.nk());
+
+  bndcnd = new BndCnd( *dom );
+
+  nam = "";
+}	
+
+/******************************************************************************/
 Scalar::Scalar(const Domain & d, const char * nm) : alias(false) {
 /*--------------------------------------+
 |  creates a scalar for a given domain  |
 +--------------------------------------*/
 
   dom = & d;
-
+	
   allocate(d.ni(), d.nj(), d.nk());
 
   bndcnd = new BndCnd( *dom );
 
-  if(nm)
-    nam = nm;
-  else
-    nam = "";
+  nam = nm;
 }	
 
 /******************************************************************************/
@@ -31,7 +43,7 @@ Scalar::Scalar(const Domain & d, BndCnd & b) : alias(false) {
   bndcnd = & b; 
 
   nam = "";
-}
+}	
 
 /******************************************************************************/
 Scalar::Scalar(const Scalar & s) : alias(false) {
@@ -40,13 +52,13 @@ Scalar::Scalar(const Scalar & s) : alias(false) {
 +---------------------------------------------------------------------*/
 
   dom = s.domain();
-
+	
   allocate(s.ni(), s.nj(), s.nk());
 
   bndcnd = new BndCnd( *dom ); 
 
   nam = "";
-}
+}	
 
 /******************************************************************************/
 Scalar::Scalar(const Scalar * s) : alias(true), nam(s->nam) {
@@ -71,7 +83,7 @@ Scalar::Scalar(const Scalar * s) : alias(true), nam(s->nam) {
 
   dom    = s->domain();
   bndcnd = s->bndcnd;
-}
+}	
 
 /******************************************************************************/
 void Scalar::allocate(int ni, int nj, int nk) {

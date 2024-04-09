@@ -11,19 +11,15 @@ void CIPCSL2::ancillary() {
   /* wall values extrapolation */
   update_at_walls(phi);
 
-  /* calculate free surface position,
-     no subgrid interfaces near walls! */
-  topo->cal_fs_interp(phi,fs,0.0,false);
+  /*  calculate free surface position */
+  cal_fs();
 
   /* normal vector */
   distfunc(phi,24); 
   gradphic(dist);
 
-  /* calculate area density */
-  heavi->calculate_adens();
-
-  /* flag the interface */
-  interfacial_flagging(phi);
+  /* calculate area */
+  cal_adens();
 
   boil::timer.stop("cipcsl2 ancillary");
 

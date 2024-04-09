@@ -18,7 +18,7 @@ void Body::cut_degen(real xp[], real yp[], real zp[], int & n,
                   + (yp[nd1]-yp[nd2])*(yp[nd1]-yp[nd2])
                   + (zp[nd1]-zp[nd2])*(zp[nd1]-zp[nd2]);
         dst = sqrt(dst);
-        if(dst<boil::nano){
+        if(dst<tol){
           nda=nd1;
           ndb=nd2;
           nnd++;

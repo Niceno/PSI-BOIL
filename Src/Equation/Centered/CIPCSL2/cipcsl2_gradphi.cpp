@@ -7,7 +7,7 @@ void CIPCSL2::gradphi(const Scalar & sca) {
 *         Resluts: nx, ny, nz
 *******************************************************************************/
 
-  real ni,nj,nk,magn;
+  real nni,nnj,nnk;
 
   /* node base */
   for(int i=sca.si(); i<=sca.ei()+1; i++) {
@@ -37,13 +37,13 @@ void CIPCSL2::gradphi(const Scalar & sca) {
   for(int i=sca.si(); i<=sca.ei()+1; i++) {
     for(int j=sca.sj(); j<=sca.ej()+1; j++) {
       for(int k=sca.sk(); k<=sca.ek()+1; k++) {
-        ni = nx[i][j][k];
-        nj = ny[i][j][k];
-        nk = nz[i][j][k];
-        normalize(ni,nj,nk);
-        nx[i][j][k] = ni;
-        ny[i][j][k] = nj;
-        nz[i][j][k] = nk;
+        nni = nx[i][j][k];
+        nnj = ny[i][j][k];
+        nnk = nz[i][j][k];
+        normalize(nni,nnj,nnk);
+        nx[i][j][k] = nni;
+        ny[i][j][k] = nnj;
+        nz[i][j][k] = nnk;
       }
     }
   }

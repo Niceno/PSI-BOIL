@@ -33,8 +33,8 @@ void Momentum::convection(Vector * conv) {
   /////////////
   for_mijk(m,i,j,k) 
     { /* u */
-    real a_w = dSx(m,Sign::neg(),i,j,k); 
-    real a_e = dSx(m,Sign::pos(),i,j,k); 
+    real a_w = dSx(m,i,j,k); 
+    real a_e = dSx(m,i,j,k); 
     if( dom->ibody().cut(m,i,j,k) ) {
       a_w *= dom->ibody().fSw(m,i,j,k);
       a_e *= dom->ibody().fSe(m,i,j,k);
@@ -56,8 +56,8 @@ void Momentum::convection(Vector * conv) {
   /////////////
   for_mijk(m,i,j,k) 
     { /* v */
-    real a_s = dSy(m,Sign::neg(),i,j,k); 
-    real a_n = dSy(m,Sign::pos(),i,j,k); 
+    real a_s = dSy(m,i,j,k); 
+    real a_n = dSy(m,i,j,k); 
     if( dom->ibody().cut(m,i,j,k) ) {
       a_s *= dom->ibody().fSs(m,i,j,k);
       a_n *= dom->ibody().fSn(m,i,j,k);
@@ -79,8 +79,8 @@ void Momentum::convection(Vector * conv) {
   /////////////
   for_mijk(m,i,j,k) 
     { /* w */
-    real a_b = dSz(m,Sign::neg(),i,j,k); 
-    real a_t = dSz(m,Sign::pos(),i,j,k); 
+    real a_b = dSz(m,i,j,k); 
+    real a_t = dSz(m,i,j,k); 
     if( dom->ibody().cut(m,i,j,k) ) {
       a_b *= dom->ibody().fSb(m,i,j,k);
       a_t *= dom->ibody().fSt(m,i,j,k);
@@ -109,8 +109,8 @@ void Momentum::convection(Vector * conv) {
   /////////////
   for_mijk(m,i,j,k) 
     { /* v */
-    real a_s = dSy(m,Sign::neg(),i,j,k); 
-    real a_n = dSy(m,Sign::pos(),i,j,k); 
+    real a_s = dSy(m,i,j,k); 
+    real a_n = dSy(m,i,j,k); 
     if( dom->ibody().cut(m,i,j,k) ) {
       a_s *= dom->ibody().fSs(m,i,j,k);
       a_n *= dom->ibody().fSn(m,i,j,k);
@@ -132,8 +132,8 @@ void Momentum::convection(Vector * conv) {
   /////////////
   for_mijk(m,i,j,k) 
     { /* u */
-    real a_w = dSx(m,Sign::neg(),i,j,k); 
-    real a_e = dSx(m,Sign::pos(),i,j,k); 
+    real a_w = dSx(m,i,j,k); 
+    real a_e = dSx(m,i,j,k); 
     if( dom->ibody().cut(m,i,j,k) ) {
       a_w *= dom->ibody().fSw(m,i,j,k);
       a_e *= dom->ibody().fSe(m,i,j,k);
@@ -155,8 +155,8 @@ void Momentum::convection(Vector * conv) {
   /////////////
   for_mijk(m,i,j,k) 
     { /* w */
-    real a_b = dSz(m,Sign::neg(),i,j,k); 
-    real a_t = dSz(m,Sign::pos(),i,j,k); 
+    real a_b = dSz(m,i,j,k); 
+    real a_t = dSz(m,i,j,k); 
     if( dom->ibody().cut(m,i,j,k) ) {
       a_b *= dom->ibody().fSb(m,i,j,k);
       a_t *= dom->ibody().fSt(m,i,j,k);
@@ -185,8 +185,8 @@ void Momentum::convection(Vector * conv) {
   /////////////
   for_mijk(m,i,j,k) 
     { /* w */
-    real a_b = dSz(m,Sign::neg(),i,j,k); 
-    real a_t = dSz(m,Sign::pos(),i,j,k); 
+    real a_b = dSz(m,i,j,k); 
+    real a_t = dSz(m,i,j,k); 
     if( dom->ibody().cut(m,i,j,k) ) {
       a_b *= dom->ibody().fSb(m,i,j,k);
       a_t *= dom->ibody().fSt(m,i,j,k);
@@ -208,8 +208,8 @@ void Momentum::convection(Vector * conv) {
   /////////////
   for_mijk(m,i,j,k) 
     { /* u */
-    real a_w = dSx(m,Sign::neg(),i,j,k); 
-    real a_e = dSx(m,Sign::pos(),i,j,k); 
+    real a_w = dSx(m,i,j,k); 
+    real a_e = dSx(m,i,j,k); 
     if( dom->ibody().cut(m,i,j,k) ) {
       a_w *= dom->ibody().fSw(m,i,j,k);
       a_e *= dom->ibody().fSe(m,i,j,k);
@@ -231,8 +231,8 @@ void Momentum::convection(Vector * conv) {
   /////////////
   for_mijk(m,i,j,k) 
     { /* v */
-    real a_s = dSy(m,Sign::neg(),i,j,k); 
-    real a_n = dSy(m,Sign::pos(),i,j,k); 
+    real a_s = dSy(m,i,j,k); 
+    real a_n = dSy(m,i,j,k); 
     if( dom->ibody().cut(m,i,j,k) ) {
       a_s *= dom->ibody().fSs(m,i,j,k);
       a_n *= dom->ibody().fSn(m,i,j,k);
@@ -249,7 +249,7 @@ void Momentum::convection(Vector * conv) {
     (*conv)[Comp::w()][i][j]  [k] += a_s * vmf*wm - a_n * vpf*wp;
     }
 
-  /* God help me, please */
+  /* God help me, pleae */
   for_mijk(Comp::u(),i,j,k) {
     real rho = fluid()->rho(Comp::u(),i,j,k);
     (*conv)[Comp::u()][i][j][k] *= rho;

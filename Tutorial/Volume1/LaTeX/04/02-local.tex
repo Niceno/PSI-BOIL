@@ -1,0 +1,180 @@
+\section{Local timing}
+\label{sec_local}
+
+In the section~\ref{sec_global} we measured the total time needed
+for program execution. Imagine you want to compare two algorithms,
+one using the {\em acos} function, and the other using {\em cos}
+(04-02-main.cpp)\footnote{These algorithms obviously serve no real 
+purpose but are used solely to illustrate timing features}:
+%
+{\small \begin{verbatim}
+      1 #include "Include/psi-boil.h"
+      2
+      3 const int N = 256;
+      4
+      5 /****************************************************************************/
+      6 main(int argc, char * argv[]) {
+      7
+      8   boil::timer.start();
+      9
+     10   real a;
+     11   real b;
+     12
+     13   boil::oout << "Running acos ..." << boil::endl;
+     14
+     15   /* algorithm using "acos" */
+     16   for(int i=0; i<N; i++)
+     17     for(int j=0; j<N; j++)
+     18       for(int k=0; k<N; k++) {
+     19         a = acos(-1.0);
+     20       }
+     21
+     22   boil::oout << "Running cos ..." << boil::endl;
+     23
+     24   /* algorithm using "cos" */
+     25   for(int i=0; i<N; i++)
+     26     for(int j=0; j<N; j++)
+     27       for(int k=0; k<N; k++) {
+     28         a = cos(3.14);
+     29       }
+     30
+     31   boil::timer.stop();
+     32   boil::timer.report();
+     33 }
+\end{verbatim}}
+%
+If you compile and run it, you will get the following output:
+%
+{\small \begin{verbatim}
+Running acos ...
+Running cos ...
++==========================================
+| Total execution time: 7.21 [s]
++------------------------------------------
+\end{verbatim}}
+%
+The execution time is measured as above, but the information on the 
+total time is not quite useful now. You would like to see how much
+time each of the algorithms ({\em acos} and {\em cos}) consumes.
+Object {\tt boil::timer} can be used for that purpose too. To achieve
+that, you must enclose the parts of the code you would like to 
+measure with {\tt boil::timer.start()} and {\tt boil::timer.stop()},
+but with the {\em names} of the parts of the algorithm sent as
+parameters. To illustrate it, lines~15--29, should be replaced by the 
+following lines~({\tt 04-03-main.cpp}):
+%
+{\small \begin{verbatim}
+     15   /* algorithm using "acos" */
+     16   boil::timer.start("acos algorithm");
+     17   for(int i=0; i<N; i++)
+     18     for(int j=0; j<N; j++)
+     19       for(int k=0; k<N; k++) {
+     20         a = acos(-1.0);
+     21       }
+     22   boil::timer.stop("acos algorithm");
+     23
+     24   boil::oout << "Running cos ..." << boil::endl;
+     25
+     26   /* algorithm using "cos" */
+     27   boil::timer.start("cos algorithm");
+     28   for(int i=0; i<N; i++)
+     29     for(int j=0; j<N; j++)
+     30       for(int k=0; k<N; k++) {
+     31         a = cos(3.14);
+     32       }
+     33   boil::timer.stop("cos algorithm");
+\end{verbatim}}
+%
+The lines which are different to previous program ({\tt 04-02-main.cpp}) are
+in lines: 16, 22, 27 and 33. Lines 16 and 22 enclose the {\em acos} algorithm
+and send the name {\tt "acos algorithm"} as parameter, while the lines 27
+and 33 enclose the {\em cos} algorithm and send the name {\tt "cos algorithm"}
+as parameter. These names are arbitrary, but must be {\em unique}. Furthermore,
+each {\tt boil::timer.start(char * name);} must have a corresponding 
+{\tt boil::timer.stop(char * name);}. If you compile and run this program, you will
+get the following output:
+%
+{\small \begin{verbatim}
+Running acos ...
+Running cos ...
++==========================================
+| Total execution time: 7.05 [s]
++------------------------------------------
+| Time spent in acos algorithm: 5.91 [s]    (83.8298%)
+| Time spent in cos algorithm : 1.14 [s]    (16.1702%)
+| Time spent elsewhere: 0 [s]    (0%)
++------------------------------------------
+\end{verbatim}}
+%
+This output quite apparently shows how much time was spent in each part of
+the code that you wanted to measure. The names you have assigned in calls
+to {\tt boil::timer.start("name")} and {\tt boil::timer.stop("name");}
+({\tt "acos algorithm"} and {\tt "cos algorithm"}) appear in the output,
+showing how much time was spend in each of them and what percentage of
+total CPU-time they consume. This information is a clear indication 
+to parts of the code which need optimization for speed. In other words, 
+{\psiboil} has built-in {\em profiling} capability. All these features work
+for parallel version as well. The information which parallel version would
+print on the terminal is the average it spent over all processors. If you
+wanted to have separate information for each processor, you should
+use {\tt boil::timer.report\_separate();} instead of 
+{\tt boil::timer.report();}.
+
+It was mentioned above that each call to {\tt boil::timer.start(char * name);} 
+requires a call to {\tt boil::timer.stop(char * name);}. It does not have to
+mean that number of {\tt boil::timer.start(char * name);} is always equal
+to number of {\tt boil::timer.stop(char * name);} in a program unit. Imagine
+you are timing a subroutine which has two possible exits, typical for iterative 
+algorithms\footnote{This is just an illustrative example, not a real program
+which could be compiled inside the {\psiboil}. It's source is therefore not 
+available in a separate file}:
+%
+{\small \begin{verbatim}
+      1 void iterative(const int n, const real res) {
+      2
+      3   boil::timer.start("iterative");
+      4
+      5   /* start the iterative procedure */
+      6   for(int it=0; it<n; it++) {
+      7      ...
+      8      ...
+      9      ...
+     10      if(residual < res) {        
+     11        boil::oout << "algorithm converged!" << boil::endl;
+     12        boil::timer.stop("iterative");
+     13        return;
+     14      }
+     15   }
+     16
+     17   boil::oout << "algorithm failed to converge!" << boil::end;
+     18   boil::timer.stop("iterative");
+     19   return;
+     20 }
+\end{verbatim}}
+%
+In this example, the whole subroutine {\tt iterative(const int, const real)}
+is measured. Timing starts in line~3, but it can end in two ways. If the desired
+criteria is met inside the iterative procedure (lines~6--15), you exit from the 
+subroutine in line~13. If the iterative procedure fails to meet the desired
+criteria, you exit from the subroutine in line~20. A call to 
+{\tt boil::timer.stop(char * name);} must be present for each of these cases.
+In the above example it is. In lines~12 and~18. 
+
+%---------------------------------------------------------------------nutshell-%
+\vspace*{5mm} \fbox{ \begin{minipage}[c] {0.97\textwidth} %-----------nutshell-%
+    {\sf Section \ref{sec_local} in a nutshell} \\ %------------------nutshell-%
+
+      - To measure the CPU-time spent in one part of the code, enclose 
+      this part with commands:
+      \begin{itemize}
+        \item {\tt boil::timer.start(char * name);} 
+        \item {\tt boil::timer.stop(char * name);} 
+      \end{itemize}
+      where {\tt name} is a {\em unique} name, and it will appear in the 
+      output of the final call to \\ {\tt boil::timer.report()}. \\
+
+      - Each call to {\tt boil::timer.start(char * name);} {\em must} have
+      a corresponding call to {\tt boil::timer.stop(char * name);}. 
+
+  \end{minipage} } %--------------------------------------------------nutshell-%
+%---------------------------------------------------------------------nutshell-%

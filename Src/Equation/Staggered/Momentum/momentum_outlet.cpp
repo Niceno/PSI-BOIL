@@ -21,13 +21,10 @@ void Momentum::outlet() {
   |  get volume flux the inlet and outlet  |
   +---------------------------------------*/
   /* v_phase_change() should be called from main.cpp, if phase change occurs */
-  real volf_in  = u.bnd_flow( BndType::inlet() )
-                + u.bnd_flow( BndType::insert() )
-                + v_phase_change;
-  if(ib_trust_vel_wall) {
-    volf_in += volf_ib;  // inflow through immersed boundary
-  }
-  real volf_out = u.bnd_flow( BndType::outlet(), &aox, &aoy, &aoz ); 
+  const real volf_in  = volf_bct( BndType::inlet() )
+                      + volf_bct( BndType::insert() )
+                      + v_phase_change;
+  real volf_out = volf_bct( BndType::outlet(), &aox, &aoy, &aoz ); 
 
   /* compute bulk velocity */
   ubo = volf_out / (aox + aoy + aoz);
@@ -55,7 +52,7 @@ void Momentum::outlet() {
   +------------------------------------------------------*/
 
   /* due to step 1, volf_out has changed */
-  volf_out = u.bnd_flow( BndType::outlet(), &aox, &aoy, &aoz ); 
+  volf_out = volf_bct( BndType::outlet(), &aox, &aoy, &aoz ); 
   ubo = volf_in / (aox + aoy + aoz);
   if(volf_out==0.0 && volf_in==0.0){
     ratio=1.0;
@@ -69,7 +66,7 @@ void Momentum::outlet() {
 
 #if 0
   /* debug */
-  volf_out = u.bnd_flow( BndType::outlet(), &aox, &aoy, &aoz );
+  volf_out = volf_bct( BndType::outlet(), &aox, &aoy, &aoz );
   ubo = volf_out / (aox + aoy + aoz);
   if(volf_out==0.0 && volf_in==0.0){
     ratio=1.0;

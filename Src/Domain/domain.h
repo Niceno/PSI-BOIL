@@ -15,10 +15,7 @@
 #include "../Ravioli/bndgrid.h"
 #include "../Ravioli/dir.h"
 #include "../Ravioli/comp.h"
-#include "../Ravioli/sign.h"
 #include "../Ravioli/decompose.h"
-#include "../Ravioli/enumerate.h"
-#include "../Ravioli/range.h"
 #include "../Global/global_swap.h"
 
 //////////////
@@ -29,37 +26,20 @@
 class Domain {
   public:
     Domain(const Grid1D & ogx, const Grid1D & ogy, const Grid1D & ogz,
-           const std::string n="domain", const Decompose dec=Decompose::xyz(),
-           const bool print_statistics = true);
+           const std::string n="domain", const Decompose dec=Decompose::xyz());
 
     Domain(const Grid1D & ogx, const Grid1D & ogy, const Grid1D & ogz,
            Body * b, /* it will change, that is why it is pointer */ 
-           const std::string n="domain", const Decompose dec=Decompose::xyz(),
-           const bool print_statistics = true);
- 
-    Domain(const Domain & fine_dom,
-           const Step cx, const Step cy = Step(-1), const Step cz = Step(-1),
-           Body * b = NULL,
-           const bool print_statistics = true);
+           const std::string n="domain", const Decompose dec=Decompose::xyz());
 
     ~Domain(){}
 
     int  level() const {return lev;}
 
-    virtual bool is_axisymmetric() const { return false; }
-    virtual bool is_cartesian() const { return true; }
-
     /* local number of cells */
     int  ni()    const {return grid_x_local->ncell_b();}
     int  nj()    const {return grid_y_local->ncell_b();}
     int  nk()    const {return grid_z_local->ncell_b();}
-    int  ntot()    const {return ni()*nj()*nk();}
-
-    /* local number of internal cells */
-    int  nii()    const {return grid_x_local->ncell();}
-    int  nij()    const {return grid_y_local->ncell();}
-    int  nik()    const {return grid_z_local->ncell();}
-    int  nitot()    const {return nii()*nij()*nik();}
 
     /* global number of cells */
     int  gi() const {return grid_x_original->ncell_b();}
@@ -117,64 +97,22 @@ class Domain {
     real global_max_y() const {return grid_y_original->x_max();}
     real global_max_z() const {return grid_z_original->x_max();}
 
-    /* original grids */
-    const Grid1D * grid_x_org() const {return grid_x_original; }
-    const Grid1D * grid_y_org() const {return grid_y_original; }
-    const Grid1D * grid_z_org() const {return grid_z_original; }
-
-    /* name */
-    std::string dom_name() const { return name; }
-
-    /* decomposition */
-    Decompose decomp() const { return dc; }
-
-    /* careful: these return global logical coordinates */
+    /* carefull: these return global logical coordinates */
     int I(const real x) const;
     int J(const real y) const;
     int K(const real z) const;
 
     /* cell surfaces */
-    virtual real dSx(const int i, const int j, const int k) const; 
-    virtual real dSy(const int i, const int j, const int k) const;
-    virtual real dSz(const int i, const int j, const int k) const;
-
-    virtual real dSx_xstag(const int i, const int j, const int k) const;
-    virtual real dSx_ystag(const int i, const int j, const int k) const;
-    virtual real dSx_zstag(const int i, const int j, const int k) const;
-
-    virtual real dSy_xstag(const int i, const int j, const int k) const;
-    virtual real dSy_ystag(const int i, const int j, const int k) const;
-    virtual real dSy_zstag(const int i, const int j, const int k) const;
-
-    virtual real dSz_xstag(const int i, const int j, const int k) const;
-    virtual real dSz_ystag(const int i, const int j, const int k) const;
-    virtual real dSz_zstag(const int i, const int j, const int k) const;
-
-    virtual real dSx(const Sign sig, const int i, const int j, const int k) const; 
-    virtual real dSy(const Sign sig, const int i, const int j, const int k) const;
-    virtual real dSz(const Sign sig, const int i, const int j, const int k) const;
-
-    virtual real dSx_xstag(const Sign sig, const int i, const int j, const int k) const;
-    virtual real dSx_ystag(const Sign sig, const int i, const int j, const int k) const;
-    virtual real dSx_zstag(const Sign sig, const int i, const int j, const int k) const;
-
-    virtual real dSy_xstag(const Sign sig, const int i, const int j, const int k) const;
-    virtual real dSy_ystag(const Sign sig, const int i, const int j, const int k) const;
-    virtual real dSy_zstag(const Sign sig, const int i, const int j, const int k) const;
-
-    virtual real dSz_xstag(const Sign sig, const int i, const int j, const int k) const;
-    virtual real dSz_ystag(const Sign sig, const int i, const int j, const int k) const;
-    virtual real dSz_zstag(const Sign sig, const int i, const int j, const int k) const;
+    real dSx(const int i, const int j, const int k) const 
+     {return dyc(j) * dzc(k);}
+    real dSy(const int i, const int j, const int k) const
+     {return dxc(i) * dzc(k);}
+    real dSz(const int i, const int j, const int k) const
+     {return dxc(i) * dyc(j);}
 
     /* cell volume */
-    virtual real dV(const int i, const int j, const int k) const; 
-
-    virtual real dV_xstag(const int i, const int j, const int k) const;
-    virtual real dV_ystag(const int i, const int j, const int k) const;
-    virtual real dV_zstag(const int i, const int j, const int k) const;
-
-    /* used as Cartesian area projection in Axisymmetric */
-    virtual real dSy_cartesian(const int i, const int j, const int k) const;
+    real dV(const int i, const int j, const int k) const 
+     {return dxc(i) * dyc(j) * dzc(k);}
 
     bool  period(const int i) const {return per[i];}
     bool  is_dummy(const int i) const {return dummy[i];}
@@ -246,20 +184,17 @@ class Domain {
     int coord(const Comp & i)  const {return coords[~i];}
     int dim(const Comp & i)    const {return dims[~i];}
 
-    /* computes and prints grid statistics
-     * -> virtual so that it gets called from the proper constructor */
-    virtual void statistics(Body * b = NULL);
+    /* computes and prints grid statistics */
+    void statistics(Body * b = NULL);
 
     real dxyz_min() const {return min_dxyz;}
     real dxyz_max() const {return max_dxyz;}
     real dV_min()   const {return min_dV;}
     real dV_max()   const {return max_dV;}
 
-    static void set_decomposition_factors(const int fx, 
-                                          const int fy, const int fz);
+    void save(const char * nm);
 
-  //private:
-  protected:
+  private:
     Domain(const Grid1D * ogx, const Grid1D * ogy, const Grid1D * ogz,
            const Grid1D * lgx, const Grid1D * lgy, const Grid1D * lgz,
            int * dms, int * crds, int * nghbrs,
@@ -298,11 +233,6 @@ class Domain {
     real min_dxyz, max_dxyz;
     real min_dV, max_dV;
     real max_ar; /* aspect ratio */
-
-    /* decomposition */
-    const Decompose dc;
-    /* with the factors below, more fine-grained user-control over
-       decomposition can be achieved */
-    static int factor_x, factor_y, factor_z;
 };	
+
 #endif

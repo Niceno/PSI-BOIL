@@ -50,19 +50,20 @@ class Plot {
                       const char *, const int) = 0;
     virtual void plot(const Vector &, const Scalar &, const Scalar &,
                       const Scalar &, const Scalar &, const Scalar &,
-                      const Scalar &, const char *, const int) = 0;  // Scalar 6
+                      const Scalar &, const char *, const int) = 0;
     virtual void plot(const Vector &, const Scalar &, const Scalar &,
                       const Scalar &, const Scalar &, const Scalar &,
-                      const Scalar &, const Scalar &,
-                      const char *, const int) = 0;                  // Scalar 7
-    virtual void plot(const Vector &, const Scalar &, const Scalar &,
-                      const Scalar &, const Scalar &, const Scalar &,
-                      const Scalar &, const Scalar &, const Scalar &,
-                      const char *, const int) = 0;                  // Scalar 8
+                      const Scalar &, const Scalar &, 
+                      const char *, const int) = 0;
     virtual void plot(const Vector &, const Scalar &, const Scalar &,
                       const Scalar &, const Scalar &, const Scalar &,
                       const Scalar &, const Scalar &, const Scalar &,
-                      const Scalar &,const char *, const int) = 0;   // Scalar 9
+                      const char *, const int) = 0;
+    virtual void plot(const Vector &, const Scalar &, const Scalar &,
+                      const Scalar &, const Scalar &, const Scalar &,
+                      const Scalar &, const Scalar &, const Scalar &,
+                      const Scalar &,
+                      const char *, const int) = 0;
     virtual void plot(const Scalar &, const Scalar &, 
                       const char *, const int = -1) = 0;
     virtual void plot(const Scalar &, const ScalarInt &, 
@@ -78,6 +79,7 @@ class Plot {
     virtual void plot(const Scalar &, const Scalar &, const Scalar &, 
                       const Scalar &, const Scalar &, const Scalar &,
                       const char *, const int) = 0;
+    virtual void set_plot_body(bool b) = 0;
   protected:
     const Domain * dom;
     int   sh;           /* shift */

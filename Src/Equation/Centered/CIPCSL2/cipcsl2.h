@@ -7,26 +7,12 @@
 #include "../../../Global/global_constants.h"
 #include "../../../Global/global_realistic.h"
 #include "../../Topology/topology.h"
-#include "../../Heaviside/MarchingCubes/marching_cubes.h"
+#include "../../Heaviside/heaviside.h"
 
 #define RCIP
 //#define LOCAL_OLSSON
 #define IB
 //#define DEBUG
-
-/***************************************************************************//**
-*  \brief Discretizes and solves color function transport equation.
-*
-*  The eqation is discretized in integral form:
-*  \f[
-*        \int_V \frac{\partial \phi}{\partial t} dV
-*      + \int_S \phi {\bf u} \, dS
-*      =  g
-*      \; \; \; \;
-*      [\frac{m^{3}}{s}]
-*  \f]
-*  where \phi \; [-]\f$ is color function, \fg is source term.
-*******************************************************************************/
 
 //////////////
 //          //
@@ -79,14 +65,10 @@ class CIPCSL2 : public Centered {
             const Scalar & kappa,
             const Vector & u, 
             Times & t,
-            Linear * S);
+            Krylov * S);
     ~CIPCSL2();
 
-    void new_time_step(const Scalar * diff_eddy = NULL){
-     if(!is_initialized)
-        init();
-      topo->new_time_step(); 
-    };
+    void new_time_step(){};
     void advance();
     void bdcond(const Scalar & sca);
     void curvature();
@@ -104,15 +86,14 @@ class CIPCSL2 : public Centered {
                      , Range<real> zr );
     void init();
     void update_node(Scalar & g);
-    void save(const char *, const int);
-    void load(const char *, const int);
-    void rm(const char *, const int);
+    void save(char *, const int);
+    void load(char *, const int);
+    void rm(char *, const int);
     void range(){
       boil::oout<<"Range of color function: "<<clr.min()<<" "<<clr.max()<<"\n";
     }
     void bnd_extract( const Dir d, real *** cp ) const;
     void bnd_insert ( const Dir d, real **  cp );
-    void enforce ( const int i, const int j, const int k, const real x);
 
     /* getter for front_minmax */
     real get_xminft() { return(xminft);};
@@ -170,7 +151,7 @@ class CIPCSL2 : public Centered {
       boil::oout<<"set_eps_st: eps_st= "<<eps_st<<boil::endl;
     }
     /* getter for eps_st */
-    real get_eps_st() { return (eps_st);};
+    real get_eps_st() { return(eps_st);};
 
     /* setter for itsmear */
     void set_itsmear(const int i) {
@@ -178,7 +159,7 @@ class CIPCSL2 : public Centered {
       boil::oout<<"itsmear: itsmear= "<<itsmear<<boil::endl;
     }
     /* getter for itsmear */
-    real get_itsmear() { return (itsmear);};
+    real get_itsmear() { return(itsmear);};
 
     /* getter for sum_outlet */
     real get_sum_outlet() { return (sum_outlet); };
@@ -192,32 +173,17 @@ class CIPCSL2 : public Centered {
     /* getter for clrsum2 */
     real get_clrsum2() { return (clrsum2); };
 
-    /* setter for extrapolate_ib */
-    void set_extrapolate_ib(const bool b) {
-      extrapolate_ib=b;
-      boil::oout<<"cipcsl2:extrapolate_ib= "<<b<<"\n";
-      boil::oout<<"        true:  extrapolate color function into solid \n";
-      boil::oout<<"        false: no extrapolate color function into solid \n";
-    }
-    bool get_extrapolate_ib() { return (extrapolate_ib); };
-
     /* min and max of color function in fluid domain */
     real minval() {return minclr;}
     real maxval() {return maxclr;}
     void color_minmax(); 
 
-    /* adens */
-    real get_adens(const int i,const int j, const int k){
-      return adens[i][j][k];
-    }
-
-    Topology * topo;
+    Topology topo;
     void ancillary();
-    Heaviside * heaviside() { return heavi; }
 
   protected:
     void bnd_wall_kappa();
-    virtual void convection();
+    void convection();
     void curv(const Scalar & g);
     void curv_interface();
     void curv_interface_ext();
@@ -281,20 +247,18 @@ class CIPCSL2 : public Centered {
     void set_maxval(real r) {maxclr=r;}
     real beta(const real a1, const real a2, const bool b);
 
+    void cal_fs();
+    void fs_bnd_nosubgrid(const Scalar & scp);
     real extrapolate_c(const Scalar & sca, const int i, const int j, const int k,
                        const int ofx, const int ofy, const int ofz,
                        const real rat);
+    void cal_adens();
     void update_at_walls(Scalar & sca);
-
-    void interfacial_flagging(Scalar & scp);
-    bool Interface(const Sign dir, const Comp m,
-                   const int i, const int j, const int k);
-    bool Interface(const int i, const int j, const int k);
 
     Scalar clr, sclr;            /* color function, smeared color function */
 
     /* ancillary */
-    Heaviside * heavi;
+    Heaviside heavi;
     Vector fs;
     Scalar adens;
 
@@ -303,12 +267,12 @@ class CIPCSL2 : public Centered {
     Scalar kappa;          /* curvature function */
     Scalar alp;            /* coefficient for local sharpening */
     Scalar fn, atmp, stmp; /* temporary */
-    ScalarInt iflag, wflag, intflag;
+    ScalarInt iflag, wflag;
     Scheme scheme;
     Matter jelly;   /* virtual fluid for level set transport */
     real xminft,xmaxft,yminft,ymaxft,zminft,zmaxft; /* xyz min&max of front */
     real tol_wall; /* wall tolerance for erroneous interfaces */
-    real phimin,phimax,phisurf;
+    real pi,phimin,phimax,phisurf;
     real dxmin,ww;
     real sum_outlet,sum_outletm,clrsum1,clrsum2;
     int nredist, itsharpen, nlayer, ialpcal, itsmear;
@@ -319,7 +283,5 @@ class CIPCSL2 : public Centered {
     real cangle;
     real minclr, maxclr;
     bool localSharpen, use_dist_for_kappa;
-    bool is_initialized;
-    bool extrapolate_ib;
 };
 #endif

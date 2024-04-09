@@ -26,7 +26,7 @@ them will not be repeated.}:
      14   for(int i=0; i<N; i++)
      15     for(int j=0; j<N; j++)
      16       for(int k=0; k<N; k++) {
-     17         a = acos(-1.0);
+     17         a = acos(3.14);
      18       }
      29
      20   boil::timer.stop();
@@ -35,7 +35,7 @@ them will not be repeated.}:
 \end{verbatim}}
 %
 The central part of this program is nested loop in lines~14--16 which computes
-$acos(-1.0)$. Clearly, this program will calculate $acos$ (a relatively 
+$acos(3.14)$. Clearly, this program will calculate $acos$ (a relatively 
 time-consuming operation) for $256^3$ times. The commands {\tt boil::timer.start();}
 and {\tt boil::timer.stop();} (lines 8 and 20 respectively) start and stop the 
 global timer. In addition to these, we also use {\tt boil::timer.report();}, which

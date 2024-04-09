@@ -1,0 +1,62 @@
+nucleation_add.cpp
+nucleation_area_vapor.cpp
+nucleation_area_vapor_sum.cpp
+nucleation_clr_site.cpp
+32,43c32,34
+<   real dxy = 0.0;  // grid spacing at nucleation site
+<   if(sites[ns].contain_site()){
+<     real dxx = (*clr).dxc(sites[ns].ic_site());
+<     real dyy = (*clr).dyc(sites[ns].jc_site());
+<     dxy = boil::maxr(dxx,dyy);
+<   }
+<   boil::cart.max_real(&dxy);
+<   if (dxy==0.0) {
+<     boil::oout<<"nucleation_clr_site:Error dxy=0.0\n";
+<     exit(0);
+<   }
+< 
+---
+>   real dxx = (*clr).dxc(sites[ns].ic_site());
+>   real dyy = (*clr).dyc(sites[ns].jc_site());
+>   real dxy = boil::maxr(dxx,dyy);
+71a63
+> 
+nucleation.cpp
+nucleation_cutneck.cpp
+nucleation_deactivate_sites.cpp
+nucleation_dmicro0.cpp
+nucleation_heat_sink.cpp
+nucleation_height_bubble.cpp
+nucleation_insert_dmicro.cpp
+nucleation_in_vapor.cpp
+nucleation_load.cpp
+nucleation_optdat.cpp
+nucleation_plant_clr.cpp
+nucleation_plant.cpp
+nucleation_replant.cpp
+188a189
+>         //bool clr_seed_cond = !in_vapor(clr_seed); /* true: in liquid */
+191a193,194
+>         //boil::oout<<"tpr_seed= "<<tpr_seed<<" Tact "<<sites[ns].active_tpr()
+> 	//<<" bheight "<<bheight<<"\n";
+nucleation_rm.cpp
+nucleation_save.cpp
+nucleation_set_range.cpp
+24c24,28
+<   zs = std::max(zs,0.0);
+---
+> #if 0
+>   if (ns==349) {
+>     boil::oout<<"set_range:ns="<<ns<<" "<<xs<<" "<<xe<<" "<<ys<<" "<<ye<<" "<<zs<<" "<<ze<<"\n";
+>   }
+> #endif
+53c57
+<     int is = clr->aim(xs, boil::femto);  // femto = 1e-15
+---
+>     int is = clr->aim(xs, boil::femto);
+nucleation_stratified_sphere.cpp
+nucleation_tpr_site.cpp
+nucleation_vol_area.cpp
+nucleation_zftmin.cpp
+nucleation_zoning.cpp
+site.cpp

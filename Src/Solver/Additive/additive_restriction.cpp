@@ -37,7 +37,7 @@ void AC::restriction(const Centered & h, Centered & H) const {
   int ih[CI+2], jh[CJ+2], kh[CK+2];
 
   real D[CI+1][CJ+1][CK+1]; // [0] not used
-
+	
   h.phi.exchange();
 
   for(int iH=H.si(); iH<=H.ei(); iH++) {
@@ -134,13 +134,6 @@ void AC::restriction(const Centered & h, Centered & H) const {
       }
     }
 
-  /* should be satisfied trivially, this is to avoid numerical errors */
-  for_vijk(H, iH, jH, kH) {
-    if(!H.aflag[iH][jH][kH]) {
-      H.fnew[iH][jH][kH] = 0.;
-    }
-  }
-
   /*----------------------------------------------------+ 
   |  r.h.s. normalization.                              |
   + - - - - - - - - - - - - - - - - - - - - - - - - - - +
@@ -149,29 +142,21 @@ void AC::restriction(const Centered & h, Centered & H) const {
   |  get distorted r.h.s. on even coarser levels        |
   +----------------------------------------------------*/
   real sum = 0.0;
-  int ncell = 0;
-  //int ncell = (H.ni()-2*boil::BW)*(H.nj()-2*boil::BW)*(H.nk()-2*boil::BW);
   for(int i=H.si(); i<=H.ei(); i++)
     for(int j=H.sj(); j<=H.ej(); j++)
-      for(int k=H.sk(); k<=H.ek(); k++) {
-        if(H.aflag[i][j][k]) {
-          sum += H.fnew[i][j][k];
-          ncell++;
-        }
-      }
+      for(int k=H.sk(); k<=H.ek(); k++)
+        sum += H.fnew[i][j][k];
 
-  boil::cart.sum_real(&sum);
-  boil::cart.sum_int (&ncell);
+  boil::cart.sum_real(& sum);
 
-  sum /= real(ncell);
+  int ncell = (H.ni()-2*boil::BW)*(H.nj()-2*boil::BW)*(H.nk()-2*boil::BW);
+  boil::cart.sum_int( & ncell );
+
+  sum /= (real)ncell;
 
   for(int i=H.si(); i<=H.ei(); i++)
     for(int j=H.sj(); j<=H.ej(); j++)
-      for(int k=H.sk(); k<=H.ek(); k++) {
-        if(H.aflag[i][j][k]) {
-          H.fnew[i][j][k] -= sum;
-        }
-      }
+      for(int k=H.sk(); k<=H.ek(); k++)
+        H.fnew[i][j][k] -= sum;
 
-  return;
 }

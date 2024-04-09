@@ -9,8 +9,6 @@ void CIPCSL2::init() {
 *  \brief  Initialize variables used for CIPCSL2
 *******************************************************************************/
 
-  is_initialized = true;
-
   for_aijk(i,j,k){
     phi[i][j][k]=min(1.0,max(0.0,phi[i][j][k]));
   }
@@ -153,8 +151,6 @@ void CIPCSL2::init() {
   plot_sxyz("sxyzj.dat",Comp::j());
   plot_sxyz("sxyzk.dat",Comp::k());
 #endif
-
-  ancillary();
 
   return;
 }

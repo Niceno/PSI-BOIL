@@ -7,7 +7,7 @@ void VOF::gradphi(const Scalar & sca) {
 *         Resluts: nx, ny, nz
 *******************************************************************************/
 
-  real ni,nj,nk,magn;
+  real ni,nj,nk;
 
   /* node base */
   for(int i=sca.si(); i<=sca.ei()+1; i++) {

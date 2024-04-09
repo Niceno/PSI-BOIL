@@ -8,14 +8,14 @@ mkdir $now/Srcfiles
 mkdir $now/Execs
 mkdir $now/Srcfiles/VOF
 mkdir $now/Srcfiles/PhaseChangeVOF
-mkdir $now/Srcfiles/EnthalpyFD
+mkdir $now/Srcfiles/EnthalpyTif
 
 cp ../Equation/Centered/VOF/*.cpp $now/Srcfiles/VOF/
 cp ../Equation/Centered/VOF/*.h   $now/Srcfiles/VOF/
 cp ../Equation/Centered/PhaseChangeVOF/*.cpp $now/Srcfiles/PhaseChangeVOF/
 cp ../Equation/Centered/PhaseChangeVOF/*.h   $now/Srcfiles/PhaseChangeVOF/
-cp ../Equation/Centered/EnthalpyFD/*.cpp   $now/Srcfiles/EnthalpyFD/
-cp ../Equation/Centered/EnthalpyFD/*.h     $now/Srcfiles/EnthalpyFD/
+cp ../Equation/Centered/EnthalpyTif/*.cpp   $now/Srcfiles/EnthalpyTif/
+cp ../Equation/Centered/EnthalpyTif/*.h     $now/Srcfiles/EnthalpyTif/
 
 cd ..
 

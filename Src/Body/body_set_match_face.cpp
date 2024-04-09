@@ -12,7 +12,7 @@ void Body::set_match_face( Cutcell & ccell, int index, int ic, int jc, int kc
   real zp[4];
 
 
-    std::cout<<"set_match: nface_match=b "<<ic<<" "<<jc<<" "<<nface_match<<"\n";
+    std::cout<<"cut_cell: nface_match=b "<<ic<<" "<<jc<<" "<<nface_match<<"\n";
     if(face_match[0][0]==1&&face_match_norm[0][0][0]<0.0) return;
     if(face_match[0][1]==1&&face_match_norm[0][1][0]>0.0) return;
     if(face_match[1][0]==1&&face_match_norm[1][0][1]<0.0) return;

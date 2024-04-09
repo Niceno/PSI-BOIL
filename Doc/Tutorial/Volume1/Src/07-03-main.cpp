@@ -4,7 +4,7 @@ const real L =  1.0;
 const int  N = 64; 
 
 /******************************************************************************/
-int main(int argc, char * argv[]) {
+main(int argc, char * argv[]) {
 
   boil::timer.start();
 
@@ -23,8 +23,6 @@ int main(int argc, char * argv[]) {
 
   Matter solid(d);                                  /* matter */
   solid.lambda(0.5);
-  solid.rho(1.0);
-  solid.cp(1.0);
 
   Krylov * solver = new CG(d, Prec::di());          /* linear solver */
 
@@ -40,8 +38,6 @@ int main(int argc, char * argv[]) {
 
   for_vijk(q,i,j,k)                                 /* fill the source term */
     q[i][j][k] = 100.0*q.dV(i,j,k);
-
-  enth.new_time_step();                             /* calculate steady-state part etc */
 
   multigrid.vcycle(ResRat(1e-4));                   /* solve linear system */
 

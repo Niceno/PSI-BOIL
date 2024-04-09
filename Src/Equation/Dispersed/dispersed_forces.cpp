@@ -111,8 +111,6 @@ void Dispersed::forces() {
     |  compute forces on the particle  |
     |                                  | 
     +---------------------------------*/
-    real sum = 0.0; 
-    real vol = 0.0;
     
     /* reynolds number based on relative velocity */
     const real reynolds = rho_cont * norm_uvwr * particles[p].d() 

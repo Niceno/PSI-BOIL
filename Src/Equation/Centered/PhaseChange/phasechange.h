@@ -4,6 +4,7 @@
 #include <cmath>
 #include "../centered.h"
 #include "../../../Parallel/communicator.h"
+#include "../../../Solver/Gauss/gauss.h"
 #include "../../../Timer/timer.h"
 #include "../../Nucleation/nucleation.h"
 
@@ -28,7 +29,8 @@ class PhaseChange : public Centered {
  
     ~PhaseChange();
     void update(const Scalar * diff_eddy = NULL);
-    void micro(Vector * vec, const Scalar * diff_eddy = NULL);
+    void micro(Vector * vec, const Scalar * diff_eddy = NULL, 
+               Scalar * hflux = NULL, Scalar *warea = NULL);
     void modify_vel(Vector & vec, const Scalar & sa,const Scalar & sb);
 
     // setter and getter for Mmicro and fmicro
@@ -61,6 +63,7 @@ class PhaseChange : public Centered {
     real get_hflux_area(const Dir d){return area_sum[int(d)];}
     real get_hflux_area_l(const Dir d){return area_l[int(d)];}
     real get_hflux_area_v(const Dir d){return area_v[int(d)];}
+    real get_hflux_area_micro(const Dir d){return area_micro[int(d)];}
     real get_smdot_pos(){return smdot_pos;}
     real get_smdot_neg(){return smdot_neg;}
 
@@ -127,7 +130,7 @@ class PhaseChange : public Centered {
     real smdot_pos, smdot_neg, smdot_pos_macro, smdot_neg_macro;
     real turbP;
     real * hflux_total, * hflux_micro, * hflux_vapor;
-    real * area_sum, * area_l, * area_v;
+    real * area_sum, * area_l, * area_v, * area_micro;
     bool use_int_res;
     real resint;
 };	

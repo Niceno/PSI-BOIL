@@ -9,7 +9,7 @@
 #include "../Ravioli/timescheme.h"
 #include "../SimulationTime/simulation_time.h"
 #include "../Domain/domain.h"
-#include "../Solver/Linear/Krylov/krylov.h"
+#include "../Solver/Krylov/krylov.h"
 #include "../Matter/matter.h"
 
 ////////////////
@@ -23,31 +23,24 @@ class Equation {
              const Times  * t, 
              Matter * f, 
              Matter * s, 
-             Linear * sm) : 
+             Krylov * sm) : 
       dom(d), time(t), flu(f), sol(s), solver(sm),
       conv_ts(TimeScheme::adams_bashforth()),
       diff_ts(TimeScheme::crank_nicolson()),
-      lim(ConvScheme::superbee()), scale(1.0) {}  
+      lim(ConvScheme::superbee()) {}  
 
     virtual void discretize(const Scalar * diff_eddy = NULL) = 0;
 
-    virtual void diffusion_set (const TimeScheme & ts) {diff_ts = ts; discretize();}
+    void diffusion_set (const TimeScheme & ts) {diff_ts = ts; discretize();}
     void convection_set(const TimeScheme & ts) {conv_ts = ts;}
     void convection_set(const ConvScheme & cs) {lim.set(cs);}
 
-    Linear * solver;
+    Krylov * solver;
 
     const Matter * fluid() const {return flu;}
     const Matter * solid() const {return sol;}
 
     const Domain * domain() const {return dom;}
-
-    real get_scale() const { return scale; }
-    void set_scale(const real s) { 
-      scale = s; 
-      boil::oout<<"Equation scale: "<<s<<boil::endl;
-      return;
-    }
     
   protected:
     TimeScheme diff_ts;
@@ -58,8 +51,6 @@ class Equation {
     const Times  * time;
     Matter * flu;
     Matter * sol;
-
-    real scale;
 };
 
 #endif

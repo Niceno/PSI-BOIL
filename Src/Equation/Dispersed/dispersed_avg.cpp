@@ -16,7 +16,6 @@ void Dispersed::avg() {
 
     for_m(m) { 
       real sum = 0.0;
-       real den = 0.0;
       real vol = 0.0;
       int ii=0; if(m == Comp::i()) ii++;
       int jj=0; if(m == Comp::j()) jj++;

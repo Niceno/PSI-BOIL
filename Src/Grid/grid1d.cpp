@@ -1,6 +1,6 @@
 #include "grid1d.h"
 
-/* If the bndgrid at N is undefined, the same is used for both sides */
+/* If the cutoff at N is undefined, the same is used for both sides */
 /* BndGrids are only relevant for non-periodic grids */
 /******************************************************************************/
 Grid1D::Grid1D(const Range<real> &  xr, const Range<real> & dxr,
@@ -16,22 +16,17 @@ Grid1D::Grid1D(const Range<real> &  xr, const Range<real> & dxr,
 
 #if 1
    if(nc_in<boil::BW) {
-     boil::oout<<"Grid1D: At least as many cells as the buffer width ("<<boil::BW
+     boil::aout<<"At least as many cells as the buffer width ("<<boil::BW
                <<") are required in each direction. Exiting."<<boil::endl;
-     exit(0);
-   }
-   if(xr.first()>xr.last()){
-     boil::oout<<"Grid1D: Error in Range-x "<< xr.first() <<" must be smaller than "
-               <<xr.last()<<"\n";
      exit(0);
    }
 #endif
 
 /*----------------+
-|  check bndgrids  |
+|  check cutoffs  |
 +----------------*/
   if(p == Periodic::no()&&ctf1 == BndGrid::undefined()) {
-    boil::aout<<"At least one bndgrid must be specified for a non-periodic grid."
+    boil::aout<<"At least one cutoff must be specified for a non-periodic grid."
               <<" Exiting."<<boil::endl;
     exit(0);
   }
@@ -49,7 +44,7 @@ Grid1D::Grid1D(const Range<real> &  xr, const Range<real> & dxr,
                           dxr.first(), dxr.last());
   
   correct_boundaries();
-}
+}  
 
 /******************************************************************************/
 Grid1D::Grid1D(const Range<real> &  xr,
@@ -68,10 +63,10 @@ Grid1D::Grid1D(const Range<real> &  xr,
 #endif
 
 /*----------------+
-|  check bndgrids  |
+|  check cutoffs  |
 +----------------*/
   if(p == Periodic::no()&&ctf1 == BndGrid::undefined()) {
-    boil::aout<<"At least one bndgrid must be specified for a non-periodic grid."
+    boil::aout<<"At least one cutoff must be specified for a non-periodic grid."
               <<" Exiting."<<boil::endl;
     exit(0);
   }
@@ -90,7 +85,7 @@ Grid1D::Grid1D(const Range<real> &  xr,
   distribute_nodes_inside( xr.first(),  xr.last(), dx, dx);
 
   correct_boundaries();
-}
+}  
 
 /******************************************************************************/
 Grid1D::Grid1D(const Grid1D & left, const Grid1D & right,
@@ -100,10 +95,10 @@ Grid1D::Grid1D(const Grid1D & left, const Grid1D & right,
                dummy_grid(false),
                period1(p), periodN(p), ctf1(co1), ctfN(coN) {
 /*----------------+
-|  check bndgrids  |
+|  check cutoffs  |
 +----------------*/
   if(p == Periodic::no()&&ctf1 == BndGrid::undefined()) {
-    boil::aout<<"At least one bndgrid must be specified for a non-periodic grid."
+    boil::aout<<"At least one cutoff must be specified for a non-periodic grid."
               <<" Exiting."<<boil::endl;
     exit(0);
   }
@@ -148,10 +143,10 @@ Grid1D::Grid1D(const Grid1D & left, const Grid1D & center, const Grid1D & right,
   dummy_grid(false),
   period1(p), periodN(p), ctf1(co1), ctfN(coN) {
 /*----------------+
-|  check bndgrids  |
+|  check cutoffs  |
 +----------------*/
   if(p == Periodic::no()&&ctf1 == BndGrid::undefined()) {
-    boil::aout<<"At least one bndgrid must be specified for a non-periodic grid."
+    boil::aout<<"At least one cutoff must be specified for a non-periodic grid."
               <<" Exiting."<<boil::endl;
     exit(0);
   }
@@ -207,8 +202,8 @@ Grid1D::Grid1D(const Grid1D & grid,
   : period1(grid.periodic1()), 
     periodN(grid.periodicN()),
     dummy_grid(grid.is_dummy()),
-    ctf1(grid.bndgrid1()),
-    ctfN(grid.bndgridN()) {
+    ctf1(grid.cutoff1()),
+    ctfN(grid.cutoffN()) {
 /*-------------------------------------------------------------------------+
 |  copy constructor with possibility to coarsen. not sure if it is needed  | 
 |                                                                          |
@@ -271,8 +266,8 @@ Grid1D::Grid1D(const Grid1D     & grid,
   : period1(grid.periodic1()), 
     periodN(grid.periodicN()),
     dummy_grid(grid.is_dummy()),
-    ctf1(grid.bndgrid1()),
-    ctfN(grid.bndgridN()) {
+    ctf1(grid.cutoff1()),
+    ctfN(grid.cutoffN()) {
 /*------------------------------------------------------------------------+
 |  copy constructor which gets a subgrid.                                 | 
 |  the disadvantage is that it allocates and de-allocates memory :-(      |

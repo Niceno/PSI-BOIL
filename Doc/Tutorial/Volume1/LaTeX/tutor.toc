@@ -1,0 +1,69 @@
+\contentsline {chapter}{\numberline {1}Introduction}{1}{}%
+\contentsline {section}{\numberline {1.1}About {\sffamily PSI-Boil}}{1}{}%
+\contentsline {chapter}{\numberline {2}Getting and Compiling the {\sffamily PSI-Boil} Sources}{3}{}%
+\contentsline {section}{\numberline {2.1}Obtaining the sources}{3}{}%
+\contentsline {subsection}{\numberline {2.1.1}Prerequisites for obtaining the {\sffamily PSI-Boil}}{3}{}%
+\contentsline {subsection}{\numberline {2.1.2}Adjusting the shell environment for {\tt CVS}}{4}{}%
+\contentsline {subsection}{\numberline {2.1.3}Retrieving the sources from {\tt CVS} database}{4}{}%
+\contentsline {section}{\numberline {2.2}Compiling the sources}{6}{}%
+\contentsline {subsection}{\numberline {2.2.1}Availability of required software}{6}{}%
+\contentsline {subsection}{\numberline {2.2.2}Creating {\tt Makefile}s}{7}{}%
+\contentsline {subsection}{\numberline {2.2.3}Compilation}{8}{}%
+\contentsline {subsection}{\numberline {2.2.4}Running the code}{9}{}%
+\contentsline {chapter}{\numberline {3}{\sffamily PSI-Boil}'s Terminal Output}{11}{}%
+\contentsline {section}{\numberline {3.1}Standard terminal output}{11}{}%
+\contentsline {section}{\numberline {3.2}Development terminal output}{14}{}%
+\contentsline {chapter}{\numberline {4}Timing {\sffamily PSI-Boil}}{17}{}%
+\contentsline {section}{\numberline {4.1}Global timing}{17}{}%
+\contentsline {section}{\numberline {4.2}Local timing}{19}{}%
+\contentsline {chapter}{\numberline {5}Creating Computational Domains}{23}{}%
+\contentsline {section}{\numberline {5.1}One-dimensional grids}{23}{}%
+\contentsline {subsection}{\numberline {5.1.1}Uniform grid}{23}{}%
+\contentsline {subsection}{\numberline {5.1.2}Periodic grid}{25}{}%
+\contentsline {subsection}{\numberline {5.1.3}Stretched grid}{25}{}%
+\contentsline {section}{\numberline {5.2}Ravioli classes}{26}{}%
+\contentsline {section}{\numberline {5.3}Three-dimensional domains}{27}{}%
+\contentsline {section}{\numberline {5.4}Immersed Bodies}{30}{}%
+\contentsline {section}{\numberline {5.5}Domain decomposition}{34}{}%
+\contentsline {chapter}{\numberline {6}Scalar and Vector Fields}{37}{}%
+\contentsline {section}{\numberline {6.1}Scalars}{37}{}%
+\contentsline {section}{\numberline {6.2}Vectors}{40}{}%
+\contentsline {chapter}{\numberline {7}Transport Equation Solvers}{45}{}%
+\contentsline {section}{\numberline {7.1}Transport equations in {\sffamily PSI-Boil}}{45}{}%
+\contentsline {subsection}{\numberline {7.1.1}Species conservation equation}{45}{}%
+\contentsline {subsection}{\numberline {7.1.2}Enthalpy conservation equation}{46}{}%
+\contentsline {subsection}{\numberline {7.1.3}Phase indicator equation}{46}{}%
+\contentsline {subsection}{\numberline {7.1.4}Pressure-Poisson equation}{46}{}%
+\contentsline {subsection}{\numberline {7.1.5}Momentum conservation equation}{46}{}%
+\contentsline {section}{\numberline {7.2}Simulation of heat conduction}{47}{}%
+\contentsline {subsection}{\numberline {7.2.1}Boundary conditions}{48}{}%
+\contentsline {subsubsection}{\numberline {7.2.1.1}Direction}{48}{}%
+\contentsline {subsubsection}{\numberline {7.2.1.2}Boundary condition type}{49}{}%
+\contentsline {subsubsection}{\numberline {7.2.1.3}Boundary condition value}{49}{}%
+\contentsline {subsubsection}{\numberline {7.2.1.4}Final form of boundary condition definition}{49}{}%
+\contentsline {subsection}{\numberline {7.2.2}Matter}{50}{}%
+\contentsline {subsection}{\numberline {7.2.3}Krylov}{50}{}%
+\contentsline {subsection}{\numberline {7.2.4}Times}{50}{}%
+\contentsline {subsection}{\numberline {7.2.5}Transport equation}{51}{}%
+\contentsline {subsection}{\numberline {7.2.6}Time-stepping scheme}{51}{}%
+\contentsline {subsection}{\numberline {7.2.7}Additive correction multigrid solver}{51}{}%
+\contentsline {subsection}{\numberline {7.2.8}Final solution}{53}{}%
+\contentsline {subsection}{\numberline {7.2.9}Exercise}{53}{}%
+\contentsline {section}{\numberline {7.3}Heat conduction with source term}{54}{}%
+\contentsline {subsection}{\numberline {7.3.1}Changing the physical properties}{55}{}%
+\contentsline {chapter}{\numberline {8}Structure of a Typical {\sffamily PSI-Boil} Program}{57}{}%
+\contentsline {chapter}{\numberline {9}Single-phase Flows}{61}{}%
+\contentsline {section}{\numberline {9.1}Flow over a cylinder}{62}{}%
+\contentsline {subsection}{\numberline {9.1.1}Domain}{63}{}%
+\contentsline {subsection}{\numberline {9.1.2}Field variables}{63}{}%
+\contentsline {subsection}{\numberline {9.1.3}Physical properties, time and solver}{64}{}%
+\contentsline {subsection}{\numberline {9.1.4}Transport equations}{65}{}%
+\contentsline {subsection}{\numberline {9.1.5}Preparation for the time-loop}{65}{}%
+\contentsline {subsection}{\numberline {9.1.6}The time-loop}{65}{}%
+\contentsline {subsection}{\numberline {9.1.7}Running the program}{67}{}%
+\contentsline {subsection}{\numberline {9.1.8}Results and footer output}{68}{}%
+\contentsline {section}{\numberline {9.2}Thermally-driven cavity flow}{70}{}%
+\contentsline {subsection}{\numberline {9.2.1}Results and footer output}{74}{}%
+\contentsline {section}{\numberline {9.3}Flow around a cube matrix}{76}{}%
+\contentsline {subsection}{\numberline {9.3.1}Unsteady flow simulation}{77}{}%
+\contentsline {subsection}{\numberline {9.3.2}Computation of flow statistics}{79}{}%

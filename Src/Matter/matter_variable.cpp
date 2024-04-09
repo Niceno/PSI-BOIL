@@ -12,26 +12,13 @@ void Matter::variable(const Set & s) {
   if(s == Set::lambda()) cond->varies(*dom);
   if(s == Set::gamma ()) diff->varies(*dom);
   if(s == Set::beta  ()) texp->varies(*dom);
-  if(s == Set::mmass ()) molm->varies(*dom);
-  if(s == Set::sigma_e ()) sige->varies(*dom);
-  if(s == Set::sigma ()) {
+  if(s == Set::sigma ()) 
     if(tens == NULL) {
       boil::oout << "# Fatal: using surface tension makes ";
       boil::oout << "sense only for mixtures. Exiting!"; 
       boil::oout << boil::endl;    
-    } else {
+    } else
       tens->varies(*dom);
-    }
-  }
-  if(s == Set::latent ()) {
-    if(heat == NULL) {
-      boil::oout << "# Fatal: using latent heat makes ";
-      boil::oout << "sense only for mixtures. Exiting!";
-      boil::oout << boil::endl;
-    } else {
-      heat->varies(*dom);
-    }
-  }
 }
 
 /*============================================================================*/
@@ -46,10 +33,6 @@ void Matter::variable() {
   cond->varies(*dom);
   diff->varies(*dom);
   texp->varies(*dom);
-  molm->varies(*dom);
-  sige->varies(*dom);
   if( tens!= NULL )
     tens->varies(*dom);
-  if( heat!= NULL )
-    heat->varies(*dom);
 }

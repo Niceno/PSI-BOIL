@@ -1,0 +1,23 @@
+\label{chap_transport}
+
+Scalar and vector fields introduced in Sec.~\ref{chap_domain}
+can be used to hold transported variables, such as species, enthalpy
+and momentum. In {\psiboil}, these fields are embedded into objects
+of type {\tt Scalar} and {\tt Vector}, but these objects do not 
+have the possibility to discretize and solve transport equations. 
+
+A set of objects which discretizes transport equations is defined
+and has a type~{\tt Equation}\footnote{Since it represents a transport equation}.
+{\tt Equation} class spawns two {\em children}, namely the {\tt Centered}
+for transported scalar fields, and {\tt Staggered} for transported
+vector fields. {\tt Centered} class spawns more children, each
+specialized for a particular transport equation. {\tt Staggered} class, on the
+other hand, has only one child, representing the equation for momentum 
+conservation. 
+
+In this chapter, all transport equations implemented in {\psiboil}
+are summarized, and enthalpy conservation equation is solved for
+a simple problem of steady heat conduction. Although the 
+equation solved is simple, it introduces quite a few new
+{\psiboil} features, such as linear system solvers, definition 
+of materials, etc.

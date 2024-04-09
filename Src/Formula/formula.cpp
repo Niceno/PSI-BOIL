@@ -152,6 +152,11 @@ real Formula :: function() {
                 return atan(factor());     // <= factor()
     case SQRT:  scanner(&sp, token, ttype);
                 return sqrt(factor());     // <= factor()
+    case TANHF: scanner(&sp, token, ttype);
+                return tanh(factor());     // <= factor()
+    case ABSF:  scanner(&sp, token, ttype);
+                return fabs(factor());     // <= factor()
+
    }
 
   return factor();

@@ -53,7 +53,7 @@ void CIPCSL2::tension(Vector * vec, const Matter matt, Scalar & sca) {
         stmp[i][j][k]=1.0;
       } else {
         stmp[i][j][k]= 0.5 + dist[i][j][k]/(2.0*eps)
-                     + 1.0/(2.0*boil::pi)*sin(boil::pi*dist[i][j][k]/eps);
+                     + 1.0/(2.0*pi)*sin(pi*dist[i][j][k]/eps);
       }
     }
     for_aijk(i,j,k){

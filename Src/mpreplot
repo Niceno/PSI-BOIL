@@ -1,0 +1,48 @@
+#!/bin/bash
+
+if [ $# -lt 4 ]; then
+  echo "Usage: "
+  echo $0 "<base_name> <first_step> <last_step> <stride>"
+else
+  BASE=$1
+  INIT=$2
+  LAST=$3
+  STEP=$4
+
+  COUNTER=$INIT
+  while [  $COUNTER -le $LAST ]; do
+    echo Time: $COUNTER
+
+    NAME=$BASE"_"$COUNTER
+
+    if [ $COUNTER -lt 100000 ]; then 
+    NAME=$BASE"_0"$COUNTER  
+    fi
+
+    if [ $COUNTER -lt 10000 ]; then 
+    NAME=$BASE"_00"$COUNTER  
+    fi
+
+    if [ $COUNTER -lt 1000 ]; then 
+    NAME=$BASE"_000"$COUNTER  
+    fi
+
+    if [ $COUNTER -lt  100 ]; then 
+    NAME=$BASE"_0000"$COUNTER 
+    fi
+
+    if [ $COUNTER -lt  10 ]; then 
+    NAME=$BASE"_00000"$COUNTER 
+    fi
+
+    COMMAND="preplot "$NAME
+    $COMMAND
+
+    let COUNTER=COUNTER+$STEP
+
+  done
+fi
+
+#------------------------------------------------------------------------------#
+# '$Id: mpreplot,v 1.4 2013/08/13 06:02:38 niceno Exp $'/
+#------------------------------------------------------------------------------#

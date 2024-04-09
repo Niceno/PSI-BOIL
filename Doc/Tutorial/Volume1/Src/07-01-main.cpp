@@ -4,7 +4,7 @@ const real L =  1.0;
 const int  N = 64; 
 
 /******************************************************************************/
-int main(int argc, char * argv[]) {
+main(int argc, char * argv[]) {
 
   boil::timer.start();
 
@@ -22,9 +22,6 @@ int main(int argc, char * argv[]) {
   t.bc().add( BndCnd( Dir::kmax(), BndType::neumann() ) );          /* b.c. */
 
   Matter solid(d);                                  /* matter */
-  solid.lambda(1.0);
-  solid.rho(1.0);
-  solid.cp(1.0);
 
   Krylov * solver = new CG(d, Prec::di());          /* linear solver */
 
@@ -37,8 +34,6 @@ int main(int argc, char * argv[]) {
   AC multigrid( &enth );                            /* AMG solver for enth. */ 
 
   t = 350.0;                                        /* initial "guess" */
-
-  enth.new_time_step();                             /* calculate steady-state part etc */
 
   multigrid.vcycle(ResRat(1e-4));                   /* solve linear system */
 

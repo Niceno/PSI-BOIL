@@ -33,6 +33,8 @@ void scanner(char **text, char *token, int &ttype)
    if(0==strcmp(token0,"acos")) ttype=ACOSF;
    if(0==strcmp(token0,"atan")) ttype=ATANF;
    if(0==strcmp(token0,"sqrt")) ttype=SQRT;
+   if(0==strcmp(token0,"tanh")) ttype=TANHF;
+   if(0==strcmp(token0,"abs")) ttype=ABSF;
    return;
   }
 

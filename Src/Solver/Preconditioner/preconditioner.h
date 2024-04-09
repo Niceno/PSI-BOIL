@@ -46,7 +46,7 @@ class Preconditioner {
     Preconditioner(const Domain & d); 
 
     //! Forms the preconditioning matrix.
-    /*! \param A              - system matrix (from Linear solver). */
+    /*! \param A              - system matrix (from Krylov solver). */
     virtual void form(const Matrix & A, const Scalar & x) = 0;
 
     //! Solves the preconditioning system.

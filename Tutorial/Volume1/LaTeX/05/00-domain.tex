@@ -1,0 +1,18 @@
+\label{chap_domain}
+
+{\psiboil} currently supports only three-dimensional Cartesian grids.
+Three-dimensional grids are represented with the class {\tt Domain}. 
+This class holds all the geometric data needed for discretization of 
+governing equations, and is built from three one-dimensional grids; each 
+one defining discretization in one coordinate direction. These, 
+one-dimensional grids, used for building three-dimensional domains
+are defined by class {\tt Grid1D}. 
+
+In this chapter, you will learn how to create one-dimensional grids
+with the class {\tt Grid1D}, and how to use them to define
+three-dimensional domains. 
+
+Furthermore, you will learn about the so-called {\em ravioli}
+classes in {\psiboil}, and use two of them: {\tt Range} and
+{\tt Periodic}.
+

@@ -10,8 +10,6 @@ void PhaseChange::insert_bc_flag(ScalarInt & val) {
 *           2nd: phi.exchange_all();
 *******************************************************************************/
 
-  int i,j,k;
-
   for( int b=0; b<val.bc().count(); b++ ) {
 
     if(val.bc().type_decomp(b)) continue;

@@ -8,6 +8,9 @@
 *  Local array "fnew" represents \f$ \{f\} \f$ in the above equation and
 *  contains contribution from time-discretization of various terms (diffusion, 
 *  convection, external).
+*
+*  Note: fext (W) is converted to (W/m3) in this function, taking into account
+*  the volume in the framework of finite difference method.
 *******************************************************************************/
 real EnthalpyFD::update_rhs() {
 
@@ -21,7 +24,6 @@ real EnthalpyFD::update_rhs() {
   +--------------------------*/
   for_ijk(i,j,k) {
     fnew[i][j][k] = fold[i][j][k]
-                  + ftif[i][j][k]
                   + cnew[i][j][k] * conv_ts.N()   
                   + fbnd[i][j][k]
                   + fext[i][j][k];

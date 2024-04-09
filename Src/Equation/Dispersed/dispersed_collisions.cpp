@@ -23,7 +23,6 @@ void Dispersed::collisions() {
 
   boil::timer.start("dispersed collisions");
 
-  real nwall_x, nwall_y, nwall_z; /* normal vector components to the wall */
   real cur_time = 0.0;  /* cuurent time: between zero and time step dt */
 
   while (cur_time < time->dt()) {

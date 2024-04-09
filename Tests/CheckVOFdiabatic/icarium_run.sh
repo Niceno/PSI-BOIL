@@ -15,14 +15,14 @@ mkdir $now/Srcfiles
 mkdir $now/Execs
 mkdir $now/Srcfiles/VOF
 mkdir $now/Srcfiles/PhaseChangeVOF
-mkdir $now/Srcfiles/EnthalpyFD
+mkdir $now/Srcfiles/EnthalpyTif
 
 cp ../Equation/Centered/VOF/*.cpp $now/Srcfiles/VOF/
 cp ../Equation/Centered/VOF/*.h   $now/Srcfiles/VOF/
 cp ../Equation/Centered/PhaseChangeVOF/*.cpp $now/Srcfiles/PhaseChangeVOF/
 cp ../Equation/Centered/PhaseChangeVOF/*.h   $now/Srcfiles/PhaseChangeVOF/
-cp ../Equation/Centered/EnthalpyFD/*.cpp   $now/Srcfiles/EnthalpyFD/
-cp ../Equation/Centered/EnthalpyFD/*.h     $now/Srcfiles/EnthalpyFD/
+cp ../Equation/Centered/EnthalpyTif/*.cpp   $now/Srcfiles/EnthalpyTif/
+cp ../Equation/Centered/EnthalpyTif/*.h     $now/Srcfiles/EnthalpyTif/
 
 cd ..
 
@@ -155,17 +155,17 @@ echo '### Stefan ###'
 cd 'Stefan'
 echo '#lvl2#'
 cd 'lvl2'
-mpirun -np 1 ./Boil 10000 > log.txt
+mpiexec --use-hwthread-cpus -np 1 ./Boil 10000 > log.txt
 grep x-m log.txt > xmn.txt
 for i in *dat; do preplot $i; done; rm *dat
 echo '#lvl4#'
 cd '../lvl4'
-mpirun -np 1 ./Boil 10000 > log.txt
+mpiexec --use-hwthread-cpus -np 1 ./Boil 10000 > log.txt
 grep x-m log.txt > xmn.txt
 for i in *dat; do preplot $i; done; rm *dat
 echo '#lvl6#'
 cd '../lvl6'
-mpirun -np 1 ./Boil 10000 > log.txt
+mpiexec --use-hwthread-cpus -np 1 ./Boil 10000 > log.txt
 grep x-m log.txt > xmn.txt
 for i in *dat; do preplot $i; done; rm *dat
 cd ..
@@ -175,17 +175,17 @@ echo '### Sucking ###'
 cd '../Sucking'
 echo '#lvl2#'
 cd 'lvl2'
-mpirun -np 1 ./Boil 10000 > log.txt
+mpiexec --use-hwthread-cpus -np 1 ./Boil 10000 > log.txt
 grep x-m log.txt > xmn.txt
 for i in *dat; do preplot $i; done; rm *dat
 echo '#lvl4#'
 cd '../lvl4'
-mpirun -np 1 ./Boil 10000 > log.txt
+mpiexec --use-hwthread-cpus -np 1 ./Boil 10000 > log.txt
 grep x-m log.txt > xmn.txt
 for i in *dat; do preplot $i; done; rm *dat
 echo '#lvl6#'
 cd '../lvl6'
-mpirun -np 1 ./Boil 10000 > log.txt
+mpiexec --use-hwthread-cpus -np 1 ./Boil 10000 > log.txt
 grep x-m log.txt > xmn.txt
 for i in *dat; do preplot $i; done; rm *dat
 cd ..
@@ -195,17 +195,17 @@ echo '### BubbleGrowth ###'
 cd '../BubbleGrowth'
 echo '#lvl2#'
 cd 'lvl2'
-mpirun -np 32 ./Boil 10000 > log.txt
+mpiexec --use-hwthread-cpus -np 32 ./Boil 10000 > log.txt
 grep totalvol log.txt > tot.txt
 dogather
 echo '#lvl4#'
 cd '../lvl4'
-mpirun -np 32 ./Boil 10000 > log.txt
+mpiexec --use-hwthread-cpus -np 32 ./Boil 10000 > log.txt
 grep totalvol log.txt > tot.txt
 dogather
 echo '#lvl6#'
 cd '../lvl6'
-mpirun -np 32 ./Boil 10000 > log.txt
+mpiexec --use-hwthread-cpus -np 32 ./Boil 10000 > log.txt
 grep totalvol log.txt > tot.txt
 dogather
 cd ..

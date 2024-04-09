@@ -101,7 +101,7 @@ class Floodfill {
     Region & getregion(int rid);  //was posregion or negregion
     
     /* rgn erased after hidden for more than 30 time steps (why 30, good guess) */
-    int mng_hidden_rgns();  
+    void mng_hidden_rgns();  
     
     int hidden_rgnid(real ix, real iy, real iz); //was hid_prgn_xyz, hid_nrgn_xyz
 

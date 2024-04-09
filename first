@@ -4,28 +4,41 @@ if [ $# -lt 1 ]; then
   echo "Wrong syntax!"
   echo "Usage: " $0 "LAM         -> configure for LAM/MPI"
   echo "       " $0 "OPEN        -> configure for OPEN MPI"
-  echo "       " $0 "MPICH       -> configure for MPICH"
+  echo "       " $0 "OPEN-INTEL  -> configure for OPEN MPI with Intel"
+  echo "       " $0 "OPEN-INTEL-CHECK  -> configure for OPEN MPI with Intel with -check-pointers"
   echo "       " $0 "CSCS        -> configure for CSCS machine"
-  echo "       " $0 "CSCS-DEBUG  -> configure for CSCS debug mode"
   echo "       " $0 "WISTERIA    -> configure for FUJITSU at WISTERIA machine"
   echo "       " $0 "WISTERIA-DEBUG  -> configure for FUJITSU at WISTERIA machine"
   echo "       " $0 "WISTERIA-NOMPI  -> configure for FUJITSU at WISTERIA machine"
-  echo "       " $0 "NOMPI       -> configure without MPI"
+  echo "       " $0 "JULIER      -> configure for JULIER.CSCS.CH machine"
+  echo "       " $0 "MPICH       -> configure for MPICH"
   echo "       " $0 "INTEL       -> configure for Intel-MPI with Intel compiler"
-  echo "       " $0 "INTEL-MPI-DEBUG  -> configure for Intel with debug mode, with MPI"
-  echo "       " $0 "INTEL-DEBUG -> configure for Intel with debug mode wo MPI"
-  echo "       " $0 "INTEL-PHI   -> configure for Intel-phi"
+  echo "       " $0 "INTEL-PHI   -> configure for INTEL-PHI"
+  echo "       " $0 "NOMPI       -> configure without MPI"
+  echo "       " $0 "NOMPI-INTEL -> configure without MPI, for Intel"
 else
   if [ $1 = "LAM" ] || [ $1 = "OPEN" ]; then
-    touch README
     aclocal
     autoconf
     autoheader
     automake --add-missing
-    ./configure CC=mpicc CXX=mpiCC CXXFLAGS='-O3 -std=c++11'
+    ./configure CC=mpicc CXX=mpiCC CXXFLAGS='-O2 -std=c++11'
+    cd Src/Parallel; ln -f -s parallel.h mpi_macros.h; cd ../../
+  elif [ $1 = "OPEN-INTEL" ]; then
+    aclocal
+    autoconf
+    autoheader
+    automake --add-missing
+    ./configure CC=mpicc CXX=mpiCC CXXFLAGS='-O2 -w2 -std=c++11'
+    cd Src/Parallel; ln -f -s parallel.h mpi_macros.h; cd ../../
+  elif [ $1 = "OPEN-INTEL-CHECK" ]; then
+    aclocal
+    autoconf
+    autoheader
+    automake --add-missing
+    ./configure CC=mpicc CXX=mpiCC CXXFLAGS='-w2  -std=c++11 -check=uninit -traceback -fstack-protector-all -fp-trap=common -fp-stack-check -check-pointers=rw -check-pointers-undimensioned'
     cd Src/Parallel; ln -f -s parallel.h mpi_macros.h; cd ../../
   elif [ $1 = "MPICH" ]; then
-    touch README
     aclocal
     autoconf
     autoheader
@@ -33,21 +46,12 @@ else
     ./configure CC=mpicc CXX=mpicxx CXXFLAGS='-O3 -std=c++11'
     cd Src/Parallel; ln -f -s parallel.h mpi_macros.h; cd ../../
   elif [ $1 = "CSCS" ]; then
-    touch README
     aclocal
     autoconf
     autoheader
     automake --add-missing
     ./configure CC=cc CXX=CC CXXFLAGS='-O2 -std=c++11'
     cd Src/Parallel; ln -f -s parallel.h mpi_macros.h; cd ../../
-  elif [ $1 = "CSCS-DEBUG" ]; then
-    aclocal
-    autoconf
-    autoheader
-    automake --add-missing
-    ./configure CC=cc CXX=CC CXXFLAGS='-G02 -std=c++11'
-    #./configure CC=craycc CXX=crayCC CXXFLAGS='-O2 -std=c++11'
-    cd Src/Parallel; ln -f -s sequential.h mpi_macros.h; cd ../../
   elif [ $1 = "WISTERIA" ]; then
     aclocal
     autoconf
@@ -71,6 +75,13 @@ else
     automake --add-missing
     ./configure CC=fccpx CXX=FCCpx CXXFLAGS='-Kfast -std=c++11' --host=aarch64-unknown-linux-gnu
     cd Src/Parallel; ln -f -s sequential.h mpi_macros.h; cd ../../
+  elif [ $1 = "JULIER" ]; then
+    aclocal
+    autoconf
+    autoheader
+    automake --add-missing
+    ./configure CC=mpicc CXX=mpicxx CXXFLAGS='-O3 -std=c++11'
+    cd Src/Parallel; ln -f -s parallel.h mpi_macros.h; cd ../../
   elif [ $1 = "NOMPI" ]; then
     aclocal
     autoconf
@@ -83,25 +94,17 @@ else
     autoconf
     autoheader
     automake --add-missing
+    #./configure CC=mpiicc CXX=mpiicpc CXXFLAGS='-O3 -opt-report=4'
     ./configure CC=mpiicc CXX=mpiicpc CXXFLAGS='-O2 -std=c++11'
     cd Src/Parallel; ln -f -s parallel.h mpi_macros.h; cd ../../
-  elif [ $1 = "INTEL-MPI-DEBUG" ]; then
+  elif [ $1 = "NOMPI-INTEL" ]; then
     aclocal
     autoconf
     autoheader
     automake --add-missing
-    ./configure CC=mpiicc CXX=mpiicpc CXXFLAGS='-g -w2 -std=c++11 -debug full -O0 -check=uninit -traceback -fstack-protector-all -fp-trap=common -fp-stack-check -check-pointers=rw'
-    #./configure CC=mpiicc CXX=mpiicpc CXXFLAGS='-O2 -std=c++11 -fstack-protector-all -fp-trap=common -fp-stack-check -check-pointers=rw'
-    cd Src/Parallel; ln -f -s parallel.h mpi_macros.h; cd ../../
-  elif [ $1 = "INTEL-DEBUG" ]; then
-    aclocal
-    autoconf
-    autoheader
-    automake --add-missing
-    ./configure CC=icpc CXX=icpc CXXFLAGS='-g -w2  -std=c++11 -debug full -O0 -check=uninit -traceback -fstack-protector-all -fp-trap=common -fp-stack-check -check-pointers=rw'
+    ./configure CC=icpc CXX=icpc CXXFLAGS='-g -w2  -std=c++11 -debug full -O0 -std=c++11 -check=uninit -traceback -fstack-protector-all -fp-trap=common -fp-stack-check -check-pointers=rw'
     cd Src/Parallel; ln -f -s sequential.h mpi_macros.h; cd ../../
   elif [ $1 = "INTEL-PHI" ]; then
-    touch README
     aclocal
     autoconf
     autoheader
@@ -112,17 +115,18 @@ else
     echo "Wrong syntax!"
     echo "Usage: " $0 "LAM         -> to configure for LAM/MPI"
     echo "       " $0 "OPEN        -> configure for OPEN MPI"
-    echo "       " $0 "MPICH       -> configure for MPICH"
+    echo "       " $0 "OPEN-INTEL  -> configure for OPEN MPI with Intel"
+    echo "       " $0 "OPEN-INTEL-CHECK  -> configure for OPEN MPI with Intel with -check-pointers"
     echo "       " $0 "CSCS        -> configure for CSCS machine"
-    echo "       " $0 "CSCS-DEBUG  -> configure for CSCS debug mode"
     echo "       " $0 "WISTERIA    -> configure for FUJITSU at WISTERIA machine"
     echo "       " $0 "WISTERIA-DEBUG  -> configure for FUJITSU at WISTERIA machine"
     echo "       " $0 "WISTERIA-NOMPI  -> configure for FUJITSU at WISTERIA machine"
-    echo "       " $0 "NOMPI       -> configure without MPI"
+    echo "       " $0 "JULIER      -> configure for JULIER.CSCS.CH machine"
+    echo "       " $0 "MPICH       -> configure for MPICH"
     echo "       " $0 "INTEL       -> configure for Intel-MPI with Intel compiler"
-    echo "       " $0 "INTEL-MPI-DEBUG  -> configure for Intel with debug mode, with MPI"
-    echo "       " $0 "INTEL-DEBUG -> configure for Intel with debug mode wo MPI"
-    echo "       " $0 "INTEL-PHI   -> configure for Intel-phi"
+    echo "       " $0 "INTEL-PHI   -> configure for Intel-PHI"
+    echo "       " $0 "NOMPI       -> configure without MPI"
+    echo "       " $0 "NOMPI-INTEL -> configure without MPI, for Intel"
   fi
 fi
 

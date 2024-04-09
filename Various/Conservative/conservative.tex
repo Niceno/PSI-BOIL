@@ -1,0 +1,137 @@
+% This is a sample LaTeX input file.  (Version of 9 April 1986) 
+% 
+% A '%' character causes TeX to ignore all remaining text on the line, 
+% and is used for comments like this one. 
+
+\documentclass[fleqn]{article}    % Specifies the document style. 
+
+\usepackage{graphicx}
+\usepackage{psfrag}
+
+\input{../commands.tex}
+
+\begin{document}           % End of preamble and beginning of text. 
+
+%============================================%
+%                                            %
+%  Conservative Form of Governing Equations  %
+%                                            %
+%============================================%
+\section{Conservative Form of Governing Equations}
+
+\noindent
+The conservative form of governing equations reads:
+%
+\be
+    \frac{\p (\rho \phi)}{\p t} 
+  + \nabla ( \rho {\bf u} \phi ) 
+  = D + S.
+  \label{eq:conservative}
+\ee
+%
+But this is not the form we solve in {\psiboil}. 
+It wouldn't work, it would diverge.
+We actually solve the following form:
+%
+\be 
+    \rho \frac{\p \phi}{\p t} 
+  + \rho \nabla ( {\bf u} \phi ) 
+  = D + S,
+  \label{eq:nonconservative}
+\ee
+%
+which is not the same as Eq.~\ref{eq:conservative}. It is non-conservative, 
+and we need a {\em correction term} to make it conservative. 
+
+\noindent
+In order to estimate the correction term, let's develop 
+Eq.~\ref{eq:conservative}:
+%
+\be 
+    \rho \frac{\p \phi}{\p t} 
+  + \phi \frac{\p \rho}{\p t} 
+  + {\bf u} \phi \nabla ( \rho ) 
+  + \rho \phi \nabla ( {\bf u} ) 
+  + \rho {\bf u} \nabla ( \phi ) 
+  = D + S.
+  \label{eq:conservative_develop_1}
+\ee
+%
+Note that 3$^{rd}$ and 4$^{th}$ term on the left can be grouped together:
+%
+\be 
+    {\bf u} \phi \nabla ( \rho ) 
+  + \rho \phi \nabla ( {\bf u} ) 
+  = \phi \nabla(\rho {\bf u}),
+  \label{eq:note_1}
+\ee
+%
+and the Eq.~\ref{eq:conservative_develop_1} can be written as:
+%
+\be 
+    \rho \frac{\p \phi}{\p t} 
+  + \phi \left[ 
+       \frac{\p \rho}{\p t} 
+     + \nabla ( \rho {\bf u} )
+    \right]
+  + \rho {\bf u} \nabla ( \phi ) 
+  = D + S.
+  \label{eq:conservative_develop_2}
+\ee
+%
+Furhtermore, since mass conservation equation states that:
+%
+\be 
+    \frac{\p \rho}{\p t}  
+  + \nabla(\rho {\bf u})
+  = 0,
+  \label{eq:note_2}
+\ee
+%
+and the Eq.~\ref{eq:conservative_develop_2} reduces to:
+%
+\be 
+    \rho \frac{\p \phi}{\p t} 
+  + \rho {\bf u} \nabla ( \phi ) 
+  = D + S.
+  \label{eq:conservative_develop_3}
+\ee
+%
+The second term on the left can be written as:
+%
+\be 
+    \rho {\bf u} \nabla ( \phi ) 
+  = \rho \nabla ( {\bf u} \phi )
+  - \rho \phi \nabla ( {\bf u} ),
+  \label{eq:note_3}
+\ee
+%
+which, when introduced in Eq.~\ref{eq:conservative_develop_3} gives the final
+form of the governing equation:
+%
+\be 
+    \rho \frac{\p \phi}{\p t} 
+  + \rho \nabla ( {\bf u} \phi )
+  - \rho \phi \nabla ( {\bf u} )
+  = D + S,
+  \label{eq:conservative_develop_4}
+\ee
+%
+or:
+%
+\be 
+    \rho \frac{\p \phi}{\p t} 
+  + \rho \nabla ( {\bf u} \phi )
+  = D + S
+  + \rho \phi \nabla ( {\bf u} ).
+  \label{eq:conservative_final}
+\ee
+%
+The last term is the so-called {\em correction term} and must be added to 
+discretization procedure to ensure conservatism.
+
+\end{document}             % End of document. 
+  
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% '$Id: conservative.tex,v 1.1 2011/05/30 11:50:05 niceno Exp $'/
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

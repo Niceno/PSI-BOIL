@@ -7,13 +7,13 @@ ScalarBool::ScalarBool(const Domain & d) : alias(false) {
 +--------------------------------------*/
 
   dom = & d;
-
+	
   allocate(d.ni(), d.nj(), d.nk());
 
   bndcnd = new BndCnd( *dom );
 
   nam = "";
-}
+}	
 
 /******************************************************************************/
 ScalarBool::ScalarBool(const Domain & d, const char * nm) : alias(false) {
@@ -22,13 +22,13 @@ ScalarBool::ScalarBool(const Domain & d, const char * nm) : alias(false) {
 +--------------------------------------*/
 
   dom = & d;
-
+	
   allocate(d.ni(), d.nj(), d.nk());
 
   bndcnd = new BndCnd( *dom );
 
   nam = nm;
-}
+}	
 
 /******************************************************************************/
 ScalarBool::ScalarBool(const Domain & d, BndCnd & b) : alias(false) {
@@ -43,7 +43,7 @@ ScalarBool::ScalarBool(const Domain & d, BndCnd & b) : alias(false) {
   bndcnd = & b; 
 
   nam = "";
-}
+}	
 
 /******************************************************************************/
 ScalarBool::ScalarBool(const ScalarBool & s) : alias(false) {
@@ -52,13 +52,13 @@ ScalarBool::ScalarBool(const ScalarBool & s) : alias(false) {
 +---------------------------------------------------------------------*/
 
   dom = s.domain();
-
+	
   allocate(s.ni(), s.nj(), s.nk());
 
   bndcnd = new BndCnd( *dom ); 
 
   nam = "";
-}
+}	
 
 /******************************************************************************/
 ScalarBool::ScalarBool(const ScalarBool * s) : alias(true), nam(s->nam) {
@@ -83,7 +83,7 @@ ScalarBool::ScalarBool(const ScalarBool * s) : alias(true), nam(s->nam) {
 
   dom    = s->domain();
   bndcnd = s->bndcnd;
-}
+}	
 
 /******************************************************************************/
 void ScalarBool::allocate(int ni, int nj, int nk) {
@@ -112,7 +112,7 @@ void ScalarBool::deallocate() {
 
   /* deallocate memory */
   dealloc3d( &val );
-}
+}	
 
 /******************************************************************************/
 ScalarBool::~ScalarBool() {

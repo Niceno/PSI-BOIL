@@ -6,51 +6,43 @@
 TIF::TIF(const real Tref) {
   tr = Tref;
   variable_tif = false;
-
-  /* unused within constant model */
-  tmin = -boil::unreal;
-  tmax = boil::unreal;
-  weaklim = false;
-  store_tif = false;
-  factor = 0.05;
 }
 
-/* initialises tif scalars */
-TIF::TIF(const real Tref, Topology * TOPO) :
-  tif(*TOPO->adens->domain()),
-  tifold(*TOPO->adens->domain()),
-  topo(TOPO),
-  iflag(TOPO->iflag),
-  tempflag(*TOPO->adens->domain()),
-  tempflag2(*TOPO->adens->domain()),
-  stmp(*TOPO->adens->domain())
+TIF::TIF(const real Tref, 
+         const real Latent,
+         const real Mresis,
+         Matter * FLU,
+         const Scalar & ADENS,
+         const Scalar & MFLX,
+         const Scalar * PRES) :
+  flu(FLU),
+  adens(&ADENS),  
+  mflx(&MFLX),  
+  tif    (*MFLX.domain()),
+  tifold (*MFLX.domain())
 {
+  dpres = PRES;
+
+  const int comp = 1; /* liquid */
+  rhol = fluid()->rho(comp);
   tr = Tref;
-  variable_tif = false;
+  latent = Latent;
+  mresis = Mresis;
 
   tmin = -boil::unreal;
   tmax = boil::unreal;
   weaklim = false;
+  stronglim = false;
+  clr = NULL;
+  tpr = NULL;
+  clrsurf = 0.5;
+
+  tif    = mflx.shape(); /* a mistake? */
+  tifold = mflx.shape(); /* a mistake? */
+
   store_tif = false;
+  variable_tif = true;
+  
   factor = 0.05;
-
-  tif    = (*TOPO->adens).shape(); 
-  tifold = (*TOPO->adens).shape();
-  tempflag  = (*TOPO->adens).shape();
-  tempflag2 = (*TOPO->adens).shape();
-  stmp = (*TOPO->adens).shape();
+  tint_field();
 }
-
-/******************************************************************************/
-/*----------------+
-|  static members |
-+----------------*/
-real TIF::calculate_heat_transfer_resistance(const real tr, const real rhov,
-                                             const real mmass,
-                                             const real latent,
-                                             const real accommodation) {
-  const real accomult = accommodation;//2.*accommodation/(2.-accommodation);
-  return std::pow(tr,1.5)/accomult/rhov/latent/latent
-                         /sqrt(mmass/(2.0*boil::pi*boil::R));
-}
-

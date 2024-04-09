@@ -1,9 +1,9 @@
 #include "cipcsl2.h"
 
 /******************************************************************************/
-void CIPCSL2::rm(const char * nm, const int it) {
+void CIPCSL2::rm(char * nm, const int it) {
 /***************************************************************************//**
-*  \brief Rm variables of CIPCSL2
+*  \brief Save variables of CIPCSL
 *******************************************************************************/
   std::string names;
 

@@ -10,8 +10,6 @@ void CIPCSL2::insert_bc_dist(Scalar & val) {
 *           2nd: phi.exchange_all();
 *******************************************************************************/
 
-  int i,j,k;
-
   for( int b=0; b<val.bc().count(); b++ ) {
 
     if(val.bc().type_decomp(b)) continue;
@@ -43,29 +41,23 @@ void CIPCSL2::insert_bc_dist(Scalar & val) {
         int jed=val.bc().at(b).ej()+1;
         int kst=val.bc().at(b).sk()-1;
         int ked=val.bc().at(b).ek()+1;
-
-        if (val.bc().at(b).si()>val.bc().at(b).ei() ||
-            val.bc().at(b).sj()>val.bc().at(b).ej() ||
-            val.bc().at(b).sk()>val.bc().at(b).ek()) {
-        } else {
-          if(d == Dir::imin() || d == Dir::imax()){
-            ist=ied=val.bc().at(b).si();
-          }
-          if(d == Dir::jmin() || d == Dir::jmax()){
-            jst=jed=val.bc().at(b).sj();
-          }
-          if(d == Dir::kmin() || d == Dir::kmax()){
-            kst=ked=val.bc().at(b).sk();
-          }
-          //if(ist==si()-1 || jst==sj()-1 || kst ==sk()-1) continue;
-
-          for(int i=ist; i<=ied; i++){
-          for(int j=jst; j<=jed; j++){
-          for(int k=kst; k<=ked; k++){
-            val[i][j][k]=val[i+iof][j+jof][k+kof];
-            //do not use extrapolation. it causes trouble in bdcurv!
-          } } }
+        if(d == Dir::imin() || d == Dir::imax()){
+          ist=ied=val.bc().at(b).si();
         }
+        if(d == Dir::jmin() || d == Dir::jmax()){
+          jst=jed=val.bc().at(b).sj();
+        }
+        if(d == Dir::kmin() || d == Dir::kmax()){
+          kst=ked=val.bc().at(b).sk();
+        }
+        //if(ist==si()-1 || jst==sj()-1 || kst ==sk()-1) continue;
+
+        for(int i=ist; i<=ied; i++){
+        for(int j=jst; j<=jed; j++){
+        for(int k=kst; k<=ked; k++){
+          val[i][j][k]=val[i+iof][j+jof][k+kof];
+          //do not use extrapolation. it causes trouble in bdcurv!
+        } } }
 
       }
     }

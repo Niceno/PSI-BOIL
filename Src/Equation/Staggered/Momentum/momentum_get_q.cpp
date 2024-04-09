@@ -6,15 +6,6 @@ void Momentum::get_q(Scalar * q) {
 |  strain and vorticity tensors are probably not computet properly.  |
 |  i think i miss 1/2 in front of each term. check it!               |
 +-------------------------------------------------------------------*/
-  /* note that the vector class offers a member function for shear
-     calculations -> no need to reproduce it here. */
-
-  if(!(domain()->is_cartesian())) {
-    boil::oout<<"Momentum::get_q: "
-              <<"Underdevelopment for non-Cartesian geometry. Exiting."
-              <<boil::endl;
-    exit(0);
-  }
 
   u.exchange();
   

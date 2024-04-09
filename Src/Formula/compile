@@ -1,1 +1,2 @@
-mpiCC main.cpp formula.cpp scanner.cpp ../Global/global_endl.cpp ../Parallel/libParallel.a ../Parallel/Out/libOut.a
+#mpiCC main.cpp formula.cpp scanner.cpp ../Global/global_endl.cpp ../Parallel/libParallel.a ../Parallel/Out/libOut.a
+mpiicpc main.cpp formula.cpp scanner.cpp ../Global/global_endl.cpp ../Parallel/libParallel.a ../Parallel/Out/libOut.a

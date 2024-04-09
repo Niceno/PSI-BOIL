@@ -7,8 +7,6 @@ void CIPCSL2::insert_bc_gradphic(const Scalar & val) {
 *   Note: values are set inside the domain, not in dummy cells!
 *******************************************************************************/
 
-  int i,j,k;
-
   for( int b=0; b<val.bc().count(); b++ ) {
 
     if(val.bc().type_decomp(b)) continue;

@@ -4,13 +4,9 @@
 #include "../../Parallel/mpi_macros.h"
 #include "../../Field/Scalar/scalar.h"
 #include "../../Global/global_constants.h"
-#include "../../Global/global_realistic.h"
 #include "../../SimulationTime/simulation_time.h"
 #include "../../Matter/matter.h"
-#include "../CommonHeatTransfer/commonheattransfer.h"
-#include "../Heaviside/heaviside.h"
 #include "site.h"
-#include "header.h"
 
 /////////////
 //         //
@@ -20,124 +16,140 @@
 class Nucleation {
 
   public:
-    Nucleation ( CommonHeatTransfer * cht,
-                 Heaviside * heavi,
-                 const Times * t,
-                 const real rs,
-                 Scalar * qsrc = NULL, 
-                 const Sign sig = Sign::pos() );
-    /* sign positive -> liquid = 1 */
+    Nucleation ( Scalar * c, Scalar * tpr, Scalar * qsrc,
+                 const Times * t, Scalar & dmicro,
+                 Matter * f, const real rs, const real dm, 
+                 const real l, const real ca, const real tst,
+                 Matter * sol = NULL);
     ~Nucleation();
 
     void save(const char *, const int);
-    void load(const char *, const int);
+    void load(const char *, const int, const real *r = NULL);
     void rm  (const char *, const int);
     void save(std::ofstream &);
-    void load(std::ifstream &);
+    void load(std::ifstream &, const real *r = NULL);
 
-    inline int  size() const { return  sites.size(); }
-    inline int dsize() const { return dsites.size(); }
+    int  size() const { return  sites.size(); }
+    int dsize() const { return dsites.size(); }
 
     void plant();
     void replant();
-    virtual void init() {}
-
-#ifndef USE_VOF_NUCL
     void cutneck(const real r);
-    inline void set_cutneck_mult(real cm){ rcut = rseed*cm; };
-    inline real get_cutneck_mult() const { return rcut; };
-#endif
-
     void add(const Site & s);
-    void st_active();
-    virtual void upkeep_after_seeding() {};
+    void deactivate_sites();
+    real area_vapor(const int i, const int j, const int k, const Dir d);
 
     real clr_site  (const int i);
     real tpr_site  (const int i);
+    bool height_bubble (const int i);
+    real dmicro0(const int i, const int j, const int k );
 
-    real distance_from_site(const int i, const int j, const int k) const;
+    void set_optdat(bool b){ boptdat=b;
+           boil::oout<<"nucleation:set_optdat = "<<b<<"\n";};
+    real get_optdat(){ return (boptdat); };
+    void optdat();
 
-    //real area_vapor(const Dir d,
-    //                const int i, const int j, const int k) const;
-    real area_vapor(const Sign sig, const Comp & mcomp,
-                    const int i, const int j, const int k) const;
+    void set_seed_period(real r){ seed_period=r; };
+    real get_seed_period(){ return (seed_period); };
 
-    inline void set_seed_period(real r){ seed_period=r; };
-    inline real get_seed_period() const { return (seed_period); };
+    void set_slope(real r){ slope=r; 
+           boil::oout<<"nucleation:slope is modfied to "<<r<<"\n";};
+    void set_slope(real r1, real r2) { slope=r1;
+           slope=r2;
+           b_slope=r2;
+           boil::oout<<"nucleation:slope is modfied to "<<r1<<"*r+"<<r2<<"\n";};
+    void set_exp_slope(real r1, real r2) { slope=r1;
+           exp_slope=r2;
+           boil::oout<<"nucleation:slope is modfied to "<<r1<<"*r^"<<r2<<"\n";};
+    real get_slope(){ return (slope); };
+    real get_b_slope(){ return (b_slope); };
+    real get_exp_slope(){ return (exp_slope); };
 
-    inline void set_prevent_replant_period(real r){ period_prevent_replant=r; };
-    inline real get_prevent_replant_period() const { return (period_prevent_replant); };
+    void set_rmax(real r){ rmax = r;
+            boil::oout<<"nucleation:rmax is modified to "<<r<<"\n";};
+    real get_rmax(){ return rmax;};
 
-    inline void set_threshold_c(real c){ threshold_c = c; };
-    inline real get_threshold_c() const { return threshold_c; };
+    void set_range_zoning(real r){range_zoning = r;
+            boil::oout<<"nucleation:range_zoning is modified to "<<r<<"\n";};
+    real get_range_zoning(){return (range_zoning);};
 
-    inline void set_zoning_limiting(bool zl, real zlmult = 0.0) {
-      limit_zoning = zl;
-      zoning_limit_multiplier = zlmult;
-    }
-    inline bool get_zoning_limiting(real & zlmult) const {
-      zlmult = zoning_limit_multiplier;
-      return limit_zoning;
-    }
-    //void set_range_zoning(real r){ get_zoning_limiting(r);
-    //        boil::oout<<"nucleation:range_zoning is modified to "<<r<<"\n";};
-    //real get_range_zoning(){return (range_zoning);};
+    void set_heat_sink(bool b){b_heat_sink = b;
+            boil::oout<<"nucleation:heat_sink is modified to "<<b<<"\n";};
+    real heat_sink(){return (b_heat_sink);};
 
+    void set_micro_exists(bool b){ b_micro_exists = b;
+            boil::oout<<"nucleation:micro_exists= "<<b<<"\n";};
+    bool micro_exists(){return (b_micro_exists);};
+
+    void set_threshold_clr_site(real r){ threshold_clr_site = r;
+            boil::oout<<"nucleation:threshold_clr_site is modified to "<<r<<"\n";};
+    real get_threshold_clr_site(){return threshold_clr_site;};
+
+    void set_rseed_plus(real r){ rseed_plus = r;
+            boil::oout<<"nucleation:rseed_plus is modified to "<<r<<"\n";};
+    real get_rseed_plus(){return rseed_plus;};
+
+
+    real cangle() {return cang;};
+    real sigma()  {return sgm;}
+
+    // pre-heat-sink: heat sink is given before the time color function is modified
+    // it is necessary to avoid Tw<Tsat
+    inline void set_pre_heat_sink(bool b){ b_pre_heat_sink = b;};
+    inline bool pre_heat_sink(){ return b_pre_heat_sink;};
+
+    std::vector<Site> sites, dsites;
+    Scalar dmicro;
+    real ** dSprev;
+    bool store_dSprev;
+    real dmicro_min;
+
+    const Matter * fluid() const {return flu;}
+    const Matter * solid() const {return sol;}
 
     bool in_vapor(const int i, const int j, const int k) const;
     bool in_vapor(const real c) const;
     bool below_threshold(const int i, const int j, const int k) const;
     bool below_threshold(const real c) const;
 
-    std::vector<Site> sites, dsites;
-
-    //const Matter * fluid() const {return flu;}
-    //const Topology * topology() const {return topo;}
-
   protected:
     void set_range(std::vector<Site> & s);
+    void vol_area(std::vector<Site> & s);
+    void vol_area_dummy(const int ns, const int nsd);
+    void plant_clr(std::vector<Site> & s, const int ns);
+    void heat_sink(std::vector<Site> & s, const int ns);
+    void insert_dmicro(std::vector<Site> & s, const int ns);
+    void plant_dummy_site(const int nsd);
 
+    real zftmin    (Range<real> xr, Range<real> yr, Range<real> zr);
     real area_vapor_sum(Range<real> xr, Range<real> yr, Range<real> zr);
-
     void zoning();
 
-    void dummy_add(const Site & s){ dsites.push_back(s); 
-                              set_range(dsites);};
     real stratified_sphere(const int i, const int j, const int k,
                         const real xcent, const real ycent, const real zcent);
 
-    void plant_site(const int ns, const bool seed_source = true);
-    void plant_dummy_site(const int nsd);
-
-    //Topology * topo;
-    CommonHeatTransfer * cht;
-    Heaviside * heavi;
-
-    Scalar * vf;
     Scalar * clr;
+    Scalar * tpr;
     Scalar * qsrc;
-    //Matter * flu;
+    Matter * flu;
+    Matter * sol;
     const Times * time;
+    real seed_period; //active_tpr, zplant;
+    real dxmin, zbtm;
+    real cang, sgm;  // contact angle, surface tension coefficient
 
-    real seed_period;
-    real period_prevent_replant;  // period of preventing replant after cutneck
-    real dxmin, eps;
-    real zbtm;
-
-    real rhol, rhov, lambdal, lambdav, cpl, cpv, latent, mmass;
-
-    real rseed;
-    bool bzoning;
+  private:
+    real slope, b_slope, exp_slope, latent, rseed;
+    real rmax;
+    bool bzoning,boptdat,b_heat_sink;
+    real clrsurf, eps_clr;
     std::vector<int> id_nearRegion, idd_nearRegion;
-    Sign matter_sig;
-
-    bool limit_zoning;
-    real zoning_limit_multiplier;
-    real threshold_c;
-
-#ifndef USE_VOF_NUCL
-    real rcut;
-#endif
+    std::ofstream ofstpr,ofsclr;
+    real range_zoning;
+    bool b_pre_heat_sink, b_micro_exists;
+    real tsat;
+    real rhov,cpv,lambdav;
+    real threshold_c, threshold_clr_site, rseed_plus;
 };
 
 #endif

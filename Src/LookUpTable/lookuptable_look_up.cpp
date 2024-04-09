@@ -11,18 +11,8 @@ real LookUpTable::look_up(const real val,
 |                                                           |
 +----------------------------------------------------------*/
 
-  if (val<table[0][col0]) {
-    boil::oout<<"### Error: look_up: exceed min table: val= "<<val<<" table= "
-              <<table[0][col0]<<" column= "<<col0<<"\n";
-    exit(0);
-  }
-  if (val>table[table.size()-1][col0]) {
-    boil::oout<<"### #Error: look_up: exceed max table: val= "<<val<<" table= "
-              <<table[table.size()-1][col0]<<" column= "<<col0<<"\n";
-    exit(0);
-  }
-  //assert(val >= table[0]             [col0]);
-  //assert(val <= table[table.size()-1][col0]);
+  assert(val >= table[0]             [col0]);
+  assert(val <= table[table.size()-1][col0]);
 
   int lowseg  = 1;
   int highseg = table.size()-1;
@@ -46,6 +36,6 @@ real LookUpTable::look_up(const real val,
     }
   }
 
-  return -1;
+  //return -1;
 }
 

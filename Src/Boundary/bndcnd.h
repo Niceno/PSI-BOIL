@@ -10,6 +10,7 @@
 #include "../Domain/domain.h"
 #include "../Formula/formula.h"
 #include "../Body/body.h"
+#include "../Global/global_endl.h"
 
 /***************************************************************************//**
 *  \brief Ravioli class for safer argument passing in BndCnd.
@@ -144,13 +145,6 @@ class BndCnd {
      {typ    = o.typ;
       val[0] = o.val[0]; val[1] = o.val[1]; val[2] = o.val[2];
       return * this;}
-
-    /* we also need the ability to copy section */
-    void replicate(BndCnd & o) {
-      for(int b=0; b<o.count(); b++) {
-        section.push_back(o.at(b));
-      }
-    }
 
     const Domain * domain() const {return dom;}
 

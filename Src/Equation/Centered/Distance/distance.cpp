@@ -5,7 +5,7 @@ Distance::Distance(const Scalar & PHI,
                    const Scalar & F,
                    const Vector & U, 
                    Times & T,
-                   Linear * S) :
+                   Krylov * S) :
 /*---------------------+ 
 |  initialize parent   | NULL is for solid
 +---------------------*/

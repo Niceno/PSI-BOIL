@@ -59,47 +59,46 @@ void CIPCSL2::bdcond(const Scalar & sca) {
       /*------------+
       |  direction  |
       +------------*/
+
       if( d == Dir::ibody() ) {
-        if( extrapolate_ib) {
-          for(int cc=0; cc<dom->ibody().nccells(); cc++) {
-            int i,j,k;
-            dom->ibody().ijk(cc,&i,&j,&k); // OPR(i); OPR(j); OPR(k);
+        for(int cc=0; cc<dom->ibody().nccells(); cc++) {
+          int i,j,k;
+          dom->ibody().ijk(cc,&i,&j,&k); // OPR(i); OPR(j); OPR(k);
 
-            if( dom->ibody().on(i,j,k) && dom->ibody().off(i-1,j,k) )
-             sca[i-1][j][k] = sca[i][j][k];
-            if( dom->ibody().on(i-1,j,k) && dom->ibody().off(i,j,k) )
-             sca[i][j][k] = sca[i-1][j][k];
+          if( dom->ibody().on(i,j,k) && dom->ibody().off(i-1,j,k) )
+           sca[i-1][j][k] = sca[i][j][k];
+          if( dom->ibody().on(i-1,j,k) && dom->ibody().off(i,j,k) )
+           sca[i][j][k] = sca[i-1][j][k];
 
-            if( dom->ibody().on(i,j,k) && dom->ibody().off(i+1,j,k) )
-             sca[i+1][j][k] = sca[i][j][k];
-            if( dom->ibody().on(i+1,j,k) && dom->ibody().off(i,j,k) )
-             sca[i][j][k] = sca[i+1][j][k];
-
-
-            if( dom->ibody().on(i,j,k) && dom->ibody().off(i,j-1,k) )
-             sca[i][j-1][k] = sca[i][j][k];
-            if( dom->ibody().on(i,j-1,k) && dom->ibody().off(i,j,k) )
-             sca[i][j][k] = sca[i][j-1][k];
-
-            if( dom->ibody().on(i,j,k) && dom->ibody().off(i,j+1,k) )
-             sca[i][j+1][k] = sca[i][j][k];
-            if( dom->ibody().on(i,j+1,k) && dom->ibody().off(i,j,k) )
-             sca[i][j][k] = sca[i][j+1][k];
+          if( dom->ibody().on(i,j,k) && dom->ibody().off(i+1,j,k) )
+           sca[i+1][j][k] = sca[i][j][k];
+          if( dom->ibody().on(i+1,j,k) && dom->ibody().off(i,j,k) )
+           sca[i][j][k] = sca[i+1][j][k];
 
 
-            if( dom->ibody().on(i,j,k) && dom->ibody().off(i,j,k-1) )
-             sca[i][j][k-1] = sca[i][j][k];
-            if( dom->ibody().on(i,j,k-1) && dom->ibody().off(i,j,k) )
-             sca[i][j][k] = sca[i][j][k-1];
+          if( dom->ibody().on(i,j,k) && dom->ibody().off(i,j-1,k) )
+           sca[i][j-1][k] = sca[i][j][k];
+          if( dom->ibody().on(i,j-1,k) && dom->ibody().off(i,j,k) )
+           sca[i][j][k] = sca[i][j-1][k];
 
-            if( dom->ibody().on(i,j,k) && dom->ibody().off(i,j,k+1) )
-             sca[i][j][k+1] = sca[i][j][k];
-            if( dom->ibody().on(i,j,k+1) && dom->ibody().off(i,j,k) )
-             sca[i][j][k] = sca[i][j][k+1];
-          }
+          if( dom->ibody().on(i,j,k) && dom->ibody().off(i,j+1,k) )
+           sca[i][j+1][k] = sca[i][j][k];
+          if( dom->ibody().on(i,j+1,k) && dom->ibody().off(i,j,k) )
+           sca[i][j][k] = sca[i][j+1][k];
+
+
+          if( dom->ibody().on(i,j,k) && dom->ibody().off(i,j,k-1) )
+           sca[i][j][k-1] = sca[i][j][k];
+          if( dom->ibody().on(i,j,k-1) && dom->ibody().off(i,j,k) )
+           sca[i][j][k] = sca[i][j][k-1];
+
+          if( dom->ibody().on(i,j,k) && dom->ibody().off(i,j,k+1) )
+           sca[i][j][k+1] = sca[i][j][k];
+          if( dom->ibody().on(i,j,k+1) && dom->ibody().off(i,j,k) )
+           sca[i][j][k] = sca[i][j][k+1];
         }
+
       } else if(d != Dir::undefined()) {
-      //if(d != Dir::undefined()) {
         if(d == Dir::imin()) iof++; if(d == Dir::imax()) iof--;
         if(d == Dir::jmin()) jof++; if(d == Dir::jmax()) jof--;
         if(d == Dir::kmin()) kof++; if(d == Dir::kmax()) kof--;

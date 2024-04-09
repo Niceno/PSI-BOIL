@@ -4,7 +4,7 @@
 #include <cmath>
 #include "../centered.h"
 #include "../../../Parallel/communicator.h"
-#include "../../../Solver/Linear/Gauss/gauss.h"
+#include "../../../Solver/Gauss/gauss.h"
 #include "../../../Timer/timer.h"
 
 /***************************************************************************//**
@@ -12,12 +12,12 @@
 *
 *  The eqation is discretized in integral form:                       
 *  \f[
-*        \int_V \frac{\partial \rho C_p T}{\partial t} dV
-*      + \int_S \rho C_p {\bf u} T \, dS
-*      = \int_S \lambda \nabla T \, dS
+*        \rho C_p \int_V \frac{\partial T}{\partial t} dV
+*      + \rho C_p ( \int_S {\bf u} T \, dS - T \int_S {\bf u} \, dS )
+*      = \int_S \lambda \nabla T \, dS 
 *      + \dot{Q}
-*      \; \; \; \;
-*      [\frac{J}{s} = W]
+*      \; \; \; \; 
+*      [\frac{J}{s} = W]$
 *  \f]
 *  where \f$T \; [K]\f$ is temperature, \f$\rho \; [\frac{kg}{m^3}]\f$ is 
 *  density, \f$C_p \; [\frac{J}{kgK}]\f$ is thermal capacity, \f${t} \; [s]\f$ 
@@ -48,7 +48,7 @@ class Enthalpy : public Centered {
                 const Scalar & f,
                 const Vector & u, 
                 Times & t,
-                Linear * sm,
+                Krylov * sm,
                 Matter * flu,
                 Matter * sol = NULL); 
     ~Enthalpy();
@@ -82,6 +82,17 @@ class Enthalpy : public Centered {
 
     real turb_diff(const Scalar * diff_eddy, const int i, const int j, const int k);
 
+    void set_fvm_convection(bool b){
+      fvm_convection=b;
+      if (fvm_convection) {
+        boil::oout<<"enthalpy: use finite volume method for convection\n";
+      } else {
+        boil::oout<<"enthalpy: use 1st order finite difference method for convection\n";
+      }
+    }
+    bool get_fvm_convection(){return fvm_convection;};
+
+
   protected:
     void create_system(const Scalar * diff_eddy = NULL);
     void create_system_innertial(const Property * f_prop,
@@ -100,10 +111,12 @@ class Enthalpy : public Centered {
     void new_time_step(const Property * f_prop,
                        const Property * s_prop = NULL,
                        const Scalar * diff_eddy = NULL);
+
     // convection
-    void convection(Scalar * conv, const Property * prop); 
+    void convection(Scalar * conv, const Property * prop);
 
     real turbPr; // turbulent Prandtl number
+    bool fvm_convection; // true: use FVM for convection, false: use FDM for convection
 };	
 
 #endif

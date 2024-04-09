@@ -142,7 +142,7 @@ void ScalarInt::exchange(const int * ical, const int dir) const {
       }
     }
   }
-
+  
   /*----------------+
   |  J - direction  |
   +----------------*/
@@ -199,7 +199,7 @@ void ScalarInt::exchange(const int * ical, const int dir) const {
         sbuff_e[l] = val[i][e_y - o_y - b][k];   // buffer j end
         sbuff_s[l] = val[i][s_y + o_y + b][k];   // buffer j start
       }
-
+  
       if( dom->neighbour(Dir::jmax()) != par_proc_null ) {
         if( ical[irank] !=0 ){
           boil::cart.isend( &sbuff_e[0], ni()*nk(), par_int, 
@@ -231,7 +231,7 @@ void ScalarInt::exchange(const int * ical, const int dir) const {
       }
     }
   }
-
+  
   /*----------------+
   |  K - direction  |
   +----------------*/

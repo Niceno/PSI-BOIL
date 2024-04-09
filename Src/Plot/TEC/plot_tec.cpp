@@ -527,6 +527,7 @@ void PlotTEC::plot(const Vector & vec,
 
   boil::timer.stop("plotting");
 }
+
 /******************************************************************************/
 void PlotTEC::plot(const Scalar & sca, 
                    const Scalar & scb, 
@@ -889,6 +890,8 @@ void PlotTEC::plot_tec_body(const Body & bod, std::vector<int> & vars) {
     out << "# BODY " << -1 << boil::endl;
     return;
   }
+
+  if(!b_plot_body) return;
 
   /*-------------------------------------------+
   |  count the number of additional triangles  |
