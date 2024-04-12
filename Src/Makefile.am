@@ -20,6 +20,7 @@ SUBDIRS = Equation/Staggered/Momentum      \
           Equation/Dispersed               \
           Equation/Floodfill               \
           Equation/Heaviside               \
+          Equation/Lagrangian              \
           Equation/Nucleation              \
           Equation/Tifmodel                \
           Equation/Topology                \
@@ -69,6 +70,7 @@ LDADD = Equation/Staggered/Momentum/libMomentum.a            \
         Equation/Dispersed/libDispersed.a                    \
         Equation/Floodfill/libFloodfill.a                    \
 	Equation/Heaviside/libHeaviside.a                    \
+	Equation/Lagrangian/libLagrangian.a                  \
 	Equation/Nucleation/libNucleation.a                  \
         Equation/Tifmodel/libTif.a                           \
         Equation/Topology/libTopology.a                      \

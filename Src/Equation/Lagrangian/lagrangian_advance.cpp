@@ -4,7 +4,7 @@
 void Lagrangian::advance(Vector * force) {
 /*==========================================================================+
 |                                                                           |
-|              the main algorithm to advance the lagrangian phase            |
+|              the main algorithm to advance the lagrangian phase           |
 |                                                                           |
 |===========================================================================|
 |                                                                           |
