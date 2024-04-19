@@ -6,6 +6,7 @@
 #include <cmath>
 #include "../../Equation/Centered/centered.h"
 #include "../../Timer/timer.h"
+#include "../Linear/linear.h"
 
 /***************************************************************************//**
 *  \brief Implementation of the Additive Correction (AC) multigrid solver.
@@ -24,7 +25,7 @@ class AC {
 	
   public:
     //! Basic constructor
-    AC(Centered * cen); 
+    AC(Centered * cen, Linear * sol = NULL); 
 
     //! The solution algorythm. V-cycle. 
     bool vcycle(const ResRat & factor, int * ncyc = NULL);
@@ -68,6 +69,9 @@ class AC {
     //! Pointers to coarser levels. 
     Centered * L[64];
     int        nlevels;
+
+    //! Solver at coarsest level.
+    Linear * solver;
 
     //! Parameters for steering of v-cycle
     int  max_cyc;

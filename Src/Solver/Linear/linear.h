@@ -43,17 +43,14 @@ class Linear {
         \param rt - residual tolerance, 
         \param rr - residual ratio.     
     */
-    virtual bool solve(Matrix & A,              
+    virtual void solve(Matrix & A,              
                        Scalar & x,               
                        Scalar & b,                
-                       const MinIter & mini,
-                       const MaxIter & mi,
+                       const MinIter & minit,
+                       const MaxIter & maxit,
                        const char * var_name,
                        const ResRat & rr = ResRat(), 
-                       const ResTol & rt = ResTol(),
-                       const real scale = 1.0,
-                       const int stalecount = -1,
-                       const bool precform = true) = 0;
+                       const ResTol & rt = ResTol()) = 0;
 
     //! Pointer to the domain on which the solver is defined.
     const Domain * domain() const {return dom;}

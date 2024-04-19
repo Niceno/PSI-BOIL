@@ -64,7 +64,7 @@ class Momentum : public Staggered {
     Momentum(const Vector & U, 
              const Vector & F, 
              Times & t, 
-             Krylov * sm,
+             Linear * sm,
              Matter * M);
     ~Momentum();
 
@@ -95,6 +95,19 @@ class Momentum : public Staggered {
 
     void outlet();
 
+    void set_min_iteration(const int i){
+      min_iter = MinIter(i);
+      boil::oout<<"Momentum:min_iteration= "<<min_iter<<"\n";
+    }
+    int get_min_iteration() {return min_iter;}
+
+    void set_max_iteration(const int i){
+      max_iter = MaxIter(i);
+      boil::oout<<"Momentum:max_iteration= "<<max_iter<<"\n";
+    }
+    int get_max_iteration() {return max_iter;}
+
+
     Matrix * A[3];
 
   private:
@@ -117,6 +130,8 @@ class Momentum : public Staggered {
 
     real v_phase_change;
     bool ifull, jfull, kfull;
+    MinIter min_iter;
+    MaxIter max_iter;
 
 };
 

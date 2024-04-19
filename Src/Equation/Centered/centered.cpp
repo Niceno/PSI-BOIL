@@ -6,7 +6,7 @@
 *  \note It is recursive (i.e. calls itself).
 *******************************************************************************/
 Centered::Centered(const Centered * fn, const Domain * d, 
-                   BndCnd & ubc, Krylov * sm) :
+                   BndCnd & ubc, Linear * sm) :
 
   Equation(d, NULL, NULL, NULL, sm), phi(*d, ubc), A(phi), 
                fnew(*d), buff(*d), res(*d), 
@@ -19,4 +19,8 @@ Centered::Centered(const Centered * fn, const Domain * d,
 
   if(dom->coarser() != NULL)
     crsr = new Centered( this, this->dom->coarser(), phi.bc(), solver ); 
+
+  min_iter = MinIter(1);
+  max_iter = MaxIter(20);
+
 }

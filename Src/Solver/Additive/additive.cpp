@@ -5,7 +5,7 @@
 *  for which it is meant to be used. As a second step, stores pointers to
 *  variable's levels.  
 *******************************************************************************/
-AC::AC(Centered * cen) {
+AC::AC(Centered * cen, Linear * sol) {
 
   /* set variables which steer the v-cycle */
   max_cyc = 20;
@@ -29,4 +29,16 @@ AC::AC(Centered * cen) {
   }
 
   boil::oout << "Number of cycling levels: " << nlevels << boil::endl;
+
+  /* is there a distinct solver at coarsest level? */
+  if(sol!=NULL) {
+    solver = sol;
+  } else {
+    solver = L[0] -> solver;
+  }
+
+  /* coarsen the active flag */
+  //for(int l=1; l<nlevels; l++)
+  //  coarsen_flag(*L[l-1], *L[l]); // finer, coarser
+
 }

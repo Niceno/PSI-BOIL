@@ -33,7 +33,7 @@
 *  \f[
 *      [A] \cdot \{ \phi \}^N = \{ f \}
 *  \f] 
-*  which can be solved with either one of the Krylov sub-space family of 
+*  which can be solved with either one of the linear solver of 
 *  solvers (CG, CGS, BiCGS), or the Additive Correction (AC) multigrid.
 *  The superscript \f$ N \f$ in the above equation denotes the new time
 *  step. All the terms without a superscript are time-averaged over 
@@ -70,7 +70,7 @@ class Centered : public Equation {
         \param t - simulation (physical) time (\f$ {t} \f$),
         \param flu - holds all material properties 
                      (\f$ \rho, B_{\phi}, \Gamma_{\phi} \f$),
-        \param sm - Krylov subspace solver. It acts as a solver, or as a
+        \param sm - linear solver. It acts as a solver, or as a
                     smoother for AC multirid.
     */
     Centered(const Domain * d,
@@ -78,7 +78,7 @@ class Centered : public Equation {
              const Vector * v, const Times & t, 
              Matter * flu,
              Matter * sol,
-             Krylov * sm = NULL) 
+             Linear * sm = NULL) 
      : Equation(d, &t, flu, sol, sm), phi(&s), A(phi), fext(&g), u(v), 
                     fold(*d), fnew(*d), fbnd(*d), 
                     cold(*d), cnew(*d), buff(*d), 
@@ -119,6 +119,17 @@ class Centered : public Equation {
 
     //! Defines the variable at coarser levels. (Needed for AC).
     void  coarsen();     
+    void set_min_iteration(const int i){
+      min_iter = MinIter(i);
+      boil::oout<<"Momentum:min_iteration= "<<min_iter<<"\n";
+    }
+    int get_min_iteration() {return min_iter;}
+
+    void set_max_iteration(const int i){
+      max_iter = MaxIter(i);
+      boil::oout<<"Momentum:max_iteration= "<<max_iter<<"\n";
+    }
+    int get_max_iteration() {return max_iter;}
 
     const Scalar & val() const {return phi;}
 
@@ -134,7 +145,7 @@ class Centered : public Equation {
 
     //! Constructor for coarser levels. 
     Centered(const Centered * fin, const Domain *, 
-             BndCnd & ubc, Krylov * sm);  
+             BndCnd & ubc, Linear * sm);  
 
     int ni() const {return phi.ni();} 
     int nj() const {return phi.nj();} 
@@ -180,6 +191,10 @@ class Centered : public Equation {
 
     const Centered * fnr;
           Centered * crsr;
+
+    MinIter min_iter;
+    MaxIter max_iter;
+
 };
 
 #endif

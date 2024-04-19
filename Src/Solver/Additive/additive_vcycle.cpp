@@ -56,7 +56,7 @@ bool AC::vcycle(const ResRat & factor, int * ncyc) {
     /* down */
     for(int l=0; l<nlevels-1; l++) {
       L[l] -> solver->solve( L[l]->A, L[l]->phi, L[l]->fnew, 
-                             MaxIter(5), NULL, 
+                             MinIter(1), MaxIter(5), NULL, 
                              ResRat(0.1), ResTol(boil::nano) );
 
       residual(*L[l]);
@@ -68,11 +68,11 @@ bool AC::vcycle(const ResRat & factor, int * ncyc) {
     for(int l=nlevels-1; l>=0; l--) {
       if(l==nlevels-1) 
         L[l] -> solver->solve( L[l]->A, L[l]->phi, L[l]->fnew, 
-                               MaxIter(40 * (l+1)), NULL, 
+                               MinIter(1), MaxIter(40 * (l+1)), NULL, 
                                ResRat(0.001), ResTol(boil::femto) );
       else
         L[l] -> solver->solve( L[l]->A, L[l]->phi, L[l]->fnew, 
-                               MaxIter(20 * (l+1)), NULL, 
+                               MinIter(1), MaxIter(20 * (l+1)), NULL, 
                                ResRat(0.01), ResTol(boil::pico) );
 
       if(l > 0)

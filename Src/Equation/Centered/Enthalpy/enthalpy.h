@@ -39,7 +39,7 @@ class Enthalpy : public Centered {
         \param f   - extarnal source array (\f$\dot{q}\f$),
         \param u   - convection velocity (\f${\bf u}\f$),
         \param t   - simulation (physical) time (\f${t}\f$),
-        \param sm  - Linear solver. It acts as a solver, or as a
+        \param sm  - linear solver. It acts as a solver, or as a
                      smoother for AC multigrid.
         \param flu - Holds all fluid properties (\f$\rho, C_p, \lambda\f$),
         \param sol - holds all solid properties (\f$\rho, C_p, \lambda\f$).
@@ -48,7 +48,7 @@ class Enthalpy : public Centered {
                 const Scalar & f,
                 const Vector & u, 
                 Times & t,
-                Krylov * sm,
+                Linear * sm,
                 Matter * flu,
                 Matter * sol = NULL); 
     ~Enthalpy();

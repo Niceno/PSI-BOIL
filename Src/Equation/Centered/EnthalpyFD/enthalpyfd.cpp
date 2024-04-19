@@ -9,7 +9,7 @@ EnthalpyFD::EnthalpyFD(const Scalar & PHI,
                        const Scalar & C,
                        const Vector & U,
                        Times & T,
-                       Krylov * S,
+                       Linear * S,
                        Matter * f,
                        const real Tsat,
                        Matter * s) :

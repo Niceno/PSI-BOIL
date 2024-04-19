@@ -4,15 +4,12 @@
 *  \brief Implementation of the Bi-Conjugate Gradient Stabilized (BiCGS) 
 *         solver.
 *
-*  \note The arguments are explained in the parent-parent, Linear.
+*  \note The arguments are explained in the parent, Krylov.
 *******************************************************************************/
-bool BiCGS :: solve(Matrix & A, Scalar & x, Scalar & b, const MinIter & mini,
-                    const MaxIter & mi, 
+void BiCGS :: solve(Matrix & A, Scalar & x, Scalar & b,
+       	            const MinIter & minit, const MaxIter & maxit, 
                     const char * name,
-                    const ResRat & res_rat, const ResTol & res_tol,
-                    const real scale,
-                    const int stalecount,
-                    const bool precform) {
+                    const ResRat & res_rat, const ResTol & res_tol) {
 /*---------------------------------------------------------------+
 |  templated bi-conjugate gradient stabilized (bicgs) algorithm  |
 +---------------------------------------------------------------*/
@@ -36,47 +33,30 @@ bool BiCGS :: solve(Matrix & A, Scalar & x, Scalar & b, const MinIter & mini,
   /*--------------------------------+
   |  form preconditioning matrix M  |
   +--------------------------------*/
-  if(precform)
-    prec->form(A, x);
-
-  /* staleness vector */
-  std::vector<real> resvect;
-  if(stalecount>0) {
-    resvect.resize(stalecount);
-    for(auto & r : resvect)
-      r = boil::unreal;
-  }
+  prec->form(A, x);
 
   /*----------------------+
   |  compute r = b - A x  |
   +----------------------*/
   r = b - A * x;
-  //real res = sqrt(r.dot_avg(r)); 
-  real res = sqrt(r.dot_voldiv_avg(r))/scale;
+  real res = r.dot(r); 
   real res0 = res;
 
-  if(stalecount>0) {
-    resvect.back() = res;
-  }
-
-#ifdef DEBUG
-  OMS(------------);
-  OPR(res0);
-  OPR(res_tol);
-  OPR(res_rat);
-#endif 
+  // OMS(------------);
+  // OPR(sqrt(res0));
+  // OPR(res_tol);
+  // OPR(res_rat);
 
   /* should res be scaled with A and x? */
-  if(res < res_tol) return true; // temporary meassure
+  if(sqrt(res) < res_tol) return; // temporary meassure
 
   /*------------+
   |  choose r~  |
   +------------*/
   r_ = r;
 
-  bool converged(false);
   int i;
-  for(i=0; i<mi; i++) {
+  for(i=0; i<maxit; i++) {
 
     /*-------------+
     |  rho = r~ r  |
@@ -86,7 +66,7 @@ bool BiCGS :: solve(Matrix & A, Scalar & x, Scalar & b, const MinIter & mini,
     /*---------------------------+
     |  if rho == 0 method fails  |
     +---------------------------*/
-    if( sqrt(fabs(rho)) < res_tol ) break;
+    if( sqrt(rho) < res_tol ) break;
 
     if(i == 0) {
       /*--------+ 
@@ -170,44 +150,19 @@ bool BiCGS :: solve(Matrix & A, Scalar & x, Scalar & b, const MinIter & mini,
     /*--------------------+
     |  exit if converged  |
     +--------------------*/
-    //res = sqrt(r.dot_avg(r));
-    res = sqrt(r.dot_voldiv_avg(r))/scale;
+    res = r.dot(r);
 
-#ifdef DEBUG
-    OPR(res);
-#endif
+    // OPR( sqrt(res) );
 
     /* should res be scaled with A and u? */
-    if( res < res_tol && i >= mini-1) { converged = true; break; }
+    if( sqrt(res) < res_tol && i >= minit-1) break;
 
-    if( res < res0 * res_rat && i >= mini-1) { converged = true; break; }
+    if( sqrt(res) < sqrt(res0) * res_rat && i >= minit-1) break; 
 
     /*---------------------------------------------------+
     |  for continuation it is necessary that omega != 0  |
     +---------------------------------------------------*/
     if( small.contains(omega) ) break;
-
-    if(stalecount>0) {
-      bool staleflag(true);
-      for(auto & r : resvect) {
-        if(res<r) {
-          staleflag = false;
-          break;
-        }
-      }
-      if(staleflag) {
-        if(name!=NULL) {
-          boil::oout << name  << " staled!";
-          for(auto & r : resvect)
-            boil::oout<<" "<<r;
-          boil::oout<<" "<<res<<boil::endl;
-        }
-        break;
-      } else {
-        std::rotate(resvect.begin(),resvect.begin()+1,resvect.end());
-        resvect.back() = res;
-      }
-    }
 
     /*----------------+
     |  rho_old = rho  |
@@ -217,13 +172,11 @@ bool BiCGS :: solve(Matrix & A, Scalar & x, Scalar & b, const MinIter & mini,
   x.exchange();
 
   /* for normalisation */
-  //p = A * x;
+  p = A * x;
 
   if(name!=NULL) boil::oout << name 
-                            << ", residual = " << res
-                            << ", ratio = " << res/res0
+                            << ", residual = " << sqrt(res/p.dot(p)) 
+                            << ", ratio = " << sqrt ( res/res0 )
                             << ", iterations = " << i+1 
                             << boil::endl;
-
-  return converged;
 }

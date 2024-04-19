@@ -5,7 +5,12 @@ Boil_SOURCES = main.cpp    \
 
 SUBDIRS = Equation/Staggered/Momentum      \
           Equation/Staggered               \
-          Solver                           \
+	  Solver/Additive                  \
+          Solver/Linear/Gauss              \
+          Solver/Linear/Iterative          \
+          Solver/Linear/Krylov             \
+          Solver/Linear                    \
+          Solver/Preconditioner            \
           Equation/Centered/Enthalpy       \
           Equation/Centered/EnthalpyFD     \
           Equation/Centered/EnthalpyTif    \
@@ -22,6 +27,7 @@ SUBDIRS = Equation/Staggered/Momentum      \
           Equation/Heaviside               \
           Equation/Lagrangian              \
           Equation/Nucleation              \
+          Equation/Pathline                \
           Equation/Tifmodel                \
           Equation/Topology                \
           Monitor/Rack                     \
@@ -55,7 +61,12 @@ SUBDIRS = Equation/Staggered/Momentum      \
 
 LDADD = Equation/Staggered/Momentum/libMomentum.a            \
         Equation/Staggered/libStaggered.a                    \
-        Solver/libSolver.a                                   \
+	Solver/Additive/libAdditive.a                        \
+        Solver/Linear/Gauss/libGauss.a                       \
+        Solver/Linear/Iterative/libIterative.a               \
+        Solver/Linear/Krylov/libKrylov.a                     \
+        Solver/Linear/libLinear.a                            \
+        Solver/Preconditioner/libPreconditioner.a            \
         Equation/Centered/Enthalpy/libEnthalpy.a             \
         Equation/Centered/EnthalpyFD/libEnthalpyFD.a         \
         Equation/Centered/EnthalpyTif/libEnthalpyTif.a       \
@@ -72,6 +83,7 @@ LDADD = Equation/Staggered/Momentum/libMomentum.a            \
 	Equation/Heaviside/libHeaviside.a                    \
 	Equation/Lagrangian/libLagrangian.a                  \
 	Equation/Nucleation/libNucleation.a                  \
+	Equation/Pathline/libPathline.a                      \
         Equation/Tifmodel/libTif.a                           \
         Equation/Topology/libTopology.a                      \
         Monitor/Rack/libRack.a                               \

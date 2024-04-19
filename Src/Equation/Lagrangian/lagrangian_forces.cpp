@@ -77,7 +77,7 @@ void Lagrangian::forces() {
       //continuous
       //lagparticle
       mu_cont  =  flu->mu(1.0) * ( (*cfu)[cell_i][cell_j][cell_k] )
-                           + flu->mu(0.0) * ( 1.0 - (*cfu)[cell_i][cell_j][cell_k] );  //1-mu_cont
+                + flu->mu(0.0) * ( 1.0 - (*cfu)[cell_i][cell_j][cell_k] );  //1-mu_cont
       rho_cont =  flu->rho(1.0) * ( (*cfu)[cell_i][cell_j][cell_k] )
                            + flu->rho(0.0) * ( 1.0 - (*cfu)[cell_i][cell_j][cell_k] );  //2-rho_cont
       rho_lagp = sol->rho(cell_i,cell_j,cell_k);  //3-rho_lagp-const
@@ -108,9 +108,9 @@ void Lagrangian::forces() {
       //continuous
       //lagp
       mu_cont  =  flu->mu(1.0) * ( (*cfu)[cell_i][cell_j][cell_k] )
-                           + flu->mu(0.0) * ( 1.0 - (*cfu)[cell_i][cell_j][cell_k] );  //1-mu_cont
+                + flu->mu(0.0) * ( 1.0 - (*cfu)[cell_i][cell_j][cell_k] );  //1-mu_cont
       rho_cont =  flu->rho(1.0) * ( (*cfu)[cell_i][cell_j][cell_k] )
-                           + flu->rho(0.0) * ( 1.0 - (*cfu)[cell_i][cell_j][cell_k] );  //2-rho_cont
+                + flu->rho(0.0) * ( 1.0 - (*cfu)[cell_i][cell_j][cell_k] );  //2-rho_cont
       rho_lagp = sol->rho(cell_i,cell_j,cell_k);  //3-rho_lagp-const
       delta_rho = fabs(rho_cont  - rho_lagp);  //4-delta_rho
 
@@ -129,9 +129,9 @@ void Lagrangian::forces() {
       //continuous
       //lagp
       mu_cont  =  flu->mu(1.0) * ( (*cfu)[cell_i][cell_j][cell_k] )
-                           + flu->mu(0.0) * ( 1.0 - (*cfu)[cell_i][cell_j][cell_k] );  //1-mu_cont
+                + flu->mu(0.0) * ( 1.0 - (*cfu)[cell_i][cell_j][cell_k] );  //1-mu_cont
       rho_cont =  flu->rho(1.0) * ( (*cfu)[cell_i][cell_j][cell_k] )
-                           + flu->rho(0.0) * ( 1.0 - (*cfu)[cell_i][cell_j][cell_k] );  //2-rho_cont
+                + flu->rho(0.0) * ( 1.0 - (*cfu)[cell_i][cell_j][cell_k] );  //2-rho_cont
       rho_lagp = sol->rho(cell_i,cell_j,cell_k);  //3-rho_lagp-const
       delta_rho = fabs(rho_cont  - rho_lagp);  //4-delta_rho
 

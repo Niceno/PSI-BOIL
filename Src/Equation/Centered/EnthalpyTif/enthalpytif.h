@@ -42,7 +42,7 @@ class EnthalpyTIF : public Centered {
         \param f   - external source array (\f$\dot{q}\f$),
         \param u   - convection velocity (\f${\bf u}\f$),
         \param t   - simulation (physical) time (\f${t}\f$),
-        \param sm  - Krylov subspace solver. It acts as a solver, or as a
+        \param sm  - linear solver. It acts as a solver, or as a
                      smoother for AC multirid.
         \param flu - Holds all fluid properties (\f$\rho, C_p, \lambda\f$),
         \param sol - holds all solid properties (\f$\rho, C_p, \lambda\f$).
@@ -60,7 +60,7 @@ class EnthalpyTIF : public Centered {
                 const Scalar & clr,
                 const Vector & u,
                 Times & t,
-                Krylov * sm,
+                Linear * sm,
                 Matter * flu,
                 TIF & tifmodel,
                 Matter * sol = NULL,
@@ -77,7 +77,7 @@ class EnthalpyTIF : public Centered {
                 const Scalar & clr,
                 const Vector & u,
                 Times & t,
-                Krylov * sm,
+                Linear * sm,
                 Matter * flu,
                 const real tsat,
                 Matter * sol = NULL);

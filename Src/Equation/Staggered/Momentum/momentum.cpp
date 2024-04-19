@@ -4,7 +4,7 @@
 Momentum::Momentum(const Vector & U, 
                    const Vector & F,
                    Times & T,   
-                   Krylov * sm,
+                   Linear * sm,
                    Matter * M) :
   Staggered(U.domain(), U, F, T, M, NULL, sm) { /* NULL is for solid */
 
@@ -36,6 +36,8 @@ Momentum::Momentum(const Vector & U,
 
   discretize();
 
+  min_iter = MinIter(1);
+  max_iter = MaxIter(10);
   v_phase_change=0.0;
 }
 

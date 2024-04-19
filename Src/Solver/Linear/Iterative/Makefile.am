@@ -3,6 +3,8 @@ libIterative_a_SOURCES = iterative.h                   \
                          gaussseidel.h                 \
                          gaussseidel.cpp               \
                          jacobi.h                      \
-                         jacobi.cpp
+                         jacobi.cpp                    \
+                         sor.h                         \
+                         sor.cpp
 
 INCLUDE = -I@top_srcdir@/

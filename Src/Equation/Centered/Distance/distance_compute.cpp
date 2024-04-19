@@ -51,7 +51,7 @@ void Distance::compute() {
   /*--------+
   |  solve  |
   +--------*/
-  solver->solve(A, phi, fnew, 
+  solver->solve(A, phi, fnew, min_iter,
                 MaxIter(1000), "distance", 
                 ResRat(boil::micro), ResTol(boil::pico));
 

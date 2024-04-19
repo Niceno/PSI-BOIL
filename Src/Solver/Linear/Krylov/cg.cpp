@@ -1,19 +1,14 @@
 #include "cg.h"
 
-//#define DEBUG
-
 /***************************************************************************//**
 *  \brief Implementation of the Conjugate Gradient (CG) solver.
 *
-*  \note The arguments are explained in the parent-parent, Linear.
+*  \note The arguments are explained in the parent, Krylov.
 *******************************************************************************/
-bool CG :: solve(Matrix & A, Scalar & x, Scalar & b, const MinIter & mini,
-                 const MaxIter & mi,
+void CG :: solve(Matrix & A, Scalar & x, Scalar & b, 
+                 const MinIter & minit, const MaxIter & maxit,
                  const char * name,
-                 const ResRat & res_rat, const ResTol & res_tol,
-                 const real scale,
-                 const int stalecount,
-                 const bool precform) {
+                 const ResRat & res_rat, const ResTol & res_tol) {
 /*----------------------------------------------+
 |  templated conjugate gradient (cg) algorithm  |
 +----------------------------------------------*/
@@ -30,42 +25,25 @@ bool CG :: solve(Matrix & A, Scalar & x, Scalar & b, const MinIter & mini,
   /*--------------------------------+
   |  form preconditioning matrix M  |
   +--------------------------------*/
-  if(precform)
-    prec->form(A, x);
-
-  /* staleness vector */
-  std::vector<real> resvect;
-  if(stalecount>0) {
-    resvect.resize(stalecount);
-    for(auto & r : resvect)
-      r = boil::unreal;
-  }
+  prec->form(A, x);
 
   /*----------------------+
   |  compute r = b - A x  |
   +----------------------*/
   r = b - A * x;
-  //real res = sqrt(r.dot_avg(r)); 
-  real res = sqrt(r.dot_voldiv_avg(r))/scale;
+  real res = r.dot(r); 
   real res0 = res;
 
-  if(stalecount>0) {
-    resvect.back() = res;
-  }
-
-#ifdef DEBUG
-  OMS(------------);
-  OPR(res0);
-  OPR(res_tol);
-  OPR(res_rat);
-#endif 
+  // OMS(------------);
+  // OPR(sqrt(res0));
+  // OPR(res_tol);
+  // OPR(res_rat);
 
   /* should res be scaled with A and x? */
-  if(res < res_tol) return true; // temporary meassure
+  if(sqrt(res) < res_tol) return; // temporary meassure
 
-  bool converged(false);
   int i;
-  for(i=0; i<mi; i++) {
+  for(i=0; i<maxit; i++) {
 
     /*-----------------+
     |  preconditioning |
@@ -117,66 +95,28 @@ bool CG :: solve(Matrix & A, Scalar & x, Scalar & b, const MinIter & mini,
     /*--------------------+
     |  exit if converged  |
     +--------------------*/
-    //res = sqrt(r.dot_avg(r));
-    res = sqrt(r.dot_voldiv_avg(r))/scale;
+    res = r.dot(r);
 
-#ifdef DEBUG
-    OPR(res);
-    if(stalecount>0) {
-      boil::oout<<i<<" ";
-      for(auto & r : resvect)
-        boil::oout<<" "<<r;
-      boil::oout<<" "<<res<<boil::endl;
-    }
-#endif
+    // OPR( sqrt(res) );
 
     /* should res be scaled with A and x? */
-    if( res < res_tol && i >= mini-1 ) { converged = true; break; }
+    if( sqrt(res) < res_tol && i >= minit-1 ) break;
 
-    if( res < res0 * res_rat && i >= mini-1 ) { converged = true; break; }
-    
-    if(stalecount>0) {
-      bool staleflag(true);
-      for(auto & r : resvect) {
-        if(res<r) {
-          staleflag = false;
-          break;
-        }
-      }
-      if(staleflag) {
-        if(name!=NULL) {
-          boil::oout << name  << " staled!";
-          for(auto & r : resvect)
-            boil::oout<<" "<<r;
-          boil::oout<<" "<<res<<boil::endl;
-        }
-        /* restore last good solution */
-        //x -= alfa * p;
-        break;
-      } else {
-        std::rotate(resvect.begin(),resvect.begin()+1,resvect.end());
-        resvect.back() = res;
-      }
-    }
-
-    //if(i >= 30 && i%10 ==0)
-    //  boil::oout<<"iteration= "<<i<<" residual= "<<res<<" ratio= "<<res/res0<<"\n";
+    if( sqrt(res) < sqrt(res0) * res_rat && i >= minit-1 ) break; 
 
     /*----------------+
     |  rho_old = rho  |
     +----------------*/
     rho_old = rho;
-  } 
+  }
   x.exchange();
 
   /* for normalisation */
-  //q = A * x;
+  q = A * x;
 
   if(name!=NULL) boil::oout << name 
-                            << ", residual = " << res
-                            << ", ratio = " << res/res0
+                            << ", residual = " << sqrt(res/q.dot(q)) 
+                            << ", ratio = " << sqrt ( res/res0 )
                             << ", iterations = " << i+1 
                             << boil::endl;
-
-  return converged;
 }

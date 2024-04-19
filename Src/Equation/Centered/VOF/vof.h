@@ -22,7 +22,7 @@ class VOF : public Centered {
         const Scalar & kappa,
         const Vector & u, 
         Times & t,
-        Krylov * S,
+        Linear * S,
         Vector * bndclr = NULL);
     ~VOF();
 

@@ -33,6 +33,7 @@ Lagrangian::Lagrangian(const Scalar & c,
   continuous(1-lagp),  //not-really-in-use
 
   lagrangian(lagp) {
+    std::cout<<"lagrangian= "<<lagrangian<<"\n";
     assert(lagrangian == 0.56789);  //mark
 
     p_id = color->shape();

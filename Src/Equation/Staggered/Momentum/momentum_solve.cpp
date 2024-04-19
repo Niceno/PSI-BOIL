@@ -47,24 +47,24 @@ void Momentum::solve(const ResRat & factor) {
 
     if(m==Comp::u()) 
       if(ifull) {
-        solver->solve(*Am, u(m), fnew(m), 
-                       MaxIter(10), "u", factor);
+        solver->solve(*Am, u(m), fnew(m), min_iter,
+                       max_iter, "u", factor);
       } else {
         for_avmijk(u,m,i,j,k) 
           u[m][i][j][k] = 0.0;
       }
     if(m==Comp::v()) 
       if(jfull) {
-        solver->solve(*Am, u(m), fnew(m), 
-                       MaxIter(10), "v", factor);
+        solver->solve(*Am, u(m), fnew(m), min_iter,
+                       max_iter, "v", factor);
       } else {
         for_avmijk(u,m,i,j,k) 
           u[m][i][j][k] = 0.0;
       }
     if(m==Comp::w()) 
       if(kfull) {
-        solver->solve(*Am, u(m), fnew(m), 
-                       MaxIter(10), "w", factor);
+        solver->solve(*Am, u(m), fnew(m), min_iter,
+                       max_iter, "w", factor);
       } else {
         for_avmijk(u,m,i,j,k) 
           u[m][i][j][k] = 0.0;

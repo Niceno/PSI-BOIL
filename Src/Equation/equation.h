@@ -9,7 +9,7 @@
 #include "../Ravioli/timescheme.h"
 #include "../SimulationTime/simulation_time.h"
 #include "../Domain/domain.h"
-#include "../Solver/Krylov/krylov.h"
+#include "../Solver/Linear/Krylov/krylov.h"
 #include "../Matter/matter.h"
 
 ////////////////
@@ -23,7 +23,7 @@ class Equation {
              const Times  * t, 
              Matter * f, 
              Matter * s, 
-             Krylov * sm) : 
+             Linear * sm) : 
       dom(d), time(t), flu(f), sol(s), solver(sm),
       conv_ts(TimeScheme::adams_bashforth()),
       diff_ts(TimeScheme::crank_nicolson()),
@@ -31,17 +31,17 @@ class Equation {
 
     virtual void discretize(const Scalar * diff_eddy = NULL) = 0;
 
-    void diffusion_set (const TimeScheme & ts) {diff_ts = ts; discretize();}
+    virtual void diffusion_set (const TimeScheme & ts) {diff_ts = ts; discretize();}
     void convection_set(const TimeScheme & ts) {conv_ts = ts;}
     void convection_set(const ConvScheme & cs) {lim.set(cs);}
 
-    Krylov * solver;
+    Linear * solver;
 
     const Matter * fluid() const {return flu;}
     const Matter * solid() const {return sol;}
 
     const Domain * domain() const {return dom;}
-    
+
   protected:
     TimeScheme diff_ts;
     TimeScheme conv_ts;
@@ -51,6 +51,7 @@ class Equation {
     const Times  * time;
     Matter * flu;
     Matter * sol;
+
 };
 
 #endif

@@ -7,13 +7,10 @@
 *
 *  \note The arguments are explained in the parent-parent, Linear.
 *******************************************************************************/
-bool Jacobi :: solve(Matrix & A, Scalar & x, Scalar & b, const MinIter & mini,
-                     const MaxIter & mi,
+void Jacobi :: solve(Matrix & A, Scalar & x, Scalar & b, 
+                     const MinIter & minit, const MaxIter & maxit,
                      const char * name,
-                     const ResRat & res_rat, const ResTol & res_tol,
-                     const real scale,
-                     const int stalecount,
-                     const bool precform) {
+                     const ResRat & res_rat, const ResTol & res_tol) {
 
   r = x.shape(); r=0.0;
 
@@ -32,11 +29,10 @@ bool Jacobi :: solve(Matrix & A, Scalar & x, Scalar & b, const MinIter & mini,
 #endif
 
   /* should res be scaled with A and x? */
-  if(sqrt(res) < res_tol) return true; // temporary meassure
+  if(sqrt(res) < res_tol) return; // temporary meassure
 
-  bool converged(false);
-  int i;
-  for(i=0; i<mi; i++) {
+  int it;
+  for(it=0; it<maxit; it++) {
     
     /* perform one iteration step */
     for_vijk(x,i,j,k) {
@@ -56,9 +52,9 @@ bool Jacobi :: solve(Matrix & A, Scalar & x, Scalar & b, const MinIter & mini,
 #endif
 
     /* should res be scaled with A and x? */
-    if( sqrt(res) < res_tol && i >= mini-1 ) { converged = true; break; }
+    if( sqrt(res) < res_tol && it >= minit-1 ) break;
 
-    if( sqrt(res) < sqrt(res0) * res_rat && i >= mini-1 ) { converged = true; break; } 
+    if( sqrt(res) < sqrt(res0) * res_rat && it >= minit-1 ) break;
   }
 
   /* for normalisation */
@@ -67,9 +63,9 @@ bool Jacobi :: solve(Matrix & A, Scalar & x, Scalar & b, const MinIter & mini,
   if(name!=NULL) boil::oout << name 
                             << ", residual = " << sqrt(res/r.dot(r)) 
                             << ", ratio = " << sqrt ( res/res0 )
-                            << ", iterations = " << i+1 
+                            << ", iterations = " << it+1 
                             << boil::endl;
 
-  return converged;
+  return;
 
 }

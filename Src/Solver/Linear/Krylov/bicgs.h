@@ -18,14 +18,10 @@ class BiCGS : public Krylov {
     BiCGS(const Domain & s, const Prec & pc) : Krylov(s, pc) {allocate(s);}
     BiCGS(const Domain & s)                  : Krylov(s)     {allocate(s);}
 
-    virtual bool solve(Matrix & A, Scalar & x, Scalar & b,
-                       const MinIter & mini,
-                       const MaxIter & mi, const char * name = NULL,
-                       const ResRat & rr = ResRat(),
-                       const ResTol & rt = ResTol(),
-                       const real scale = 1.0,
-                       const int stalecount = -1,
-                       const bool precform = true);
+    void solve(Matrix & A, Scalar & x, Scalar & b,
+               const MinIter & minit,  const MaxIter & maxit, 
+               const char * name = NULL,
+               const ResRat & rr = ResRat(), const ResTol & rt = ResTol());
 
   private:
     void allocate(const Domain & d) {

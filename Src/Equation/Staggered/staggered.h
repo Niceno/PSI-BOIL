@@ -20,7 +20,7 @@ class Staggered : public Equation {
               Times & t,
               Matter * flu,
               Matter * sol,
-              Krylov * sm) : Equation(d,&t,flu,sol,sm), u(&v), fext(&f),
+              Linear * sm) : Equation(d,&t,flu,sol,sm), u(&v), fext(&f),
                              fold(*d), fnew(*d), 
                              cold(*d), cnew(*d), gradp(*d) {
                 set_indices();

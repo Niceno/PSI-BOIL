@@ -2,6 +2,16 @@
 #define KRYLOV_H
 
 #include "../linear.h"
+//#include "../../Parallel/mpi_macros.h"
+//#include <iostream>
+//#include <cmath>
+//#include "../../Ravioli/restol.h"
+//#include "../../Ravioli/resrat.h"
+//#include "../../Ravioli/maxiter.h"
+//#include "../../Domain/domain.h"
+//#include "../../Matrix/matrix.h"
+//#include "../../Field/Scalar/scalar.h"
+//#include "../Preconditioner/preconditioner.h"
 
 /***************************************************************************//**
 *  \brief Parent class for all Krylov subspace solvers.
@@ -15,19 +25,17 @@
 class Krylov : public Linear {
   public:
     Krylov(const Domain & d, const Prec & pc = Prec::di())
-      : Linear(d,pc) {}; 
+      : Linear(d,pc) {};
 
-    virtual bool solve(Matrix & A,              
+    virtual void solve(Matrix & A,              
                        Scalar & x,               
                        Scalar & b,                
-                       const MinIter & mini,
-                       const MaxIter & mi,
+                       const MinIter & minit,
+                       const MaxIter & maxit,
                        const char * var_name = NULL,
                        const ResRat & rr = ResRat(), 
-                       const ResTol & rt = ResTol(),
-                       const real scale = 1.0,
-                       const int stalecount = -1,
-                       const bool precform = true) = 0;
+                       const ResTol & rt = ResTol()) = 0;
+
 };
 
 #endif

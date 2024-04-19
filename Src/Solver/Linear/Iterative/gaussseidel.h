@@ -7,23 +7,20 @@
 *  \brief Iterative child embedding the Gauss-Seidel (GS) solver.
 *******************************************************************************/
 
-//////////////
-//          //
-//  Jacobi  //
-//          //
-//////////////
+///////////////////
+//               //
+//  GaussSeidel  //
+//               //
+///////////////////
 class GaussSeidel : public Iterative {
   public:
     GaussSeidel(const Domain & s) : Iterative(s)     {allocate(s);}
 
-    virtual bool solve(Matrix & A, Scalar & x, Scalar & b, 
-                       const MinIter & mini,
-                       const MaxIter & mi, const char * name = NULL,
+    void solve(Matrix & A, Scalar & x, Scalar & b, 
+                       const MinIter & minit,
+                       const MaxIter & maxit, const char * name = NULL,
                        const ResRat & rr = ResRat(),
-                       const ResTol & rt = ResTol(),
-                       const real scale = 1.0,
-                       const int stalecount = -1,
-                       const bool precform = true);
+                       const ResTol & rt = ResTol());
 
   private:
     void allocate(const Domain & s) {

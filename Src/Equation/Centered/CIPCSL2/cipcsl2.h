@@ -65,7 +65,7 @@ class CIPCSL2 : public Centered {
             const Scalar & kappa,
             const Vector & u, 
             Times & t,
-            Krylov * S);
+            Linear * S);
     ~CIPCSL2();
 
     void new_time_step(){};
