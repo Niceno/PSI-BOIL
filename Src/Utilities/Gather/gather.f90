@@ -2,6 +2,7 @@
    module base_var
      IMPLICIT NONE
      REAL(4),ALLOCATABLE::x(:,:,:,:),v(:,:,:,:)
+     REAL(8)::solutiontime
      INTEGER::icmax,jcmax,kcmax   !!cell
      INTEGER::inmax,jnmax,knmax   !!node
      INTEGER::np,nvariable,ndigit
@@ -341,6 +342,7 @@
    INTEGER::ins,ine,jns,jne,kns,kne   !!node
    INTEGER::i,j,k,ifile,iline,idummy,m
    CHARACTER(len=12)::cdummy1,cdummy2
+   CHARACTER(len=2048)::cline1
 
    x=1.0d+20
 
@@ -375,6 +377,20 @@
          !WRITE(*,*)ins,ine,jns,jne,kns,kne
          READ(10,*,err=998,end=998) !!VARIABLES
          READ(10,*,err=998,end=998) !!ZONE
+
+         ! SOLUTIONTIME
+         READ(10,'(a2048)')cline1
+         IF(cline1(1:14)=="SOLUTIONTIME=" .OR. cline1(2:14)=="SOLUTIONTIME=") THEN
+           BACKSPACE(10)
+           READ(10,*,err=998,end=998)cdummy1,solutiontime
+#ifdef DEBUG
+           WRITE(*,*)"SOLUTIONTIME=",solutiontime
+#endif
+         ELSE
+           solutiontime = 0.0
+           BACKSPACE(10)
+         ENDIF
+
          DO m=1,3
             !WRITE(*,*)'m=',m
             READ(10,*,err=998,end=998) !!# COORDINATES
@@ -394,6 +410,7 @@
                 (((v(i,j,k,m),i=ins,ine),j=jns,jne),k=kns,kne)
            ENDDO
          ENDIF
+
       CLOSE(10)
    ENDDO
 
@@ -458,7 +475,10 @@
 #endif
    VIsDouble = 0
    ZoneType = 0
-   SolTime = 0.0
+   SolTime = solutiontime ! 2024.0418
+#ifdef DEBUG
+   WRITE(*,*)"SolTime = ",SolTime
+#endif
    StrandID = 0
    !unused = 0 ! ParentZone is no longer used
    IsBlock = 1
@@ -569,6 +589,9 @@
                  Valuelocation, &
                  Null, &
                  ShrConn)
+#ifdef DEBUG
+                 WRITE(*,*)"output:SolTime= ",SolTime,ICellMax,inmax
+#endif
 !
 !... Write out the field data.
 !
