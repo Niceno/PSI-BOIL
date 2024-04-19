@@ -3,12 +3,12 @@
    integer::ip,interval,nend,ntime,istep,nstep,ndigit,ispeed,nval,i,itmp,i_png_avi,i_width
    integer::nplt_each
    character(len=1024)::ctmp,vlist
-   character(len=2048)::fncommon,cline,fname,fout,fname2
+   character(len=2048)::fncommon,fncommon2,cline,fname,fout,fname2
 
  100 continue
-   write(*,*)"Input number of plt-files drawn in each picture. 1 or 2"
+   write(*,*)"Input number of plt-files drawn in each picture. 1, 2 or 3"
    read(*,*,err=100,end=100)nplt_each
-   if (nplt_each/=1.and.nplt_each/=2) goto 100
+   if (nplt_each/=1.and.nplt_each/=2.and.nplt_each/=3) goto 100
  101 continue
    write(*,*)"Input start of time step"
    read(*,*,err=101,end=101)ntime
@@ -36,6 +36,13 @@
    if(nval<0) goto 107
  108 continue
    if(nplt_each==2)then
+     write(*,*)"Input second file name. The name must be fixed. Ex: nozzle.plt"
+     read(*,*,err=104,end=104)fname2
+   endif
+   if(nplt_each==3)then
+     write(*,*)"Input common file name of second file. Example: particles_"
+     read(*,*,err=104,end=104)fncommon2
+
      write(*,*)"Input second file name. The name must be fixed. Ex: nozzle.plt"
      read(*,*,err=104,end=104)fname2
    endif
@@ -74,6 +81,7 @@
 
    call int2char(ntime,ctmp,ndigit)
    fname=trim(fncommon)//ctmp(1:ndigit)//".plt"
+   WRITE(*,*)trim(fname)
 
    write(10,'(a)')"#!MC 1100"
    cline="$!READDATASET  '"
@@ -81,6 +89,16 @@
    if(nplt_each==2)then
      cline=trim(cline)//" "//trim(fname2)
    endif
+   if(nplt_each==3)then
+     WRITE(*,*)trim(cline)
+     fname=trim(fncommon2)//ctmp(1:ndigit)//".plt"
+     WRITE(*,*)trim(fname)
+     cline=trim(cline)//" "//trim(fname)
+     WRITE(*,*)trim(cline)
+     cline=trim(cline)//" "//trim(fname2)
+     WRITE(*,*)trim(cline)
+   endif
+
    cline=trim(cline)//"'"
    write(10,'(a)')trim(cline)
    write(10,'(a)')"  READDATAOPTION = NEW"
@@ -116,6 +134,15 @@
       cline=trim(cline)//trim(fname)
       if(nplt_each==2)then
         cline=trim(cline)//" "//trim(fname2)
+      endif
+      if(nplt_each==3)then
+        WRITE(*,*)trim(cline)
+        fname=trim(fncommon2)//ctmp(1:ndigit)//".plt"
+        WRITE(*,*)trim(fname)
+        cline=trim(cline)//" "//trim(fname)
+        WRITE(*,*)trim(cline)
+        cline=trim(cline)//" "//trim(fname2)
+        WRITE(*,*)trim(cline)
       endif
       cline=trim(cline)//"'"
       write(10,'(a)')trim(cline)
