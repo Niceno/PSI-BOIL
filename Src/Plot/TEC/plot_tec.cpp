@@ -3,7 +3,7 @@
 /******************************************************************************/
 void PlotTEC::plot(Domain & dm, // couldn't make const out of "*this"
                    const char * nam, 
-                   const int i) {
+                   const int i, Times * t) {
 
   boil::timer.start("plotting");
 
@@ -17,7 +17,7 @@ void PlotTEC::plot(Domain & dm, // couldn't make const out of "*this"
   vnames.push_back("Z"); 
 
   plot_tec_header(*dom, nam, i);
-  plot_tec_prologue(vnames);
+  plot_tec_prologue(vnames, t);
   plot_tec_domain(*dom);
   plot_tec_body(dom->ibody(),vars);
   plot_tec_footer();
@@ -28,7 +28,7 @@ void PlotTEC::plot(Domain & dm, // couldn't make const out of "*this"
 /******************************************************************************/
 void PlotTEC::plot(Body & bd, // couldn't make const out of "*this"
                    const char * nam, 
-                   const int i) {
+                   const int i, Times * t) {
 
   std::vector<int> vars;
 
@@ -42,7 +42,7 @@ void PlotTEC::plot(Body & bd, // couldn't make const out of "*this"
 /******************************************************************************/
 void PlotTEC::plot(const Scalar & sca, 
                    const char * nam, 
-                   const int i) {
+                   const int i, Times * t) {
 
   boil::timer.start("plotting");
 
@@ -57,7 +57,7 @@ void PlotTEC::plot(const Scalar & sca,
   vnames.push_back("PHI"); if(sca.name().length() > 0) vnames[3] = sca.name();
 
   plot_tec_header(*dom, nam, i);
-  plot_tec_prologue(vnames);
+  plot_tec_prologue(vnames, t);
   plot_tec_domain(*dom);
   plot_tec_scalar(*dom, sca);
   plot_tec_body(dom->ibody(),vars);
@@ -69,7 +69,7 @@ void PlotTEC::plot(const Scalar & sca,
 /******************************************************************************/
 void PlotTEC::plot(const ScalarInt & sca, 
                    const char * nam, 
-                   const int i) {
+                   const int i, Times * t) {
 
   boil::timer.start("plotting");
 
@@ -84,7 +84,7 @@ void PlotTEC::plot(const ScalarInt & sca,
   vnames.push_back("PHI"); if(sca.name().length() > 0) vnames[3] = sca.name();
 
   plot_tec_header(*dom, nam, i);
-  plot_tec_prologue(vnames);
+  plot_tec_prologue(vnames, t);
   plot_tec_domain(*dom);
   plot_tec_scalarint(*dom, sca);
   plot_tec_body(dom->ibody(),vars);
@@ -96,7 +96,7 @@ void PlotTEC::plot(const ScalarInt & sca,
 /******************************************************************************/
 void PlotTEC::plot(const Vector & vec, 
                    const char * nam, 
-                   const int i) {
+                   const int i, Times * t) {
 
   boil::timer.start("plotting");
 
@@ -114,7 +114,7 @@ void PlotTEC::plot(const Vector & vec,
   vnames.push_back("W"); 
 
   plot_tec_header(*dom, nam, i);
-  plot_tec_prologue(vnames);
+  plot_tec_prologue(vnames, t);
   plot_tec_domain(*dom);
   plot_tec_vector(*dom, vec);
   plot_tec_body(dom->ibody(),vars);
@@ -127,7 +127,7 @@ void PlotTEC::plot(const Vector & vec,
 void PlotTEC::plot(const Vector & vec, 
                    const Scalar & sca,
                    const char * nam, 
-                   const int i) {
+                   const int i, Times * t) {
 
   boil::timer.start("plotting");
 
@@ -146,7 +146,7 @@ void PlotTEC::plot(const Vector & vec,
   vnames.push_back("A"); if(sca.name().length() > 0) vnames [6] = sca.name();
 
   plot_tec_header(*dom, nam, i);
-  plot_tec_prologue(vnames);
+  plot_tec_prologue(vnames, t);
   plot_tec_domain(*dom);
   plot_tec_vector(*dom, vec);
   plot_tec_scalar(*dom, sca);
@@ -161,7 +161,8 @@ void PlotTEC::plot(const Vector & vec,
                    const Scalar & sca,
                    const Scalar & scb,
                    const char * nam,
-                   const int i) {
+                   const int i,
+                   Times * t) {
 
   boil::timer.start("plotting");
 
@@ -181,7 +182,7 @@ void PlotTEC::plot(const Vector & vec,
   vnames.push_back("B"); if(scb.name().length() > 0) vnames [7] = scb.name();
 
   plot_tec_header(*dom, nam, i);
-  plot_tec_prologue(vnames);
+  plot_tec_prologue(vnames, t);
   plot_tec_domain(*dom);
   plot_tec_vector(*dom, vec);
   plot_tec_scalar(*dom, sca);
@@ -198,7 +199,8 @@ void PlotTEC::plot(const Vector & vec,
                    const Scalar & scb,
                    const Scalar & scc,
                    const char * nam,
-                   const int i) {
+                   const int i,
+                   Times * t) {
 
   boil::timer.start("plotting");
 
@@ -219,7 +221,7 @@ void PlotTEC::plot(const Vector & vec,
   vnames.push_back("C"); if(scc.name().length() > 0) vnames [8] = scc.name();
 
   plot_tec_header(*dom, nam, i);
-  plot_tec_prologue(vnames);
+  plot_tec_prologue(vnames, t);
   plot_tec_domain(*dom);
   plot_tec_vector(*dom, vec);
   plot_tec_scalar(*dom, sca);
@@ -238,7 +240,7 @@ void PlotTEC::plot(const Vector & vec,
                    const Scalar & scc,
                    const Scalar & scd,
                    const char * nam,
-                   const int i) {
+                   const int i, Times * t) {
 
   boil::timer.start("plotting");
 
@@ -260,7 +262,7 @@ void PlotTEC::plot(const Vector & vec,
   vnames.push_back("D"); if(scd.name().length() > 0) vnames [9] = scd.name();
 
   plot_tec_header(*dom, nam, i);
-  plot_tec_prologue(vnames);
+  plot_tec_prologue(vnames, t);
   plot_tec_domain(*dom);
   plot_tec_vector(*dom, vec);
   plot_tec_scalar(*dom, sca);
@@ -281,7 +283,7 @@ void PlotTEC::plot(const Vector & vec,
                    const Scalar & scd,
                    const Scalar & sce,
                    const char * nam,
-                   const int i) {
+                   const int i, Times * t) {
 
   boil::timer.start("plotting");
 
@@ -304,7 +306,7 @@ void PlotTEC::plot(const Vector & vec,
   vnames.push_back("E"); if(sce.name().length() > 0) vnames[10] = sce.name();
 
   plot_tec_header(*dom, nam, i);
-  plot_tec_prologue(vnames);
+  plot_tec_prologue(vnames, t);
   plot_tec_domain(*dom);
   plot_tec_vector(*dom, vec);
   plot_tec_scalar(*dom, sca);
@@ -327,7 +329,7 @@ void PlotTEC::plot(const Vector & vec,
                    const Scalar & sce,
                    const Scalar & scf,
                    const char * nam,
-                   const int i) {
+                   const int i, Times * t) {
 
   boil::timer.start("plotting");
 
@@ -351,7 +353,7 @@ void PlotTEC::plot(const Vector & vec,
   vnames.push_back("F"); if(scf.name().length() > 0) vnames[11] = scf.name();
 
   plot_tec_header(*dom, nam, i);
-  plot_tec_prologue(vnames);
+  plot_tec_prologue(vnames, t);
   plot_tec_domain(*dom);
   plot_tec_vector(*dom, vec);
   plot_tec_scalar(*dom, sca);
@@ -376,7 +378,7 @@ void PlotTEC::plot(const Vector & vec,
                    const Scalar & scf,
                    const Scalar & scg,
                    const char * nam,
-                   const int i) {
+                   const int i, Times * t) {
 
   boil::timer.start("plotting");
 
@@ -401,7 +403,7 @@ void PlotTEC::plot(const Vector & vec,
   vnames.push_back("G"); if(scg.name().length() > 0) vnames[12] = scg.name();
 
   plot_tec_header(*dom, nam, i);
-  plot_tec_prologue(vnames);
+  plot_tec_prologue(vnames, t);
   plot_tec_domain(*dom);
   plot_tec_vector(*dom, vec);
   plot_tec_scalar(*dom, sca);
@@ -428,7 +430,7 @@ void PlotTEC::plot(const Vector & vec,
                    const Scalar & scg,
                    const Scalar & sch,
                    const char * nam,
-                   const int i) {
+                   const int i, Times * t) {
 
   boil::timer.start("plotting");
 
@@ -454,7 +456,7 @@ void PlotTEC::plot(const Vector & vec,
   vnames.push_back("H"); if(sch.name().length() > 0) vnames[13] = sch.name();
 
   plot_tec_header(*dom, nam, i);
-  plot_tec_prologue(vnames);
+  plot_tec_prologue(vnames, t);
   plot_tec_domain(*dom);
   plot_tec_vector(*dom, vec);
   plot_tec_scalar(*dom, sca);
@@ -483,7 +485,7 @@ void PlotTEC::plot(const Vector & vec,
                    const Scalar & sch,
                    const Scalar & sci,
                    const char * nam,
-                   const int i) {
+                   const int i, Times * t) {
 
   boil::timer.start("plotting");
 
@@ -510,7 +512,7 @@ void PlotTEC::plot(const Vector & vec,
   vnames.push_back("I"); if(sci.name().length() > 0) vnames[14] = sci.name();
 
   plot_tec_header(*dom, nam, i);
-  plot_tec_prologue(vnames);
+  plot_tec_prologue(vnames, t);
   plot_tec_domain(*dom);
   plot_tec_vector(*dom, vec);
   plot_tec_scalar(*dom, sca);
@@ -532,7 +534,7 @@ void PlotTEC::plot(const Vector & vec,
 void PlotTEC::plot(const Scalar & sca, 
                    const Scalar & scb, 
                    const char * nam, 
-                   const int i) {
+                   const int i, Times * t) {
 
   boil::timer.start("plotting");
 
@@ -549,7 +551,7 @@ void PlotTEC::plot(const Scalar & sca,
   vnames.push_back("B"); if(scb.name().length() > 0) vnames[4] = scb.name();
 
   plot_tec_header(*dom, nam, i);
-  plot_tec_prologue(vnames);
+  plot_tec_prologue(vnames, t);
   plot_tec_domain(*dom);
   plot_tec_scalar(*dom, sca);
   plot_tec_scalar(*dom, scb);
@@ -563,7 +565,7 @@ void PlotTEC::plot(const Scalar & sca,
 void PlotTEC::plot(const Scalar & sca,
                    const ScalarInt & scb,
                    const char * nam,
-                   const int i) {
+                   const int i, Times * t) {
 
   boil::timer.start("plotting");
 
@@ -580,7 +582,7 @@ void PlotTEC::plot(const Scalar & sca,
   vnames.push_back("B"); if(scb.name().length() > 0) vnames[4] = scb.name();
 
   plot_tec_header(*dom, nam, i);
-  plot_tec_prologue(vnames);
+  plot_tec_prologue(vnames, t);
   plot_tec_domain(*dom);
   plot_tec_scalar(*dom, sca);
   plot_tec_scalarint(*dom, scb);
@@ -595,7 +597,7 @@ void PlotTEC::plot(const Scalar & sca,
                    const Scalar & scb, 
                    const Scalar & scc, 
                    const char * nam, 
-                   const int i) {
+                   const int i, Times * t) {
 
   boil::timer.start("plotting");
 
@@ -613,7 +615,7 @@ void PlotTEC::plot(const Scalar & sca,
   vnames.push_back("C"); if(scc.name().length() > 0) vnames[5] = scc.name();
 
   plot_tec_header(*dom, nam, i);
-  plot_tec_prologue(vnames);
+  plot_tec_prologue(vnames, t);
   plot_tec_domain(*dom);
   plot_tec_scalar(*dom, sca);
   plot_tec_scalar(*dom, scb);
@@ -630,7 +632,7 @@ void PlotTEC::plot(const Scalar & sca,
                    const Scalar & scc, 
                    const Scalar & scd, 
                    const char * nam, 
-                   const int i) {
+                   const int i, Times * t) {
 
   boil::timer.start("plotting");
 
@@ -649,7 +651,7 @@ void PlotTEC::plot(const Scalar & sca,
   vnames.push_back("D"); if(scd.name().length() > 0) vnames[6] = scd.name();
 
   plot_tec_header(*dom, nam, i);
-  plot_tec_prologue(vnames);
+  plot_tec_prologue(vnames, t);
   plot_tec_domain(*dom);
   plot_tec_scalar(*dom, sca);
   plot_tec_scalar(*dom, scb);
@@ -668,7 +670,7 @@ void PlotTEC::plot(const Scalar & sca,
                    const Scalar & scd, 
                    const Scalar & sce, 
                    const char * nam, 
-                   const int i) {
+                   const int i, Times * t) {
 
   boil::timer.start("plotting");
 
@@ -688,7 +690,7 @@ void PlotTEC::plot(const Scalar & sca,
   vnames.push_back("E"); if(sce.name().length() > 0) vnames[7] = sce.name();
 
   plot_tec_header(*dom, nam, i);
-  plot_tec_prologue(vnames);
+  plot_tec_prologue(vnames, t);
   plot_tec_domain(*dom);
   plot_tec_scalar(*dom, sca);
   plot_tec_scalar(*dom, scb);
@@ -709,7 +711,7 @@ void PlotTEC::plot(const Scalar & sca,
                    const Scalar & sce, 
                    const Scalar & scf, 
                    const char * nam, 
-                   const int i) {
+                   const int i, Times * t) {
 
   boil::timer.start("plotting");
 
@@ -730,7 +732,7 @@ void PlotTEC::plot(const Scalar & sca,
   vnames.push_back("F"); if(scf.name().length() > 0) vnames[8] = scf.name();
 
   plot_tec_header(*dom, nam, i);
-  plot_tec_prologue(vnames);
+  plot_tec_prologue(vnames, t);
   plot_tec_domain(*dom);
   plot_tec_scalar(*dom, sca);
   plot_tec_scalar(*dom, scb);
@@ -743,6 +745,33 @@ void PlotTEC::plot(const Scalar & sca,
 
   boil::timer.stop("plotting");
 }
+
+/******************************************************************************/
+void PlotTEC::plot(const Pathline & pl, 
+                   const char * nam, 
+                   const int i, Times * t) {
+  if( boil::cart.iam()==0 ) {
+    /* open the result file */
+    std::string name = name_file(nam, ".dat", i);
+    boil::oout << "# Plotting: "<<name<<"\n";
+    out.open(name.c_str());
+    out << "VARIABLES= X Y Z U V W\n";
+    out << "ZONE I= " <<pl.np()<<" DATAPACKING=POINT\n";
+    if (t!=NULL) {
+      out << "SOLUTIONTIME= "<<t->current_time()<<"\n";
+    }
+    for (int ip = 0; ip < pl.np(); ip++){
+      out << pl.particles[ip].x()<<" "
+          << pl.particles[ip].y()<<" "
+          << pl.particles[ip].z()<<" "
+          << pl.particles[ip].u()<<" "
+          << pl.particles[ip].v()<<" "
+          << pl.particles[ip].w()<<"\n";
+    }
+    out.close();
+  }
+}
+
 
 /******************************************************************************/
 void PlotTEC::plot_tec_header(const Domain & dom, 
@@ -815,7 +844,8 @@ void PlotTEC::plot_tec_header(const char * nam, const int i) {
 }
   
 /******************************************************************************/
-void PlotTEC::plot_tec_prologue(const std::vector<std::string> & vnames) {
+void PlotTEC::plot_tec_prologue(const std::vector<std::string> & vnames,
+                                const Times * t) {
 
   int x_nodes = dom->ni()-2*boil::BW+1 + 2*sh;
   int y_nodes = dom->nj()-2*boil::BW+1 + 2*sh;
@@ -837,6 +867,9 @@ void PlotTEC::plot_tec_prologue(const std::vector<std::string> & vnames) {
     else      out << ", VARLOCATION=([4-" << vnames.size() << "]=CELLCENTERED)";
   }
   out << boil::endl;
+  if(t != NULL){
+    out << "SOLUTIONTIME= "<<t->current_time()<<"\n";
+  }
 }
 
 /******************************************************************************/

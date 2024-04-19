@@ -16,6 +16,7 @@
 #include "../Ravioli/box.h"
 #include "../Domain/domain.h"
 #include "../Field/ScalarInt/scalarint.h"
+#include "../Equation/Pathline/pathline.h"
 
 class Scalar;
 class Vector;
@@ -31,55 +32,56 @@ class Plot {
     Plot( const AsNodes asno=AsNodes::no(),
           const Buffers buff=Buffers::no() ) {} 
 
-    virtual void plot(Domain &, const char *, const int = -1) = 0;
-    virtual void plot(Body &, const char *, const int = -1) = 0;
-    virtual void plot(const Scalar &, const char *, const int = -1) = 0;
-    virtual void plot(const ScalarInt &, const char *, const int = -1) = 0;
-    virtual void plot(const Vector &, const char *, const int = -1) = 0;
-    virtual void plot(const Vector &, const Scalar &, const char *, const int) 
+    virtual void plot(Domain &, const char *, const int = -1, Times * t = NULL) = 0;
+    virtual void plot(Body &, const char *, const int = -1, Times * t = NULL) = 0;
+    virtual void plot(const Scalar &, const char *, const int = -1, Times * t = NULL) = 0;
+    virtual void plot(const ScalarInt &, const char *, const int = -1, Times * t = NULL) = 0;
+    virtual void plot(const Vector &, const char *, const int = -1, Times * t = NULL) = 0;
+    virtual void plot(const Vector &, const Scalar &, const char *, const int, Times * t = NULL) 
                  = 0;
     virtual void plot(const Vector &, const Scalar &, const Scalar &,
-                      const char *, const int) = 0;
+                      const char *, const int, Times * t = NULL) = 0;
     virtual void plot(const Vector &, const Scalar &, const Scalar &,
-                      const Scalar &, const char *, const int) = 0;
+                      const Scalar &, const char *, const int, Times * t = NULL) = 0;
     virtual void plot(const Vector &, const Scalar &, const Scalar &,
                       const Scalar &, const Scalar &,
-                      const char *, const int) = 0;
+                      const char *, const int, Times * t = NULL) = 0;
     virtual void plot(const Vector &, const Scalar &, const Scalar &,
                       const Scalar &, const Scalar &, const Scalar &,
-                      const char *, const int) = 0;
+                      const char *, const int, Times * t = NULL) = 0;
     virtual void plot(const Vector &, const Scalar &, const Scalar &,
                       const Scalar &, const Scalar &, const Scalar &,
-                      const Scalar &, const char *, const int) = 0;
+                      const Scalar &, const char *, const int, Times * t = NULL) = 0;
     virtual void plot(const Vector &, const Scalar &, const Scalar &,
                       const Scalar &, const Scalar &, const Scalar &,
                       const Scalar &, const Scalar &, 
-                      const char *, const int) = 0;
+                      const char *, const int, Times * t = NULL) = 0;
     virtual void plot(const Vector &, const Scalar &, const Scalar &,
                       const Scalar &, const Scalar &, const Scalar &,
                       const Scalar &, const Scalar &, const Scalar &,
-                      const char *, const int) = 0;
+                      const char *, const int, Times * t = NULL) = 0;
     virtual void plot(const Vector &, const Scalar &, const Scalar &,
                       const Scalar &, const Scalar &, const Scalar &,
                       const Scalar &, const Scalar &, const Scalar &,
                       const Scalar &,
-                      const char *, const int) = 0;
+                      const char *, const int, Times * t = NULL) = 0;
     virtual void plot(const Scalar &, const Scalar &, 
-                      const char *, const int = -1) = 0;
+                      const char *, const int = -1, Times * t = NULL) = 0;
     virtual void plot(const Scalar &, const ScalarInt &, 
-                      const char *, const int = -1) = 0;
+                      const char *, const int = -1, Times * t = NULL) = 0;
     virtual void plot(const Scalar &, const Scalar &, const Scalar &,
-                      const char *, const int = -1) = 0;
+                      const char *, const int = -1, Times * t = NULL) = 0;
     virtual void plot(const Scalar &, const Scalar &, 
                       const Scalar &, const Scalar &,
-                      const char *, const int = -1) = 0;
+                      const char *, const int = -1, Times * t = NULL) = 0;
     virtual void plot(const Scalar &, const Scalar &, const Scalar &, 
                       const Scalar &, const Scalar &, 
-                      const char *, const int) = 0;
+                      const char *, const int, Times * t = NULL) = 0;
     virtual void plot(const Scalar &, const Scalar &, const Scalar &, 
                       const Scalar &, const Scalar &, const Scalar &,
-                      const char *, const int) = 0;
+                      const char *, const int, Times * t = NULL) = 0;
     virtual void set_plot_body(bool b) = 0;
+    virtual void plot(const Pathline &, const char *, const int, Times * t = NULL) = 0;
   protected:
     const Domain * dom;
     int   sh;           /* shift */

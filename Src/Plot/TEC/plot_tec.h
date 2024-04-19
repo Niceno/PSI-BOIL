@@ -28,46 +28,48 @@ class PlotTEC : public Plot {
       b_plot_body=true;
     }
 
-    void plot(Domain &, const char *, const int);
-    void plot(Body &, const char *, const int);
-    void plot(const Scalar &, const char *, const int);
-    void plot(const ScalarInt &, const char *, const int);
-    void plot(const Vector &, const char *, const int);
-    void plot(const Vector &, const Scalar &, const char *, const int);
+    void plot(Domain &, const char *, const int, Times * t = NULL);
+    void plot(Body &, const char *, const int, Times * t = NULL);
+    void plot(const Scalar &, const char *, const int, Times * t = NULL);
+    void plot(const ScalarInt &, const char *, const int, Times * t = NULL);
+    void plot(const Vector &, const char *, const int, Times * t = NULL);
+    void plot(const Vector &, const Scalar &, const char *, const int, Times * t = NULL);
     void plot(const Vector &, const Scalar &, const Scalar &,
-              const char *, const int);
+              const char *, const int, Times * t = NULL);
     void plot(const Vector &, const Scalar &, const Scalar &,
-              const Scalar &, const char *, const int);
+              const Scalar &, const char *, const int, Times * t = NULL);
     void plot(const Vector &, const Scalar &, const Scalar &, const Scalar &,
-              const Scalar &, const char *, const int);
+              const Scalar &, const char *, const int, Times * t = NULL);
     void plot(const Vector &, const Scalar &, const Scalar &, const Scalar &,
-              const Scalar &, const Scalar &, const char *, const int);
+              const Scalar &, const Scalar &, const char *, const int, Times * t = NULL);
     void plot(const Vector &, const Scalar &, const Scalar &, const Scalar &,
               const Scalar &, const Scalar &, const Scalar &,
-              const char *, const int);
+              const char *, const int, Times * t = NULL);
     void plot(const Vector &, const Scalar &, const Scalar &, const Scalar &,
               const Scalar &, const Scalar &, const Scalar &, const Scalar &,
-              const char *, const int);
+              const char *, const int, Times * t = NULL);
     void plot(const Vector &, const Scalar &, const Scalar &, const Scalar &,
               const Scalar &, const Scalar &, const Scalar &, const Scalar &,
-              const Scalar &, const char *, const int);
+              const Scalar &, const char *, const int, Times * t = NULL);
     void plot(const Vector &, const Scalar &, const Scalar &, const Scalar &,
               const Scalar &, const Scalar &, const Scalar &, const Scalar &,
-              const Scalar &, const Scalar &, const char *, const int);
+              const Scalar &, const Scalar &, const char *, const int, Times * t = NULL);
     void plot(const Scalar &, const Scalar &, 
-              const char *, const int);
+              const char *, const int, Times * t = NULL);
     void plot(const Scalar &, const ScalarInt &,
-              const char *, const int);
+              const char *, const int, Times * t = NULL);
     void plot(const Scalar &, const Scalar &, const Scalar &,
-              const char *, const int);
+              const char *, const int, Times * t = NULL);
     void plot(const Scalar &, const Scalar &, const Scalar &, const Scalar &,
-              const char *, const int);
+              const char *, const int, Times * t = NULL);
     void plot(const Scalar &, const Scalar &, const Scalar &, 
               const Scalar &, const Scalar &, 
-              const char *, const int);
+              const char *, const int, Times * t = NULL);
     void plot(const Scalar &, const Scalar &, const Scalar &, 
               const Scalar &, const Scalar &, const Scalar &,
-              const char *, const int);
+              const char *, const int, Times * t = NULL);
+    void plot(const Pathline &, const char *, const int, Times * t = NULL);
+
     void set_plot_body(bool b){
       b_plot_body = b;
       boil::oout<<"PlotTEC:set_plot_body= "<<b<<"\n";
@@ -76,7 +78,8 @@ class PlotTEC : public Plot {
   private:
     void plot_tec_header   (const Domain &, const char *, const int);
     void plot_tec_header   (const char   *, const int);
-    void plot_tec_prologue (const std::vector<std::string> & vnames);
+    void plot_tec_prologue (const std::vector<std::string> & vnames,
+                            const Times * t = NULL);
     void plot_tec_domain   (const Domain &);
     void plot_tec_body     (const Body   &, std::vector<int> &);
     void plot_tec_scalar   (const Domain &, const Scalar &);
