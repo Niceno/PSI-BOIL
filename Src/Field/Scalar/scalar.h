@@ -189,6 +189,9 @@ class Scalar {
     real average_ik(int i, int k) const; 
     real average_jk(int j, int k) const; 
 
+    real Interpolate(const real x, const real y, const real z) const; //global
+    real interpolate(const real x, const real y, const real z) const; //local
+
     void limit(const Range<real> & lim)
      {for_ijk(i,j,k) 
        {if(val[i][j][k] < lim.first()) val[i][j][k]=lim.first();

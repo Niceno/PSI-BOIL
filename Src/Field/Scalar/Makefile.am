@@ -15,6 +15,7 @@ libScalar_a_SOURCES = scalar.h                     \
                       scalar_exchange_flag.cpp     \
                       scalar_grad.cpp              \
                       scalar_ijk.cpp               \
+                      scalar_interpolate.cpp       \
                       scalar_load.cpp              \
                       scalar_minmax.cpp            \
                       scalar_one2all.cpp           \
