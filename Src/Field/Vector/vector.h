@@ -186,6 +186,15 @@ class Vector {
     void central(const int i, const int j, const int k,
                  real * uvw) const;
 
+    /* interpolate */
+    // for local
+    real interpolate(const Comp m, const real x, const real y, const real z) const
+      {return vec[m].interpolate(x,y,z);}
+    // for global
+    real Interpolate(const Comp m, const real x, const real y, const real z) const
+      {return vec[m].Interpolate(x,y,z);}
+
+
     /* mathematical operators */
     /* 
        = */
