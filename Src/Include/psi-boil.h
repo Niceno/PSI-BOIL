@@ -10,6 +10,7 @@
 #include "../Ravioli/buffers.h"
 #include "../Equation/Centered/Enthalpy/enthalpy.h"
 #include "../Equation/Centered/EnthalpyFD/enthalpyfd.h"
+#include "../Equation/Centered/EnthalpyFDAdiabatic/enthalpyfdadiabatic.h"
 #include "../Equation/Centered/EnthalpyTif/enthalpytif.h"
 #include "../Equation/Centered/PhaseChange/phasechange.h"
 #include "../Equation/Centered/PhaseChangeVOF/phasechangevof.h"

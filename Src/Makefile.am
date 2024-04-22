@@ -13,6 +13,7 @@ SUBDIRS = Equation/Staggered/Momentum      \
           Solver/Preconditioner            \
           Equation/Centered/Enthalpy       \
           Equation/Centered/EnthalpyFD     \
+          Equation/Centered/EnthalpyFDAdiabatic \
           Equation/Centered/EnthalpyTif    \
           Equation/Centered/Concentration  \
           Equation/Centered/Pressure       \
@@ -69,6 +70,7 @@ LDADD = Equation/Staggered/Momentum/libMomentum.a            \
         Solver/Preconditioner/libPreconditioner.a            \
         Equation/Centered/Enthalpy/libEnthalpy.a             \
         Equation/Centered/EnthalpyFD/libEnthalpyFD.a         \
+        Equation/Centered/EnthalpyFDAdiabatic/libEnthalpyFDAdiabatic.a         \
         Equation/Centered/EnthalpyTif/libEnthalpyTif.a       \
         Equation/Centered/Concentration/libConcentration.a   \
         Equation/Centered/Pressure/libPressure.a             \
