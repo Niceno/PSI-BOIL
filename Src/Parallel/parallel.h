@@ -31,8 +31,12 @@
         MPI_Allreduce((a),(b),(n),par_int,MPI_MIN,(c))
 #define par_max_real(a,b,c)     \
         MPI_Allreduce((a),(b),1,par_real,MPI_MAX,(c))
+#define par_max_real_n(a,b,n,c)     \
+        MPI_Allreduce((a),(b),(n),par_real,MPI_MAX,(c))
 #define par_min_real(a,b,c)     \
         MPI_Allreduce((a),(b),1,par_real,MPI_MIN,(c))
+#define par_min_real_n(a,b,n,c)     \
+        MPI_Allreduce((a),(b),(n),par_real,MPI_MIN,(c))
 #define par_max_int(a,b,c)     \
         MPI_Allreduce((a),(b),1,par_int,MPI_MAX,(c))
 #define par_min_int(a,b,c)     \

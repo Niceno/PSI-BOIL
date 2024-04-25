@@ -196,10 +196,24 @@ class Communicator {
       * a = d[0]; 
       return 0;}
 
+    //! Returns maximum of a real number among all processors.
+    int max_real_n(real * a, const int n) const  
+     {assert(n <= MAX_BUFF_SIZE);
+      par_max_real_n(a, d, n, MPI_COMM_WORLD);
+      for(int k=0; k<n; k++) a[k] = d[k];
+      return 0;}
+
     //! Returns minimum of a real number among all processors.
     int min_real(real * a) const 
      {par_min_real(a, d, MPI_COMM_WORLD); 
       * a = d[0]; 
+      return 0;}
+
+    //! Returns minimum of a real number among all processors.
+    int min_real_n(real * a, const int n) const
+     {assert(n <= MAX_BUFF_SIZE);
+      par_min_real_n(a, d, n, MPI_COMM_WORLD);
+      for(int k=0; k<n; k++) a[k] = d[k];
       return 0;}
 
     //! Returns maximum of a real number among all processors.

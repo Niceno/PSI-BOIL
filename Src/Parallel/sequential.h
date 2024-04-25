@@ -24,7 +24,9 @@
 #define par_max_int_n(a,b,n,c)       for(int I=0;I<(n);I++) *((b)+I)=*((a)+I)
 #define par_min_int_n(a,b,n,c)       for(int I=0;I<(n);I++) *((b)+I)=*((a)+I)
 #define par_max_real(a,b,c)          *b=*a
+#define par_max_real_n(a,b,n,c)      for(int I=0;I<(n);I++) *((b)+I)=*((a)+I)
 #define par_min_real(a,b,c)          *b=*a
+#define par_min_real_n(a,b,n,c)      for(int I=0;I<(n);I++) *((b)+I)=*((a)+I)
 #define par_max_int(a,b,c)           *b=*a
 #define par_min_int(a,b,c)           *b=*a
 #define par_sendrecv(a,b,c,d,e,f,g,h,i,j,k) 
