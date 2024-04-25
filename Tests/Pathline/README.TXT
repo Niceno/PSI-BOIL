@@ -7,7 +7,7 @@
    > tecmcr.exe < input-tecmcr.txt
    NOTE: pathline.exe is in ./Src/Utilities/Pathline/pathline.f90
          tecmcr.exe is in ./Src/Utilities/TecplotMacro/tecmcr.f90
-   > tec360 uvw-c-press_pall_000000.plt particles_000000.plt pathline.plt &
+   > tec360 3D.lay &
      tec360 GUI: Scripting (top bar) > Play Macro/Script: select png.mcr
 
         

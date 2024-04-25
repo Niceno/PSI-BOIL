@@ -46,8 +46,8 @@ int main(int argc, char * argv[]) {
   |  define unknowns  |
   +------------------*/
   Vector uvw(d), xyz(d); // velocity and body force
-  Scalar p  (d), f  (d), press(d); // pressure
-  Scalar c  (d), g  (d), kappa(d); // concentration
+  Scalar p  (d,"dp"), f  (d), press(d,"pressure"); // pressure
+  Scalar c  (d,"color"), g  (d), kappa(d); // concentration
 #ifndef USE_VOF
   Scalar step(d), sflag(d);
 #endif
@@ -137,7 +137,8 @@ int main(int argc, char * argv[]) {
 #endif
 
   /* Pathline */
-  Pathline pathline(uvw, & time);
+  //Pathline pathline(uvw, & time);
+  Pathline pathline(uvw, & time, & c, & press, & p);
 
   /*--------------------+
   |  initial condition  |
@@ -188,6 +189,7 @@ int main(int argc, char * argv[]) {
       pathline.add(xx,yy,zcent);
     }
   }
+  pathline.init();
 
   boil::plot->plot(uvw,c,press, "uvw-c-press",0);
   boil::plot->plot(pathline, "particles",0);
@@ -285,7 +287,8 @@ int main(int argc, char * argv[]) {
     +---------*/
     if(conc.get_zmaxft()>=LZ*0.95){
        boil::oout<<"Bubble reaches to the top boundary. Exit.";
-       exit(0);
+       break;
+       //exit(0);
     }
   }
   boil::oout << "finished" << boil::endl;
