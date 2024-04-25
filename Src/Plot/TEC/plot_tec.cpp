@@ -755,7 +755,24 @@ void PlotTEC::plot(const Pathline & pl,
     std::string name = name_file(nam, ".dat", i);
     boil::oout << "# Plotting: "<<name<<"\n";
     out.open(name.c_str());
-    out << "VARIABLES= X Y Z U V W\n";
+
+    out << "#Number_of_variables= "<<6+pl.nval()<<"\n";
+    out << "VARIABLES= X Y Z U V W ";
+    std::string vname;
+    if (pl.nval()>=1) { 
+      vname = "A"; if(pl.s1->name().length() > 0) vname = pl.s1->name();
+      out << "\""<< vname <<"\" " ;
+    }
+    if (pl.nval()>=2) { 
+      vname = "B"; if(pl.s2->name().length() > 0) vname = pl.s2->name();
+      out << "\""<< vname <<"\" " ;
+    }
+    if (pl.nval()>=3) { 
+      vname = "C"; if(pl.s3->name().length() > 0) vname = pl.s3->name();
+      out << "\""<< vname <<"\" " ;
+    }
+    out << boil::endl;
+
     out << "ZONE I= " <<pl.np()<<" DATAPACKING=POINT\n";
     if (t!=NULL) {
       out << "SOLUTIONTIME= "<<t->current_time()<<"\n";
@@ -766,7 +783,14 @@ void PlotTEC::plot(const Pathline & pl,
           << pl.particles[ip].z()<<" "
           << pl.particles[ip].u()<<" "
           << pl.particles[ip].v()<<" "
-          << pl.particles[ip].w()<<"\n";
+          << pl.particles[ip].w()<<" ";
+      //if (pl.nval()>=1) out << pl.particles[ip].sval(1)<<" ";
+      //if (pl.nval()>=2) out << pl.particles[ip].s2()<<" ";
+      //if (pl.nval()>=3) out << pl.particles[ip]->sval(3)<<" ";
+      for (int ival = 0; ival < pl.nval(); ival++) {
+        out << pl.particles[ip].sval(ival)<<" ";
+      }
+      out << boil::endl;
     }
     out.close();
   }
