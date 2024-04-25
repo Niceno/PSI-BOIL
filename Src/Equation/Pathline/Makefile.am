@@ -4,6 +4,7 @@ libPathline_a_SOURCES = pathline.h                         \
                         pathline.cpp                       \
                         pathline_add.cpp                   \
                         pathline_advance.cpp               \
+                        pathline_init.cpp                  \
                         pathline_load.cpp                  \
                         pathline_rm.cpp                    \
                         pathline_save.cpp                  \

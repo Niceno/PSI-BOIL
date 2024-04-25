@@ -30,6 +30,7 @@ void Pathline::load(std::ifstream & in) {
 
   int nparticles;
   real x_saved, y_saved, z_saved;
+  int  i_saved;
   in.read(reinterpret_cast<char *> (&nparticles), sizeof(int));
   boil::oout<<"pathline_load: total number of particles = "<<nparticles<<"\n";
 
@@ -37,10 +38,9 @@ void Pathline::load(std::ifstream & in) {
     in.read(reinterpret_cast<char *> (&x_saved), sizeof(real));
     in.read(reinterpret_cast<char *> (&y_saved), sizeof(real));
     in.read(reinterpret_cast<char *> (&z_saved), sizeof(real));
-    real xold = particles[ip].x();
-    real yold = particles[ip].y();
-    real zold = particles[ip].z();
+    in.read(reinterpret_cast<char *> (&i_saved), sizeof(int));
     add(x_saved, y_saved, z_saved);
+    particles[ip].id(i_saved);
   }
   return;
 }

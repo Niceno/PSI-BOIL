@@ -28,9 +28,11 @@ void Pathline::save(std::ofstream & out) {
     real xold = particles[ip].x();
     real yold = particles[ip].y();
     real zold = particles[ip].z();
+    int  idd  = particles[ip].id();
     out.write(reinterpret_cast<const char *> (&xold), sizeof(real));
     out.write(reinterpret_cast<const char *> (&yold), sizeof(real));
     out.write(reinterpret_cast<const char *> (&zold), sizeof(real));
+    out.write(reinterpret_cast<const char *> (&idd ), sizeof(int));
   }
   return;
 }
