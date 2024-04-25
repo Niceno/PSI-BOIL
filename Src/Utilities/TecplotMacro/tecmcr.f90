@@ -30,10 +30,10 @@
 !    goto 106
 !  endif
    ndigit=6
- 107 continue
-   write(*,*)"Input number of variables. For example, uvw-c is 4"
-   read(*,*,err=107,end=107)nval
-   if(nval<0) goto 107
+!107 continue
+!  write(*,*)"Input number of variables. For example, uvw-c is 4"
+!  read(*,*,err=107,end=107)nval
+!  if(nval<0) goto 107
  108 continue
    if(nplt_each==2)then
      write(*,*)"Input second file name. The name must be fixed. Ex: nozzle.plt"
@@ -66,12 +66,10 @@
    endif
 
 !--make vlist
-   vlist="X Y Z U V W"
-   do i=1,nval-3
-     !write(*,*)char(64+i)
-     vlist=trim(vlist)//" "//char(64+i)
-     !write(*,*)trim(vlist)
-   enddo
+!  vlist="X Y Z U V W"
+!  do i=1,nval-3
+!    vlist=trim(vlist)//" "//char(64+i)
+!  enddo
 
 !--output 
 
@@ -155,7 +153,7 @@
       write(10,*)"  VARLOADMODE = BYNAME"
       write(10,*)"  ASSIGNSTRANDIDS = YES"
       !write(10,*)"  VARNAMELIST = 'X Y Z U V W A B'"
-      write(10,'(a,a,a)')"  VARNAMELIST = ' ",trim(vlist)," '"
+      !write(10,'(a,a,a)')"  VARNAMELIST = ' ",trim(vlist)," '"
       write(10,*)"$!REDRAW "
       if(i_png_avi==1)then
         write(10,'(3a)')"$!EXPORTSETUP EXPORTFNAME = './",ctmp(1:ndigit),".png'"

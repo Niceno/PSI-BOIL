@@ -1,11 +1,13 @@
   Program pathline
   implicit none
-  integer::nstart,nend,interval,nstep,istep,itime,ndigit
-  integer::np,i
+  integer::nstart,nend,interval,nstep,istep,itime,ndigit,nval,np,n_header
+  integer::iline,i,j
   real(8),allocatable::x(:,:),y(:,:),z(:,:),u(:,:),v(:,:),w(:,:),time(:)
-  character(len=512),allocatable::fname(:)
+  real(8),allocatable::val(:,:,:)  ! ival,ip,istep
+  character(len=512),allocatable::fname(:),vname(:)
   character(len=512)::fncommon
   character(len=512)::ctmp,ctmp1
+  character(len=20 )::format_str
 
 
   ndigit=6
@@ -39,41 +41,97 @@
     !WRITE(*,*)trim(fname(istep))
   ENDDO
 
-  ! set np
+  ! set np, nval
+  nval = 0
   OPEN(10,file=trim(fname(1)),status='old',err=999)
-    READ(10,*)
-    READ(10,*)ctmp,ctmp,np
+
+    ! nval
+    DO iline = 1,10
+      READ(10,*)ctmp
+      !WRITE(*,*)trim(ctmp)
+      if (trim(ctmp).eq."#Number_of_variables=") then
+        BACKSPACE(10)
+        READ(10,*)ctmp,nval
+        EXIT
+      endif
+    ENDDO
+    WRITE(*,*)'nval=',nval
+    IF (nval==0) THEN
+      WRITE(*,*)'ERROR! nval=0'
+      STOP
+    ENDIF
+    ALLOCATE(vname(nval))
+
+    ! np
+    REWIND(10)
+    DO iline = 1,10
+      READ(10,*)ctmp
+      !WRITE(*,*)trim(ctmp)
+      if (trim(ctmp) .eq. "ZONE") then
+        n_header = iline
+        BACKSPACE(10)
+        READ(10,*)ctmp,ctmp,np
+        EXIT
+      endif
+    ENDDO
+    WRITE(*,*)'np=',np
+
+    ! vname
+    REWIND(10)
+    DO iline = 1,10
+      READ(10,*)ctmp
+      if (trim(ctmp) .eq. "VARIABLES=") then
+        BACKSPACE(10)
+        READ(10,*)ctmp,(vname(j),j=1,nval)
+        EXIT
+      endif
+    ENDDO
+    WRITE(*,*)'VARIABLES=',(' ',trim(vname(j)),j=1,nval)
   CLOSE(10)
 
   ! allocate variables
   allocate(x(np,nstep),y(np,nstep),z(np,nstep), &
            u(np,nstep),v(np,nstep),w(np,nstep),time(nstep))
+  allocate(val(nval-6,np,nstep))
 
   ! read data
   DO istep = 1, nstep
     OPEN(10,file=trim(fname(istep)),status='old',err=998)
-    READ(10,*)
-    READ(10,*)
-    !READ(10,*)ctmp,time(istep)
+    !WRITE(*,*)'n_header=',n_header
+    DO iline = 1, n_header
+      READ(10,*)
+    ENDDO
     DO i = 1, np
       READ(10,*)x(i,istep),y(i,istep),z(i,istep), &
-                u(i,istep),v(i,istep),w(i,istep)
+                u(i,istep),v(i,istep),w(i,istep), &
+                (val(j,i,istep),j=1,nval-6)
     ENDDO
     CLOSE(10)
     WRITE(*,*)trim(fname(istep))
   ENDDO
 
-  OPEN(10,file='pathline.dat',FORM='formatted')
+  OPEN(10,file='pathlines.dat',FORM='formatted')
+    WRITE(*,*)'# output to: pathlines.dat'
+    WRITE(format_str, '(A,I0,A)') '(', nval, 'E16.8)'
     DO i = 1, np
       call int2char(i,ctmp1,ndigit)
       ctmp = 'TITLE= "Particle'//ctmp1(1:ndigit)//'"'
       !WRITE(10,*)'TITLE= "Particle',i,'"'
       WRITE(10,*)trim(ctmp)
-      WRITE(10,*)"VARIABLES= X Y Z U V W"
+      WRITE(10,*)'VARIABLES=',(' ',trim(vname(j)),j=1,nval)
+      !WRITE(10,*)"VARIABLES= X Y Z U V W"
       WRITE(10,*)"ZONE I=",nstep, "DATAPACKING=POINT"
+
+      !DO i = 1, nval
+      !  WRITE(format_str, '(A,I0,A)') '(', i, 'E16.8)'
+      !  write(*, format_str) 1.0  ! ここで1.0は仮の値です
+      !ENDDO
+      !WRITE(format_str, '(A,I0,A)') '(', nval, 'E16.8)'
+      !WRITE(*,*)'format_str=',format_str
       DO istep = 1, nstep
-        WRITE(10,'(6E16.8)')x(i,istep),y(i,istep),z(i,istep), &
-                u(i,istep),v(i,istep),w(i,istep)
+        WRITE(10,format_str)x(i,istep),y(i,istep),z(i,istep), &
+                u(i,istep),v(i,istep),w(i,istep),  &
+                (val(j,i,istep),j=1,nval-6)
       ENDDO
     ENDDO
   CLOSE(10)
