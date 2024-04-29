@@ -83,7 +83,7 @@ These objects are:
                            of output on some high-performance computational platforms.
                            Namely, the {\tt C++} standard {\tt std::endl} was slowing
                            down the output on Cray-XT3 computer by two orders of 
-                           magnitude.) 
+                           magnitude. The problem disappears in newer Cray computers.) 
   \item {\tt boil::pid} - processor i.d. for printing. (Not an integer value holding
                           the processor number). 
 \end{itemize}
@@ -92,7 +92,7 @@ These objects are:
 Now try to execute the application on four processors. Use the command:
 %
 \begin{verbatim}
-> mpirun -np 4 ./Boil
+> mpiexec -np 4 ./Boil
 \end{verbatim}
 %
 As you could expect, you get the following output:
