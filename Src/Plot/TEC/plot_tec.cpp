@@ -756,7 +756,8 @@ void PlotTEC::plot(const Pathline & pl,
     boil::oout << "# Plotting: "<<name<<"\n";
     out.open(name.c_str());
 
-    out << "#Number_of_variables= "<<6+pl.nval()<<"\n";
+    // visit cannot read the next line.
+    //out << "#Number_of_variables= "<<6+pl.nval()<<"\n";
     out << "VARIABLES= X Y Z U V W ";
     std::string vname;
     if (pl.nval()>=1) { 

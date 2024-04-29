@@ -1,14 +1,14 @@
   Program pathline
   implicit none
   integer::nstart,nend,interval,nstep,istep,itime,ndigit,nval,np,n_header
-  integer::iline,i,j
+  integer::iline,i,j,num_words
   real(8),allocatable::x(:,:),y(:,:),z(:,:),u(:,:),v(:,:),w(:,:),time(:)
   real(8),allocatable::val(:,:,:)  ! ival,ip,istep
   character(len=512),allocatable::fname(:),vname(:)
   character(len=512)::fncommon
   character(len=512)::ctmp,ctmp1
   character(len=20 )::format_str
-
+  character(len=200),allocatable::words(:)
 
   ndigit=6
 
@@ -48,10 +48,12 @@
     ! nval
     DO iline = 1,10
       READ(10,*)ctmp
-      !WRITE(*,*)trim(ctmp)
-      if (trim(ctmp).eq."#Number_of_variables=") then
+      if (trim(ctmp) .eq. "VARIABLES=") then
         BACKSPACE(10)
-        READ(10,*)ctmp,nval
+        READ(10,'(512a)')ctmp
+        WRITE(*,*)trim(ctmp)
+        CALL split_string(ctmp, num_words)
+        nval = num_words-1
         EXIT
       endif
     ENDDO
@@ -162,4 +164,34 @@
 
    RETURN
    END SUBROUTINE int2char
+
+!-----------------------------------------------------------------------
+   SUBROUTINE split_string(input_line, num_words)
+        character(len=*), intent(in) :: input_line
+        integer, intent(out) :: num_words
+        character(len=200):: words, temp_word
+        integer :: i, j, ist
+
+        ! remove space
+        temp_word = trim(input_line)
+
+        ! cout word
+        num_words = 0
+        ist = 1
+        999 continue
+        do i = ist, len_trim(temp_word)
+            if (temp_word(i:i) /= ' ') then
+                num_words = num_words + 1
+                j = 0
+                do while (i+j <= len_trim(temp_word) .and. temp_word(i+j:i+j) /= ' ')
+                    j = j + 1
+                end do
+                words = temp_word(i:i+j-1)
+                WRITE(*,*)trim(words)
+                ist = i + j
+                goto 999
+            end if
+        end do
+  END SUBROUTINE split_string
+
 

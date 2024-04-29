@@ -8,3 +8,10 @@ output: pathline.dat (Tecplot format)
 
 2. execute
 > pathline.exe
+
+MEMO:
+VisIt can read particles_000*.dat (TECPLOT ASCII format files),
+but cannot read particles_000*.plt (TECPLOT binary format files).
+
+
+
