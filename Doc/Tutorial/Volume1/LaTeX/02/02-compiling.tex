@@ -27,16 +27,16 @@ to use it.
 To check if you have {\tt MPI} on your system, run the command:
 %
 \begin{verbatim}
-> mpirun
+> mpiexec
 \end{verbatim}
 %
 That should give you a hint whether MPI is installed, but also which {\em flavor}
 it is. That is important to know. In case you had {\tt LAM/MPI} implementation,
-the {\tt mpirun} command will result in output like:
+the {\tt mpiexec} command will result in output like:
 %
 {\small \begin{verbatim}
-Synopsis:       mpirun [options] <app>
-                mpirun [options] <where> <program> [<prog args>]
+Synopsis:       mpiexec [options] <app>
+                mpiexec [options] <where> <program> [<prog args>]
 
 Description:    Start an MPI application in LAM/MPI.
 
@@ -45,7 +45,7 @@ Notes:
 ...
 \end{verbatim}}
 %
-Even if {\tt mpirun} command is available on your system, {\tt C++} compiler
+Even if {\tt mpiexec} command is available on your system, {\tt C++} compiler
 for {\tt MPI} might not be. Try to run {\tt mpiCC} or {\tt mpicxx} in the shell.
 %
 If none of those is available, they might be available as modules. To check 
@@ -232,7 +232,7 @@ You can run the executable from the source directory by:
 Try it. It will do nothing. You should even try the parallel version:
 %
 \begin{verbatim}
-> mpirun -np 2 ./Boil
+> mpiexec -np 2 ./Boil
 \end{verbatim} 
 %
 It also does nothing. It is no wonder, since the main program has very little action
