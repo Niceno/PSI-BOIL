@@ -36,14 +36,14 @@
 !  if(nval<0) goto 107
  108 continue
    if(nplt_each==2)then
-     write(*,*)"Input second file name. The name must be fixed. Ex: nozzle.plt"
+     write(*,*)"Input the next file name. The name must be fixed. Ex: nozzle.plt"
      read(*,*,err=104,end=104)fname2
    endif
    if(nplt_each==3)then
-     write(*,*)"Input common file name of second file. Example: particles_"
+     write(*,*)"Input common file name of the next file. Example: particles_"
      read(*,*,err=104,end=104)fncommon2
 
-     write(*,*)"Input second file name. The name must be fixed. Ex: nozzle.plt"
+     write(*,*)"Input the next file name. The name must be fixed. Ex: nozzle.plt"
      read(*,*,err=104,end=104)fname2
    endif
 
