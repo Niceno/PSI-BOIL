@@ -92,21 +92,15 @@ a parameter, and if it is not, one sends {\tt Periodic::no()}.
 
 The grid created by this program is shown in Fig.~\ref{fig_uniform_grid}. 
 First thing worth nothing is that there are~16 cells inside the domain (shown
-by black dots and numbered from 1-16). But, in addition to cells in the
+by black dots and numbered from 3-18). But, in addition to cells in the
 domain, {\psiboil} creates additional cells at the boundaries (red dots,
-numbered 0 and 17). These {\em boundary} cells hold the values of boundary 
-conditions or serve as {\em buffer} cells for parallel version. Note that,
+numbered 2 and 19). These {\em boundary} cells hold the values of boundary 
+conditions or serve as {\em buffer} cells for parallel version. 
+Note that the cell index starts with 3 instead of 1! This is due to the
+strategy in parallel computation, i.e. there are three layers of buffer cells, 
+which will be explained in the next section. In addition, note that,
 for the case of non-periodic grid, boundary cells coincide with boundary
 nodes.
-
-If you would like to check all coordinates in the grid, un-comment line~14
-and the program will write node, cell coordinates, as well as cell dimensions
-on the terminal.
-For a qualitative visual observation, un-comment line~15. The program will 
-create an {\tt eps} figure in file {\tt grid.eps}. Both of these functions
-({\tt print()} and {\tt plot(char * name)}) are used quite seldomly. Grid is
-usually checked later in a post-processing package, after the {\tt Domain}
-has been generated.
 
 \subsection{Periodic grid}
 \label{sub_sec_periodic}
@@ -122,9 +116,11 @@ changed to ({\tt 05-02-main.cpp}):
 This program, when compiled and ran, creates the grid shown in 
 Fig.~\ref{fig_periodic_grid}. Dimensions of the domain cells are the same
 as in previous example, but boundary cells do {\em not} coincide any
-longer with boundary nodes. Boundary cell~0 is now a copy of domain
-cell~16, shifted by $L$ in negative $\xi$ direction, while cell~17 is
-a copy of cell~1, shifted by $L$ in positive $\xi$ direction. 
+longer with boundary nodes. Boundary cell~2 is now a copy of domain
+cell~18, shifted by $L$ in negative $\xi$ direction, while cell~19 is
+a copy of cell~3, shifted by $L$ in positive $\xi$ direction. 
+In the same way, cell~0 is a copy of cell~ 16, cell~1 is cell~17,
+cell~20 is cell~4, and cell~21 is cell~5.
 
 %-----------------%
 %                 %
