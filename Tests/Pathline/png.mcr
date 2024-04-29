@@ -1,5 +1,5 @@
 #!MC 1100
-$!READDATASET  'uvw-c-press_pall_000000.plt particles_000000.plt pathline.plt'
+$!READDATASET  'uvw-c-press_pall_000000.plt particles_000000.plt pathlines.plt'
   READDATAOPTION = NEW
   RESETSTYLE = NO
   INCLUDETEXT = NO
@@ -13,7 +13,7 @@ $!EXPORTSETUP IMAGEWIDTH = 1280
 $!EXPORTSETUP EXPORTFNAME = './000000.png'
 $!EXPORT
  
-$!READDATASET  'uvw-c-press_pall_000001.plt particles_000001.plt pathline.plt'
+$!READDATASET  'uvw-c-press_pall_000001.plt particles_000001.plt pathlines.plt'
  READDATAOPTION = NEW
    RESETSTYLE = NO
    INCLUDETEXT = NO
@@ -21,13 +21,12 @@ $!READDATASET  'uvw-c-press_pall_000001.plt particles_000001.plt pathline.plt'
    INCLUDECUSTOMLABELS = NO
    VARLOADMODE = BYNAME
    ASSIGNSTRANDIDS = YES
-  VARNAMELIST = ' X Y Z U V W A B '
  $!REDRAW 
 $!EXPORTSETUP EXPORTFNAME = './000001.png'
 $!EXPORT
   EXPORTREGION = CURRENTFRAME
  
-$!READDATASET  'uvw-c-press_pall_000002.plt particles_000002.plt pathline.plt'
+$!READDATASET  'uvw-c-press_pall_000002.plt particles_000002.plt pathlines.plt'
  READDATAOPTION = NEW
    RESETSTYLE = NO
    INCLUDETEXT = NO
@@ -35,13 +34,12 @@ $!READDATASET  'uvw-c-press_pall_000002.plt particles_000002.plt pathline.plt'
    INCLUDECUSTOMLABELS = NO
    VARLOADMODE = BYNAME
    ASSIGNSTRANDIDS = YES
-  VARNAMELIST = ' X Y Z U V W A B '
  $!REDRAW 
 $!EXPORTSETUP EXPORTFNAME = './000002.png'
 $!EXPORT
   EXPORTREGION = CURRENTFRAME
  
-$!READDATASET  'uvw-c-press_pall_000003.plt particles_000003.plt pathline.plt'
+$!READDATASET  'uvw-c-press_pall_000003.plt particles_000003.plt pathlines.plt'
  READDATAOPTION = NEW
    RESETSTYLE = NO
    INCLUDETEXT = NO
@@ -49,13 +47,12 @@ $!READDATASET  'uvw-c-press_pall_000003.plt particles_000003.plt pathline.plt'
    INCLUDECUSTOMLABELS = NO
    VARLOADMODE = BYNAME
    ASSIGNSTRANDIDS = YES
-  VARNAMELIST = ' X Y Z U V W A B '
  $!REDRAW 
 $!EXPORTSETUP EXPORTFNAME = './000003.png'
 $!EXPORT
   EXPORTREGION = CURRENTFRAME
  
-$!READDATASET  'uvw-c-press_pall_000004.plt particles_000004.plt pathline.plt'
+$!READDATASET  'uvw-c-press_pall_000004.plt particles_000004.plt pathlines.plt'
  READDATAOPTION = NEW
    RESETSTYLE = NO
    INCLUDETEXT = NO
@@ -63,13 +60,12 @@ $!READDATASET  'uvw-c-press_pall_000004.plt particles_000004.plt pathline.plt'
    INCLUDECUSTOMLABELS = NO
    VARLOADMODE = BYNAME
    ASSIGNSTRANDIDS = YES
-  VARNAMELIST = ' X Y Z U V W A B '
  $!REDRAW 
 $!EXPORTSETUP EXPORTFNAME = './000004.png'
 $!EXPORT
   EXPORTREGION = CURRENTFRAME
  
-$!READDATASET  'uvw-c-press_pall_000005.plt particles_000005.plt pathline.plt'
+$!READDATASET  'uvw-c-press_pall_000005.plt particles_000005.plt pathlines.plt'
  READDATAOPTION = NEW
    RESETSTYLE = NO
    INCLUDETEXT = NO
@@ -77,13 +73,12 @@ $!READDATASET  'uvw-c-press_pall_000005.plt particles_000005.plt pathline.plt'
    INCLUDECUSTOMLABELS = NO
    VARLOADMODE = BYNAME
    ASSIGNSTRANDIDS = YES
-  VARNAMELIST = ' X Y Z U V W A B '
  $!REDRAW 
 $!EXPORTSETUP EXPORTFNAME = './000005.png'
 $!EXPORT
   EXPORTREGION = CURRENTFRAME
  
-$!READDATASET  'uvw-c-press_pall_000006.plt particles_000006.plt pathline.plt'
+$!READDATASET  'uvw-c-press_pall_000006.plt particles_000006.plt pathlines.plt'
  READDATAOPTION = NEW
    RESETSTYLE = NO
    INCLUDETEXT = NO
@@ -91,13 +86,12 @@ $!READDATASET  'uvw-c-press_pall_000006.plt particles_000006.plt pathline.plt'
    INCLUDECUSTOMLABELS = NO
    VARLOADMODE = BYNAME
    ASSIGNSTRANDIDS = YES
-  VARNAMELIST = ' X Y Z U V W A B '
  $!REDRAW 
 $!EXPORTSETUP EXPORTFNAME = './000006.png'
 $!EXPORT
   EXPORTREGION = CURRENTFRAME
  
-$!READDATASET  'uvw-c-press_pall_000007.plt particles_000007.plt pathline.plt'
+$!READDATASET  'uvw-c-press_pall_000007.plt particles_000007.plt pathlines.plt'
  READDATAOPTION = NEW
    RESETSTYLE = NO
    INCLUDETEXT = NO
@@ -105,13 +99,12 @@ $!READDATASET  'uvw-c-press_pall_000007.plt particles_000007.plt pathline.plt'
    INCLUDECUSTOMLABELS = NO
    VARLOADMODE = BYNAME
    ASSIGNSTRANDIDS = YES
-  VARNAMELIST = ' X Y Z U V W A B '
  $!REDRAW 
 $!EXPORTSETUP EXPORTFNAME = './000007.png'
 $!EXPORT
   EXPORTREGION = CURRENTFRAME
  
-$!READDATASET  'uvw-c-press_pall_000008.plt particles_000008.plt pathline.plt'
+$!READDATASET  'uvw-c-press_pall_000008.plt particles_000008.plt pathlines.plt'
  READDATAOPTION = NEW
    RESETSTYLE = NO
    INCLUDETEXT = NO
@@ -119,13 +112,12 @@ $!READDATASET  'uvw-c-press_pall_000008.plt particles_000008.plt pathline.plt'
    INCLUDECUSTOMLABELS = NO
    VARLOADMODE = BYNAME
    ASSIGNSTRANDIDS = YES
-  VARNAMELIST = ' X Y Z U V W A B '
  $!REDRAW 
 $!EXPORTSETUP EXPORTFNAME = './000008.png'
 $!EXPORT
   EXPORTREGION = CURRENTFRAME
  
-$!READDATASET  'uvw-c-press_pall_000009.plt particles_000009.plt pathline.plt'
+$!READDATASET  'uvw-c-press_pall_000009.plt particles_000009.plt pathlines.plt'
  READDATAOPTION = NEW
    RESETSTYLE = NO
    INCLUDETEXT = NO
@@ -133,13 +125,12 @@ $!READDATASET  'uvw-c-press_pall_000009.plt particles_000009.plt pathline.plt'
    INCLUDECUSTOMLABELS = NO
    VARLOADMODE = BYNAME
    ASSIGNSTRANDIDS = YES
-  VARNAMELIST = ' X Y Z U V W A B '
  $!REDRAW 
 $!EXPORTSETUP EXPORTFNAME = './000009.png'
 $!EXPORT
   EXPORTREGION = CURRENTFRAME
  
-$!READDATASET  'uvw-c-press_pall_000010.plt particles_000010.plt pathline.plt'
+$!READDATASET  'uvw-c-press_pall_000010.plt particles_000010.plt pathlines.plt'
  READDATAOPTION = NEW
    RESETSTYLE = NO
    INCLUDETEXT = NO
@@ -147,13 +138,12 @@ $!READDATASET  'uvw-c-press_pall_000010.plt particles_000010.plt pathline.plt'
    INCLUDECUSTOMLABELS = NO
    VARLOADMODE = BYNAME
    ASSIGNSTRANDIDS = YES
-  VARNAMELIST = ' X Y Z U V W A B '
  $!REDRAW 
 $!EXPORTSETUP EXPORTFNAME = './000010.png'
 $!EXPORT
   EXPORTREGION = CURRENTFRAME
  
-$!READDATASET  'uvw-c-press_pall_000011.plt particles_000011.plt pathline.plt'
+$!READDATASET  'uvw-c-press_pall_000011.plt particles_000011.plt pathlines.plt'
  READDATAOPTION = NEW
    RESETSTYLE = NO
    INCLUDETEXT = NO
@@ -161,13 +151,12 @@ $!READDATASET  'uvw-c-press_pall_000011.plt particles_000011.plt pathline.plt'
    INCLUDECUSTOMLABELS = NO
    VARLOADMODE = BYNAME
    ASSIGNSTRANDIDS = YES
-  VARNAMELIST = ' X Y Z U V W A B '
  $!REDRAW 
 $!EXPORTSETUP EXPORTFNAME = './000011.png'
 $!EXPORT
   EXPORTREGION = CURRENTFRAME
  
-$!READDATASET  'uvw-c-press_pall_000012.plt particles_000012.plt pathline.plt'
+$!READDATASET  'uvw-c-press_pall_000012.plt particles_000012.plt pathlines.plt'
  READDATAOPTION = NEW
    RESETSTYLE = NO
    INCLUDETEXT = NO
@@ -175,13 +164,12 @@ $!READDATASET  'uvw-c-press_pall_000012.plt particles_000012.plt pathline.plt'
    INCLUDECUSTOMLABELS = NO
    VARLOADMODE = BYNAME
    ASSIGNSTRANDIDS = YES
-  VARNAMELIST = ' X Y Z U V W A B '
  $!REDRAW 
 $!EXPORTSETUP EXPORTFNAME = './000012.png'
 $!EXPORT
   EXPORTREGION = CURRENTFRAME
  
-$!READDATASET  'uvw-c-press_pall_000013.plt particles_000013.plt pathline.plt'
+$!READDATASET  'uvw-c-press_pall_000013.plt particles_000013.plt pathlines.plt'
  READDATAOPTION = NEW
    RESETSTYLE = NO
    INCLUDETEXT = NO
@@ -189,13 +177,12 @@ $!READDATASET  'uvw-c-press_pall_000013.plt particles_000013.plt pathline.plt'
    INCLUDECUSTOMLABELS = NO
    VARLOADMODE = BYNAME
    ASSIGNSTRANDIDS = YES
-  VARNAMELIST = ' X Y Z U V W A B '
  $!REDRAW 
 $!EXPORTSETUP EXPORTFNAME = './000013.png'
 $!EXPORT
   EXPORTREGION = CURRENTFRAME
  
-$!READDATASET  'uvw-c-press_pall_000014.plt particles_000014.plt pathline.plt'
+$!READDATASET  'uvw-c-press_pall_000014.plt particles_000014.plt pathlines.plt'
  READDATAOPTION = NEW
    RESETSTYLE = NO
    INCLUDETEXT = NO
@@ -203,13 +190,12 @@ $!READDATASET  'uvw-c-press_pall_000014.plt particles_000014.plt pathline.plt'
    INCLUDECUSTOMLABELS = NO
    VARLOADMODE = BYNAME
    ASSIGNSTRANDIDS = YES
-  VARNAMELIST = ' X Y Z U V W A B '
  $!REDRAW 
 $!EXPORTSETUP EXPORTFNAME = './000014.png'
 $!EXPORT
   EXPORTREGION = CURRENTFRAME
  
-$!READDATASET  'uvw-c-press_pall_000015.plt particles_000015.plt pathline.plt'
+$!READDATASET  'uvw-c-press_pall_000015.plt particles_000015.plt pathlines.plt'
  READDATAOPTION = NEW
    RESETSTYLE = NO
    INCLUDETEXT = NO
@@ -217,13 +203,12 @@ $!READDATASET  'uvw-c-press_pall_000015.plt particles_000015.plt pathline.plt'
    INCLUDECUSTOMLABELS = NO
    VARLOADMODE = BYNAME
    ASSIGNSTRANDIDS = YES
-  VARNAMELIST = ' X Y Z U V W A B '
  $!REDRAW 
 $!EXPORTSETUP EXPORTFNAME = './000015.png'
 $!EXPORT
   EXPORTREGION = CURRENTFRAME
  
-$!READDATASET  'uvw-c-press_pall_000016.plt particles_000016.plt pathline.plt'
+$!READDATASET  'uvw-c-press_pall_000016.plt particles_000016.plt pathlines.plt'
  READDATAOPTION = NEW
    RESETSTYLE = NO
    INCLUDETEXT = NO
@@ -231,13 +216,12 @@ $!READDATASET  'uvw-c-press_pall_000016.plt particles_000016.plt pathline.plt'
    INCLUDECUSTOMLABELS = NO
    VARLOADMODE = BYNAME
    ASSIGNSTRANDIDS = YES
-  VARNAMELIST = ' X Y Z U V W A B '
  $!REDRAW 
 $!EXPORTSETUP EXPORTFNAME = './000016.png'
 $!EXPORT
   EXPORTREGION = CURRENTFRAME
  
-$!READDATASET  'uvw-c-press_pall_000017.plt particles_000017.plt pathline.plt'
+$!READDATASET  'uvw-c-press_pall_000017.plt particles_000017.plt pathlines.plt'
  READDATAOPTION = NEW
    RESETSTYLE = NO
    INCLUDETEXT = NO
@@ -245,13 +229,12 @@ $!READDATASET  'uvw-c-press_pall_000017.plt particles_000017.plt pathline.plt'
    INCLUDECUSTOMLABELS = NO
    VARLOADMODE = BYNAME
    ASSIGNSTRANDIDS = YES
-  VARNAMELIST = ' X Y Z U V W A B '
  $!REDRAW 
 $!EXPORTSETUP EXPORTFNAME = './000017.png'
 $!EXPORT
   EXPORTREGION = CURRENTFRAME
  
-$!READDATASET  'uvw-c-press_pall_000018.plt particles_000018.plt pathline.plt'
+$!READDATASET  'uvw-c-press_pall_000018.plt particles_000018.plt pathlines.plt'
  READDATAOPTION = NEW
    RESETSTYLE = NO
    INCLUDETEXT = NO
@@ -259,13 +242,12 @@ $!READDATASET  'uvw-c-press_pall_000018.plt particles_000018.plt pathline.plt'
    INCLUDECUSTOMLABELS = NO
    VARLOADMODE = BYNAME
    ASSIGNSTRANDIDS = YES
-  VARNAMELIST = ' X Y Z U V W A B '
  $!REDRAW 
 $!EXPORTSETUP EXPORTFNAME = './000018.png'
 $!EXPORT
   EXPORTREGION = CURRENTFRAME
  
-$!READDATASET  'uvw-c-press_pall_000019.plt particles_000019.plt pathline.plt'
+$!READDATASET  'uvw-c-press_pall_000019.plt particles_000019.plt pathlines.plt'
  READDATAOPTION = NEW
    RESETSTYLE = NO
    INCLUDETEXT = NO
@@ -273,13 +255,12 @@ $!READDATASET  'uvw-c-press_pall_000019.plt particles_000019.plt pathline.plt'
    INCLUDECUSTOMLABELS = NO
    VARLOADMODE = BYNAME
    ASSIGNSTRANDIDS = YES
-  VARNAMELIST = ' X Y Z U V W A B '
  $!REDRAW 
 $!EXPORTSETUP EXPORTFNAME = './000019.png'
 $!EXPORT
   EXPORTREGION = CURRENTFRAME
  
-$!READDATASET  'uvw-c-press_pall_000020.plt particles_000020.plt pathline.plt'
+$!READDATASET  'uvw-c-press_pall_000020.plt particles_000020.plt pathlines.plt'
  READDATAOPTION = NEW
    RESETSTYLE = NO
    INCLUDETEXT = NO
@@ -287,13 +268,12 @@ $!READDATASET  'uvw-c-press_pall_000020.plt particles_000020.plt pathline.plt'
    INCLUDECUSTOMLABELS = NO
    VARLOADMODE = BYNAME
    ASSIGNSTRANDIDS = YES
-  VARNAMELIST = ' X Y Z U V W A B '
  $!REDRAW 
 $!EXPORTSETUP EXPORTFNAME = './000020.png'
 $!EXPORT
   EXPORTREGION = CURRENTFRAME
  
-$!READDATASET  'uvw-c-press_pall_000021.plt particles_000021.plt pathline.plt'
+$!READDATASET  'uvw-c-press_pall_000021.plt particles_000021.plt pathlines.plt'
  READDATAOPTION = NEW
    RESETSTYLE = NO
    INCLUDETEXT = NO
@@ -301,13 +281,12 @@ $!READDATASET  'uvw-c-press_pall_000021.plt particles_000021.plt pathline.plt'
    INCLUDECUSTOMLABELS = NO
    VARLOADMODE = BYNAME
    ASSIGNSTRANDIDS = YES
-  VARNAMELIST = ' X Y Z U V W A B '
  $!REDRAW 
 $!EXPORTSETUP EXPORTFNAME = './000021.png'
 $!EXPORT
   EXPORTREGION = CURRENTFRAME
  
-$!READDATASET  'uvw-c-press_pall_000022.plt particles_000022.plt pathline.plt'
+$!READDATASET  'uvw-c-press_pall_000022.plt particles_000022.plt pathlines.plt'
  READDATAOPTION = NEW
    RESETSTYLE = NO
    INCLUDETEXT = NO
@@ -315,13 +294,12 @@ $!READDATASET  'uvw-c-press_pall_000022.plt particles_000022.plt pathline.plt'
    INCLUDECUSTOMLABELS = NO
    VARLOADMODE = BYNAME
    ASSIGNSTRANDIDS = YES
-  VARNAMELIST = ' X Y Z U V W A B '
  $!REDRAW 
 $!EXPORTSETUP EXPORTFNAME = './000022.png'
 $!EXPORT
   EXPORTREGION = CURRENTFRAME
  
-$!READDATASET  'uvw-c-press_pall_000023.plt particles_000023.plt pathline.plt'
+$!READDATASET  'uvw-c-press_pall_000023.plt particles_000023.plt pathlines.plt'
  READDATAOPTION = NEW
    RESETSTYLE = NO
    INCLUDETEXT = NO
@@ -329,13 +307,12 @@ $!READDATASET  'uvw-c-press_pall_000023.plt particles_000023.plt pathline.plt'
    INCLUDECUSTOMLABELS = NO
    VARLOADMODE = BYNAME
    ASSIGNSTRANDIDS = YES
-  VARNAMELIST = ' X Y Z U V W A B '
  $!REDRAW 
 $!EXPORTSETUP EXPORTFNAME = './000023.png'
 $!EXPORT
   EXPORTREGION = CURRENTFRAME
  
-$!READDATASET  'uvw-c-press_pall_000024.plt particles_000024.plt pathline.plt'
+$!READDATASET  'uvw-c-press_pall_000024.plt particles_000024.plt pathlines.plt'
  READDATAOPTION = NEW
    RESETSTYLE = NO
    INCLUDETEXT = NO
@@ -343,13 +320,12 @@ $!READDATASET  'uvw-c-press_pall_000024.plt particles_000024.plt pathline.plt'
    INCLUDECUSTOMLABELS = NO
    VARLOADMODE = BYNAME
    ASSIGNSTRANDIDS = YES
-  VARNAMELIST = ' X Y Z U V W A B '
  $!REDRAW 
 $!EXPORTSETUP EXPORTFNAME = './000024.png'
 $!EXPORT
   EXPORTREGION = CURRENTFRAME
  
-$!READDATASET  'uvw-c-press_pall_000025.plt particles_000025.plt pathline.plt'
+$!READDATASET  'uvw-c-press_pall_000025.plt particles_000025.plt pathlines.plt'
  READDATAOPTION = NEW
    RESETSTYLE = NO
    INCLUDETEXT = NO
@@ -357,13 +333,12 @@ $!READDATASET  'uvw-c-press_pall_000025.plt particles_000025.plt pathline.plt'
    INCLUDECUSTOMLABELS = NO
    VARLOADMODE = BYNAME
    ASSIGNSTRANDIDS = YES
-  VARNAMELIST = ' X Y Z U V W A B '
  $!REDRAW 
 $!EXPORTSETUP EXPORTFNAME = './000025.png'
 $!EXPORT
   EXPORTREGION = CURRENTFRAME
  
-$!READDATASET  'uvw-c-press_pall_000026.plt particles_000026.plt pathline.plt'
+$!READDATASET  'uvw-c-press_pall_000026.plt particles_000026.plt pathlines.plt'
  READDATAOPTION = NEW
    RESETSTYLE = NO
    INCLUDETEXT = NO
@@ -371,13 +346,12 @@ $!READDATASET  'uvw-c-press_pall_000026.plt particles_000026.plt pathline.plt'
    INCLUDECUSTOMLABELS = NO
    VARLOADMODE = BYNAME
    ASSIGNSTRANDIDS = YES
-  VARNAMELIST = ' X Y Z U V W A B '
  $!REDRAW 
 $!EXPORTSETUP EXPORTFNAME = './000026.png'
 $!EXPORT
   EXPORTREGION = CURRENTFRAME
  
-$!READDATASET  'uvw-c-press_pall_000027.plt particles_000027.plt pathline.plt'
+$!READDATASET  'uvw-c-press_pall_000027.plt particles_000027.plt pathlines.plt'
  READDATAOPTION = NEW
    RESETSTYLE = NO
    INCLUDETEXT = NO
@@ -385,13 +359,12 @@ $!READDATASET  'uvw-c-press_pall_000027.plt particles_000027.plt pathline.plt'
    INCLUDECUSTOMLABELS = NO
    VARLOADMODE = BYNAME
    ASSIGNSTRANDIDS = YES
-  VARNAMELIST = ' X Y Z U V W A B '
  $!REDRAW 
 $!EXPORTSETUP EXPORTFNAME = './000027.png'
 $!EXPORT
   EXPORTREGION = CURRENTFRAME
  
-$!READDATASET  'uvw-c-press_pall_000028.plt particles_000028.plt pathline.plt'
+$!READDATASET  'uvw-c-press_pall_000028.plt particles_000028.plt pathlines.plt'
  READDATAOPTION = NEW
    RESETSTYLE = NO
    INCLUDETEXT = NO
@@ -399,13 +372,12 @@ $!READDATASET  'uvw-c-press_pall_000028.plt particles_000028.plt pathline.plt'
    INCLUDECUSTOMLABELS = NO
    VARLOADMODE = BYNAME
    ASSIGNSTRANDIDS = YES
-  VARNAMELIST = ' X Y Z U V W A B '
  $!REDRAW 
 $!EXPORTSETUP EXPORTFNAME = './000028.png'
 $!EXPORT
   EXPORTREGION = CURRENTFRAME
  
-$!READDATASET  'uvw-c-press_pall_000029.plt particles_000029.plt pathline.plt'
+$!READDATASET  'uvw-c-press_pall_000029.plt particles_000029.plt pathlines.plt'
  READDATAOPTION = NEW
    RESETSTYLE = NO
    INCLUDETEXT = NO
@@ -413,13 +385,12 @@ $!READDATASET  'uvw-c-press_pall_000029.plt particles_000029.plt pathline.plt'
    INCLUDECUSTOMLABELS = NO
    VARLOADMODE = BYNAME
    ASSIGNSTRANDIDS = YES
-  VARNAMELIST = ' X Y Z U V W A B '
  $!REDRAW 
 $!EXPORTSETUP EXPORTFNAME = './000029.png'
 $!EXPORT
   EXPORTREGION = CURRENTFRAME
  
-$!READDATASET  'uvw-c-press_pall_000030.plt particles_000030.plt pathline.plt'
+$!READDATASET  'uvw-c-press_pall_000030.plt particles_000030.plt pathlines.plt'
  READDATAOPTION = NEW
    RESETSTYLE = NO
    INCLUDETEXT = NO
@@ -427,13 +398,12 @@ $!READDATASET  'uvw-c-press_pall_000030.plt particles_000030.plt pathline.plt'
    INCLUDECUSTOMLABELS = NO
    VARLOADMODE = BYNAME
    ASSIGNSTRANDIDS = YES
-  VARNAMELIST = ' X Y Z U V W A B '
  $!REDRAW 
 $!EXPORTSETUP EXPORTFNAME = './000030.png'
 $!EXPORT
   EXPORTREGION = CURRENTFRAME
  
-$!READDATASET  'uvw-c-press_pall_000031.plt particles_000031.plt pathline.plt'
+$!READDATASET  'uvw-c-press_pall_000031.plt particles_000031.plt pathlines.plt'
  READDATAOPTION = NEW
    RESETSTYLE = NO
    INCLUDETEXT = NO
@@ -441,13 +411,12 @@ $!READDATASET  'uvw-c-press_pall_000031.plt particles_000031.plt pathline.plt'
    INCLUDECUSTOMLABELS = NO
    VARLOADMODE = BYNAME
    ASSIGNSTRANDIDS = YES
-  VARNAMELIST = ' X Y Z U V W A B '
  $!REDRAW 
 $!EXPORTSETUP EXPORTFNAME = './000031.png'
 $!EXPORT
   EXPORTREGION = CURRENTFRAME
  
-$!READDATASET  'uvw-c-press_pall_000032.plt particles_000032.plt pathline.plt'
+$!READDATASET  'uvw-c-press_pall_000032.plt particles_000032.plt pathlines.plt'
  READDATAOPTION = NEW
    RESETSTYLE = NO
    INCLUDETEXT = NO
@@ -455,13 +424,12 @@ $!READDATASET  'uvw-c-press_pall_000032.plt particles_000032.plt pathline.plt'
    INCLUDECUSTOMLABELS = NO
    VARLOADMODE = BYNAME
    ASSIGNSTRANDIDS = YES
-  VARNAMELIST = ' X Y Z U V W A B '
  $!REDRAW 
 $!EXPORTSETUP EXPORTFNAME = './000032.png'
 $!EXPORT
   EXPORTREGION = CURRENTFRAME
  
-$!READDATASET  'uvw-c-press_pall_000033.plt particles_000033.plt pathline.plt'
+$!READDATASET  'uvw-c-press_pall_000033.plt particles_000033.plt pathlines.plt'
  READDATAOPTION = NEW
    RESETSTYLE = NO
    INCLUDETEXT = NO
@@ -469,13 +437,12 @@ $!READDATASET  'uvw-c-press_pall_000033.plt particles_000033.plt pathline.plt'
    INCLUDECUSTOMLABELS = NO
    VARLOADMODE = BYNAME
    ASSIGNSTRANDIDS = YES
-  VARNAMELIST = ' X Y Z U V W A B '
  $!REDRAW 
 $!EXPORTSETUP EXPORTFNAME = './000033.png'
 $!EXPORT
   EXPORTREGION = CURRENTFRAME
  
-$!READDATASET  'uvw-c-press_pall_000034.plt particles_000034.plt pathline.plt'
+$!READDATASET  'uvw-c-press_pall_000034.plt particles_000034.plt pathlines.plt'
  READDATAOPTION = NEW
    RESETSTYLE = NO
    INCLUDETEXT = NO
@@ -483,13 +450,12 @@ $!READDATASET  'uvw-c-press_pall_000034.plt particles_000034.plt pathline.plt'
    INCLUDECUSTOMLABELS = NO
    VARLOADMODE = BYNAME
    ASSIGNSTRANDIDS = YES
-  VARNAMELIST = ' X Y Z U V W A B '
  $!REDRAW 
 $!EXPORTSETUP EXPORTFNAME = './000034.png'
 $!EXPORT
   EXPORTREGION = CURRENTFRAME
  
-$!READDATASET  'uvw-c-press_pall_000035.plt particles_000035.plt pathline.plt'
+$!READDATASET  'uvw-c-press_pall_000035.plt particles_000035.plt pathlines.plt'
  READDATAOPTION = NEW
    RESETSTYLE = NO
    INCLUDETEXT = NO
@@ -497,13 +463,12 @@ $!READDATASET  'uvw-c-press_pall_000035.plt particles_000035.plt pathline.plt'
    INCLUDECUSTOMLABELS = NO
    VARLOADMODE = BYNAME
    ASSIGNSTRANDIDS = YES
-  VARNAMELIST = ' X Y Z U V W A B '
  $!REDRAW 
 $!EXPORTSETUP EXPORTFNAME = './000035.png'
 $!EXPORT
   EXPORTREGION = CURRENTFRAME
  
-$!READDATASET  'uvw-c-press_pall_000036.plt particles_000036.plt pathline.plt'
+$!READDATASET  'uvw-c-press_pall_000036.plt particles_000036.plt pathlines.plt'
  READDATAOPTION = NEW
    RESETSTYLE = NO
    INCLUDETEXT = NO
@@ -511,13 +476,12 @@ $!READDATASET  'uvw-c-press_pall_000036.plt particles_000036.plt pathline.plt'
    INCLUDECUSTOMLABELS = NO
    VARLOADMODE = BYNAME
    ASSIGNSTRANDIDS = YES
-  VARNAMELIST = ' X Y Z U V W A B '
  $!REDRAW 
 $!EXPORTSETUP EXPORTFNAME = './000036.png'
 $!EXPORT
   EXPORTREGION = CURRENTFRAME
  
-$!READDATASET  'uvw-c-press_pall_000037.plt particles_000037.plt pathline.plt'
+$!READDATASET  'uvw-c-press_pall_000037.plt particles_000037.plt pathlines.plt'
  READDATAOPTION = NEW
    RESETSTYLE = NO
    INCLUDETEXT = NO
@@ -525,13 +489,12 @@ $!READDATASET  'uvw-c-press_pall_000037.plt particles_000037.plt pathline.plt'
    INCLUDECUSTOMLABELS = NO
    VARLOADMODE = BYNAME
    ASSIGNSTRANDIDS = YES
-  VARNAMELIST = ' X Y Z U V W A B '
  $!REDRAW 
 $!EXPORTSETUP EXPORTFNAME = './000037.png'
 $!EXPORT
   EXPORTREGION = CURRENTFRAME
  
-$!READDATASET  'uvw-c-press_pall_000038.plt particles_000038.plt pathline.plt'
+$!READDATASET  'uvw-c-press_pall_000038.plt particles_000038.plt pathlines.plt'
  READDATAOPTION = NEW
    RESETSTYLE = NO
    INCLUDETEXT = NO
@@ -539,13 +502,12 @@ $!READDATASET  'uvw-c-press_pall_000038.plt particles_000038.plt pathline.plt'
    INCLUDECUSTOMLABELS = NO
    VARLOADMODE = BYNAME
    ASSIGNSTRANDIDS = YES
-  VARNAMELIST = ' X Y Z U V W A B '
  $!REDRAW 
 $!EXPORTSETUP EXPORTFNAME = './000038.png'
 $!EXPORT
   EXPORTREGION = CURRENTFRAME
  
-$!READDATASET  'uvw-c-press_pall_000039.plt particles_000039.plt pathline.plt'
+$!READDATASET  'uvw-c-press_pall_000039.plt particles_000039.plt pathlines.plt'
  READDATAOPTION = NEW
    RESETSTYLE = NO
    INCLUDETEXT = NO
@@ -553,13 +515,12 @@ $!READDATASET  'uvw-c-press_pall_000039.plt particles_000039.plt pathline.plt'
    INCLUDECUSTOMLABELS = NO
    VARLOADMODE = BYNAME
    ASSIGNSTRANDIDS = YES
-  VARNAMELIST = ' X Y Z U V W A B '
  $!REDRAW 
 $!EXPORTSETUP EXPORTFNAME = './000039.png'
 $!EXPORT
   EXPORTREGION = CURRENTFRAME
  
-$!READDATASET  'uvw-c-press_pall_000040.plt particles_000040.plt pathline.plt'
+$!READDATASET  'uvw-c-press_pall_000040.plt particles_000040.plt pathlines.plt'
  READDATAOPTION = NEW
    RESETSTYLE = NO
    INCLUDETEXT = NO
@@ -567,13 +528,12 @@ $!READDATASET  'uvw-c-press_pall_000040.plt particles_000040.plt pathline.plt'
    INCLUDECUSTOMLABELS = NO
    VARLOADMODE = BYNAME
    ASSIGNSTRANDIDS = YES
-  VARNAMELIST = ' X Y Z U V W A B '
  $!REDRAW 
 $!EXPORTSETUP EXPORTFNAME = './000040.png'
 $!EXPORT
   EXPORTREGION = CURRENTFRAME
  
-$!READDATASET  'uvw-c-press_pall_000041.plt particles_000041.plt pathline.plt'
+$!READDATASET  'uvw-c-press_pall_000041.plt particles_000041.plt pathlines.plt'
  READDATAOPTION = NEW
    RESETSTYLE = NO
    INCLUDETEXT = NO
@@ -581,13 +541,12 @@ $!READDATASET  'uvw-c-press_pall_000041.plt particles_000041.plt pathline.plt'
    INCLUDECUSTOMLABELS = NO
    VARLOADMODE = BYNAME
    ASSIGNSTRANDIDS = YES
-  VARNAMELIST = ' X Y Z U V W A B '
  $!REDRAW 
 $!EXPORTSETUP EXPORTFNAME = './000041.png'
 $!EXPORT
   EXPORTREGION = CURRENTFRAME
  
-$!READDATASET  'uvw-c-press_pall_000042.plt particles_000042.plt pathline.plt'
+$!READDATASET  'uvw-c-press_pall_000042.plt particles_000042.plt pathlines.plt'
  READDATAOPTION = NEW
    RESETSTYLE = NO
    INCLUDETEXT = NO
@@ -595,13 +554,12 @@ $!READDATASET  'uvw-c-press_pall_000042.plt particles_000042.plt pathline.plt'
    INCLUDECUSTOMLABELS = NO
    VARLOADMODE = BYNAME
    ASSIGNSTRANDIDS = YES
-  VARNAMELIST = ' X Y Z U V W A B '
  $!REDRAW 
 $!EXPORTSETUP EXPORTFNAME = './000042.png'
 $!EXPORT
   EXPORTREGION = CURRENTFRAME
  
-$!READDATASET  'uvw-c-press_pall_000043.plt particles_000043.plt pathline.plt'
+$!READDATASET  'uvw-c-press_pall_000043.plt particles_000043.plt pathlines.plt'
  READDATAOPTION = NEW
    RESETSTYLE = NO
    INCLUDETEXT = NO
@@ -609,13 +567,12 @@ $!READDATASET  'uvw-c-press_pall_000043.plt particles_000043.plt pathline.plt'
    INCLUDECUSTOMLABELS = NO
    VARLOADMODE = BYNAME
    ASSIGNSTRANDIDS = YES
-  VARNAMELIST = ' X Y Z U V W A B '
  $!REDRAW 
 $!EXPORTSETUP EXPORTFNAME = './000043.png'
 $!EXPORT
   EXPORTREGION = CURRENTFRAME
  
-$!READDATASET  'uvw-c-press_pall_000044.plt particles_000044.plt pathline.plt'
+$!READDATASET  'uvw-c-press_pall_000044.plt particles_000044.plt pathlines.plt'
  READDATAOPTION = NEW
    RESETSTYLE = NO
    INCLUDETEXT = NO
@@ -623,7 +580,6 @@ $!READDATASET  'uvw-c-press_pall_000044.plt particles_000044.plt pathline.plt'
    INCLUDECUSTOMLABELS = NO
    VARLOADMODE = BYNAME
    ASSIGNSTRANDIDS = YES
-  VARNAMELIST = ' X Y Z U V W A B '
  $!REDRAW 
 $!EXPORTSETUP EXPORTFNAME = './000044.png'
 $!EXPORT
