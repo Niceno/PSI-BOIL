@@ -26,7 +26,6 @@ void Times::print_current() const {
                              << total_steps()                     << boil::endl;
     boil::oout << "# TIME: " << current_time() << " / " 
                              << total_time()                      << boil::endl;
-    boil::oout << "#                 " << boil::endl;
     boil::oout << "# WALL: " << boil::timer.current_min() << " [min]; " 
                              << boil::timer.current_hour() << " [h]"          
                                                                   << boil::endl;
