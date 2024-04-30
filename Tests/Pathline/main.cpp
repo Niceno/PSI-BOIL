@@ -112,7 +112,7 @@ int main(int argc, char * argv[]) {
   const int ndt = 10000;
   Times time(ndt, dt);
   const real tint = 0.01;
-  const int nint= 2000;
+  const int nint= 100;
   const real cfl_limit=0.25;
 
   /*-----------------+
@@ -143,6 +143,7 @@ int main(int argc, char * argv[]) {
   /*--------------------+
   |  initial condition  |
   +--------------------*/
+#if 1
   /* color function */
   for_vijk(c,i,j,k)
     c[i][j][k] = 1.0;
@@ -182,11 +183,22 @@ int main(int argc, char * argv[]) {
   c.exchange_all();
 
   /* pathlines */
+  // pattern 1: define in each decomposed domain
+  for_vijk(c,i,j,k) {
+    if (c[i][j][k]< 0.5) {
+       if (i%2==0 && j%2==0 && k%2==0) {
+         pathline.add_local(c.xc(i),c.yc(j),c.zc(k));
+       }
+    }
+  }
+  pathline.exchange();  // Never forget this!
+  
+  // pattern 2: define by coordinates
   for (int i = 0; i < 32; i++) {
     for (int j = 0; j < 32; j++) {
       real xx = 2.0 * dxmin * i;
       real yy = 2.0 * dxmin * j;
-      pathline.add(xx,yy,zcent);
+      pathline.add_global(xx,yy,0.5*LZ);
     }
   }
   pathline.init();
@@ -194,6 +206,19 @@ int main(int argc, char * argv[]) {
   boil::plot->plot(uvw,c,press, "uvw-c-press",0);
   boil::plot->plot(pathline, "particles",0);
   conc.front_minmax();
+#else
+  /*----------+
+  |  restart  |
+  +----------*/
+  int ts=200;
+  real tct=0.0445188;
+  time.first_step(ts);
+  time.current_time(dt*real(tct));
+  uvw.load     ("uvw",     ts);
+  press.load   ("press",   ts);
+  c.load       ("c",       ts);
+  pathline.load("pathline",ts);
+#endif
 
 #ifndef USE_VOF
   update_step(c, step, sflag);
