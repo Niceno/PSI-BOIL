@@ -39,7 +39,7 @@ void Pathline::load(std::ifstream & in) {
     in.read(reinterpret_cast<char *> (&y_saved), sizeof(real));
     in.read(reinterpret_cast<char *> (&z_saved), sizeof(real));
     in.read(reinterpret_cast<char *> (&i_saved), sizeof(int));
-    add(x_saved, y_saved, z_saved);
+    add_global(x_saved, y_saved, z_saved);
     particles[ip].id(i_saved);
   }
   return;
