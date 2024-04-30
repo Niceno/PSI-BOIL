@@ -20,6 +20,33 @@ Pathline::Pathline ( const Vector & v, const Times * t,
   if (s3 !=NULL) { nv = 3;}
   //std::cout<<"pathline:time= "<<time->current_time()<<"\n";
   boil::oout<<"Pathline:nval()= "<<nval()<<"\n";
+
+  boil::oout<<"###########################################################\n";
+  boil::oout<<"#  Pathline: WARNING with respect to parallelization !!!  #\n";
+  boil::oout<<"#  pathline_add(x, y, z) must be cynchronized between     #\n";
+  boil::oout<<"#  processes. Next loop does not work                     #\n";
+  boil::oout<<"#---------------------------------------------------------#\n";
+  boil::oout<<"#    for_vijk(c,i,j,k) {                                  #\n";
+  boil::oout<<"#        if(c[i][j][k]<0.5) {                             #\n";
+  boil::oout<<"#          pathline.add_global(c.xc(i),c.yc(j),c.zc(k));  #\n";
+  boil::oout<<"#        }                                                #\n";
+  boil::oout<<"#    }                                                    #\n";
+  boil::oout<<"###########################################################\n";
+  boil::oout<<"#  Next is correct.                                       #\n";
+  boil::oout<<"#---------------------------------------------------------#\n";
+  boil::oout<<"#    for_vijk(c,i,j,k) {                                  #\n";
+  boil::oout<<"#      if(c[i][j][k]<0.5) {                               #\n";
+  boil::oout<<"#        pathline.add_local(c.xc(i),c.yc(j),c.zc(k));     #\n";
+  boil::oout<<"#      }                                                  #\n";
+  boil::oout<<"#    }                                                    #\n";
+  boil::oout<<"#    pathline.exchange();                                 #\n";
+  boil::oout<<"###########################################################\n";
+  boil::oout<<"#  Next is also correct.                                  #\n";
+  boil::oout<<"#---------------------------------------------------------#\n";
+  boil::oout<<"#    pathline.add_global(0.001,0.001,0.001);              #\n";
+  boil::oout<<"###########################################################\n";
+
+
 }
 
 /******************************************************************************/

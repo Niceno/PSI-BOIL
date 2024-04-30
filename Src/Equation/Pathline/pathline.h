@@ -6,6 +6,10 @@
 #include "../../SimulationTime/simulation_time.h"
 #include "particle.h"
 
+struct Coordinate {
+    double x,y,z;
+};
+
 ////////////////
 //            //
 //  Pathline  //
@@ -28,7 +32,9 @@ class Pathline {
     void rm  (const char * nm, const int it);
 
     /* add particles */
-    void add(const real x, const real y, const real z);
+    void add_global(const real x, const real y, const real z);
+    void add_local(const real x, const real y, const real z);
+    void exchange();
 
     /* number of current particles */
     int np() const {return npa;}
@@ -51,6 +57,7 @@ class Pathline {
     int npa;  // number of particles 
     int nv; // number of additional variables
     int id_serial;
+    std::vector<Coordinate> particle_local;
 };	
 
 #endif

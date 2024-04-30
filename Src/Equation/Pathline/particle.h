@@ -36,16 +36,9 @@ class Particle {
                                      + w_vel * w_vel);}
 
     /* additional scalar to be traced */
-    //real s1() const {return ss1;}
-    real s2() const {return ss2;}
-    //real s3() const {return ss3;}
 
-    //void s1(real r){ss1=r;}
-    void s2(real r){ss2=r;}
-    //void s3(real r){ss3=r;}
-
-    real sval(const int i) const {return sca[i-1];} 
-    void sval(const int i, const real r){sca[i-1]=r;}
+    real sval(const int i) const {return sca[i];}
+    void sval(const int i, const real r){sca[i]=r;}
 
     int id() const {return iid;}
     void id(int i){iid=i;}
@@ -54,16 +47,9 @@ class Particle {
 
     real xpos,ypos,zpos;
     real u_vel,v_vel,w_vel;
-    real ss1,ss2,ss3;
     int  iid;
-    //real sca[10];
     std::vector<double> sca;
-    //real *sca;
 
-    /* locally numbered logical coordinates */
-    //int s_x, s_y, s_z;
-    //int e_x, e_y, e_z;
-
-};	
+};
 
 #endif
