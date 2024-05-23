@@ -71,6 +71,10 @@ void PhaseChange4::insert_bc_hf(const Scalar * diff_eddy) {
                                         ResistEval::no,Old::no);
               real totresist = dist/lmb+cht.wall_resistance(ii,jj,kk);
               if(cht.above_interface(ii,jj,kk,Old::no)) {
+                if(totresist == 0.0){
+                  // the interface touches to the temperature dirichlet boundary
+                  totresist = (0.5 * phi.dxc(ii))/lmb; // crude code
+                }
                 txv[ii][jj][kk] = (tw-ti)/totresist*real(sig);
                 txv[i ][j ][k ] = (tw-ti)/totresist*real(sig);
               } else {
@@ -78,6 +82,10 @@ void PhaseChange4::insert_bc_hf(const Scalar * diff_eddy) {
                 /* only liquid resistance is considered */
                 if(cht.use_int_resistance()) {
                   totresist += cht.int_resistance_liq(ii,jj,kk);
+                }
+                if(totresist == 0.0){
+                  // the interface touches to the temperature dirichlet boundary
+                  totresist = (0.5 * phi.dxc(ii))/lmb; // crude code
                 }
                 txl[ii][jj][kk] = (tw-ti)/totresist*real(sig);
                 txl[i ][j ][k ] = (tw-ti)/totresist*real(sig);
@@ -87,6 +95,10 @@ void PhaseChange4::insert_bc_hf(const Scalar * diff_eddy) {
                                         ResistEval::no,Old::no);
               real totresist = dist/lmb+cht.wall_resistance(ii,jj,kk);
               if(cht.above_interface(ii,jj,kk,Old::no)) {
+                if(totresist == 0.0){
+                  // the interface touches to the temperature dirichlet boundary
+                  totresist = (0.5 * phi.dyc(jj))/lmb; // crude code
+                }
                 tyv[ii][jj][kk] = (tw-ti)/totresist*real(sig);
                 tyv[i ][j ][k ] = (tw-ti)/totresist*real(sig);
               } else {
@@ -94,6 +106,10 @@ void PhaseChange4::insert_bc_hf(const Scalar * diff_eddy) {
                 /* only liquid resistance is considered */
                 if(cht.use_int_resistance()) {
                   totresist += cht.int_resistance_liq(ii,jj,kk);
+                }
+                if(totresist == 0.0){
+                  // the interface touches to the temperature dirichlet boundary
+                  totresist = (0.5 * phi.dyc(jj))/lmb; // crude code
                 }
                 tyl[ii][jj][kk] = (tw-ti)/totresist*real(sig);
                 tyl[i ][j ][k ] = (tw-ti)/totresist*real(sig);
@@ -103,6 +119,10 @@ void PhaseChange4::insert_bc_hf(const Scalar * diff_eddy) {
                                         ResistEval::no,Old::no);
               real totresist = dist/lmb+cht.wall_resistance(ii,jj,kk);
               if(cht.above_interface(ii,jj,kk,Old::no)) {
+                if(totresist == 0.0){
+                  // the interface touches to the temperature dirichlet boundary
+                  totresist = (0.5 * phi.dzc(kk))/lmb; // crude code
+                }
                 tzv[ii][jj][kk] = (tw-ti)/totresist*real(sig);
                 tzv[i ][j ][k ] = (tw-ti)/totresist*real(sig);
               } else {
@@ -110,6 +130,10 @@ void PhaseChange4::insert_bc_hf(const Scalar * diff_eddy) {
                 /* only liquid resistance is considered */
                 if(cht.use_int_resistance()) {
                   totresist += cht.int_resistance_liq(ii,jj,kk);
+                }
+                if(totresist == 0.0){
+                  // the interface touches to the temperature dirichlet boundary
+                  totresist = (0.5 * phi.dzc(kk))/lmb; // crude code
                 }
                 tzl[ii][jj][kk] = (tw-ti)/totresist*real(sig);
                 tzl[i ][j ][k ] = (tw-ti)/totresist*real(sig);
