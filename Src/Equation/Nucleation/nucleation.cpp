@@ -36,6 +36,9 @@ Nucleation::Nucleation ( CommonHeatTransfer * CHT, Heaviside * HEAVI,
   }
   latent = cht->fluid()->latent()->value();
 
+  // 2023.0913
+  cps = cht->solid()->cp()->value();
+
 #ifndef USE_VOF_NUCL
   rcut = 4.*rseed;
 #endif
@@ -43,6 +46,7 @@ Nucleation::Nucleation ( CommonHeatTransfer * CHT, Heaviside * HEAVI,
   period_prevent_replant = 0.0;
   dxmin = vf->domain()->dxyz_min();
   eps = 1.5*dxmin;
+  set_pre_heat_sink( false );
   bzoning = false;
   zbtm = 0.0;
   threshold_c = 0.5;

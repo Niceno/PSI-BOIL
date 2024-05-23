@@ -21,6 +21,10 @@ real Microlayer::d0(const int i, const int j, const int k) const {
     d_return = boil::unreal;
   }
 
+#if 0
+  if (i==26&&j==21&&k==15)
+  std::cout<<"microlayer_d0:26,21,15 "<<rl<<" "<<d_return<<"\n";
+#endif
   return d_return;
 }
 

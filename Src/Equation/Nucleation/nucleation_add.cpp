@@ -7,13 +7,16 @@ void Nucleation::add(const Site & s) {
 
   sites.push_back(s);
   set_range(sites);
+  vol_area(sites);
+
 #if 0
-    std::cout<<"add:x "<<sites[0].x()<<" "<<sites[0].ic()<<" "
-             <<sites[0].is()<<" "<<sites[0].ie()<<"\n";
-    std::cout<<"add:y "<<sites[0].y()<<" "<<sites[0].jc()<<" "
-             <<sites[0].js()<<" "<<sites[0].je()<<"\n";
-    std::cout<<"add:z "<<sites[0].z()<<" "<<sites[0].kc()<<" "
-             <<sites[0].ks()<<" "<<sites[0].ke()<<"\n";
+    std::cout<<"add:x "<<sites[0].x()<<" i= "<<sites[0].ic()<<" is= "
+             <<sites[0].is()<<" ie= "<<sites[0].ie()<<"\n";
+    std::cout<<"add:y "<<sites[0].y()<<" j= "<<sites[0].jc()<<" js= "
+             <<sites[0].js()<<" je= "<<sites[0].je()<<"\n";
+    std::cout<<"add:z "<<sites[0].z()<<" k= "<<sites[0].kc()<<" ks= "
+             <<sites[0].ks()<<" ke= "<<sites[0].ke()<<" z+ "
+             <<vf->zc(sites[0].kc())<<" z- "<<vf->zc(sites[0].kc()-1)<<"\n";
 #endif
 
   /* add dummy sites for periodic boundary */

@@ -6,20 +6,19 @@ real Nucleation::tpr_site(const int ns ) {
 *  \brief calculate average temperature of nucleation site
 *******************************************************************************/
 
-  real xs = sites[ns].x();
-  real ys = sites[ns].y();
-  real zs = sites[ns].z();
-
   real tpr_seed = -boil::unreal;
-  if( vf->domain()->contains_xyz( xs, ys, zs) ) {
-    /* seed is inside the decomposed domain */
-    tpr_seed = (cht->node_tmp_flu())[Comp::k()] /* only k-dir */
-                                    [sites[ns].ic()]
-                                    [sites[ns].jc()]
-                                    [sites[ns].kc()];
+
+  if (sites[ns].contain_site()) {
+    tpr_seed = cht->tmp()[sites[ns].ic_site()]
+                         [sites[ns].jc_site()]
+                         [sites[ns].kc_site()]; // in solid
   }
   boil::cart.max_real(&tpr_seed);
-  //std::cout<<"tpr_seed= "<<tpr_seed<<"\n";
+
+  if(!boil::realistic(tpr_seed)) {
+    boil::oout<<"nucleation:tpr_site: Error!!!\n";
+    exit(0);
+  }
 
   return (tpr_seed);
 }

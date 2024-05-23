@@ -4,12 +4,13 @@
 *  cut neck of the bubble when the bottom-area < area_neck
 *******************************************************************************/
 void Nucleation::cutneck (const real area_neck) {
+#if 0
 
   /* set neck */
   for(int ns=0; ns<size(); ns++){
     bool bneck=false;
     real a_vapor=0.0;
-    if( time->current_time() > (sites[ns].time_seed() + seed_period) ) {
+    if( time->current_time() > (sites[ns].time_plant_clr() + seed_period) ) {
       a_vapor
 	= area_vapor_sum( Range<real>(sites[ns].x()-rcut, sites[ns].x()+rcut)
                         , Range<real>(sites[ns].y()-rcut, sites[ns].y()+rcut)
@@ -93,4 +94,8 @@ void Nucleation::cutneck (const real area_neck) {
       }
     }
   }
+#else
+  boil::oout<<"Nucleation::cutneck may not run in this version!  Exiting!\n";
+  exit(0);
+#endif
 }

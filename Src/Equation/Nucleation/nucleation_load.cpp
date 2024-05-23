@@ -42,15 +42,27 @@ void Nucleation::load(std::ifstream & in) {
     in.read(reinterpret_cast<char *> (&c2_saved), sizeof(real));
     add(Site(x_saved, y_saved, z_saved, c1_saved, c2_saved));
     in.read(reinterpret_cast<char *> (&t_saved), sizeof(real));
-    sites[ns].set_time_seed(t_saved);
+    sites[ns].set_time_plant_clr(t_saved);
     in.read(reinterpret_cast<char *> (&bseedp), sizeof(bool));
     sites[ns].set_seed_prev(bseedp);
     in.read(reinterpret_cast<char *> (&act), sizeof(bool));
     sites[ns].set_active(act);
+    if (pre_heat_sink()) {
+      real sqe, tTact;
+      bool bqsink;
+      in.read(reinterpret_cast<char *> (&sqe),    sizeof(real));
+      in.read(reinterpret_cast<char *> (&tTact),  sizeof(real));
+      in.read(reinterpret_cast<char *> (&bqsink), sizeof(bool));
+      sites[ns].set_sum_sink_energy(sqe);
+      sites[ns].set_time_Tact(tTact);
+      sites[ns].set_qsink(bqsink);
+    }
 
-    boil::oout<<"nucleation_load: "<<ns<<" "<<x_saved<<" "<<y_saved<<" "
-              <<z_saved<<" "<<c1_saved<<" "<<c2_saved<<" "
-              <<t_saved<<" "<<bseedp<<" "<<act<<"\n";
+    if (ns%1000==1) {
+      boil::oout<<"nucleation_load: "<<ns<<" "<<x_saved<<" "<<y_saved<<" "
+                <<z_saved<<" "<<c1_saved<<" "<<c2_saved<<" "
+                <<t_saved<<" "<<bseedp<<" "<<act<<"\n";
+    }
   }
 
 }

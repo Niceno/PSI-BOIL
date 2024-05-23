@@ -5,15 +5,16 @@ Site::Site (const real x, const real y, const real z,
             const real t, const real zpl) {
   xsite=x;
   ysite=y;
-  if (z<boil::nano) {
+  if (z<boil::pico) {
     //boil::oout<<"site: z is moved to "<<boil::pico<<"\n";
-    zsite=boil::nano;
+    zsite=boil::pico;
   } else {
     zsite=z;
   }
   set_active_tpr(t);
   set_zplant(zpl);
-  tseed=-boil::unreal;
+  tm_plant_clr=-boil::unreal;
+  tm_Tact=-boil::unreal;
   tcutneck=-boil::unreal;
   bseed_prev = false;
   bneck_prev = false;
@@ -21,6 +22,7 @@ Site::Site (const real x, const real y, const real z,
   allow_seed =true;  // answer to site for replant
   set_active(false); // default value. It is modified in phasechange_micro
   bqsink = false;
+  s_sum_energy = 0.0;
 
 #if 0
   real h = z + rs;                             // height of bubble seed

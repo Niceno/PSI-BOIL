@@ -120,7 +120,7 @@ void Grid1D::distribute_nodes_inside(const real & x1, const real & xn,
   +-----------------------------*/
   for(int i=boil::BW+1; i<nc_in+2; i++) 
     if(x_node[i] <= x_node[i-1]) {
-      boil::aout << "fprintf('Failure! Probably due to too big D1 and DN\\n')\n" << boil::endl;
+      boil::aout << "Failure! Probably due to too big D1 and DN" << boil::endl;
       exit(0);
     }
 }

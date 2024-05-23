@@ -7,14 +7,10 @@ real Nucleation::clr_site(const int ns ) {
 *******************************************************************************/
 
   real clr_seed = -boil::unreal;
-  real xs = sites[ns].x();
-  real ys = sites[ns].y();
-  real zs = sites[ns].z();
-  //std::cout<<"clr_site: "<<sites[ns].ic()<<" "<<sites[ns].jc()<<" "
-  //         <<sites[ns].kc()<<" "<<boil::cart.iam()<<"\n";
-  if ( vf->domain()->contains_xyz( xs, ys, zs) ) {
-    // seed is inside the decomposed domain
-    clr_seed = (*(cht->topo->clr))[sites[ns].ic()][sites[ns].jc()][sites[ns].kc()];
+  if (sites[ns].contain_site()) {
+    clr_seed = (*(cht->topo->clr))[sites[ns].ic_site()]
+                                  [sites[ns].jc_site()]
+                                  [sites[ns].kc_site()+1];  // fluid phase
   }
   boil::cart.max_real(&clr_seed);
 

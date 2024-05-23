@@ -12,6 +12,10 @@ real Nucleation::distance_from_site(const int i, const int j, const int k)
 
   /* genuine sites */
   //for (int ns=0; ns < size(); ns++){
+#if 0
+  if (i==26&&j==21&&k==15)
+    std::cout<<"distance_from_site:26,21,15 "<<id_nearRegion.size()<<"\n";
+#endif
   for (int id=0; id<id_nearRegion.size(); id++){
     int ns=id_nearRegion[id];
     if (sites[ns].active()) {

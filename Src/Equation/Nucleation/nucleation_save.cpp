@@ -28,7 +28,7 @@ void Nucleation::save(std::ofstream & out) {
     real z = sites[ns].z();
     real c1 = sites[ns].active_tpr();
     real c2 = sites[ns].zplant();
-    real tseed = sites[ns].time_seed();
+    real tseed = sites[ns].time_plant_clr();
     bool bseedp = sites[ns].seed_prev();
     bool act    = sites[ns].active();
     out.write(reinterpret_cast<const char *> (&x), sizeof(real));
@@ -39,6 +39,14 @@ void Nucleation::save(std::ofstream & out) {
     out.write(reinterpret_cast<const char *> (&tseed), sizeof(real));
     out.write(reinterpret_cast<const char *> (&bseedp), sizeof(bool));
     out.write(reinterpret_cast<const char *> (&act), sizeof(bool));
+    if (pre_heat_sink()) {
+      real sqe = sites[ns].sum_sink_energy();
+      real tTact = sites[ns].time_Tact();
+      bool bqsink = sites[ns].qsink();
+      out.write(reinterpret_cast<const char *> (&sqe),    sizeof(real));
+      out.write(reinterpret_cast<const char *> (&tTact),  sizeof(real));
+      out.write(reinterpret_cast<const char *> (&bqsink), sizeof(bool));
+    }
   }
 
 }
