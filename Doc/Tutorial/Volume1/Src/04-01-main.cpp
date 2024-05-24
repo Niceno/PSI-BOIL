@@ -14,7 +14,7 @@ main(int argc, char * argv[]) {
   for(int i=0; i<N; i++)
     for(int j=0; j<N; j++)
       for(int k=0; k<N; k++) {
-        a = acos(3.14);
+        a = acos(-1.0);
       }
 
   boil::timer.stop();

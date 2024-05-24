@@ -78,7 +78,7 @@ main(int argc, char * argv[]) {
 
   AC multigrid( &pr );
 
-  Location m0("m0", d, NX/2, NY/2, NX/4);
+  Location m0("m0", d, t.sI()+NX/2, t.sJ()+NY/2, t.sK()+NX/4);
 
   for(time.start(); time.end(); time.increase()) {
 
@@ -112,13 +112,15 @@ main(int argc, char * argv[]) {
   }
 
   boil::plot = new PlotTEC();
-  boil::plot->plot(uvw, t, "uvw,t", time.current_step()-1);
+  boil::plot->plot(uvw, t, "uvw-t", time.current_step()-1);
   boil::plot->plot(p,      "p",     time.current_step()-1);
 
-  Rack    r0("u-comp", d, NX/2+1, NY/2, Range<int>(1,NX));
-  Rack    r2("w-comp", d, Range<int>(1,NX), NY/2, NX/2+1);
+#if 0
+  Rack    r0("u-comp", d, t.sI()+NX/2+1, t.sJ()+NY/2, Range<int>(t.sK(),t.sK()+NX));
+  Rack    r2("w-comp", d, Range<int>(t.sI(),t.sI()+NX), t.sJ()+NY/2, t.sK()+NX/2+1);
   r0.print(uvw,Comp::u());
   r2.print(uvw,Comp::w());
+#endif
 
   const int ii = t.si();   /* i inside the domain */
   const int iw = ii-1;     /* i in the wall */
