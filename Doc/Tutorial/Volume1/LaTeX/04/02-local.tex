@@ -26,7 +26,7 @@ purpose but are used solely to illustrate timing features}:
      16   for(int i=0; i<N; i++)
      17     for(int j=0; j<N; j++)
      18       for(int k=0; k<N; k++) {
-     19         a = acos(-1.0);
+     19         a = acos(-1.0));
      20       }
      21
      22   boil::oout << "Running cos ..." << boil::endl;
@@ -35,7 +35,7 @@ purpose but are used solely to illustrate timing features}:
      25   for(int i=0; i<N; i++)
      26     for(int j=0; j<N; j++)
      27       for(int k=0; k<N; k++) {
-     28         a = cos(3.14);
+     28         a = cos(-1.0);
      29       }
      30
      31   boil::timer.stop();
@@ -80,7 +80,7 @@ following lines~({\tt 04-03-main.cpp}):
      28   for(int i=0; i<N; i++)
      29     for(int j=0; j<N; j++)
      30       for(int k=0; k<N; k++) {
-     31         a = cos(3.14);
+     31         a = cos(-1.0);
      32       }
      33   boil::timer.stop("cos algorithm");
 \end{verbatim}}

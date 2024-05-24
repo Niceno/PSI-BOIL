@@ -5,8 +5,7 @@
 The main reasons for that are free availability of {\tt C++} 
 compilers\footnote{\tt www.thefreecountry.com/compilers/cpp.shtml},
 {\tt MPI} libraries\footnote{\tt www-unix.mcs.anl.gov/mpi/mpich1, 
-www.open-mpi.org}
-{\tt cvs} program\footnote{\tt www.cvshome.org}, 
+www.open-mpi.org}, 
 {\tt make} facility and {\tt autotools}.
 % All these programs and libraries could be installed under Windows, but that
 % requires significant effort which would eventually {\em go in vain}, since 
@@ -18,173 +17,87 @@ It can be compiled for Windows as well, but only under the Cygwin sub-system,
 being a Linux-like environment for Windows. Cygwin comes with all tools and
 libraries necessary to compile {\psiboil}, {\em except} {\tt MPI} libraries.
 
-\subsection{Obtaining the {\psiboil} as tarball}
+\subsection{Prerequisites for obtaining the {\psiboil}}
 
-If you obtain {\psiboil} sources as a tarball, untar it in:
-
-\begin{verbatim}
-	> ~/Developemt/PSI-Boil
-\end{verbatim}
-
-Then you can skip the following parts in~\ref{sec_obtaining}, and jump to~\ref{sec_compiling}.
-
-\subsection{Obtaining the {\psiboil} via CVS}
-
-{\psiboil} is stored as a {\tt CVS} database on PSI's {\tt afs} system. Before you
-try to obtain the sources, make sure that you have:
+{\psiboil} is stored in {\tt Github}  (https://github.com/Niceno/PSI-BOIL). 
+Before you try to obtain the sources, make sure that you have:
 
 \begin{itemize}
-  \item an account on PSI's {\tt afs} system,
+  \item an account on {\tt Github},
   \item access to a Linux-based PC or workstation (computer,
         for short) {\em or} a Windows-based PC with Cygwin,
-  \item {\tt CVS} installed on your system.
+  \item {\tt git} installed on your system.
 \end{itemize}
 
-In most cases, you get an account on PSI's {\tt afs} system as soon as you
-become PSI's employee, but in case you are not sure, or you are sure 
-you do not have it, contact PSI's IT support person.
-
-If you are sure you have an {\tt afs} account, you must also make sure you
-have access to a Linux-based computer on which you want to compile 
-and run {\psiboil}. That might be either your local PC, a remote cluster, 
-or even a remote supercomputer (such as the ones at CSCS\footnote{\tt www.cscs.ch} 
-in Manno). 
-Remote computers can be accessed either from local PCs running Linux 
-(easy and recommended) or Windows. In latter case, you may eiteher use
-Cygwin sub-system, or a
-program like {\tt putty\footnote{\tt www.putty.org}} and X-libraries for Windows 
-(such as {\tt X-ming\footnote{\tt sourceforge.net/projects/xming}}) to
-access the computer where you want to use {\psiboil}. Note that Cygwin can
-be used as a replacement for {\tt putty + X-ming} to act as a terminal
-to a Linux-based computer on which you compile and run, but it can also
-be used as the environment for compiling and running under Windows itself. 
-
-Once you access the Linux-based system on which you want to use {\psiboil},
-it is very unlikely that it will not have a {\tt CVS} installation on it. 
-To check it, try typing:
-%
+To obtain the source code, type the next command:
 \begin{verbatim}
-> cvs
+	> git clone https://github.com/Niceno/PSI-BOIL
 \end{verbatim}
 %
 (followed by enter) in your shell and you should get something like:
 %
 {\small \begin{verbatim}
-Usage: cvs [cvs-options] command [command-options-and-arguments]
-  where cvs-options are -q, -n, etc.
-    (specify --help-options for a list of options)
-  where command is add, admin, etc.
-    (specify --help-commands for a list of commands
-     or --help-synonyms for a list of command synonyms)
-  where command-options-and-arguments depend on the specific command
-    (specify -H followed by a command name for command-specific help)
-  Specify --help to receive this message
-
-The Concurrent Versions System (CVS) is a tool for version control.
-For CVS updates and additional information, see
-    the CVS home page at http://www.cvshome.org/ or
-    Pascal Molli's CVS site at http://www.loria.fr/~molli/cvs-index.html
+		remote: Enumerating objects: 12801, done.
+		remote: Counting objects: 100% (926/926), done.
+		remote: Compressing objects: 100% (498/498), done.
+		remote: Total 12801 (delta 447), reused 856 (delta 419), pack-reused 11875
+		Receiving objects: 100% (12801/12801), 58.93 MiB | 21.76 MiB/s, done.
+		Resolving deltas: 100% (8691/8691), done.
 \end{verbatim}}
 
-\subsection{Adjusting the shell environment for {\tt CVS}}
+Then the folder {\tt PSI-BOIL} is created, which stores all the codes. 
 
-If all of the above requirements are met, you are almost ready to get
-the sources. However, the sources are retrieved by {\tt CVS} and it needs to
-know where is the {\em repository}. {\tt CVS} is {\em instructed} by two 
-environment variables: {\tt CVS\_RSH} and {\tt CVSROOT}. The formers instructs
-{\tt CVS} which client program to use to access the repository and the letter
-points to location of repository. These environment variables should be set 
-in your shell initialization file. In case you use {\tt bash} shell, you should
-edit the {\tt .bashrc} file and add the following two lines to it:
+\subsection{Usage of {\tt git}}
 
+Please refer some books or ask {\tt ChatGPT} about the usage of {\tt Github}.  Here, several useful commands are listed. 
+
+First, change directory to the folder: PSI-BOIL.
 \begin{verbatim}
-#-----#
-# CVS #
-#-----#
-export CVS_RSH=ssh
-export CVSROOT=:ext:your_afs_name@savannah.psi.ch:/afs/psi.ch/project/lth-sd/.CR
+	> cd PSI-BOIL
 \end{verbatim}
 
-where {\tt your\_afs\_name} has to be replaced with your {\tt afs} name, clearly. 
-Once you add these lines into your {\tt .bashrc}, you should {\em source} it for 
-the changes to take effect, using the following command:
-
+Then, to list all the branches of PSI-BOIL in {\tt Github},
 \begin{verbatim}
-> source ~/.bashrc
+	> git branch -a
 \end{verbatim}
 
-Alternatively, you may log out and log in to your system again. 
-
-\subsection{Retrieving the sources from {\tt CVS} database}
-
-Once the environment variables for {\tt CVS} are set, you can go to directory
-where you want {\psiboil} sources (for example: \verb"~"{\tt /Development} and get 
-them with:
-%
+To show the current branch,
 \begin{verbatim}
-> cvs checkout PSI-Boil
-\end{verbatim}
-%
-You will be asked for your password at {\tt savannah}:
-
-\begin{verbatim}
-your_afs_name@savanna.psi.ch's password:
+	> git branch --contains
 \end{verbatim}
 
-You should provide your {\tt afs} password at this point. When you do it, the
-sources will start to appear in your directory. The output will look roughly 
-like this:
+To switch to a branch, named e.g. branch\_to\_switch,
 
-{\small \begin{verbatim}
-...
-cvs checkout: Updating PSI-Boil/Src/Parallel
-U PSI-Boil/Src/Parallel/Makefile.am
-U PSI-Boil/Src/Parallel/communicator.cpp
-U PSI-Boil/Src/Parallel/communicator.h
-U PSI-Boil/Src/Parallel/mpi_macros.h
-cvs checkout: Updating PSI-Boil/Src/Parallel/Out
-U PSI-Boil/Src/Parallel/Out/Makefile.am
-U PSI-Boil/Src/Parallel/Out/out.cpp
-U PSI-Boil/Src/Parallel/Out/out.h
-U PSI-Boil/Src/Parallel/Out/print.h
-cvs checkout: Updating PSI-Boil/Src/Plot
-U PSI-Boil/Src/Plot/Makefile.am
-U PSI-Boil/Src/Plot/plot.cpp
-U PSI-Boil/Src/Plot/plot.h
-cvs checkout: Updating PSI-Boil/Src/Plot/GMV
-U PSI-Boil/Src/Plot/GMV/Makefile.am
-U PSI-Boil/Src/Plot/GMV/plot_gmv.cpp
-U PSI-Boil/Src/Plot/GMV/plot_gmv.h
-cvs checkout: Updating PSI-Boil/Src/Plot/TEC
-U PSI-Boil/Src/Plot/TEC/Makefile.am
-U PSI-Boil/Src/Plot/TEC/plot_tec.cpp
-U PSI-Boil/Src/Plot/TEC/plot_tec.h
-...
-\end{verbatim}}
+\begin{verbatim}
+	> git checkout branch_to_switch
+\end{verbatim}
 
-This source retrieval might take few minutes, depending on the speed of your
-connection with {\tt savannah.psi.ch}. 
+
+To create a new branch (new\_branch) from a source branch (source\_branch),
+\begin{verbatim}
+	> git checkout -b new_branch old_branch
+	 (if you have access right)
+	> git push origin new_branch 
+\end{verbatim}
 
 
 %---------------------------------------------------------------------nutshell-%
 \vspace*{5mm} \fbox{ \begin{minipage}[c] {0.97\textwidth} %-----------nutshell-%
     {\sf Section \ref{sec_obtaining} in a nutshell} \\ %--------------nutshell-%
 
-    - To obtain {\psiboil} sources via CVS, you need:
+    - To obtain {\psiboil} sources, you need:
     %
     \begin{itemize}
-      \item an account on PSI {\tt afs} system,
+      \item an account on {\tt Github} system,
       \item access to a Linux-based computer or Windows-based PC with Cygwin,
             either with access to PSI's {\tt afs},
-      \item {\tt CVS} software (installed on almost every Linux).
-      \item environment variables {\tt CVS\_RSH} and {\tt CVSROOT} must be set
-            properly.
+      \item {\tt git} software (installed on almost every Linux).
     \end{itemize}
 
     -Provided all of the above is fulfilled, you get the sources with the
     command: 
     \begin{itemize}
-      \item {\tt cvs checkout PSI-Boil}
+      \item {\tt git clone https://github.com/Niceno/PSI-BOIL}
     \end{itemize}
   \end{minipage} } %--------------------------------------------------nutshell-%
 %---------------------------------------------------------------------nutshell-%
