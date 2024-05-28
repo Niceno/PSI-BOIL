@@ -43,6 +43,7 @@ AC_OUTPUT(Makefile                                     \
           Src/Equation/Lagrangian/Makefile             \
           Src/Equation/Nucleation/Makefile             \
           Src/Equation/Pathline/Makefile               \
+          Src/Equation/Pathline/SolidParticle/Makefile \
           Src/Equation/Tifmodel/Makefile               \
           Src/Equation/Topology/Makefile               \
           Src/Boundary/Makefile                        \
@@ -70,4 +71,5 @@ AC_OUTPUT(Makefile                                     \
           Src/Utilities/ChangeGrid/Makefile            \
           Src/Utilities/ChangeProc/Makefile            \
           Src/Template/Makefile                        \
+          Src/Custom/Makefile                          \
           Src/Custom/IF97/Makefile)

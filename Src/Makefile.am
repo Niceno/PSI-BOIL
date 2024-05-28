@@ -29,6 +29,7 @@ SUBDIRS = Equation/Staggered/Momentum      \
           Equation/Lagrangian              \
           Equation/Nucleation              \
           Equation/Pathline                \
+          Equation/Pathline/SolidParticle  \
           Equation/Tifmodel                \
           Equation/Topology                \
           Monitor/Rack                     \
@@ -58,6 +59,7 @@ SUBDIRS = Equation/Staggered/Momentum      \
           Parallel/Out                     \
           Parallel                         \
           Template                         \
+          Custom                           \
           Custom/IF97
 
 LDADD = Equation/Staggered/Momentum/libMomentum.a            \
@@ -86,6 +88,7 @@ LDADD = Equation/Staggered/Momentum/libMomentum.a            \
 	Equation/Lagrangian/libLagrangian.a                  \
 	Equation/Nucleation/libNucleation.a                  \
 	Equation/Pathline/libPathline.a                      \
+	Equation/Pathline/SolidParticle/libSolidParticle.a   \
         Equation/Tifmodel/libTif.a                           \
         Equation/Topology/libTopology.a                      \
         Monitor/Rack/libRack.a                               \
@@ -116,6 +119,7 @@ LDADD = Equation/Staggered/Momentum/libMomentum.a            \
         Parallel/libParallel.a                               \
         Template/libTemplate.a                               \
         Domain/libDomain.a                                   \
+        Custom/libCustom.a                                   \
         Custom/IF97/libIF97.a
 ### Domain/libDomain.a is define twice because of compile error in the case that
 ### vector_bnd_extract_global is used.

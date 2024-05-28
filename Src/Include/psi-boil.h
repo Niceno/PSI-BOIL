@@ -25,6 +25,7 @@
 #include "../Equation/Heaviside/marching_cube.h"
 #include "../Equation/Lagrangian/lagrangian.h"
 #include "../Equation/Pathline/pathline.h"
+#include "../Equation/Pathline/SolidParticle/solidparticle.h"
 #include "../Equation/Tifmodel/tif.h"
 #include "../Equation/Topology/topology.h"
 #include "../Timer/timer.h"
@@ -37,4 +38,5 @@
 #include "../Body/Empty/empty.h"
 #include "../Profile/profile.h"
 #include "../Model/model.h"
+#include "../Custom/custom.h"
 #include "../Custom/IF97/if97.h"
