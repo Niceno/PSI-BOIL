@@ -4,7 +4,7 @@
 #include "../Field/Scalar/scalar.h"
 #include "../Field/Vector/vector.h"
 #include "../Equation/Centered/CIPCSL2/cipcsl2.h"
-#include "../Equation/Centered/PhaseChange4/phasechange4.h"
+//#include "../Equation/Centered/PhaseChange4/phasechange4.h"
 #include "../Equation/Centered/VOF/vof.h"
 #include "../Equation/Nucleation/nucleation.h"
 #include "../Matter/matter.h"
@@ -18,6 +18,7 @@
 ////////////////////////
 namespace boil {
 
+#if 0
   /* cell-center velocities */
   void cell_center_velocities(const Vector & uvw,
                               Scalar & u, Scalar & v, Scalar & w);
@@ -107,12 +108,13 @@ namespace boil {
 
   /* setup circle */
   void setup_circle_xz(Scalar & c, const real radius, const real xcent, const real zcent);
-
+#endif
   /* setup sphere */
   real setup_sphere(Scalar & c, const real radius,
                     const real xcent, const real ycent, const real zcent,
                     const real mm = 20);
-
+  void update_step(const Scalar & c, Scalar & step, Scalar & sflag);
+#if 0
   /* setup square */
   void setup_plane(VOF & conc, const real nnx,
                    const real nny, const real nnz,
@@ -138,6 +140,7 @@ namespace boil {
   inline void print_line(T a) {
     boil::oout<<a<<boil::endl;
   }
+#endif
 }
 
 #endif
