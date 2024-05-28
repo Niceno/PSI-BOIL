@@ -758,7 +758,10 @@ void PlotTEC::plot(const Pathline & pl,
 
     // visit cannot read the next line.
     //out << "#Number_of_variables= "<<6+pl.nval()<<"\n";
-    out << "VARIABLES= X Y Z U V W ";
+    out << "VARIABLES= X Y Z U V W ID ";
+    if(pl.dia_den()) {
+      out << "Diameter Density ";
+    }
     std::string vname;
     if (pl.nval()>=1) { 
       vname = "A"; if(pl.s1->name().length() > 0) vname = pl.s1->name();
@@ -784,7 +787,12 @@ void PlotTEC::plot(const Pathline & pl,
           << pl.particles[ip].z()<<" "
           << pl.particles[ip].u()<<" "
           << pl.particles[ip].v()<<" "
-          << pl.particles[ip].w()<<" ";
+          << pl.particles[ip].w()<<" "
+          << pl.particles[ip].id()<<" ";
+      if(pl.dia_den()) {
+        out << pl.particles[ip].diameter()<<" "
+            << pl.particles[ip].density()<<" ";
+      }
       //if (pl.nval()>=1) out << pl.particles[ip].sval(1)<<" ";
       //if (pl.nval()>=2) out << pl.particles[ip].s2()<<" ";
       //if (pl.nval()>=3) out << pl.particles[ip]->sval(3)<<" ";
