@@ -38,6 +38,8 @@ class Matter {
            const Scalar * cda = NULL,  /* concentration of dispersed "a" */
            const Scalar * cdb = NULL); /* concentration of dispersed "b" */
 
+    const Domain * domain() const {return dom;}
+
     real rho   (const int i,
                 const int j,
                 const int k) const {return dens->value(i,j,k);}
