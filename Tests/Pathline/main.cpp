@@ -10,8 +10,8 @@ void update_step(const Scalar & c, Scalar & step, Scalar & sflag);
 
 const int NX= 128;
 const int NZ= NX*1;
-const real RB = 0.5 * 0.0261;  // diameter = 0.0261 m
-const real LX = RB*12.0;
+const real radius = 0.5 * 0.0261;  // diameter = 0.0261 m
+const real LX = radius*12.0;
 const real LZ = LX*NZ/NX; 
 
 const real gravity = -9.8;
@@ -137,91 +137,88 @@ int main(int argc, char * argv[]) {
 #endif
 
   /* Pathline */
-  //Pathline pathline(uvw, & time);
   Pathline pathline(uvw, & time, & c, & press, & p);
 
-  /*--------------------+
-  |  initial condition  |
-  +--------------------*/
-#if 1
-  /* color function */
-  for_vijk(c,i,j,k)
-    c[i][j][k] = 1.0;
 
-  const real radius=RB;
-  const real zcent =LZ*0.1;
-  for_vijk(c,i,j,k) {
-    real dist=sqrt(pow(c.xc(i),2.0)+pow(c.yc(j),2.0)+pow((c.zc(k)-zcent),2.0));
-    if (dist<radius*0.75) {
-      c[i][j][k]=0.0;
-    } else if(dist<radius*1.25) {
-      int mm=8;
-      real x0=d.xn(i);
-      real y0=d.yn(j);
-      real z0=d.zn(k);
-      real ddx=d.dxc(i)/real(mm);
-      real ddy=d.dyc(j)/real(mm);
-      real ddz=d.dzc(k)/real(mm);
-      int itmp=0;
-      for (int ii=0; ii<mm; ii++){
-        for (int jj=0; jj<mm; jj++){
-          for (int kk=0; kk<mm; kk++){
-            real xxc=x0+0.5*ddx+real(ii)*ddx;
-            real yyc=y0+0.5*ddy+real(jj)*ddy;
-            real zzc=z0+0.5*ddz+real(kk)*ddz;
-            real dist=sqrt(pow(xxc,2.0)+pow(yyc,2.0)+pow(zzc-zcent,2.0));
-            if (dist>radius){
-              itmp=itmp+1;
-            }
-          }
-        }
+  /*-------------------------------+
+  |  initial condition or restart  |
+  +-------------------------------*/
+  int ts=0;
+  bool restart = false;
+
+  std::fstream input;
+  input.open("time.txt", std::ios::in);
+  if( !input.fail() ) {
+    restart=true;
+  }
+
+  if( restart ) {
+    /*----------+
+    |  restart  |
+    +----------*/
+    real t,dtf;
+    input >> ts;
+    input >> t;
+    input >> dtf;
+    time.first_step(ts);
+    time.current_time(t);
+    time.set_dt(dtf);
+
+    uvw.load     ("uvw",     ts);
+    press.load   ("press",   ts);
+    c.load       ("c",       ts);
+    pathline.load("pathline",ts);
+
+  } else {
+    /*--------------------+
+    |  initial condition  |
+    +--------------------*/
+
+    /* color function */
+    // initialize (not mandatory)
+    c = 0.0;
+
+    // define bubble center
+    const real xcent =0.0;
+    const real ycent =0.0;
+    const real zcent =LZ*0.1;
+    // define sphere (inside = 1, outside = 0)
+    boil::setup_sphere(c, radius, xcent, ycent, zcent, 8);
+
+    // reverse
+    for_vijk(c,i,j,k)
+      c[i][j][k] = 1.0 - c[i][j][k];
+    c.exchange_all();
+    c.bnd_update();
+
+    /* pathlines */
+    // pattern 1: define in each decomposed domain
+    for_vijk(c,i,j,k) {
+      if (c[i][j][k]< 0.5) {
+         if (i%2==0 && j%2==0 && k%2==0) {
+           pathline.add_local(c.xc(i),c.yc(j),c.zc(k));
+         }
       }
-      c[i][j][k]=real(itmp)/real(mm*mm*mm);
     }
-  }
-  c.bnd_update();
-  c.exchange_all();
-
-  /* pathlines */
-  // pattern 1: define in each decomposed domain
-  for_vijk(c,i,j,k) {
-    if (c[i][j][k]< 0.5) {
-       if (i%2==0 && j%2==0 && k%2==0) {
-         pathline.add_local(c.xc(i),c.yc(j),c.zc(k));
-       }
-    }
-  }
-  pathline.exchange();  // Never forget this!
+    pathline.exchange();  // Never forget this!
   
-  // pattern 2: define by coordinates
-  for (int i = 0; i < 32; i++) {
-    for (int j = 0; j < 32; j++) {
-      real xx = 2.0 * dxmin * i;
-      real yy = 2.0 * dxmin * j;
-      pathline.add_global(xx,yy,0.5*LZ);
+    // pattern 2: define by coordinates
+    for (int i = 0; i < 32; i++) {
+      for (int j = 0; j < 32; j++) {
+        real xx = 2.0 * dxmin * i;
+        real yy = 2.0 * dxmin * j;
+        pathline.add_global(xx,yy,0.5*LZ);
+      }
     }
-  }
-  pathline.init();
+    pathline.init();
 
-  boil::plot->plot(uvw,c,press, "uvw-c-press",0);
-  boil::plot->plot(pathline, "particles",0);
-  conc.front_minmax();
-#else
-  /*----------+
-  |  restart  |
-  +----------*/
-  int ts=200;
-  real tct=0.0445188;
-  time.first_step(ts);
-  time.current_time(dt*real(tct));
-  uvw.load     ("uvw",     ts);
-  press.load   ("press",   ts);
-  c.load       ("c",       ts);
-  pathline.load("pathline",ts);
-#endif
+    boil::plot->plot(uvw,c,press, "uvw-c-press",0);
+    boil::plot->plot(pathline, "particles",0);
+    conc.front_minmax();
+  }
 
 #ifndef USE_VOF
-  update_step(c, step, sflag);
+  boil::update_step(c, step, sflag);
 #endif
 
   /* set iint */
@@ -271,7 +268,7 @@ int main(int argc, char * argv[]) {
     conc.new_time_step();
     conc.advance();
 #ifndef USE_VOF
-    update_step(c, step, sflag);
+    boil::update_step(c, step, sflag);
 #endif
     conc.totalvol();
     conc.front_minmax();
@@ -301,10 +298,27 @@ int main(int argc, char * argv[]) {
       iint = int(time.current_time()/tint) + 1;
     }
     if( time.current_step() % nint == 0 ) {
+      // output variables (*.bck) for restart
       uvw.save     ("uvw",     time.current_step());
       press.save   ("press",   time.current_step());
       c.save       ("c",       time.current_step());
       pathline.save("pathline",time.current_step());
+      // output time-*.txt file
+      if( boil::cart.iam()==0) {
+        std::fstream output;
+        std::stringstream ss;
+        ss <<"time-"<<time.current_step()<<".txt";
+        std::string fname = ss.str();
+        int len = fname.length();
+        char * cfname = new char[len+1];
+        memcpy(cfname, fname.c_str(), len+1);
+        output << std::setprecision(16);
+        output.open(cfname, std::ios::out);
+        output << time.current_step() << boil::endl;
+        output << time.current_time()+time.dt() << boil::endl;
+        output << time.dt() << boil::endl;
+        output.close();
+      }
     }
 
     /*---------+
@@ -323,57 +337,3 @@ int main(int argc, char * argv[]) {
 
 }
 
-/******************************************************************************/
-void update_step(const Scalar & c, Scalar & step, Scalar & sflag){
-  const real phisurf=0.5;
-  for_avijk(sflag,i,j,k) {
-    sflag[i][j][k]=0;
-  }
-  for_vijk(c,i,j,k) {
-    if(c[i][j][k]>=phisurf)
-      sflag[i][j][k]=1;
-  }
-  /* i-direction */
-  for(int i=c.si()-1; i<=c.ei(); i++){
-    for_vjk(c,j,k){
-       if((c[i][j][k]-phisurf)*(c[i+1][j][k]-phisurf)<=0.0){
-          sflag[i  ][j][k]=2;
-          sflag[i+1][j][k]=2;
-       }
-    }
-  }
-  /* j-direction */
-  for(int j=c.sj()-1; j<=c.ej(); j++){
-    for_vik(c,i,k){
-      if((c[i][j][k]-phisurf)*(c[i][j+1][k]-phisurf)<=0.0){
-          sflag[i][j  ][k]=2;
-          sflag[i][j+1][k]=2;
-       }
-    }
-  }
-  /* k-direction */
-  for(int k=c.sk()-1; k<=c.ek(); k++){
-    for_vij(c,i,j){
-       if((c[i][j][k]-phisurf)*(c[i][j][k+1]-phisurf)<=0.0){
-          sflag[i][j][k  ]=2;
-          sflag[i][j][k+1]=2;
-       }
-    }
-  }
-  sflag.exchange_all();
-  for_avijk(c,i,j,k){
-    if(sflag[i][j][k]==2){
-      step[i][j][k]=c[i][j][k];
-    } else {
-      if(c[i][j][k]<0.5){
-        step[i][j][k]=0.0;
-      } else {
-        step[i][j][k]=1.0;
-      }
-    }
-  }
-}
-	
-/*-----------------------------------------------------------------------------+
- '$Id: main-bubble-3d.cpp,v 1.5 2009/07/01 14:18:53 niceno Exp $'/
-+-----------------------------------------------------------------------------*/
