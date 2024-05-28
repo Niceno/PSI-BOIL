@@ -13,7 +13,9 @@
 class Particle {
 
   public:
-    Particle(const real r1, const real r2, const real r3, const int nval);
+    //Particle(const real x, const real y, const real z, const int nval);
+    Particle(const real x, const real y, const real z, const int nval,
+             const real di=NULL, const real de=NULL);
 
     real x() const {return xpos;}
     real y() const {return ypos;}
@@ -35,6 +37,12 @@ class Particle {
                                      + v_vel * v_vel
                                      + w_vel * w_vel);}
 
+    void diameter(real r) {dia=r;}
+    real diameter() const {return dia;}
+
+    void density(real r) {den=r;}
+    real density() const {return den;}
+
     /* additional scalar to be traced */
 
     real sval(const int i) const {return sca[i];}
@@ -45,8 +53,9 @@ class Particle {
 
   private:
 
-    real xpos,ypos,zpos;
-    real u_vel,v_vel,w_vel;
+    real xpos,  ypos,  zpos;
+    real u_vel, v_vel, w_vel;
+    real dia,   den;
     int  iid;
     std::vector<double> sca;
 

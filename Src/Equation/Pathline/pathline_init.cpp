@@ -61,7 +61,6 @@ void Pathline::init() {
 
     for (int ip = 0; ip < np(); ip++){
       particles[ip].sval(ival,utmp[ip]);
-      //if(ip==0)boil::oout<<"sval="<<particles[ip].sval(ival)<<"\n";
     }
   }
 

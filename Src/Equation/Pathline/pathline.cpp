@@ -15,6 +15,7 @@ Pathline::Pathline ( const Vector & v, const Times * t,
   npa = 0;
   nv = 0;
   id_serial = -1;
+  b_dia_den = false;
   if (s1 !=NULL) { nv = 1;}
   if (s2 !=NULL) { nv = 2;}
   if (s3 !=NULL) { nv = 3;}
