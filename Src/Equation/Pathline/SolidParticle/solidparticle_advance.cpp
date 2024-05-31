@@ -115,9 +115,13 @@ void SolidParticle::advance() {
     real Fdy = A * 0.5 * Cd * dflu[ip] * velmag * ((vflu[ip]-vp));
     real Fdz = A * 0.5 * Cd * dflu[ip] * velmag * ((wflu[ip]-wp));
     // Draf force limit = m * (up - uf)/dt
-    real Fdx_limit = mass * (up-uflu[ip])/dt;
-    real Fdy_limit = mass * (vp-vflu[ip])/dt;
-    real Fdz_limit = mass * (wp-wflu[ip])/dt;
+    // Derivation:     F = m * a
+    //            F * dt = m * a * dt
+    //            F * dt = m * (u2 - u1), where u2 is the updated velocity
+    //            The drag force makes u2 = u_fluid in the maximum condition
+    real Fdx_limit = mass * (uflu[ip]-up)/dt;
+    real Fdy_limit = mass * (vflu[ip]-vp)/dt;
+    real Fdz_limit = mass * (wflu[ip]-wp)/dt;
     // Limit Fd
     Fdx = copysign(1.0,Fdx) * boil::minr(fabs(Fdx),fabs(Fdx_limit));
     Fdy = copysign(1.0,Fdy) * boil::minr(fabs(Fdy),fabs(Fdy_limit));
