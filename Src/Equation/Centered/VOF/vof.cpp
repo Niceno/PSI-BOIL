@@ -35,6 +35,9 @@ VOF::VOF(const Scalar & PHI,
 |  this constructor is called only at the finest level  |
 +------------------------------------------------------*/
 { 
+#if 0
+  // If next lines are used, then boundary conditions are shared between nx, and phi
+  // when boundary condition fo nx is changed, then bc for phi, ny, nz, ... are modified automatically!
   kappa     = phi.shape();
   nx        = phi.shape();
   ny        = phi.shape();
@@ -48,7 +51,22 @@ VOF::VOF(const Scalar & PHI,
   iflag     = phi.shape();
   iflagx    = phi.shape();
   adens     = phi.shape();
-
+#else
+  for( int b=0; b<phi.bc().count(); b++ ) {
+    nx.bc().add(phi.bc().at(b));
+    ny.bc().add(phi.bc().at(b));
+    nz.bc().add(phi.bc().at(b));
+    mx.bc().add(phi.bc().at(b));
+    my.bc().add(phi.bc().at(b));
+    mz.bc().add(phi.bc().at(b));
+    nalpha.bc().add(phi.bc().at(b));
+    stmp.bc().add(phi.bc().at(b));
+    stmp2.bc().add(phi.bc().at(b));
+    iflag.bc().add(phi.bc().at(b));
+    iflagx.bc().add(phi.bc().at(b));
+    adens.bc().add(phi.bc().at(b));
+  }
+#endif
   for( int b=0; b<phi.bc().count(); b++ ) {
     if(    phi.bc().type(b) == BndType::dirichlet()
         || phi.bc().type(b) == BndType::inlet()
@@ -62,7 +80,7 @@ VOF::VOF(const Scalar & PHI,
        adens.bc().type(b) = BndType::neumann();
        mx.bc().type(b) = BndType::neumann();
        my.bc().type(b) = BndType::neumann();
-       mx.bc().type(b) = BndType::neumann();
+       mz.bc().type(b) = BndType::neumann();  // bug!!!
 
        boil::oout << "Adjusting b.c.s for geometrical properties at " << b
                   << boil::endl;
