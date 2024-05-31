@@ -10,14 +10,14 @@ void update_step(const Scalar & c, Scalar & step, Scalar & sflag);
 
 const int NX= 128;
 const int NZ= NX*1;
-const real radius = 0.5 * 0.0261;  // diameter = 0.0261 m
+const real radius = 0.5 * 0.0261;  // bubble diameter = 0.0261 m
 const real LX = radius*12.0;
 const real LZ = LX*NZ/NX; 
 
 const real gravity = -9.8;
 
-const real particle_density = 1.0e+3;
-const real particle_diameter = 1.0e-4;
+const real p_den = 1.0e+3;  // particle density
+const real p_dia = 1.0e-4;  // particle diameter
 
 /******************************************************************************/
 int main(int argc, char * argv[]) {
@@ -199,7 +199,7 @@ int main(int argc, char * argv[]) {
     for_vijk(c,i,j,k) {
       if (c[i][j][k]< 0.5) {
          if (i%2==0 && j%2==0 && k%2==0) {
-           solidp.add_local(c.xc(i),c.yc(j),c.zc(k),particle_diameter,particle_density);
+           solidp.add_local(c.xc(i), c.yc(j), c.zc(k), & p_dia, & p_den);
 	   np_local++;
          }
       }
@@ -208,16 +208,16 @@ int main(int argc, char * argv[]) {
     std::cout<<"main:np_local= "<<np_local<<"\n";
     boil::cart.sum_int(&np_local);
     boil::oout<<"main:np_global= "<<np_local<<"\n";
-#if 0 
+
     // pattern 2: define by coordinates
     for (int i = 0; i < 32; i++) {
       for (int j = 0; j < 32; j++) {
         real xx = 2.0 * dxmin * i;
         real yy = 2.0 * dxmin * j;
-        solidp.add_global(xx,yy,0.5*LZ,1e-6,1e+3);
+        solidp.add_global(xx, yy, 0.5*LZ, & p_dia, & p_den);
       }
     }
-#endif
+
     solidp.init();
 
     boil::plot->plot(uvw,c,press, "uvw-c-press",0);
