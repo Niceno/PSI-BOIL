@@ -102,7 +102,7 @@ VOF::VOF(const Scalar & PHI,
        adens.bc().type(b) = BndType::neumann();
        mx.bc().type(b) = BndType::neumann();
        my.bc().type(b) = BndType::neumann();
-       mx.bc().type(b) = BndType::neumann();
+       mz.bc().type(b) = BndType::neumann();
        iflag.bc().type(b) = BndType::neumann();
        tempflag.bc().type(b) = BndType::neumann();
        tempflag2.bc().type(b) = BndType::neumann();
