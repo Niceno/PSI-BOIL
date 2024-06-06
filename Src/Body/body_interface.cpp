@@ -623,7 +623,9 @@ real Body::fSt(const Comp & m, const int cc) const
 real Body::fSw(const Comp & m, const int i, const int j, const int k) const {
   const int cc = index[~m][i][j][k];
   if(cc == -1)
-    return 1.0;
+    //return 1.0;
+    if(fV(m,i,j,k)==0.0){return 0.0;}
+    else {return 1.0;}
   else
     return cells[~m][cc].fS(0,0);
 }
@@ -632,7 +634,9 @@ real Body::fSw(const Comp & m, const int i, const int j, const int k) const {
 real Body::fSe(const Comp & m, const int i, const int j, const int k) const {
   const int cc = index[~m][i][j][k];
   if(cc == -1)
-    return 1.0;
+    //return 1.0;
+    if(fV(m,i,j,k)==0.0){return 0.0;}
+    else {return 1.0;}
   else
     return cells[~m][cc].fS(0,1);
 }
@@ -641,7 +645,9 @@ real Body::fSe(const Comp & m, const int i, const int j, const int k) const {
 real Body::fSs(const Comp & m, const int i, const int j, const int k) const {
   const int cc = index[~m][i][j][k];
   if(cc == -1)
-    return 1.0;
+    //return 1.0;
+    if(fV(m,i,j,k)==0.0){return 0.0;}
+    else {return 1.0;}
   else
     return cells[~m][cc].fS(1,0);
 }
@@ -650,7 +656,9 @@ real Body::fSs(const Comp & m, const int i, const int j, const int k) const {
 real Body::fSn(const Comp & m, const int i, const int j, const int k) const {
   const int cc = index[~m][i][j][k];
   if(cc == -1)
-    return 1.0;
+    //return 1.0;
+    if(fV(m,i,j,k)==0.0){return 0.0;}
+    else {return 1.0;}
   else
     return cells[~m][cc].fS(1,1);
 }
@@ -659,7 +667,9 @@ real Body::fSn(const Comp & m, const int i, const int j, const int k) const {
 real Body::fSb(const Comp & m, const int i, const int j, const int k) const {
   const int cc = index[~m][i][j][k];
   if(cc == -1)
-    return 1.0;
+    //return 1.0;
+    if(fV(m,i,j,k)==0.0){return 0.0;}
+    else {return 1.0;}
   else
     return cells[~m][cc].fS(2,0);
 }
@@ -668,7 +678,9 @@ real Body::fSb(const Comp & m, const int i, const int j, const int k) const {
 real Body::fSt(const Comp & m, const int i, const int j, const int k) const {
   const int cc = index[~m][i][j][k];
   if(cc == -1)
-    return 1.0;
+    //return 1.0;
+    if(fV(m,i,j,k)==0.0){return 0.0;}
+    else {return 1.0;}
   else
     return cells[~m][cc].fS(2,1);
 }
