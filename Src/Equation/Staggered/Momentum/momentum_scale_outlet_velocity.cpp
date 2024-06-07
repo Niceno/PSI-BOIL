@@ -21,7 +21,8 @@ void Momentum::scale_outlet_velocity(const real ubo, const real ratio) {
         if( m == Comp::u() && d == Dir::imin() )
           for_vjk(u.bc(m).at(b),j,k)
             for(int ii=1; ii<=boil::BW; ii++) {
-              if (approx(dom->ibody().fSw(si(m)-1,j,k),0.0) ) {
+              //if (approx(dom->ibody().fSw(si(m)-1,j,k),0.0) ) {
+              if (dom->ibody().off(si(m)-1,j,k)) {
                 u[m][si(m)-ii][j][k] = 0.0;
               }else {
                 u[m][si(m)-ii][j][k] = -ubo;
@@ -30,7 +31,8 @@ void Momentum::scale_outlet_velocity(const real ubo, const real ratio) {
         if( m == Comp::u() && d == Dir::imax() )
           for_vjk(u.bc(m).at(b),j,k)
             for(int ii=1; ii<=boil::BW; ii++) {
-              if (approx(dom->ibody().fSe(ei(m)+1,j,k),0.0) ) {
+              //if (approx(dom->ibody().fSe(ei(m)+1,j,k),0.0) ) {
+              if (dom->ibody().off(ei(m)+1,j,k)) {
                 u[m][ei(m)+ii][j][k] = 0.0;
               } else {
                 u[m][ei(m)+ii][j][k] = +ubo;
@@ -39,7 +41,8 @@ void Momentum::scale_outlet_velocity(const real ubo, const real ratio) {
         if( m == Comp::v() && d == Dir::jmin() )
           for_vik(u.bc(m).at(b),i,k) 
             for(int jj=1; jj<=boil::BW; jj++) {
-              if (approx(dom->ibody().fSs(i,sj(m)-1,k),0.0) ) {
+              //if (approx(dom->ibody().fSs(i,sj(m)-1,k),0.0) ) {
+              if (dom->ibody().off(i,sj(m)-1,k)) {
                 u[m][i][sj(m)-jj][k] = 0.0;
               } else {
                 u[m][i][sj(m)-jj][k] = -ubo;
@@ -48,7 +51,8 @@ void Momentum::scale_outlet_velocity(const real ubo, const real ratio) {
         if( m == Comp::v() && d == Dir::jmax() )
           for_vik(u.bc(m).at(b),i,k)
             for(int jj=1; jj<=boil::BW; jj++) {
-              if (approx(dom->ibody().fSn(i,ej(m)+1,k),0.0) ) {
+              //if (approx(dom->ibody().fSn(i,ej(m)+1,k),0.0) ) {
+              if (dom->ibody().off(i,ej(m)+1,k)) {
                 u[m][i][ej(m)+jj][k] = 0.0;
               } else {
                 u[m][i][ej(m)+jj][k] = +ubo;
@@ -57,7 +61,8 @@ void Momentum::scale_outlet_velocity(const real ubo, const real ratio) {
         if( m == Comp::w() && d == Dir::kmin() )
           for_vij(u.bc(m).at(b),i,j) 
             for(int kk=1; kk<=boil::BW; kk++) {
-              if (approx(dom->ibody().fSb(i,j,sk(m)-1),0.0) ) {
+              //if (approx(dom->ibody().fSb(i,j,sk(m)-1),0.0) ) {
+              if (dom->ibody().off(i,j,sk(m)-1)) {
                 u[m][i][j][sk(m)-kk] = 0.0;
 	      } else {
                 u[m][i][j][sk(m)-kk] = -ubo;
@@ -66,7 +71,8 @@ void Momentum::scale_outlet_velocity(const real ubo, const real ratio) {
         if( m == Comp::w() && d == Dir::kmax() )
           for_vij(u.bc(m).at(b),i,j) 
             for(int kk=1; kk<=boil::BW; kk++) {
-              if (approx(dom->ibody().fSt(i,j,ek(m)+1),0.0) ) {
+              //if (approx(dom->ibody().fSt(i,j,ek(m)+1),0.0) ) {
+              if (dom->ibody().off(i,j,ek(m)+1)) {
                 u[m][i][j][ek(m)+kk] = 0.0;
               } else {
                 u[m][i][j][ek(m)+kk] = +ubo;
