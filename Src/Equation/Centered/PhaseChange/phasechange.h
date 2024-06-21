@@ -73,6 +73,12 @@ class PhaseChange : public Centered {
       boil::oout<<"EnthalpyFD:turbP= "<<turbP<<"\n";
     }
 
+    void set_rhol(const real r){
+      rhol = r;
+      boil::oout<<"EnthalpyFD:rhol= "<<rhol<<"\n";
+    }
+    real get_rhol(){return rhol;}
+
   private:
     void cal_gradt(const Scalar * diff_eddy = NULL);
     void distfunc(const Scalar & sca, const int itnum);
