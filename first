@@ -13,6 +13,7 @@ if [ $# -lt 1 ]; then
   echo "       " $0 "JULIER      -> configure for JULIER.CSCS.CH machine"
   echo "       " $0 "MPICH       -> configure for MPICH"
   echo "       " $0 "INTEL       -> configure for Intel-MPI with Intel compiler"
+  echo "       " $0 "INTEL2024   -> configure for Intel-MPI with Intel compiler 2024"
   echo "       " $0 "INTEL-PHI   -> configure for INTEL-PHI"
   echo "       " $0 "NOMPI       -> configure without MPI"
   echo "       " $0 "NOMPI-INTEL -> configure without MPI, for Intel"
@@ -96,6 +97,14 @@ else
     automake --add-missing
     #./configure CC=mpiicc CXX=mpiicpc CXXFLAGS='-O3 -opt-report=4'
     ./configure CC=mpiicc CXX=mpiicpc CXXFLAGS='-O2 -std=c++11'
+    #./configure CC=mpiicx CXX=mpiicpx CXXFLAGS='-O2 -std=c++11'
+    cd Src/Parallel; ln -f -s parallel.h mpi_macros.h; cd ../../
+  elif [ $1 = "INTEL2024" ]; then
+    aclocal
+    autoconf
+    autoheader
+    automake --add-missing
+    ./configure CC=mpiicx CXX=mpiicpx CXXFLAGS='-O2 -std=c++11'
     cd Src/Parallel; ln -f -s parallel.h mpi_macros.h; cd ../../
   elif [ $1 = "NOMPI-INTEL" ]; then
     aclocal
@@ -124,6 +133,7 @@ else
     echo "       " $0 "JULIER      -> configure for JULIER.CSCS.CH machine"
     echo "       " $0 "MPICH       -> configure for MPICH"
     echo "       " $0 "INTEL       -> configure for Intel-MPI with Intel compiler"
+    echo "       " $0 "INTEL2024   -> configure for Intel-MPI with Intel compiler 2024"
     echo "       " $0 "INTEL-PHI   -> configure for Intel-PHI"
     echo "       " $0 "NOMPI       -> configure without MPI"
     echo "       " $0 "NOMPI-INTEL -> configure without MPI, for Intel"
