@@ -16,7 +16,7 @@ main(int argc, char * argv[]) {
                N, 
                Periodic::no());
 
-  grid.plot("grid.eps");
+  //grid.plot("grid.eps");
 
   boil::timer.stop();
   boil::timer.report();
