@@ -154,7 +154,7 @@ were both uniform. Many problems require grid to be stretched towards
 the regions where important phenomena is occurring at smaller scales to
 resolve it more accurately. To create such {\em stretched} grids we need
 to pass the desired cell dimension at the beginning and the end of the grid
-to {\tt Grid1D}'s constructor. It is illustrated by the following program 
+to {\tt Grid1D}'s constructor. The grid is made by the following program 
 ({\tt 05-03-main.cpp}):
 %
 {\small \begin{verbatim}
@@ -176,7 +176,7 @@ to {\tt Grid1D}'s constructor. It is illustrated by the following program
      16                N,
      17                Periodic::no());
      18
-     19   grid.plot("grid.eps");
+     19   //grid.plot("grid.eps");
      20
      21   boil::timer.stop();
      22   boil::timer.report();
