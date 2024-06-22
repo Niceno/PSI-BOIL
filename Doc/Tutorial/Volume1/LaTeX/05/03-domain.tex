@@ -56,15 +56,15 @@ Domain is plotted in lines~21--23. Plotting is performed with the global {\psibo
 object~{\tt boil::plot}. This global object can be created in two ways, depending
 on the format of output files you would like to create. If you would like to plot
 your grids (and later results) in Tecplot\footnote{Tecplot is a registered trademark
-of Tecplot Inc.\ ({\tt www.tecplot.com})} format,
-create the {\tt boil::plot} as in line~22. If you prefer output files in General
-Mesh Viewer\footnote{{\tt www-xdiv.lanl.gov/XCM/gmv/GMVHome.html}}~(GMV) format, 
-change the line~22 to:
-%
-{\small \begin{verbatim}
-     22   boil::plot = new PlotGMV();
-\end{verbatim}}
-%
+of Tecplot Inc.\ ({\tt www.tecplot.com})} format,create the {\tt boil::plot} as 
+in line~22.
+
+The Tecplot format file, which is output from PSI-Boil, can be opened by the 
+visualization software e.g. Tecplot, Paraview\footnote{\ {\tt www.paraview.org}} 
+and VisIt\footnote{\ {\tt visit-dav.github.io/visit-website/}}. 
+The details of post-process will be provided in Section ~\ref{chap_post_process}.
+
+
 When running the program~{\tt 05-04-main.cpp}, you will get the following output:
 %
 {\small \begin{verbatim}
@@ -274,7 +274,6 @@ is plotted in~Fig.~\ref{fig_domain_double_stretched}.
  
       - {\tt boil::plot} can be defined as:
       \begin{itemize}
-        \item {\tt boil::plot = new PlotGMV();} for plotting with GMV,
         \item {\tt boil::plot = new PlotTEC();} for plotting with Tecplot.
       \end{itemize}
 
