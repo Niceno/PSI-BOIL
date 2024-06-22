@@ -6,7 +6,12 @@ declare -i numprocs=0
 declare -i numfiles=0
 for filename in *.dat; do
     IFS="_" arr=($filename) # split file name according to _
-    procnum=${arr[1]} # e.g. p001
+    if [ ${#arr[@]} -eq 2 ]; then
+      procnum=${arr[1]//.dat}    # e.g. p000.dat -> p000
+    else
+      procnum=${arr[1]} # e.g. p001
+    fi
+    #echo $procnum
     if [[ $procnum != "pall" ]]; then
       numfiles=$((numfiles + 1))
       procnum=${procnum//p}    # p001 -> 001
@@ -17,6 +22,7 @@ for filename in *.dat; do
     fi
 done
 numprocs=$((numprocs + 1)) # numbering starts with zero
+echo numproc= $numprocs
 
 #if [ $# -eq 0 ];  then
 #    echo "Number of processors must be specified!"
@@ -27,11 +33,28 @@ numprocs=$((numprocs + 1)) # numbering starts with zero
 # perform gather
 for filename in *.dat; do
     IFS="_" arr=($filename) # split file name according to _
+    #echo ${#arr[@]}         # number of arr
+
+    # keyword
     keyword=${arr[0]}       # e.g. uvw-tpr-press
-    procnum=${arr[1]}       # e.g. p000
+
+    # procnum
+    if [ ${#arr[@]} -eq 3 ]; then
+      procnum=${arr[1]}       # e.g. p000
+    fi
+    if [ ${#arr[@]} -eq 2 ]; then
+      procnum=${arr[1]//.dat}    # e.g. p000.dat -> p000
+    fi
     procnum2=$(expr ${procnum#?} + 0)   # p000 -> 000 -> 0
-    step=${arr[2]//.dat}    # e.g. 000023.dat -> 000023
-    step=$(expr $step + 0)  # 000023 -> 23
+
+    # step
+    if [ ${#arr[@]} -eq 3 ]; then
+      step=${arr[2]//.dat}    # e.g. 000023.dat -> 000023
+      step=$(expr $step + 0)  # 000023 -> 23
+    else
+      step="-1"
+    fi
+    #echo step= $step numproccs= $numprocs
     IFS="-" arr=($keyword)  # uvw-tpr-press -> uvw tpr press
     declare -i varnum=${#arr[@]}    # uvw+tpr+press = 3     
     varnum=$((varnum + 2))          # u+v+w+tpr+press = 5
@@ -39,16 +62,16 @@ for filename in *.dat; do
     add="_p"
     keyword="$keyword$add"  # uvw-tpr-press -> uvw-tpr-press_p
     if [[ $procnum != "pall" ]] && [[ $procnum2 -eq 0 ]]; then
-      # run gather-szplt with the given arguments for each file in folder
+      # run gather with the given arguments for each file in folder
       printf '%s\n' "$numprocs" "6" "$step" "$step" "1" "$keyword" | gather-szplt.exe
    fi
 done
 
 # change extension to .plt so that visit recognises the tecplot format
-for filename in *.dat; do
-    IFS="_" arr=($filename) # split file name according to _
-    procnum=${arr[1]}       # e.g. p000
-    if [[ $procnum == "pall" ]]; then
-      mv "$filename" "${filename%.dat}.plt"
-    fi
-done
+#for filename in *.dat; do
+#    IFS="_" arr=($filename) # split file name according to _
+#    procnum=${arr[1]}       # e.g. p000
+#    if [[ $procnum == "pall" ]]; then
+#      mv "$filename" "${filename%.dat}.plt"
+#    fi
+#done

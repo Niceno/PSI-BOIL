@@ -76,20 +76,46 @@
       ntime=nstart+(istep-1)*interval
 
       call int2char(ntime,ctmp,ndigit)
-      DO ip=1,np
-         if(ip-1<=999)then
-           call int2char3(ip-1,ctmp3)
-           fname(ip)=trim(fncommon)//ctmp3//"_"//ctmp(1:ndigit)//".dat"
-         else if(ip-1<=9999)then
-           call int2char4(ip-1,ctmp4)
-           fname(ip)=trim(fncommon)//ctmp4//"_"//ctmp(1:ndigit)//".dat"
-         else
-           call int2char5(ip-1,ctmp5)
-           fname(ip)=trim(fncommon)//ctmp5//"_"//ctmp(1:ndigit)//".dat"
-         endif
-         write(*,*)trim(fname(ip))
-      ENDDO
-      fname_out=trim(fncommon)//"all_"//ctmp(1:ndigit)//".plt"
+
+      WRITE(*,*) "nstart=",nstart
+      IF (nstart.ge.0) THEN
+
+        DO ip=1,np
+           if(ip-1<=999)then
+             call int2char3(ip-1,ctmp3)
+             fname(ip)=trim(fncommon)//ctmp3//"_"//ctmp(1:ndigit)//".dat"
+           else if(ip-1<=9999)then
+             call int2char4(ip-1,ctmp4)
+             fname(ip)=trim(fncommon)//ctmp4//"_"//ctmp(1:ndigit)//".dat"
+           else
+             call int2char5(ip-1,ctmp5)
+             fname(ip)=trim(fncommon)//ctmp5//"_"//ctmp(1:ndigit)//".dat"
+           endif
+           write(*,*)trim(fname(ip))
+        ENDDO
+        fname_out=trim(fncommon)//"all_"//ctmp(1:ndigit)//".plt"
+
+      ELSE 
+
+        DO ip=1,np
+           if(ip-1<=999)then
+             call int2char3(ip-1,ctmp3)
+             fname(ip)=trim(fncommon)//ctmp3//".dat"
+           else if(ip-1<=9999)then
+             call int2char4(ip-1,ctmp4)
+             fname(ip)=trim(fncommon)//ctmp4//".dat"
+           else
+             call int2char5(ip-1,ctmp5)
+             fname(ip)=trim(fncommon)//ctmp5//".dat"
+           endif
+           write(*,*)trim(fname(ip))
+        ENDDO
+        fname_out=trim(fncommon)//"all.plt"
+
+      ENDIF
+
+      WRITE(*,*) "fname_out=", trim(fname_out)
+
 #ifdef DEBUG
       WRITE(*,*)'call getnvar'
 #endif
@@ -508,10 +534,11 @@
 !
    call int2char(nt,ctmp,ndigit)
 #ifndef SZPLT
-   fout=trim(fncommon)//"all_"//ctmp(1:ndigit)//".plt"
+   !fout=trim(fncommon)//"all_"//ctmp(1:ndigit)//".plt"
+   fout=fname_out
 #else
-   !fout=trim(fncommon)//"all_"//ctmp(1:ndigit)
-   fout=trim(fncommon)//"all_"//ctmp(1:ndigit)//".plt"
+   !fout=trim(fncommon)//"all_"//ctmp(1:ndigit)//".plt"
+   fout=fname_out
 #endif
    write(*,*)"Output to ",trim(fout)
 !
