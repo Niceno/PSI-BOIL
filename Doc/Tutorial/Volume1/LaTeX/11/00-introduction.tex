@@ -1,0 +1,45 @@
+\label{chap_post_process}
+
+This chapter describes several utilities for {\psiboil}.
+
+\section{ChangeProc}
+\label{sec_changeproc}
+When you need to change the number of processes/cores used for the parallel computation at restart of computation, {\\t ChangeProc} can be used. 
+\begin{verbatim}
+	> cp Src/Utilities/ChangeProc
+	> make
+	> cp ChangeProc ~/.bin
+\end{verbatim} 
+The input files of {/tt ChangeProc} are {\tt "*.bck"} and the output files are {\tt "*.bck2"}. After you execute {\tt ChangeProc}, move the original backup files {\tt "*.bck"} to a backup folder, and change the file extension of {\tt bck2} to {\tt bck}.
+\begin{verbatim}
+	> tcsh
+	> foreach i (*.bck2)
+	  mv $i $i:r.bck
+	  end
+\end{verbatim} 
+
+\section{ChangeGrid}
+\label{sec_changeproc}
+When you need to change the grid resolution at restart of computation, {\tt ChangeGrid} can be used. 
+\begin{verbatim}
+	> cp Src/Utilities/ChangeGrid
+	> make
+	> cp ChangeGrid ~/.bin
+\end{verbatim} 
+The file I/O of {\tt ChangeGrid} is as follows.
+    \begin{itemize}
+	\item Input: old and new grids, *.bck
+	\item Output *.bck2
+\end{itemize}
+The old and new grid files must be prepared in advance.  In the old {\tt main.cpp}, include {\tt dom.save} as follows.
+{\small \begin{verbatim}
+  Domain dom(gx, gy, gz);
+  dom.save("grid_old.grd");
+\end{verbatim}}
+
+Then, after you change the grid resolution, output the new grid.
+{\small \begin{verbatim}
+  Domain dom(gx_new, gy_new, gz_new);
+  dom.save("grid_new.grd");
+\end{verbatim}}
+You run PSI-BOIL from the initial condition at this stage. Now, you have old and new grids and *.bck.  Then perform {\tt ChangeGrid} and obtain *.bck2. In the same was {\tt ChangeGrid}, change the file extension of bck2 to bck. Then you can restart the simulation using different grid resolution and different number of processes/cores.
