@@ -3,14 +3,16 @@
 #include <string>
 #include <cstring>
 #include "update_step.cpp"
+//#define USE_VOF   // If USE_VOF is defined, then VOF is used.
+                    // Otherwise, CIPCSL2 is used for interface tracking method.
 
-#define _GNU_SOURCE 1
-#include <fenv.h>
-static void __attribute__ ((constructor)) trapfpe(void)
-{
-  /* Enable some exceptions. At startup all exceptions are masked. */
-  feenableexcept(FE_INVALID|FE_DIVBYZERO|FE_OVERFLOW);
-}
+/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+* Simplified version of
+* Sato, Niceno, JCP 300 (2015) 20-52
+* Duan's case: Case 1 in Table 3
+* Grid: Grid e (gLevel=3) in Table 4
+* The result may differ from the paper due to the simplification
+*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
 /* domain dimensions */
 const real LX1 = 0.003;
@@ -24,20 +26,21 @@ const int NX2  = 10*gLevel;
 const int NZ0  =  4*gLevel;  // solid
 const int NZ1  = 32*gLevel;
 const int NZ2  = 20*gLevel;
-const real h_width = 0.010;  // heater width
 
 /* parameter for boundary or initial condition */
-const real tsat   = 1.0E+02;
-const real tout = tsat - 0.5;
-const real twall = tsat + 9.0;
-const real radius=0.0e-3;
+const real tsat   = 1.0E+02;   // saturation temperature [deg.]
+const real tout  = tsat - 0.5; // temperature at outlet and side boundaries [deg.]
+const real tact  = tsat + 9.0; // nucleation activation temperature [deg.]
 
 /* constants */
 const real gravity = 9.8;
-const real pi = acos(-1.0);
+
+/* heater */
+const real h_width = 0.010;       // heater width
+const real qflux   = 28.7*1000.0; // heater power[W/m2]
 
 /******************************************************************************/
-main(int argc, char ** argv) {
+int main(int argc, char ** argv) {
 
   boil::timer.start();
 
@@ -57,20 +60,20 @@ main(int argc, char ** argv) {
   /*----------+
   |  grid(s)  |
   +----------*/
-  Grid1D gx0( Range<real>(-LX2,-LX1)
-            , Range<real>(2.0*LX1/real(NX1),LX1/real(NX1))
-            , NX2, Periodic::no() );
+  Grid1D gx0( Range<real>(-LX2,-LX1),
+              Range<real>(2.0*LX1/real(NX1),LX1/real(NX1)),
+              NX2, Periodic::no() );
   Grid1D gx1( Range<real>(-LX1,LX1), 2*NX1, Periodic::no() );
-  Grid1D gx2( Range<real>( LX1, LX2)
-            , Range<real>(LX1/real(NX1),2.0*LX1/real(NX1))
-            , NX2, Periodic::no() );
+  Grid1D gx2( Range<real>( LX1, LX2),
+              Range<real>(LX1/real(NX1),2.0*LX1/real(NX1)),
+              NX2, Periodic::no() );
   Grid1D gt1 (gx0 , gx1, Periodic::no());
   Grid1D gx  (gt1 , gx2, Periodic::no());
   Grid1D gz0( Range<real>(LZ0, 0.0), NZ0, Periodic::no() );
   Grid1D gz1( Range<real>(0.0, LZ1), NZ1, Periodic::no() );
-  Grid1D gz2( Range<real>(LZ1, LZ2)
-            , Range<real>(LZ1/real(NZ1),4.0*LZ1/real(NZ1))
-            , NZ2, Periodic::no() );
+  Grid1D gz2( Range<real>(LZ1, LZ2),
+              Range<real>(LZ1/real(NZ1),4.0*LZ1/real(NZ1)),
+              NZ2, Periodic::no() );
   Grid1D gztmp ( gz0, gz1, Periodic::no());
   Grid1D gz    ( gztmp, gz2, Periodic::no());
 
@@ -78,28 +81,33 @@ main(int argc, char ** argv) {
   |  domain  |
   +---------*/
   Body floor("floor.stl");
-  Domain d(gx, gx, gz, & floor);
+  Domain d(gx, gx, gz, & floor);  // immerse boundary method
 
   /*------------------+
   |  define unknowns  |
   +------------------*/
-  Vector uvw(d), xyz(d);           // vel
-  Scalar p  (d), f  (d), press(d); // pressure
-  Scalar c  (d), g  (d), kappa(d), cold(d); // color function
-  Scalar tpr(d), q  (d), step(d), sflag(d); // temperature
-  Scalar mdot(d);                  // phase-change rate
-  Scalar dmicro(d);                // micro-layer film thickness
-  Scalar mu_t(d);                  // eddy viscosity
+  // Note: character in "" will appear in TEC file, e.g. "vfl"
+  Vector uvw(d), xyz(d);               // uvw: velocity [m/s], xyz: source term for NS (body force) [N]
+  Scalar p(d), f(d), press(d,"press"); // p: pressure difference in time step [Pa]
+				       // f: source term of pressure Poisson equation [m3/s2]
+  Scalar c(d,"vfl"), g(d), kappa(d,"kappa"); // c: color function (= volume fraction of liquid) [-]
+					     // g: source term of the equation for color [1/s]
+					     // kappa: curvature [1/m]
+  Scalar tpr(d,"temperature"), q  (d); // tpr: temperature [deg.], q: heat source [W]
+  Scalar mdot(d,"mdot");               // mdot: phase-change rate [kg/m3s]
+  Scalar dmicro(d,"dmicro");           // dmicro: micro-layer film thickness [m]
+  Scalar mu_t(d,"mut");                // eddy viscosity [Pa.s]
+#ifndef USE_VOF
+  Scalar step(d), sflag(d);            // step: step function for color function [-]
+#endif
 
   /*-----------------------------+ 
   |  insert boundary conditions  |
   +-----------------------------*/
   for_m(m) {
     uvw.bc(m).add( BndCnd( Dir::imin(), BndType::wall() ) );
-    //uvw.bc(m).add( BndCnd( Dir::imin(), BndType::symmetry() ) );
     uvw.bc(m).add( BndCnd( Dir::imax(), BndType::wall() ) );
     uvw.bc(m).add( BndCnd( Dir::jmin(), BndType::wall() ) );
-    //uvw.bc(m).add( BndCnd( Dir::jmin(), BndType::symmetry() ) );
     uvw.bc(m).add( BndCnd( Dir::jmax(), BndType::wall() ) );
     uvw.bc(m).add( BndCnd( Dir::kmin(), BndType::wall() ) );
     uvw.bc(m).add( BndCnd( Dir::kmax(), BndType::outlet() ) );
@@ -114,10 +122,13 @@ main(int argc, char ** argv) {
 
   /* copy b.c. from p */
   press = p.shape();
-  f = p.shape();
-  mdot = p.shape();
-  q = p.shape();
-  mu_t = p.shape();
+  f     = p.shape();
+  mdot  = p.shape();
+  q     = p.shape();
+  mu_t  = p.shape();
+  kappa = p.shape();
+  g     = p.shape();
+  dmicro = p.shape();
 
   c.bc().add( BndCnd( Dir::imin(), BndType::neumann() ) );
   c.bc().add( BndCnd( Dir::imax(), BndType::neumann() ) );
@@ -125,10 +136,10 @@ main(int argc, char ** argv) {
   c.bc().add( BndCnd( Dir::jmax(), BndType::neumann() ) );
   c.bc().add( BndCnd( Dir::kmin(), BndType::neumann() ) );
   c.bc().add( BndCnd( Dir::kmax(), BndType::outlet() ) );
-  g = c.shape();
+#ifndef USE_VOF
   step = c.shape();
   sflag = c.shape();
-  dmicro = c.shape();
+#endif
 
   tpr.bc().add( BndCnd( Dir::imin(), BndType::dirichlet(), tout ) );
   tpr.bc().add( BndCnd( Dir::imax(), BndType::dirichlet(), tout ) );
@@ -139,7 +150,6 @@ main(int argc, char ** argv) {
 
   /* heater power */
   real qsrc;
-  real qflux=28.7*1000.0;     // [W/m2]
   for_vk(tpr,k){
     if(approx(tpr.zn(k+1),0.0)){
       qsrc=qflux/tpr.dzc(k);  // [W/m3]
@@ -151,10 +161,10 @@ main(int argc, char ** argv) {
   |  physical properties  |
   +----------------------*/
   Matter vapor(d), liquid(d), sapphire(d);
-  vapor  .mu    (1.255e-5);
-  vapor  .rho   (0.597);
-  vapor  .cp    (2030*0.597);
-  vapor  .lambda(0.025);
+  vapor  .mu    (1.255e-5);  // dynamic viscosity [Pa.s]
+  vapor  .rho   (0.597);     // density [kg/m3]
+  vapor  .cp    (2030*0.597);// heat capacity [J/m3K]
+  vapor  .lambda(0.025);     // thermal conductivity [W/mK]
   liquid.mu    (0.28e-3);
   liquid.rho   (958.4);
   liquid.cp    (4215.9*958.4);
@@ -162,26 +172,29 @@ main(int argc, char ** argv) {
   sapphire.rho    (3980.0);
   sapphire.cp     (750.0*3980.0);
   sapphire.lambda (35.0);
-  const real latent=2258.0*1e3;
-  Matter mixed(liquid, vapor, & step);
-  mixed.sigma(5.9e-2);
-  const real liquid_drhodt=-0.7;   //[kg/m3K]
-  const real vapor_drhodt=-0.0017; //[kg/m3K]
+  const real latent=2258.0*1e3; // latent heat [J/kg]
+#ifdef USE_VOF
+  Matter mixed(liquid, vapor, & c);  // property averaged with c
+#else
+  Matter mixed(liquid, vapor, & step);  // property averaged with step
+#endif
+  mixed.sigma(5.9e-2);  // surface tension coefficient [N/m]
+  const real liquid_drhodt=-0.7;   // temperature derivation of liquid density [kg/m3K]
+  const real vapor_drhodt=-0.0017; // temperature derivation of vapor density [kg/m3K]
 
   /*-------------------+
   |  time-integration  |
   +-------------------*/
-  const int  ndt = 500000;
-  const real tint = 1.0e-2;
-  const real tint2 = 1.0e-2;
-  const int  nint2= 1000*gLevel;
-  const real dxmin = d.dxyz_min();
+  const int  ndt = 500000;   // total number of time step to be computed
+  const real tint = 5.0e-4;  // time interval for TEC file [s]
+  const int  nint = 1000*gLevel;  // time step interval for backup file
+  const real dxmin = d.dxyz_min();// minimum cell size in fluid domain
   boil::oout<<"main:dxmin= "<<dxmin<<" "<<boil::cart.iam()<<"\n";
-  const real dt  =10.0*pow(0.5*pow(dxmin,3.0)
+  const real dt  =10.0*pow(0.5*pow(dxmin,3.0)  // 10 is acceleration
                  / (2.0*3.1415*mixed.sigma()->value()),0.5);
-  const real cfl_with = 0.05;
-  const real cfl_wo   = 0.2;
-  Times time(ndt, 0.002);
+  const real cfl_with = 0.05;  // max CFL number when liquid-vapor interface exists
+  const real cfl_wo   = 0.2;   // max CFL number when no liquid-vapor interface exists
+  Times time(ndt, 0.002);      // 0.002 is initial time increment
   time.print_time(false);
   time.set_coef_dec(0.75);
 
@@ -192,11 +205,15 @@ main(int argc, char ** argv) {
   Krylov * solver2 = new CG(d, Prec::di());
 
   /* color function */
+#ifndef USE_VOF
   CIPCSL2 conc  (c,  g, kappa, uvw, time, solver);
   conc.set_globalSharpen();
   conc.set_nredist(1);
   conc.set_itsharpen(10);
-  conc.set_cangle(0.0);
+#else
+  VOF conc  (c,  g, kappa, uvw, time, solver);
+#endif
+  conc.set_cangle(0.0);  // static contact angle
 
   /* momentum equation */
   Momentum ns( uvw, xyz, time, solver, &mixed);
@@ -205,9 +222,9 @@ main(int argc, char ** argv) {
   /* pressure solver */
   Pressure pr(p, f, uvw, time, solver, &mixed);
   AC multigrid( &pr );
-  multigrid.stop_if_diverging(true);
-  multigrid.min_cycles(3);
-  multigrid.max_cycles(10);
+  multigrid.stop_if_diverging(true);  // stop iteration when residual increases
+  multigrid.min_cycles(3);            // min no. iteration for multigrid
+  multigrid.max_cycles(10);           // max no. iteration for multigrid
 
   /* enthalpy equation */
   EnthalpyFD enthFD(tpr, q, c, uvw, time, solver2, & mixed ,tsat, & sapphire);
@@ -215,20 +232,23 @@ main(int argc, char ** argv) {
   enthFD.diffusion_set(TimeScheme::backward_euler());
 
   /* nucleation site */
-  real rseed=83.33333e-6;
-  //real rseed=125.0e-6;
-  //real rseed=187.5e-6;
-  real area_neck=1.50e-7;
-  if(gLevel>2) area_neck=1.50e-7;
+  real rseed = 1.5 * dxmin; // radius of seed bubble [m]
   real zplant=-1.0; // when bottom of bubble reaches zplant, next seed is set
-  real tseed =109.0;  // when temp of nucleation site reaches tseed, next ...
-  const real dmicro_min=1.0e-8;
+  const real dmicro_min=1.0e-8;  // min microlayer thickness to avoid divided-by-zero
   Nucleation nucl( &c, &tpr, &q, &time, dmicro, &mixed, rseed,
-                   dmicro_min, latent, conc.get_cangle());
-  nucl.set_slope(1.0*4.46e-3);
+                   dmicro_min, latent, conc.get_cangle(), tsat, &sapphire);
+  nucl.set_slope(1.0*4.46e-3);  // C_slope, initial microlayer thickness = C_slope * r
+  nucl.set_seed_period(1e-5);   // bubble is enforced to be planted during this period
+				// after activation of the site [s]
+
   /* phase change */
-  PhaseChange pc( mdot, tpr, q, c, g, f, step, uvw, time, &mixed , latent
-                , tsat, &sapphire, &nucl);
+#ifdef USE_VOF
+  PhaseChange pc( mdot, tpr, q, c, g, f, c, uvw, time, &mixed , latent,
+                  tsat, &sapphire, &nucl);
+#else
+  PhaseChange pc( mdot, tpr, q, c, g, f, step, uvw, time, &mixed , latent,
+                  tsat, &sapphire, &nucl);
+#endif
 
   /*-------------------+
   |  check if restart  |
@@ -265,7 +285,11 @@ main(int argc, char ** argv) {
     input >> dtf;
     uvw.  load("uvw",   ts);
     press.load("press",   ts);
+#ifndef USE_VOF
     conc. load("conc", ts);
+#else
+    c.load("c", ts);
+#endif
     tpr.  load("tpr", ts);
     nucl. load("nucl", ts);
     dmicro.load("dmicro", ts);
@@ -291,24 +315,28 @@ main(int argc, char ** argv) {
     /*--------------------+
     |  initial condition  |
     +--------------------*/
+    // make domain full of liquid
     for_vijk(c,i,j,k) 
       c[i][j][k] = 1.0;
 
-    /* set seed */
-    real zsite=rseed*cos(45.0/180.0*pi);
-    nucl.add(Site( 0.000,  0.000, zsite, tseed, zplant));
-#if 0
-    /* plant seed from initial step */
-    for(int ns=0; ns<nucl.size(); ns++){
-      nucl.sites[ns].set_time_seed(0.0);
-    }
-    nucl.plant();
-#endif
-    c.bnd_update();
-    c.exchange_all();
+    c.bnd_update();   // after Scalar or Vector variable is enforced to be modified in main.cpp,
+    c.exchange_all(); // bnd_update() and exchnage_all()/exchange() must be called.
 
-#if 0
-    const real ztconst = 1.0*1.0e-3;
+    // initialization of VOF/CIPCSL
+    conc.init();
+
+    /* add nucleation site */
+    real zsite=rseed*cos(45.0/180.0*boil::pi);
+    nucl.add(Site( 0.000,  0.000, zsite, tact, zplant)); // center of spherical seed bubble is
+							 // (0.0, 0.0, zsite)
+							 // if zsite = 0, hemi-sphere.
+
+#if 1
+    tpr = tout;
+#else
+    // temperature with thermal boundary layer
+    const real twall = tsat + 8.95;// used for initial temperature field [deg.]
+    const real ztconst = 1.0*1.0e-3;  // thermal boundary layer thickness
     for_vijk(c,i,j,k) {
       if(tpr.zc(k)<0.0) {
         tpr[i][j][k] = twall;
@@ -318,23 +346,21 @@ main(int argc, char ** argv) {
         tpr[i][j][k] = tout;
       }
     }
-#else
-    tpr=tout;
 #endif
-
     tpr.bnd_update();
     tpr.exchange_all();
-    conc.init();
-    boil::plot->plot(uvw,c,tpr,press,mdot,dmicro
-                    ,"uvw-c-tpr-press-mdot-dmicro",0);
+
+    // output of initial condition
+    boil::plot->plot(uvw,c,tpr,press,mdot,dmicro,"uvw-c-tpr-press-mdot-dmicro",0);
   }
   input.close();
 
+#ifndef USE_VOF
   update_step(c, step, sflag);
+#endif
 
-  /* set iint */
+  /* set iint (counter for TEC file) */
   int iint = int(time.current_time()/tint) + 1;
-  int iint2 = int(time.current_time()/tint2) + 1;
   boil::oout<<"iint= "<<iint<<"\n";
 
   const real rhol=liquid.rho()->value();
@@ -353,19 +379,23 @@ main(int argc, char ** argv) {
     boil::oout << "# WTIME:     " << boil::timer.current_min() << boil::endl;
     boil::oout << "########################" << boil::endl;
 
-    /*------------------+
-    |  reset body force |
-    +------------------*/
+    /*-------------------+
+    |  reset body force  |
+    +-------------------*/
     for_m(m)
       for_avmijk(xyz,m,i,j,k)
         xyz[m][i][j][k]=0.0;
+
+    /*------------------+
+    |  set heat source  |
+    +------------------*/
     q=0.0;
 
     for_vk(tpr,k){
       if(approx(tpr.zn(k+1),0.0)){
         for_vij(tpr,i,j){
           if( fabs(tpr.xc(i))<0.5*h_width && fabs(tpr.yc(j))<0.5*h_width ){
-            q[i][j][k]=qsrc*tpr.dV(i,j,k);
+            q[i][j][k]=qsrc*tpr.dV(i,j,k);  // [W/m3]*[m3] = [W]
           }
 	}
       }
@@ -374,15 +404,19 @@ main(int argc, char ** argv) {
     /*---------------+
     |  phase change  |
     +---------------*/
-    pc.update();
-    pc.micro(&xyz);
-    update_step(c, step, sflag);  // 0119 need to update step for with IB
-    ns.vol_phase_change(&f);
+    pc.update();    // calculate mdot in bulk
+    pc.micro(&xyz); // calculate mdot in microlayer and update microlayer thickness
+#ifndef USE_VOF
+    update_step(c, step, sflag);  // need to update step for with IB
+#endif
+    ns.vol_phase_change(&f);  // outlet velocity is modified due to mdot
 
     /* bottom area */
-    real area_l=pc.get_hflux_area_l(Dir::ibody());
-    real area_v=pc.get_hflux_area_v(Dir::ibody());
-    boil::oout<<"area= "<<time.current_time()<<" "<<area_l<<" "<<area_v<<"\n";
+    real area_l    = pc.get_hflux_area_l(Dir::ibody());
+    real area_v    = pc.get_hflux_area_v(Dir::ibody());
+    real area_micro= pc.get_hflux_area_micro(Dir::ibody());
+    boil::oout<<"area= "<<time.current_time()<<" "<<area_l<<" "<<area_v
+              <<" "<<area_micro<<"\n";
 
     /*--------------------------+
     |  solve momentum equation  |
@@ -390,7 +424,11 @@ main(int argc, char ** argv) {
     /* gravity force */
     Comp m = Comp::w();
     for_vmijk(xyz,m,i,j,k){
+#ifdef USE_VOF
+      real phil=c[i][j][k];
+#else
       real phil=step[i][j][k];
+#endif
       real phiv=1.0-phil;
       real deltmp=tpr[i][j][k]-tsat;
       real rhomix = (liquid.rho()->value() + liquid_drhodt*deltmp)*phil
@@ -400,16 +438,21 @@ main(int argc, char ** argv) {
     }
 
     /* surface tension */
+#ifndef USE_VOF
     conc.tension(&xyz, mixed, step);
+#else
+    conc.tension(&xyz, mixed);
+#endif
     //boil::plot->plot(xyz,c,mdot,"bodyforce-xyz-c-mdot",1);
 
     /*--------------------------+
     |  solve momentum equation  |
     +--------------------------*/
-    /* essential for moving front */
-    //mod.smagorinsky( &ns, &mu_t, 0.173 );
+    /* turbulence model */
+    //mod.smagorinsky( &ns, &mu_t, 0.173 );  // if this is commented out, then laminar flow
+
 #if 1 
-    /* increase viscosity in outlet region */
+    /* increase viscosity in outlet region to stabilize calculation */
     const real z0=0.010;
     const real z1=0.015;
     for_avk(c,k){
@@ -426,16 +469,15 @@ main(int argc, char ** argv) {
     pr.coarsen();
 
     /* momentum */
-    ns.new_time_step();
-
-    ns.grad(press);
-    ns.solve(ResRat(1e-14));
+    ns.new_time_step(); // cal convection term
+    ns.grad(press);     // cal nabla.p
+    ns.solve(ResRat(1e-14));  // cal diffusion term, and intermediate velocity
 
     p = 0.0;
     if (multigrid.vcycle(ResRat(1e-6))) OMS(converged);
     p.exchange();
-    ns.project(p);
-    press += p;
+    ns.project(p);  // update velocity
+    press += p;     // update pressure
 
     /* shift pressure */
     real pmin=1.0e+300;
@@ -459,11 +501,8 @@ main(int argc, char ** argv) {
     /*---------------------------+
     |  solve transport equation  |
     +---------------------------*/
-    cold = c;
     conc.advance();
     conc.totalvol();
-
-    pc.modify_vel(uvw,c,cold);
 
     /*---------------------------+
     |  replant seed or cut neck  |
@@ -473,20 +512,7 @@ main(int argc, char ** argv) {
     /*-------------------------------+
     |  outlet region: delete bubbles |
     +-------------------------------*/
-#if 0
-    /* delete gradually */
-    //const real z0=0.011;
-    //const real z1=0.015;
-    for_avk(c,k){
-      if(c.zc(k)>z0){
-        real coef=std::min((c.zc(k)-z0)/(z1-z0),1.0);
-        for_avij(c,i,j){
-          c[i][j][k]= (1.0-coef)*c[i][j][k] + coef*1.0;
-        }
-      }
-    }
-#else
-    /* flash */
+    /* delete bubble in outlet region: flash method */
     int kkm = -1;
     real clrmin_m=boil::exa;
     real clrmin_p=boil::exa;
@@ -510,7 +536,15 @@ main(int argc, char ** argv) {
         }
       }
     }
+    /* update clr in cipcsl2 after seed, cutneck and outlet-region */
+    c.bnd_update();
+    c.exchange_all();
+#ifndef USE_VOF
+    conc.update_node(c);  // update color function at node, edge and face in accordance with c
+    update_step(c, step, sflag);
 #endif
+
+    // temperature in outlet region
     for_avk(tpr,k){
       if(c.zc(k)>z0){
         for_avij(c,i,j){
@@ -521,18 +555,12 @@ main(int argc, char ** argv) {
     tpr.bnd_update();
     tpr.exchange_all();
 
-    /* update clr in cipcsl2 after seed, cutneck and outlet-region */
-    c.bnd_update();
-    c.exchange_all();
-    conc.update_node(c);
-    update_step(c, step, sflag);
-
     /*------------------------+
     |  solve energy equation  |
     +------------------------*/
     enthFD.discretize();
-    enthFD.new_time_step();
-    enthFD.solve(ResRat(1e-16),"enthFD");
+    enthFD.new_time_step();  // cal convection term
+    enthFD.solve(ResRat(1e-16),"enthFD");  // cal diffusion term
 
     boil::oout<<"hflux:time,_total[W],_micro[W] "
               <<time.current_time()<<"  "
@@ -557,7 +585,6 @@ main(int argc, char ** argv) {
       /* interface is included */
       time.control_dt(ns.cfl_max(), cfl_with, dt);
     } else {
-
       /* interface is not included */
       time.control_dt(ns.cfl_max(), cfl_wo, 0.002);
     }
@@ -589,82 +616,32 @@ main(int argc, char ** argv) {
       iint = int(time.current_time()/tint) + 1;
     }
 
-#if 1
-    if((time.current_time()) / (tint2) >= real(iint2) ) {
-      iint2 = int(time.current_time() / tint2);
-      std::cout.setf(std::ios_base::scientific);
-      std::cout<< std::setprecision(16);
-      /* temperature on wall */
-      for_vk(c,k){
-        if(approx(c.zn(k), 0.0, 1.0e-12)) {
-          for_vi(c,i) {
-            if(approx(c.xn(i), 0.0, 1.0e-12)) { 
-              std::ofstream fout;
-              std::stringstream ss;
-              ss <<"twall_p"<<boil::cart.iam()<<"_"<<iint2<<".dat";
-              std::string fname = ss.str();
-              int len = fname.length();
-              char * cfname = new char[len+1];
-              memcpy(cfname, fname.c_str(), len+1);
-              fout.open(cfname);
-              for_vj(c,j) {
-                real dw = 0.5 * c.dzc(k-1);
-                real dflu;
-                real lambdas = sapphire.lambda()->value();
-                real lambdaf;
-                real tflu;
-                if( dmicro[i][j][k]>boil::mega ){
-                  dflu = 0.5 * c.dzc(k);
-                  lambdaf=liquid.lambda()->value();
-                  tflu = tpr[i][j][k];
-                } else if( dmicro[i][j][k]<dmicro_min+boil::pico ){
-                  dflu = 0.5 * c.dzc(k);
-                  lambdaf=vapor.lambda()->value();
-                  tflu = tpr[i][j][k];
-                } else {
-                  dflu=dmicro[i][j][k];
-                  lambdaf=liquid.lambda()->value();
-                  tflu=tsat;
-                }
-                  
-                real tw = ( dflu * lambdas * tpr[i][j][k-1]
-                          + dw * lambdaf * tflu )
-                        / ( dflu * lambdas + dw * lambdaf);
-
-                fout<<c.xc(i)<<" "<<c.yc(j)<<"  "<<tw<<" "<<tpr[i][j][k-1]<<" "
-                    <<tpr[i][j][k]<<" "<<dmicro[i][j][k]<<" "
-                    <<c[i][j][k]<<" "<<i<<" "<<j<<" "<<k<<"\n";
-              }
-              fout.close();
-            }
-          }
-        }
-      }
-      std::cout<< std::setprecision(8);
-#endif
-      iint2 = int(time.current_time()/tint2) + 1;
-    }
-
     /* diameter */
     if(nucl.size()==1) {
       real dia=0.0;
-      if (area_v>0.0) {
+      if ((area_v+area_micro)>0.0) {
         real zft=0.006;
         conc.front_minmax( Range<real>(-LX2,LX2) ,Range<real>(-LX2,LX2)
                           ,Range<real>(0, zft));
         dia = 0.5 * ( (conc.get_xmaxft() - conc.get_xminft())
                     + (conc.get_ymaxft() - conc.get_yminft()) );
       }
-      boil::oout<<"Diameter= "<<time.current_time()<<" "<<dia<<"\n";
+      boil::oout<<"Diameter= "<<time.current_time()<<" "<<dia
+                <<" xcent "<<0.5*(conc.get_xminft()+conc.get_xmaxft())
+                <<" ycent "<<0.5*(conc.get_yminft()+conc.get_ymaxft())<<"\n";
     }
 
     /*--------------+
     |  backup data  |
     +--------------*/
-    if((time.current_step()) % (nint2)==0 ) {
+    if(time.current_step() % nint == 0 ) {
       uvw  .save("uvw",   time.current_step());
       press.save("press", time.current_step());
+#ifndef USE_VOF
       conc .save("conc",  time.current_step());
+#else
+      c.save("c",  time.current_step());
+#endif
       tpr  .save("tpr",   time.current_step());
       nucl .save("nucl",   time.current_step());
       dmicro.save("dmicro",time.current_step());
@@ -684,11 +661,15 @@ main(int argc, char ** argv) {
         output.close();
       }
     } 
-    if( boil::timer.current_min() > (wmin-30.0)
+    if( boil::timer.current_min() > wmin
       || time.current_step()==time.total_steps()) {
       uvw  .save("uvw",   time.current_step());
       press.save("press", time.current_step());
+#ifndef USE_VOF
       conc .save("conc",  time.current_step());
+#else
+      c.save("c",  time.current_step());
+#endif
       tpr  .save("tpr",   time.current_step());
       nucl .save("nucl",   time.current_step());
       dmicro.save("dmicro",time.current_step());
@@ -706,7 +687,11 @@ main(int argc, char ** argv) {
       boil::timer.report();
       uvw  .rm("uvw", ts);
       press.rm("press", ts);
+#ifndef USE_VOF
       conc .rm("conc", ts);
+#else
+      c.rm("c", ts);
+#endif
       tpr  .rm("tpr", ts);
       nucl .rm("nucl", ts);
       exit(0); 
