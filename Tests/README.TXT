@@ -1,8 +1,9 @@
 LIST OF Tests
 
-ghost-fluid-method: how to implement ghost fluid method by Yohei
-Pathline:           particle path lines
-phase-change:       boiling simulation
+ghost-fluid-method: ghost fluid method by Yohei
+Pathline:           draw particle path lines
+PhaseChange:        phase change simulation
+  |--NucleateBoil   nucleate boiling simulation
 randomflow-inlet:   randomflow generated for entier inlet plane
 random-plane:       randomflow generated in each decomposed domain
 restart:            how to restart simulation by Yohei
