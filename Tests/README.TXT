@@ -1,6 +1,6 @@
 LIST OF Tests
 
-ghost-fluid-method: ghost fluid method by Yohei
+GhostFluidMethod: ghost fluid method by Yohei
 Pathline:           draw particle path lines
 PhaseChange:        phase change simulation
   |--NucleateBoil   nucleate boiling simulation
