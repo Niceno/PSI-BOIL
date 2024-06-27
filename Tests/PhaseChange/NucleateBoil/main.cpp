@@ -482,7 +482,7 @@ int main(int argc, char ** argv) {
     /* shift pressure */
     real pmin=1.0e+300;
     for_vijk(press,i,j,k){
-      if(d.ibody().on(i,j,k)){
+      if(d.ibody().on(i,j,k)){  // in fluid domain
         if(pmin>press[i][j][k]) pmin=press[i][j][k];
       }
     }
@@ -490,9 +490,9 @@ int main(int argc, char ** argv) {
 
     for_vijk(press,i,j,k){
       if(d.ibody().on(i,j,k)){
-        press[i][j][k] -= pmin;
+        press[i][j][k] -= pmin;  // in fluid domain
       } else {
-        press[i][j][k] = 0.0;
+        press[i][j][k] = 0.0;    // in solid domain
       }
     }
     press.bnd_update();
