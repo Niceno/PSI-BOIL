@@ -72,4 +72,5 @@ AC_OUTPUT(Makefile                                     \
           Src/Utilities/ChangeProc/Makefile            \
           Src/Template/Makefile                        \
           Src/Custom/Makefile                          \
-          Src/Custom/IF97/Makefile)
+          Src/Custom/IF97/Makefile                     \
+          Src/Custom/PIDcontrol/Makefile)
