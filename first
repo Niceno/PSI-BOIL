@@ -95,16 +95,14 @@ else
     autoconf
     autoheader
     automake --add-missing
-    #./configure CC=mpiicc CXX=mpiicpc CXXFLAGS='-O3 -opt-report=4'
-    ./configure CC=mpiicc CXX=mpiicpc CXXFLAGS='-O2 -std=c++11'
-    #./configure CC=mpiicx CXX=mpiicpx CXXFLAGS='-O2 -std=c++11'
+    ./configure CC=mpiicc CXX=mpiicpc CXXFLAGS='-O2 -std=c++11 -fp-trap-all=common'
     cd Src/Parallel; ln -f -s parallel.h mpi_macros.h; cd ../../
   elif [ $1 = "INTEL2024" ]; then
     aclocal
     autoconf
     autoheader
     automake --add-missing
-    ./configure CC=mpiicx CXX=mpiicpx CXXFLAGS='-O2 -std=c++11'
+    ./configure CC=mpiicx CXX=mpiicpx CXXFLAGS='-O2 -std=c++11 -fp-trap-all=common'
     cd Src/Parallel; ln -f -s parallel.h mpi_macros.h; cd ../../
   elif [ $1 = "NOMPI-INTEL" ]; then
     aclocal
