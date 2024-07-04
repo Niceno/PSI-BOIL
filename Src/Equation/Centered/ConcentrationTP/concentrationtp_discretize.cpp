@@ -56,7 +56,7 @@ void ConcentrationTP::discretize(const Scalar * diff_eddy) {
       real col_new = vfval(i,j,k);
       if(matter_sig==Sign::neg()) col_new = 1.-col_new;
       if(  heavi->status(i,j,k)==-matter_sig
-        // ||col_new<=col_crit
+         ||col_new<=col_crit  // modified on 2024.07.03 for falling film Janani
         ) {
         A.c[i][j][k]  = 1.0;
         A.w[i][j][k]  = 0.0;
