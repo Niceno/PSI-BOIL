@@ -37,6 +37,7 @@ EnthalpyFD::EnthalpyFD(const Scalar & PHI,
   epsl=1.0e-2;
   turbP=0.9;
   laminar=true;
+  conv_divu_subtract=true;
 
   phi.bnd_update();
 

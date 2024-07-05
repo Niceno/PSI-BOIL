@@ -156,15 +156,16 @@ void EnthalpyFD::convection(Scalar * conv) {
   for_jk(j,k) (*conv)[ei()][j][k] += buff[ei()+1][j][k];
   for_jk(j,k) (*conv)[si()][j][k] += buff[si()-1][j][k];
 
-  for_ijk(i,j,k) {
-    real divu = - dSx(i,j,k)*(*u)[Comp::u()][i]  [j]  [k]
-                + dSx(i,j,k)*(*u)[Comp::u()][i+1][j]  [k]
-                - dSy(i,j,k)*(*u)[Comp::v()][i]  [j]  [k]
-                + dSy(i,j,k)*(*u)[Comp::v()][i]  [j+1][k]
-                - dSz(i,j,k)*(*u)[Comp::w()][i]  [j]  [k]
-                + dSz(i,j,k)*(*u)[Comp::w()][i]  [j]  [k+1];
-    (*conv)[i][j][k] += phi[i][j][k] * divu;
-    //(*conv)[i][j][k] /= dV(i,j,k);
+  if(conv_divu_subtract) {
+    for_ijk(i,j,k) {
+      real divu = - dSx(i,j,k)*(*u)[Comp::u()][i]  [j]  [k]
+                  + dSx(i,j,k)*(*u)[Comp::u()][i+1][j]  [k]
+                  - dSy(i,j,k)*(*u)[Comp::v()][i]  [j]  [k]
+                  + dSy(i,j,k)*(*u)[Comp::v()][i]  [j+1][k]
+                  - dSz(i,j,k)*(*u)[Comp::w()][i]  [j]  [k]
+                  + dSz(i,j,k)*(*u)[Comp::w()][i]  [j]  [k+1];
+      (*conv)[i][j][k] += phi[i][j][k] * divu;
+    }
   }
 
 #if 1

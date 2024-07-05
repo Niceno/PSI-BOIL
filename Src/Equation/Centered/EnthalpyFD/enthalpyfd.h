@@ -94,7 +94,14 @@ class EnthalpyFD : public Centered {
       boil::oout<<"EnthalpyFD:turbP= "<<turbP<<"\n";
     }
 
+    void set_conv_divu_subtract(bool b) {
+      conv_divu_subtract = b;
+      boil::oout<<"EnthalpyFD:conv_divu_subtract= "<<conv_divu_subtract<<"\n";
+    }
+    bool get_conv_divu_subtract() {return conv_divu_subtract;}
+
     void convection();
+    void diffusion_fd(const Scalar * diff_eddy = NULL);
   protected:
     void create_system(const Scalar * diff_eddy = NULL);
     void create_system_innertial();
@@ -102,7 +109,7 @@ class EnthalpyFD : public Centered {
     void create_system_bnd();
     real update_rhs();
     void convection(Scalar * sca);
-    void diffusion_fd(const Scalar * diff_eddy = NULL);
+    //void diffusion_fd(const Scalar * diff_eddy = NULL);
     real dVFD(const int i, const int j, const int k){
       real vol = 0.5 * (phi.dxw(i)+phi.dxe(i))
                * 0.5 * (phi.dys(j)+phi.dyn(j))
@@ -132,6 +139,7 @@ class EnthalpyFD : public Centered {
     ScalarInt iflag;
     real turbP; //turbulent Prandtl number
     bool laminar;
+    bool conv_divu_subtract; // subtract T.divu from convection term (nabla.(Tu)-T.divu)
 
 };
 #endif
