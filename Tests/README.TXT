@@ -26,6 +26,7 @@ APPLICATIONS
   PhaseChange:        Phase change simulation
     |--NucleateBoil   Nucleate boiling simulation
   RisingBubble:       rising bubble using ColorFunction by Bojan
+  SolidParticles:     Lagrangian particle tracking. Solid particles initially placed in a bubble
   Zeppelin:           zeppelin
 
 SCRIPT (Automatically run simulations)
