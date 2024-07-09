@@ -190,8 +190,9 @@ int main(int argc, char * argv[]) {
     // reverse
     for_vijk(c,i,j,k)
       c[i][j][k] = 1.0 - c[i][j][k];
-    c.exchange_all();
     c.bnd_update();
+    c.exchange_all();
+    conc.init();
 
     /* solidparticle */
     // pattern 1: define in each decomposed domain
