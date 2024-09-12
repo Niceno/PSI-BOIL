@@ -119,14 +119,20 @@ void EnthalpyFDAdiabatic::new_time_step(const Scalar * diff_eddy) {
           }if( ((*clr)[i][j][k]-clrsurf)*(clrold[i][j+1][k]-clrsurf) > 0.0 && ((*clr)[i][j+1][k]-clrsurf)*(clrold[i][j+1][k]-clrsurf) > 0.0){
               phi_sum += phi [i][j+1][k];
               num += 1.0;
-          }if( ((*clr)[i][j][k]-clrsurf)*(clrold[i][j][k-1]-clrsurf) > 0.0 && ((*clr)[i][j][k-1]-clrsurf)*(clrold[i][j][k-1]-clrsurf) > 0.0){
+          }if( ((*clr)[i][j][k]-clrsurf)*(clrold[i][j][k-1]-clrsurf) > 0.0 && ((*clr)[i][j][k-1]-clrsurf)*(clrold[i][j][k-1]-clrsurf) > 0.0 && dom->ibody().on(i,j,k-1)){
               phi_sum += phi [i][j][k-1];
               num += 1.0;
           }if( ((*clr)[i][j][k]-clrsurf)*(clrold[i][j][k+1]-clrsurf) > 0.0 && ((*clr)[i][j][k+1]-clrsurf)*(clrold[i][j][k+1]-clrsurf) > 0.0){
               phi_sum += phi [i][j][k+1];
               num += 1.0;
           }
-          phi [i][j][k] = phi_sum/num;
+
+          if(num == 0){
+              phi [i][j][k] = t_new;
+          }else{
+              phi [i][j][k] = phi_sum/num;
+          }
+
 
       }else{
           phi [i][j][k] = t_new;

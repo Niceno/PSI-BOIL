@@ -9,7 +9,7 @@ EnthalpyFDAdiabatic::EnthalpyFDAdiabatic(const Scalar & PHI,
                        const Scalar & C,
                        const Vector & U,
                        Times & T,
-                       Linear * S,
+                       Krylov * S,
                        Matter * f,
                        const real Tsat,
                        Matter * s) :
