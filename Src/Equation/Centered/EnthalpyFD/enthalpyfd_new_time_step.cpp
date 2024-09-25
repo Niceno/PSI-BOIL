@@ -14,6 +14,8 @@
 *******************************************************************************/
 void EnthalpyFD::new_time_step(const Scalar * diff_eddy) {
 
+  boil::timer.start("enthalpyfd new_time_step");
+
   if(diff_eddy == NULL){
     if(!laminar){
       boil::oout<<"### enthalpyfd_new_time_step: Error!!!\n";
@@ -123,4 +125,5 @@ void EnthalpyFD::new_time_step(const Scalar * diff_eddy) {
   +---------------------------------------*/
   diffusion_fd(diff_eddy);
 
+  boil::timer.stop("enthalpyfd new_time_step");
 }
