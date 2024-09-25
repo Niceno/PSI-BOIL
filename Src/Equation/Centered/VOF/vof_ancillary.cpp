@@ -11,6 +11,15 @@ void VOF::ancillary(Scalar & scp) {
 *  \brief Calculate ancillary vof parameters.
 *******************************************************************************/
 
+  /* avoid scp = 0.5 */
+#if 0
+  for_ijk(i,j,k) {
+    if(fabs(scp[i][j][k]-phisurf)<boil::femto) {
+      scp[i][j][k]=phisurf+copysign(1.0,scp[i][j][k]-phisurf)*boil::femto;
+    }
+  }
+#endif
+
   /* with bnd update, the wall values of scp are distorted! 
    * update_at_walls should be called */
   scp.bnd_update();
