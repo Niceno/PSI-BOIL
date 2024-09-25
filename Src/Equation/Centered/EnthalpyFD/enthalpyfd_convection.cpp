@@ -1,5 +1,4 @@
 #include "enthalpyfd.h"
-#define VERSION_STABLE
 using namespace std;
 
 /***************************************************************************//**
@@ -200,9 +199,6 @@ void EnthalpyFD::convection(Scalar * conv) {
         real dxm = max(epsl,(clrsurf-clrc)/(clrold[i-1][j][k]-clrc));
         dxm = dxm * dxw(i);
         dtdxm = (phi[i][j][k]-tsat)/dxm;
-#ifndef VERSION_STABLE
-        umf = upf;
-#endif
       } else {
         dtdxm = (phi[i  ][j][k]-phi[i-1][j][k])/dxw(i);
       }
@@ -212,9 +208,6 @@ void EnthalpyFD::convection(Scalar * conv) {
         real dxp = max(epsl,(clrsurf-clrc)/(clrold[i+1][j][k]-clrc));
         dxp = dxp * dxe(i);
         dtdxp = (tsat-phi[i][j][k])/dxp;
-#ifndef VERSION_STABLE
-        upf = umf;
-#endif
       } else {
         dtdxp = (phi[i+1][j][k]-phi[i  ][j][k])/dxe(i);
       }
@@ -224,9 +217,6 @@ void EnthalpyFD::convection(Scalar * conv) {
         real dym = max(epsl,(clrsurf-clrc)/(clrold[i][j-1][k]-clrc));
         dym = dym * dys(j);
         dtdym = (phi[i][j][k]-tsat)/dym;
-#ifndef VERSION_STABLE
-        vmf = vpf;
-#endif
       } else {
         dtdym = (phi[i][j  ][k]-phi[i][j-1][k])/dys(j);
       }
@@ -236,9 +226,6 @@ void EnthalpyFD::convection(Scalar * conv) {
         real dyp = max(epsl,(clrsurf-clrc)/(clrold[i][j+1][k]-clrc));
         dyp = dyp * dyn(j);
         dtdyp = (tsat-phi[i][j][k])/dyp;
-#ifndef VERSION_STABLE
-        vpf = vmf;
-#endif
       } else {
         dtdyp = (phi[i][j+1][k]-phi[i][j  ][k])/dyn(j);
       }
@@ -248,9 +235,6 @@ void EnthalpyFD::convection(Scalar * conv) {
         real dzm = max(epsl,(clrsurf-clrc)/(clrold[i][j][k-1]-clrc));
         dzm = dzm * dzb(k);
         dtdzm = (phi[i][j][k]-tsat)/dzm;
-#ifndef VERSION_STABLE
-        wmf = wpf;
-#endif
       } else {
         dtdzm = (phi[i][j][k  ]-phi[i][j][k-1])/dzb(k);
       }
@@ -260,9 +244,6 @@ void EnthalpyFD::convection(Scalar * conv) {
         real dzp = max(epsl,(clrsurf-clrc)/(clrold[i][j][k+1]-clrc));
         dzp = dzp * dzt(k);
         dtdzp = (tsat-phi[i][j][k])/dzp;
-#ifndef VERSION_STABLE
-        wpf = wmf;
-#endif
       } else {
         dtdzp = (phi[i][j][k+1]-phi[i][j][k  ])/dzt(k);
       }
