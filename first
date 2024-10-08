@@ -104,12 +104,14 @@ else
     automake --add-missing
     ./configure CC=mpiicx CXX=mpiicpx CXXFLAGS='-O2 -std=c++11 -fp-trap-all=common'
     cd Src/Parallel; ln -f -s parallel.h mpi_macros.h; cd ../../
+    echo "WARNING!!! Boil compiled with icpx is unstable!!!"
   elif [ $1 = "NOMPI-INTEL" ]; then
     aclocal
     autoconf
     autoheader
     automake --add-missing
     ./configure CC=icpc CXX=icpc CXXFLAGS='-g -w2  -std=c++11 -debug full -O0 -std=c++11 -check=uninit -traceback -fstack-protector-all -fp-trap=common -fp-stack-check -check-pointers=rw'
+    #./configure CC=icx CXX=icpx CXXFLAGS='-g -Wall  -std=c++11 -debug full -O0 -std=c++11 -fsanitize=undefined -traceback -fstack-protector-all -fsanitize=address -fsanitize=integer-divide-by-zero'
     cd Src/Parallel; ln -f -s sequential.h mpi_macros.h; cd ../../
   elif [ $1 = "INTEL-PHI" ]; then
     aclocal
