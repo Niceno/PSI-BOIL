@@ -11,6 +11,7 @@
 *  respectivelly.
 *
 *  clrold: color function in previous time step
+*  buff:   temporarily store updated temperature 
 *******************************************************************************/
 void EnthalpyFDhighNu::new_time_step(const Scalar * diff_eddy) {
 
@@ -88,7 +89,6 @@ void EnthalpyFDhighNu::new_time_step(const Scalar * diff_eddy) {
     if(dom->ibody().on(i,j,k)){
       real c;
       if((*clr)[i][j][k]>=clrsurf){  // synchronize with upper definition
-      //if(clrold[i][j][k]>=clrsurf){
         c = cpl;
       } else {
         c = cpv;
@@ -99,100 +99,44 @@ void EnthalpyFDhighNu::new_time_step(const Scalar * diff_eddy) {
       if( ((*clr)[i][j][k]-clrsurf)*(clrold[i][j][k]-clrsurf) < 0.0){
         real phi_sum = 0.0;
         int num = 0;
-        if( ((*clr)[i][j][k]-clrsurf)*(clrold[i-1][j][k]-clrsurf) > 0.0 &&
-            ((*clr)[i-1][j][k]-clrsurf)*(clrold[i-1][j][k]-clrsurf) > 0.0){
+        if( ((*clr)[i][j][k]-clrsurf)*(clrold[i-1][j][k]-clrsurf) > 0.0) {
           phi_sum += phi [i-1][j][k];
           num++;
-          //if(boil::cart.iam()==0) {
-          //  std::cout<<"i-1: "<<(*clr)[i][j][k]<<" "<<clrold[i-1][j][k]<<" "
-          //           <<(*clr)[i-1][j][k]<<" "<<phi [i-1][j][k]<<" "<<num<<"\n";
-          //}
         }
-        if( ((*clr)[i][j][k]-clrsurf)*(clrold[i+1][j][k]-clrsurf) > 0.0 &&
-            ((*clr)[i+1][j][k]-clrsurf)*(clrold[i+1][j][k]-clrsurf) > 0.0){
+        if( ((*clr)[i][j][k]-clrsurf)*(clrold[i+1][j][k]-clrsurf) > 0.0) {
           phi_sum += phi [i+1][j][k];
           num++;
-          //if(boil::cart.iam()==0) {
-          //  std::cout<<"i+1: "<<(*clr)[i][j][k]<<" "<<clrold[i+1][j][k]<<" "
-          //           <<(*clr)[i+1][j][k]<<" "<<phi [i+1][j][k]<<" "<<num<<"\n";
-          //}
         }
-        if( ((*clr)[i][j][k]-clrsurf)*(clrold[i][j-1][k]-clrsurf) > 0.0 && 
-            ((*clr)[i][j-1][k]-clrsurf)*(clrold[i][j-1][k]-clrsurf) > 0.0){
+        if( ((*clr)[i][j][k]-clrsurf)*(clrold[i][j-1][k]-clrsurf) > 0.0) {
           phi_sum += phi [i][j-1][k];
           num++;
-          //if(boil::cart.iam()==0) {
-          //  std::cout<<"j-1: "<<(*clr)[i][j][k]<<" "<<clrold[i][j-1][k]<<" "
-          //           <<(*clr)[i][j-1][k]<<" "<<phi [i][j-1][k]<<" "<<num<<"\n";
-          //}
         }
-        if( ((*clr)[i][j][k]-clrsurf)*(clrold[i][j+1][k]-clrsurf) > 0.0 && 
-            ((*clr)[i][j+1][k]-clrsurf)*(clrold[i][j+1][k]-clrsurf) > 0.0){
+        if( ((*clr)[i][j][k]-clrsurf)*(clrold[i][j+1][k]-clrsurf) > 0.0) {
           phi_sum += phi [i][j+1][k];
           num++;
-          //if(boil::cart.iam()==0) {
-          //  std::cout<<"j+1: "<<(*clr)[i][j][k]<<" "<<clrold[i][j+1][k]<<" "
-          //           <<(*clr)[i][j+1][k]<<" "<<phi [i][j+1][k]<<" "<<num<<"\n";
-          //}
         }
         if( ((*clr)[i][j][k]-clrsurf)*(clrold[i][j][k-1]-clrsurf) > 0.0 &&
-            ((*clr)[i][j][k-1]-clrsurf)*(clrold[i][j][k-1]-clrsurf) > 0.0 && 
             dom->ibody().on(i,j,k-1)){
           phi_sum += phi [i][j][k-1];
           num++;
-          //if(boil::cart.iam()==0) {
-          //  std::cout<<"k-1: "<<(*clr)[i][j][k]<<" "<<clrold[i][j][k-1]<<" "
-          //           <<(*clr)[i][j][k-1]<<" "<<phi [i][j][k-1]<<" "<<num<<"\n";
-          //}
         }
-        if( ((*clr)[i][j][k]-clrsurf)*(clrold[i][j][k+1]-clrsurf) > 0.0 && 
-            ((*clr)[i][j][k+1]-clrsurf)*(clrold[i][j][k+1]-clrsurf) > 0.0){
+        if( ((*clr)[i][j][k]-clrsurf)*(clrold[i][j][k+1]-clrsurf) > 0.0) {
           phi_sum += phi [i][j][k+1];
           num++;
-          //if(boil::cart.iam()==0) {
-          //  std::cout<<"k+1: "<<(*clr)[i][j][k]<<" "<<clrold[i][j][k+1]<<" "
-          //           <<(*clr)[i][j][k+1]<<" "<<phi [i][j][k+1]<<" "<<num<<"\n";
-          //}
         }
 
         if(num == 0){
-          //phi[i][j][k] = t_new;
           buff[i][j][k] = t_new;
-          //std::cout<<"num==0 "<<i<<" "<<j<<" "<<k<<" "<<boil::cart.iam()<<"\n";
-          //std::cout<<"num0:clrold "<<clrold[i][j][k]<<" "<<clrold[i-1][j][k]<<" "<<clrold[i+1][j][k]<<" "<<clrold[i][j-1][k]<<" "<<clrold[i][j+1][k]<<" "<<clrold[i][j][k-1]<<" "<<clrold[i][j][k+1]<<"\n";
-          //std::cout<<"num0:clr "<<(*clr)[i][j][k]<<" "<<(*clr)[i-1][j][k]<<" "<<(*clr)[i+1][j][k]<<" "<<(*clr)[i][j-1][k]<<" "<<(*clr)[i][j+1][k]<<" "<<(*clr)[i][j][k-1]<<" "<<(*clr)[i][j][k+1]<<"\n";
-          //std::cout<<"num0:phi "<<phi[i][j][k]<<" "<<t_new<<"\n";
-          //boil::plot->plot(*clr, iflag,"clr-phi-iflag", time->current_step());
-          //exit(0);
           std::cout<<"Warning:enthalpyfdhighnu_new_time_step:num==0! proc= "
                    <<boil::cart.iam()<<" i,j,k= "<<i<<" "<<j<<" "<<k<<"\n";
         }else{
-          //phi[i][j][k] = phi_sum/real(num);
           buff[i][j][k] = phi_sum/real(num);
-#if 0
-          if(boil::cart.iam()==0) {
-            std::cout<<"new_time_step: "<<phi[i][j][k]<<" "<<(*clr)[i][j][k]
-            <<" "<<clrold[i][j][k]<<" "<<num<<" "<<" "<<i<<" "<<j<<" "<<k<<" "
-            <<clrold[i-1][j][k]<<" "<<clrold[i+1][j][k]<<" "
-            <<clrold[i][j-1][k]<<" "<<clrold[i][j+1][k]<<" "
-            <<clrold[i][j][k-1]<<" "<<clrold[i][j][k+1]<<"\n";
-            std::cout<<"phi[32][34][34]= "<<phi[32][34][34]<<"\n";
-          }
-#endif
         }
-        //exit(0);
 
       } else {
-        //phi[i][j][k] = t_new;
         buff[i][j][k] = t_new;
       }
 
-      //if((*clr)[i][j][k]>=clrsurf){
-        //c = cpl;
-      //} else {
-        //c = cpv;
-      //}
-      //fold[i][j][k] = c * dV(i,j,k) * phi[i][j][k] * time->dti();
       fold[i][j][k] = c * dV(i,j,k) * buff[i][j][k] * time->dti();
     }
   }

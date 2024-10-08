@@ -57,15 +57,15 @@ void EnthalpyFDhighNu::convection(Scalar * conv) {
   //boil::plot->plot(*clr, iflag,"clr-phi-iflag", time->current_step());
 
   /* set flag */
-  setflag();
+  //setflag();
 
   /*-----------------------+
   |  finite volume method  |
   +-----------------------*/
   for_ijk(i,j,k) {
-    if(iflag[i][j][k]==0){
-      continue;
-    }
+    //if(iflag[i][j][k]==0){
+    //  continue;
+    //}
     { /////////
       //  u  //
       /////////
@@ -79,15 +79,41 @@ void EnthalpyFDhighNu::convection(Scalar * conv) {
       a_e *= dom->ibody().fSe(i,j,k);
     }
 
-    phim = a_w*lim.limit(-umf, phi[i+1][j][k],phi[i][j][k],phi[i-1][j][k]);
-    phip = a_e*lim.limit(+upf, phi[i-1][j][k],phi[i][j][k],phi[i+1][j][k]);
-  
-    if(i==si() && imin) phim = a_w*phi[i-1][j][k];
-    if(i==ei() && imax) phip = a_e*phi[i+1][j][k];
+    real phi_im2 = phi[i-2][j][k];
+    real phi_im1 = phi[i-1][j][k];
+    real phi_c   = phi[i  ][j][k];
+    real phi_ip1 = phi[i+1][j][k];
+    real phi_ip2 = phi[i+2][j][k];
 
-    (*conv)[i]  [j][k] += (umf*phim - upf*phip);
-    (*conv)[i+1][j][k] +=  upf*phip;
-    (*conv)[i-1][j][k] -=  umf*phim;
+    if( (clrold[i][j][k]-clrsurf)*(clrold[i-1][j][k]-clrsurf) < 0.0 ) {
+      phi_im1 = phi_c;
+      phi_im2 = phi_c;
+    } else if( (clrold[i-1][j][k]-clrsurf)*(clrold[i-2][j][k]-clrsurf) < 0.0 )  {
+      phi_im2 = phi_im1;
+    }
+    if( (clrold[i][j][k]-clrsurf)*(clrold[i+1][j][k]-clrsurf) < 0.0 ) {
+      phi_ip1 = phi_c;
+      phi_ip2 = phi_c;
+    } else if( (clrold[i+1][j][k]-clrsurf)*(clrold[i+2][j][k]-clrsurf) < 0.0 ) {
+      phi_ip2 = phi_ip1;
+    }
+    // flux at minus-surface, u is negative
+    //phim = a_w*lim.limit(-umf, phi_ip,phi_c,phi_im);
+    phim = a_w * ( lim.limit(+umf, phi_im2, phi_im1, phi_c)
+                 + lim.limit(-umf, phi_ip1, phi_c, phi_im1));
+    // flux at plus-surface, u is positive
+    //phip = a_e*lim.limit(+upf, phi_im,phi_c,phi_ip);
+    phip = a_e * ( lim.limit(+upf, phi_im1, phi_c, phi_ip1)
+                 + lim.limit(-upf, phi_ip2, phi_ip1, phi_c));
+ 
+    // comment out 2024.10.03 
+    //if(i==si() && imin) phim = a_w*phi[i-1][j][k];
+    //if(i==ei() && imax) phip = a_e*phi[i+1][j][k];
+
+    (*conv)[i][j][k] += (umf*phim - upf*phip);
+    //(*conv)[i+1][j][k] +=  upf*phip;
+    //(*conv)[i-1][j][k] -=  umf*phim;
+
     }
     { /////////
       //  v  //
@@ -102,21 +128,45 @@ void EnthalpyFDhighNu::convection(Scalar * conv) {
       a_n *= dom->ibody().fSn(i,j,k);
     }
 
-    phim = a_s*lim.limit(-vmf, phi[i][j+1][k],phi[i][j][k],phi[i][j-1][k]);
-    phip = a_n*lim.limit(+vpf, phi[i][j-1][k],phi[i][j][k],phi[i][j+1][k]);
+    real phi_jm2 = phi[i][j-2][k];
+    real phi_jm1 = phi[i][j-1][k];
+    real phi_c   = phi[i][j  ][k];
+    real phi_jp1 = phi[i][j+1][k];
+    real phi_jp2 = phi[i][j+2][k];
 
-    if(j==sj() && jmin) phim = a_s*phi[i][j-1][k];
-    if(j==ej() && jmax) phip = a_n*phi[i][j+1][k];
+    if( (clrold[i][j][k]-clrsurf)*(clrold[i][j-1][k]-clrsurf) < 0.0 ) {
+      phi_jm1 = phi_c;
+      phi_jm2 = phi_c;
+    } else if( (clrold[i][j-1][k]-clrsurf)*(clrold[i][j-2][k]-clrsurf) < 0.0 ) {
+      phi_jm2 = phi_jm1;
+    }
+    if( (clrold[i][j][k]-clrsurf)*(clrold[i][j+1][k]-clrsurf) < 0.0 ) {
+      phi_jp1 = phi_c;
+      phi_jp2 = phi_c;
+    } else if( (clrold[i][j][k]-clrsurf)*(clrold[i][j+1][k]-clrsurf) < 0.0 ) {
+      phi_jp2 = phi_jp1;
+    }
 
-    (*conv)[i][j]  [k] += (vmf*phim - vpf*phip);
-    (*conv)[i][j+1][k] +=  vpf*phip;
-    (*conv)[i][j-1][k] -=  vmf*phim;
+    //phim = a_s*lim.limit(-vmf, phi_jp,phi_c,phi_jp);
+    phim = a_s * ( lim.limit(+vmf, phi_jm2, phi_jm1, phi_c)
+                 + lim.limit(-vmf, phi_jp1, phi_c, phi_jm1));
+    //phip = a_n*lim.limit(+vpf, phi_jm,phi_c,phi_jp);
+    phip = a_n * ( lim.limit(+vpf, phi_jm1, phi_c, phi_jp1)
+                 + lim.limit(-vpf, phi_jp2, phi_jp1, phi_c));
+
+    //if(j==sj() && jmin) phim = a_s*phi[i][j-1][k];
+    //if(j==ej() && jmax) phip = a_n*phi[i][j+1][k];
+
+    (*conv)[i][j][k] += (vmf*phim - vpf*phip);
+    //(*conv)[i][j+1][k] +=  vpf*phip;
+    //(*conv)[i][j-1][k] -=  vmf*phim;
+
     } 
     { /////////
       //  w  //
       /////////
-    wmf = (*u)[Comp::w()][i][j][k];    // w @ kmin
-    wpf = (*u)[Comp::w()][i][j][k+1];  // w @ kmax
+    wmf = (*u)[Comp::w()][i][j][k];    // w @ k-plus
+    wpf = (*u)[Comp::w()][i][j][k+1];  // w @ k-minus
 
     real a_b = dSz(i,j,k);
     real a_t = dSz(i,j,k);
@@ -125,26 +175,43 @@ void EnthalpyFDhighNu::convection(Scalar * conv) {
       a_t *= dom->ibody().fSt(i,j,k);
     }
 
-    phim = a_b*lim.limit(-wmf, phi[i][j][k+1], phi[i][j][k], phi[i][j][k-1]);
-    phip = a_t*lim.limit(+wpf, phi[i][j][k-1], phi[i][j][k], phi[i][j][k+1]);
+    real phi_km2 = phi[i][j][k-2];
+    real phi_km1 = phi[i][j][k-1];
+    real phi_c   = phi[i][j][k];
+    real phi_kp1 = phi[i][j][k+1];
+    real phi_kp2 = phi[i][j][k+2];
 
-#if 0
-    if(fabs(phi[i][j][k+1]-phi[i][j][k-1])>0.1){
-      std::cout<<"k+1:k-1: "<<phi[i][j][k+1]<<" "<<phi[i][j][k-1]<<" "
-               <<boil::cart.iam()<<" "<<i<<" "<<j<<" "<<k<<"\n";
-      exit(0);
+    if( (clrold[i][j][k]-clrsurf)*(clrold[i][j][k-1]-clrsurf) < 0.0 ) {
+      phi_km1 = phi_c;
+      phi_km2 = phi_c;
+    } else if( (clrold[i][j][k-1]-clrsurf)*(clrold[i][j][k-2]-clrsurf) < 0.0 ) {
+      phi_km2 = phi_km1;
     }
-#endif
+    if( (clrold[i][j][k]-clrsurf)*(clrold[i][j][k+1]-clrsurf) < 0.0 ) {
+      phi_kp1 = phi_c;
+      phi_kp2 = phi_c;
+    } else if( (clrold[i][j][k+1]-clrsurf)*(clrold[i][j][k+2]-clrsurf) < 0.0 ) {
+      phi_kp2 = phi_kp1;
+    }
 
-    if(k==sk() && kmin) phim = a_b*phi[i][j][k-1];
-    if(k==ek() && kmax) phip = a_t*phi[i][j][k+1];
+    //phim = a_b*lim.limit(-wmf, phi_kp, phi_c, phi_km);
+    phim = a_b * ( lim.limit(+wmf, phi_km2, phi_km1, phi_c)
+                 + lim.limit(-wmf, phi_kp1, phi_c, phi_km1));
+    //phip = a_t*lim.limit(+wpf, phi_km, phi_c, phi_kp);
+    phip = a_t * ( lim.limit(+wpf, phi_km1, phi_c, phi_kp1)
+                 + lim.limit(-wpf, phi_kp2, phi_kp1, phi_c));
 
-    (*conv)[i][j][k]   += (wmf*phim - wpf*phip);
-    (*conv)[i][j][k+1] +=  wpf*phip;
-    (*conv)[i][j][k-1] -=  wmf*phim;
+    //if(k==sk() && kmin) phim = a_b*phi[i][j][k-1];
+    //if(k==ek() && kmax) phip = a_t*phi[i][j][k+1];
+
+    (*conv)[i][j][k] += (wmf*phim - wpf*phip);
+    //(*conv)[i][j][k+1] +=  wpf*phip;
+    //(*conv)[i][j][k-1] -=  wmf*phim;
+    
     }
   }
 
+#if 0
   // k-direction
   for_ij(i,j) buff[i][j][ek()] = (*conv)[i][j][ek()+1]; 
   for_ij(i,j) buff[i][j][sk()] = (*conv)[i][j][sk()-1]; 
@@ -165,11 +232,12 @@ void EnthalpyFDhighNu::convection(Scalar * conv) {
   buff.exchange(0);
   for_jk(j,k) (*conv)[ei()][j][k] += buff[ei()+1][j][k];
   for_jk(j,k) (*conv)[si()][j][k] += buff[si()-1][j][k];
+#endif
 
   for_ijk(i,j,k) {
-    if(iflag[i][j][k]==0){
-      continue;
-    }
+    //if(iflag[i][j][k]==0){
+    //  continue;
+    //}
     real divu = - dSx(i,j,k)*(*u)[Comp::u()][i]  [j]  [k]
                 + dSx(i,j,k)*(*u)[Comp::u()][i+1][j]  [k]
                 - dSy(i,j,k)*(*u)[Comp::v()][i]  [j]  [k]
@@ -178,127 +246,6 @@ void EnthalpyFDhighNu::convection(Scalar * conv) {
                 + dSz(i,j,k)*(*u)[Comp::w()][i]  [j]  [k+1];
     (*conv)[i][j][k] += phi[i][j][k] * divu;
   }
-
-#if 0
-  if(boil::cart.iam()==0)
-    std::cout<<"conv(32,34,34,0)= "<<(*conv)[32][34][34]<<"\n";
-#endif
-
-#if 1
-  /*---------------------------+
-  |  finite difference method  |
-  +---------------------------*/
-  for_ijk(i,j,k) {
-
-    if(iflag[i][j][k]==0){
-
-      real umf, upf, vmf, vpf, wmf, wpf, uc, vc, wc;
-      real dtdxm, dtdxp, dtdym, dtdyp, dtdzm, dtdzp;
-      real udtdx, vdtdy, wdtdz;
-
-      //real clrc = (*clr)[i][j][k]; //shono edit
-      real clrc = clrold[i][j][k];
-
-      /* set velocity */
-      // u
-      umf = (*u)[Comp::u()][i]  [j][k];
-      upf = (*u)[Comp::u()][i+1][j][k];
-
-      // v
-      vmf = (*u)[Comp::v()][i][j]  [k];
-      vpf = (*u)[Comp::v()][i][j+1][k];
-
-      // w
-      wmf = (*u)[Comp::w()][i][j][k];
-      wpf = (*u)[Comp::w()][i][j][k+1];
-
-      // dtdxm
-      //if((clrc-clrsurf)*((*clr)[i-1][j][k]-clrsurf)<0.0){ //shono edit
-      if((clrc-clrsurf)*(clrold[i-1][j][k]-clrsurf)<0.0){
-        dtdxm = 0; //shono edit
-      } else {
-        dtdxm = (phi[i  ][j][k]-phi[i-1][j][k])/dxw(i);
-      }
-
-      // dtdxp
-      //if((clrc-clrsurf)*((*clr)[i+1][j][k]-clrsurf)<0.0){ //shono edit
-      if((clrc-clrsurf)*(clrold[i+1][j][k]-clrsurf)<0.0){
-        dtdxp = 0; //shono edit
-      } else {
-        dtdxp = (phi[i+1][j][k]-phi[i  ][j][k])/dxe(i);
-      }
-
-      // dtdym
-      //if((clrc-clrsurf)*((*clr)[i][j-1][k]-clrsurf)<0.0){ //shono edit
-      if((clrc-clrsurf)*(clrold[i][j-1][k]-clrsurf)<0.0){
-        dtdym = 0; //shono edit
-      } else {
-        dtdym = (phi[i][j  ][k]-phi[i][j-1][k])/dys(j);
-      }
-
-      // dtdyp
-      //if((clrc-clrsurf)*((*clr)[i][j+1][k]-clrsurf)<0.0){ //shono edit
-      if((clrc-clrsurf)*(clrold[i][j+1][k]-clrsurf)<0.0){
-        dtdyp = 0; //shono edit
-      } else {
-        dtdyp = (phi[i][j+1][k]-phi[i][j  ][k])/dyn(j);
-      }
-
-      // dtdzm
-      //if((clrc-clrsurf)*((*clr)[i][j][k-1]-clrsurf)<0.0){ //shono edit
-      if((clrc-clrsurf)*(clrold[i][j][k-1]-clrsurf)<0.0){
-        dtdzm = 0; //shono edit
-      } else {
-        dtdzm = (phi[i][j][k  ]-phi[i][j][k-1])/dzb(k);
-      }
-
-      // dtdzp
-      //if((clrc-clrsurf)*((*clr)[i][j][k+1]-clrsurf)<0.0){ //shono edit
-      if((clrc-clrsurf)*(clrold[i][j][k+1]-clrsurf)<0.0){ //shono edit
-        dtdzp = 0; //shono edit
-      } else {
-        dtdzp = (phi[i][j][k+1]-phi[i][j][k  ])/dzt(k);
-      }
-
-      uc  = 0.5*(umf+upf);
-      vc  = 0.5*(vmf+vpf);
-      wc  = 0.5*(wmf+wpf);
-#if 1
-      udtdx = 0.5*(uc+fabs(uc))*dtdxm
-            + 0.5*(uc-fabs(uc))*dtdxp;
-      vdtdy = 0.5*(vc+fabs(vc))*dtdym
-            + 0.5*(vc-fabs(vc))*dtdyp;
-      wdtdz = 0.5*(wc+fabs(wc))*dtdzm
-            + 0.5*(wc-fabs(wc))*dtdzp;
-#else
-      real u_sign=copysign(1.0,uc);
-      real v_sign=copysign(1.0,vc);
-      real w_sign=copysign(1.0,wc);
-      udtdx = 0.5 * (u_sign+fabs(u_sign)) * dtdxm * umf  // uc > 0
-            - 0.5 * (u_sign-fabs(u_sign)) * dtdxp * upf; // uc < 0
-      vdtdy = 0.5 * (v_sign+fabs(v_sign)) * dtdym * vmf  // vc > 0
-            - 0.5 * (v_sign-fabs(v_sign)) * dtdyp * vpf; // vc < 0
-      wdtdz = 0.5 * (w_sign+fabs(w_sign)) * dtdzm * wmf  // wc > 0
-            - 0.5 * (w_sign-fabs(w_sign)) * dtdzp * wpf; // wc < 0
-
-#endif
-      (*conv)[i][j][k] = - (udtdx + vdtdy + wdtdz) * dV(i,j,k);
-
-#if 0
-  //if(boil::cart.iam()==0&&i==32&&j==34&&k==34)
-  if(boil::cart.iam()==0&&i==32&&j==34&&k==34) {
-    std::cout<<"FDM:conv(32,34,34,0)= "<<(*conv)[32][34][34]<<" "
-             <<udtdx<<" "<<vdtdy<<" "<<wdtdz<<"\n";
-    std::cout<<"if-state: "<<(clrc-clrsurf)*(clrold[i][j][k-1]-clrsurf)<<" "
-             <<(clrc-clrsurf)*(clrold[i][j][k+1]-clrsurf)<<" "
-             <<dtdzm<<" "<<dtdzp<<"\n";
-    std::cout<<"phi: "<<phi[i][j][k-1]<<" "<<phi[i][j][k]<<" "<<phi[i][j][k+1]<<"\n";
-    std::cout<<"clr: "<<clrold[i][j][k-1]<<" "<<clrold[i][j][k]<<" "<<clrold[i][j][k+1]<<"\n";
-  }
-#endif
-    }
-  }
-#endif
 
   /*-------------------------------+
   |  a "touch" from immersed body  |
@@ -319,20 +266,8 @@ void EnthalpyFDhighNu::convection(Scalar * conv) {
     } else {
       c = cpv;
     }
-#if 0
-    //std::cout<<"enthalpyfdhinu_convection\n";
-    if (fabs((*conv)[i][j][k])>1e-16) {
-      std::cout<<"convection: "<<(*conv)[i][j][k]<<" "<<i<<" "<<j<<" "<<k<<"\n";
-      exit(0);
-    }
-#endif
     (*conv)[i][j][k] = c * (*conv)[i][j][k];
   }
 #endif
 
-
-#if 0
-  if(boil::cart.iam()==0)
-    std::cout<<"End:conv(32,34,34,0)= "<<(*conv)[32][34][34]<<" "<<phi[32][34][34]<<" "<<iflag[32][34][34]<<"\n";
-#endif
 }
