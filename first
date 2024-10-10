@@ -95,7 +95,7 @@ else
     autoconf
     autoheader
     automake --add-missing
-    ./configure CC=mpiicc CXX=mpiicpc CXXFLAGS='-O2 -std=c++11 -fp-trap-all=common'
+    ./configure CC=mpiicc CXX=mpiicpc CXXFLAGS='-O2 -std=c++11 -fp-trap-all=common -diag-disable=10441'
     cd Src/Parallel; ln -f -s parallel.h mpi_macros.h; cd ../../
   elif [ $1 = "INTEL2024" ]; then
     aclocal
