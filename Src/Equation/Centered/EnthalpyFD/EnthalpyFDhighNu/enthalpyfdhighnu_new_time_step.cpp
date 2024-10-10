@@ -87,6 +87,7 @@ void EnthalpyFDhighNu::new_time_step(const Scalar * diff_eddy) {
   /* semi-laglangian scheme */
   for_ijk(i,j,k){
     if(dom->ibody().on(i,j,k)){
+      // in fluid
       real c;
       if((*clr)[i][j][k]>=clrsurf){  // synchronize with upper definition
         c = cpl;
@@ -138,6 +139,9 @@ void EnthalpyFDhighNu::new_time_step(const Scalar * diff_eddy) {
       }
 
       fold[i][j][k] = c * dV(i,j,k) * buff[i][j][k] * time->dti();
+    } else {
+      // in solid
+      buff[i][j][k] = phi[i][j][k];
     }
   }
   phi = buff;
