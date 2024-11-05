@@ -51,8 +51,9 @@ void ConcentrationTP::new_time_step(const Scalar * diff_eddy) {
     //real col_old = std::min(1.0,std::max(0.0,clrold[i][j][k]));
     //real col_new = clr[i][j][k];
     //real col_old = clrold[i][j][k];
-    real r = rho_dif->value(i,j,k);
+    real r = rho_dif->value(i,j,k);  // density
 
+    // if color function is the volume fraction of liquid
     if(matter_sig==Sign::neg()) col_old = 1.-col_old;
  
     fold[i][j][k] = r * dV(i,j,k) * time->dti() *
