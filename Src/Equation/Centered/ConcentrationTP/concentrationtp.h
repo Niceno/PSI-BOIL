@@ -25,6 +25,8 @@
 *  \f${\bf u_{vol}} \; [\frac{m}{s}]\f$ is volumetric velocity,
 *  \f$\gamma \; [\frac{kg}{ms}]\f$ is species diffusivity and
 *  \f$\dot{M} \; [\frac{kg}{s}]\f$ is (external) mass source rate.
+*
+*  YOHEI: see Eq.1.64 in Lubomir's PhD thesis for more details!
 *******************************************************************************/
 
 /////////////////////
@@ -87,12 +89,16 @@ class ConcentrationTP : public Centered {
 
     virtual void convection();
     void extrapolate();
+    void extrapolate_interface();
 
     //! Velocity calculations.
     void compute_umass(Vector & umass, const Vector & uvol,
                        const Matter * gas, const Scalar * diff_eddy = NULL);
     void compute_udiff_div(Scalar & p, const Property * mu_fluid,
                            const Vector & udiff);
+
+    // cut-off mass transfer if vf is smaller than critvf
+    void mdot_cutoff(Scalar & mdot);
 
   protected:
     void create_system_innertial();
@@ -118,7 +124,7 @@ class ConcentrationTP : public Centered {
     const Property * dcoef;
 
     real turbS; /* turbulent schmidt number */
-    real col_crit;
+    real col_crit; // color function criteria
     bool laminar, store_vf;
     bool use_heaviside_instead_of_vf;
     const Sign matter_sig;
