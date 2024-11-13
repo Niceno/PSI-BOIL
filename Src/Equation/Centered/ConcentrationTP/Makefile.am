@@ -4,7 +4,9 @@ libConcentrationTP_a_SOURCES = concentrationtp.h                            \
 		               concentrationtp_convection.cpp               \
                                concentrationtp_discretize.cpp               \
                                concentrationtp_extrapolate.cpp              \
+                               concentrationtp_extrapolate_interface.cpp    \
                                concentrationtp_extrapolation_flag.cpp       \
+                               concentrationtp_mdot_cutoff.cpp              \
                                concentrationtp_new_time_step.cpp            \
                                concentrationtp_solve.cpp                    \
                                concentrationtp_surface_color.cpp            \
