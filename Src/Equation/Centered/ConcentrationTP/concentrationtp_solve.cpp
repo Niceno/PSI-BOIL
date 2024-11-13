@@ -24,8 +24,13 @@ void ConcentrationTP::solve(const ResTol & toler, const ResRat & fact,
   /* solve */
   update_rhs();
 
+  // in the phase which will not be solved, [1]*phi=phi
   for_avijk(phi,i,j,k) {
-    if(heavi->status(i,j,k)==-matter_sig) {
+    real col_new = vfval(i,j,k);
+    if(matter_sig==Sign::neg()) col_new = 1.-col_new;
+    // col_new: volume fraction of gas
+    if(  heavi->status(i,j,k)==-matter_sig
+       ||col_new<=col_crit) {  // modified on 2024.11.12 for falling film Janani
       fnew[i][j][k] = phi[i][j][k];
     }
   }
