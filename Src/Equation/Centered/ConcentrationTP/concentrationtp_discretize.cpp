@@ -55,8 +55,9 @@ void ConcentrationTP::discretize(const Scalar * diff_eddy) {
     if(dom->ibody().on(i,j,k)) {
       real col_new = vfval(i,j,k);
       if(matter_sig==Sign::neg()) col_new = 1.-col_new;
+      // col_new: volume fraction of gas
       if(  heavi->status(i,j,k)==-matter_sig
-         ||col_new<=col_crit  // modified on 2024.07.03 for falling film Janani
+         ||col_new<=col_crit  // modified on 2024.07.04 for falling film Janani
         ) {
         A.c[i][j][k]  = 1.0;
         A.w[i][j][k]  = 0.0;
@@ -66,7 +67,7 @@ void ConcentrationTP::discretize(const Scalar * diff_eddy) {
         A.b[i][j][k]  = 0.0;
         A.t[i][j][k]  = 0.0;
         A.ci[i][j][k] = 1.0;
-        fold[i][j][k] = phi[i][j][k];
+        //fold[i][j][k] = phi[i][j][k]; // comment out this because fold will be modified by new_time_step
       }
     }
     else {
