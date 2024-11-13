@@ -25,12 +25,13 @@ void ConcentrationTP::new_time_step(const Scalar * diff_eddy) {
     }
   }
 
+   // conv_ts.Nm1 must be 1.0; diff_ts.Nm1 must be 0.0
   if(conv_ts.Nm1()!=1.0) {
-    std::cout<<"concentrationtp_new_time_step, forward_euler should be used!\n";
+    boil::oout<<"concentrationtp_new_time_step, forward_euler should be used!\n";
     exit(0);
   }
   if(diff_ts.Nm1()!=0.0) {
-    std::cout<<"concentrationtp_new_time_step, backward_euler should be used!\n";
+    boil::oout<<"concentrationtp_new_time_step, backward_euler should be used!\n";
     exit(0);
   }
 
@@ -40,6 +41,9 @@ void ConcentrationTP::new_time_step(const Scalar * diff_eddy) {
     } 
     store_vf = true;
   }
+
+  // extrapolate eps at new interface cells: vf changed from 1 to 0.999
+  extrapolate_interface();
 
   /*------------------------------+
   |  fold = vol * rho * eps / dt  |
@@ -83,9 +87,8 @@ void ConcentrationTP::new_time_step(const Scalar * diff_eddy) {
   /* semi-lagrangian scheme */
   for_ijk(i,j,k) {
     real col_new = vfval(i,j,k);
-    if(matter_sig==Sign::neg()) {
-      col_new = 1.-col_new;
-    }
+    if(matter_sig==Sign::neg()) col_new = 1.-col_new;
+    // col_new: volume fraction of vapor
     if(dom->ibody().on(i,j,k)&&heavi->status(i,j,k)!=-matter_sig
        &&col_new>col_crit) {
       real r = rho_dif->value(i,j,k);
@@ -98,7 +101,8 @@ void ConcentrationTP::new_time_step(const Scalar * diff_eddy) {
         Ac *= fV;
       }
 
-      phi[i][j][k] = fold[i][j][k] / Ac;
+      real phi_new = fold[i][j][k] / Ac;
+      phi[i][j][k] = std::max(0.0,std::min(1.0,phi_new));
     }
   }
 
@@ -109,8 +113,9 @@ void ConcentrationTP::new_time_step(const Scalar * diff_eddy) {
     if(matter_sig==Sign::neg()) {
       col_new = 1.-col_new;
     }
-    if(dom->ibody().on(i,j,k)&&heavi->status(i,j,k)!=-matter_sig
-       &&col_new>col_crit) {
+    if(dom->ibody().on(i,j,k)                // in fluid domain (not solid)
+       && heavi->status(i,j,k)!=-matter_sig  // gas-phase
+       && col_new>col_crit) {                // not-full-of-liquid-cell
       real r = rho_dif->value(i,j,k);
 
       /* gas diffusive innertial */
