@@ -9,6 +9,7 @@ inline real TIF::underrelaxation(const real tintnew, const real tifold) {
  *  Tn+1 = Tint*factor + Tn*(1-factor)
 *******************************************************************************/
 void TIF::tint_field(const bool newstep) {
+
   if(variable_tif) {
     if(store_tif) {
       if(newstep) {
@@ -36,10 +37,11 @@ void TIF::tint_field(const bool newstep) {
     if(store_tif) {
       if(factor < 1.00) {
         for_vijk(tif,i,j,k) {
-          if(topo->interface(i,j,k)) {
-            real tintnew = tif[i][j][k];
-            tif[i][j][k] = underrelaxation(tintnew,tifold[i][j][k]);
-          }
+          //if(topo->interface(i,j,k)){ // This is unnecessary; it causes problem
+          //                            // New interface cell doesn't have tifold
+          real tintnew = tif[i][j][k];
+          tif[i][j][k] = underrelaxation(tintnew,tifold[i][j][k]);
+          //}
         }
       }
     } 
