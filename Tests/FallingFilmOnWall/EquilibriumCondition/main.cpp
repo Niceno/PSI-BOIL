@@ -393,6 +393,10 @@ int main(int argc, char ** argv) {
                        load_scalars, load_scalar_names,
                        load_vectors, load_vector_names)) {
     conc.init();
+#ifdef VARIABLE
+    tsat.update_tifold();
+#endif
+
   } else {
     boil::oout << "######################" << boil::endl;
     boil::oout << "#                    #" << boil::endl;
@@ -435,7 +439,6 @@ int main(int argc, char ** argv) {
     eps.exchange_all(); //Necessary for parallel computation, values are exchanged between processors
 
 #ifdef VARIABLE
-    tsat.tif = tsat.temperature(eps0);
     tsat.init();
 #endif
 
@@ -465,6 +468,15 @@ int main(int argc, char ** argv) {
     |  phase change  |
     +---------------*/
     pc.update();                // calculate mdot from temperature field
+    // outlet region for mdot
+    for_vijk(mdot,i,j,k){
+      if (mdot.zc(k)<0.04*LZ) {
+        mdot[i][j][k]=0.0;
+      }
+    }
+    mdot.bnd_update();
+    mdot.exchange_all();
+
     ngtransp.mdot_cutoff(mdot); // set mdot=0 for the cells of vfv < limitvf
     ns.vol_phase_change(&f);    // calculate volume change in whole domain
 
@@ -535,7 +547,7 @@ int main(int argc, char ** argv) {
     |  solve transport equation  |
     +---------------------------*/
     conc.new_time_step();
-    conc.advance_with_extrapolation(false,ResTol(1e-7),uvw,f,
+    conc.advance_with_extrapolation(true,ResTol(1e-7),uvw,f,
                                     one,&uvw_1,zero,&uvw_2);
 
     // outlet region

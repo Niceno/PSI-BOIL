@@ -99,7 +99,8 @@ int main(int argc, char ** argv) {
   const bool use_unconditional_extrapolation = false;
 
   /* under-relaxation */
-  const real ur = 0.01;
+  //const real ur = 0.01;
+  const real ur = 0.1;
 
   /* limit vfrac for ctp */
   const real limitvf = 0.001;
@@ -146,7 +147,6 @@ int main(int argc, char ** argv) {
 
   const real DZ = 4.0 * DX;
   const int  NZ = 128 * gLevel;
-  //const int  NZ = 32 * gLevel;
   const real LZ = real(NZ)*DZ;
 
   const int  NY = 8 * gLevel;
@@ -402,11 +402,8 @@ int main(int argc, char ** argv) {
                        load_scalars, load_scalar_names,
                        load_vectors, load_vector_names)) {
     conc.init();
-    //boil::plot->plot(uvw,c,tpr,eps,press,mdot,"uvw-c-tpr-eps-press-mdot",999999); 
-    //exit(0);
 #ifdef VARIABLE
-    tsat.tif = tsat.temperature(eps0);
-    tsat.init();
+    tsat.update_tifold();
 #endif
 
   } else {
@@ -475,8 +472,7 @@ int main(int argc, char ** argv) {
     /*.si()-1 or .ei()+1 gives the domain boundary, for the first cell centre just use .si()*/
 
 #ifdef VARIABLE
-    tsat.tif = tsat.temperature(eps0);
-    tsat.init();
+    tsat.init();  // calculate tif: interface temperature
 #endif
 
     boil::plot->plot(uvw,c,tpr,eps,press,mdot,"uvw-c-tpr-eps-press-mdot",0); 
@@ -497,14 +493,28 @@ int main(int argc, char ** argv) {
   +------------*/
   for(time.start(); time.end(); time.increase()) {
 
-    /* temperature field */
-    boil::oout<<"tsat.tint_field\n";
+    // test: update topo
+    //conc.new_time_step();
+
+    /* interface temperature field */
+    // since relaxation factor is used, tif depends on tifold. 
+    // tifold is stored here
     tsat.tint_field();
 
     /*---------------+
     |  phase change  |
     +---------------*/
     pc.update();                // calculate mdot from temperature field
+
+    // outlet region for mdot
+    for_vijk(mdot,i,j,k){
+      if (mdot.zc(k)<DZ*5.0) {
+        mdot[i][j][k]=0.0;
+      }
+    }
+    mdot.bnd_update();
+    mdot.exchange_all();
+
     ngtransp.mdot_cutoff(mdot); // set mdot=0 for the cells of vfv < limitvf
     ns.vol_phase_change(&f);    // calculate volume change in whole domain
 
@@ -515,7 +525,8 @@ int main(int argc, char ** argv) {
 
     /* surface tension */
     conc.tension(&xyz, mixed,conc.color());
-    // outlet
+
+    // outlet region for surface tension
     for_m(m){
       for_vmijk(xyz,m,i,j,k){
         if(xyz.zc(m,k)<DZ*5.0){
@@ -575,10 +586,10 @@ int main(int argc, char ** argv) {
     |  solve transport equation  |
     +---------------------------*/
     conc.new_time_step();
-    conc.advance_with_extrapolation(false,ResTol(1e-7),uvw,f,
+    conc.advance_with_extrapolation(true,ResTol(1e-7),uvw,f,  //true: call vof_ancillary
                                     one,&uvw_1,zero,&uvw_2);
 
-    // outlet region
+    // outlet region for color function
     for_vijk(c,i,j,k){
       if (c.zc(k)<DZ*4.0) {
         c[i][j][k]=0.0;
@@ -594,7 +605,7 @@ int main(int argc, char ** argv) {
     enthFD.new_time_step();
     enthFD.solve(ResRat(1e-16),"enthFD");
 
-    // outlet region
+    // outlet region for temperature
     for_vijk(tpr,i,j,k){
       if (tpr.zc(k)<DZ*5.0) {
         tpr[i][j][k]=tinliq;
@@ -611,7 +622,7 @@ int main(int argc, char ** argv) {
     ngtransp.solve(ResRat(1e-14),"Concentration");
     ngtransp.extrapolate();
 
-    // outlet region
+    // outlet region for eps
     for_vijk(eps,i,j,k){
       if (eps.zc(k)<DZ*5.0) {
         eps[i][j][k]=eps1;
@@ -635,7 +646,10 @@ int main(int argc, char ** argv) {
     |  output data  |
     +--------------*/
     if((time.current_time()) / (t_per_plot) >= real(iint) || time.current_step()==1 ) {
-      boil::plot->plot(uvw,c,tpr,eps,press,mdot,"uvw-c-tpr-eps-press-mdot",iint);
+      p[i][j][k]=cht.topo->get_adens()[i][j][k];
+      boil::plot->plot(uvw,c,tpr,eps,press,mdot,p,"uvw-c-tpr-eps-press-mdot-adens",iint);
+      p=0.0;
+
       iint++;
     }
 
