@@ -48,6 +48,10 @@ void VOF::ancillary(Scalar & scp, const bool reconstruct) {
   if(bndclr)
     cal_bndclr(scp);
 
+#if 0
+  boil::plot->plot(phi,*(topo->clr),adens,"phi-clr-adens", time->current_step());
+#endif
+
   boil::timer.stop("vof ancillary");
 
   return;
