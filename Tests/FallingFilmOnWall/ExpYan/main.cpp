@@ -2,8 +2,11 @@
 #include <fstream>
 #include <iostream>
 #include <fenv.h>
-
 #define VARIABLE
+
+void ave_profile(const real ZZ, const Domain & d, const int NX, const int NY,
+                 const Vector & uvw, const Scalar & c, const Scalar & tpr,
+                 const Scalar & eps, const Scalar & mdot, const int icount);
 
 /******************************************************************************/
 int main(int argc, char ** argv) {
@@ -104,10 +107,6 @@ int main(int argc, char ** argv) {
 
   /* limit vfrac for ctp */
   const real limitvf = 0.001;
-
-  /* moving-frame */
-  const real ur_vel = 0.1;
-  real wvel = 0.0;
 
 /******************************************************************************/
 /* ------------ material properties */
@@ -645,13 +644,31 @@ int main(int argc, char ** argv) {
     /*--------------+
     |  output data  |
     +--------------*/
-    if((time.current_time()) / (t_per_plot) >= real(iint) || time.current_step()==1 ) {
-      p[i][j][k]=cht.topo->get_adens()[i][j][k];
-      boil::plot->plot(uvw,c,tpr,eps,press,mdot,p,"uvw-c-tpr-eps-press-mdot-adens",iint);
-      p=0.0;
+    if((time.current_time()) / (t_per_plot) >= real(iint)) {
+      // output to tecplot/visit/paraview
+      boil::plot->plot(uvw,c,tpr,eps,press,mdot,p,"uvw-c-tpr-eps-press-mdot",iint);
+      // output velocity profile to text file: profile in the x-direction averaged in y
+      ave_profile(12*DZ, d, NX, NY, uvw, c, tpr, eps, mdot, iint);
 
       iint++;
     }
+
+    /*---------------+
+    |  post-process  |
+    +---------------*/
+    // volume-averaging of liquid-temperature at Z = 12*DZ
+    real sum_tpr = 0.0;
+    real sum_vol = 0.0;
+    for_vijk(tpr,i,j,k) {
+      if(tpr.zc(k)<12.0*DZ && 12.0*DZ<tpr.zc(k+1)) {
+        sum_tpr += tpr[i][j][k] * tpr.dV(i,j,k) * c[i][j][k];
+        sum_vol += tpr.dV(i,j,k) * c[i][j][k];
+      }
+    }
+    boil::cart.sum_real(&sum_tpr);
+    boil::cart.sum_real(&sum_vol);
+    boil::oout<<"Temperature-liquid-volume-averaged: "<<time.current_time()
+              <<" "<<sum_tpr/sum_vol<<"\n";
 
     /*--------------+
     |  backup data  |
@@ -687,3 +704,74 @@ int main(int argc, char ** argv) {
 
 }
 
+void ave_profile(const real ZZ, const Domain & d, const int NX, const int NY,
+                 const Vector & uvw, const Scalar & c, const Scalar & tpr,
+                 const Scalar & eps, const Scalar & mdot, const int icount){
+  // profiles at Z, average in the j-direction
+  // define array
+  real xtmp [NX]={0.0};
+  real vel_u[NX]={0.0};
+  real vel_v[NX]={0.0};
+  real vel_w[NX]={0.0};
+  real ave_c[NX]={0.0};
+  real ave_t[NX]={0.0};
+  real ave_e[NX]={0.0};
+  real ave_m[NX]={0.0};
+
+  for_vk(c,k){
+    if (c.zc(k)<ZZ && ZZ<c.zc(k+1)) {
+      for_vij(c,i,j) {
+        int I = d.global_I(i);
+        int J = d.global_J(j);
+        xtmp[I-3]  += c.xc(i);
+        vel_u[I-3] += 0.5*(uvw[Comp::u()][i][j][k]+uvw[Comp::u()][i+1][j][k]);
+        vel_v[I-3] += 0.5*(uvw[Comp::v()][i][j][k]+uvw[Comp::v()][i][j+1][k]);
+        vel_w[I-3] += uvw[Comp::w()][i][j][k];
+        ave_c[I-3] += c[i][j][k];
+        ave_t[I-3] += tpr[i][j][k];
+        ave_e[I-3] += eps[i][j][k];
+        ave_m[I-3] += mdot[i][j][k];
+      }
+    }
+  }
+  boil::cart.sum_real_n(xtmp ,NX);
+  boil::cart.sum_real_n(vel_u,NX);
+  boil::cart.sum_real_n(vel_v,NX);
+  boil::cart.sum_real_n(vel_w,NX);
+  boil::cart.sum_real_n(ave_c,NX);
+  boil::cart.sum_real_n(ave_t,NX);
+  boil::cart.sum_real_n(ave_e,NX);
+  boil::cart.sum_real_n(ave_m,NX);
+
+  // output to file
+  if( boil::cart.iam()==0) {
+
+    std::ostringstream oss;
+    oss << std::setw(6) << std::setfill('0') << icount;
+    std::string icount_6digits = oss.str();
+
+    std::fstream output;
+    std::stringstream ss;
+    ss <<"vel-"<<ZZ<<"-"<<icount_6digits<<".txt";
+    std::string fname = ss.str();
+    int len = fname.length();
+    char * cfname = new char[len+1];
+    memcpy(cfname, fname.c_str(), len+1);
+    output.open(cfname, std::ios::out);
+    boil::oout<<"# Plotting: "<<cfname<<"\n";
+    output<<"x  vel_u  vel_v  vel_w  c  tpr  eps  mdot  (at Z= "<<ZZ<<")\n";
+    for (int I=0; I<NX; I++) {
+      xtmp[I]  = xtmp[I] /real(NY);
+      vel_u[I] = vel_u[I]/real(NY);
+      vel_v[I] = vel_v[I]/real(NY);
+      vel_w[I] = vel_w[I]/real(NY);
+      ave_c[I] = ave_c[I]/real(NY);
+      ave_t[I] = ave_t[I]/real(NY);
+      ave_e[I] = ave_e[I]/real(NY);
+      ave_m[I] = ave_m[I]/real(NY);
+      output<<xtmp[I] <<" "<<vel_u[I]<<" "<<vel_v[I]<<" "<<vel_w[I]<<" "
+            <<ave_c[I]<<" "<<ave_t[I]<<" "<<ave_e[I]<<" "<<ave_m[I]<<"\n";
+    }
+    output.close();
+  }
+}

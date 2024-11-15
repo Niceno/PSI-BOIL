@@ -101,10 +101,6 @@ int main(int argc, char ** argv) {
   /* limit vfrac for ctp */
   const real limitvf = 0.001;
 
-  /* moving-frame */
-  const real ur_vel = 0.1;
-  real wvel = 0.0;
-
 /******************************************************************************/
 /* ------------ material properties */
   const real Mv = 18.0e-3;  // molecular mass of water [kg/mol] used for diffcoef and clap
