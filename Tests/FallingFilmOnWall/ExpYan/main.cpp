@@ -752,7 +752,7 @@ void ave_profile(const real ZZ, const Domain & d, const int NX, const int NY,
 
     std::fstream output;
     std::stringstream ss;
-    ss <<"vel-"<<ZZ<<"-"<<icount_6digits<<".txt";
+    ss <<"profiles-"<<ZZ<<"-"<<icount_6digits<<".txt";
     std::string fname = ss.str();
     int len = fname.length();
     char * cfname = new char[len+1];
