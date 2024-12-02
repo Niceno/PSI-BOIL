@@ -22,6 +22,11 @@ void Model::wall_function( const Vector & uvw, const Matter & fluid,
 
   /* get normal to the wall */
   real nx, ny, nz; dist.grad_abs(i, j, k, &nx, &ny, &nz);
+  if (nx*nx+ny*ny+nz*nz==0.0) {
+    std::cout<<"#ERROR!!!  wall_function: wall normal vector = 0.0\n";
+    std::cout<<"exiting\n";
+    exit(0);
+  }
 
   /* estimate tangential velocity component */
   real ux, uy, uz; uvw.central( i, j, k, &ux, &uy, &uz );
@@ -32,6 +37,10 @@ void Model::wall_function( const Vector & uvw, const Matter & fluid,
  
   /* and kinematic viscosity */
   const real nu = fluid.mu(i,j,k) / fluid.rho(i,j,k);
+  if (nu==0.0) {
+    std::cout<<"#ERROR!!!  wall_function: nu = 0.0 "<<i<<" "<<j<<" "<<k<<" "
+             <<fluid.mu(i,j,k)<<" "<<fluid.rho(i,j,k)<<"\n";
+  }
 
   /* try linear */
   real y_plus = sqrt( ut * d / nu );
