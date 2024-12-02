@@ -21,7 +21,13 @@ void Scalar::grad_abs( const int i, const int j, const int k,
 
   real d = sqrt( dx*dx + dy*dy + dz*dz );
 
-  *d_x = dx / d;  
-  *d_y = dy / d;  
-  *d_z = dz / d;  
+  if(d==0.0){
+    *d_x = 0.0;
+    *d_y = 0.0;
+    *d_z = 0.0;
+  } else {
+    *d_x = dx / d;
+    *d_y = dy / d;
+    *d_z = dz / d;
+  }
 }
