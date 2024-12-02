@@ -1,7 +1,7 @@
 #include "distance.h"
 
 /******************************************************************************/
-void Distance::compute() {
+void Distance::compute(real restol) {
 
   boil::timer.start("distance");
 
@@ -53,7 +53,7 @@ void Distance::compute() {
   +--------*/
   solver->solve(A, phi, fnew, min_iter,
                 MaxIter(1000), "distance", 
-                ResRat(boil::micro), ResTol(boil::pico));
+                ResRat(boil::micro), ResTol(restol));
 
   phi.bnd_update();
 

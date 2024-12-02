@@ -19,7 +19,7 @@ class Distance : public Centered {
              Linear * S);
     ~Distance();
 	  
-    void compute();
+    void compute(real r = 0.0);
 
   protected:
     Matter v_fluid; /* virtual fluid for distance transport equation */
