@@ -1,3 +1,10 @@
+#include <fenv.h>
+static void __attribute__ ((constructor)) trapfpe(void)
+{
+  /* Enable some exceptions. At startup all exceptions are masked. */
+  feenableexcept(FE_INVALID|FE_DIVBYZERO|FE_OVERFLOW);
+}
+
 #include "../Solver/Additive/additive.h"
 #include "../Solver/Linear/Iterative/iterative.h"
 #include "../Solver/Linear/Krylov/krylov.h"
