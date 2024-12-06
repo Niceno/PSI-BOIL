@@ -1,12 +1,11 @@
 #include "cipcsl2.h"
 #include <iomanip>
 
+
 /******************************************************************************/
 void CIPCSL2::totalvol() {
 /***************************************************************************//**
-*  \brief Calculate volume by two methods.
-*         Method1: Sum(clr*dV)
-*         Method2: Sum(dV)  in the region clr > phisurf
+*  \brief Calculate Sum(clr*dV)
 *******************************************************************************/
 
    clrsum1=0.0;
@@ -27,7 +26,6 @@ void CIPCSL2::totalvol() {
    boil::cart.sum_real(&clrsum1);
    boil::cart.sum_real(&clrsum2);
 
-#if 1
    std::cout.setf(std::ios_base::scientific);
    std::cout<< std::setprecision(16);
    boil::oout << "cipcsl2_totalvol:time,clrsum1,clrsum2= " 
@@ -35,7 +33,6 @@ void CIPCSL2::totalvol() {
               <<" "<< clrsum1 <<" "<< clrsum2 << boil::endl;
    std::cout.unsetf(std::ios_base::floatfield);
    std::cout<< std::setprecision(6);
-#endif
 
    return;
 }
@@ -43,9 +40,7 @@ void CIPCSL2::totalvol() {
 /******************************************************************************/
 void CIPCSL2::totalvol( Range<real> xr, Range<real> yr, Range<real> zr) {
 /***************************************************************************//**
-*  \brief Calculate volume by two methods.
-*         Method1: Sum(clr*dV)
-*         Method2: Sum(dV)  in the region clr > phisurf
+*  \brief Calculate Sum(clr*dV) in Range
 *******************************************************************************/
 
    real clrsum1r=0.0;
@@ -86,15 +81,17 @@ void CIPCSL2::totalvol( Range<real> xr, Range<real> yr, Range<real> zr) {
    boil::cart.sum_real(&clrsum1r);
    boil::cart.sum_real(&clrsum2r);
 
+   std::cout.setf(std::ios_base::scientific);
+   std::cout<< std::setprecision(16);
    boil::oout << "cipcsl2_totalvolRange:time,clrsum1,clrsum2= " 
               << time->current_time()
               <<" "<< clrsum1r <<" "<< clrsum2r <<"\n";
+   std::cout.unsetf(std::ios_base::floatfield);
+   std::cout<< std::setprecision(6);
+
 
    return;
 }
-
-
-
 
 /******************************************************************************/
 real CIPCSL2::totalvol(const Scalar & sca ) {
