@@ -218,7 +218,30 @@ mentum_cfl_max.Tpo"; exit 1; fi
 \end{verbatim}}
 %
 Once the compilation is done, the executable called {\tt Boil} will reside in the
-source directory. 
+source directory. If the next compile error appears, then follow the next section.
+{\small \begin{verbatim}
+make[1]: *** No rule to make target 'Plot/TECMPI/teciompisrc/libteciompi.a', needed by 
+'Boil'.  Stop.
+\end{verbatim}}
+
+\subsection{3rd party library}
+
+In some branches of {\psiboil}, a third party library provided by Tecplot Inc. is used. 
+The library is related to MPI, thus it could be better to compile on your system. To 
+compile it, {\tt cmake} and {\tt Boost library} are required. cmake and Boost can be 
+installed by yourself, or you may use the module on your system.
+\begin{verbatim}
+	> module load cmake
+	> module load Boost
+\end{verbatim}
+Then compile the library as follows.
+\begin{verbatim}
+	> cd ./Src/Plot/TECMPI/teciompisrc
+	> cmake .
+	> make
+\end{verbatim}
+If you face a problem of this process, read {\tt 00\_README.txt} in this folder. The library
+ {\tt libteciompi.a} must be created by these operation.
 
 \subsection{Running the code}
 
