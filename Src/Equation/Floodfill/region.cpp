@@ -5,7 +5,8 @@
 Region::Region(const int rid,
                const int cvol,
                const real x, const real y, const real z,
-               const real u, const real v, const real w) {
+               const real u, const real v, const real w,
+               const real vol) {
 
   m_id=rid;
   m_pos[0]=x; m_pos[1]=y; m_pos[2]=z;
@@ -13,6 +14,7 @@ Region::Region(const int rid,
   m_vel[0]=u; m_vel[1]=v; m_vel[2]=w;
   m_comvel[0]=u; m_comvel[1]=v; m_comvel[2]=w;
   m_cellvol=cvol;
+  m_volume=vol;
   m_hiding=false;
   m_tsteps_hiding=0;
 

@@ -17,6 +17,7 @@ void Floodfill::get_region_info(int ptmpcalcID, int ntmpcalcID) {
   flookup_u.resize(size_lookups);
   flookup_v.resize(size_lookups);
   flookup_w.resize(size_lookups);
+  flookup_vol.resize(size_lookups);
 
   /* to ensure reassigned to 0, this is necessary */
   for (int i=0; i<flookup_cvol.size(); i++) {
@@ -27,6 +28,7 @@ void Floodfill::get_region_info(int ptmpcalcID, int ntmpcalcID) {
     flookup_u[i] = 0.;
     flookup_v[i] = 0.;
     flookup_w[i] = 0.;
+    flookup_vol[i] = 0.;
   }
 
   pt_flookup_cvol = flookup_cvol.data();
@@ -36,6 +38,7 @@ void Floodfill::get_region_info(int ptmpcalcID, int ntmpcalcID) {
   pt_flookup_u   = flookup_u.data();
   pt_flookup_v   = flookup_v.data();
   pt_flookup_w   = flookup_w.data();
+  pt_flookup_vol = flookup_vol.data();
   pt_flookup_cvol        -= ntmpcalcID;
   pt_flookup_x           -= ntmpcalcID;
   pt_flookup_y           -= ntmpcalcID;
@@ -43,20 +46,29 @@ void Floodfill::get_region_info(int ptmpcalcID, int ntmpcalcID) {
   pt_flookup_u           -= ntmpcalcID;
   pt_flookup_v           -= ntmpcalcID;
   pt_flookup_w           -= ntmpcalcID;
+  pt_flookup_vol         -= ntmpcalcID;
 
   /*----------------------------------------------------+
   |  Calculate the volume, center of mass, and avg uvw  |
   |  for each of the final regions                      |
   +----------------------------------------------------*/
   for_vijk(rgnid,i,j,k) {
-    int rid = int(rgnid[i][j][k]);
-    pt_flookup_cvol[rid]++;
-    pt_flookup_x[rid] += rgnid.xc(i);
-    pt_flookup_y[rid] += rgnid.yc(j);
-    pt_flookup_z[rid] += rgnid.zc(k);
-    pt_flookup_u[rid] += 0.5*((*uvw)[Comp::u()][i][j][k]+(*uvw)[Comp::u()][i+1][j][k]);
-    pt_flookup_v[rid] += 0.5*((*uvw)[Comp::v()][i][j][k]+(*uvw)[Comp::v()][i][j+1][k]);
-    pt_flookup_w[rid] += 0.5*((*uvw)[Comp::w()][i][j][k]+(*uvw)[Comp::w()][i][j][k+1]);
+    // Range
+    if(xr.contains(c.xc(i)) &&
+       yr.contains(c.yc(j)) &&
+       zr.contains(c.zc(k))) {
+      int rid = int(rgnid[i][j][k]);
+      pt_flookup_cvol[rid]++;
+      pt_flookup_x[rid] += rgnid.xc(i);
+      pt_flookup_y[rid] += rgnid.yc(j);
+      pt_flookup_z[rid] += rgnid.zc(k);
+      pt_flookup_u[rid] += 0.5*((*uvw)[Comp::u()][i][j][k]+(*uvw)[Comp::u()][i+1][j][k]);
+      pt_flookup_v[rid] += 0.5*((*uvw)[Comp::v()][i][j][k]+(*uvw)[Comp::v()][i][j+1][k]);
+      pt_flookup_w[rid] += 0.5*((*uvw)[Comp::w()][i][j][k]+(*uvw)[Comp::w()][i][j][k+1]);
+      real ctmp = c[i][j][k];
+      if (ctmp<0.5) ctmp = 1.0 - ctmp;
+      pt_flookup_vol[rid] += ctmp*c.dV(i,j,k);
+    }
   }
   boil::cart.sum_int_n(&flookup_cvol[0], size_lookups);
   boil::cart.sum_real_n(&flookup_x[0], size_lookups);
@@ -65,6 +77,7 @@ void Floodfill::get_region_info(int ptmpcalcID, int ntmpcalcID) {
   boil::cart.sum_real_n(&flookup_u[0], size_lookups);
   boil::cart.sum_real_n(&flookup_v[0], size_lookups);
   boil::cart.sum_real_n(&flookup_w[0], size_lookups);
+  boil::cart.sum_real_n(&flookup_vol[0], size_lookups);
   for (int i=ntmpcalcID; i<=ptmpcalcID; i++) {
     if (pt_flookup_cvol[i]) {  
       real volcells = pt_flookup_cvol[i];

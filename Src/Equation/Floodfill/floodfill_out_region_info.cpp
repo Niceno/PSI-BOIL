@@ -41,14 +41,14 @@ void Floodfill::out_region_info() {
     if (!(r.hiding()) ) { //do not output hidden regions
 #ifdef VERBOSE
       outrgn<<"Info1:t "<<time->current_time()<<" ID "<<r.id()
-            <<" cvol "<<r.cellvol()
+            <<" cvol "<<r.cellvol()<<" vol "<<r.volume()
             <<" xyz "<<r.x()<<" "<<r.y()<<" "<<r.z()
             <<" uvw "<<r.u()<<" "<<r.v()<<" "<<r.w()
             <<" comuvw "<<r.comu()<<" "<<r.comv()<<" "<<r.comw()
             <<std::endl;
 #else
       outrgn<<"Info1:t "<<time->current_time()<<" ID "<<r.id()
-            <<" cvol "<<r.cellvol()
+            <<" cvol "<<r.cellvol()<<" vol "<<r.volume()
             <<" xyz "<<r.x()<<" "<<r.y()<<" "<<r.z()
             <<std::endl;
 #endif

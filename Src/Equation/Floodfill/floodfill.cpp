@@ -35,6 +35,7 @@ Floodfill::Floodfill(Scalar & colorf,
   flookup_v.reserve(BIG_BUFFER_SIZE);
   flookup_w.reserve(BIG_BUFFER_SIZE);
   flookup_cvol.reserve(BIG_BUFFER_SIZE);
+  flookup_vol.reserve(BIG_BUFFER_SIZE);
   smlookup_oldid.reserve(BIG_BUFFER_SIZE);
   smlookupvchk.reserve(BIG_BUFFER_SIZE);
   oldid_num_newrgns.reserve(BIG_BUFFER_SIZE);
@@ -53,6 +54,7 @@ Floodfill::Floodfill(Scalar & colorf,
   pt_flookup_u   = 0;
   pt_flookup_v   = 0;
   pt_flookup_w   = 0;
+  pt_flookup_vol = 0;
 
   rgnid_old = srid.shape();
   
@@ -61,6 +63,10 @@ Floodfill::Floodfill(Scalar & colorf,
   pltinc = 0; //for debug plotting
 
   out_rgn_info_freq=50;
+  size_smallrgn = 3;
+  xr.first(-boil::yotta); xr.last(boil::yotta);
+  yr.first(-boil::yotta); yr.last(boil::yotta);
+  zr.first(-boil::yotta); zr.last(boil::yotta);
 
   if (!boil::cart.iam()){
     outrgn.open("tracked_regions.txt",std::ios::app);
