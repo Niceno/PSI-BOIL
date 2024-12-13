@@ -46,6 +46,8 @@ class Communicator {
 
     ~Communicator() {par_stop();}
 
+    par_comm world() const {return MPI_COMM_WORLD;} 
+
     //! Acronym of "I am" returning the current processor number.
     int iam()   const {return iampro;}
 
