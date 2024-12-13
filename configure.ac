@@ -8,6 +8,7 @@ AC_PROG_CC
 AC_PROG_CXX
 AC_PROG_INSTALL
 AC_PROG_RANLIB
+AC_CHECK_PROG(cmake)
 AC_OUTPUT(Makefile                                     \
           Src/Domain/Makefile                          \
           Src/Global/Makefile                          \
@@ -65,6 +66,7 @@ AC_OUTPUT(Makefile                                     \
           Src/Model/Makefile                           \
           Src/Plot/Makefile                            \
           Src/Plot/TEC/Makefile                        \
+          Src/Plot/TECMPI/Makefile                     \
           Src/Plot/VTK/Makefile                        \
           Src/Unstructured/Solver/Makefile             \
           Src/Utilities/Connect/Makefile               \

@@ -39,6 +39,7 @@ static void __attribute__ ((constructor)) trapfpe(void)
 #include "../Timer/timer.h"
 #include "../Matter/matter.h"
 #include "../Plot/TEC/plot_tec.h"
+#include "../Plot/TECMPI/plot_tecmpi.h"
 #include "../Plot/VTK/plot_vtk.h"
 #include "../Monitor/Rack/rack.h"
 #include "../Monitor/Location/location.h"
