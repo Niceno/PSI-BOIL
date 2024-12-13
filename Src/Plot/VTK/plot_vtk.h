@@ -58,6 +58,30 @@ class PlotVTK : public Plot {
               const Scalar &, const Scalar &, const Scalar &,
               const char *, const int);
 
+    // unused
+    void plot(const char *, const int, Times * t,
+                      const Scalar * s1,
+                      const Scalar * s2 = NULL,
+                      const Scalar * s3 = NULL,
+                      const Scalar * s4 = NULL,
+                      const Scalar * s5 = NULL,
+                      const Scalar * s6 = NULL,
+                      const Scalar * s7 = NULL,
+                      const Scalar * s8 = NULL,
+                      const Scalar * s9 = NULL) {
+       boil::oout<<"Error! These arguments are for TECMPI\n"; exit(0);};
+     void plot(const char *, const int, Times * t, const Vector *,
+                      const Scalar * s1 = NULL,
+                      const Scalar * s2 = NULL,
+                      const Scalar * s3 = NULL,
+                      const Scalar * s4 = NULL,
+                      const Scalar * s5 = NULL,
+                      const Scalar * s6 = NULL,
+                      const Scalar * s7 = NULL,
+                      const Scalar * s8 = NULL,
+                      const Scalar * s9 = NULL) {
+       boil::oout<<"Error! These arguments are for TECMPI\n"; exit(0);};
+
   private:
     void plot_vtk_header   (const Domain &, const char *, const int);
     void plot_vtk_domain   (const Domain &);
