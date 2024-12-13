@@ -23,12 +23,14 @@ Src/*.bck
 Src/*.cpp
 Src/*.dat
 Src/*.gnu
+Src/*.grd
 Src/*.mcr
 Src/*.lay
 Src/*.out
 Src/*.plt
 Src/*.png
 Src/*.stl
+Src/*.szplt
 Src/*.txt
 Src/*.TXT
 Src/main*.cpp*
