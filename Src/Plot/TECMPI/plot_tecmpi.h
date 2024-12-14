@@ -51,9 +51,8 @@ class PlotTECMPI : public Plot {
       commSize   = boil::cart.nproc();
       commRank   = boil::cart.iam();
       mpiComm    = boil::cart.world();
-      NUM_ZONES  = commSize;   // =boil::cart.nproc();
+      NUM_ZONES  = commSize;
     }
-
     void plot(const char *, const int, Times * t,
                       const Scalar * s1,
                       const Scalar * s2 = NULL,
@@ -77,7 +76,7 @@ class PlotTECMPI : public Plot {
     void plot(Domain &, const char *, const int, Times * t = NULL);
     void plot(const Pathline &, const char *, const int, Times * t = NULL);
 
-    // undefined functions
+    // unused functions (still necessary because of pure virtual function)
     void plot(Body &, const char *, const int, Times * t = NULL) {
          boil::oout<<"Error! Check arguments for TECMPI\n"; exit(0);};
     void plot(const ScalarInt &, const char *, const int, Times * t = NULL) {

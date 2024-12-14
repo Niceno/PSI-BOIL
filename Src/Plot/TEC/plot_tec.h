@@ -75,7 +75,7 @@ class PlotTEC : public Plot {
       boil::oout<<"PlotTEC:set_plot_body= "<<b<<"\n";
     }
 
-    // unused
+    // unused functions (still necessary because of pure virtual function)
     void plot(const char *, const int, Times * t,
                       const Scalar * s1,
                       const Scalar * s2 = NULL,
