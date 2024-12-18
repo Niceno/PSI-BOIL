@@ -102,6 +102,7 @@ class EnthalpyFD : public Centered {
 
     void convection();
     void diffusion_fd(const Scalar * diff_eddy = NULL);
+    void clrold_store();
   protected:
     void create_system(const Scalar * diff_eddy = NULL);
     void create_system_innertial();

@@ -5,6 +5,7 @@ libEnthalpyFD_a_SOURCES = enthalpyfd.h                    \
                           enthalpyfd_system_diffusive.cpp \
                           enthalpyfd_system_innertial.cpp \
                           enthalpyfd_system_bnd.cpp       \
+                          enthalpyfd_clrold_store.cpp     \
                           enthalpyfd_create_system.cpp    \
                           enthalpyfd_convection.cpp       \
                           enthalpyfd_diff_matrix.cpp      \
