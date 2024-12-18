@@ -52,6 +52,16 @@ class Plot {
                       const Scalar * s7 = NULL,
                       const Scalar * s8 = NULL,
                       const Scalar * s9 = NULL) = 0;
+    virtual void read(const char *, const int, Times * t, Vector *,
+                      Scalar * s1 = NULL,
+                      Scalar * s2 = NULL,
+                      Scalar * s3 = NULL,
+                      Scalar * s4 = NULL,
+                      Scalar * s5 = NULL,
+                      Scalar * s6 = NULL,
+                      Scalar * s7 = NULL,
+                      Scalar * s8 = NULL,
+                      Scalar * s9 = NULL) = 0;
 
     virtual void plot(Domain &, const char *, const int = -1, Times * t = NULL) = 0;
     virtual void plot(Body &, const char *, const int = -1, Times * t = NULL) = 0;
@@ -103,6 +113,7 @@ class Plot {
                       const char *, const int, Times * t = NULL) = 0;
     virtual void set_plot_body(bool b) = 0;
     virtual void plot(const Pathline &, const char *, const int, Times * t = NULL) = 0;
+
   protected:
     const Domain * dom;
     int   sh;           /* shift */

@@ -279,7 +279,19 @@ int main(int argc, char * argv[]) {
     tpr.exchange_all();
 
 #ifdef USE_TECMPI
+    /* write to szplt */
     boil::plot->plot("uvw-c-press-tpr-mdot",0,&time,&uvw,&c,&press,&tpr,&mdot);
+    /* read szplt */
+    boil::plot->read("uvw-c-press-tpr-mdot",0,&time,&uvw,&c,&press,&tpr,&mdot);
+    // memo: uvw in szplt is defined at cell center, thus copy it to cell center
+    Scalar uu(d,"U"), vv(d,"V"), ww(d,"W");
+    for_m(m)
+      for_vmijk(uvw,m,i,j,k) {
+        if(m==Comp::u())uu[i][j][k]=uvw[m][i][j][k];
+        if(m==Comp::v())vv[i][j][k]=uvw[m][i][j][k];
+        if(m==Comp::w())ww[i][j][k]=uvw[m][i][j][k];
+      }
+    boil::plot->plot("u-v-w-c-press-tpr-mdot",1,&time,&uu,&vv,&ww,&c,&press,&tpr,&mdot);
 #else
     boil::plot->plot(uvw,c,press,tpr,mdot, "uvw-c-press-tpr-mdot",0,&time);
 #endif
@@ -434,7 +446,19 @@ int main(int argc, char * argv[]) {
       for_avmijk(uvw,m,i,j,k) { uvw[m][i][j][k] += w_camera; }
 
 #ifdef USE_TECMPI
+      /* write to szplt */
       boil::plot->plot("uvw-c-press-tpr-mdot",iint,&time,&uvw,&c,&press,&tpr,&mdot);
+      /* read szplt */
+      boil::plot->read("uvw-c-press-tpr-mdot",iint,&time,&uvw,&c,&press,&tpr,&mdot);
+      // memo: uvw in szplt is defined at cell center, thus copy it to cell center
+      Scalar uu(d,"U"), vv(d,"V"), ww(d,"W");
+      for_m(mm)
+        for_vmijk(uvw,m,i,j,k) {
+          if(mm==Comp::u())uu[i][j][k]=uvw[mm][i][j][k];
+          if(mm==Comp::v())vv[i][j][k]=uvw[mm][i][j][k];
+          if(mm==Comp::w())ww[i][j][k]=uvw[mm][i][j][k];
+      }
+      boil::plot->plot("u-v-w-c-press-tpr-mdot",iint,&time,&uu,&vv,&ww,&c,&press,&tpr,&mdot);
 #else
       boil::plot->plot(uvw,c,press,tpr,mdot, "uvw-c-press-tpr-mdot",iint,&time);
 #endif

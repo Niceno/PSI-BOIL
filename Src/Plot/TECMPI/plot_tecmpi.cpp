@@ -1,4 +1,7 @@
 #include "plot_tecmpi.h"
+//#define READ_VEL_AVE  // velocity defined at face is average of cell center values
+                        // If READ_VEL_AVE is not defined, then the cell center values
+			// will be stored at face of uvw
 
 std::string name_zone(int32_t zoneOwner){
   std::ostringstream oss;
@@ -18,6 +21,7 @@ void PlotTECMPI::plot(Domain & dm, // couldn't make const out of "*this"
   plot_tecmpi_set_domain(dom);
   /* output file name */
   string fname = plot_tecmpi_fname(nam, i);
+  boil::oout << "# Plotting: " << fname << boil::endl;
   /* variable names */
   std::vector<std::string> vnames;
   vnames.push_back("X");
@@ -26,18 +30,18 @@ void PlotTECMPI::plot(Domain & dm, // couldn't make const out of "*this"
   vnames.push_back("Rank");
   string variables = plot_tecmpi_variables(vnames);
   /* variable share */
-  std::vector<int32_t> shareVarFromZone(NUMVARS, 0); // No variable sharing for first zone output
+  std::vector<int32_t> shareVarFromZone(numVars, 0); // No variable sharing for first zone output
   /* variable type */
-  std::vector<int32_t> varTypes(NUMVARS, FieldDataType_Float);  // set all variables float
+  std::vector<int32_t> varTypes(numVars, FieldDataType_Float);  // set all variables float
   varTypes[3] = FieldDataType_Int32;  // variable no.4 is Rank = integer
   /* variable location */
-  std::vector<int32_t> valueLocations(NUMVARS, 1); // 0: cell center, 1: node point
+  std::vector<int32_t> valueLocations(numVars, 1); // 0: cell center, 1: node point
 
   /* Open and initialize the file */
   plot_tecmpi_tecOpenInit(fname,variables);
 
   // Loop for zone
-  for (int32_t zn = 0; zn < NUM_ZONES; ++zn) {
+  for (int32_t zn = 0; zn < numZones; ++zn) {
 
     int32_t zone;
     int32_t zoneOwner = zn;  // owner (rank) of this zone
@@ -68,6 +72,159 @@ void PlotTECMPI::plot(Domain & dm, // couldn't make const out of "*this"
 }
 
 /******************************************************************************/
+void PlotTECMPI::read(const char * nam,
+                      const int i,
+                      Times * t,
+                      Vector * vec,
+                      Scalar * sca,
+                      Scalar * scb,
+                      Scalar * scc,
+                      Scalar * scd,
+                      Scalar * sce,
+                      Scalar * scf,
+                      Scalar * scg,
+                      Scalar * sch,
+                      Scalar * sci) {
+  dom = vec->domain(); // take it as a constant
+  /* set domain size */
+  plot_tecmpi_set_domain(dom);
+  /* output file name */
+  string fname = plot_tecmpi_fname(nam, i);
+  boil::oout << "# Reading: " << fname << boil::endl;
+
+  try {
+    /* open file */
+    res = tecFileReaderOpen(fname.c_str(), &fileHandle);
+
+    /* variable names */
+    int32_t numVars;
+    res = tecDataSetGetNumVars(fileHandle, &numVars);
+    boil::oout<<"# read:numVars= "<<numVars<<"\n";
+    std::vector<std::string> vnames(numVars + 1);
+
+    for (int32_t var = 1; var <= numVars; ++var) {
+      char* name = NULL;
+      res = tecVarGetName(fileHandle, var, &name);
+      vnames[var] = name;
+      //boil::oout<<" vnames,i= "<<vnames[var]<<" "<<var<<"\n";
+    }
+
+    // numZones
+    res = tecDataSetGetNumZones(fileHandle, &numZones);
+    boil::oout<<"# read:numZones= "<<numZones<<"\n";
+
+    // solution time
+    int32_t inputZone = 1;
+    real solutionTime;
+    res = tecZoneGetSolutionTime(fileHandle, inputZone, &solutionTime);
+    t->current_time(solutionTime);
+    boil::oout<<"# read:solutionTime= "<<solutionTime<<"\n";
+
+#ifdef READ_VEL_AVE
+    /* reset vel */
+    for_m(m)
+      for_avmijk((*vec),m,i,j,k) {
+        (*vec)[m][i][j][k]=0.0;
+      }
+#endif
+
+    inputZone = commRank +1;
+    for (int32_t var = 4; var <= numVars; ++var) {
+      const int LEN = XDIM_C * YDIM_C * ZDIM_C;
+      int64_t numValuesRead = 0;
+      int64_t numValuesToRead = LEN;
+      std::unique_ptr<float[]> values(new float[LEN]);  // receive
+
+      /* read data */
+      res = tecZoneVarGetFloatValues(fileHandle, inputZone, var, numValuesRead + 1,
+                                     numValuesToRead, &values[0]);
+
+#ifdef READ_VEL_AVE
+      int icount[XDIM][YDIM][ZDIM];
+      if(var==4) {
+        Comp m = Comp::u();
+        std::memset(icount, 0, sizeof(icount));
+        for (int i = 0; i < XDIM_C; ++i)
+          for (int j = 0; j < YDIM_C; ++j)
+            for (int k = 0; k < ZDIM_C; ++k) {
+              int index = (k * YDIM_C + j) * XDIM_C + i;
+              (*vec)[m][i+BW  ][j+BW][k+BW] = values[index];
+              (*vec)[m][i+BW+1][j+BW][k+BW] = values[index];
+              icount[i  ][j][k]++;
+              icount[i+1][j][k]++;
+            }
+        for (int i = 0; i < XDIM; ++i)
+          for (int j = 0; j < YDIM; ++j)
+            for (int k = 0; k < ZDIM; ++k) {
+              if (icount[i][j][k] != 0)
+                (*vec)[m][i+BW][j+BW][k+BW] /= icount[i][j][k];
+            }
+      }
+      if(var==5) {
+        Comp m = Comp::v();
+        std::memset(icount, 0, sizeof(icount));
+        for (int i = 0; i < XDIM_C; ++i)
+          for (int j = 0; j < YDIM_C; ++j)
+            for (int k = 0; k < ZDIM_C; ++k) {
+              int index = (k * YDIM_C + j) * XDIM_C + i;
+              (*vec)[m][i+BW][j+BW  ][k+BW] = values[index];
+              (*vec)[m][i+BW][j+BW+1][k+BW] = values[index];
+              icount[i][j  ][k]++;
+              icount[i][j+1][k]++;
+            }
+        for (int i = 0; i < XDIM; ++i)
+          for (int j = 0; j < YDIM; ++j)
+            for (int k = 0; k < ZDIM; ++k) {
+              if (icount[i][j][k] != 0)
+                (*vec)[m][i+BW][j+BW][k+BW] /= icount[i][j][k];
+            }
+      }
+      if(var==6) {
+        Comp m = Comp::w();
+        std::memset(icount, 0, sizeof(icount));
+        for (int i = 0; i < XDIM_C; ++i)
+          for (int j = 0; j < YDIM_C; ++j)
+            for (int k = 0; k < ZDIM_C; ++k) {
+              int index = (k * YDIM_C + j) * XDIM_C + i;
+              (*vec)[m][i+BW][j+BW][k+BW  ] = values[index];
+              (*vec)[m][i+BW][j+BW][k+BW+1] = values[index];
+              icount[i][j][k  ]++;
+              icount[i][j][k+1]++;
+            }
+        for (int i = 0; i < XDIM; ++i)
+          for (int j = 0; j < YDIM; ++j)
+            for (int k = 0; k < ZDIM; ++k) {
+              if (icount[i][j][k] != 0)
+                (*vec)[m][i+BW][j+BW][k+BW] /= icount[i][j][k];
+            }
+      }
+#endif
+
+#ifndef READ_VEL_AVE
+      if(var==4 ) copy_valCell(values,vec,Comp::u()); 
+      if(var==5 ) copy_valCell(values,vec,Comp::v()); 
+      if(var==6 ) copy_valCell(values,vec,Comp::w()); 
+#endif
+      if(var==7 ) copy_valCell(values,sca);
+      if(var==8 ) copy_valCell(values,scb);
+      if(var==9 ) copy_valCell(values,scc);
+      if(var==10) copy_valCell(values,scd);
+      if(var==11) copy_valCell(values,sce);
+      if(var==12) copy_valCell(values,scf);
+      if(var==13) copy_valCell(values,scg);
+      if(var==14) copy_valCell(values,scg);
+      if(var==15) copy_valCell(values,scg);
+    }
+
+    /* close file */
+    res = tecFileReaderClose(&fileHandle);
+  } catch (std::runtime_error const& e) {
+    std::cerr << "Error: " << e.what() << "Proc=" <<commRank<< std::endl;
+    exit(0);
+  }
+
+}
+/******************************************************************************/
 void PlotTECMPI::plot(const char * nam,
                       const int i,
                       Times * t,
@@ -87,6 +244,7 @@ void PlotTECMPI::plot(const char * nam,
   plot_tecmpi_set_domain(dom);
   /* output file name */
   string fname = plot_tecmpi_fname(nam, i);
+  boil::oout << "# Plotting: " << fname << boil::endl;
   /* variable names */
   std::vector<std::string> vnames;
   vnames.push_back("X");
@@ -96,18 +254,18 @@ void PlotTECMPI::plot(const char * nam,
   if(scb!=NULL) {vnames.push_back("B"); if(scb->name().length() > 0) vnames [4] = scb->name();}
   if(scc!=NULL) {vnames.push_back("C"); if(scc->name().length() > 0) vnames [5] = scc->name();}
   if(scd!=NULL) {vnames.push_back("D"); if(scd->name().length() > 0) vnames [6] = scd->name();}
-  if(sce!=NULL) {vnames.push_back("E"); if(scd->name().length() > 0) vnames [7] = scd->name();}
-  if(scf!=NULL) {vnames.push_back("F"); if(scd->name().length() > 0) vnames [8] = scd->name();}
-  if(scg!=NULL) {vnames.push_back("G"); if(scd->name().length() > 0) vnames [9] = scd->name();}
-  if(sch!=NULL) {vnames.push_back("H"); if(scd->name().length() > 0) vnames [10] = scd->name();}
-  if(sci!=NULL) {vnames.push_back("I"); if(scd->name().length() > 0) vnames [11] = scd->name();}
+  if(sce!=NULL) {vnames.push_back("E"); if(scd->name().length() > 0) vnames [7] = sce->name();}
+  if(scf!=NULL) {vnames.push_back("F"); if(scd->name().length() > 0) vnames [8] = scf->name();}
+  if(scg!=NULL) {vnames.push_back("G"); if(scd->name().length() > 0) vnames [9] = scg->name();}
+  if(sch!=NULL) {vnames.push_back("H"); if(scd->name().length() > 0) vnames [10] = sch->name();}
+  if(sci!=NULL) {vnames.push_back("I"); if(scd->name().length() > 0) vnames [11] = sci->name();}
   string variables = plot_tecmpi_variables(vnames);
   /* variable share */
-  std::vector<int32_t> shareVarFromZone(NUMVARS, 0); // No variable sharing for first zone output
+  std::vector<int32_t> shareVarFromZone(numVars, 0); // No variable sharing for first zone output
   /* variable type */
-  std::vector<int32_t> varTypes(NUMVARS, FieldDataType_Float);  // set all variables float
+  std::vector<int32_t> varTypes(numVars, FieldDataType_Float);  // set all variables float
   /* value location */
-  std::vector<int32_t> valueLocations(NUMVARS, 0); // 0: cell center, 1: node point
+  std::vector<int32_t> valueLocations(numVars, 0); // 0: cell center, 1: node point
   valueLocations[0] = 1;  // X node point
   valueLocations[1] = 1;  // Y node point
   valueLocations[2] = 1;  // Z node point
@@ -116,7 +274,7 @@ void PlotTECMPI::plot(const char * nam,
   plot_tecmpi_tecOpenInit(fname,variables);
 
   // Loop for zone
-  for (int32_t zn = 0; zn < NUM_ZONES; ++zn) {
+  for (int32_t zn = 0; zn < numZones; ++zn) {
 
     int32_t zone;
     int32_t zoneOwner = zn;  // owner (rank) of this zone
@@ -169,6 +327,7 @@ void PlotTECMPI::plot(const char * nam,
   plot_tecmpi_set_domain(dom);
   /* output file name */
   string fname = plot_tecmpi_fname(nam, i);
+  boil::oout << "# Plotting: " << fname << boil::endl;
   /* variable names */
   std::vector<std::string> vnames;
   vnames.push_back("X");
@@ -188,11 +347,11 @@ void PlotTECMPI::plot(const char * nam,
   if(sci!=NULL) {vnames.push_back("I"); if(scd->name().length() > 0) vnames [14] = scd->name();}
   string variables = plot_tecmpi_variables(vnames);
   /* variable share */
-  std::vector<int32_t> shareVarFromZone(NUMVARS, 0); // No variable sharing for first zone output
+  std::vector<int32_t> shareVarFromZone(numVars, 0); // No variable sharing for first zone output
   /* variable type */
-  std::vector<int32_t> varTypes(NUMVARS, FieldDataType_Float);  // set all variables float
+  std::vector<int32_t> varTypes(numVars, FieldDataType_Float);  // set all variables float
   /* value location */
-  std::vector<int32_t> valueLocations(NUMVARS, 0); // 0: cell center, 1: node point
+  std::vector<int32_t> valueLocations(numVars, 0); // 0: cell center, 1: node point
   valueLocations[0] = 1;  // X node point
   valueLocations[1] = 1;  // Y node point
   valueLocations[2] = 1;  // Z node point
@@ -201,7 +360,7 @@ void PlotTECMPI::plot(const char * nam,
   plot_tecmpi_tecOpenInit(fname,variables);
 
   // Loop for zone
-  for (int32_t zn = 0; zn < NUM_ZONES; ++zn) {
+  for (int32_t zn = 0; zn < numZones; ++zn) {
 
     int32_t zone;
     int32_t zoneOwner = zn;  // owner (rank) of this zone
@@ -299,7 +458,6 @@ std::string PlotTECMPI::plot_tecmpi_fname(const char * nam, const int i) {
 
   /* file name extension */
   std::string name = name_file(nam, ".szplt", i); // i: time step
-  boil::oout << "# Plotting: " << name << boil::endl;
   return name;
 }
 
@@ -307,9 +465,9 @@ std::string PlotTECMPI::plot_tecmpi_fname(const char * nam, const int i) {
 void PlotTECMPI::plot_tecmpi_set_domain(const Domain * dom){
 
   /* set array size for decomposed domain */
-  XDIM = dom->ni() -2*boil::BW +1;
-  YDIM = dom->nj() -2*boil::BW +1;
-  ZDIM = dom->nk() -2*boil::BW +1;
+  XDIM = dom->ni() -2*BW +1;
+  YDIM = dom->nj() -2*BW +1;
+  ZDIM = dom->nk() -2*BW +1;
 
   XDIM_C = XDIM -1;
   YDIM_C = YDIM -1;
@@ -319,8 +477,8 @@ void PlotTECMPI::plot_tecmpi_set_domain(const Domain * dom){
 /******************************************************************************/
 std::string PlotTECMPI::plot_tecmpi_variables
                         (const std::vector<std::string>& vnames) {
-  // set NUMVARS
-  NUMVARS = vnames.size();
+  // set numVars
+  numVars = vnames.size();
   // Use a string stream to concatenate the vector elements
   std::ostringstream oss;
   for (size_t i = 0; i < vnames.size(); ++i) {
@@ -330,7 +488,7 @@ std::string PlotTECMPI::plot_tecmpi_variables
     }
   }
   //boil::oout<<"plot_tecmpi_variables:variables= "<<oss.str()
-  //          <<"\nNUMVARS= "<<NUMVARS<<"\n";
+  //          <<"\nnumVars= "<<numVars<<"\n";
 
   // Return the concatenated result as a string
   return oss.str();
@@ -407,7 +565,7 @@ void PlotTECMPI::plot_tecmpi_write(const Domain * dom, int32_t & zone,
     for (int j = 0; j < YDIM; ++j)
       for (int k = 0; k < ZDIM; ++k) { 
         int index = (k * YDIM + j) * XDIM + i;
-        xyz[index] = dom->xn(i+boil::BW);
+        xyz[index] = dom->xn(i+BW);
       }
   IVARNUM++;
   //std::cout<<"plot_tecmpi_write:Rank= "<<commRank<<" IVARNUM "<<IVARNUM<<" zone "<<zone<<"\n";
@@ -420,7 +578,7 @@ void PlotTECMPI::plot_tecmpi_write(const Domain * dom, int32_t & zone,
     for (int j = 0; j < YDIM; ++j)
       for (int k = 0; k < ZDIM; ++k) { 
         int index = (k * YDIM + j) * XDIM + i;
-        xyz[index] = dom->yn(j+boil::BW);
+        xyz[index] = dom->yn(j+BW);
       }
   IVARNUM++;
   //std::cout<<"plot_tecmpi_write:Rank= "<<commRank<<" IVARNUM "<<IVARNUM<<" zone "<<zone<<"\n";
@@ -433,7 +591,7 @@ void PlotTECMPI::plot_tecmpi_write(const Domain * dom, int32_t & zone,
     for (int j = 0; j < YDIM; ++j)
       for (int k = 0; k < ZDIM; ++k) {
         int index = (k * YDIM + j) * XDIM + i;
-        xyz[index] = dom->zn(k+boil::BW);
+        xyz[index] = dom->zn(k+BW);
       }
   IVARNUM++;
   //std::cout<<"plot_tecmpi_write:Rank= "<<commRank<<" IVARNUM "<<IVARNUM<<" zone "<<zone<<"\n";
@@ -444,7 +602,6 @@ void PlotTECMPI::plot_tecmpi_write(const Domain * dom, int32_t & zone,
 void PlotTECMPI::plot_tecmpi_write(const Vector * vec, int32_t & zone,
                                    int & IVARNUM) {
 
-  const int BW = boil::BW;
   const int LEN = XDIM_C * YDIM_C * ZDIM_C;
   std::unique_ptr<float[]> uvw(new float[LEN]);
 
@@ -508,4 +665,25 @@ void PlotTECMPI::plot_tecmpi_write(const Scalar * s, int32_t & zone,
   res = tecZoneVarWriteFloatValues(fileHandle, zone, IVARNUM, 0, LEN, &val[0]);
 
 }
- 
+
+/******************************************************************************/
+void PlotTECMPI::copy_valCell(const std::unique_ptr<float[]>& values, Scalar *s) {
+  for (int i = 0; i < XDIM_C; ++i)
+    for (int j = 0; j < YDIM_C; ++j)
+      for (int k = 0; k < ZDIM_C; ++k) {
+        int index = (k * YDIM_C + j) * XDIM_C + i;
+        (*s)[i+BW][j+BW][k+BW] = values[index];
+      }
+}
+
+/******************************************************************************/
+void PlotTECMPI::copy_valCell(const std::unique_ptr<float[]>& values,
+                              Vector *v, const Comp &m) {
+  for (int i = 0; i < XDIM_C; ++i)
+    for (int j = 0; j < YDIM_C; ++j)
+      for (int k = 0; k < ZDIM_C; ++k) {
+        int index = (k * YDIM_C + j) * XDIM_C + i;
+        (*v)[m][i+BW][j+BW][k+BW] = values[index];
+      }
+  boil::oout<<"copy_valCell: "<<values[0]<<" "<<(*v)[m][BW][BW][BW]<<"\n";
+}

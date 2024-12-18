@@ -98,6 +98,17 @@ class PlotTEC : public Plot {
                       const Scalar * s8 = NULL,
                       const Scalar * s9 = NULL) {
        boil::oout<<"Error! These arguments are for TECMPI\n"; exit(0);};
+     void read(const char *, const int, Times * t, Vector *,
+                      Scalar * s1 = NULL,
+                      Scalar * s2 = NULL,
+                      Scalar * s3 = NULL,
+                      Scalar * s4 = NULL,
+                      Scalar * s5 = NULL,
+                      Scalar * s6 = NULL,
+                      Scalar * s7 = NULL,
+                      Scalar * s8 = NULL,
+                      Scalar * s9 = NULL) {
+       boil::oout<<"Error! This function is valid only  for TECMPI\n"; exit(0);};
 
   private:
     void plot_tec_header   (const Domain &, const char *, const int);

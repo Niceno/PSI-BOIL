@@ -43,15 +43,16 @@ class PlotTECMPI : public Plot {
       sh=0;    if( buff == Buffers::yes() ) sh=1;
       b_plot_body=false;
       Debug      = 1;
-      VIsDouble  = 0;
+      isDouble  = 0;
       FileType   = 0;
-      FileFormat = 1; // SZPLT; .PLT not supported for partitioned zones
+      fileFormat = 1; // SZPLT; .PLT not supported for partitioned zones
       I          = 0; // Used to track return codes
       mainRank   = 0;
       commSize   = boil::cart.nproc();
       commRank   = boil::cart.iam();
       mpiComm    = boil::cart.world();
-      NUM_ZONES  = commSize;
+      numZones   = commSize;
+      BW         = boil::BW;
     }
     void plot(const char *, const int, Times * t,
                       const Scalar * s1,
@@ -75,6 +76,16 @@ class PlotTECMPI : public Plot {
                       const Scalar * s9 = NULL);
     void plot(Domain &, const char *, const int, Times * t = NULL);
     void plot(const Pathline &, const char *, const int, Times * t = NULL);
+    void read(const char *, const int, Times * t, Vector *,
+                      Scalar * s1 = NULL,
+                      Scalar * s2 = NULL,
+                      Scalar * s3 = NULL,
+                      Scalar * s4 = NULL,
+                      Scalar * s5 = NULL,
+                      Scalar * s6 = NULL,
+                      Scalar * s7 = NULL,
+                      Scalar * s8 = NULL,
+                      Scalar * s9 = NULL);
 
     // unused functions (still necessary because of pure virtual function)
     void plot(Body &, const char *, const int, Times * t = NULL) {
@@ -149,19 +160,23 @@ class PlotTECMPI : public Plot {
     void plot_tecmpi_tecCreateMap(vector<int32_t> & v1, vector<int32_t> & v2, 
            vector<int32_t> & v3, int32_t & i1, int32_t & i2, const int &i,
            const Times * t = NULL);
+    void copy_valCell(const std::unique_ptr<float[]>& values, Scalar *s);
+    void copy_valCell(const std::unique_ptr<float[]>& values,
+                              Vector *v, const Comp &m);
 
     ofstream out;
     bool b_plot_body;
 
     // for teciompi
-    INTEGER4 Debug,VIsDouble,FileType,FileFormat,I;
+    INTEGER4 Debug,isDouble,FileType,fileFormat,I;
     INTEGER4 mainRank;
     par_comm mpiComm;
     int      commSize, commRank;
-    int      NUM_ZONES, NUMVARS;
+    int      numZones, numVars;
     int      XDIM, YDIM, ZDIM, XDIM_C, YDIM_C, ZDIM_C;
     int32_t res;
     void*   fileHandle;
+    int BW;
 
 };
 
