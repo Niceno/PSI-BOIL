@@ -3,6 +3,8 @@
 /******************************************************************************/
 void Scalar::save(const char * nm, const int it) {
 
+  boil::timer.start("bck saving");
+
   /* file name */
   std::string name = name_file(nm, ".bck", it, boil::cart.iam());
 
@@ -14,6 +16,8 @@ void Scalar::save(const char * nm, const int it) {
   
   /* close a file */
   out.close();
+
+  boil::timer.stop("bck saving");
 }
 
 /******************************************************************************/
