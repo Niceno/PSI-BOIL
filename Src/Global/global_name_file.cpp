@@ -16,8 +16,12 @@ const std::string name_file(const char * gname, const char * ext,
     numb.fill('0');
     if( cpu < 1000) {
       numb.width(3);
-    } else {
+    } else if ( cpu < 10000) {
       numb.width(4);
+    } else if ( cpu < 100000){
+      numb.width(5);
+    } else {
+      numb.width(6);
     }
     numb << cpu;
   }
