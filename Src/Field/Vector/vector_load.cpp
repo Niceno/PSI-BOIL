@@ -3,6 +3,8 @@
 /******************************************************************************/
 void Vector::load(const char * nm, const int it) {
 
+  boil::timer.start("bck loading");
+
   /* file name */
   std::string name = name_file(nm, ".bck", it, boil::cart.iam());
 
@@ -21,6 +23,8 @@ void Vector::load(const char * nm, const int it) {
 
   /* close a file */
   in.close();
+
+  boil::timer.stop("bck loading");
 }
 
 /******************************************************************************/
