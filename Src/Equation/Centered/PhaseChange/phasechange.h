@@ -70,12 +70,12 @@ class PhaseChange : public Centered {
     real get_turbP(){return turbP;}
     void set_turbP(real a){
       turbP=a;
-      boil::oout<<"EnthalpyFD:turbP= "<<turbP<<"\n";
+      boil::oout<<"PhaseChange:turbP= "<<turbP<<"\n";
     }
 
     void set_rhol(const real r){
       rhol = r;
-      boil::oout<<"EnthalpyFD:rhol= "<<rhol<<"\n";
+      boil::oout<<"PhaseChange:rhol= "<<rhol<<"\n";
     }
     real get_rhol(){return rhol;}
 
