@@ -113,6 +113,7 @@ VOF::VOF(const Scalar & PHI,
   limit_color=false;
   use_subgrid=false;
   use_HF_wall=false;
+  use_flag_tension=false;
 
   discretize();
 

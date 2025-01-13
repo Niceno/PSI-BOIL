@@ -111,6 +111,15 @@ class VOF : public Centered {
     /* getter for use_subgrid */
     bool get_use_HF_wall() { return(use_HF_wall);};
 
+    /* setter for use_flag_tension */
+    // if use_flag_tension==true, surface tension works only around the cells
+    // iso-surface of color function = 0.5.
+    void set_use_flag_tension(const bool b) {
+      use_flag_tension=b;
+      boil::oout<<"set_use_flag_tension= "<<b<<"\n";
+    }
+    bool get_use_flag_tension() {return use_flag_tension;};
+
     /* min and max of color function in fluid domain */
     real minval() {return minclr;}
     real maxval() {return maxclr;}
@@ -261,6 +270,7 @@ class VOF : public Centered {
     bool iminc, imaxc, jminc, jmaxc, kminc, kmaxc; // true = cut-stencil
     bool ifull, jfull, kfull; // true = not a dummy direction
     bool limit_color, use_subgrid, use_HF_wall;
+    bool use_flag_tension;
     real minclr, maxclr;
 
     Heaviside heavi;
