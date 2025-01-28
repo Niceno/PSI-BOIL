@@ -26,7 +26,7 @@ AC_OUTPUT(Makefile                                     \
           Src/Makefile                                 \
           Src/Equation/Centered/Enthalpy/Makefile      \
           Src/Equation/Centered/EnthalpyFD/Makefile    \
-          Src/Equation/Centered/EnthalpyFD/EnthalpyFDhighNu/Makefile    \
+          Src/Equation/Centered/EnthalpyFD/EnthalpyFDhighPr/Makefile    \
           Src/Equation/Centered/EnthalpyFDAdiabatic/Makefile    \
           Src/Equation/Centered/EnthalpyTif/Makefile   \
           Src/Equation/Centered/Concentration/Makefile \

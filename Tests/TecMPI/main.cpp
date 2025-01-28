@@ -154,7 +154,7 @@ int main(int argc, char * argv[]) {
   VOF conc (c,   g, kappa, uvw, time, solver);
 
   /* enthalpy equation */
-  EnthalpyFDhighNu enthFD(tpr, q, c, uvw, time, solver, & mixed ,c_surf);
+  EnthalpyFDhighPr enthFD(tpr, q, c, uvw, time, solver, & mixed ,c_surf);
   //EnthalpyFD enthFD(tpr, q, c, uvw, time, solver, & mixed ,c_surf);
   enthFD.convection_set(TimeScheme::forward_euler());
   enthFD.diffusion_set(TimeScheme::backward_euler());

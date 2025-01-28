@@ -17,7 +17,7 @@ static void __attribute__ ((constructor)) trapfpe(void)
 #include "../Ravioli/buffers.h"
 #include "../Equation/Centered/Enthalpy/enthalpy.h"
 #include "../Equation/Centered/EnthalpyFD/enthalpyfd.h"
-#include "../Equation/Centered/EnthalpyFD/EnthalpyFDhighNu/enthalpyfdhighnu.h"
+#include "../Equation/Centered/EnthalpyFD/EnthalpyFDhighPr/enthalpyfdhighpr.h"
 #include "../Equation/Centered/EnthalpyFDAdiabatic/enthalpyfdadiabatic.h"
 #include "../Equation/Centered/EnthalpyTif/enthalpytif.h"
 #include "../Equation/Centered/PhaseChange/phasechange.h"
