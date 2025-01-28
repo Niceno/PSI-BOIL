@@ -39,6 +39,7 @@ Momentum::Momentum(const Vector & U,
   min_iter = MinIter(1);
   max_iter = MaxIter(10);
   v_phase_change=0.0;
+  print_cfl = false;
 }
 
 /******************************************************************************/

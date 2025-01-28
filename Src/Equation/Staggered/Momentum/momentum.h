@@ -107,6 +107,12 @@ class Momentum : public Staggered {
     }
     int get_max_iteration() {return max_iter;}
 
+    void set_print_cfl(bool b){
+      print_cfl = b;
+      boil::oout<<"Momentum:print_cfl= "<<print_cfl<<"\n";
+    }
+    bool get_print_cfl() {return print_cfl;}
+
 
     Matrix * A[3];
 
@@ -132,6 +138,7 @@ class Momentum : public Staggered {
     bool ifull, jfull, kfull;
     MinIter min_iter;
     MaxIter max_iter;
+    bool print_cfl;
 
 };
 
