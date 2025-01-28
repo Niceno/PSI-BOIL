@@ -1,3 +1,4 @@
+on merlin and CSCS
 $ module load Boost
 $ cmake .
 $ make
@@ -7,8 +8,7 @@ $ module load boost
 $ cmake .
 $ make
 
-recompile
+re-compile
 $ make clean
 $ rm CMakeCache.txt
-$ rm -rf CMakeFiles/
-$ make
+$ rm -rf CMakeFiles/ 
