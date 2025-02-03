@@ -45,9 +45,12 @@ class Floodfill {
     }
 
     /* Range */
-    void set_range(Range<real>rx, Range<real>ry, Range<real>rz) {
+    void set_range(const Range<real>rx, const Range<real>ry, const Range<real>rz) {
       xr = rx; yr = ry; zr = rz;
-      boil::oout<<"Floodfill:set_range= "<<xr<<" "<<yr<<" "<<zr<<"\n";
+      //xr(rx); yr(ry); zr(rz);
+      boil::oout<<"Floodfill:set_range= "<<xr.first()<<" <x< "<<xr.last()
+                <<", "<<yr.first()<<" <y< "<<yr.last()
+                <<", "<<zr.first()<<" <z< "<<zr.last()<<"\n";
     }
 
   private:
