@@ -3,14 +3,6 @@
 +----------------------*/
 #include "Include/psi-boil.h"
 
-#define _GNU_SOURCE 1
-#include <fenv.h>
-static void __attribute__ ((constructor)) trapfpe(void)
-{
-  /* Enable some exceptions. At startup all exceptions are masked. */
-  feenableexcept(FE_INVALID|FE_DIVBYZERO|FE_OVERFLOW);
-}
-
 void update_step(const Scalar & c, Scalar & step, Scalar & sflag);
 
 const int Level=1;  // =1,2,4
@@ -69,7 +61,7 @@ main(int argc, char * argv[]) {
   +------------------*/
   Vector uvw(d), xyz(d); // vel
   Scalar p  (d), f  (d); // p.
-  Scalar c  (d), g  (d), step(d), sflag(d); // concentration
+  Scalar c  (d), g  (d), step(d), sflag(d), kappa(d); // concentration
   Scalar press(d);
 
   /*-----------------------------+ 
@@ -91,6 +83,7 @@ main(int argc, char * argv[]) {
   p.bc().add( BndCnd( Dir::kmin(), BndType::neumann() ) );
   p.bc().add( BndCnd( Dir::kmax(), BndType::neumann() ) );
   press = p.shape();
+  kappa = p.shape();
   
   c.bc().add( BndCnd( Dir::imin(), BndType::wall() ) );
   c.bc().add( BndCnd( Dir::imax(), BndType::wall() ) );
@@ -101,7 +94,7 @@ main(int argc, char * argv[]) {
   step = c.shape();
   sflag = c.shape();
 
-  Matter mixed(water, air, step);
+  Matter mixed(water, air, & step);
   mixed.sigma(0.072);
   /*------------+
   |  time step  |
@@ -166,7 +159,7 @@ main(int argc, char * argv[]) {
     boil::plot->plot(uvw,c, press, "uvw-c-press",0);
 
   //ColorFunction  conc  (c,   g, uvw, time, solver); 
-  CIPCSL2 conc (c,   g, uvw, time, solver);
+  CIPCSL2 conc (c,  g, kappa, uvw, time, solver);
   conc.set_nredist(1);
   conc.set_itsharpen(4);
   conc.front_minmax();
@@ -218,7 +211,7 @@ main(int argc, char * argv[]) {
     press.exchange();
 
     /* dt control */
-    ns.control_dt(&time,0.1,dt);
+    time.control_dt(ns.cfl_max(),0.1,dt);
 
     if(time.current_step() % nint == 0) {
       boil::plot->plot(uvw,c, press, "uvw-c-press",time.current_step()/nint);
