@@ -254,11 +254,11 @@ void PlotTECMPI::plot(const char * nam,
   if(scb!=NULL) {vnames.push_back("B"); if(scb->name().length() > 0) vnames [4] = scb->name();}
   if(scc!=NULL) {vnames.push_back("C"); if(scc->name().length() > 0) vnames [5] = scc->name();}
   if(scd!=NULL) {vnames.push_back("D"); if(scd->name().length() > 0) vnames [6] = scd->name();}
-  if(sce!=NULL) {vnames.push_back("E"); if(scd->name().length() > 0) vnames [7] = sce->name();}
-  if(scf!=NULL) {vnames.push_back("F"); if(scd->name().length() > 0) vnames [8] = scf->name();}
-  if(scg!=NULL) {vnames.push_back("G"); if(scd->name().length() > 0) vnames [9] = scg->name();}
-  if(sch!=NULL) {vnames.push_back("H"); if(scd->name().length() > 0) vnames [10] = sch->name();}
-  if(sci!=NULL) {vnames.push_back("I"); if(scd->name().length() > 0) vnames [11] = sci->name();}
+  if(sce!=NULL) {vnames.push_back("E"); if(sce->name().length() > 0) vnames [7] = sce->name();}
+  if(scf!=NULL) {vnames.push_back("F"); if(scf->name().length() > 0) vnames [8] = scf->name();}
+  if(scg!=NULL) {vnames.push_back("G"); if(scg->name().length() > 0) vnames [9] = scg->name();}
+  if(sch!=NULL) {vnames.push_back("H"); if(sch->name().length() > 0) vnames [10] = sch->name();}
+  if(sci!=NULL) {vnames.push_back("I"); if(sci->name().length() > 0) vnames [11] = sci->name();}
   string variables = plot_tecmpi_variables(vnames);
   /* variable share */
   std::vector<int32_t> shareVarFromZone(numVars, 0); // No variable sharing for first zone output
@@ -340,11 +340,11 @@ void PlotTECMPI::plot(const char * nam,
   if(scb!=NULL) {vnames.push_back("B"); if(scb->name().length() > 0) vnames [7] = scb->name();}
   if(scc!=NULL) {vnames.push_back("C"); if(scc->name().length() > 0) vnames [8] = scc->name();}
   if(scd!=NULL) {vnames.push_back("D"); if(scd->name().length() > 0) vnames [9] = scd->name();}
-  if(sce!=NULL) {vnames.push_back("E"); if(scd->name().length() > 0) vnames [10] = scd->name();}
-  if(scf!=NULL) {vnames.push_back("F"); if(scd->name().length() > 0) vnames [11] = scd->name();}
-  if(scg!=NULL) {vnames.push_back("G"); if(scd->name().length() > 0) vnames [12] = scd->name();}
-  if(sch!=NULL) {vnames.push_back("H"); if(scd->name().length() > 0) vnames [13] = scd->name();}
-  if(sci!=NULL) {vnames.push_back("I"); if(scd->name().length() > 0) vnames [14] = scd->name();}
+  if(sce!=NULL) {vnames.push_back("E"); if(sce->name().length() > 0) vnames [10] = scd->name();}
+  if(scf!=NULL) {vnames.push_back("F"); if(scf->name().length() > 0) vnames [11] = scd->name();}
+  if(scg!=NULL) {vnames.push_back("G"); if(scg->name().length() > 0) vnames [12] = scd->name();}
+  if(sch!=NULL) {vnames.push_back("H"); if(sch->name().length() > 0) vnames [13] = scd->name();}
+  if(sci!=NULL) {vnames.push_back("I"); if(sci->name().length() > 0) vnames [14] = scd->name();}
   string variables = plot_tecmpi_variables(vnames);
   /* variable share */
   std::vector<int32_t> shareVarFromZone(numVars, 0); // No variable sharing for first zone output
