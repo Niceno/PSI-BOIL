@@ -234,17 +234,20 @@ void EnthalpyFDhighPr::convection(Scalar * conv) {
   for_jk(j,k) (*conv)[si()][j][k] += buff[si()-1][j][k];
 #endif
 
-  for_ijk(i,j,k) {
-    //if(iflag[i][j][k]==0){
-    //  continue;
-    //}
-    real divu = - dSx(i,j,k)*(*u)[Comp::u()][i]  [j]  [k]
-                + dSx(i,j,k)*(*u)[Comp::u()][i+1][j]  [k]
-                - dSy(i,j,k)*(*u)[Comp::v()][i]  [j]  [k]
-                + dSy(i,j,k)*(*u)[Comp::v()][i]  [j+1][k]
-                - dSz(i,j,k)*(*u)[Comp::w()][i]  [j]  [k]
-                + dSz(i,j,k)*(*u)[Comp::w()][i]  [j]  [k+1];
-    (*conv)[i][j][k] += phi[i][j][k] * divu;
+  if(conv_divu_subtract) {  // false = conservative form (nabla.(Tu)
+                            // true  = u.nabla(T) (=nabla.(Tu)-T*div(u))
+    for_ijk(i,j,k) {
+      //if(iflag[i][j][k]==0){
+      //  continue;
+      //}
+      real divu = - dSx(i,j,k)*(*u)[Comp::u()][i]  [j]  [k]
+                  + dSx(i,j,k)*(*u)[Comp::u()][i+1][j]  [k]
+                  - dSy(i,j,k)*(*u)[Comp::v()][i]  [j]  [k]
+                  + dSy(i,j,k)*(*u)[Comp::v()][i]  [j+1][k]
+                  - dSz(i,j,k)*(*u)[Comp::w()][i]  [j]  [k]
+                  + dSz(i,j,k)*(*u)[Comp::w()][i]  [j]  [k+1];
+      (*conv)[i][j][k] += phi[i][j][k] * divu;
+    }
   }
 
   /*-------------------------------+
