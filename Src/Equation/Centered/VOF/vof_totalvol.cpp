@@ -18,7 +18,6 @@ void VOF::totalvol() {
    boil::cart.sum_real(&phisum);
    boil::cart.sum_real(&phisum_inv);
 
-
    std::cout.setf(std::ios_base::scientific);
    std::cout<< std::setprecision(16);
    boil::oout << "totalvol:time,volume,phisum= " 
@@ -26,6 +25,9 @@ void VOF::totalvol() {
               <<" "<< phisum << " "<< phisum_inv << boil::endl;
    std::cout.unsetf(std::ios_base::floatfield);
    std::cout<< std::setprecision(6);
+
+   total_vol0 = phisum;
+   total_vol1 = phisum_inv;
 
    return;
 }

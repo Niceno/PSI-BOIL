@@ -114,6 +114,8 @@ VOF::VOF(const Scalar & PHI,
   use_subgrid=false;
   use_HF_wall=false;
   use_flag_tension=false;
+  total_vol0=0.0;
+  total_vol1=0.0;
 
   discretize();
 

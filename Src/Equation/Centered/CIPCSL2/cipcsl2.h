@@ -103,6 +103,10 @@ class CIPCSL2 : public Centered {
     real get_zminft() { return(zminft);};
     real get_zmaxft() { return(zmaxft);};
 
+    // getter for volume: these function must be called after total_vol
+    real get_vol0() {return(total_vol0);};
+    real get_vol1() {return(total_vol1);};
+
     /* setter for ww */
     void set_ww(const real a) {
       ww=a*dxmin;
@@ -282,6 +286,7 @@ class CIPCSL2 : public Centered {
     Vector sxyz;
     real cangle;
     real minclr, maxclr;
+    real total_vol0,total_vol1;
     bool localSharpen, use_dist_for_kappa;
 };
 #endif

@@ -50,6 +50,10 @@ class VOF : public Centered {
     real get_zminft() { return(zminft);};
     real get_zmaxft() { return(zmaxft);};
 
+    // getter for volume: these function must be called after total_vol
+    real get_vol0() {return(total_vol0);};
+    real get_vol1() {return(total_vol1);};
+
     // getter and setter for wall value tolerance
     real get_tol_wall() { return tol_wall; }
     void set_tol_wall(real tolnew) {
@@ -265,6 +269,7 @@ class VOF : public Centered {
     real phisurf;
     real tol_wall, tol_flux, tol_ext, flux_cfl;
     real ww, dxmin;
+    real total_vol0, total_vol1;  // total volume for phase 0 and 1
     bool iminp, imaxp, jminp, jmaxp, kminp, kmaxp; // true = periodic
     bool iminw, imaxw, jminw, jmaxw, kminw, kmaxw; // true = wall
     bool iminc, imaxc, jminc, jmaxc, kminc, kmaxc; // true = cut-stencil

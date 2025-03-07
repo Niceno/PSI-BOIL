@@ -34,6 +34,9 @@ void CIPCSL2::totalvol() {
    std::cout.unsetf(std::ios_base::floatfield);
    std::cout<< std::setprecision(6);
 
+   total_vol0 = clrsum1;
+   total_vol1 = clrsum2;
+
    return;
 }
 
@@ -89,6 +92,8 @@ void CIPCSL2::totalvol( Range<real> xr, Range<real> yr, Range<real> zr) {
    std::cout.unsetf(std::ios_base::floatfield);
    std::cout<< std::setprecision(6);
 
+   total_vol0 = clrsum1r;
+   total_vol1 = clrsum2r;
 
    return;
 }
