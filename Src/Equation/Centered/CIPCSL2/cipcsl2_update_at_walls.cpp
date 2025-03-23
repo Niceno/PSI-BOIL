@@ -1,4 +1,5 @@
 #include "cipcsl2.h"
+using namespace boil;
 
 /******************************************************************************/
 void CIPCSL2::update_at_walls(Scalar & sca) {
@@ -492,8 +493,8 @@ real CIPCSL2::extrapolate_c(const Scalar & sca,
    
 
   /* the picos are to avoid singularity for atanh */
-  real sca1 = std::max(boil::pico,std::min(1.-boil::pico,sca[ii1][jj1][kk1]));
-  real sca2 = std::max(boil::pico,std::min(1.-boil::pico,sca[ii2][jj2][kk2]));
+  real sca1 = maxr(boil::pico,minr(1.-boil::pico,sca[ii1][jj1][kk1]));
+  real sca2 = maxr(boil::pico,minr(1.-boil::pico,sca[ii2][jj2][kk2]));
 
   /* erroneous interfaces */
   if(sca1<tol_wall||sca1-1.0>-tol_wall) {

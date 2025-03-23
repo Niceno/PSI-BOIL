@@ -1,6 +1,5 @@
 #include "enthalpyfdadiabatic.h"
-
-using namespace std;
+using namespace boil;
 
 /***************************************************************************//**
 *  \brief Adds diffusion to right hand side.
@@ -55,9 +54,9 @@ void EnthalpyFDAdiabatic::diffusion_fd(const Scalar * diff_eddy) {
         lc += (*diff_eddy)[i][j][k]*cp_mass/turbP;
       }
       const real vol = phi.dV(i,j,k);
-      const real clrw = std::min(std::max((*clr)[i-1][j][k],0.0),1.0);
-      const real clrc = std::min(std::max((*clr)[i  ][j][k],0.0),1.0);
-      const real clre = std::min(std::max((*clr)[i+1][j][k],0.0),1.0);
+      const real clrw = minr(maxr((*clr)[i-1][j][k],0.0),1.0);
+      const real clrc = minr(maxr((*clr)[i  ][j][k],0.0),1.0);
+      const real clre = minr(maxr((*clr)[i+1][j][k],0.0),1.0);
       const real pc = phi[i][j][k];
       real xm,xp,pm,pp,aflagm,aflagp;
       aflagm=aflagp=0.0;
@@ -65,7 +64,7 @@ void EnthalpyFDAdiabatic::diffusion_fd(const Scalar * diff_eddy) {
         xm=phi.dxw(i);
         pm=phi[i-1][j][k];
       } else {
-        xm=std::max((0.5-clrc)/(clrw-clrc),epsl)*phi.dxw(i);
+        xm=maxr((0.5-clrc)/(clrw-clrc),epsl)*phi.dxw(i);
         pm=phi[i][j][k]; //shono edit
         //pm=tsat;
         aflagm=1.0;
@@ -74,7 +73,7 @@ void EnthalpyFDAdiabatic::diffusion_fd(const Scalar * diff_eddy) {
         xp=phi.dxe(i);
         pp=phi[i+1][j][k];
       } else {
-        xp=std::max((0.5-clrc)/(clre-clrc),epsl)*phi.dxe(i);
+        xp=maxr((0.5-clrc)/(clre-clrc),epsl)*phi.dxe(i);
         pp=phi[i][j][k]; //shono edit
         //pp=tsat;
         aflagp=1.0;
@@ -105,9 +104,9 @@ void EnthalpyFDAdiabatic::diffusion_fd(const Scalar * diff_eddy) {
         lc += (*diff_eddy)[i][j][k]*cp_mass/turbP;
       }
       const real vol = phi.dV(i,j,k);
-      const real clrs = std::min(std::max((*clr)[i][j-1][k],0.0),1.0);
-      const real clrc = std::min(std::max((*clr)[i][j  ][k],0.0),1.0);
-      const real clrn = std::min(std::max((*clr)[i][j+1][k],0.0),1.0);
+      const real clrs = minr(maxr((*clr)[i][j-1][k],0.0),1.0);
+      const real clrc = minr(maxr((*clr)[i][j  ][k],0.0),1.0);
+      const real clrn = minr(maxr((*clr)[i][j+1][k],0.0),1.0);
       const real pc = phi[i][j][k];
       real ym,yp,pm,pp,aflagm,aflagp;
       aflagm=aflagp=0.0;
@@ -115,7 +114,7 @@ void EnthalpyFDAdiabatic::diffusion_fd(const Scalar * diff_eddy) {
         ym=phi.dys(j);
         pm=phi[i][j-1][k];
       } else {
-        ym=std::max((0.5-clrc)/(clrs-clrc),epsl)*phi.dys(j);
+        ym=maxr((0.5-clrc)/(clrs-clrc),epsl)*phi.dys(j);
         pm=phi[i][j][k]; //shono edit
         //pm=tsat;
         aflagm=1.0;
@@ -124,7 +123,7 @@ void EnthalpyFDAdiabatic::diffusion_fd(const Scalar * diff_eddy) {
         yp=phi.dyn(j);
         pp=phi[i][j+1][k];
       } else {
-        yp=std::max((0.5-clrc)/(clrn-clrc),epsl)*phi.dyn(j);
+        yp=maxr((0.5-clrc)/(clrn-clrc),epsl)*phi.dyn(j);
         pp=phi[i][j][k]; //shono edit
         //pp=tsat;
         aflagp=1.0;
@@ -154,9 +153,9 @@ void EnthalpyFDAdiabatic::diffusion_fd(const Scalar * diff_eddy) {
         lc += (*diff_eddy)[i][j][k]*cp_mass/turbP;
       }
       const real vol = phi.dV(i,j,k);
-      const real clrb = std::min(std::max((*clr)[i][j][k-1],0.0),1.0);
-      const real clrc = std::min(std::max((*clr)[i][j][k  ],0.0),1.0);
-      const real clrt = std::min(std::max((*clr)[i][j][k+1],0.0),1.0);
+      const real clrb = minr(maxr((*clr)[i][j][k-1],0.0),1.0);
+      const real clrc = minr(maxr((*clr)[i][j][k  ],0.0),1.0);
+      const real clrt = minr(maxr((*clr)[i][j][k+1],0.0),1.0);
       const real pc = phi[i][j][k];
       real zm,zp,pm,pp,aflagm,aflagp;
       aflagm=aflagp=0.0;
@@ -164,7 +163,7 @@ void EnthalpyFDAdiabatic::diffusion_fd(const Scalar * diff_eddy) {
         zm=phi.dzb(k);
         pm=phi[i][j][k-1];
       } else {
-        zm=std::max((0.5-clrc)/(clrb-clrc),epsl)*phi.dzb(k);
+        zm=maxr((0.5-clrc)/(clrb-clrc),epsl)*phi.dzb(k);
         pm=phi[i][j][k]; //shono edit
         //pm=tsat;
         aflagm=1.0;
@@ -173,7 +172,7 @@ void EnthalpyFDAdiabatic::diffusion_fd(const Scalar * diff_eddy) {
         zp=phi.dzt(k);
         pp=phi[i][j][k+1];
       } else {
-        zp=std::max((0.5-clrc)/(clrt-clrc),epsl)*phi.dzt(k);
+        zp=maxr((0.5-clrc)/(clrt-clrc),epsl)*phi.dzt(k);
         pp=phi[i][j][k]; //shono edit;
         //pp=tsat;
         aflagp=1.0;

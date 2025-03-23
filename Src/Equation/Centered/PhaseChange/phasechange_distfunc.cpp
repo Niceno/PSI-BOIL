@@ -1,5 +1,6 @@
 #include "phasechange.h"
 #include <iomanip>
+using namespace boil;
 
 /******************************************************************************/
 void PhaseChange::distfunc(const Scalar & sca, const int itnum) {
@@ -167,7 +168,7 @@ void PhaseChange::distfunc(const Scalar & sca, const int itnum) {
           }
 
           real dpdxyz=sqrt(dpdx*dpdx+dpdy*dpdy+dpdz*dpdz);
-          dpdxyz = std::max(dpdxyz,1.0e-12);
+          dpdxyz = maxr(dpdxyz,1.0e-12);
           real d = stmp[i][j][k] / dpdxyz;
           delta[i][j][k] = dtau /dx * ( asgn * fabs(dist[i][j][k]) - d);
         } else {
@@ -190,25 +191,25 @@ void PhaseChange::distfunc(const Scalar & sca, const int itnum) {
 	  if(dflag[i][j][k]<-1000){
             g=0;
 	  } else if(dist[i][j][k]>=0){
-            real ap = std::max(a,0.0);
-            real bm = std::min(0.0,b);
-            real cp = std::max(c,0.0);
-            real dm = std::min(0.0,d);
-            real ep = std::max(e,0.0);
-            real fm = std::min(0.0,f);
-            g = sqrt(std::max(ap*ap,bm*bm)
-                    +std::max(cp*cp,dm*dm)
-                    +std::max(ep*ep,fm*fm))-1.0;
+            real ap = maxr(a,0.0);
+            real bm = minr(0.0,b);
+            real cp = maxr(c,0.0);
+            real dm = minr(0.0,d);
+            real ep = maxr(e,0.0);
+            real fm = minr(0.0,f);
+            g = sqrt(maxr(ap*ap,bm*bm)
+                    +maxr(cp*cp,dm*dm)
+                    +maxr(ep*ep,fm*fm))-1.0;
           } else {
-            real am = std::min(0.0,a);
-            real bp = std::max(b,0.0);
-            real cm = std::min(0.0,c);
-            real dp = std::max(d,0.0);
-            real em = std::min(0.0,e);
-            real fp = std::max(f,0.0);
-            g = sqrt(std::max(am*am,bp*bp)
-                    +std::max(cm*cm,dp*dp)
-                    +std::max(em*em,fp*fp))-1.0;
+            real am = minr(0.0,a);
+            real bp = maxr(b,0.0);
+            real cm = minr(0.0,c);
+            real dp = maxr(d,0.0);
+            real em = minr(0.0,e);
+            real fp = maxr(f,0.0);
+            g = sqrt(maxr(am*am,bp*bp)
+                    +maxr(cm*cm,dp*dp)
+                    +maxr(em*em,fp*fp))-1.0;
           }
           delta[i][j][k] = dtau * asgn * g;
         }

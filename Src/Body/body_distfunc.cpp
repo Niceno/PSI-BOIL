@@ -4,6 +4,7 @@
 #include "../Domain/domain.h"
 #include <iomanip>
 //#define DEBUG
+using namespace boil;
 
 /******************************************************************************/
 void Body::distfunc(const Domain & dom) {
@@ -206,8 +207,8 @@ void Body::distfunc(const Domain & dom) {
         if((*dflag)[i][j][k]==0.0){
           (*stmp)[i][j][k]=0.0;
         } else {
-          real dx = std::min(bdist->dzc(k),
-                    std::min(bdist->dxc(i),bdist->dyc(j))); // crude
+          real dx = minr(bdist->dzc(k),
+                    minr(bdist->dxc(i),bdist->dyc(j))); // crude
           real dtau = 0.5*dx;
           real asgn=copysign(1.0, (*bdist)[i][j][k]);
           /* cells except NFCell */
@@ -219,25 +220,25 @@ void Body::distfunc(const Domain & dom) {
           real f=((*bdist)[i][j][k+1]-(*bdist)[i][j][k])/bdist->dzt(k);
           real g;
           if((*bdist)[i][j][k]>=0){
-            real ap = std::max(a,0.0);
-            real bm = std::min(0.0,b);
-            real cp = std::max(c,0.0);
-            real dm = std::min(0.0,d);
-            real ep = std::max(e,0.0);
-            real fm = std::min(0.0,f);
-            g = sqrt(std::max(ap*ap,bm*bm)
-                    +std::max(cp*cp,dm*dm)
-                    +std::max(ep*ep,fm*fm))-1.0;
+            real ap = maxr(a,0.0);
+            real bm = minr(0.0,b);
+            real cp = maxr(c,0.0);
+            real dm = minr(0.0,d);
+            real ep = maxr(e,0.0);
+            real fm = minr(0.0,f);
+            g = sqrt(maxr(ap*ap,bm*bm)
+                    +maxr(cp*cp,dm*dm)
+                    +maxr(ep*ep,fm*fm))-1.0;
           } else {
-            real am = std::min(0.0,a);
-            real bp = std::max(b,0.0);
-            real cm = std::min(0.0,c);
-            real dp = std::max(d,0.0);
-            real em = std::min(0.0,e);
-            real fp = std::max(f,0.0);
-            g = sqrt(std::max(am*am,bp*bp)
-                    +std::max(cm*cm,dp*dp)
-                    +std::max(em*em,fp*fp))-1.0;
+            real am = minr(0.0,a);
+            real bp = maxr(b,0.0);
+            real cm = minr(0.0,c);
+            real dp = maxr(d,0.0);
+            real em = minr(0.0,e);
+            real fp = maxr(f,0.0);
+            g = sqrt(maxr(am*am,bp*bp)
+                    +maxr(cm*cm,dp*dp)
+                    +maxr(em*em,fp*fp))-1.0;
           }
           (*stmp)[i][j][k] = dtau * asgn * g;
         }

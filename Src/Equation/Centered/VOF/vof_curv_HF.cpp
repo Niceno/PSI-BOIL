@@ -1,6 +1,6 @@
 #include "vof.h"
 #define LOPEZ
-using namespace std;
+using namespace boil;
 
 /******************************************************************************/
 void VOF::curv_HF() {
@@ -76,7 +76,7 @@ void VOF::curv_HF() {
 
   /* copy phi to stmp */
   for_aijk(i,j,k) {
-    stmp[i][j][k] = min(1.0,max(0.0,phi[i][j][k]));
+    stmp[i][j][k] = minr(1.0,maxr(0.0,phi[i][j][k]));
   }
 
   for_ijk(i,j,k) {
@@ -129,10 +129,10 @@ void VOF::curv_HF() {
         int imin_bnd = imin - 1; /* uses update at walls */
         int imax_bnd = imax + 1;
 
-        if (iminc&&!iminw) imin=max(-3,si()-i);  // limit stencil size for cut-stencil
-        if (imaxc&&!imaxw) imax=min( 3,ei()-i);
-        if(iminw) { imin = max(-3,si()-i-1); imin_bnd = imin; }
-        if(imaxw) { imax = min(+3,ei()-i+1); imax_bnd = imax; }
+        if (iminc&&!iminw) imin=maxi(-3,si()-i);  // limit stencil size for cut-stencil
+        if (imaxc&&!imaxw) imax=mini( 3,ei()-i);
+        if(iminw) { imin = maxi(-3,si()-i-1); imin_bnd = imin; }
+        if(imaxw) { imax = mini(+3,ei()-i+1); imax_bnd = imax; }
 
         if (dom->ibody().off(i-1,j,k)) { imin=-1; imin_bnd = imin; }  // use wall adjacent phi
         else if(dom->ibody().off(i-2,j,k)) { imin=-2; imin_bnd = imin; } // in solid
@@ -254,7 +254,7 @@ void VOF::curv_HF() {
         for (int ii=imin; ii<=imax; ii++) {
         for (int jj=-1; jj<=1; jj++) {
         for (int kk=-1; kk<=1; kk++) {
-          stmp[i+ii][j+jj][k+kk] = min(1.0,max(0.0,phi[i+ii][j+jj][k+kk]));
+          stmp[i+ii][j+jj][k+kk] = minr(1.0,maxr(0.0,phi[i+ii][j+jj][k+kk]));
         }}}
 
       } else if (dirMax==2) {
@@ -271,10 +271,10 @@ void VOF::curv_HF() {
         int jmin_bnd = jmin - 1; /* uses update at walls */
         int jmax_bnd = jmax + 1;
 
-        if (jminc&&!jminw) jmin=max(-3,sj()-j);  // limit stencil size for cut-stencil
-        if (jmaxc&&!jmaxw) jmax=min( 3,ej()-j);
-        if(jminw) { jmin = max(-3,sj()-j-1); jmin_bnd = jmin; }
-        if(jmaxw) { jmax = min(+3,ej()-j+1); jmax_bnd = jmax; }
+        if (jminc&&!jminw) jmin=maxi(-3,sj()-j);  // limit stencil size for cut-stencil
+        if (jmaxc&&!jmaxw) jmax=mini( 3,ej()-j);
+        if(jminw) { jmin = maxi(-3,sj()-j-1); jmin_bnd = jmin; }
+        if(jmaxw) { jmax = mini(+3,ej()-j+1); jmax_bnd = jmax; }
 
         if (dom->ibody().off(i,j-1,k)) { jmin=-1; jmin_bnd = jmin; }
         else if(dom->ibody().off(i,j-2,k)) { jmin=-2; jmin_bnd = jmin; }
@@ -395,7 +395,7 @@ void VOF::curv_HF() {
         for (int ii=-1; ii<=1; ii++) {
         for (int jj=jmin; jj<=jmax; jj++) {
         for (int kk=-1; kk<=1; kk++) {
-          stmp[i+ii][j+jj][k+kk] = min(1.0,max(0.0,phi[i+ii][j+jj][k+kk]));
+          stmp[i+ii][j+jj][k+kk] = minr(1.0,maxr(0.0,phi[i+ii][j+jj][k+kk]));
         }}}
 
       } else if (dirMax==3) {
@@ -412,10 +412,10 @@ void VOF::curv_HF() {
         int kmin_bnd = kmin - 1; /* uses update at walls */
         int kmax_bnd = kmax + 1;
 
-        if (kminc&&!kminw) kmin=max(-3,sk()-k);  // limit stencil size for cut-stencil
-        if (kmaxc&&!kmaxw) kmax=min( 3,ek()-k);
-        if(kminw) { kmin = max(-3,sk()-k-1); kmin_bnd = kmin; }
-        if(kmaxw) { kmax = min(+3,ek()-k+1); kmax_bnd = kmax; }
+        if (kminc&&!kminw) kmin=maxi(-3,sk()-k);  // limit stencil size for cut-stencil
+        if (kmaxc&&!kmaxw) kmax=mini( 3,ek()-k);
+        if(kminw) { kmin = maxi(-3,sk()-k-1); kmin_bnd = kmin; }
+        if(kmaxw) { kmax = mini(+3,ek()-k+1); kmax_bnd = kmax; }
 
         if (dom->ibody().off(i,j,k-1)) { kmin=-1; kmin_bnd = kmin; }
         else if(dom->ibody().off(i,j,k-2)) { kmin=-2; kmin_bnd = kmin; }
@@ -541,7 +541,7 @@ void VOF::curv_HF() {
         for (int ii=-1; ii<=1; ii++) {
         for (int jj=-1; jj<=1; jj++) {
         for (int kk=kmin; kk<=kmax; kk++) {
-          stmp[i+ii][j+jj][k+kk] = min(1.0,max(0.0,phi[i+ii][j+jj][k+kk]));
+          stmp[i+ii][j+jj][k+kk] = minr(1.0,maxr(0.0,phi[i+ii][j+jj][k+kk]));
         }}}
 
       }
@@ -561,16 +561,16 @@ void VOF::curv_HF() {
     for_ijk(i,j,k) {
       if(dom->ibody().off(i,j,k)) continue;
       if(iflag[i][j][k]==0) {
-        int inb =  min(1,iflag[i-1][j][k]) + min(1,iflag[i+1][j][k])
-                 + min(1,iflag[i][j-1][k]) + min(1,iflag[i][j+1][k])
-                 + min(1,iflag[i][j][k-1]) + min(1,iflag[i][j][k+1]);
+        int inb =  mini(1,iflag[i-1][j][k]) + mini(1,iflag[i+1][j][k])
+                 + mini(1,iflag[i][j-1][k]) + mini(1,iflag[i][j+1][k])
+                 + mini(1,iflag[i][j][k-1]) + mini(1,iflag[i][j][k+1]);
         if (inb >= 1) {
-            stmp[i][j][k] = (real(min(1,iflag[i-1][j][k])) * kappa[i-1][j][k]
-                           + real(min(1,iflag[i+1][j][k])) * kappa[i+1][j][k]
-                           + real(min(1,iflag[i][j-1][k])) * kappa[i][j-1][k]
-                           + real(min(1,iflag[i][j+1][k])) * kappa[i][j+1][k]
-                           + real(min(1,iflag[i][j][k-1])) * kappa[i][j][k-1]
-                           + real(min(1,iflag[i][j][k+1])) * kappa[i][j][k+1])
+            stmp[i][j][k] = (real(mini(1,iflag[i-1][j][k])) * kappa[i-1][j][k]
+                           + real(mini(1,iflag[i+1][j][k])) * kappa[i+1][j][k]
+                           + real(mini(1,iflag[i][j-1][k])) * kappa[i][j-1][k]
+                           + real(mini(1,iflag[i][j+1][k])) * kappa[i][j+1][k]
+                           + real(mini(1,iflag[i][j][k-1])) * kappa[i][j][k-1]
+                           + real(mini(1,iflag[i][j][k+1])) * kappa[i][j][k+1])
                            /real(inb);
             iflagx[i][j][k] = 2;  // iflag=2 for extrapolated
         }

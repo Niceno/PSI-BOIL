@@ -155,7 +155,7 @@ class Dispersed : public Scalar {
     void cell_init();
     void cell_link();
     int NX_coarse, NY_coarse, NZ_coarse;
-    double diam_x, diam_y, diam_z;
+    real diam_x, diam_y, diam_z;
 
     Scalar p_id; /* p_id[i][j][k] gives the number of particle that
                                                 is in cell(i,j,k)*/

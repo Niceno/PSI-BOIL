@@ -115,10 +115,11 @@ void PlotTECMPI::read(const char * nam,
 
     // solution time
     int32_t inputZone = 1;
-    real solutionTime;
+    //real solutionTime;
+    double solutionTime;
     res = tecZoneGetSolutionTime(fileHandle, inputZone, &solutionTime);
     t->current_time(solutionTime);
-    boil::oout<<"# read:solutionTime= "<<solutionTime<<"\n";
+    boil::oout<<"# read:solutionTime= "<<real(solutionTime)<<"\n";
 
 #ifdef READ_VEL_AVE
     /* reset vel */
@@ -267,10 +268,11 @@ void PlotTECMPI::read(const char * nam,
 
     // solution time
     int32_t inputZone = 1;
-    real solutionTime;
+    //real solutionTime;
+    double solutionTime;
     res = tecZoneGetSolutionTime(fileHandle, inputZone, &solutionTime);
     t->current_time(solutionTime);
-    boil::oout<<"# read:solutionTime= "<<solutionTime<<"\n";
+    boil::oout<<"# read:solutionTime= "<<real(solutionTime)<<"\n";
 
     inputZone = commRank +1;
     for (int32_t var = 4; var <= numVars; ++var) {

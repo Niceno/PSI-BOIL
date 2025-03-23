@@ -1,4 +1,5 @@
 #include "marching_cube.h"
+using namespace boil;
 
 /******************************************************************************/
 real MarchingCube::area(const int i, const int j, const int k){
@@ -31,7 +32,7 @@ real MarchingCube::area(const int i, const int j, const int k){
     for(int idx=0;idx<2;idx++)
       for(int jdx=0;jdx<2;jdx++)
         for(int kdx=0;kdx<2;kdx++)
-          grid.val[m]+=std::max(0.0,std::min(1.0,(*clr)[ii+idx][jj+jdx][kk+kdx]));
+          grid.val[m]+=maxr(0.0,minr(1.0,(*clr)[ii+idx][jj+jdx][kk+kdx]));
     grid.val[m] /= 8.0;
 #endif 
 

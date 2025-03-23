@@ -1,5 +1,5 @@
 #include "enthalpyfdadiabatic.h"
-using namespace std;
+using namespace boil;
 
 /***************************************************************************//**
 *  \brief Creates diffusive part of the system matrix \f$ [A] \f$.
@@ -29,21 +29,21 @@ void EnthalpyFDAdiabatic::create_system_diffusive(const Scalar * diff_eddy) {
         lc += (*diff_eddy)[i][j][k]*cp_mass/turbP;
       }
       const real vol = phi.dV(i,j,k);
-      const real clrw = std::min(std::max((*clr)[i-1][j][k],0.0),1.0);
-      const real clrc = std::min(std::max((*clr)[i  ][j][k],0.0),1.0);
-      const real clre = std::min(std::max((*clr)[i+1][j][k],0.0),1.0);
+      const real clrw = minr(maxr((*clr)[i-1][j][k],0.0),1.0);
+      const real clrc = minr(maxr((*clr)[i  ][j][k],0.0),1.0);
+      const real clre = minr(maxr((*clr)[i+1][j][k],0.0),1.0);
       real xm,xp,aflagm,aflagp;
       aflagm=aflagp=1.0;
       if((clrw-0.5)*(clrc-0.5)>=0){
         xm=phi.dxw(i);
       } else {
-        xm=std::max((0.5-clrc)/(clrw-clrc),epsl)*phi.dxw(i);
+        xm=maxr((0.5-clrc)/(clrw-clrc),epsl)*phi.dxw(i);
         aflagm=0.0;
       }
       if((clrc-0.5)*(clre-0.5)>=0){
         xp=phi.dxe(i);
       } else {
-        xp=std::max((0.5-clrc)/(clre-clrc),epsl)*phi.dxe(i);
+        xp=maxr((0.5-clrc)/(clre-clrc),epsl)*phi.dxe(i);
         aflagp=0.0;
       }
       A.w[i][j][k] =  tscn * lc * vol * 2.0 / (xm*(xm+xp)) * aflagm;
@@ -66,21 +66,21 @@ void EnthalpyFDAdiabatic::create_system_diffusive(const Scalar * diff_eddy) {
         lc += (*diff_eddy)[i][j][k]*cp_mass/turbP;
       }
       const real vol = phi.dV(i,j,k);
-      const real clrs = std::min(std::max((*clr)[i][j-1][k],0.0),1.0);
-      const real clrc = std::min(std::max((*clr)[i][j  ][k],0.0),1.0);
-      const real clrn = std::min(std::max((*clr)[i][j+1][k],0.0),1.0);
+      const real clrs = minr(maxr((*clr)[i][j-1][k],0.0),1.0);
+      const real clrc = minr(maxr((*clr)[i][j  ][k],0.0),1.0);
+      const real clrn = minr(maxr((*clr)[i][j+1][k],0.0),1.0);
       real ym,yp,aflagm,aflagp;
       aflagm=aflagp=1.0;
       if((clrs-0.5)*(clrc-0.5)>=0){
         ym=phi.dys(j);
       } else {
-        ym=std::max((0.5-clrc)/(clrs-clrc),epsl)*phi.dys(j);
+        ym=maxr((0.5-clrc)/(clrs-clrc),epsl)*phi.dys(j);
         aflagm=0.0;
       }
       if((clrc-0.5)*(clrn-0.5)>=0){
         yp=phi.dyn(j);
       } else {
-        yp=std::max((0.5-clrc)/(clrn-clrc),epsl)*phi.dyn(j);
+        yp=maxr((0.5-clrc)/(clrn-clrc),epsl)*phi.dyn(j);
         aflagp=0.0;
       }
       A.s[i][j][k] =  tscn * lc * vol * 2.0 / (ym*(ym+yp)) * aflagm;
@@ -103,21 +103,21 @@ void EnthalpyFDAdiabatic::create_system_diffusive(const Scalar * diff_eddy) {
         lc += (*diff_eddy)[i][j][k]*cp_mass/turbP;
       }
       const real vol = phi.dV(i,j,k);
-      const real clrb = std::min(std::max((*clr)[i][j][k-1],0.0),1.0);
-      const real clrc = std::min(std::max((*clr)[i][j][k  ],0.0),1.0);
-      const real clrt = std::min(std::max((*clr)[i][j][k+1],0.0),1.0);
+      const real clrb = minr(maxr((*clr)[i][j][k-1],0.0),1.0);
+      const real clrc = minr(maxr((*clr)[i][j][k  ],0.0),1.0);
+      const real clrt = minr(maxr((*clr)[i][j][k+1],0.0),1.0);
       real zm,zp,aflagm,aflagp;
       aflagm=aflagp=1.0;
       if((clrb-0.5)*(clrc-0.5)>=0){
         zm=phi.dzb(k);
       } else {
-        zm=std::max((0.5-clrc)/(clrb-clrc),epsl)*phi.dzb(k);
+        zm=maxr((0.5-clrc)/(clrb-clrc),epsl)*phi.dzb(k);
         aflagm=0.0;
       }
       if((clrc-0.5)*(clrt-0.5)>=0){
         zp=phi.dzt(k);
       } else {
-        zp=std::max((0.5-clrc)/(clrt-clrc),epsl)*phi.dzt(k);
+        zp=maxr((0.5-clrc)/(clrt-clrc),epsl)*phi.dzt(k);
         aflagp=0.0;
       }
       A.b[i][j][k] =  tscn * lc * vol * 2.0 / (zm*(zm+zp)) * aflagm;

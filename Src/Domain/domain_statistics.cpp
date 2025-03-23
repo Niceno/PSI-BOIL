@@ -3,6 +3,7 @@
 #include "../Plot/plot.h"
 #include <iomanip>
 #include <iostream>
+using namespace boil;
 
 /******************************************************************************/
 void Domain::statistics(Body * body) {
@@ -32,21 +33,21 @@ void Domain::statistics(Body * body) {
         if(body){
           if((*body).off(i,j,k)) continue;
         }
-        min_dx = std::min(dxc(i), min_dx);
-        max_dx = std::max(dxc(i), max_dx);
-        min_dy = std::min(dyc(j), min_dy);
-        max_dy = std::max(dyc(j), max_dy);
-        min_dz = std::min(dzc(k), min_dz);
-        max_dz = std::max(dzc(k), max_dz);
-        min_dV = std::min(dV(i,j,k), min_dV);
-        max_dV = std::max(dV(i,j,k), max_dV);
+        min_dx = minr(dxc(i), min_dx);
+        max_dx = maxr(dxc(i), max_dx);
+        min_dy = minr(dyc(j), min_dy);
+        max_dy = maxr(dyc(j), max_dy);
+        min_dz = minr(dzc(k), min_dz);
+        max_dz = maxr(dzc(k), max_dz);
+        min_dV = minr(dV(i,j,k), min_dV);
+        max_dV = maxr(dV(i,j,k), max_dV);
 
-        real ratio_xy = std::max(dxc(i)/dyc(j), dyc(j)/dxc(i));
-        real ratio_xz = std::max(dxc(i)/dzc(k), dzc(k)/dxc(i));
-        real ratio_yz = std::max(dyc(j)/dzc(k), dzc(k)/dyc(j));
+        real ratio_xy = maxr(dxc(i)/dyc(j), dyc(j)/dxc(i));
+        real ratio_xz = maxr(dxc(i)/dzc(k), dzc(k)/dxc(i));
+        real ratio_yz = maxr(dyc(j)/dzc(k), dzc(k)/dyc(j));
         real ratio = boil::maxr(ratio_xy, ratio_xz, ratio_yz);
 
-        max_ar = std::max(max_ar, ratio);
+        max_ar = maxr(max_ar, ratio);
       }
 
   /* find global exreme values */

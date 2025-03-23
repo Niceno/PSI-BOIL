@@ -3,6 +3,7 @@
 #include "../Field/Scalar/scalar.h"
 #include "../Plot/plot.h"
 //#define DEBUG
+using namespace boil;
 
 /******************************************************************************/
 CutCell * Body::cut_cell(const int poly_index,
@@ -275,8 +276,8 @@ CutCell * Body::cut_cell(const int poly_index,
   } else if(n>=7){
     boil::aout<<"body_cut_cell:Error! (n>=7)  n= "<<n<<"\n";
     boil::aout<<"Body shape is too complicated. Use finer grid.\n";
-    boil::aout<<"position of cell celter (x,y,z)= ( "<<0.5*(x[0]+x[1])<<" , "
-              <<0.5*(y[0]+y[1])<<" , "<<0.5*(z[0]+z[1])<<" )\n";
+    boil::aout<<"position of cell celter (x,y,z)= ( "<<real(0.5*(x[0]+x[1]))<<" , "
+              <<real(0.5*(y[0]+y[1]))<<" , "<<real(0.5*(z[0]+z[1]))<<" )\n";
     boil::aout<<"dx,dy,dz= "<<dx<<" "<<dy<<" "<<dz<<"\n";
     boil::aout<<"position (i,j,k,irank)= ( "<<ic<<" , "
               <<jc<<" , "<<kc<<" , "<<boil::cart.iam()<<" )\n";
@@ -627,24 +628,24 @@ CutCell * Body::cut_cell(const int poly_index,
     /* "i" direction; dxw & dxe */
     const real dxw = xc - xw;
     const real dxe = xe - xc;
-    if( xi < xc && xi > xw ) fdxw = std::min(1.0,(xc - xi)/dxw);
-    if( xi > xc && xi < xe ) fdxe = std::min(1.0,(xi - xc)/dxe);
+    if( xi < xc && xi > xw ) fdxw = minr(1.0,(xc - xi)/dxw);
+    if( xi > xc && xi < xe ) fdxe = minr(1.0,(xi - xc)/dxe);
     assert( fdxw > 0.0 );
     assert( fdxe > 0.0 );
  
     /* "j" direction; dys & dyn */
     const real dys = yc - ys;
     const real dyn = yn - yc;
-    if( yi < yc && yi > ys ) fdys = std::min(1.0,(yc - yi)/dys);
-    if( yi > yc && yi < yn ) fdyn = std::min(1.0,(yi - yc)/dyn);
+    if( yi < yc && yi > ys ) fdys = minr(1.0,(yc - yi)/dys);
+    if( yi > yc && yi < yn ) fdyn = minr(1.0,(yi - yc)/dyn);
     assert( fdys > 0.0 );
     assert( fdyn > 0.0 );
 
     /* "k" direction; dzb & dzt */
     const real dzb = zc - zb; 
     const real dzt = zt - zc;
-    if( zi < zc && zi > zb ) fdzb = std::min(1.0,(zc - zi)/dzb);
-    if( zi > zc && zi < zt ) fdzt = std::min(1.0,(zi - zc)/dzt);
+    if( zi < zc && zi > zb ) fdzb = minr(1.0,(zc - zi)/dzb);
+    if( zi > zc && zi < zt ) fdzt = minr(1.0,(zi - zc)/dzt);
     assert( fdzb > 0.0 );
     assert( fdzt > 0.0 );
 

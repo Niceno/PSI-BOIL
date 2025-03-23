@@ -1,5 +1,5 @@
 #include "enthalpyfd.h"
-using namespace std;
+using namespace boil;
 
 /***************************************************************************//**
 *  \brief Creates diffusive part of the system matrix \f$ [A] \f$.
@@ -80,7 +80,7 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
       //std::cout<<"s-s-s: "<<i<<" "<<j<<" "<<k<<"\n";
     } else if(onm && ofp){
       // f-s-s
-      fdm = max(fdm,epsl);
+      fdm = maxr(fdm,epsl);
       dxm = dxm * fdm;
       /* FDM */
       //am = lc*vol*2.0/(dxm*(dxm+dxp))*fdm*lm/(fdm*lm+(1.0-fdm)*lc);
@@ -94,7 +94,7 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
       //std::cout<<"f-s-s: "<<i<<" "<<j<<" "<<k<<" "<<am-ac+ap<<"\n";
     } else if(ofm && onp){
       // s-s-f
-      fdp = max(fdp,epsl);
+      fdp = maxr(fdp,epsl);
       dxp = dxp * fdp;
       /* FDM */
       //am = lc*vol*2.0/(dxm*(dxm+dxp));
@@ -124,14 +124,14 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
       if((clm-0.5)*(clc-0.5)>=0){
         dxm=dxm;
       } else {
-        dxm=std::max((0.5-clc)/(clm-clc),epsl)*dxm;
+        dxm=maxr((0.5-clc)/(clm-clc),epsl)*dxm;
         aflagm=0.0;
         tm = tsat;
       }
       if((clc-0.5)*(clp-0.5)>=0){
         dxp=dxp;
       } else {
-        dxp=std::max((0.5-clc)/(clp-clc),epsl)*dxp;
+        dxp=maxr((0.5-clc)/(clp-clc),epsl)*dxp;
         aflagp=0.0;
         tp = tsat;
 #if 0
@@ -154,12 +154,12 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
     } else if(ofm && onp){ 
 
       // s-f-f
-      fdm = max(fdm,epsl);
+      fdm = maxr(fdm,epsl);
       dxm = dxm * fdm;
       if((clc-0.5)*(clp-0.5)>=0){
         dxp=dxp;
       } else {
-        dxp=std::max((0.5-clc)/(clp-clc),epsl)*dxp;
+        dxp=maxr((0.5-clc)/(clp-clc),epsl)*dxp;
         aflagp=0.0;
         tp = tsat;
       }
@@ -180,12 +180,12 @@ void EnthalpyFD::diff_matrix(real & am, real & ac, real & ap
     } else if(onm && ofp){
 
       // f-f-s
-      fdp = max(fdp,epsl);
+      fdp = maxr(fdp,epsl);
       dxp = dxp * fdp;
       if((clm-0.5)*(clc-0.5)>=0){
         dxm=dxm;
       } else {
-        dxm=std::max((0.5-clc)/(clm-clc),epsl)*dxm;
+        dxm=maxr((0.5-clc)/(clm-clc),epsl)*dxm;
         aflagm=0.0;
         tm = tsat;
       }

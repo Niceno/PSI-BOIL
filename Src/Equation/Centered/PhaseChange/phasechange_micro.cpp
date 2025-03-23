@@ -1,7 +1,7 @@
 #include "phasechange.h"
 //#define ST_LENGTH
 //#define DEBUG
-using namespace std;
+using namespace boil;
 
 /******************************************************************************/
 void PhaseChange::micro(Vector * vec, const Scalar * diff_eddy,
@@ -143,10 +143,10 @@ void PhaseChange::micro(Vector * vec, const Scalar * diff_eddy,
                          - dt/rhol/latent
                          * ( tpr[i][j][k] - tsat ) 
                          / (nucl->dmicro[ii][jj][kk]/lambdal + resint);
-	      dmicro_new = max(dmicro_new, nucl->dmicro_min);
+	      dmicro_new = maxr(dmicro_new, nucl->dmicro_min);
 
               // micro-layer thicnkess doesn't increase
-              dmicro_new = min(dmicro_new,  nucl->dmicro[ii][jj][kk]); 
+              dmicro_new = minr(dmicro_new,  nucl->dmicro[ii][jj][kk]); 
 
               phi[ii][jj][kk] = - rhol * (dmicro_new - nucl->dmicro[ii][jj][kk])
                               / dt * area / vol;
@@ -281,7 +281,7 @@ void PhaseChange::micro(Vector * vec, const Scalar * diff_eddy,
       boil::oout<<"micro:a_vapor= "<<a_vapor<<" ijk "<<i<<" "<<j<<" "<<k<<"\n";
     }
 #endif
-    real clrc = min(1.0,max(0.0,clr[i][j][k]));
+    real clrc = minr(1.0,maxr(0.0,clr[i][j][k]));
     bool inclNoInterface = incl_no_interface(i,j,k);
     if (incl_no_interface(i,j,k)) {
       if (clrc>0.5) {
@@ -375,10 +375,10 @@ void PhaseChange::micro(Vector * vec, const Scalar * diff_eddy,
                   / ( dw/lambdas + nucl->dmicro[i][j][k]/lambdal + resint); 
 
         dmicro_new = nucl->dmicro[i][j][k] - dt / rhol * qtmp / latent;
-        dmicro_new = max(dmicro_new, nucl->dmicro_min);
+        dmicro_new = maxr(dmicro_new, nucl->dmicro_min);
 
         // micro-layer thicnkess doesn't increase
-        dmicro_new = min(dmicro_new,  nucl->dmicro[i][j][k]); 
+        dmicro_new = minr(dmicro_new,  nucl->dmicro[i][j][k]); 
 
         if (phi[i][j][k]>=0.0) {
           smdot_pos_macro_overwrite += phi[i][j][k]*vol;
@@ -460,10 +460,10 @@ void PhaseChange::micro(Vector * vec, const Scalar * diff_eddy,
                   / ( dw/lambdas + nucl->dmicro[i][j][k]/lambdal + resint);
         
         dmicro_new = nucl->dmicro[i][j][k] - dt / rhol * qtmp / latent;
-        dmicro_new = max(dmicro_new, nucl->dmicro_min);
+        dmicro_new = maxr(dmicro_new, nucl->dmicro_min);
        
         // micro-layer thicnkess doesn't increase
-        dmicro_new = min(dmicro_new,  nucl->dmicro[i][j][k]); 
+        dmicro_new = minr(dmicro_new,  nucl->dmicro[i][j][k]); 
  
         if (phi[i][j][k]>=0.0) {
           smdot_pos_macro_overwrite += phi[i][j][k]*vol;

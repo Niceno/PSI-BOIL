@@ -1,6 +1,7 @@
 #include "domain.h"
 #include "../Parallel/communicator.h"
 #include "../Plot/plot.h"
+using namespace boil;
 
 /******************************************************************************/
 const Domain * Domain::coarsen() const {
@@ -12,7 +13,7 @@ const Domain * Domain::coarsen() const {
   //return NULL;
  
   /* minimum resulution (with buffers) */
-  const int min_n =  std::max(4,boil::BW) + 2*boil::BW;
+  const int min_n =  maxi(4,boil::BW) + 2*boil::BW;
 
   /* coarsening factors */
   int c_fac_x = 2; 

@@ -1,5 +1,5 @@
 #include "cipcsl2.h"
-using namespace std;
+using namespace boil;
 
 /******************************************************************************/
 void CIPCSL2::bdphiface(const Vector & vec
@@ -41,7 +41,7 @@ void CIPCSL2::bdphiface(const Vector & vec
             if (k>=ek()+1) continue;
             real dy=phi.dyc(j);
             real dz=phi.dzc(k);
-            real stmp = min(1.0,max(0.0,sca[i][j][k]));
+            real stmp = minr(1.0,maxr(0.0,sca[i][j][k]));
             vec[m][i+iof2][j][k] = dy*dz*stmp;
           }
         }
@@ -59,7 +59,7 @@ void CIPCSL2::bdphiface(const Vector & vec
             if (k>=ek()+1) continue;
             real dy=phi.dyc(j);
             real dz=phi.dzc(k);
-            real stmp = min(1.0,max(0.0,sca[i+iof][j][k]));
+            real stmp = minr(1.0,maxr(0.0,sca[i+iof][j][k]));
             vec[m][i+iof2][j][k] = dy*dz*stmp;
           }
         }
@@ -96,7 +96,7 @@ void CIPCSL2::bdphiface(const Vector & vec
             if (k>=ek()+1) continue;
             real dx=phi.dxc(i);
             real dz=phi.dzc(k);
-            real stmp = min(1.0,max(0.0,sca[i][j][k]));
+            real stmp = minr(1.0,maxr(0.0,sca[i][j][k]));
             vec[m][i][j+jof2][k] = dx*dz*stmp;
           }
         }
@@ -114,7 +114,7 @@ void CIPCSL2::bdphiface(const Vector & vec
             if (k>=ek()+1) continue;
             real dx=phi.dxc(i);
             real dz=phi.dzc(k);
-            real stmp = min(1.0,max(0.0,sca[i][j+jof][k]));
+            real stmp = minr(1.0,maxr(0.0,sca[i][j+jof][k]));
             vec[m][i][j+jof2][k] = dx*dz*stmp;
           }
         }
@@ -150,7 +150,7 @@ void CIPCSL2::bdphiface(const Vector & vec
             if (k>=ek()+2) continue;
             real dx=phi.dxc(i);
             real dy=phi.dyc(j);
-            real stmp = min(1.0,max(0.0,sca[i][j][k]));
+            real stmp = minr(1.0,maxr(0.0,sca[i][j][k]));
             vec[m][i][j][k+kof2] = dx*dy*stmp;
           }
         }
@@ -168,7 +168,7 @@ void CIPCSL2::bdphiface(const Vector & vec
             if (k>=ek()+2) continue;
             real dx=phi.dxc(i);
             real dy=phi.dyc(j);
-            real stmp = min(1.0,max(0.0,sca[i][j][k+kof]));
+            real stmp = minr(1.0,maxr(0.0,sca[i][j][k+kof]));
             vec[m][i][j][k+kof2] = dx*dy*stmp;
           }
         }

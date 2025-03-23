@@ -1,4 +1,5 @@
 #include "nucleation.h"
+using namespace boil;
 
 /***************************************************************************//**
 * set loop range
@@ -21,7 +22,7 @@ void Nucleation::set_range(std::vector<Site> & s) {
   real ye = s[ns].y()+rng;
   real zs = s[ns].z()-rng;
   real ze = s[ns].z()+rng;
-  zs = std::max(zs,0.0);
+  zs = maxr(zs,0.0);
 
   /* set_contain_range: range is inside/outside of decomposed domain */
   /* Note: <= and >= are used for the detection */
@@ -58,12 +59,12 @@ void Nucleation::set_range(std::vector<Site> & s) {
     int ke = clr->akp(ze, boil::femto);
     //std::cout<<ns<<" "<<ic<<" "<<jc<<" "<<kc<<"\n";
     //std::cout<<ns<<" "<<is<<" "<<ie<<" "<<js<<" "<<je<<" "<<ks<<" "<<ke<<"\n";
-    is = std::max(is,clr->si());
-    ie = std::min(ie,clr->ei());
-    js = std::max(js,clr->sj());
-    je = std::min(je,clr->ej());
-    ks = std::max(ks,clr->sk());
-    ke = std::min(ke,clr->ek());
+    is = maxi(is,clr->si());
+    ie = mini(ie,clr->ei());
+    js = maxi(js,clr->sj());
+    je = mini(je,clr->ej());
+    ks = maxi(ks,clr->sk());
+    ke = mini(ke,clr->ek());
 
     s[ns].set_is(is);
     s[ns].set_ie(ie);

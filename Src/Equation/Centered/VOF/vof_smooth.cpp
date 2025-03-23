@@ -1,5 +1,6 @@
 #include "vof.h"
 #include <iomanip>
+using namespace boil;
 
 /******************************************************************************/
 void VOF::smooth(const Scalar & sca, Scalar & scb, const int itnum) {
@@ -71,7 +72,7 @@ void VOF::smooth(const Scalar & sca, Scalar & scb, const int itnum) {
       // update
       //for_aijk(i,j,k){
       for_ijk(i,j,k){
-        //real coef=std::min(1.0,pow(abs(2.0*sca[i][j][k]-1.0),1.0));
+        //real coef=minr(1.0,pow(abs(2.0*sca[i][j][k]-1.0),1.0));
         //scb[i][j][k]=scb[i][j][k]+dtau*coef*nmag[i][j][k];
         scb[i][j][k]=scb[i][j][k]+dtau*stmp[i][j][k];
       }
@@ -87,7 +88,7 @@ void VOF::smooth(const Scalar & sca, Scalar & scb, const int itnum) {
   |  cut-off  |
   +----------*/
   for_aijk(i,j,k)
-    scb[i][j][k]=std::max(0.0,(std::min(1.0,scb[i][j][k])));
+    scb[i][j][k]=maxr(0.0,(minr(1.0,scb[i][j][k])));
 
 #if 0
   boil::plot->plot(sca,scb, "sca-scb", time->current_step());

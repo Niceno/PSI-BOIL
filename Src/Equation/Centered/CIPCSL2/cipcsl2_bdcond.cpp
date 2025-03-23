@@ -1,5 +1,5 @@
 #include "cipcsl2.h"
-using namespace std;
+using namespace boil;
 
 /******************************************************************************/
 void CIPCSL2::bdcond(const Scalar & sca) {
@@ -110,7 +110,7 @@ void CIPCSL2::bdcond(const Scalar & sca) {
           if (j>=ej()+2) continue;
           if (k<=sk()-2) continue;
           if (k>=ek()+2) continue;
-              sca[i][j][k]=std::max(0.0,min(1.0,sca[i+iof][j+jof][k+kof]));
+              sca[i][j][k]=maxr(0.0,minr(1.0,sca[i+iof][j+jof][k+kof]));
         }
       }
     }

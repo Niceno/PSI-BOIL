@@ -54,7 +54,10 @@ class AllOut : public std::ostream {
     AllOut & operator << (const unsigned u) 
      {std::cout << u; return *this;} 
 
-    AllOut & operator << (const real & r) 
+    AllOut & operator << (const float & r) 
+     {std::cout << r; return *this;} 
+
+    AllOut & operator << (const double & r) 
      {std::cout << r; return *this;} 
 
     AllOut & operator << (const std::string & s) 
@@ -107,7 +110,10 @@ class OneOut : public std::ostream {
     OneOut & operator << (const unsigned u) 
      {std::cout << u; return *this;} 
 
-    OneOut & operator << (const real & r) 
+    OneOut & operator << (const float & r) 
+     {if(!boil::cart.iam()) std::cout << r; return *this;} 
+
+    OneOut & operator << (const double & r) 
      {if(!boil::cart.iam()) std::cout << r; return *this;} 
 
     OneOut & operator << (const std::string & s) 

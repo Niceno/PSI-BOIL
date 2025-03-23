@@ -1,5 +1,5 @@
 #include "cipcsl2.h"
-using namespace std;
+using namespace boil;
 
 /******************************************************************************/
 void Scheme::bdcond_i(const Scalar & sca) {
@@ -74,7 +74,7 @@ void Scheme::bdcond_i(const Scalar & sca) {
             real dx=sca.dxc(i);
             //sigx[i][j+jof2][k+kof2] = dx*0.5*(sca[i][j][k]+sca[i][j][k-1]);
             real stmp = 0.5*(sca[i][j][k]+sca[i][j][k-1]);
-            stmp = min(1.0,max(0.0,stmp));
+            stmp = minr(1.0,maxr(0.0,stmp));
             sigx[i][j+jof2][k+kof2] = dx*stmp;
           }}}
         } else if(d == Dir::kmin() || d == Dir::kmax()){
@@ -84,7 +84,7 @@ void Scheme::bdcond_i(const Scalar & sca) {
             real dx=sca.dxc(i);
             //sigx[i][j+jof2][k+kof2] = dx*0.5*(sca[i][j][k]+sca[i][j-1][k]);
             real stmp = 0.5*(sca[i][j][k]+sca[i][j-1][k]);
-            stmp = min(1.0,max(0.0,stmp));
+            stmp = minr(1.0,maxr(0.0,stmp));
             sigx[i][j+jof2][k+kof2] = dx*stmp;
           }}}
         }
@@ -110,7 +110,7 @@ void Scheme::bdcond_i(const Scalar & sca) {
             real dx=sca.dxc(i);
             //sigx[i][j+jof2][k+kof2] = dx*0.5*(sca[i][j][k]+sca[i][j][k-1]);
             real stmp = 0.5*(sca[i][j][k]+sca[i][j][k-1]);
-            stmp = min(1.0,max(0.0,stmp));
+            stmp = minr(1.0,maxr(0.0,stmp));
             sigx[i][j+jof2][k+kof2] = dx*stmp;
           }}}
         } else if(d == Dir::kmin() || d == Dir::kmax()){
@@ -120,7 +120,7 @@ void Scheme::bdcond_i(const Scalar & sca) {
             real dx=sca.dxc(i);
             //sigx[i][j+jof2][k+kof2] = dx*0.5*(sca[i][j][k]+sca[i][j-1][k]);
             real stmp = 0.5*(sca[i][j][k]+sca[i][j-1][k]);
-            stmp = min(1.0,max(0.0,stmp));
+            stmp = minr(1.0,maxr(0.0,stmp));
             sigx[i][j+jof2][k+kof2] = dx*stmp;
           }}}
         }
@@ -206,7 +206,7 @@ void Scheme::bdcond_j(const Scalar & sca) {
             real dy=sca.dyc(j);
             //sigy[i+iof2][j][k+kof2] = dy*0.5*(sca[i][j][k]+sca[i][j][k-1]);
             real stmp = 0.5*(sca[i][j][k]+sca[i][j][k-1]);
-            stmp = min(1.0,max(0.0,stmp));
+            stmp = minr(1.0,maxr(0.0,stmp));
             sigy[i+iof2][j][k+kof2] = dy*stmp;
           }}}
         } else if(d == Dir::kmin() || d == Dir::kmax()){
@@ -216,7 +216,7 @@ void Scheme::bdcond_j(const Scalar & sca) {
             real dy=sca.dyc(j);
             //sigy[i+iof2][j][k+kof2] = dy*0.5*(sca[i][j][k]+sca[i-1][j][k]);
             real stmp = 0.5*(sca[i][j][k]+sca[i-1][j][k]);
-            stmp = min(1.0,max(0.0,stmp));
+            stmp = minr(1.0,maxr(0.0,stmp));
             sigy[i+iof2][j][k+kof2] = dy*stmp;
           }}}
         }
@@ -245,7 +245,7 @@ void Scheme::bdcond_j(const Scalar & sca) {
             real dy=sca.dyc(j);
             //sigy[i+iof2][j][k+kof2] = dy*0.5*(sca[i][j][k]+sca[i][j][k-1]);
             real stmp = 0.5*(sca[i][j][k]+sca[i][j][k-1]);
-            stmp = min(1.0,max(0.0,stmp));
+            stmp = minr(1.0,maxr(0.0,stmp));
             sigy[i+iof2][j][k+kof2] = dy*stmp;
           }}}
         } else if(d == Dir::kmin() || d == Dir::kmax()){
@@ -255,7 +255,7 @@ void Scheme::bdcond_j(const Scalar & sca) {
             real dy=sca.dyc(j);
             //sigy[i+iof2][j][k+kof2] = dy*0.5*(sca[i][j][k]+sca[i-1][j][k]);
             real stmp = 0.5*(sca[i][j][k]+sca[i-1][j][k]);
-            stmp = min(1.0,max(0.0,stmp));
+            stmp = minr(1.0,maxr(0.0,stmp));
             sigy[i+iof2][j][k+kof2] = dy*stmp;
           }}}
         }
@@ -340,7 +340,7 @@ void Scheme::bdcond_k(const Scalar & sca) {
             real dz=sca.dzc(k);
             //sigz[i+iof2][j+jof2][k] = dz*0.5*(sca[i][j][k]+sca[i][j-1][k]);
             real stmp = 0.5*(sca[i][j][k]+sca[i][j-1][k]);
-            stmp = min(1.0,max(0.0,stmp));
+            stmp = minr(1.0,maxr(0.0,stmp));
             sigz[i+iof2][j+jof2][k] = dz*stmp;
           }}}
         } else if(d == Dir::jmin() || d == Dir::jmax()){
@@ -350,7 +350,7 @@ void Scheme::bdcond_k(const Scalar & sca) {
             real dz=sca.dzc(k);
             //sigz[i+iof2][j+jof2][k] = dz*0.5*(sca[i][j][k]+sca[i-1][j][k]);
             real stmp = 0.5*(sca[i][j][k]+sca[i-1][j][k]);
-            stmp = min(1.0,max(0.0,stmp));
+            stmp = minr(1.0,maxr(0.0,stmp));
             sigz[i+iof2][j+jof2][k] = dz*stmp;
           }}}
         }
@@ -380,7 +380,7 @@ void Scheme::bdcond_k(const Scalar & sca) {
             real dz=sca.dzc(k);
             //sigz[i+iof2][j+jof2][k] = dz*0.5*(sca[i][j][k]+sca[i][j-1][k]);
             real stmp = 0.5*(sca[i][j][k]+sca[i][j-1][k]);
-            stmp = min(1.0,max(0.0,stmp));
+            stmp = minr(1.0,maxr(0.0,stmp));
             sigz[i+iof2][j+jof2][k] = dz*stmp;
           }}}
         } else if(d == Dir::jmin() || d == Dir::jmax()){
@@ -390,7 +390,7 @@ void Scheme::bdcond_k(const Scalar & sca) {
             real dz=sca.dzc(k);
             //sigz[i+iof2][j+jof2][k] = dz*0.5*(sca[i][j][k]+sca[i-1][j][k]);
             real stmp = 0.5*(sca[i][j][k]+sca[i-1][j][k]);
-            stmp = min(1.0,max(0.0,stmp));
+            stmp = minr(1.0,maxr(0.0,stmp));
             sigz[i+iof2][j+jof2][k] = dz*stmp;
           }}}
         }
@@ -487,7 +487,7 @@ void Scheme::bdcond_f(const Scalar & sca) {
                                     +sca[i][j][k-kof]+sca[i-iof][j][k-kof])
                       +iof*jof*0.25*(sca[i][j    ][k]+sca[i-iof][j    ][k]
                                     +sca[i][j-jof][k]+sca[i-iof][j-jof][k]);
-          f[i+iof2][j+jof2][k+kof2] = min(1.0,max(0.0,ftmp));
+          f[i+iof2][j+jof2][k+kof2] = minr(1.0,maxr(0.0,ftmp));
         }}}
       }
     }
@@ -523,7 +523,7 @@ void Scheme::bdcond_f(const Scalar & sca) {
                                     +sca[i][j][k-kof]+sca[i-iof][j][k-kof])
                       +iof*jof*0.25*(sca[i][j    ][k]+sca[i-iof][j    ][k]
                                     +sca[i][j-jof][k]+sca[i-iof][j-jof][k]);
-          f[i+iof2][j+jof2][k+kof2] = min(1.0,max(0.0,ftmp));
+          f[i+iof2][j+jof2][k+kof2] = minr(1.0,maxr(0.0,ftmp));
         }}}
       }
     }

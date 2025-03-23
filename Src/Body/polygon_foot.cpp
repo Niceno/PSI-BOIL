@@ -1,4 +1,5 @@
 #include "body.h"
+using namespace boil;
 
 /******************************************************************************/
 real prod_inner(const real vec1[], const real vec2[]) {
@@ -56,8 +57,8 @@ bool Polygon::foot(const real xin, const real yin, const real zin,
     vec2[1]=yn(iv+1)-yft;
     vec2[2]=zn(iv+1)-zft;
     if(vnorm(vec1)==0||vnorm(vec2)==0) return true;
-    real ac=std::max(-1.0,prod_inner(vec1,vec2)/(vnorm(vec1)*vnorm(vec2)));
-    ac=std::min(ac,1.0);
+    real ac=maxr(-1.0,prod_inner(vec1,vec2)/(vnorm(vec1)*vnorm(vec2)));
+    ac=minr(ac,1.0);
     real theta = acos(ac);
     //avoid truncation error: intel compiler faces floating point exception.
     //real theta = acos(prod_inner(vec1,vec2)/(vnorm(vec1)*vnorm(vec2)));
@@ -72,8 +73,8 @@ bool Polygon::foot(const real xin, const real yin, const real zin,
     vec2[1]=yn(0)-yft;
     vec2[2]=zn(0)-zft;
     if(vnorm(vec1)==0||vnorm(vec2)==0) return true;
-    real ac=std::max(-1.0,prod_inner(vec1,vec2)/(vnorm(vec1)*vnorm(vec2)));
-    ac=std::min(ac,1.0);
+    real ac=maxr(-1.0,prod_inner(vec1,vec2)/(vnorm(vec1)*vnorm(vec2)));
+    ac=minr(ac,1.0);
     real theta = acos(ac);
     //avoid truncation error: intel compiler faces floating point exception.
     //real theta = acos(prod_inner(vec1,vec2)/(vnorm(vec1)*vnorm(vec2)));

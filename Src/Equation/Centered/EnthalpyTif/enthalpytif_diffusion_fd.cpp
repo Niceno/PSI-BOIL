@@ -1,6 +1,5 @@
 #include "enthalpytif.h"
-
-using namespace std;
+using namespace boil;
 
 /***************************************************************************//**
 *  \brief Adds diffusion to right hand side.
@@ -55,9 +54,9 @@ void EnthalpyTIF::diffusion_fd(const Scalar * diff_eddy) {
         lc += (*diff_eddy)[i][j][k]*cp_mass/turbP;
       }
       const real vol = phi.dV(i,j,k);
-      const real clrw = std::min(std::max((*clr)[i-1][j][k],0.0),1.0);
-      const real clrc = std::min(std::max((*clr)[i  ][j][k],0.0),1.0);
-      const real clre = std::min(std::max((*clr)[i+1][j][k],0.0),1.0);
+      const real clrw = minr(maxr((*clr)[i-1][j][k],0.0),1.0);
+      const real clrc = minr(maxr((*clr)[i  ][j][k],0.0),1.0);
+      const real clre = minr(maxr((*clr)[i+1][j][k],0.0),1.0);
       const real pc = phi[i][j][k];
       real xm,xp,pm,pp,aflagm,aflagp;
       aflagm=aflagp=0.0;
@@ -67,11 +66,11 @@ void EnthalpyTIF::diffusion_fd(const Scalar * diff_eddy) {
         pm=phi[i-1][j][k];
       } else {
         if(!fs) {
-          real frac = std::max((clrsurf-clrc)/(clrw-clrc),epsl);
+          real frac = maxr((clrsurf-clrc)/(clrw-clrc),epsl);
           xm=frac*phi.dxw(i);
           pm=Tint(-1,Comp::i(),frac,i,j,k);
         } else {
-          xm = std::max(epsl*phi.dxw(i),distance_x(i,j,k,-1,pm));
+          xm = maxr(epsl*phi.dxw(i),distance_x(i,j,k,-1,pm));
         }
         aflagm=1.0;
       }
@@ -81,11 +80,11 @@ void EnthalpyTIF::diffusion_fd(const Scalar * diff_eddy) {
         pp=phi[i+1][j][k];
       } else {
         if(!fs) {
-          real frac = std::max((clrsurf-clrc)/(clre-clrc),epsl);
+          real frac = maxr((clrsurf-clrc)/(clre-clrc),epsl);
           xp=frac*phi.dxe(i);
           pp=Tint(+1,Comp::i(),frac,i,j,k);
         } else {
-          xp = std::max(epsl*phi.dxe(i),distance_x(i,j,k,+1,pp));
+          xp = maxr(epsl*phi.dxe(i),distance_x(i,j,k,+1,pp));
         }
         aflagp=1.0;
       }
@@ -116,9 +115,9 @@ void EnthalpyTIF::diffusion_fd(const Scalar * diff_eddy) {
         lc += (*diff_eddy)[i][j][k]*cp_mass/turbP;
       }
       const real vol = phi.dV(i,j,k);
-      const real clrs = std::min(std::max((*clr)[i][j-1][k],0.0),1.0);
-      const real clrc = std::min(std::max((*clr)[i][j  ][k],0.0),1.0);
-      const real clrn = std::min(std::max((*clr)[i][j+1][k],0.0),1.0);
+      const real clrs = minr(maxr((*clr)[i][j-1][k],0.0),1.0);
+      const real clrc = minr(maxr((*clr)[i][j  ][k],0.0),1.0);
+      const real clrn = minr(maxr((*clr)[i][j+1][k],0.0),1.0);
       const real pc = phi[i][j][k];
       real ym,yp,pm,pp,aflagm,aflagp;
       aflagm=aflagp=0.0;
@@ -128,11 +127,11 @@ void EnthalpyTIF::diffusion_fd(const Scalar * diff_eddy) {
         pm=phi[i][j-1][k];
       } else {
         if(!fs) {
-          real frac = std::max((clrsurf-clrc)/(clrs-clrc),epsl);
+          real frac = maxr((clrsurf-clrc)/(clrs-clrc),epsl);
           ym=frac*phi.dys(j);
           pm=Tint(-1,Comp::j(),frac,i,j,k);
         } else {
-          ym = std::max(epsl*phi.dys(j),distance_y(i,j,k,-1,pm));
+          ym = maxr(epsl*phi.dys(j),distance_y(i,j,k,-1,pm));
         }
         aflagm=1.0;
       }
@@ -142,11 +141,11 @@ void EnthalpyTIF::diffusion_fd(const Scalar * diff_eddy) {
         pp=phi[i][j+1][k];
       } else {
         if(!fs) {
-          real frac = std::max((clrsurf-clrc)/(clrn-clrc),epsl);
+          real frac = maxr((clrsurf-clrc)/(clrn-clrc),epsl);
           yp=frac*phi.dyn(j);
           pp=Tint(+1,Comp::j(),frac,i,j,k);
         } else {
-          yp = std::max(epsl*phi.dyn(j),distance_y(i,j,k,+1,pp));
+          yp = maxr(epsl*phi.dyn(j),distance_y(i,j,k,+1,pp));
         }
         aflagp=1.0;
       }
@@ -176,9 +175,9 @@ void EnthalpyTIF::diffusion_fd(const Scalar * diff_eddy) {
         lc += (*diff_eddy)[i][j][k]*cp_mass/turbP;
       }
       const real vol = phi.dV(i,j,k);
-      const real clrb = std::min(std::max((*clr)[i][j][k-1],0.0),1.0);
-      const real clrc = std::min(std::max((*clr)[i][j][k  ],0.0),1.0);
-      const real clrt = std::min(std::max((*clr)[i][j][k+1],0.0),1.0);
+      const real clrb = minr(maxr((*clr)[i][j][k-1],0.0),1.0);
+      const real clrc = minr(maxr((*clr)[i][j][k  ],0.0),1.0);
+      const real clrt = minr(maxr((*clr)[i][j][k+1],0.0),1.0);
       const real pc = phi[i][j][k];
       real zm,zp,pm,pp,aflagm,aflagp;
       aflagm=aflagp=0.0;
@@ -188,11 +187,11 @@ void EnthalpyTIF::diffusion_fd(const Scalar * diff_eddy) {
         pm=phi[i][j][k-1];
       } else {
         if(!fs) {
-          real frac = std::max((clrsurf-clrc)/(clrb-clrc),epsl);
+          real frac = maxr((clrsurf-clrc)/(clrb-clrc),epsl);
           zm=frac*phi.dzb(k);
           pm=Tint(-1,Comp::k(),frac,i,j,k);
         } else {
-          zm = std::max(epsl*phi.dzb(k),distance_z(i,j,k,-1,pm));
+          zm = maxr(epsl*phi.dzb(k),distance_z(i,j,k,-1,pm));
         }
         aflagm=1.0;
       }
@@ -202,11 +201,11 @@ void EnthalpyTIF::diffusion_fd(const Scalar * diff_eddy) {
         pp=phi[i][j][k+1];
       } else {
         if(!fs) {
-          real frac = std::max((clrsurf-clrc)/(clrt-clrc),epsl);
+          real frac = maxr((clrsurf-clrc)/(clrt-clrc),epsl);
           zp=frac*phi.dzt(k);
           pp=Tint(+1,Comp::k(),frac,i,j,k);
         } else {
-          zp = std::max(epsl*phi.dzt(k),distance_z(i,j,k,+1,pp));
+          zp = maxr(epsl*phi.dzt(k),distance_z(i,j,k,+1,pp));
         }
         aflagp=1.0;
       }

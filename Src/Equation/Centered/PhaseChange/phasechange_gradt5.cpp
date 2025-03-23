@@ -1,5 +1,5 @@
 #include "phasechange.h"
-using namespace std;
+using namespace boil;
 
 /******************************************************************************/
 void PhaseChange::gradtx5( const int i, const int j, const int k,
@@ -11,8 +11,8 @@ void PhaseChange::gradtx5( const int i, const int j, const int k,
 *           m: [i  ][j][k]
 *           p: [i+1][j][k]
 *******************************************************************************/
-  real clrm=std::max(0.0,std::min(1.0,clr[i][j][k]));
-  real clrp=std::max(0.0,std::min(1.0,clr[i+1][j][k]));
+  real clrm=maxr(0.0,minr(1.0,clr[i][j][k]));
+  real clrp=maxr(0.0,minr(1.0,clr[i+1][j][k]));
 
   real wm = (phisurf-clrm)/(clrp-clrm);
   real wp = 1.0-wm;
@@ -69,8 +69,8 @@ void PhaseChange::gradty5( const int i, const int j, const int k,
 *           m: [i][j  ][k]
 *           p: [i][j+1][k]
 *******************************************************************************/
-  real clrm=std::max(0.0,std::min(1.0,clr[i][j][k]));
-  real clrp=std::max(0.0,std::min(1.0,clr[i][j+1][k]));
+  real clrm=maxr(0.0,minr(1.0,clr[i][j][k]));
+  real clrp=maxr(0.0,minr(1.0,clr[i][j+1][k]));
 
   real wm = (phisurf-clrm)/(clrp-clrm);
   real wp = 1.0-wm;
@@ -127,8 +127,8 @@ void PhaseChange::gradtz5( const int i, const int j, const int k,
 *           m: [i][j][k  ]
 *           p: [i][j][k+1]
 *******************************************************************************/
-  real clrm=std::max(0.0,std::min(1.0,clr[i][j][k]));
-  real clrp=std::max(0.0,std::min(1.0,clr[i][j][k+1]));
+  real clrm=maxr(0.0,minr(1.0,clr[i][j][k]));
+  real clrp=maxr(0.0,minr(1.0,clr[i][j][k+1]));
 
   real wm = (phisurf-clrm)/(clrp-clrm);
   real wp = 1.0-wm;

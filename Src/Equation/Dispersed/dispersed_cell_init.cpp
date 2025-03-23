@@ -21,9 +21,9 @@ void Dispersed::cell_init() {
   NY_coarse = int (gy/list_diameter);
   NZ_coarse = int (gz/list_diameter);
 
-  diam_x  = gx / double (NX_coarse);
-  diam_y  = gy / double (NY_coarse);
-  diam_z  = gz / double (NZ_coarse);
+  diam_x  = gx / real (NX_coarse);
+  diam_y  = gy / real (NY_coarse);
+  diam_z  = gz / real (NZ_coarse);
   OPR(diam_x); OPR(diam_y); OPR(diam_z); 
 
   if(NX_coarse == 0) {

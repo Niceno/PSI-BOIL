@@ -1,4 +1,5 @@
 #include "custom.h"
+using namespace boil;
 
 namespace boil {
   void update_step(const Scalar & c, Scalar & step, Scalar & sflag){
@@ -41,7 +42,7 @@ namespace boil {
     sflag.exchange_all();
     for_avijk(c,i,j,k){
       if(sflag[i][j][k]==2){
-        step[i][j][k]=std::min(1.0,std::max(0.0,c[i][j][k]));
+        step[i][j][k]=minr(1.0,maxr(0.0,c[i][j][k]));
       } else {
         if(c[i][j][k]<0.5){
           step[i][j][k]=0.0;

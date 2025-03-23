@@ -29,7 +29,7 @@ void Lagrangian::collisions() {
 
     std::vector<int> indice_pa_wall; /* contains indices of particles
                                                colliding with wall */
-    std::vector<double> wall_normal; /* contains which wall the
+    std::vector<real> wall_normal; /* contains which wall the
                                       particles are colliding with */
     std::vector<int> indice_p; /* contains indices of particle-particle 
                                                         collisions */

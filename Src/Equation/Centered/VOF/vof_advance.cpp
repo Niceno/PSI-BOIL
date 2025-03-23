@@ -1,4 +1,5 @@
 #include "vof.h"
+using namespace boil;
 
 /******************************************************************************/
 void VOF::advance(const bool anci) {
@@ -57,7 +58,7 @@ void VOF::advance(Scalar & scp, const bool anci) {
   if (limit_color) {
     for_ijk(i,j,k){
       real phi_tmp = stmp[i][j][k] / dV(i,j,k);
-      phi[i][j][k] = std::min(1.0,std::max(0.0,phi_tmp));
+      phi[i][j][k] = minr(1.0,maxr(0.0,phi_tmp));
     }
   } else {
     int ierr=0;

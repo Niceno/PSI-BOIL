@@ -1,4 +1,5 @@
 #include "vof.h"
+using namespace boil;
 
 /******************************************************************************/
 void VOF::update_at_walls(Scalar & scp, const real * cang) {
@@ -611,7 +612,7 @@ real VOF::extrapolate_v(const int i, const int j, const int k,
         real dxy = 0.5*(phi.dxc(ii)+phi.dyc(jj));
         real dz = phi.dzc(kk);
         real hz = (dz - dxy*tan(*cang))/dz;
-        hz = std::min(1.0,std::max(0.0,hz));
+        hz = minr(1.0,maxr(0.0,hz));
         //std::cout<<"extrapolate_v: "<<hz<<"\n";
         return hz;
       }

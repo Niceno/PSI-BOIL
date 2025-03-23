@@ -1,7 +1,7 @@
 #include "cipcsl2.h"
 #include <iomanip>
 //#define DEBUG
-using namespace std;
+using namespace boil;
 
 /******************************************************************************/
 void CIPCSL2::init() {
@@ -10,7 +10,7 @@ void CIPCSL2::init() {
 *******************************************************************************/
 
   for_aijk(i,j,k){
-    phi[i][j][k]=min(1.0,max(0.0,phi[i][j][k]));
+    phi[i][j][k]=maxr(1.0,maxr(0.0,phi[i][j][k]));
   }
  
   bdcond(phi);
