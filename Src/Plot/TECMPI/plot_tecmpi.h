@@ -86,6 +86,16 @@ class PlotTECMPI : public Plot {
                       Scalar * s7 = NULL,
                       Scalar * s8 = NULL,
                       Scalar * s9 = NULL);
+   void read(const char *, const int, Times * t,
+                      Scalar * s1 = NULL,
+                      Scalar * s2 = NULL,
+                      Scalar * s3 = NULL,
+                      Scalar * s4 = NULL,
+                      Scalar * s5 = NULL,
+                      Scalar * s6 = NULL,
+                      Scalar * s7 = NULL,
+                      Scalar * s8 = NULL,
+                      Scalar * s9 = NULL);
 
     // unused functions (still necessary because of pure virtual function)
     void plot(Body &, const char *, const int, Times * t = NULL) {

@@ -225,6 +225,83 @@ void PlotTECMPI::read(const char * nam,
 
 }
 /******************************************************************************/
+void PlotTECMPI::read(const char * nam,
+                      const int i,
+                      Times * t,
+                      Scalar * sca,
+                      Scalar * scb,
+                      Scalar * scc,
+                      Scalar * scd,
+                      Scalar * sce,
+                      Scalar * scf,
+                      Scalar * scg,
+                      Scalar * sch,
+                      Scalar * sci) {
+  dom = sca->domain(); // take it as a constant
+  /* set domain size */
+  plot_tecmpi_set_domain(dom);
+  /* output file name */
+  string fname = plot_tecmpi_fname(nam, i);
+  boil::oout << "# Reading: " << fname << boil::endl;
+
+  try {
+    /* open file */
+    res = tecFileReaderOpen(fname.c_str(), &fileHandle);
+
+    /* variable names */
+    int32_t numVars;
+    res = tecDataSetGetNumVars(fileHandle, &numVars);
+    boil::oout<<"# read:numVars= "<<numVars<<"\n";
+    std::vector<std::string> vnames(numVars + 1);
+
+    for (int32_t var = 1; var <= numVars; ++var) {
+      char* name = NULL;
+      res = tecVarGetName(fileHandle, var, &name);
+      vnames[var] = name;
+      //boil::oout<<" vnames,i= "<<vnames[var]<<" "<<var<<"\n";
+    }
+
+    // numZones
+    res = tecDataSetGetNumZones(fileHandle, &numZones);
+    boil::oout<<"# read:numZones= "<<numZones<<"\n";
+
+    // solution time
+    int32_t inputZone = 1;
+    real solutionTime;
+    res = tecZoneGetSolutionTime(fileHandle, inputZone, &solutionTime);
+    t->current_time(solutionTime);
+    boil::oout<<"# read:solutionTime= "<<solutionTime<<"\n";
+
+    inputZone = commRank +1;
+    for (int32_t var = 4; var <= numVars; ++var) {
+      const int LEN = XDIM_C * YDIM_C * ZDIM_C;
+      int64_t numValuesRead = 0;
+      int64_t numValuesToRead = LEN;
+      std::unique_ptr<float[]> values(new float[LEN]);  // receive
+
+      /* read data */
+      res = tecZoneVarGetFloatValues(fileHandle, inputZone, var, numValuesRead + 1,
+                                     numValuesToRead, &values[0]);
+
+      if(var==4 ) copy_valCell(values,sca);
+      if(var==5 ) copy_valCell(values,scb);
+      if(var==6 ) copy_valCell(values,scc);
+      if(var==7) copy_valCell(values,scd);
+      if(var==8) copy_valCell(values,sce);
+      if(var==9) copy_valCell(values,scf);
+      if(var==10) copy_valCell(values,scg);
+      if(var==11) copy_valCell(values,scg);
+      if(var==12) copy_valCell(values,scg);
+    }
+
+    /* close file */
+    res = tecFileReaderClose(&fileHandle);
+  } catch (std::runtime_error const& e) {
+    std::cerr << "Error: " << e.what() << "Proc=" <<commRank<< std::endl;
+    exit(0);
+  }
+}
+/******************************************************************************/
 void PlotTECMPI::plot(const char * nam,
                       const int i,
                       Times * t,
