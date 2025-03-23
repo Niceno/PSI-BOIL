@@ -79,6 +79,9 @@ class PhaseChange : public Centered {
     }
     real get_rhol(){return rhol;}
 
+    // export M: mass transfer rate per unit area
+    void get_M(Scalar & sca);
+
   private:
     void cal_gradt(const Scalar * diff_eddy = NULL);
     void distfunc(const Scalar & sca, const int itnum);

@@ -6,6 +6,7 @@ libPhaseChange_a_SOURCES = phasechange.h                        \
                            phasechange_dmicro_intermediate.cpp  \
                            phasechange_ext_gradt.cpp            \
                            phasechange_gradphic.cpp             \
+                           phasechange_get_M.cpp                \
                            phasechange_gradt.cpp                \
                            phasechange_gradt5.cpp               \
                            phasechange_ib_ext_scalar.cpp        \
