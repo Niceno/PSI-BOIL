@@ -22,8 +22,8 @@
 // #endif
 
 /* defintions for double-precision */
-//#define real     double
-#define real     float
+#define real     double
+//#define real     float
 #ifdef UseMPI
   #define par_int  MPI_INT
 #define par_real MPI_DOUBLE
