@@ -75,7 +75,7 @@ VOF::VOF(const Scalar & PHI,
        ) {
        nx.bc().type(b) = BndType::neumann();
        ny.bc().type(b) = BndType::neumann();
-       nx.bc().type(b) = BndType::neumann();
+       nz.bc().type(b) = BndType::neumann();
        nalpha.bc().type(b) = BndType::neumann();
        adens.bc().type(b) = BndType::neumann();
        mx.bc().type(b) = BndType::neumann();
