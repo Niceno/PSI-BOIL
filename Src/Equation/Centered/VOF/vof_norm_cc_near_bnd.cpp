@@ -83,7 +83,7 @@ void VOF::norm_cc_near_bnd(const Scalar & val) {
 
     // south
     if (dom->ibody().off(i,j-1,k)) {
-      norm_cc_kmin(val,i,j,k);
+      norm_cc_jmin(val,i,j,k);
     }
 
     // north
