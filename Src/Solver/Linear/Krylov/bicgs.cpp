@@ -86,7 +86,7 @@ bool BiCGS :: solve(Matrix & A, Scalar & x, Scalar & b, const MinIter & mini,
     /*---------------------------+
     |  if rho == 0 method fails  |
     +---------------------------*/
-    if( sqrt(fabs(rho)) < res_tol ) break;
+    if( sqrt(fabs(boil::maxr(0.0,rho))) < res_tol ) break;
 
     if(i == 0) {
       /*--------+ 
@@ -132,7 +132,7 @@ bool BiCGS :: solve(Matrix & A, Scalar & x, Scalar & b, const MinIter & mini,
     |    set x = x + alfa p^ and stop     |
     +------------------------------------*/
     ss = s.dot(s);
-    if( sqrt(ss) < res_tol ) {
+    if( sqrt(boil::maxr(0.0,ss)) < res_tol ) {
       x += alfa * p_;
       break;
     }
@@ -171,7 +171,7 @@ bool BiCGS :: solve(Matrix & A, Scalar & x, Scalar & b, const MinIter & mini,
     |  exit if converged  |
     +--------------------*/
     //res = sqrt(r.dot_avg(r));
-    res = sqrt(r.dot_voldiv_avg(r))/scale;
+    res = sqrt(boil::maxr(0.0,r.dot_voldiv_avg(r)))/scale;
 
 #ifdef DEBUG
     OPR(res);
