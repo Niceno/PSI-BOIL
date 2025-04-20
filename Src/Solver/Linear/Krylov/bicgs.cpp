@@ -48,7 +48,8 @@ void BiCGS :: solve(Matrix & A, Scalar & x, Scalar & b,
   // OPR(res_rat);
 
   /* should res be scaled with A and x? */
-  if(sqrt(res) < res_tol) return; // temporary meassure
+  // maxr is intriduced because of fpe on eiger.cscs.ch
+  if(sqrt(boil::maxr(0.0,res)) < res_tol) return; // temporary meassure 
 
   /*------------+
   |  choose r~  |
