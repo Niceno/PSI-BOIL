@@ -2,26 +2,38 @@
  *  Material properties 
 ******************************************************************************/
 inline real cpl(const int i, const int j, const int k) const {
-  return val_cpl;
+  //return val_cpl;
+  return fluid()->cp_immiscribe(i,j,k);
 }
 inline real cpv(const int i, const int j, const int k) const {
-  return val_cpv;
+  //return val_cpv;
+  return fluid()->cp_immiscribe(i,j,k);
 }
 inline real rhol(const int i, const int j, const int k) const {
-  return val_rhol;
+  //return val_rhol;
+  return fluid()->rho_immiscribe(i,j,k);
 }
 inline real rhov(const int i, const int j, const int k) const {
-  return val_rhov;
+  //return val_rhov;
+  return fluid()->rho_immiscribe(i,j,k);
 }
 inline real lambdal(const int i, const int j, const int k,
                     const Scalar * diff_eddy = NULL) const {
-  return diff_eddy ? val_lambdal + (*diff_eddy)[i][j][k]*val_cpl/val_rhol/turbP
-                   : val_lambdal;
+  real tmp = fluid()->lambda_immiscribe(i,j,k);
+  if (diff_eddy) {
+    return tmp + (*diff_eddy)[i][j][k]*val_cpl/val_rhol/turbP;
+  } else {
+    return tmp;
+  }
 }
 inline real lambdav(const int i, const int j, const int k,
                     const Scalar * diff_eddy = NULL) const {
-  return diff_eddy ? val_lambdav + (*diff_eddy)[i][j][k]*val_cpv/val_rhov/turbP
-                   : val_lambdav;
+  real tmp = fluid()->lambda_immiscribe(i,j,k);
+  if(diff_eddy) {
+    return tmp +  + (*diff_eddy)[i][j][k]*val_cpv/val_rhov/turbP;
+  } else {
+    return tmp;
+  }
 }
 
 /***************************************************************************//**
