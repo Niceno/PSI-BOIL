@@ -15,6 +15,12 @@ real Property::value(const int i, const int j, const int k) const {
 }
 
 /*============================================================================*/
+real Property::value_immiscribe(const int i, const int j, const int k) const {
+  if(con) return cval;
+  return val[i][j][k];
+}
+
+/*============================================================================*/
 real Property::value(const Comp & m, 
                      const int i, const int j, const int k) const {
 
@@ -67,6 +73,21 @@ real PropertyMix::value(const int i, const int j, const int k) const {
 
    return a -> value(i,j,k) * col_a +
           b -> value(i,j,k) * (1.0 - col_a);
+}
+
+/*============================================================================*/
+real PropertyMix::value_immiscribe(const int i, const int j, const int k) const {
+
+  real col_a = (*c_a)[i][j][k];
+
+  if( col_a > 1.0 ) col_a = 1.0;
+  if( col_a < 0.0 ) col_a = 0.0;
+
+  if (col_a < 0.5) {
+    return b->value(i,j,k);
+  } else  if (col_a >=0.5) {
+    return a->value(i,j,k);
+  }
 }
 
 /*============================================================================*/
@@ -123,6 +144,20 @@ real PropertyMixHarm::value(const int i, const int j, const int k) const {
          col_a = col_a + (*c_disp_b)[i][j][k] - 1.0;
 
    return 1.0 / (col_a/a->value(i,j,k) + (1.0-col_a)/b->value(i,j,k));
+}
+
+/*============================================================================*/
+real PropertyMixHarm::value_immiscribe(const int i, const int j, const int k) const {
+  real col_a = (*c_a)[i][j][k];
+
+  if( col_a > 1.0 ) col_a = 1.0;
+  if( col_a < 0.0 ) col_a = 0.0;
+
+  if (col_a < 0.5) {
+    return b->value(i,j,k);
+  } else if (col_a >=0.5) {
+    return a->value(i,j,k);
+  }
 }
 
 /*============================================================================*/

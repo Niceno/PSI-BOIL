@@ -67,8 +67,8 @@ Matter::Matter(const Matter & a,
   assert(b.texp != NULL);
   assert(b.molm != NULL);
   assert(b.sige != NULL);
-  assert(b.tens == NULL);
-  assert(b.heat == NULL);
+  //assert(b.tens == NULL);
+  //assert(b.heat == NULL);
   if( ca->bc().count() == 0 ) {
     boil::oout << "# Fatal: defining mixture using concentration ";
     boil::oout << "variable without boundary conditions. Exiting!"; 

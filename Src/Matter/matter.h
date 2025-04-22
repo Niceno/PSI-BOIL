@@ -50,6 +50,10 @@ class Matter {
 
     real rho   (const int comp) const {return dens->value_comp(comp);}
 
+    real rho_immiscribe   (const int i,
+                const int j,
+                const int k) const {return dens->value_immiscribe(i,j,k);}
+
     real mu    (const int i,
                 const int j,
                 const int k) const {return visc->value(i,j,k);}
@@ -71,6 +75,9 @@ class Matter {
                     return capa->value(m,i,j,k);
                 }
     real cp    (const int comp) const {return capa->value_comp(comp);}
+    real cp_immiscribe   (const int i,
+                const int j,
+                const int k) const {return capa->value_immiscribe(i,j,k);}
 
     real lambda(const int i,
                 const int j,
@@ -82,6 +89,9 @@ class Matter {
                     return cond->value(m,i,j,k);
                 }
     real lambda(const int comp) const {return cond->value_comp(comp);}
+    real lambda_immiscribe   (const int i,
+                const int j,
+                const int k) const {return cond->value_immiscribe(i,j,k);}
 
     real gamma (const int i,
                 const int j,

@@ -30,6 +30,7 @@ class Property : public Scalar {
     virtual real value(const int i, const int j, const int k) const;
     virtual real value(const Comp & m,
                        const int i, const int j, const int k) const;
+    virtual real value_immiscribe(const int i, const int j, const int k) const;
     void value(const real & v);
     void varies(const Domain & d);
     real value_comp(const int comp) const;
@@ -88,6 +89,7 @@ class PropertyMix : public Property {
     real value(const int i, const int j, const int k) const;
     real value(const Comp & m,
                const int i, const int j, const int k) const;
+    real value_immiscribe(const int i, const int j, const int k) const;
 
   private:
     const Scalar  * c_a;
@@ -141,6 +143,7 @@ class PropertyMixHarm : public Property {
     real value(const int i, const int j, const int k) const;
     real value(const Comp & m,
                const int i, const int j, const int k) const;
+    real value_immiscribe(const int i, const int j, const int k) const;
 
   private:
     const Scalar  * c_a;
@@ -169,6 +172,9 @@ class PropertyInv : public Property {
                const int i, const int j, const int k) const {
       return 1.0 / a -> value(m,i,j,k);
     }
+    real value_immiscribe(const int i, const int j, const int k) const {
+      return a -> value(i,j,k) * b -> value(i,j,k);
+    }
 };
 
 ///////////////////
@@ -193,6 +199,9 @@ class PropertyDiv : public Property {
                const int i, const int j, const int k) const {
       return a -> value(m,i,j,k) / b -> value(m,i,j,k);
     }
+    real value_immiscribe(const int i, const int j, const int k) const {
+      return a -> value(i,j,k) * b -> value(i,j,k);
+    }
 };
 
 ///////////////////
@@ -216,6 +225,9 @@ class PropertyMul : public Property {
     real value(const Comp & m,
                const int i, const int j, const int k) const {
       return a -> value(m,i,j,k) * b -> value(m,i,j,k);
+    }
+    real value_immiscribe(const int i, const int j, const int k) const {
+      return a -> value(i,j,k) * b -> value(i,j,k);
     }
 };
 
