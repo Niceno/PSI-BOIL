@@ -101,8 +101,11 @@ main(int argc, char * argv[]) {
 
   for(time.start(); time.end(); time.increase()) {
 
+    // obtain t (=Column(0)) from co2.txt based on h (=Column(2))
     t.look_up(h, CO2, Column(2), Column(0));
-    fluid.look_up(Set::rho(), t, CO2, Column(0), Column(3));
+    // obtain rho (=Column(3) from co2.txt based on t (=Column(0))
+    fluid.look_up(Set::rho(), t, CO2, Column(0), Column(3)); 
+    // obtain mu (=Column(6) from co2.txt based on t (=Column(0))
     fluid.look_up(Set::mu(),  t, CO2, Column(0), Column(6));
 
     enth.discretize();
