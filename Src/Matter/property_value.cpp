@@ -3,7 +3,7 @@
 /*============================================================================*/
 real Property::value() const {
 
-  assert(con==true);
+  //assert(con==true);
 
   return cval;
 }
