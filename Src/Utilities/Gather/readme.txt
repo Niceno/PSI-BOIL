@@ -18,9 +18,9 @@ libtecio.a is created in teciosrc (new library using TecDat142)
  gfortran -cpp -DVISIT -DSZPLT gather.f90 ./libtecio.a -lm -lstdc++ -fopenmp -fcray-pointer -o gather-szplt.exe
 1.3 On eiger.cscs.ch
  module switch PrgEnv-cray PrgEnv-intel
-   ftn -fpp -DVISIT gather.f90 ./tecio64.a -lm -lstdc++ -qopenmp -o gather.exe memory.f90
+   ftn -fpp -DVISIT -DCSCS gather.f90 ./tecio64.a -lm -lstdc++ -qopenmp -o gather.exe memory.f90
  module switch PrgEnv-cray PrgEnv-gnu
-   ftn -cpp -DVISIT gather.f90 ./tecio64.a -fcray-pointer -lm -lstdc++ -fopenmp -o gather.exe memory.f90
+   ftn -cpp -DVISIT -DCSCS gather.f90 ./tecio64.a -fcray-pointer -lm -lstdc++ -fopenmp -o gather.exe memory.f90
 
 2. Execute gather.exe
  possible option --debug (= verbose, not slow down)

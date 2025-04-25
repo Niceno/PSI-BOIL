@@ -43,7 +43,9 @@
      WRITE(*,*)'Debug mode is OFF.'
    end if
 
+#ifdef CSCS
    call cscs_read_procstatm
+#endif
 
  100 continue
    write(*,*)"Input number of processor"
