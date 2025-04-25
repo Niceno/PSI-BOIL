@@ -7,7 +7,7 @@
      INTEGER::inmax,jnmax,knmax   !!node
      INTEGER::np,nvariable,ndigit
      INTEGER::nodal
-     LOGICAL::withBuffer
+     LOGICAL::withBuffer,debug_mode
      CHARACTER(len=2048),allocatable::fname(:)
      CHARACTER(len=24),allocatable::valname(:)
      CHARACTER(len=2048)fncommon
@@ -24,6 +24,23 @@
    character(len=5)::ctmp5
    character(len=1024)::ctmp
    character(len=2048)::cline
+   integer :: i, argc
+   character(len=100) :: arg
+
+   debug_mode = .false.
+   argc = command_argument_count()
+   do i = 1, argc
+     call get_command_argument(i, arg)
+       if (trim(arg) == '--debug') then
+         debug_mode = .true.
+       end if
+   end do
+
+   if (debug_mode) then
+     WRITE(*,*)'Debug mode is ON.'
+   else
+     WRITE(*,*)'Debug mode is OFF.'
+   end if
 
  100 continue
    write(*,*)"Input number of processor"
@@ -116,20 +133,16 @@
 
       WRITE(*,*) "fname_out=", trim(fname_out)
 
-#ifdef DEBUG
-      WRITE(*,*)'call getnvar'
-#endif
+      IF(debug_mode)WRITE(*,*)'call getnvar'
       call getnvar
 
-#ifdef DEBUG
-      WRITE(*,*)'call alloc'
-#endif
+      IF(debug_mode)WRITE(*,*)'call alloc'
       call alloc
 
-#ifdef DEBUG
-      WRITE(*,*)'call gather'
-#endif
+      IF(debug_mode)WRITE(*,*)'call gather'
       call gather
+
+      IF(debug_mode)WRITE(*,*)'call output'
       call output(ntime)
 #ifdef ZIP
       call compress
@@ -297,6 +310,7 @@
    withBuffer=.FALSE.
    DO ifile=1,np
       OPEN(11,file=fname(ifile),status='OLD',err=999)
+         IF(debug_mode)WRITE(*,*)'alloc:open ',trim(fname(ifile))
          READ(11,*,err=998,end=998)
          READ(11,*,err=500,end=500)cdummy1,cdummy2,cdummy3,cdummy4,cdummy5
          IF(trim(cdummy5)=="BUFFER")THEN
@@ -374,6 +388,7 @@
 
    DO ifile=1,np
       OPEN(10,file=fname(ifile),status='OLD',err=999)
+         IF(debug_mode)WRITE(*,*)'gather:open ',trim(fname(ifile))
          DO i=1,100
             READ(10,*,err=998,end=998)cdummy1,cdummy2
             IF(cdummy2=="I-RANGE")EXIT
