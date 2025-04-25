@@ -19,7 +19,7 @@
  program main
    USE base_var
    IMPLICIT NONE
-   integer::ip,interval,nend,nstart,ntime,istep,nstep
+   integer::ip,interval,nend,nstart,ntime,istep,nstep,wait_min
    character(len=3)::ctmp3
    character(len=4)::ctmp4
    character(len=5)::ctmp5
@@ -29,19 +29,23 @@
    character(len=100) :: arg
 
    debug_mode = .false.
-   argc = command_argument_count()
-   do i = 1, argc
-     call get_command_argument(i, arg)
-       if (trim(arg) == '--debug') then
-         debug_mode = .true.
-       end if
-   end do
+   wait_min = 0
 
-   if (debug_mode) then
-     WRITE(*,*)'Debug mode is ON.'
-   else
-     WRITE(*,*)'Debug mode is OFF.'
-   end if
+   argc = command_argument_count()
+   !WRITE(*,*)'Argc=',argc
+   DO i = 1, argc
+     call get_command_argument(i, arg)
+     !WRITE(*,*)i,trim(arg)
+     IF (trim(arg) == '--debug') THEN
+       debug_mode = .true.
+       WRITE(*,*)'Debug mode is ON.'
+     ENDIF 
+     IF (trim(arg) == '--wait') THEN
+       call get_command_argument(i+1, arg)
+       READ(arg,*) wait_min
+       WRITE(*,*)'Will wait before exit (min)',wait_min
+     ENDIF
+   ENDDO 
 
 #ifdef CSCS
    call cscs_read_procstatm
@@ -152,14 +156,19 @@
 #ifdef ZIP
       call compress
 #endif
-#ifndef SZPLT
+#ifndef TEC142
       !call delfile
 #endif
       call dealloc
    ENDDO
 
-   stop
-   end
+   IF (wait_min > 0) THEN
+     WRITE(*,*)"Waiting", wait_min, "minutes before exit..."
+     CALL sleep(wait_min*60)
+   END IF
+
+   STOP
+   END
 !
 !-----------------------------------------------------------------------
 #ifdef ZIP
@@ -284,7 +293,7 @@
    ENDDO
 
    DO m=1,nvariable+3
-#ifndef SZPLT
+#ifndef TEC142
       call del_spaces(valname(m))
 #endif
       WRITE(*,*)m,trim(valname(m))
@@ -414,9 +423,10 @@
 
    x=1.0d+20
 
-!$OMP PARALLEL DO DEFAULT(SHARED) PRIVATE(ifile,iu,i,j,k,m,ics,ice,  &
+!$OMP PARALLEL DO SCHEDULE(GUIDED) DEFAULT(SHARED)  &
+!$OMP   PRIVATE(ifile,iu,i,j,k,m,ics,ice,  &
 !$OMP   jcs,jce,kcs,kce,ins,ine,jns,jne,kns,kne,cdummy1,cdummy2,  &
-!$OMP    cline1,solutiontime)
+!$OMP   cline1,solutiontime)
    DO ifile=1,np
 #ifdef _OPENMP
       IF(debug_mode) WRITE(*,'(3a,i5,a,i5)')'gather:open ',  &
@@ -528,7 +538,7 @@
    SUBROUTINE output(nt)
    USE base_var
    IMPLICIT NONE
-#ifdef SZPLT
+#ifdef TEC142
    INCLUDE 'tecio.f90'
 #else
    INCLUDE 'tecio110.f90'
@@ -546,7 +556,7 @@
    Real*8    SolTime
    Integer*4 VIsDouble, FileType, FileFormat
    Integer*4 ZoneType,StrandID,IsBlock
-#ifdef SZPLT
+#ifdef TEC142
    Integer*4 unused
 #else
    Integer*4 ParentZn
@@ -560,13 +570,13 @@
    NullPtr = 0
    Debug   = 0
    FileType = 0
-#ifdef SZPLT
-   FileFormat = 0 ! 0 = PLT, 1 = SZPLT
+#ifdef TEC142
+   FileFormat = 0 ! 0 = PLT, 1 = TEC142
    unused = 0 ! ParentZone is no longer used
 #else
-   !FileFormat = 1 ! 0 = PLT, 1 = SZPLT
+   !FileFormat = 1 ! 0 = PLT, 1 = TEC142
    ParentZn = 0
-   !FileFormat = 1 ! 0 = PLT, 1 = SZPLT
+   !FileFormat = 1 ! 0 = PLT, 1 = TEC142
 #endif
    VIsDouble = 0
    ZoneType = 0
@@ -602,7 +612,7 @@
 !... Set output file name
 !
    call int2char(nt,ctmp,ndigit)
-#ifndef SZPLT
+#ifndef TEC142
    !fout=trim(fncommon)//"all_"//ctmp(1:ndigit)//".plt"
    fout=fname_out
 #else
@@ -615,7 +625,7 @@
 !
    cline=valname(1)
    DO m=2,nvariable+3
-#ifdef SZPLT
+#ifdef TEC142
      cline=trim(cline)//", "//valname(m)
 #else
      cline=trim(cline)//" "//valname(m)
@@ -626,7 +636,7 @@
 !... Open the file and write the tecplot datafile 
 !... header information.
 !
-#ifdef SZPLT
+#ifdef TEC142
    I = TecIni142('DATASET'//NULLCHR, &
                  trim(cline)//NULLCHR, &
                  trim(fout)//NULLCHR, &
@@ -647,13 +657,13 @@
 !... Write the zone header information.
 !
 #ifndef VISIT
-#ifdef SZPLT
+#ifdef TEC142
    I = TecZne142(ctmp(1:ndigit)//NULLCHR, &
 #else
    I = TecZne110(ctmp(1:ndigit)//NULLCHR, &
 #endif
 #else
-#ifdef SZPLT
+#ifdef TEC142
    I = TecZne142('000000'//NULLCHR, &
 #else
    I = TecZne110('000000'//NULLCHR, &
@@ -668,7 +678,7 @@
                  KCellMax, &
                  SolTime, &
                  StrandID, &
-#ifdef SZPLT
+#ifdef TEC142
                  unused, &
 #else
                  ParentZn, &
@@ -676,7 +686,7 @@
                  IsBlock, &
                  NFConns, &
                  FNMode, &
-#ifdef SZPLT
+#ifdef TEC142
                  0, &
                  0, &
                  0, &
@@ -701,7 +711,7 @@
      ENDDO
      ENDDO
      ENDDO
-#ifdef SZPLT
+#ifdef TEC142
      I   = TecDat142(III,anode,0)
 #else
      I   = TecDat110(III,anode,0)
@@ -718,7 +728,7 @@
        ENDDO
        ENDDO
        ENDDO
-#ifdef SZPLT
+#ifdef TEC142
        I = TecDat142(IIII,acell,0)
 #else
        I = TecDat110(IIII,acell,0)
@@ -733,7 +743,7 @@
        ENDDO
        ENDDO
        ENDDO
-#ifdef SZPLT
+#ifdef TEC142
        I = TecDat142(III,acell,0)
 #else
        I = TecDat110(III,acell,0)
@@ -741,12 +751,14 @@
      ENDDO
    ENDIF
 
-#ifdef SZPLT
+   IF(debug_mode)WRITE(*,*)"TecEnd"
+#ifdef TEC142
    I = TecEnd142()
 #else
    I = TecEnd110()
 #endif
 
+   IF(debug_mode)WRITE(*,*)"DEALLOC(anode,acell)"
    DEALLOCATE(anode,acell)
 
    RETURN
