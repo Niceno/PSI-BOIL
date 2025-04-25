@@ -1,5 +1,6 @@
 !  gather tecplot (PSI-Boil dat format) file
    module base_var
+     USE OMP_LIB
      IMPLICIT NONE
      REAL(4),ALLOCATABLE::x(:,:,:,:),v(:,:,:,:)
      REAL(8)::solutiontime
@@ -41,6 +42,8 @@
    else
      WRITE(*,*)'Debug mode is OFF.'
    end if
+
+   call cscs_read_procstatm
 
  100 continue
    write(*,*)"Input number of processor"
@@ -148,7 +151,7 @@
       call compress
 #endif
 #ifndef SZPLT
-      call delfile
+      !call delfile
 #endif
       call dealloc
    ENDDO
@@ -300,7 +303,7 @@
    SUBROUTINE alloc
    USE base_var
    IMPLICIT NONE
-   INTEGER::i,j,k,ifile,idummy,m
+   INTEGER::i,j,k,ifile,idummy,m,iu
    CHARACTER(len=12)::cdummy1,cdummy2,cdummy3,cdummy4,cdummy5
 
    ! set icmax,jcmax,kcmax --------------------------
@@ -308,20 +311,37 @@
    jcmax=0
    kcmax=0
    withBuffer=.FALSE.
+
+!$OMP PARALLEL DO DEFAULT(NONE) SHARED(icmax,jcmax,kcmax,withBuffer,np,fname,debug_mode), &
+!$OMP   PRIVATE(ifile,iu,cdummy1,cdummy2,cdummy3,cdummy4,cdummy5, &
+!$OMP   i,j,k,nodal,idummy)
    DO ifile=1,np
-      OPEN(11,file=fname(ifile),status='OLD',err=999)
-         IF(debug_mode)WRITE(*,*)'alloc:open ',trim(fname(ifile))
-         READ(11,*,err=998,end=998)
-         READ(11,*,err=500,end=500)cdummy1,cdummy2,cdummy3,cdummy4,cdummy5
+      iu = 100+ifile
+#ifdef _OPENMP
+      IF(debug_mode) WRITE(*,'(3a,i5,a,i5)')'alloc:open ',  &
+      &              trim(fname(ifile)),' OMP-Thread ',  &
+      &              OMP_GET_THREAD_NUM(),' of ',OMP_GET_NUM_THREADS()
+#else
+      IF(debug_mode) WRITE(*,'(2a)')'alloc:open ',trim(fname(ifile))
+#endif
+      !OPEN(11,file=fname(ifile),status='OLD',err=999)
+      OPEN(iu,file=fname(ifile),status='OLD')
+         !READ(11,*,err=998,end=998)
+         !READ(11,*,err=500,end=500)cdummy1,cdummy2,cdummy3,cdummy4,cdummy5
+         READ(iu,*)
+         READ(iu,*)cdummy1,cdummy2,cdummy3,cdummy4,cdummy5
          IF(trim(cdummy5)=="BUFFER")THEN
            withBuffer=.TRUE.
            goto 501
          ENDIF
 
  500     CONTINUE
-         BACKSPACE(11)
-         BACKSPACE(11)
-         READ(11,*,err=998,end=998)cdummy1,cdummy2
+         !BACKSPACE(11)
+         !BACKSPACE(11)
+         BACKSPACE(iu)
+         BACKSPACE(iu)
+         !READ(11,*,err=998,end=998)cdummy1,cdummy2
+         READ(iu,*)cdummy1,cdummy2
          IF(cdummy2=="NODAL")THEN
            nodal=1
          ELSE
@@ -330,14 +350,20 @@
 
  501     CONTINUE
 
-         READ(11,*,err=998,end=998)cdummy1,cdummy2,idummy,i
-         READ(11,*,err=998,end=998)cdummy1,cdummy2,idummy,j
-         READ(11,*,err=998,end=998)cdummy1,cdummy2,idummy,k
+         !READ(11,*,err=998,end=998)cdummy1,cdummy2,idummy,i
+         !READ(11,*,err=998,end=998)cdummy1,cdummy2,idummy,j
+         !READ(11,*,err=998,end=998)cdummy1,cdummy2,idummy,k
+         READ(iu,*)cdummy1,cdummy2,idummy,i
+         READ(iu,*)cdummy1,cdummy2,idummy,j
+         READ(iu,*)cdummy1,cdummy2,idummy,k
          IF(icmax<=i)icmax=i
          IF(jcmax<=j)jcmax=j
          IF(kcmax<=k)kcmax=k
-      CLOSE(11)
+      !CLOSE(11)
+      CLOSE(iu)
    ENDDO
+!$OMP END PARALLEL DO
+
    WRITE(*,*)'WITH BUFFER= ',withBuffer
    IF(withBuffer)THEN
      icmax=icmax+2
@@ -380,23 +406,38 @@
    IMPLICIT NONE
    INTEGER::ics,ice,jcs,jce,kcs,kce   !!cell
    INTEGER::ins,ine,jns,jne,kns,kne   !!node
-   INTEGER::i,j,k,ifile,iline,idummy,m
+   INTEGER::i,j,k,ifile,iline,idummy,m,iu
    CHARACTER(len=12)::cdummy1,cdummy2
    CHARACTER(len=2048)::cline1
 
    x=1.0d+20
 
+!$OMP PARALLEL DO DEFAULT(SHARED) PRIVATE(ifile,iu,i,j,k,m,ics,ice,  &
+!$OMP   jcs,jce,kcs,kce,ins,ine,jns,jne,kns,kne,cdummy1,cdummy2,  &
+!$OMP    cline1,solutiontime)
    DO ifile=1,np
-      OPEN(10,file=fname(ifile),status='OLD',err=999)
-         IF(debug_mode)WRITE(*,*)'gather:open ',trim(fname(ifile))
+#ifdef _OPENMP
+      IF(debug_mode) WRITE(*,'(3a,i5,a,i5)')'gather:open ',  &
+      &              trim(fname(ifile)),' OMP-Thread ',  &
+      &              OMP_GET_THREAD_NUM(),' of ',OMP_GET_NUM_THREADS()
+#else
+      IF(debug_mode) WRITE(*,'(2a)')'gather:open ',trim(fname(ifile))
+#endif
+      iu = 100 + ifile
+      !OPEN(iu,file=fname(ifile),status='OLD',err=999)
+      OPEN(iu,file=fname(ifile),status='OLD')
          DO i=1,100
-            READ(10,*,err=998,end=998)cdummy1,cdummy2
+            !READ(10,*,err=998,end=998)cdummy1,cdummy2
+            READ(iu,*)cdummy1,cdummy2
             IF(cdummy2=="I-RANGE")EXIT
          ENDDO
-         BACKSPACE(10)
-         READ(10,*,err=998,end=998)cdummy1,cdummy2,ics,ice
-         READ(10,*,err=998,end=998)cdummy1,cdummy2,jcs,jce
-         READ(10,*,err=998,end=998)cdummy1,cdummy2,kcs,kce
+         BACKSPACE(iu)
+         !READ(10,*,err=998,end=998)cdummy1,cdummy2,ics,ice
+         !READ(10,*,err=998,end=998)cdummy1,cdummy2,jcs,jce
+         !READ(10,*,err=998,end=998)cdummy1,cdummy2,kcs,kce
+         READ(iu,*)cdummy1,cdummy2,ics,ice
+         READ(iu,*)cdummy1,cdummy2,jcs,jce
+         READ(iu,*)cdummy1,cdummy2,kcs,kce
 
          IF(withBuffer)THEN
            ins=ics
@@ -416,44 +457,55 @@
          ENDIF
 
          !WRITE(*,*)ins,ine,jns,jne,kns,kne
-         READ(10,*,err=998,end=998) !!VARIABLES
-         READ(10,*,err=998,end=998) !!ZONE
+         !READ(10,*,err=998,end=998) !!VARIABLES
+         !READ(10,*,err=998,end=998) !!ZONE
+         READ(iu,*) !!VARIABLES
+         READ(iu,*) !!ZONE
 
          ! SOLUTIONTIME
-         READ(10,'(a2048)')cline1
+         !READ(10,'(a2048)')cline1
+         READ(iu,'(a2048)')cline1
          IF(cline1(1:14)=="SOLUTIONTIME=" .OR. cline1(2:14)=="SOLUTIONTIME=") THEN
-           BACKSPACE(10)
-           READ(10,*,err=998,end=998)cdummy1,solutiontime
+           BACKSPACE(iu)
+           !READ(10,*,err=998,end=998)cdummy1,solutiontime
+           READ(iu,*)cdummy1,solutiontime
 #ifdef DEBUG
            WRITE(*,*)"SOLUTIONTIME=",solutiontime
 #endif
          ELSE
            solutiontime = 0.0
-           BACKSPACE(10)
+           BACKSPACE(iu)
          ENDIF
 
          DO m=1,3
             !WRITE(*,*)'m=',m
-            READ(10,*,err=998,end=998) !!# COORDINATES
-            READ(10,*,err=998,end=998)  &
+            !READ(10,*,err=998,end=998) !!# COORDINATES
+            !READ(10,*,err=998,end=998)  &
+            READ(iu,*) !!# COORDINATES
+            READ(iu,*)  &
               (((x(i,j,k,m),i=ins,ine),j=jns,jne),k=kns,kne)
          ENDDO
          IF(nodal==0)THEN
            DO m=1,nvariable
-              READ(10,*,err=998,end=998) !!# VARIABLES
-              READ(10,*,err=998,end=998)  &
+              !READ(10,*,err=998,end=998) !!# VARIABLES
+              !READ(10,*,err=998,end=998)  &
+              READ(iu,*) !!# VARIABLES
+              READ(iu,*)  &
                 (((v(i,j,k,m),i=ics,ice),j=jcs,jce),k=kcs,kce)
            ENDDO
          ELSE
            DO m=1,nvariable
-              READ(10,*,err=998,end=998) !!# VARIABLES
-              READ(10,*,err=998,end=998)  &
+              !READ(10,*,err=998,end=998) !!# VARIABLES
+              !READ(10,*,err=998,end=998)  &
+              READ(iu,*) !!# VARIABLES
+              READ(iu,*)  &
                 (((v(i,j,k,m),i=ins,ine),j=jns,jne),k=kns,kne)
            ENDDO
          ENDIF
 
-      CLOSE(10)
+      CLOSE(iu)
    ENDDO
+!$OMP END PARALLEL DO
 
    !Check
    IF (maxval(x)>1.0d+20) THEN
@@ -631,15 +683,15 @@
                  Valuelocation, &
                  Null, &
                  ShrConn)
-#ifdef DEBUG
-                 WRITE(*,*)"output:SolTime= ",SolTime,ICellMax,inmax
-#endif
+
+   IF(debug_mode)WRITE(*,*)"output:SolTime= ",SolTime
 !
 !... Write out the field data.
 !
    III = inmax*jnmax*knmax
    IIII = (inmax-1)*(jnmax-1)*(knmax-1)
    DO m=1,3
+     IF(debug_mode)WRITE(*,*)"Write out the field data: anode m= ",m
      DO k=1,knmax
      DO j=1,jnmax
      DO i=1,inmax
@@ -656,6 +708,7 @@
 
    IF(nodal==0)THEN
      DO m=1,nvariable
+       IF(debug_mode)WRITE(*,*)"Write out the field data: acell m= ",m
        DO k=1,knmax-1
        DO j=1,jnmax-1
        DO i=1,inmax-1
