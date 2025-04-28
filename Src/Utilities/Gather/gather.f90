@@ -157,7 +157,7 @@
       call compress
 #endif
 #ifndef TEC142
-      !call delfile
+      call delfile
 #endif
       call dealloc
    ENDDO
