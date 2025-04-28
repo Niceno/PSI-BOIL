@@ -764,5 +764,5 @@ void PlotTECMPI::copy_valCell(const std::unique_ptr<float[]>& values,
         int index = (k * YDIM_C + j) * XDIM_C + i;
         (*v)[m][i+BW][j+BW][k+BW] = values[index];
       }
-  boil::oout<<"copy_valCell: "<<values[0]<<" "<<(*v)[m][BW][BW][BW]<<"\n";
+  //boil::oout<<"copy_valCell: "<<values[0]<<" "<<(*v)[m][BW][BW][BW]<<"\n";
 }
