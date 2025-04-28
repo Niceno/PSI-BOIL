@@ -549,7 +549,7 @@
    CHARACTER(len=2048)::cline
    CHARACTER(len=12)::cdummy1,cdummy2
    CHARACTER(len=1024)::ctmp
-   REAL(4),ALLOCATABLE::anode(:,:,:),acell(:,:,:)
+   REAL(4),ALLOCATABLE::anode_IJ(:,:),acell_IJ(:,:)
 
    character*1 NULLCHR
    Integer*4   Debug,III,IIII,NPts,NElm
@@ -607,7 +607,7 @@
      ENDDO
    ENDIF
 
-   ALLOCATE(anode(inmax,jnmax,knmax),acell(inmax-1,jnmax-1,knmax-1))
+   ALLOCATE(anode_IJ(inmax,jnmax),acell_IJ(inmax-1,jnmax-1))
 !
 !... Set output file name
 !
@@ -707,15 +707,17 @@
      DO k=1,knmax
      DO j=1,jnmax
      DO i=1,inmax
-       anode(i,j,k)=x(i,j,k,m)
-     ENDDO
+       anode_IJ(i,j)=x(i,j,k,m)
      ENDDO
      ENDDO
 #ifdef TEC142
-     I   = TecDat142(III,anode,0)
-#else
-     I   = TecDat110(III,anode,0)
-#endif
+     IF (debug_mode) WRITE(*,*)"call:  TecDat142:xyz:k,m=",k,m
+     I   = TecDat142(inmax*jnmax,anode_IJ,0)
+#else 
+     IF (debug_mode) WRITE(*,*)"call:  TecDat110:xyz:k,m=",k,m
+     I   = TecDat110(inmax*jnmax,anode_IJ,0)
+#endif 
+     ENDDO
    ENDDO
 
    IF(nodal==0)THEN
@@ -724,14 +726,21 @@
        DO k=1,knmax-1
        DO j=1,jnmax-1
        DO i=1,inmax-1
-         acell(i,j,k)=v(i,j,k,m)
-       ENDDO
+         acell_IJ(i,j)=v(i,j,k,m)
        ENDDO
        ENDDO
 #ifdef TEC142
-       I = TecDat142(IIII,acell,0)
+       IF (debug_mode) WRITE(*,*)"call:  TecDat142:acell:k,m=",k,m
+       I = TecDat142((inmax-1)*(jnmax-1),acell_IJ,0)
 #else
-       I = TecDat110(IIII,acell,0)
+       IF (debug_mode) WRITE(*,*)"call:  TecDat110:acell:k,m=",k,m
+       I = TecDat110((inmax-1)*(jnmax-1),acell_IJ,0)
+#endif
+       ENDDO
+#ifdef TEC142
+       !I = TecDat142(IIII,acell,0)
+#else
+       !I = TecDat110(IIII,acell,0)
 #endif
      ENDDO
    ELSE
@@ -739,15 +748,15 @@
        DO k=1,knmax
        DO j=1,jnmax
        DO i=1,inmax
-         anode(i,j,k)=v(i,j,k,m)
-       ENDDO
+         anode_IJ(i,j)=v(i,j,k,m)
        ENDDO
        ENDDO
 #ifdef TEC142
-       I = TecDat142(III,acell,0)
+       I = TecDat142(inmax*jnmax,anode_IJ,0)
 #else
-       I = TecDat110(III,acell,0)
+       I = TecDat110(inmax*jnmax,anode_IJ,0)
 #endif
+       ENDDO
      ENDDO
    ENDIF
 
@@ -758,8 +767,8 @@
    I = TecEnd110()
 #endif
 
-   IF(debug_mode)WRITE(*,*)"DEALLOC(anode,acell)"
-   DEALLOCATE(anode,acell)
+   IF(debug_mode)WRITE(*,*)"DEALLOC(anode_IJ,acell_IJ)"
+   DEALLOCATE(anode_IJ,acell_IJ)
 
    RETURN
    END SUBROUTINE output

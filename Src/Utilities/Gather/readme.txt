@@ -8,6 +8,11 @@ libtecio.a is created in teciosrc (new library using TecDat142)
  make
 
 1. Compile gather.f90
+  -DVISIT:  without this option, Visit cannot read plt files
+  -DZIP:    gzip after the output of plt file
+  -DTEC142: with this option, tecio version 142 is used. Without this option, tecio version 110 is used.
+            tecio 142 is faster than 110. But plt-file output from 110 can be read directly 
+  -DCSCS:   include memory.f90 which may be useful for debug
 1.1 Intel compiler with OpenMP
  ifort -fpp -DVISIT gather.f90 ./tecio64.a -lm -lstdc++ -qopenmp -o gather.exe
  ifort -fpp -DVISIT -DZIP gather.f90 ./tecio64.a -lm -lstdc++ -qopenmp -o gather-zip.exe
