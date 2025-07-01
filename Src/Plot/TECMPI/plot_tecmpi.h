@@ -124,6 +124,16 @@ class PlotTECMPI : public Plot {
               const Scalar &, const Scalar &, const Scalar &,
               const char *, const int, Times * t = NULL) {
          boil::oout<<"Error! Check arguments for TECMPI\n"; exit(0);};
+    void plot(const Scalar &, const Scalar &, const Scalar &,
+              const Scalar &, const Scalar &, const Scalar &,
+              const Scalar &,
+              const char *, const int, Times * t = NULL) {
+         boil::oout<<"Error! Check arguments for TECMPI\n"; exit(0);}
+    void plot(const Scalar &, const Scalar &, const Scalar &,
+              const Scalar &, const Scalar &, const Scalar &,
+              const Scalar &, const Scalar &,
+              const char *, const int, Times * t = NULL) {
+         boil::oout<<"Error! Check arguments for TECMPI\n"; exit(0);}
     void plot(const Vector &, const char *, const int, Times * t = NULL) {
          boil::oout<<"Error! Check arguments for TECMPI\n"; exit(0);};
     void plot(const Vector &, const Scalar &, const char *, const int, Times * t = NULL) {
