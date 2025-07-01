@@ -67,7 +67,16 @@ class PlotTEC : public Plot {
               const char *, const int, Times * t = NULL);
     void plot(const Scalar &, const Scalar &, const Scalar &, 
               const Scalar &, const Scalar &, const Scalar &,
+              const Scalar &,
               const char *, const int, Times * t = NULL);
+    void plot(const Scalar &, const Scalar &, const Scalar &, 
+              const Scalar &, const Scalar &, const Scalar &,
+              const Scalar &, const Scalar &,
+              const char *, const int, Times * t = NULL);
+    void plot(const Scalar &, const Scalar &, const Scalar &, 
+              const Scalar &, const Scalar &, const Scalar &,
+              const char *, const int, Times * t = NULL);
+
     void plot(const Pathline &, const char *, const int, Times * t = NULL);
 
     void set_plot_body(bool b){

@@ -747,6 +747,101 @@ void PlotTEC::plot(const Scalar & sca,
 }
 
 /******************************************************************************/
+void PlotTEC::plot(const Scalar & sca, 
+                   const Scalar & scb, 
+                   const Scalar & scc,
+                   const Scalar & scd,
+                   const Scalar & sce, 
+                   const Scalar & scf, 
+                   const Scalar & scg, 
+                   const char * nam, 
+                   const int i, Times * t) {
+      
+  boil::timer.start("plotting");
+    
+  dom = sca.domain(); // take it as a constant
+      
+  std::vector<int> vars;  
+  for(int v=4; v<=10; v++) vars.push_back(v);
+    
+  std::vector<std::string> vnames;
+  vnames.push_back("X");  
+  vnames.push_back("Y");
+  vnames.push_back("Z");
+  vnames.push_back("A"); if(sca.name().length() > 0) vnames[3] = sca.name();
+  vnames.push_back("B"); if(scb.name().length() > 0) vnames[4] = scb.name();
+  vnames.push_back("C"); if(scc.name().length() > 0) vnames[5] = scc.name();
+  vnames.push_back("D"); if(scd.name().length() > 0) vnames[6] = scd.name();
+  vnames.push_back("E"); if(sce.name().length() > 0) vnames[7] = sce.name();
+  vnames.push_back("F"); if(scf.name().length() > 0) vnames[8] = scf.name();
+  vnames.push_back("G"); if(scg.name().length() > 0) vnames[9] = scf.name();
+    
+  plot_tec_header(*dom, nam, i);
+  plot_tec_prologue(vnames, t);
+  plot_tec_domain(*dom);
+  plot_tec_scalar(*dom, sca);
+  plot_tec_scalar(*dom, scb);
+  plot_tec_scalar(*dom, scc);
+  plot_tec_scalar(*dom, scd);
+  plot_tec_scalar(*dom, sce);
+  plot_tec_scalar(*dom, scf);
+  plot_tec_scalar(*dom, scg);
+  plot_tec_body(dom->ibody(),vars);
+  plot_tec_footer();
+
+  boil::timer.stop("plotting");
+}
+
+/******************************************************************************/
+void PlotTEC::plot(const Scalar & sca, 
+                   const Scalar & scb, 
+                   const Scalar & scc,
+                   const Scalar & scd,
+                   const Scalar & sce, 
+                   const Scalar & scf, 
+                   const Scalar & scg, 
+                   const Scalar & sch, 
+                   const char * nam, 
+                   const int i, Times * t) {
+      
+  boil::timer.start("plotting");
+    
+  dom = sca.domain(); // take it as a constant
+      
+  std::vector<int> vars;  
+  for(int v=4; v<=11; v++) vars.push_back(v);
+    
+  std::vector<std::string> vnames;
+  vnames.push_back("X");  
+  vnames.push_back("Y");
+  vnames.push_back("Z");
+  vnames.push_back("A"); if(sca.name().length() > 0) vnames[3] = sca.name();
+  vnames.push_back("B"); if(scb.name().length() > 0) vnames[4] = scb.name();
+  vnames.push_back("C"); if(scc.name().length() > 0) vnames[5] = scc.name();
+  vnames.push_back("D"); if(scd.name().length() > 0) vnames[6] = scd.name();
+  vnames.push_back("E"); if(sce.name().length() > 0) vnames[7] = sce.name();
+  vnames.push_back("F"); if(scf.name().length() > 0) vnames[8] = scf.name();
+  vnames.push_back("G"); if(scf.name().length() > 0) vnames[9] = scf.name();
+  vnames.push_back("H"); if(scf.name().length() > 0) vnames[10] = scf.name();
+    
+  plot_tec_header(*dom, nam, i);
+  plot_tec_prologue(vnames, t);
+  plot_tec_domain(*dom);
+  plot_tec_scalar(*dom, sca);
+  plot_tec_scalar(*dom, scb);
+  plot_tec_scalar(*dom, scc);
+  plot_tec_scalar(*dom, scd);
+  plot_tec_scalar(*dom, sce);
+  plot_tec_scalar(*dom, scf);
+  plot_tec_scalar(*dom, scg);
+  plot_tec_scalar(*dom, sch);
+  plot_tec_body(dom->ibody(),vars);
+  plot_tec_footer();
+
+  boil::timer.stop("plotting");
+}
+
+/******************************************************************************/
 void PlotTEC::plot(const Pathline & pl, 
                    const char * nam, 
                    const int i, Times * t) {

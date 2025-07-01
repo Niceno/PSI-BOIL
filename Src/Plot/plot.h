@@ -121,6 +121,14 @@ class Plot {
     virtual void plot(const Scalar &, const Scalar &, const Scalar &, 
                       const Scalar &, const Scalar &, const Scalar &,
                       const char *, const int, Times * t = NULL) = 0;
+    virtual void plot(const Scalar &, const Scalar &, const Scalar &,
+                      const Scalar &, const Scalar &, const Scalar &,
+                      const Scalar &,
+                      const char *, const int, Times * t = NULL) = 0;
+    virtual void plot(const Scalar &, const Scalar &, const Scalar &,
+                      const Scalar &, const Scalar &, const Scalar &,
+                      const Scalar &, const Scalar &,
+                      const char *, const int, Times * t = NULL) = 0;
     virtual void set_plot_body(bool b) = 0;
     virtual void plot(const Pathline &, const char *, const int, Times * t = NULL) = 0;
 
