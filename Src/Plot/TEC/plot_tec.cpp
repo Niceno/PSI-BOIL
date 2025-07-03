@@ -821,8 +821,8 @@ void PlotTEC::plot(const Scalar & sca,
   vnames.push_back("D"); if(scd.name().length() > 0) vnames[6] = scd.name();
   vnames.push_back("E"); if(sce.name().length() > 0) vnames[7] = sce.name();
   vnames.push_back("F"); if(scf.name().length() > 0) vnames[8] = scf.name();
-  vnames.push_back("G"); if(scf.name().length() > 0) vnames[9] = scf.name();
-  vnames.push_back("H"); if(scf.name().length() > 0) vnames[10] = scf.name();
+  vnames.push_back("G"); if(scg.name().length() > 0) vnames[9] = scf.name();
+  vnames.push_back("H"); if(sch.name().length() > 0) vnames[10] = scf.name();
     
   plot_tec_header(*dom, nam, i);
   plot_tec_prologue(vnames, t);
