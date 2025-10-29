@@ -12,6 +12,7 @@ EnthalpyFD::EnthalpyFD(const Scalar & PHI,
                        Linear * S,
                        Matter * f,
                        const real Tsat,
+		       const real ri,
                        Matter * s) :
 /*---------------------+ 
 |  initialize parent   |
@@ -21,6 +22,7 @@ EnthalpyFD::EnthalpyFD(const Scalar & PHI,
   iflag (  *C  .domain())
 {
   tsat = Tsat,
+  Ri = ri;
   rhol = fluid()->rho(1),
   rhov = fluid()->rho(0),
   cpl  = fluid()->cp(1),
@@ -38,6 +40,8 @@ EnthalpyFD::EnthalpyFD(const Scalar & PHI,
   turbP=0.9;
   laminar=true;
   conv_divu_subtract=true;
+  heater_power=50000;
+  half_heater=5.0e-3;
 
   phi.bnd_update();
 
