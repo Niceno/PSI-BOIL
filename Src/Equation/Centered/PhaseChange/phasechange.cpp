@@ -11,7 +11,7 @@ PhaseChange::PhaseChange(const Scalar & MDOT,
                    const Vector & U, 
                    Times & T, 
                    Matter * f,
-                   real r1, real r2,
+                   real r1, real r2, real r3,
                    Matter * s,
                    Nucleation * NUCL ) :
 /*---------------------+ 
@@ -61,6 +61,7 @@ PhaseChange::PhaseChange(const Scalar & MDOT,
   /* set arguments */
   latent = r1;
   tsat = r2;
+  Ri = r3;
   rhol = fluid()->rho(1);
   rhov = fluid()->rho(0);
   rhoave = 0.5*(rhol+rhov);

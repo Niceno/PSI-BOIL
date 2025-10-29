@@ -9,7 +9,7 @@ void PhaseChange::m(const Scalar * diff_eddy) {
 
   boil::timer.start("phasechange m");
 
-  for_ijk(i,j,k){
+  for_vijk(clr,i,j,k){
     if((iflag[i][j][k] == -1) || (iflag[i][j][k] == 1)){
       real lv = lambdav;
       real ll = lambdal;
@@ -24,6 +24,32 @@ void PhaseChange::m(const Scalar * diff_eddy) {
                       + tyl[i][j][k]*ny[i][j][k]
                       + tzl[i][j][k]*nz[i][j][k]);
       M[i][j][k] = (qv + ql) / latent;
+    } else if (iflag[i][j][k] == -3){
+      real lv = lambdav;
+      real ll = lambdal;
+      real ls = solid()->lambda(i,j,k-1);
+
+      real dzf = clr[i][j][k]*tpr.dzc(k);
+      real dzs = tpr.zn(k)-tpr.zc(k-1);
+
+      real qv = -lv * (tzv[i][j][k]*nz[i][j][k]);
+      real tw = (ls*dzf*tpr[i][j][k-1] + ll*dzs*tsat) / (ll*dzs + ls*dzf);
+      real ql = ll/dzf * (tw-tsat);
+
+      M[i][j][k] = (qv + ql) /latent;
+    } else if (iflag[i][j][k] == 3) {
+      real lv = lambdav;
+      real ll = lambdal;
+      real ls = solid()->lambda(i,j,k-1);
+
+      real dzf = (1.0-clr[i][j][k])*tpr.dzc(k);
+      real dzs = tpr.zn(k)-tpr.zc(k-1);
+
+      real ql = ll * (tzl[i][j][k]*nz[i][j][k]);
+      real tw = (ls*dzf*tpr[i][j][k-1] + ll*dzs*tsat) / (ll*dzs + ls*dzf);
+      real qv = -lv/dzf * (tw-tsat);
+
+      M[i][j][k] = (qv + ql) /latent;
     }
   }
   M.exchange_all();

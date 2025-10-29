@@ -23,6 +23,7 @@ void PhaseChange::update(const Scalar * diff_eddy) {
   gradt(diff_eddy);
 
   /* calculate m */
+  tpr.exchange_all();
   m(diff_eddy);
 #ifdef DEBUG
   boil::plot->plot(clr, tpr, phi, "clr-tpr-m",  time->current_step());
@@ -41,7 +42,9 @@ void PhaseChange::update(const Scalar * diff_eddy) {
   sources_sum();
   boil::oout<<"phasechange_update: time= "<<time->current_time()
             <<" smdot_pos[kg/s]= "<<smdot_pos
-            <<" smdot_neg[kg/s]= "<<smdot_neg<<"\n";
+            <<" smdot_neg[kg/s]= "<<smdot_neg
+	    <<" smdot_micro_VOF[kg/s]= "<<smdot_micro_VOF
+	    <<"\n";
   smdot_pos_macro=smdot_pos;
   smdot_neg_macro=smdot_neg;
 
