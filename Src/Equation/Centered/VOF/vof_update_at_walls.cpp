@@ -510,10 +510,23 @@ real VOF::extrapolate_v(const int i, const int j, const int k,
     int kk = k+ofz;
    
     real scpscp = scp[ii][jj][kk];
+    real scpscp_t = scp[ii][jj][kk+1];
+    real scpscp_s = scp[ii][jj-1][kk];
+    real scpscp_n = scp[ii][jj+1][kk+1];
+    real scpscp_w = scp[ii-1][jj][kk+1];
+    real scpscp_e = scp[ii+1][jj][kk+1];
+
 
     /* erroneous interfaces */
     if(scpscp<tol_wall||scpscp-1.0>-tol_wall) {
       return real(scpscp>phisurf);
+    }
+
+    /* delete subgrid vapor, if bottom is immersed boudary */
+    if (dom->ibody().off(i,j,k-1)) {
+      if(scpscp>phisurf && (scpscp_t-phisurf)*(scpscp-phisurf)>0.0 && (scpscp_s-phisurf)*(scpscp_n-phisurf)>0.0 && (scpscp_w-phisurf)*(scpscp_e-phisurf)>0.0) {
+        return real(scpscp>phisurf);
+      }
     } 
 
     /* unnormalized alpha value */
