@@ -13,15 +13,33 @@ void VOF::ib_norm(const Scalar & sca) {
   for(int cc=0; cc<dom->ibody().nccells(); cc++){
     int i,j,k;
     dom->ibody().ijk(cc,&i,&j,&k);
-
-    if(dom->ibody().fPmmm(i,j,k)==0) ib_norm_cal(cc, i  ,j  ,k  );
-    if(dom->ibody().fPpmm(i,j,k)==0) ib_norm_cal(cc, i+1,j  ,k  );
-    if(dom->ibody().fPmpm(i,j,k)==0) ib_norm_cal(cc, i  ,j+1,k  );
-    if(dom->ibody().fPppm(i,j,k)==0) ib_norm_cal(cc, i+1,j+1,k  );
-    if(dom->ibody().fPmmp(i,j,k)==0) ib_norm_cal(cc, i  ,j  ,k+1);
-    if(dom->ibody().fPpmp(i,j,k)==0) ib_norm_cal(cc, i+1,j  ,k+1);
-    if(dom->ibody().fPmpp(i,j,k)==0) ib_norm_cal(cc, i  ,j+1,k+1);
-    if(dom->ibody().fPppp(i,j,k)==0) ib_norm_cal(cc, i+1,j+1,k+1);
+    if ((sca[i][j][k]-0.5)*(sca[i][j][k-1]-0.5)<0.0) {
+      if ((sca[i-1][j][k]-0.5)*(sca[i-1][j][k-1]-0.5)>0.0) {
+        ib_norm_cal(cc, i  ,j  ,k  );
+	ib_norm_cal(cc, i  ,j+1,k  );
+      }
+      if ((sca[i+1][j][k]-0.5)*(sca[i+1][j][k-1]-0.5)>0.0) {
+        ib_norm_cal(cc, i+1  ,j    ,k  );
+        ib_norm_cal(cc, i+1  ,j+1  ,k  );
+      }
+      if ((sca[i][j-1][k]-0.5)*(sca[i][j-1][k-1]-0.5)>0.0) {
+        ib_norm_cal(cc, i   ,j  ,k  );
+        ib_norm_cal(cc, i+1 ,j  ,k  );
+      }
+      if ((sca[i][j+1][k]-0.5)*(sca[i][j+1][k-1]-0.5)>0.0) {
+        ib_norm_cal(cc, i    ,j+1  ,k  );
+        ib_norm_cal(cc, i+1  ,j+1  ,k  );
+      }
+      //if(dom->ibody().fPmmm(i,j,k)==0) ib_norm_cal(cc, i  ,j  ,k  );
+      //if(dom->ibody().fPpmm(i,j,k)==0) ib_norm_cal(cc, i+1,j  ,k  );
+      //if(dom->ibody().fPmpm(i,j,k)==0) ib_norm_cal(cc, i  ,j+1,k  );
+      //if(dom->ibody().fPppm(i,j,k)==0) ib_norm_cal(cc, i+1,j+1,k  );
+    }
+      if(dom->ibody().fPmmp(i,j,k)==0) ib_norm_cal(cc, i  ,j  ,k+1);
+      if(dom->ibody().fPpmp(i,j,k)==0) ib_norm_cal(cc, i+1,j  ,k+1);
+      if(dom->ibody().fPmpp(i,j,k)==0) ib_norm_cal(cc, i  ,j+1,k+1);
+      if(dom->ibody().fPppp(i,j,k)==0) ib_norm_cal(cc, i+1,j+1,k+1);
+      // if immersed boundary is top side, this code need to be developed.
   }
 
 #if 0

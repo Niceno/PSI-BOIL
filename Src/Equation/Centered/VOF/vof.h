@@ -180,8 +180,8 @@ class VOF : public Centered {
     void norm_mixed(real & nx_val, real & ny_val, real & nz_val,
                     const int i, const int j, const int k,
                     const Scalar & sca);
-
     void bdnorm(Scalar & scp);
+
     void extend_norm(const Scalar & g);
 
     void normalize(real & r1, real & r2, real & r3);
