@@ -522,12 +522,14 @@ real VOF::extrapolate_v(const int i, const int j, const int k,
       return real(scpscp>phisurf);
     }
 
+#if 1
     /* delete subgrid vapor, if bottom is immersed boudary */
     if (dom->ibody().off(i,j,k-1)) {
       if(scpscp>phisurf && (scpscp_t-phisurf)*(scpscp-phisurf)>0.0 && (scpscp_s-phisurf)*(scpscp_n-phisurf)>0.0 && (scpscp_w-phisurf)*(scpscp_e-phisurf)>0.0) {
         return real(scpscp>phisurf);
       }
     } 
+#endif
 
     /* unnormalized alpha value */
     real alphaval = nalpha[ii][jj][kk];
