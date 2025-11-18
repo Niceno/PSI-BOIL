@@ -15,9 +15,9 @@ VOF::VOF(const Scalar & PHI,
   jelly( *PHI.domain() ),
   Centered( PHI.domain(), PHI, F , & U, T, &jelly, NULL, S ),
   kappa( &K ),
-  nx( *PHI.domain() ),
-  ny( *PHI.domain() ),
-  nz( *PHI.domain() ),
+  nx( *PHI.domain(),"nx" ),
+  ny( *PHI.domain(),"ny" ),
+  nz( *PHI.domain(),"nz" ),
   mx( *PHI.domain() ),
   my( *PHI.domain() ),
   mz( *PHI.domain() ),
@@ -114,6 +114,7 @@ VOF::VOF(const Scalar & PHI,
   use_subgrid=false;
   use_HF_wall=false;
   use_flag_tension=false;
+  use_delete_wall_vapor=false;
   total_vol0=0.0;
   total_vol1=0.0;
 
