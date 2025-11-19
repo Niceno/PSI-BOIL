@@ -1,0 +1,4 @@
+/home/sato/Downloads/TecIO/tecio/teciosrc/CMakeFiles/tecio.dir
+/home/sato/Downloads/TecIO/tecio/teciosrc/CMakeFiles/szcombine.dir
+/home/sato/Downloads/TecIO/tecio/teciosrc/CMakeFiles/edit_cache.dir
+/home/sato/Downloads/TecIO/tecio/teciosrc/CMakeFiles/rebuild_cache.dir

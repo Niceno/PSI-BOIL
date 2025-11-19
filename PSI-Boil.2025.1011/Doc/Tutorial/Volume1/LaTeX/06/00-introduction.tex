@@ -1,0 +1,20 @@
+\label{chap_fields}
+
+Once computational domains are defined~(Sec.~\ref{chap_domain}) the
+{\em fields} can be defined as well. Fields are unknown functions  
+solved in a numerical simulation, such as: temperature, pressure,
+species concentration, velocity fields, and their source terms, as well
+as physical properties, or anything else which is defined as a 
+variable function over a computational domain. 
+
+As {\psiboil} is based on {\em staggered} FV method, scalar fields   
+are computed at cell centers, while vector fields are at the staggered grid, 
+placed on the grid cell faces. It is therefore clear that two classes are 
+defined in {\psiboil} to represent fields: {\tt Scalar} which holds the
+scalar unknown (temperature, pressure, etc.) and {\tt Vector}
+which holds velocity components. 
+
+In this chapter, you will learn how to define each of these types
+of fields. The most essential thing for each field is the 
+domain for which it is defined. Field constructors are therefore
+quite simple, the only argument they need is a reference to {\tt Domain}.

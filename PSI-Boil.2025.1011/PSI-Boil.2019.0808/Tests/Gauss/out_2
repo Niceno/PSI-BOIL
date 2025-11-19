@@ -1,0 +1,107 @@
+unnamed
+1:  dims[i] 1: 1 1: 1 1: 2 1: 
+1:  neighbours: 1:  1 1:  1 1:  -2 1:  -2 1:  0 1:  -2 1: 
+1:  coords[i] 1: 0 1: 0 1: 1 1: 
+1: n_dir[k] = 5
+1: n_dir[k] = 11
+1: n_dir[k] = 5
+1: n_dir[k] = 6
+PROC: 1, FILE: domain.cpp, LINE: 70, cr_x = first = 1, last = 5
+PROC: 1, FILE: domain.cpp, LINE: 71, cr_y = first = 1, last = 11
+PROC: 1, FILE: domain.cpp, LINE: 72, cr_z = first = 6, last = 11
+1: ni =   7
+1: nj =   13
+1: nk =   8
+unnamed
+1:  dims[i] 1: 1 1: 1 1: 2 1: 
+1:  neighbours: 1:  -2 1:  -2 1:  1 1:  1 1:  0 1:  -2 1: 
+1:  coords[i] 1: 0 1: 0 1: 1 1: 
+1: n_dir[k] = 11
+1: n_dir[k] = 5
+1: n_dir[k] = 5
+1: n_dir[k] = 6
+PROC: 1, FILE: domain.cpp, LINE: 70, cr_x = first = 1, last = 11
+PROC: 1, FILE: domain.cpp, LINE: 71, cr_y = first = 1, last = 5
+PROC: 1, FILE: domain.cpp, LINE: 72, cr_z = first = 6, last = 11
+1: ni =   13
+1: nj =   7
+1: nk =   8
+unnamed
+1:  dims[i] 1: 1 1: 2 1: 1 1: 
+1:  neighbours: 1:  -2 1:  -2 1:  0 1:  -2 1:  1 1:  1 1: 
+1:  coords[i] 1: 0 1: 1 1: 0 1: 
+1: n_dir[k] = 11
+1: n_dir[k] = 5
+1: n_dir[k] = 6
+1: n_dir[k] = 5
+PROC: 1, FILE: domain.cpp, LINE: 70, cr_x = first = 1, last = 11
+PROC: 1, FILE: domain.cpp, LINE: 71, cr_y = first = 6, last = 11
+PROC: 1, FILE: domain.cpp, LINE: 72, cr_z = first = 1, last = 5
+1: ni =   13
+1: nj =   8
+1: nk =   7
+Plotting: t1_p:001.gmv.0000
+Plotting: t2_p:001.gmv.0000
+Plotting: t3_p:001.gmv.0000
+temperature discretize: 0 [s]    (0%)
+temperature solver    : 1.015 [s]    (100%)
+plotting              : 0 [s]    (0%)
+Plotting: test_p:001.gmv.0000
+FILE: domain.cpp, LINE: 33, name = unnamed
+0:  dims[i] 0: 1 0: 1 0: 2 0: 
+0:  neighbours: 0:  0 0:  0 0:  -2 0:  -2 0:  -2 0:  1 0: 
+0:  coords[i] 0: 0 0: 0 0: 0 0: 
+0: n_dir[k] = 5
+0: n_dir[k] = 11
+Warning: domains will not be balanced!!!
+0: n_dir[k] = 5
+0: n_dir[k] = 6
+PROC: 0, FILE: domain.cpp, LINE: 70, cr_x = first = 1, last = 5
+PROC: 0, FILE: domain.cpp, LINE: 71, cr_y = first = 1, last = 11
+PROC: 0, FILE: domain.cpp, LINE: 72, cr_z = first = 1, last = 5
+0: ni =   7
+0: nj =   13
+0: nk =   7
+FILE: domain.cpp, LINE: 33, name = unnamed
+0:  dims[i] 0: 1 0: 1 0: 2 0: 
+0:  neighbours: 0:  -2 0:  -2 0:  0 0:  0 0:  -2 0:  1 0: 
+0:  coords[i] 0: 0 0: 0 0: 0 0: 
+0: n_dir[k] = 11
+0: n_dir[k] = 5
+Warning: domains will not be balanced!!!
+0: n_dir[k] = 5
+0: n_dir[k] = 6
+PROC: 0, FILE: domain.cpp, LINE: 70, cr_x = first = 1, last = 11
+PROC: 0, FILE: domain.cpp, LINE: 71, cr_y = first = 1, last = 5
+PROC: 0, FILE: domain.cpp, LINE: 72, cr_z = first = 1, last = 5
+0: ni =   13
+0: nj =   7
+0: nk =   7
+FILE: domain.cpp, LINE: 33, name = unnamed
+0:  dims[i] 0: 1 0: 2 0: 1 0: 
+0:  neighbours: 0:  -2 0:  -2 0:  -2 0:  1 0:  0 0:  0 0: 
+0:  coords[i] 0: 0 0: 0 0: 0 0: 
+0: n_dir[k] = 11
+Warning: domains will not be balanced!!!
+0: n_dir[k] = 5
+0: n_dir[k] = 6
+0: n_dir[k] = 5
+PROC: 0, FILE: domain.cpp, LINE: 70, cr_x = first = 1, last = 11
+PROC: 0, FILE: domain.cpp, LINE: 71, cr_y = first = 1, last = 5
+PROC: 0, FILE: domain.cpp, LINE: 72, cr_z = first = 1, last = 5
+0: ni =   13
+0: nj =   7
+0: nk =   7
+Plotting: t1_p:000.gmv.0000
+Plotting: t2_p:000.gmv.0000
+Plotting: t3_p:000.gmv.0000
+finished
++==========================================
+| Total execution time: 1.015 [s]
++------------------------------------------
+| Time spent in temperature discretize: 0 [s]    (0%)
+| Time spent in temperature solver    : 1.015 [s]    (100%)
+| Time spent in plotting              : 0 [s]    (0%)
+| Time spent elsewhere: 0 [s]    (0%)
++------------------------------------------
+Plotting: test_p:000.gmv.0000

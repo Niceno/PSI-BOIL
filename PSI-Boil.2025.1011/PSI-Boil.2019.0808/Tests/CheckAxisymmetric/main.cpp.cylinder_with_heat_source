@@ -1,0 +1,118 @@
+#include "Include/psi-boil.h"
+
+const int gLevel = 8;
+const int NX = 24*gLevel;
+const int NZ = 1;
+
+/* domain dimensions (given by problem) */
+const real LX = 1.0;
+const real DX = LX/real(NX);
+
+const real q0 = 100.0;
+const real tout = 100.0;
+
+/******************************************************************************/
+int main(int argc, char ** argv) {
+
+  boil::timer.start();
+
+  /*--------------------------------+
+  |  choose the output file format  |
+  +--------------------------------*/
+  boil::plot = new PlotTEC();
+  //boil::plot = new PlotTEC(AsNodes::no(),Buffers::yes());
+
+  /*----------+
+  |  grid(s)  |
+  +----------*/
+  Grid1D gx( Range<real>(0.0,LX), NX, Periodic::no() );
+  Grid1D gz(DX);
+
+  /*---------+
+  |  domain  |
+  +---------*/
+  Axisymmetric d(gx,gz,DX);
+
+  /*------------------+
+  |  define unknowns  |
+  +------------------*/
+  Vector uvw(d), xyz(d);           // vel
+  Scalar tpr(d), q  (d);           // temperature
+
+  /*-----------------------------+
+  |  insert boundary conditions  |
+  +-----------------------------*/
+  for_m(m) {
+    uvw.bc(m).add( BndCnd( Dir::imin(), BndType::wall() ) );
+    uvw.bc(m).add( BndCnd( Dir::imax(), BndType::wall() ) );
+    uvw.bc(m).add( BndCnd( Dir::kmin(), BndType::pseudo() ) );
+    uvw.bc(m).add( BndCnd( Dir::kmax(), BndType::pseudo() ) );
+    uvw.bc(m).add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
+    uvw.bc(m).add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
+  }
+
+  tpr.bc().add( BndCnd( Dir::imin(), BndType::neumann() ) );
+  tpr.bc().add( BndCnd( Dir::imax(), BndType::dirichlet(),tout ) );
+  tpr.bc().add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
+  tpr.bc().add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
+  tpr.bc().add( BndCnd( Dir::kmin(), BndType::pseudo() ) );
+  tpr.bc().add( BndCnd( Dir::kmax(), BndType::pseudo() ) );
+
+  q.bc().add( BndCnd( Dir::imin(), BndType::neumann() ) );
+  q.bc().add( BndCnd( Dir::imax(), BndType::neumann() ) );
+  q.bc().add( BndCnd( Dir::kmin(), BndType::pseudo() ) );
+  q.bc().add( BndCnd( Dir::kmax(), BndType::pseudo() ) );
+  q.bc().add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
+  q.bc().add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
+
+  /*----------------------+
+  |  physical properties  |
+  +----------------------*/
+  Matter liquid(d);
+
+  liquid.lambda(0.5);
+
+  /*-------------------+
+  |  time-integration  |
+  +-------------------*/
+  Times time;
+
+  /*-----------------+
+  |  define solvers  |
+  +-----------------*/
+  Krylov * solver = new CG(d, Prec::ic2());
+
+  Enthalpy enth(tpr,q,uvw,time,solver,&liquid);
+  enth.diffusion_set(TimeScheme::backward_euler());
+
+  AC multigrid( &enth );                            /* AMG solver for enth. */
+
+  /*--------------------+
+  |  initial condition  |
+  +--------------------*/
+  tpr = 0.0;
+  for_vijk(q,i,j,k)                                 /* fill the source term */
+    q[i][j][k] = q0*q.dV(i,j,k);
+
+  /*------------+
+  |  time loop  |
+  +------------*/  
+  multigrid.vcycle(ResRat(1e-4));                   /* solve linear system */
+
+  boil::plot->plot(tpr, "tpr");
+
+  for_vi(tpr,i) {
+    int j = boil::BW;
+    int k = boil::BW;
+
+    real pos = tpr.xc(i);
+    boil::oout<<pos<<" "<<tpr[i][j][k]<<" "
+              <<tout + q0*(LX*LX-pos*pos)/4./liquid.lambda(i,j,k)<<boil::endl;
+  }
+
+  boil::oout << "Finished!" << boil::endl;
+
+  boil::timer.stop();
+  boil::timer.report();
+
+}	

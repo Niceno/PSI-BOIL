@@ -1,0 +1,3531 @@
+vof_adens.cpp
+10a11,20
+> 
+> #if 0
+>   /* cell centered */
+>   for_vijk(adens,i,j,k) {
+>     real area = marching_cube_area(i,j,k);
+>     real volume = dV(i,j,k);
+> 
+>     adens[i][j][k] = area/volume;
+>   }
+> #else
+11a22,34
+> #endif
+> 
+> #if 0
+>   real sum(0.0);
+>   int count(0);
+>   for_vijk(adens,i,j,k) {
+>     real sumplus =  adens[i][j][k]*adens.dV(i,j,k);
+>     if(sumplus>boil::atto) count++;
+>     sum += sumplus;
+>   }
+>   boil::oout<<"VOF::adens "<<count<<" "<<sum<<boil::endl;
+> #endif
+> 
+vof_advance.cpp
+4,5c4,5
+< void VOF::advance(const bool anci) {
+<   advance(phi,anci);
+---
+> void VOF::advance() {
+>   advance(phi);
+8c8
+< void VOF::advance(Scalar & scp, const bool anci) {
+---
+> void VOF::advance(Scalar & scp) {
+24,27d23
+< #if 1
+<   #if 1
+<   norm_mixed(scp);
+<   #else
+29,33d24
+<   #endif
+< #else
+<   norm_elvira(scp);
+< #endif
+<   bdnorm(scp);
+40,41c31
+<   if(ifull)
+<     advance_x(scp);
+---
+>   advance_x(scp);
+44,45c34
+<   if(jfull)
+<     advance_y(scp);
+---
+>   advance_y(scp);
+48,49c37
+<   if(kfull)
+<     advance_z(scp);
+---
+>   advance_z(scp);
+68,69c56
+<   if(anci)
+<     ancillary(phi);
+---
+>   ancillary();
+vof_advance_x.cpp
+vof_advance_y.cpp
+vof_advance_z.cpp
+vof_ancillary.cpp
+3,7d2
+< void VOF::ancillary() {
+<   ancillary(phi);
+<   return;
+< }
+< 
+9c4
+< void VOF::ancillary(Scalar & scp) {
+---
+> void VOF::ancillary() {
+14,16c9,13
+<   /* with bnd update, the wall values of scp are distorted! 
+<    * update_at_walls should be called */
+<   scp.bnd_update();
+---
+> #if 1
+>   /*--------------------------+
+>   |  flagging interface cells  |
+>   +--------------------------*/
+>   set_iflag();  /* done in curv_HF */
+18d14
+<   boil::timer.start("vof ancillary");
+22,27c18
+< #if 1
+<   #if 1
+<   norm_mixed(scp);
+<   #else
+<   norm_cc(scp);
+<   #endif
+---
+>   norm_cc(phi);
+29c20
+<   norm_elvira(scp);
+---
+>   curv_HF();
+31,33c22
+< 
+<   /* iterate boundary normal vector */
+<   bdnorm(scp);
+---
+>   boil::timer.start("vof ancillary");
+36c25,29
+<   extract_alpha(scp);
+---
+>   extract_alpha();
+> 
+>   /*  calculate free surface position */
+>   //cal_fs3();
+>   cal_fs_interp();
+39c32
+<   update_at_walls(scp);
+---
+>   update_at_walls();
+42a36
+>   //norm_young(phi); 
+44,52c38
+<   /*  calculate free surface position */
+< #if 1
+<   cal_fs3(scp);
+< #else
+<   cal_fs_interp(scp);
+<   if(!use_subgrid) fs_bnd_nosubgrid(scp);
+< #endif
+< 
+<   /* calculate area -> due to the Heaviside bindings, phi is used, not scp */
+---
+>   /* calculate area */
+54,57c40,41
+< #if 0
+<   cal_adens_geom(adens);
+<   set_adens(adensgeom);
+< #endif
+---
+>   //cal_adens_geom(adens);
+>   //set_adens(adensgeom);
+59,61c43,45
+<   /* calculate scp in staggered cells */
+<   if(bndclr)
+<     cal_bndclr(scp);
+---
+>   /* calculate phi in staggered cells */
+>   //if(bndclr)
+>   //  cal_bndclr();
+vof_bdcurv.cpp
+428a429,431
+> #if 0
+>   std::cout<<"divnorm: "<<k<<" "<<nb<<" "<<nt<<"\n";
+> #endif
+vof_bdnorm.cpp
+vof_bndclr.cpp
+6c6
+< void VOF::cal_bndclr(const Scalar & scp) {
+---
+> void VOF::cal_bndclr() {
+29,30c29,30
+<       real scpp = scp[i ][j ][k ];
+<       real scpm = scp[ii][jj][kk];     
+---
+>       real phip = phi[i ][j ][k ];
+>       real phim = phi[ii][jj][kk];     
+32,35c32,35
+<       bool liqp = scpp-1.>-boil::pico;
+<       bool gasp = scpp<boil::pico;
+<       bool liqm = scpm-1.>-boil::pico;
+<       bool gasm = scpm<boil::pico;
+---
+>       bool liqp = phip-1.>-boil::pico;
+>       bool gasp = phip<boil::pico;
+>       bool liqm = phim-1.>-boil::pico;
+>       bool gasm = phim<boil::pico;
+37c37
+<       real stagscpp, stagscpm;
+---
+>       real stagphip, stagphim;
+41c41
+<         (*bndclr)[m][i][j][k] = 0.5 * (scpp + scpm);
+---
+>         (*bndclr)[m][i][j][k] = 0.5 * (phip + phim);
+46c46
+<         stagscpp = scpp*0.5*dV(i,j,k); /* this only works for cart. grid...*/
+---
+>         stagphip = phip*0.5*dV(i,j,k); /* this only works for cart. grid...*/
+50c50
+<         real c = scpp;
+---
+>         real c = phip;
+86c86
+<         stagscpp = calc_v(alpha*qa, vm1*qa, vm2*qa, vm3*qa)*absg*dV(i,j,k);
+---
+>         stagphip = calc_v(alpha*qa, vm1*qa, vm2*qa, vm3*qa)*absg*dV(i,j,k);
+90c90
+<         stagscpm = scpm*0.5*dV(ii,jj,kk);
+---
+>         stagphim = phim*0.5*dV(ii,jj,kk);
+93c93
+<         real c = scpm;
+---
+>         real c = phim;
+127c127
+<         stagscpm = calc_v(alpha*qa, vm1*qa, vm2*qa, vm3*qa)*g*dV(ii,jj,kk);
+---
+>         stagphim = calc_v(alpha*qa, vm1*qa, vm2*qa, vm3*qa)*g*dV(ii,jj,kk);
+132c132
+<       boil::oout<<"VOF::bdclr "<<i<<" "<<stagscpp<<" "<<stagscpm<<" "<<(*bndclr).dV(m,i,j,k)<<boil::endl;
+---
+>       boil::oout<<"VOF::bdclr "<<i<<" "<<stagphip<<" "<<stagphim<<" "<<(*bndclr).dV(m,i,j,k)<<boil::endl;
+136c136
+<       (*bndclr)[m][i][j][k] = (stagscpp+stagscpm)/(*bndclr).dV(m,i,j,k);
+---
+>       (*bndclr)[m][i][j][k] = (stagphip+stagphim)/(*bndclr).dV(m,i,j,k);
+vof_calc_alpha.cpp
+vof_calc_flux.cpp
+vof_calc_v.cpp
+vof_color_minmax.cpp
+6,7c6,7
+< *  \brief Detect maximum and minimum of color function.
+< *           results: cmin, cmax, ijk
+---
+> *  \brief Detect maximu and minimum of free surface position.
+> *           results: xminft,xmaxft,yminft,ymaxft,zminft,zmaxft
+vof.cpp
+17a18
+>   //clr( *PHI.domain() ),
+28a30,31
+>   iflagy(*PHI.domain() ),
+>   iflagz(*PHI.domain() ),
+31c34
+<   topo(&mx,&my,&mz,&adens,&fs)
+---
+>   topo(&nx,&ny,&nz,&adens,&fs)
+37a41
+>   //clr       = phi.shape();
+47a52,53
+>   iflagy    = phi.shape();
+>   iflagz    = phi.shape();
+50,69d55
+<   for( int b=0; b<phi.bc().count(); b++ ) {
+<     if(    phi.bc().type(b) == BndType::dirichlet()
+<         || phi.bc().type(b) == BndType::inlet()
+<         || phi.bc().type(b) == BndType::insert()
+<         || phi.bc().type(b) == BndType::convective()
+<        ) {
+<        nx.bc().type(b) = BndType::neumann();
+<        ny.bc().type(b) = BndType::neumann();
+<        nx.bc().type(b) = BndType::neumann();
+<        nalpha.bc().type(b) = BndType::neumann();
+<        adens.bc().type(b) = BndType::neumann();
+<        mx.bc().type(b) = BndType::neumann();
+<        my.bc().type(b) = BndType::neumann();
+<        mx.bc().type(b) = BndType::neumann();
+< 
+<        boil::oout << "Adjusting b.c.s for geometrical properties at " << b
+<                   << boil::endl;
+<     }
+<   }
+< 
+72,76d57
+< 
+<   for_m(m)
+<     for_avmijk(fs,m,i,j,k)
+<       fs[m][i][j][k] = boil::unreal;
+< 
+94d74
+<   use_subgrid=false;
+104,106c84
+<   iminc = imaxc = jminc = jmaxc = kminc = kmaxc = true;  // true for cut-stencil
+<   iminw = imaxw = jminw = jmaxw = kminw = kmaxw = false; // true for wall
+<   ifull = jfull = kfull = true; // true for not a dummy direction
+---
+>   iminc = imaxc = jminc = jmaxc = kminc = kmaxc = true; // true for cut-stencil
+128,133d105
+<     } else if (phi.bc().type(d,BndType::wall())) {
+<       imaxw=true;
+<     } else if (phi.bc().type(d,BndType::pseudo())) {
+<       imaxp=true;
+<       imaxc=false;
+<       ifull = false;
+146,151d117
+<     } else if (phi.bc().type(d,BndType::wall())) {
+<       jminw=true;
+<     } else if (phi.bc().type(d,BndType::pseudo())) {
+<       jminp=true;
+<       jminc=false;
+<       jfull = false;
+164,169d129
+<     } else if (phi.bc().type(d,BndType::wall())) {
+<       jmaxw=true;
+<     } else if (phi.bc().type(d,BndType::pseudo())) {
+<       jmaxp=true;
+<       jmaxc=false;
+<       jfull = false;
+182,187d141
+<     } else if (phi.bc().type(d,BndType::wall())) {
+<       kminw=true;
+<     } else if (phi.bc().type(d,BndType::pseudo())) {
+<       kminp=true;
+<       kminc=false;
+<       kfull = false;
+200,205d153
+<     } else if (phi.bc().type(d,BndType::wall())) {
+<       kmaxw=true;
+<     } else if (phi.bc().type(d,BndType::pseudo())) {
+<       kmaxp=true;
+<       kmaxc=false;
+<       kfull = false;
+210d157
+< #if 0
+216,220d162
+<   boil::aout<<"curv_HF::wall= "<<boil::cart.iam()<<" "
+<             <<iminw<<" "<<imaxw<<" "
+<             <<jminw<<" "<<jmaxw<<" "
+<             <<kminw<<" "<<kmaxw<<"\n";
+< 
+225,227d166
+< 
+<   boil::oout<<"VOF-full: "<<ifull<<" "<<jfull<<" "<<kfull<<boil::endl;
+< #endif
+vof_curvature.cpp
+vof_curv_HF.cpp
+28d27
+< #if 1
+30,42d28
+<   true_norm_vect();
+<   for_aijk(i,j,k) {
+<     nx[i][j][k] = mx[i][j][k];
+<     ny[i][j][k] = my[i][j][k];
+<     nz[i][j][k] = mz[i][j][k];
+<   }
+< #else
+<   for_aijk(i,j,k) {
+<     nx[i][j][k] = mx[i][j][k];
+<     ny[i][j][k] = my[i][j][k];
+<     nz[i][j][k] = mz[i][j][k];
+<   }
+< #endif
+106,111d91
+<         if(!ifull) {
+<           boil::oout<<"Curv_HF: Pseudo direction selected at "<<i<<" "<<j<<" "
+<                     <<k<<" with dirMax="<<dirMax<<" ; exiting."<<boil::endl;
+<           exit(0);
+<         }
+< 
+115,130c95,100
+< 
+<         int imin_bnd = imin - 1; /* uses update at walls */
+<         int imax_bnd = imax + 1;
+< 
+<         if (iminc&&!iminw) imin=max(-3,si()-i);  // limit stencil size for cut-stencil
+<         if (imaxc&&!imaxw) imax=min( 3,ei()-i);
+<         if(iminw) { imin = max(-3,si()-i-1); imin_bnd = imin; }
+<         if(imaxw) { imax = min(+3,ei()-i+1); imax_bnd = imax; }
+< 
+<         if (dom->ibody().off(i-1,j,k)) { imin=-1; imin_bnd = imin; }  // use wall adjacent phi
+<         else if(dom->ibody().off(i-2,j,k)) { imin=-2; imin_bnd = imin; } // in solid
+<         else if(dom->ibody().off(i-3,j,k)) { imin=-3; imin_bnd = imin; }
+< 
+<         if (dom->ibody().off(i+1,j,k)) { imax=1; imax_bnd = imax; }
+<         else if(dom->ibody().off(i+2,j,k)) { imax=2; imax_bnd = imax; }
+<         else if(dom->ibody().off(i+3,j,k)) { imax=3; imax_bnd = imax; }
+---
+>         if (iminc) imin=max(-3,si()-i);  // limit stencil size for cut-stencil
+>         if (imaxc) imax=min( 3,ei()-i);
+>         if (dom->ibody().off(i-1,j,k)) { imin=-1; }  // use wall adjacent phi
+>         else if(dom->ibody().off(i-2,j,k)) { imin=-2; } // in solid
+>         if (dom->ibody().off(i+1,j,k)) { imax=1; }
+>         else if(dom->ibody().off(i+2,j,k)) { imax=2; }
+180,196c150,158
+<           real deltax = phi.dxc(i+ii);
+<           /* increment by one for update at walls usage */
+<           if(ii==imin_bnd) deltax = phi.dxc(i+imin_bnd+1);
+<           if(ii==imax_bnd) deltax = phi.dxc(i+imax_bnd-1);
+<           /* Warning: does not work properly if immerse body
+<            * does not span the whole plane */
+<           /* At the same time, update_at_walls fails then as well */
+< 
+<           hmm += stmp[i+ii][j-1][k-1]*deltax;
+<           hcm += stmp[i+ii][j  ][k-1]*deltax;
+<           hpm += stmp[i+ii][j+1][k-1]*deltax;
+<           hmc += stmp[i+ii][j-1][k  ]*deltax;
+<           hcc += stmp[i+ii][j  ][k  ]*deltax;
+<           hpc += stmp[i+ii][j+1][k  ]*deltax;
+<           hmp += stmp[i+ii][j-1][k+1]*deltax;
+<           hcp += stmp[i+ii][j  ][k+1]*deltax; 
+<           hpp += stmp[i+ii][j+1][k+1]*deltax;
+---
+>           hmm += stmp[i+ii][j-1][k-1]*phi.dxc(i+ii);
+>           hcm += stmp[i+ii][j  ][k-1]*phi.dxc(i+ii);
+>           hpm += stmp[i+ii][j+1][k-1]*phi.dxc(i+ii);
+>           hmc += stmp[i+ii][j-1][k  ]*phi.dxc(i+ii);
+>           hcc += stmp[i+ii][j  ][k  ]*phi.dxc(i+ii);
+>           hpc += stmp[i+ii][j+1][k  ]*phi.dxc(i+ii);
+>           hmp += stmp[i+ii][j-1][k+1]*phi.dxc(i+ii);
+>           hcp += stmp[i+ii][j  ][k+1]*phi.dxc(i+ii); 
+>           hpp += stmp[i+ii][j+1][k+1]*phi.dxc(i+ii);
+207,210c169,172
+<           real hy  = jfull*(hpc-hmc)/(dys(j)+dyn(j));
+<           real hz  = kfull*(hcp-hcm)/(dzb(k)+dzt(k));
+<           real hyy = jfull*(hpc-2.0*hcc+hmc)/(phi.dyc(j)*phi.dyc(j));
+<           real hzz = kfull*(hcp-2.0*hcc+hcm)/(phi.dzc(k)*phi.dzc(k));
+---
+>           real hy  = (hpc-hmc)/(dys(j)+dyn(j));
+>           real hz  = (hcp-hcm)/(dzb(k)+dzt(k));
+>           real hyy = (hpc-2.0*hcc+hmc)/(phi.dyc(j)*phi.dyc(j));
+>           real hzz = (hcp-2.0*hcc+hcm)/(phi.dzc(k)*phi.dzc(k));
+212c174
+<           real hy  = jfull*(g*(hpp-hmp)+(hpc-hmc)+g*(hpm-hmm))
+---
+>           real hy  = (g*(hpp-hmp)+(hpc-hmc)+g*(hpm-hmm))
+214c176
+<           real hz  = kfull*(g*(hpp-hpm)+(hcp-hcm)+g*(hmp-hmm))
+---
+>           real hz  = (g*(hpp-hpm)+(hcp-hcm)+g*(hmp-hmm))
+216c178
+<           real hyy = jfull*(g*(hpp-2.0*hcp+hmp)+(hpc-2.0*hcc+hmc)+g*(hpm-2.0*hcm+hmm))
+---
+>           real hyy = (g*(hpp-2.0*hcp+hmp)+(hpc-2.0*hcc+hmc)+g*(hpm-2.0*hcm+hmm))
+218c180
+<           real hzz = kfull*(g*(hpp-2.0*hpc+hpm)+(hcp-2.0*hcc+hcm)+g*(hmp-2.0*hmc+hmm))
+---
+>           real hzz = (g*(hpp-2.0*hpc+hpm)+(hcp-2.0*hcc+hcm)+g*(hmp-2.0*hmc+hmm))
+221c183
+<           real hyz = jfull*kfull*(hpp-hpm-hmp+hmm)/(4.0*phi.dyc(j)*phi.dzc(k));
+---
+>           real hyz = (hpp-hpm-hmp+hmm)/(4.0*phi.dyc(j)*phi.dzc(k));
+236,241d197
+<         if(!jfull) {
+<           boil::oout<<"Curv_HF: Pseudo direction selected at "<<i<<" "<<j<<" "
+<                     <<k<<" with dirMax="<<dirMax<<" ; exiting."<<boil::endl;
+<           exit(0);
+<         }
+< 
+245,260c201,206
+<         
+<         int jmin_bnd = jmin - 1; /* uses update at walls */
+<         int jmax_bnd = jmax + 1;
+< 
+<         if (jminc&&!jminw) jmin=max(-3,sj()-j);  // limit stencil size for cut-stencil
+<         if (jmaxc&&!jmaxw) jmax=min( 3,ej()-j);
+<         if(jminw) { jmin = max(-3,sj()-j-1); jmin_bnd = jmin; }
+<         if(jmaxw) { jmax = min(+3,ej()-j+1); jmax_bnd = jmax; }
+< 
+<         if (dom->ibody().off(i,j-1,k)) { jmin=-1; jmin_bnd = jmin; }
+<         else if(dom->ibody().off(i,j-2,k)) { jmin=-2; jmin_bnd = jmin; }
+<         else if(dom->ibody().off(i,j-3,k)) { jmin=-3; jmin_bnd = jmin; }
+< 
+<         if (dom->ibody().off(i,j+1,k)) { jmax=1; jmax_bnd = jmax; }
+<         else if(dom->ibody().off(i,j+2,k)) { jmax=2; jmax_bnd = jmax; }
+<         else if(dom->ibody().off(i,j+3,k)) { jmax=3; jmax_bnd = jmax; }
+---
+>         if (jminc) jmin=max(-3,sj()-j);  // limit stencil size for cut-stencil
+>         if (jmaxc) jmax=min( 3,ej()-j);
+>         if (dom->ibody().off(i,j-1,k)) { jmin=-1; }
+>         else if(dom->ibody().off(i,j-2,k)) { jmin=-2; }
+>         if (dom->ibody().off(i,j+1,k)) { jmax=1; }
+>         else if(dom->ibody().off(i,j+2,k)) { jmax=2; }
+309,325c255,263
+<           real deltay = phi.dyc(j+jj);
+<           /* increment by one for update at walls usage */
+<           if(jj==jmin_bnd) deltay = phi.dyc(j+jmin_bnd+1);
+<           if(jj==jmax_bnd) deltay = phi.dyc(j+jmax_bnd-1);
+<           /* Warning: does not work properly if immerse body
+<            * does not span the whole plane */
+<           /* At the same time, update_at_walls fails then as well */
+< 
+<           hmm += stmp[i-1][j+jj][k-1]*deltay;
+<           hcm += stmp[i  ][j+jj][k-1]*deltay;
+<           hpm += stmp[i+1][j+jj][k-1]*deltay;
+<           hmc += stmp[i-1][j+jj][k  ]*deltay;
+<           hcc += stmp[i  ][j+jj][k  ]*deltay;
+<           hpc += stmp[i+1][j+jj][k  ]*deltay;
+<           hmp += stmp[i-1][j+jj][k+1]*deltay;
+<           hcp += stmp[i  ][j+jj][k+1]*deltay;
+<           hpp += stmp[i+1][j+jj][k+1]*deltay;
+---
+>           hmm += stmp[i-1][j+jj][k-1]*phi.dyc(j+jj);
+>           hcm += stmp[i  ][j+jj][k-1]*phi.dyc(j+jj);
+>           hpm += stmp[i+1][j+jj][k-1]*phi.dyc(j+jj);
+>           hmc += stmp[i-1][j+jj][k  ]*phi.dyc(j+jj);
+>           hcc += stmp[i  ][j+jj][k  ]*phi.dyc(j+jj);
+>           hpc += stmp[i+1][j+jj][k  ]*phi.dyc(j+jj);
+>           hmp += stmp[i-1][j+jj][k+1]*phi.dyc(j+jj);
+>           hcp += stmp[i  ][j+jj][k+1]*phi.dyc(j+jj);
+>           hpp += stmp[i+1][j+jj][k+1]*phi.dyc(j+jj);
+336,339c274,277
+<           real hx  = ifull*(hpc-hmc)/(dxw(i)+dxe(i));
+<           real hz  = kfull*(hcp-hcm)/(dzb(k)+dzt(k));
+<           real hxx = ifull*(hpc-2.0*hcc+hmc)/(phi.dxc(i)*phi.dxc(i));
+<           real hzz = kfull*(hcp-2.0*hcc+hcm)/(phi.dzc(k)*phi.dzc(k));
+---
+>           real hx  = (hpc-hmc)/(dxw(i)+dxe(i));
+>           real hz  = (hcp-hcm)/(dzb(k)+dzt(k));
+>           real hxx = (hpc-2.0*hcc+hmc)/(phi.dxc(i)*phi.dxc(i));
+>           real hzz = (hcp-2.0*hcc+hcm)/(phi.dzc(k)*phi.dzc(k));
+341c279
+<           real hx  = ifull*(g*(hpp-hmp)+(hpc-hmc)+g*(hpm-hmm))
+---
+>           real hx  = (g*(hpp-hmp)+(hpc-hmc)+g*(hpm-hmm))
+343c281
+<           real hz  = kfull*(g*(hpp-hpm)+(hcp-hcm)+g*(hmp-hmm))
+---
+>           real hz  = (g*(hpp-hpm)+(hcp-hcm)+g*(hmp-hmm))
+345c283
+<           real hxx = ifull*(g*(hpp-2.0*hcp+hmp)+(hpc-2.0*hcc+hmc)+g*(hpm-2.0*hcm+hmm))
+---
+>           real hxx = (g*(hpp-2.0*hcp+hmp)+(hpc-2.0*hcc+hmc)+g*(hpm-2.0*hcm+hmm))
+347c285
+<           real hzz = kfull*(g*(hpp-2.0*hpc+hpm)+(hcp-2.0*hcc+hcm)+g*(hmp-2.0*hmc+hmm))
+---
+>           real hzz = (g*(hpp-2.0*hpc+hpm)+(hcp-2.0*hcc+hcm)+g*(hmp-2.0*hmc+hmm))
+350c288
+<           real hxz = ifull*kfull*(hpp-hpm-hmp+hmm) / (4.0*phi.dxc(i)*phi.dzc(k));
+---
+>           real hxz = (hpp-hpm-hmp+hmm) / (4.0*phi.dxc(i)*phi.dzc(k));
+365,370d302
+<         if(!kfull) {
+<           boil::oout<<"Curv_HF: Pseudo direction selected at "<<i<<" "<<j<<" "
+<                     <<k<<" with dirMax="<<dirMax<<" ; exiting."<<boil::endl;
+<           exit(0);
+<         }
+< 
+373a306,307
+>         if (kminc) kmin=max(-3,sk()-k);  // limit stencil size for cut-stencil
+>         if (kmaxc) kmax=min( 3,ek()-k);
+375,389c309,312
+<         int kmin_bnd = kmin - 1; /* uses update at walls */
+<         int kmax_bnd = kmax + 1;
+< 
+<         if (kminc&&!kminw) kmin=max(-3,sk()-k);  // limit stencil size for cut-stencil
+<         if (kmaxc&&!kmaxw) kmax=min( 3,ek()-k);
+<         if(kminw) { kmin = max(-3,sk()-k-1); kmin_bnd = kmin; }
+<         if(kmaxw) { kmax = min(+3,ek()-k+1); kmax_bnd = kmax; }
+< 
+<         if (dom->ibody().off(i,j,k-1)) { kmin=-1; kmin_bnd = kmin; }
+<         else if(dom->ibody().off(i,j,k-2)) { kmin=-2; kmin_bnd = kmin; }
+<         else if(dom->ibody().off(i,j,k-3)) { kmin=-3; kmin_bnd = kmin; }
+< 
+<         if (dom->ibody().off(i,j,k+1)) { kmax=1; kmax_bnd = kmax; }
+<         else if(dom->ibody().off(i,j,k+2)) { kmax=2; kmax_bnd = kmax; }
+<         else if(dom->ibody().off(i,j,k+3)) { kmax=3; kmax_bnd = kmax; }
+---
+>         if (dom->ibody().off(i,j,k-1)) { kmin=-1; }
+>         else if(dom->ibody().off(i,j,k-2)) { kmin=-2; }
+>         if (dom->ibody().off(i,j,k+1)) { kmax=1; }
+>         else if(dom->ibody().off(i,j,k+2)) { kmax=2; }
+437,453c360,368
+<           real deltaz = phi.dzc(k+kk);
+<           /* increment by one for update at walls usage */
+<           if(kk==kmin_bnd) deltaz = phi.dzc(k+kmin_bnd+1);
+<           if(kk==kmax_bnd) deltaz = phi.dzc(k+kmax_bnd-1);
+<           /* Warning: does not work properly if immerse body
+<            * does not span the whole plane */
+<           /* At the same time, update_at_walls fails then as well */
+< 
+<           hmm += stmp[i-1][j-1][k+kk]*deltaz;
+<           hcm += stmp[i  ][j-1][k+kk]*deltaz;
+<           hpm += stmp[i+1][j-1][k+kk]*deltaz;
+<           hmc += stmp[i-1][j  ][k+kk]*deltaz;
+<           hcc += stmp[i  ][j  ][k+kk]*deltaz;
+<           hpc += stmp[i+1][j  ][k+kk]*deltaz;
+<           hmp += stmp[i-1][j+1][k+kk]*deltaz; 
+<           hcp += stmp[i  ][j+1][k+kk]*deltaz;
+<           hpp += stmp[i+1][j+1][k+kk]*deltaz;
+---
+>           hmm += stmp[i-1][j-1][k+kk]*phi.dzc(k+kk);
+>           hcm += stmp[i  ][j-1][k+kk]*phi.dzc(k+kk);
+>           hpm += stmp[i+1][j-1][k+kk]*phi.dzc(k+kk);
+>           hmc += stmp[i-1][j  ][k+kk]*phi.dzc(k+kk);
+>           hcc += stmp[i  ][j  ][k+kk]*phi.dzc(k+kk);
+>           hpc += stmp[i+1][j  ][k+kk]*phi.dzc(k+kk);
+>           hmp += stmp[i-1][j+1][k+kk]*phi.dzc(k+kk); 
+>           hcp += stmp[i  ][j+1][k+kk]*phi.dzc(k+kk);
+>           hpp += stmp[i+1][j+1][k+kk]*phi.dzc(k+kk);
+457c372
+<         if (hc_limit<=hc && hc<=(hc_limit+1.0)) {
+---
+>         if (hc_limit<hc && hc<(hc_limit+1.0)) {
+464,467c379,382
+<           real hx  = ifull*(hpc-hmc)/(dxw(i)+dxe(i));
+<           real hy  = jfull*(hcp-hcm)/(dys(j)+dyn(j));
+<           real hxx = ifull*(hpc-2.0*hcc+hmc)/(phi.dxc(i)*phi.dxc(i));
+<           real hyy = jfull*(hcp-2.0*hcc+hcm)/(phi.dyc(j)*phi.dyc(j));
+---
+>           real hx  = (hpc-hmc)/(dxw(i)+dxe(i));
+>           real hy  = (hcp-hcm)/(dys(j)+dyn(j));
+>           real hxx = (hpc-2.0*hcc+hmc)/(phi.dxc(i)*phi.dxc(i));
+>           real hyy = (hcp-2.0*hcc+hcm)/(phi.dyc(j)*phi.dyc(j));
+469c384
+<           real hx  = ifull*(g*(hpp-hmp)+(hpc-hmc)+g*(hpm-hmm))
+---
+>           real hx  = (g*(hpp-hmp)+(hpc-hmc)+g*(hpm-hmm))
+471c386
+<           real hy  = jfull*(g*(hpp-hpm)+(hcp-hcm)+g*(hmp-hmm))
+---
+>           real hy  = (g*(hpp-hpm)+(hcp-hcm)+g*(hmp-hmm))
+473c388
+<           real hxx = ifull*(g*(hpp-2.0*hcp+hmp)+(hpc-2.0*hcc+hmc)+g*(hpm-2.0*hcm+hmm))
+---
+>           real hxx = (g*(hpp-2.0*hcp+hmp)+(hpc-2.0*hcc+hmc)+g*(hpm-2.0*hcm+hmm))
+475c390
+<           real hyy = jfull*(g*(hpp-2.0*hpc+hpm)+(hcp-2.0*hcc+hcm)+g*(hmp-2.0*hmc+hmm))
+---
+>           real hyy = (g*(hpp-2.0*hpc+hpm)+(hcp-2.0*hcc+hcm)+g*(hmp-2.0*hmc+hmm))
+478c393
+<           real hxy = ifull*jfull*(hpp-hpm-hmp+hmm) / (4.0*phi.dxc(i)*phi.dyc(j));
+---
+>           real hxy = (hpp-hpm-hmp+hmm) / (4.0*phi.dxc(i)*phi.dyc(j));
+vof_curv_smooth.cpp
+vof_extend_norm.cpp
+vof_extract_alpha.cpp
+4c4
+< void VOF::extract_alpha(Scalar & scp) {
+---
+> void VOF::extract_alpha() {
+14,15c14,15
+<   for_avijk(scp,i,j,k) {
+<     if(scp[i][j][k]==0.5) scp[i][j][k] += boil::pico;
+---
+>   for_avijk(phi,i,j,k) {
+>     if(phi[i][j][k]==0.5) phi[i][j][k] += boil::pico;
+20,22c20,21
+<   for_vijk(nalpha,i,j,k) {
+<     nalpha[i][j][k] = alpha_val(scp[i][j][k],
+<                                 nx[i][j][k],ny[i][j][k],nz[i][j][k]);
+---
+>   for_avijk(nalpha,i,j,k) {
+>     nalpha[i][j][k] = alpha_val(i,j,k);
+24,142d22
+< 
+<   return;
+< }
+< 
+< /******************************************************************************/
+< void VOF::extract_alpha_near_bnd(const Scalar & scp) {
+< /***************************************************************************//**
+< *  \brief alpha for cells adjacent to a wall or an immersed boundary
+< *******************************************************************************/
+< 
+<   for( int b=0; b<scp.bc().count(); b++ ) {
+< 
+<     if(scp.bc().type_decomp(b)) continue;
+< 
+<     if( scp.bc().type(b) == BndType::wall() ) {
+< 
+<       /*-------+
+<       |  Wall  |
+<       +-------*/
+< 
+<       int iof=0, jof=0, kof=0;
+< 
+<       Dir d      = scp.bc().direction(b);
+< 
+<       if(d != Dir::undefined()) {
+< 
+<         if(d == Dir::imin()){
+<           for_vijk( scp.bc().at(b), i,j,k ){
+<             int ii=i+1;
+<             nalpha[ii][j][k] = alpha_val(scp[ii][j][k],
+<                                 nx[ii][j][k],ny[ii][j][k],nz[ii][j][k]);
+<           }
+<         }
+<         if(d == Dir::imax()){
+<           for_vijk( scp.bc().at(b), i,j,k ){
+<             int ii=i-1;
+<             nalpha[ii][j][k] = alpha_val(scp[ii][j][k],
+<                                 nx[ii][j][k],ny[ii][j][k],nz[ii][j][k]);
+<           }
+<         }
+<         if(d == Dir::jmin()){
+<           for_vijk( scp.bc().at(b), i,j,k ){
+<             int jj=j+1;
+<             nalpha[i][jj][k] = alpha_val(scp[i][jj][k],
+<                                 nx[i][jj][k],ny[i][jj][k],nz[i][jj][k]);
+<           }
+<         }
+<         if(d == Dir::jmax()){
+<           for_vijk( scp.bc().at(b), i,j,k ){
+<             int jj=j-1;
+<             nalpha[i][jj][k] = alpha_val(scp[i][jj][k],
+<                                 nx[i][jj][k],ny[i][jj][k],nz[i][jj][k]);
+<           }
+<         }
+<         if(d == Dir::kmin()){
+<           for_vijk( scp.bc().at(b), i,j,k ){
+<             int kk=k+1;
+<             nalpha[i][j][kk] = alpha_val(scp[i][j][kk],
+<                                 nx[i][j][kk],ny[i][j][kk],nz[i][j][kk]);
+<           }
+<         }
+<         if(d == Dir::kmax()){
+<           for_vijk( scp.bc().at(b), i,j,k ){
+<             int kk=k-1;
+<             nalpha[i][j][kk] = alpha_val(scp[i][j][kk],
+<                                 nx[i][j][kk],ny[i][j][kk],nz[i][j][kk]);
+<           }
+<         }
+<       }
+<     }
+< 
+<   } /* bcs */
+< 
+<   /***************+
+<   | immersed body |
+<   +***************/
+<   for(int cc=0; cc<dom->ibody().nccells(); cc++){
+<     int i,j,k;
+<     // cell[i][j][k] is wall adjacent cells in fluid domain
+<     dom->ibody().ijk(cc,&i,&j,&k);
+< 
+<     // west is in solid domain
+<     if (dom->ibody().off(i-1,j,k)) {
+<       nalpha[i][j][k] = alpha_val(scp[i][j][k],
+<                                   nx[i][j][k],ny[i][j][k],nz[i][j][k]);
+<     }
+< 
+<     // east
+<     if (dom->ibody().off(i+1,j,k)) {
+<       nalpha[i][j][k] = alpha_val(scp[i][j][k],
+<                                   nx[i][j][k],ny[i][j][k],nz[i][j][k]);
+<     }
+< 
+<     // south
+<     if (dom->ibody().off(i,j-1,k)) {
+<       nalpha[i][j][k] = alpha_val(scp[i][j][k],
+<                                   nx[i][j][k],ny[i][j][k],nz[i][j][k]);
+<     }
+< 
+<     // north
+<     if (dom->ibody().off(i,j+1,k)) {
+<       nalpha[i][j][k] = alpha_val(scp[i][j][k],
+<                                   nx[i][j][k],ny[i][j][k],nz[i][j][k]);
+<     }
+< 
+<     // bottom
+<     if (dom->ibody().off(i,j,k-1)) {
+<       nalpha[i][j][k] = alpha_val(scp[i][j][k],
+<                                   nx[i][j][k],ny[i][j][k],nz[i][j][k]);
+<     }
+< 
+<     // top
+<     if (dom->ibody().off(i,j,k+1)) {
+<       nalpha[i][j][k] = alpha_val(scp[i][j][k],
+<                                   nx[i][j][k],ny[i][j][k],nz[i][j][k]);
+<     }
+<   }
+< 
+<   return;
+148c28
+< real VOF::alpha_val(const real c, const real nnx, const real nny, const real nnz) {
+---
+> real VOF::alpha_val(const int i, const int j, const int k) {
+150a31
+>   real c = phi[i][j][k];
+157,159c38,40
+<   real vn1 = -nnx;
+<   real vn2 = -nny;
+<   real vn3 = -nnz;
+---
+>   real vn1 = -nx[i][j][k];
+>   real vn2 = -ny[i][j][k];
+>   real vn3 = -nz[i][j][k];
+177d57
+< 
+vof_front_minmax.cpp
+2a3,4
+> real frontPosition(real xyz1, real xyz2, real phi1, real phi2);
+> 
+15c17
+< *  \brief Detect maximum and minimum of free surface position.
+---
+> *  \brief Detect maximu and minimum of free surface position.
+52,54c54,56
+<        }  /* k */
+<      }  /* j */
+<    } /* i */
+---
+>        }
+>      }
+>    }
+80,83c82,85
+<          } 
+<        } /* k */
+<      } /* j */
+<    } /* i */
+---
+>          }
+>        }
+>      } 
+>    }
+110,112c112,114
+<        } /* k */
+<      } /* j */
+<    } /* i */
+---
+>        }
+>      }
+>    }
+vof_fs3.cpp
+4c4
+< void VOF::cal_fs3(const Scalar & scp) {
+---
+> void VOF::cal_fs3() {
+32,35d31
+< 
+<     /* immersed body */
+<     if(dom->ibody().off(i-1,j,k)||dom->ibody().off(i,j,k))
+<       continue;
+38,39c34,35
+<     real clrw = scp[i-1][j][k];
+<     real clre = scp[i  ][j][k];
+---
+>     real clrw = phi[i-1][j][k];
+>     real clre = phi[i  ][j][k];
+46c42
+<       fs[m][i][j][k] = scp.xn(i);
+---
+>       fs[m][i][j][k] = phi.xn(i);
+63c59
+<       fs[m][i][j][k] = scp.xn(i-1) + scp.dxc(i-1) * fsxw;
+---
+>       fs[m][i][j][k] = phi.xn(i-1) + phi.dxc(i-1) * fsxw;
+67c63
+<       fs[m][i][j][k] = scp.xn(i) + scp.dxc(i) * fsxe;
+---
+>       fs[m][i][j][k] = phi.xn(i) + phi.dxc(i) * fsxe;
+75c71
+<         fs[m][i][j][k] = scp.xn(i);
+---
+>         fs[m][i][j][k] = phi.xn(i);
+78,79c74,75
+<                          scp.xn(i-1) + scp.dxc(i-1) * fsxw
+<                        : scp.xn(i  ) + scp.dxc(i  ) * fsxe;
+---
+>                          phi.xn(i-1) + phi.dxc(i-1) * fsxw
+>                        : phi.xn(i  ) + phi.dxc(i  ) * fsxe;
+84c80
+<     fs[m][i][j][k] = scp.xn(i);
+---
+>     fs[m][i][j][k] = phi.xn(i);
+96,99d91
+< 
+<     /* immersed body */
+<     if(dom->ibody().off(i,j-1,k)||dom->ibody().off(i,j,k))
+<       continue;
+102,103c94,95
+<     real clrs = scp[i][j-1][k];
+<     real clrn = scp[i][j  ][k];
+---
+>     real clrs = phi[i][j-1][k];
+>     real clrn = phi[i][j  ][k];
+110c102
+<       fs[m][i][j][k] = scp.yn(j);
+---
+>       fs[m][i][j][k] = phi.yn(j);
+127c119
+<       fs[m][i][j][k] = scp.yn(j-1) + scp.dyc(j-1) * fsys;
+---
+>       fs[m][i][j][k] = phi.yn(j-1) + phi.dyc(j-1) * fsys;
+131c123
+<       fs[m][i][j][k] = scp.yn(j) + scp.dyc(j) * fsyn;
+---
+>       fs[m][i][j][k] = phi.yn(j) + phi.dyc(j) * fsyn;
+139c131
+<         fs[m][i][j][k] = scp.yn(j);
+---
+>         fs[m][i][j][k] = phi.yn(j);
+142,143c134,135
+<                          scp.yn(j-1) + scp.dyc(j-1) * fsys
+<                        : scp.yn(j  ) + scp.dyc(j  ) * fsyn;
+---
+>                          phi.yn(j-1) + phi.dyc(j-1) * fsys
+>                        : phi.yn(j  ) + phi.dyc(j  ) * fsyn;
+147c139
+<     fs[m][i][j][k] = scp.yn(j);
+---
+>     fs[m][i][j][k] = phi.yn(j);
+159,162d150
+< 
+<     /* immersed body */
+<     if(dom->ibody().off(i,j,k-1)||dom->ibody().off(i,j,k))
+<       continue;
+165,166c153,154
+<     real clrb = scp[i][j][k-1];
+<     real clrt = scp[i][j][k  ];
+---
+>     real clrb = phi[i][j][k-1];
+>     real clrt = phi[i][j][k  ];
+173c161
+<       fs[m][i][j][k] = scp.zn(k);
+---
+>       fs[m][i][j][k] = phi.zn(k);
+192c180
+<       fs[m][i][j][k] = scp.zn(k-1) + scp.dzc(k-1) * fszb;
+---
+>       fs[m][i][j][k] = phi.zn(k-1) + phi.dzc(k-1) * fszb;
+196c184
+<       fs[m][i][j][k] = scp.zn(k) + scp.dzc(k) * fszt;
+---
+>       fs[m][i][j][k] = phi.zn(k) + phi.dzc(k) * fszt;
+204c192
+<         fs[m][i][j][k] = scp.zn(k);
+---
+>         fs[m][i][j][k] = phi.zn(k);
+207,208c195,196
+<                          scp.zn(k-1) + scp.dzc(k-1) * fszb
+<                        : scp.zn(k  ) + scp.dzc(k  ) * fszt;
+---
+>                          phi.zn(k-1) + phi.dzc(k-1) * fszb
+>                        : phi.zn(k  ) + phi.dzc(k  ) * fszt;
+212c200
+<     fs[m][i][j][k] = scp.zn(k);
+---
+>     fs[m][i][j][k] = phi.zn(k);
+216,219c204
+<   if(use_subgrid)
+<     fs_bnd(scp);
+<   else
+<     fs_bnd_nosubgrid(scp);
+---
+>   fs_bnd();
+222c207
+<   //boil::plot->plot(fs,scp, "fs-clr", 0);
+---
+>   //boil::plot->plot(fs,phi, "fs-clr", 0);
+vof_fs_bnd.cpp
+4c4
+< void VOF::fs_bnd(const Scalar & scp) {
+---
+> void VOF::fs_bnd() {
+19c19
+<   for( int b=0; b<scp.bc().count(); b++ ) {
+---
+>   for( int b=0; b<phi.bc().count(); b++ ) {
+21c21
+<     if( scp.bc().type_decomp(b) ) continue;
+---
+>     if( phi.bc().type_decomp(b) ) continue;
+24c24
+<     if( scp.bc().type(b) == BndType::wall() ) {
+---
+>     if( phi.bc().type(b) == BndType::wall() ) {
+26c26
+<       Dir d = scp.bc().direction(b);
+---
+>       Dir d = phi.bc().direction(b);
+88,97c88
+<         for_vijk( scp.bc().at(b), i,j,k ) { 
+<           /* at first, the fs value is reset */
+<           if(mcomp==Comp::i()) {
+<             fs[mcomp][i+of][j][k] = boil::unreal;
+<           } else if(mcomp==Comp::j()) {
+<             fs[mcomp][i][j+of][k] = boil::unreal;
+<           } else {
+<             fs[mcomp][i][j][k+of] = boil::unreal;
+<           }
+< 
+---
+>         for_vijk( phi.bc().at(b), i,j,k ) { 
+106,107c97,98
+<           real scpscp = scp[ii][jj][kk];
+<           bool errint = (scpscp<tol_wall||scpscp-1.0>-tol_wall);
+---
+>           real phiphi = phi[ii][jj][kk];
+>           bool errint = (phiphi<tol_wall||phiphi-1.0>-tol_wall);
+112c103
+<               fs[mcomp][i+of][j][k] = scp.xn(ii) + scp.dxc(ii) * fsval;
+---
+>               fs[mcomp][i+of][j][k] = phi.xn(ii) + phi.dxc(ii) * fsval;
+114c105
+<               fs[mcomp][i][j+of][k] = scp.yn(jj) + scp.dyc(jj) * fsval;   
+---
+>               fs[mcomp][i][j+of][k] = phi.yn(jj) + phi.dyc(jj) * fsval;   
+116c107
+<               fs[mcomp][i][j][k+of] = scp.zn(kk) + scp.dzc(kk) * fsval;
+---
+>               fs[mcomp][i][j][k+of] = phi.zn(kk) + phi.dzc(kk) * fsval;
+134,160c125,127
+<     real scpscp = scp[i][j][k];
+<     bool errint = (scpscp<tol_wall||scpscp-1.0>-tol_wall);
+<     if(errint) {
+<       if(dom->ibody().off(i-1,j,k)) {
+<         mcomp = Comp::i();
+<         fs[mcomp][i  ][j][k] = boil::unreal;
+<       }
+<       if(dom->ibody().off(i+1,j,k)) {
+<         mcomp = Comp::i();
+<         fs[mcomp][i+1][j][k] = boil::unreal;
+<       }
+<       if(dom->ibody().off(i,j-1,k)) {
+<         mcomp = Comp::j();
+<         fs[mcomp][i][j  ][k] = boil::unreal;
+<       }
+<       if(dom->ibody().off(i,j+1,k)) {
+<         mcomp = Comp::j();
+<         fs[mcomp][i][j+1][k] = boil::unreal;
+<       }
+<       if(dom->ibody().off(i,j,k-1)) {
+<         mcomp = Comp::k();
+<         fs[mcomp][i][j][k  ] = boil::unreal;
+<       }
+<       if(dom->ibody().off(i,j,k+1)) {
+<         mcomp = Comp::k();
+<         fs[mcomp][i][j][k+1] = boil::unreal;
+<       }
+---
+>     real phiphi = phi[i][j][k];
+>     bool errint = (phiphi<tol_wall||phiphi-1.0>-tol_wall);
+>     if(errint)
+162d128
+<     }
+170,172c136
+<         fs[mcomp][i  ][j][k] = scp.xn(i) + scp.dxc(i) * fsval;
+<       else
+<         fs[mcomp][i  ][j][k] = boil::unreal;
+---
+>         fs[mcomp][i  ][j][k] = phi.xn(i) + phi.dxc(i) * fsval;
+181,183c145
+<         fs[mcomp][i+1][j][k] = scp.xn(i) + scp.dxc(i) * fsval;
+<       else
+<         fs[mcomp][i+1][j][k] = boil::unreal;
+---
+>         fs[mcomp][i+1][j][k] = phi.xn(i) + phi.dxc(i) * fsval;
+192,194c154
+<         fs[mcomp][i][j  ][k] = scp.yn(j) + scp.dyc(j) * fsval;
+<       else
+<         fs[mcomp][i][j  ][k] = boil::unreal;
+---
+>         fs[mcomp][i][j  ][k] = phi.yn(j) + phi.dyc(j) * fsval;
+203,205c163
+<         fs[mcomp][i][j+1][k] = scp.yn(j) + scp.dyc(j) * fsval;
+<       else
+<         fs[mcomp][i][j+1][k] = boil::unreal;
+---
+>         fs[mcomp][i][j+1][k] = phi.yn(j) + phi.dyc(j) * fsval;
+214,218c172
+<         fs[mcomp][i][j][k  ] = scp.zn(k) + scp.dzc(k) * fsval;
+<       else
+<         fs[mcomp][i][j][k  ] = boil::unreal;
+<       
+<       //boil::oout<<"VOF-fs_bnd "<<i<<" "<<j<<" "<<k<<" | "<<scp.zn(k)<<" "<<fsval<<" "<<scp.dzc(k)<<" "<<fs[mcomp][i][j][k  ]<<boil::endl;
+---
+>         fs[mcomp][i][j][k  ] = phi.zn(k) + phi.dzc(k) * fsval;
+227,229c181
+<         fs[mcomp][i][j][k+1] = scp.zn(k) + scp.dzc(k) * fsval;
+<       else
+<         fs[mcomp][i][j][k+1] = boil::unreal;
+---
+>         fs[mcomp][i][j][k+1] = phi.zn(k) + phi.dzc(k) * fsval;
+233d184
+<   return;
+vof_fs_bnd_nosubgrid.cpp
+vof_fs_interp.cpp
+4c4
+< void VOF::cal_fs_interp(const Scalar & scp) {
+---
+> void VOF::cal_fs_interp() {
+25,28d24
+<     /* immersed body */
+<     if(dom->ibody().off(i-1,j,k)&&dom->ibody().off(i,j,k))
+<       continue;
+< 
+30,31c26,27
+<     real clrw = scp[i-1][j][k];
+<     real clre = scp[i  ][j][k];
+---
+>     real clrw = phi[i-1][j][k];
+>     real clre = phi[i  ][j][k];
+38c34
+<       fs[m][i][j][k] = scp.xn(i);
+---
+>       fs[m][i][j][k] = phi.xn(i);
+43c39
+<       fs[m][i][j][k] = scp.xn(i);
+---
+>       fs[m][i][j][k] = phi.xn(i);
+47c43
+<     fs[m][i][j][k] =  scp.xc(i-1) + (phisurf-clrw)/(clre-clrw)*scp.dxe(i-1);
+---
+>     fs[m][i][j][k] =  phi.xc(i-1) + (phisurf-clrw)/(clre-clrw)*phi.dxe(i-1);
+57,60d52
+<     /* immersed body */
+<     if(dom->ibody().off(i,j-1,k)&&dom->ibody().off(i,j,k))
+<       continue;
+< 
+62,63c54,55
+<     real clrs = scp[i][j-1][k];
+<     real clrn = scp[i][j  ][k];
+---
+>     real clrs = phi[i][j-1][k];
+>     real clrn = phi[i][j  ][k];
+70c62
+<       fs[m][i][j][k] = scp.yn(j);
+---
+>       fs[m][i][j][k] = phi.yn(j);
+75c67
+<       fs[m][i][j][k] = scp.yn(j);
+---
+>       fs[m][i][j][k] = phi.yn(j);
+79c71
+<     fs[m][i][j][k] =  scp.yc(j-1) + (phisurf-clrs)/(clrn-clrs)*scp.dyn(j-1);
+---
+>     fs[m][i][j][k] =  phi.yc(j-1) + (phisurf-clrs)/(clrn-clrs)*phi.dyn(j-1);
+89,92d80
+<     /* immersed body */
+<     if(dom->ibody().off(i,j,k-1)&&dom->ibody().off(i,j,k))
+<       continue;
+< 
+94,95c82,83
+<     real clrb = scp[i][j][k-1];
+<     real clrt = scp[i][j][k  ];
+---
+>     real clrb = phi[i][j][k-1];
+>     real clrt = phi[i][j][k  ];
+102c90
+<       fs[m][i][j][k] = scp.zn(k);
+---
+>       fs[m][i][j][k] = phi.zn(k);
+107c95
+<       fs[m][i][j][k] = scp.zn(k);
+---
+>       fs[m][i][j][k] = phi.zn(k);
+111c99
+<     fs[m][i][j][k] =  scp.zc(k-1) + (phisurf-clrb)/(clrt-clrb)*scp.dzt(k-1);
+---
+>     fs[m][i][j][k] =  phi.zc(k-1) + (phisurf-clrb)/(clrt-clrb)*phi.dzt(k-1);
+118c106
+<   //boil::plot->plot(fs,scp, "fs-clr", 0);
+---
+>   //boil::plot->plot(fs,phi, "fs-clr", 0);
+vof_gradphic.cpp
+vof_gradphi.cpp
+vof_ib_norm.cpp
+vof_insert_bc.cpp
+13,15d12
+<   boil::oout<<"Obsolete! Use bnd_update instead. Exiting."<<boil::endl;
+<   exit(0);
+< 
+83d79
+<       ||val.bc().type(b) == BndType::pseudo()
+vof_insert_bc_flag.cpp
+23d22
+<       ||val.bc().type(b) == BndType::pseudo()
+vof_insert_bc_gradphic.cpp
+vof_insert_bc_gradphi.cpp
+vof_insert_bc_norm_cc.cpp
+6c6,7
+< *  \brief normal vector for cells adjacent to a wall or an immersed boundary
+---
+> *  \brief normal vector for the adjacent cells next wall, symmetric and
+> *         immersed boundary
+14a16,17
+>       //std::cout<<"insert_bc_norm_cc: "<<boil::cart.iam()<<"\n";
+> 
+24a28,29
+>         real mxX, myX, mzX, mxY, myY, mzY, mxZ, myZ, mzZ;
+> 
+64c69,250
+<   } /* bcs */
+---
+> #if 0
+>     // Symmetry can be calculated in normal way in norm_cc
+>     if( val.bc().type(b) == BndType::symmetry() ) {
+> 
+>       /*-----------+
+>       |  Symmetry  |
+>       +-----------*/
+> 
+>       int iof=0, jof=0, kof=0;
+> 
+>       Dir d      = val.bc().direction(b);
+> 
+>       if(d != Dir::undefined()) {
+> 
+>         real mxX, myX, mzX, mxY, myY, mzY, mxZ, myZ, mzZ;
+> 
+>         if(d == Dir::imin()){
+>           for_vijk( val.bc().at(b), i,j,k ){
+>             int ii=i+1; // val[ii-1]=val[ii]
+>             mxX = copysign(1.0,+(val[ii+1][j][k]-val[ii][j][k]));
+>             myX = 0.5 * ( (val[ii+1][j+1][k]+val[ii][j+1][k]+val[ii][j+1][k])
+>                         - (val[ii+1][j-1][k]+val[ii][j-1][k]+val[ii][j-1][k]));
+>             mzX = 0.5 * ( (val[ii+1][j][k+1]+val[ii][j][k+1]+val[ii][j][k+1])
+>                         - (val[ii+1][j][k-1]+val[ii][j][k-1]+val[ii][j][k-1]));
+>             normalize(mxX,myX,mzX);
+> 
+>             mxY = 1.0 * ( (val[ii+1][j-1][k]+val[ii+1][j][k]+val[ii+1][j+1][k])
+>                         - (val[ii  ][j-1][k]+val[ii  ][j][k]+val[ii  ][j+1][k]));
+>             myY = copysign(1.0,+(val[ii][j+1][k]-val[ii][j-1][k]));
+>             mzY = 0.5 * ( (val[ii][j-1][k+1]+val[ii][j][k+1]+val[ii][j+1][k+1])
+>                         - (val[ii][j-1][k-1]+val[ii][j][k-1]+val[ii][j+1][k-1]));
+>             normalize(mxY,myY,mzY);
+> 
+>             mxZ = 1.0 * ( (val[ii+1][j][k-1]+val[ii+1][j][k]+val[ii+1][j][k+1])
+>                         - (val[ii  ][j][k-1]+val[ii  ][j][k]+val[ii  ][j][k+1]));
+>             myZ = 0.5 * ( (val[ii][j+1][k-1]+val[ii][j+1][k]+val[ii][j+1][k+1])
+>                         - (val[ii][j-1][k-1]+val[ii][j-1][k]+val[ii][j-1][k+1]));
+>             mzZ = copysign(1.0,+(val[ii][j][k+1]-val[ii][j][k-1]));
+>             normalize(mxZ,myZ,mzZ);
+> 
+>             selectMax(mxX,myX,mzX,mxY,myY,mzY,mxZ,myZ,mzZ,ii,j,k);
+>           }
+>         }
+>         if(d == Dir::imax()){
+>           for_vijk( val.bc().at(b), i,j,k ){
+>             int ii=i-1;  // val[ii+1]=val[ii]
+>             mxX = copysign(1.0,+(val[ii][j][k]-val[ii-1][j][k]));
+>             myX = 0.5 * ( (val[ii][j+1][k]+val[ii][j+1][k]+val[ii-1][j+1][k])
+>                         - (val[ii][j-1][k]+val[ii][j-1][k]+val[ii-1][j-1][k]));
+>             mzX = 0.5 * ( (val[ii][j][k+1]+val[ii][j][k+1]+val[ii-1][j][k+1])
+>                         - (val[ii][j][k-1]+val[ii][j][k-1]+val[ii-1][j][k-1]));
+>             normalize(mxX,myX,mzX);
+>         
+>             mxY = 0.5 * ( (val[ii][j-1][k]+val[ii][j][k]+val[ii][j+1][k])
+>                         - (val[ii-1][j-1][k]+val[ii-1][j][k]+val[ii-1][j+1][k]));
+>             myY = copysign(1.0,+(val[ii][j+1][k]-val[ii][j-1][k]));
+>             mzY = 0.5 * ( (val[ii][j-1][k+1]+val[ii][j][k+1]+val[ii][j+1][k+1])
+>                         - (val[ii][j-1][k-1]+val[ii][j][k-1]+val[ii][j+1][k-1]));
+>             normalize(mxY,myY,mzY);
+> 
+>             mxZ = 0.5 * ( (val[ii][j][k-1]+val[ii][j][k]+val[ii][j][k+1])
+>                         - (val[ii-1][j][k-1]+val[ii-1][j][k]+val[ii-1][j][k+1]));
+>             myZ = 0.5 * ( (val[ii][j+1][k-1]+val[ii][j+1][k]+val[ii][j+1][k+1])
+>                         - (val[ii][j-1][k-1]+val[ii][j-1][k]+val[ii][j-1][k+1]));
+>             mzZ = copysign(1.0,+(val[ii][j][k+1]-val[ii][j][k-1]));
+>             normalize(mxZ,myZ,mzZ);
+> 
+>             selectMax(mxX,myX,mzX,mxY,myY,mzY,mxZ,myZ,mzZ,ii,j,k);
+>           }
+>         }
+>         if(d == Dir::jmin()){
+>           for_vijk( val.bc().at(b), i,j,k ){
+>             int jj=j+1;  // val[jj-1]=val[jj]
+>             mxX = copysign(1.0,+(val[i+1][jj][k]-val[i-1][jj][k]));
+>             myX = 0.5 * ( (val[i+1][jj+1][k]+val[i][jj+1][k]+val[i-1][jj+1][k])
+>                         - (val[i+1][jj  ][k]+val[i][jj  ][k]+val[i-1][jj  ][k]));
+>             mzX = 0.5 * ( (val[i+1][jj][k+1]+val[i][jj][k+1]+val[i-1][jj][k+1])
+>                         - (val[i+1][jj][k-1]+val[i][jj][k-1]+val[i-1][jj][k-1]));
+>             normalize(mxX,myX,mzX);
+> 
+>             mxY = 0.5 * ( (val[i+1][jj  ][k]+val[i+1][jj][k]+val[i+1][jj+1][k])
+>                         - (val[i-1][jj  ][k]+val[i-1][jj][k]+val[i-1][jj+1][k]));
+>             myY = copysign(1.0,+(val[i][jj+1][k]-val[i][jj  ][k]));
+>             mzY = 0.5 * ( (val[i][jj  ][k+1]+val[i][jj][k+1]+val[i][jj+1][k+1])
+>                         - (val[i][jj  ][k-1]+val[i][jj][k-1]+val[i][jj+1][k-1]));
+>             normalize(mxY,myY,mzY);
+> 
+>             mxZ = 0.5 * ( (val[i+1][jj][k-1]+val[i+1][jj][k]+val[i+1][jj][k+1])
+>                         - (val[i-1][jj][k-1]+val[i-1][jj][k]+val[i-1][jj][k+1]));
+>             myZ = 0.5 * ( (val[i][jj+1][k-1]+val[i][jj+1][k]+val[i][jj+1][k+1])
+>                         - (val[i][jj  ][k-1]+val[i][jj  ][k]+val[i][jj  ][k+1]));
+>             mzZ = copysign(1.0,+(val[i][jj][k+1]-val[i][jj][k-1]));
+>             normalize(mxZ,myZ,mzZ);
+> 
+>             selectMax(mxX,myX,mzX,mxY,myY,mzY,mxZ,myZ,mzZ,i,jj,k);
+>           }
+>         }
+>         if(d == Dir::jmax()){
+>           for_vijk( val.bc().at(b), i,j,k ){
+>             int jj=j-1; // val[jj+1] = val[jj]
+>             mxX = copysign(1.0,+(val[i+1][jj][k]-val[i-1][jj][k]));
+>             myX = 0.5 * ( (val[i+1][jj  ][k]+val[i][jj  ][k]+val[i-1][jj  ][k])
+>                         - (val[i+1][jj-1][k]+val[i][jj-1][k]+val[i-1][jj-1][k]));
+>             mzX = 0.5 * ( (val[i+1][jj][k+1]+val[i][jj][k+1]+val[i-1][jj][k+1])
+>                         - (val[i+1][jj][k-1]+val[i][jj][k-1]+val[i-1][jj][k-1]));
+>             normalize(mxX,myX,mzX);
+> 
+>             mxY = 0.5 * ( (val[i+1][jj-1][k]+val[i+1][jj][k]+val[i+1][jj  ][k])
+>                         - (val[i-1][jj-1][k]+val[i-1][jj][k]+val[i-1][jj  ][k]));
+>             myY = copysign(1.0,+(val[i][jj  ][k]-val[i][jj-1][k]));
+>             mzY = 0.5 * ( (val[i][jj-1][k+1]+val[i][jj][k+1]+val[i][jj  ][k+1])
+>                         - (val[i][jj-1][k-1]+val[i][jj][k-1]+val[i][jj  ][k-1]));
+>             normalize(mxY,myY,mzY);
+> 
+>             mxZ = 0.5 * ( (val[i+1][jj][k-1]+val[i+1][jj][k]+val[i+1][jj][k+1])
+>                         - (val[i-1][jj][k-1]+val[i-1][jj][k]+val[i-1][jj][k+1]));
+>             myZ = 0.5 * ( (val[i][jj  ][k-1]+val[i][jj  ][k]+val[i][jj  ][k+1])
+>                         - (val[i][jj-1][k-1]+val[i][jj-1][k]+val[i][jj-1][k+1]));
+>             mzZ = copysign(1.0,+(val[i][jj][k+1]-val[i][jj][k-1]));
+>             normalize(mxZ,myZ,mzZ);
+> 
+>             selectMax(mxX,myX,mzX,mxY,myY,mzY,mxZ,myZ,mzZ,i,jj,k);
+>           }
+>         }
+>         if(d == Dir::kmin()){
+>           for_vijk( val.bc().at(b), i,j,k ){
+>             int kk=k+1; //val[kk-1] = val[kk]
+>             mxX = copysign(1.0,+(val[i+1][j][kk]-val[i-1][j][kk]));
+>             myX = 0.5 * ( (val[i+1][j+1][kk]+val[i][j+1][kk]+val[i-1][j+1][kk])
+>                         - (val[i+1][j-1][kk]+val[i][j-1][kk]+val[i-1][j-1][kk]));
+>             mzX = 0.5 * ( (val[i+1][j][kk+1]+val[i][j][kk+1]+val[i-1][j][kk+1])
+>                         - (val[i+1][j][kk  ]+val[i][j][kk  ]+val[i-1][j][kk  ]));
+>             normalize(mxX,myX,mzX);
+> 
+>             mxY = 0.5 * ( (val[i+1][j-1][kk]+val[i+1][j][kk]+val[i+1][j+1][kk])
+>                         - (val[i-1][j-1][kk]+val[i-1][j][kk]+val[i-1][j+1][kk]));
+>             myY = copysign(1.0,+(val[i][j+1][kk]-val[i][j-1][kk]));
+>             mzY = 0.5 * ( (val[i][j-1][kk+1]+val[i][j][kk+1]+val[i][j+1][kk+1])
+>                         - (val[i][j-1][kk  ]+val[i][j][kk  ]+val[i][j+1][kk  ]));
+>             normalize(mxY,myY,mzY);
+> 
+>             mxZ = 0.5 * ( (val[i+1][j][kk  ]+val[i+1][j][kk]+val[i+1][j][kk+1])
+>                         - (val[i-1][j][kk  ]+val[i-1][j][kk]+val[i-1][j][kk+1]));
+>             myZ = 0.5 * ( (val[i][j+1][kk  ]+val[i][j+1][kk]+val[i][j+1][kk+1])
+>                         - (val[i][j-1][kk  ]+val[i][j-1][kk]+val[i][j-1][kk+1]));
+>             mzZ = copysign(1.0,+(val[i][j][kk+1]-val[i][j][kk  ]));
+>             normalize(mxZ,myZ,mzZ);
+> 
+>             selectMax(mxX,myX,mzX,mxY,myY,mzY,mxZ,myZ,mzZ,i,j,kk);
+>           }
+>         }
+>         if(d == Dir::kmax()){
+>           for_vijk( val.bc().at(b), i,j,k ){
+>             int kk=k-1; // val[kk+1] = val[kk]
+>             mxX = copysign(1.0,+(val[i+1][j][kk]-val[i-1][j][kk]));
+>             myX = 0.5 * ( (val[i+1][j+1][kk]+val[i][j+1][kk]+val[i-1][j+1][kk])
+>                         - (val[i+1][j-1][kk]+val[i][j-1][kk]+val[i-1][j-1][kk]));
+>             mzX = 0.5 * ( (val[i+1][j][kk  ]+val[i][j][kk  ]+val[i-1][j][kk  ])
+>                         - (val[i+1][j][kk-1]+val[i][j][kk-1]+val[i-1][j][kk-1]));
+>             normalize(mxX,myX,mzX);
+> 
+>             mxY = 0.5 * ( (val[i+1][j-1][kk]+val[i+1][j][kk]+val[i+1][j+1][kk])
+>                         - (val[i-1][j-1][kk]+val[i-1][j][kk]+val[i-1][j+1][kk]));
+>             myY = copysign(1.0,+(val[i][j+1][kk]-val[i][j-1][kk]));
+>             mzY = 0.5 * ( (val[i][j-1][kk  ]+val[i][j][kk  ]+val[i][j+1][kk  ])
+>                         - (val[i][j-1][kk-1]+val[i][j][kk-1]+val[i][j+1][kk-1]));
+>             normalize(mxY,myY,mzY);
+> 
+>             mxZ = 0.5 * ( (val[i+1][j][kk-1]+val[i+1][j][kk]+val[i+1][j][kk  ])
+>                         - (val[i-1][j][kk-1]+val[i-1][j][kk]+val[i-1][j][kk  ]));
+>             myZ = 0.5 * ( (val[i][j+1][kk-1]+val[i][j+1][kk]+val[i][j+1][kk  ])
+>                         - (val[i][j-1][kk-1]+val[i][j-1][kk]+val[i][j-1][kk  ]));
+>             mzZ = copysign(1.0,+(val[i][j][kk  ]-val[i][j][kk-1]));
+>             normalize(mxZ,myZ,mzZ);
+> 
+>             selectMax(mxX,myX,mzX,mxY,myY,mzY,mxZ,myZ,mzZ,i,j,kk);
+>           }
+>         }
+>       }
+>     }
+> #endif
+>   }
+114,116c300,302
+<       real nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ;
+<       nxX = copysign(1.0,+(val[i+1][j][k]-val[i][j][k]));
+<       nyX = 1.0 * ((val[i+1][j+1][k]+val[i][j+1][k])
+---
+>       real mxX, myX, mzX, mxY, myY, mzY, mxZ, myZ, mzZ;
+>       mxX = copysign(1.0,+(val[i+1][j][k]-val[i][j][k]));
+>       myX = 1.0 * ((val[i+1][j+1][k]+val[i][j+1][k])
+118c304
+<       nzX = 0.5 * ((val[i+1][j][k+1]+val[i][j][k+1])
+---
+>       mzX = 0.5 * ((val[i+1][j][k+1]+val[i][j][k+1])
+119a306
+>       normalize(mxX,myX,mzX);
+121c308
+<       nxY = 1.0 * ((val[i+1][j][k]+val[i+1][j+1][k])
+---
+>       mxY = 1.0 * ((val[i+1][j][k]+val[i+1][j+1][k])
+123,124c310,311
+<       nyY = copysign(1.0,+(val[i][j+1][k]-val[i][j][k]));
+<       nzY = 0.5 * ((val[i][j][k+1]+val[i][j+1][k+1])
+---
+>       myY = copysign(1.0,+(val[i][j+1][k]-val[i][j][k]));
+>       mzY = 0.5 * ((val[i][j][k+1]+val[i][j+1][k+1])
+125a313
+>       normalize(mxY,myY,mzY);
+127c315
+<       nxZ = 1.0 * ((val[i+1][j][k-1]+val[i+1][j][k]+val[i+1][j][k+1])
+---
+>       mxZ = 1.0 * ((val[i+1][j][k-1]+val[i+1][j][k]+val[i+1][j][k+1])
+129c317
+<       nyZ = 1.0 * ((val[i][j+1][k-1]+val[i][j+1][k]+val[i][j+1][k+1])
+---
+>       myZ = 1.0 * ((val[i][j+1][k-1]+val[i][j+1][k]+val[i][j+1][k+1])
+131c319,320
+<       nzZ = copysign(1.0,+(val[i][j][k+1]-val[i][j][k-1]));
+---
+>       mzZ = copysign(1.0,+(val[i][j][k+1]-val[i][j][k-1]));
+>       normalize(mxZ,myZ,mzZ);
+133,135c322
+<       Comp mcomp; 
+<   select_norm_cc(nx[i][j][k],ny[i][j][k],nz[i][j][k],
+<                  nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ, mcomp);
+---
+>       selectMax(mxX,myX,mzX,mxY,myY,mzY,mxZ,myZ,mzZ,i,j,k);
+145,147c332,334
+<       real nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ;
+<       nxX = copysign(1.0,+(val[i+1][j][k]-val[i][j][k]));
+<       nyX = 1.0 * ((val[i+1][j  ][k]+val[i][j  ][k])
+---
+>       real mxX, myX, mzX, mxY, myY, mzY, mxZ, myZ, mzZ;
+>       mxX = copysign(1.0,+(val[i+1][j][k]-val[i][j][k]));
+>       myX = 1.0 * ((val[i+1][j  ][k]+val[i][j  ][k])
+149c336
+<       nzX = 0.5 * ((val[i+1][j][k+1]+val[i][j][k+1])
+---
+>       mzX = 0.5 * ((val[i+1][j][k+1]+val[i][j][k+1])
+150a338
+>       normalize(mxX,myX,mzX);
+152c340
+<       nxY = 1.0 * ((val[i+1][j-1][k]+val[i+1][j][k])
+---
+>       mxY = 1.0 * ((val[i+1][j-1][k]+val[i+1][j][k])
+154,155c342,343
+<       nyY = copysign(1.0,+(val[i][j][k]-val[i][j-1][k]));
+<       nzY = 0.5 * ((val[i][j-1][k+1]+val[i][j][k+1])
+---
+>       myY = copysign(1.0,+(val[i][j][k]-val[i][j-1][k]));
+>       mzY = 0.5 * ((val[i][j-1][k+1]+val[i][j][k+1])
+156a345
+>       normalize(mxY,myY,mzY);
+158c347
+<       nxZ = 1.0 * ((val[i+1][j][k-1]+val[i+1][j][k]+val[i+1][j][k+1])
+---
+>       mxZ = 1.0 * ((val[i+1][j][k-1]+val[i+1][j][k]+val[i+1][j][k+1])
+160c349
+<       nyZ = 1.0 * ((val[i][j  ][k-1]+val[i][j  ][k]+val[i][j  ][k+1])
+---
+>       myZ = 1.0 * ((val[i][j  ][k-1]+val[i][j  ][k]+val[i][j  ][k+1])
+162c351,352
+<       nzZ = copysign(1.0,+(val[i][j][k+1]-val[i][j][k-1]));
+---
+>       mzZ = copysign(1.0,+(val[i][j][k+1]-val[i][j][k-1]));
+>       normalize(mxZ,myZ,mzZ);
+164,166c354
+<       Comp mcomp; 
+<   select_norm_cc(nx[i][j][k],ny[i][j][k],nz[i][j][k],
+<                  nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ, mcomp);
+---
+>       selectMax(mxX,myX,mzX,mxY,myY,mzY,mxZ,myZ,mzZ,i,j,k);
+176,178c364,366
+<       real nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ;
+<       nxX = copysign(1.0,+(val[i+1][j][k]-val[i][j][k]));
+<       nyX = 0.5 * ((val[i+1][j+1][k]+val[i][j+1][k])
+---
+>       real mxX, myX, mzX, mxY, myY, mzY, mxZ, myZ, mzZ;
+>       mxX = copysign(1.0,+(val[i+1][j][k]-val[i][j][k]));
+>       myX = 0.5 * ((val[i+1][j+1][k]+val[i][j+1][k])
+180c368
+<       nzX = 1.0 * ((val[i+1][j][k+1]+val[i][j][k+1])
+---
+>       mzX = 1.0 * ((val[i+1][j][k+1]+val[i][j][k+1])
+181a370
+>       normalize(mxX,myX,mzX);
+183c372
+<       nxY = 1.0 * ((val[i+1][j-1][k]+val[i+1][j][k]+val[i+1][j+1][k])
+---
+>       mxY = 1.0 * ((val[i+1][j-1][k]+val[i+1][j][k]+val[i+1][j+1][k])
+185,186c374,375
+<       nyY = copysign(1.0,+(val[i][j+1][k]-val[i][j-1][k]));
+<       nzY = 1.0 * ((val[i][j-1][k+1]+val[i][j][k+1]+val[i][j+1][k+1])
+---
+>       myY = copysign(1.0,+(val[i][j+1][k]-val[i][j-1][k]));
+>       mzY = 1.0 * ((val[i][j-1][k+1]+val[i][j][k+1]+val[i][j+1][k+1])
+187a377
+>       normalize(mxY,myY,mzY);
+189c379
+<       nxZ = 1.0 * ((val[i+1][j][k]+val[i+1][j][k+1])
+---
+>       mxZ = 1.0 * ((val[i+1][j][k]+val[i+1][j][k+1])
+191c381
+<       nyZ = 0.5 * ((val[i][j+1][k]+val[i][j+1][k+1])
+---
+>       myZ = 0.5 * ((val[i][j+1][k]+val[i][j+1][k+1])
+193c383,384
+<       nzZ = copysign(1.0,+(val[i][j][k+1]-val[i][j][k]));
+---
+>       mzZ = copysign(1.0,+(val[i][j][k+1]-val[i][j][k]));
+>       normalize(mxZ,myZ,mzZ);
+195,197c386
+<       Comp mcomp; 
+<   select_norm_cc(nx[i][j][k],ny[i][j][k],nz[i][j][k],
+<                  nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ, mcomp);
+---
+>       selectMax(mxX,myX,mzX,mxY,myY,mzY,mxZ,myZ,mzZ,i,j,k);
+207,209c396,398
+<       real nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ;
+<       nxX = copysign(1.0,+(val[i+1][j][k]-val[i][j][k]));
+<       nyX = 0.5 * ((val[i+1][j+1][k]+val[i][j+1][k])
+---
+>       real mxX, myX, mzX, mxY, myY, mzY, mxZ, myZ, mzZ;
+>       mxX = copysign(1.0,+(val[i+1][j][k]-val[i][j][k]));
+>       myX = 0.5 * ((val[i+1][j+1][k]+val[i][j+1][k])
+211c400
+<       nzX = 1.0 * ((val[i+1][j][k  ]+val[i][j][k  ])
+---
+>       mzX = 1.0 * ((val[i+1][j][k  ]+val[i][j][k  ])
+212a402
+>       normalize(mxX,myX,mzX);
+214c404
+<       nxY = 1.0 * ((val[i+1][j-1][k]+val[i+1][j][k]+val[i+1][j+1][k])
+---
+>       mxY = 1.0 * ((val[i+1][j-1][k]+val[i+1][j][k]+val[i+1][j+1][k])
+216,217c406,407
+<       nyY = copysign(1.0,+(val[i][j+1][k]-val[i][j-1][k]));
+<       nzY = 1.0 * ((val[i][j-1][k  ]+val[i][j][k  ]+val[i][j+1][k  ])
+---
+>       myY = copysign(1.0,+(val[i][j+1][k]-val[i][j-1][k]));
+>       mzY = 1.0 * ((val[i][j-1][k  ]+val[i][j][k  ]+val[i][j+1][k  ])
+218a409
+>       normalize(mxY,myY,mzY);
+220c411
+<       nxZ = 1.0 * ((val[i+1][j][k-1]+val[i+1][j][k])
+---
+>       mxZ = 1.0 * ((val[i+1][j][k-1]+val[i+1][j][k])
+222c413
+<       nyZ = 0.5 * ((val[i][j+1][k-1]+val[i][j+1][k])
+---
+>       myZ = 0.5 * ((val[i][j+1][k-1]+val[i][j+1][k])
+224c415,416
+<       nzZ = copysign(1.0,+(val[i][j][k]-val[i][j][k-1]));
+---
+>       mzZ = copysign(1.0,+(val[i][j][k]-val[i][j][k-1]));
+>       normalize(mxZ,myZ,mzZ);
+226,228c418
+<       Comp mcomp; 
+<   select_norm_cc(nx[i][j][k],ny[i][j][k],nz[i][j][k],
+<                  nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ, mcomp);
+---
+>       selectMax(mxX,myX,mzX,mxY,myY,mzY,mxZ,myZ,mzZ,i,j,k);
+238,240c428,430
+<       real nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ;
+<       nxX = copysign(1.0,+(val[i][j][k]-val[i-1][j][k]));
+<       nyX = 1.0 * ((val[i][j+1][k]+val[i-1][j+1][k])
+---
+>       real mxX, myX, mzX, mxY, myY, mzY, mxZ, myZ, mzZ;
+>       mxX = copysign(1.0,+(val[i][j][k]-val[i-1][j][k]));
+>       myX = 1.0 * ((val[i][j+1][k]+val[i-1][j+1][k])
+242c432
+<       nzX = 0.5 * ((val[i][j][k+1]+val[i-1][j][k+1])
+---
+>       mzX = 0.5 * ((val[i][j][k+1]+val[i-1][j][k+1])
+243a434
+>       normalize(mxX,myX,mzX);
+245c436
+<       nxY = 1.0 * ((val[i  ][j][k]+val[i  ][j+1][k])
+---
+>       mxY = 1.0 * ((val[i  ][j][k]+val[i  ][j+1][k])
+247,248c438,439
+<       nyY = copysign(1.0,+(val[i][j+1][k]-val[i][j][k]));
+<       nzY = 0.5 * ((val[i][j][k+1]+val[i][j+1][k+1])
+---
+>       myY = copysign(1.0,+(val[i][j+1][k]-val[i][j][k]));
+>       mzY = 0.5 * ((val[i][j][k+1]+val[i][j+1][k+1])
+249a441
+>       normalize(mxY,myY,mzY);
+251c443
+<       nxZ = 1.0 * ((val[i  ][j][k-1]+val[i  ][j][k]+val[i  ][j][k+1])
+---
+>       mxZ = 1.0 * ((val[i  ][j][k-1]+val[i  ][j][k]+val[i  ][j][k+1])
+253c445
+<       nyZ = 1.0 * ((val[i][j+1][k-1]+val[i][j+1][k]+val[i][j+1][k+1])
+---
+>       myZ = 1.0 * ((val[i][j+1][k-1]+val[i][j+1][k]+val[i][j+1][k+1])
+255c447,448
+<       nzZ = copysign(1.0,+(val[i][j][k+1]-val[i][j][k-1]));
+---
+>       mzZ = copysign(1.0,+(val[i][j][k+1]-val[i][j][k-1]));
+>       normalize(mxZ,myZ,mzZ);
+257,259c450
+<       Comp mcomp; 
+<   select_norm_cc(nx[i][j][k],ny[i][j][k],nz[i][j][k],
+<                  nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ, mcomp);
+---
+>       selectMax(mxX,myX,mzX,mxY,myY,mzY,mxZ,myZ,mzZ,i,j,k);
+269,271c460,462
+<       real nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ;
+<       nxX = copysign(1.0,+(val[i][j][k]-val[i-1][j][k]));
+<       nyX = 1.0 * ((val[i][j  ][k]+val[i-1][j  ][k])
+---
+>       real mxX, myX, mzX, mxY, myY, mzY, mxZ, myZ, mzZ;
+>       mxX = copysign(1.0,+(val[i][j][k]-val[i-1][j][k]));
+>       myX = 1.0 * ((val[i][j  ][k]+val[i-1][j  ][k])
+273c464
+<       nzX = 0.5 * ((val[i][j][k+1]+val[i-1][j][k+1])
+---
+>       mzX = 0.5 * ((val[i][j][k+1]+val[i-1][j][k+1])
+274a466
+>       normalize(mxX,myX,mzX);
+276c468
+<       nxY = 1.0 * ((val[i  ][j-1][k]+val[i  ][j][k])
+---
+>       mxY = 1.0 * ((val[i  ][j-1][k]+val[i  ][j][k])
+278,279c470,471
+<       nyY = copysign(1.0,+(val[i][j][k]-val[i][j-1][k]));
+<       nzY = 0.5 * ((val[i][j-1][k+1]+val[i][j][k+1])
+---
+>       myY = copysign(1.0,+(val[i][j][k]-val[i][j-1][k]));
+>       mzY = 0.5 * ((val[i][j-1][k+1]+val[i][j][k+1])
+280a473
+>       normalize(mxY,myY,mzY);
+282c475
+<       nxZ = 1.0 * ((val[i  ][j][k-1]+val[i  ][j][k]+val[i  ][j][k+1])
+---
+>       mxZ = 1.0 * ((val[i  ][j][k-1]+val[i  ][j][k]+val[i  ][j][k+1])
+284c477
+<       nyZ = 1.0 * ((val[i][j  ][k-1]+val[i][j  ][k]+val[i][j  ][k+1])
+---
+>       myZ = 1.0 * ((val[i][j  ][k-1]+val[i][j  ][k]+val[i][j  ][k+1])
+286c479,480
+<       nzZ = copysign(1.0,+(val[i][j][k+1]-val[i][j][k-1]));
+---
+>       mzZ = copysign(1.0,+(val[i][j][k+1]-val[i][j][k-1]));
+>       normalize(mxZ,myZ,mzZ);
+288,290c482
+<       Comp mcomp; 
+<   select_norm_cc(nx[i][j][k],ny[i][j][k],nz[i][j][k],
+<                  nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ, mcomp);
+---
+>       selectMax(mxX,myX,mzX,mxY,myY,mzY,mxZ,myZ,mzZ,i,j,k);
+300,302c492,494
+<       real nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ;
+<       nxX = copysign(1.0,+(val[i][j][k]-val[i-1][j][k]));
+<       nyX = 0.5 * ((val[i][j+1][k]+val[i-1][j+1][k])
+---
+>       real mxX, myX, mzX, mxY, myY, mzY, mxZ, myZ, mzZ;
+>       mxX = copysign(1.0,+(val[i][j][k]-val[i-1][j][k]));
+>       myX = 0.5 * ((val[i][j+1][k]+val[i-1][j+1][k])
+304c496
+<       nzX = 1.0 * ((val[i][j][k+1]+val[i-1][j][k+1])
+---
+>       mzX = 1.0 * ((val[i][j][k+1]+val[i-1][j][k+1])
+305a498
+>       normalize(mxX,myX,mzX);
+307c500
+<       nxY = 1.0 * ((val[i  ][j-1][k]+val[i  ][j][k]+val[i  ][j+1][k])
+---
+>       mxY = 1.0 * ((val[i  ][j-1][k]+val[i  ][j][k]+val[i  ][j+1][k])
+309,310c502,503
+<       nyY = copysign(1.0,+(val[i][j+1][k]-val[i][j-1][k]));
+<       nzY = 1.0 * ((val[i][j-1][k+1]+val[i][j][k+1]+val[i][j+1][k+1])
+---
+>       myY = copysign(1.0,+(val[i][j+1][k]-val[i][j-1][k]));
+>       mzY = 1.0 * ((val[i][j-1][k+1]+val[i][j][k+1]+val[i][j+1][k+1])
+311a505
+>       normalize(mxY,myY,mzY);
+313c507
+<       nxZ = 1.0 * ((val[i  ][j][k]+val[i  ][j][k+1])
+---
+>       mxZ = 1.0 * ((val[i  ][j][k]+val[i  ][j][k+1])
+315c509
+<       nyZ = 0.5 * ((val[i][j+1][k]+val[i][j+1][k+1])
+---
+>       myZ = 0.5 * ((val[i][j+1][k]+val[i][j+1][k+1])
+317c511,512
+<       nzZ = copysign(1.0,+(val[i][j][k+1]-val[i][j][k]));
+---
+>       mzZ = copysign(1.0,+(val[i][j][k+1]-val[i][j][k]));
+>       normalize(mxZ,myZ,mzZ);
+319,321c514
+<       Comp mcomp; 
+<   select_norm_cc(nx[i][j][k],ny[i][j][k],nz[i][j][k],
+<                  nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ, mcomp);
+---
+>       selectMax(mxX,myX,mzX,mxY,myY,mzY,mxZ,myZ,mzZ,i,j,k);
+331,333c524,526
+<       real nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ;
+<       nxX = copysign(1.0,+(val[i][j][k]-val[i-1][j][k]));
+<       nyX = 0.5 * ((val[i][j+1][k]+val[i-1][j+1][k])
+---
+>       real mxX, myX, mzX, mxY, myY, mzY, mxZ, myZ, mzZ;
+>       mxX = copysign(1.0,+(val[i][j][k]-val[i-1][j][k]));
+>       myX = 0.5 * ((val[i][j+1][k]+val[i-1][j+1][k])
+335c528
+<       nzX = 1.0 * ((val[i][j][k  ]+val[i-1][j][k  ])
+---
+>       mzX = 1.0 * ((val[i][j][k  ]+val[i-1][j][k  ])
+336a530
+>       normalize(mxX,myX,mzX);
+338c532
+<       nxY = 1.0 * ((val[i  ][j-1][k]+val[i  ][j][k]+val[i  ][j+1][k])
+---
+>       mxY = 1.0 * ((val[i  ][j-1][k]+val[i  ][j][k]+val[i  ][j+1][k])
+340,341c534,535
+<       nyY = copysign(1.0,+(val[i][j+1][k]-val[i][j-1][k]));
+<       nzY = 1.0 * ((val[i][j-1][k  ]+val[i][j][k  ]+val[i][j+1][k  ])
+---
+>       myY = copysign(1.0,+(val[i][j+1][k]-val[i][j-1][k]));
+>       mzY = 1.0 * ((val[i][j-1][k  ]+val[i][j][k  ]+val[i][j+1][k  ])
+342a537
+>       normalize(mxY,myY,mzY);
+344c539
+<       nxZ = 1.0 * ((val[i  ][j][k-1]+val[i  ][j][k])
+---
+>       mxZ = 1.0 * ((val[i  ][j][k-1]+val[i  ][j][k])
+346c541
+<       nyZ = 0.5 * ((val[i][j+1][k-1]+val[i][j+1][k])
+---
+>       myZ = 0.5 * ((val[i][j+1][k-1]+val[i][j+1][k])
+348c543,544
+<       nzZ = copysign(1.0,+(val[i][j][k]-val[i][j][k-1]));
+---
+>       mzZ = copysign(1.0,+(val[i][j][k]-val[i][j][k-1]));
+>       normalize(mxZ,myZ,mzZ);
+350,352c546
+<       Comp mcomp; 
+<   select_norm_cc(nx[i][j][k],ny[i][j][k],nz[i][j][k],
+<                  nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ, mcomp);
+---
+>       selectMax(mxX,myX,mzX,mxY,myY,mzY,mxZ,myZ,mzZ,i,j,k);
+362,364c556,558
+<       real nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ;
+<       nxX = copysign(1.0,+(val[i+1][j][k]-val[i-1][j][k]));
+<       nyX = 1.0 * ((val[i+1][j+1][k]+val[i][j+1][k]+val[i-1][j+1][k])
+---
+>       real mxX, myX, mzX, mxY, myY, mzY, mxZ, myZ, mzZ;
+>       mxX = copysign(1.0,+(val[i+1][j][k]-val[i-1][j][k]));
+>       myX = 1.0 * ((val[i+1][j+1][k]+val[i][j+1][k]+val[i-1][j+1][k])
+366c560
+<       nzX = 1.0 * ((val[i+1][j][k+1]+val[i][j][k+1]+val[i-1][j][k+1])
+---
+>       mzX = 1.0 * ((val[i+1][j][k+1]+val[i][j][k+1]+val[i-1][j][k+1])
+367a562
+>       normalize(mxX,myX,mzX);
+369c564
+<       nxY = 0.5 * ((val[i+1][j][k]+val[i+1][j+1][k])
+---
+>       mxY = 0.5 * ((val[i+1][j][k]+val[i+1][j+1][k])
+371,372c566,567
+<       nyY = copysign(1.0,+(val[i][j+1][k]-val[i][j][k]));
+<       nzY = 1.0 * ((val[i][j][k+1]+val[i][j+1][k+1])
+---
+>       myY = copysign(1.0,+(val[i][j+1][k]-val[i][j][k]));
+>       mzY = 1.0 * ((val[i][j][k+1]+val[i][j+1][k+1])
+373a569
+>       normalize(mxY,myY,mzY);
+375c571
+<       nxZ = 0.5 * ((val[i+1][j][k]+val[i+1][j][k+1])
+---
+>       mxZ = 0.5 * ((val[i+1][j][k]+val[i+1][j][k+1])
+377c573
+<       nyZ = 1.0 * ((val[i][j+1][k]+val[i][j+1][k+1])
+---
+>       myZ = 1.0 * ((val[i][j+1][k]+val[i][j+1][k+1])
+379c575,576
+<       nzZ = copysign(1.0,+(val[i][j][k+1]-val[i][j][k]));
+---
+>       mzZ = copysign(1.0,+(val[i][j][k+1]-val[i][j][k]));
+>       normalize(mxZ,myZ,mzZ);
+381,383c578
+<       Comp mcomp; 
+<   select_norm_cc(nx[i][j][k],ny[i][j][k],nz[i][j][k],
+<                  nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ, mcomp);
+---
+>       selectMax(mxX,myX,mzX,mxY,myY,mzY,mxZ,myZ,mzZ,i,j,k);
+393,395c588,590
+<       real nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ;
+<       nxX = copysign(1.0,+(val[i+1][j][k]-val[i-1][j][k]));
+<       nyX = 1.0 * ((val[i+1][j+1][k]+val[i][j+1][k]+val[i-1][j+1][k])
+---
+>       real mxX, myX, mzX, mxY, myY, mzY, mxZ, myZ, mzZ;
+>       mxX = copysign(1.0,+(val[i+1][j][k]-val[i-1][j][k]));
+>       myX = 1.0 * ((val[i+1][j+1][k]+val[i][j+1][k]+val[i-1][j+1][k])
+397c592
+<       nzX = 1.0 * ((val[i+1][j][k  ]+val[i][j][k  ]+val[i-1][j][k  ])
+---
+>       mzX = 1.0 * ((val[i+1][j][k  ]+val[i][j][k  ]+val[i-1][j][k  ])
+398a594
+>       normalize(mxX,myX,mzX);
+400c596
+<       nxY = 0.5 * ((val[i+1][j][k]+val[i+1][j+1][k])
+---
+>       mxY = 0.5 * ((val[i+1][j][k]+val[i+1][j+1][k])
+402,403c598,599
+<       nyY = copysign(1.0,+(val[i][j+1][k]-val[i][j][k]));
+<       nzY = 1.0 * ((val[i][j][k  ]+val[i][j+1][k  ])
+---
+>       myY = copysign(1.0,+(val[i][j+1][k]-val[i][j][k]));
+>       mzY = 1.0 * ((val[i][j][k  ]+val[i][j+1][k  ])
+404a601
+>       normalize(mxY,myY,mzY);
+406c603
+<       nxZ = 0.5 * ((val[i+1][j][k-1]+val[i+1][j][k])
+---
+>       mxZ = 0.5 * ((val[i+1][j][k-1]+val[i+1][j][k])
+408c605
+<       nyZ = 1.0 * ((val[i][j+1][k-1]+val[i][j+1][k])
+---
+>       myZ = 1.0 * ((val[i][j+1][k-1]+val[i][j+1][k])
+410c607,608
+<       nzZ = copysign(1.0,+(val[i][j][k]-val[i][j][k-1]));
+---
+>       mzZ = copysign(1.0,+(val[i][j][k]-val[i][j][k-1]));
+>       normalize(mxZ,myZ,mzZ);
+412,414c610
+<       Comp mcomp; 
+<   select_norm_cc(nx[i][j][k],ny[i][j][k],nz[i][j][k],
+<                  nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ, mcomp);
+---
+>       selectMax(mxX,myX,mzX,mxY,myY,mzY,mxZ,myZ,mzZ,i,j,k);
+424,426c620,622
+<       real nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ;
+<       nxX = copysign(1.0,+(val[i+1][j][k]-val[i-1][j][k]));
+<       nyX = 1.0 * ((val[i+1][j  ][k]+val[i][j  ][k]+val[i-1][j  ][k])
+---
+>       real mxX, myX, mzX, mxY, myY, mzY, mxZ, myZ, mzZ;
+>       mxX = copysign(1.0,+(val[i+1][j][k]-val[i-1][j][k]));
+>       myX = 1.0 * ((val[i+1][j  ][k]+val[i][j  ][k]+val[i-1][j  ][k])
+428c624
+<       nzX = 1.0 * ((val[i+1][j][k+1]+val[i][j][k+1]+val[i-1][j][k+1])
+---
+>       mzX = 1.0 * ((val[i+1][j][k+1]+val[i][j][k+1]+val[i-1][j][k+1])
+429a626
+>       normalize(mxX,myX,mzX);
+431c628
+<       nxY = 0.5 * ((val[i+1][j-1][k]+val[i+1][j][k])
+---
+>       mxY = 0.5 * ((val[i+1][j-1][k]+val[i+1][j][k])
+433,434c630,631
+<       nyY = copysign(1.0,+(val[i][j][k]-val[i][j-1][k]));
+<       nzY = 1.0 * ((val[i][j-1][k+1]+val[i][j][k+1])
+---
+>       myY = copysign(1.0,+(val[i][j][k]-val[i][j-1][k]));
+>       mzY = 1.0 * ((val[i][j-1][k+1]+val[i][j][k+1])
+435a633
+>       normalize(mxY,myY,mzY);
+437c635
+<       nxZ = 0.5 * ((val[i+1][j][k]+val[i+1][j][k+1])
+---
+>       mxZ = 0.5 * ((val[i+1][j][k]+val[i+1][j][k+1])
+439c637
+<       nyZ = 1.0 * ((val[i][j  ][k]+val[i][j  ][k+1])
+---
+>       myZ = 1.0 * ((val[i][j  ][k]+val[i][j  ][k+1])
+441c639,640
+<       nzZ = copysign(1.0,+(val[i][j][k+1]-val[i][j][k]));
+---
+>       mzZ = copysign(1.0,+(val[i][j][k+1]-val[i][j][k]));
+>       normalize(mxZ,myZ,mzZ);
+443,445c642
+<       Comp mcomp; 
+<   select_norm_cc(nx[i][j][k],ny[i][j][k],nz[i][j][k],
+<                  nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ, mcomp);
+---
+>       selectMax(mxX,myX,mzX,mxY,myY,mzY,mxZ,myZ,mzZ,i,j,k);
+455,457c652,654
+<       real nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ;
+<       nxX = copysign(1.0,+(val[i+1][j][k]-val[i-1][j][k]));
+<       nyX = 1.0 * ((val[i+1][j  ][k]+val[i][j  ][k]+val[i-1][j  ][k])
+---
+>       real mxX, myX, mzX, mxY, myY, mzY, mxZ, myZ, mzZ;
+>       mxX = copysign(1.0,+(val[i+1][j][k]-val[i-1][j][k]));
+>       myX = 1.0 * ((val[i+1][j  ][k]+val[i][j  ][k]+val[i-1][j  ][k])
+459c656
+<       nzX = 1.0 * ((val[i+1][j][k  ]+val[i][j][k  ]+val[i-1][j][k  ])
+---
+>       mzX = 1.0 * ((val[i+1][j][k  ]+val[i][j][k  ]+val[i-1][j][k  ])
+460a658
+>       normalize(mxX,myX,mzX);
+462c660
+<       nxY = 0.5 * ((val[i+1][j-1][k]+val[i+1][j][k])
+---
+>       mxY = 0.5 * ((val[i+1][j-1][k]+val[i+1][j][k])
+464,465c662,663
+<       nyY = copysign(1.0,+(val[i][j][k]-val[i][j-1][k]));
+<       nzY = 1.0 * ((val[i][j-1][k  ]+val[i][j][k  ])
+---
+>       myY = copysign(1.0,+(val[i][j][k]-val[i][j-1][k]));
+>       mzY = 1.0 * ((val[i][j-1][k  ]+val[i][j][k  ])
+466a665
+>       normalize(mxY,myY,mzY);
+468c667
+<       nxZ = 0.5 * ((val[i+1][j][k-1]+val[i+1][j][k])
+---
+>       mxZ = 0.5 * ((val[i+1][j][k-1]+val[i+1][j][k])
+470c669
+<       nyZ = 1.0 * ((val[i][j  ][k-1]+val[i][j  ][k])
+---
+>       myZ = 1.0 * ((val[i][j  ][k-1]+val[i][j  ][k])
+472c671,672
+<       nzZ = copysign(1.0,+(val[i][j][k]-val[i][j][k-1]));
+---
+>       mzZ = copysign(1.0,+(val[i][j][k]-val[i][j][k-1]));
+>       normalize(mxZ,myZ,mzZ);
+474,476c674
+<       Comp mcomp; 
+<   select_norm_cc(nx[i][j][k],ny[i][j][k],nz[i][j][k],
+<                  nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ, mcomp);
+---
+>       selectMax(mxX,myX,mzX,mxY,myY,mzY,mxZ,myZ,mzZ,i,j,k);
+487,489c685,687
+<     real nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ;
+<     nxX = copysign(1.0,+(val[i][j][k]-val[i-1][j][k]));
+<     nyX = 1.0 * ((val[i][j+1][k]+val[i-1][j+1][k])
+---
+>     real mxX, myX, mzX, mxY, myY, mzY, mxZ, myZ, mzZ;
+>     mxX = copysign(1.0,+(val[i][j][k]-val[i-1][j][k]));
+>     myX = 1.0 * ((val[i][j+1][k]+val[i-1][j+1][k])
+491c689
+<     nzX = 1.0 * ((val[i][j][k+1]+val[i-1][j][k+1])
+---
+>     mzX = 1.0 * ((val[i][j][k+1]+val[i-1][j][k+1])
+492a691
+>     normalize(mxX,myX,mzX);
+494c693
+<     nxY = 1.0 * ((val[i  ][j][k]+val[i  ][j+1][k])
+---
+>     mxY = 1.0 * ((val[i  ][j][k]+val[i  ][j+1][k])
+496,497c695,696
+<     nyY = copysign(1.0,+(val[i][j+1][k]-val[i][j][k]));
+<     nzY = 1.0 * ((val[i][j][k+1]+val[i][j+1][k+1])
+---
+>     myY = copysign(1.0,+(val[i][j+1][k]-val[i][j][k]));
+>     mzY = 1.0 * ((val[i][j][k+1]+val[i][j+1][k+1])
+498a698
+>     normalize(mxY,myY,mzY);
+500c700
+<     nxZ = 1.0 * ((val[i  ][j][k]+val[i  ][j][k+1])
+---
+>     mxZ = 1.0 * ((val[i  ][j][k]+val[i  ][j][k+1])
+502c702
+<     nyZ = 1.0 * ((val[i][j+1][k]+val[i][j+1][k+1])
+---
+>     myZ = 1.0 * ((val[i][j+1][k]+val[i][j+1][k+1])
+504c704,705
+<     nzZ = copysign(1.0,+(val[i][j][k+1]-val[i][j][k]));
+---
+>     mzZ = copysign(1.0,+(val[i][j][k+1]-val[i][j][k]));
+>     normalize(mxZ,myZ,mzZ);
+506,508c707
+<     Comp mcomp; 
+<   select_norm_cc(nx[i][j][k],ny[i][j][k],nz[i][j][k],
+<                  nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ, mcomp);
+---
+>     selectMax(mxX,myX,mzX,mxY,myY,mzY,mxZ,myZ,mzZ,i,j,k);
+518,520c717,719
+<       real nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ;
+<       nxX = copysign(1.0,+(val[i][j][k]-val[i-1][j][k]));
+<       nyX = 1.0 * ((val[i][j+1][k]+val[i-1][j+1][k])
+---
+>       real mxX, myX, mzX, mxY, myY, mzY, mxZ, myZ, mzZ;
+>       mxX = copysign(1.0,+(val[i][j][k]-val[i-1][j][k]));
+>       myX = 1.0 * ((val[i][j+1][k]+val[i-1][j+1][k])
+522c721
+<       nzX = 1.0 * ((val[i][j][k  ]+val[i-1][j][k  ])
+---
+>       mzX = 1.0 * ((val[i][j][k  ]+val[i-1][j][k  ])
+523a723
+>       normalize(mxX,myX,mzX);
+525c725
+<       nxY = 1.0 * ((val[i  ][j][k]+val[i  ][j+1][k])
+---
+>       mxY = 1.0 * ((val[i  ][j][k]+val[i  ][j+1][k])
+527,528c727,728
+<       nyY = copysign(1.0,+(val[i][j+1][k]-val[i][j][k]));
+<       nzY = 1.0 * ((val[i][j][k  ]+val[i][j+1][k  ])
+---
+>       myY = copysign(1.0,+(val[i][j+1][k]-val[i][j][k]));
+>       mzY = 1.0 * ((val[i][j][k  ]+val[i][j+1][k  ])
+529a730
+>       normalize(mxY,myY,mzY);
+531c732
+<       nxZ = 1.0 * ((val[i  ][j][k-1]+val[i  ][j][k])
+---
+>       mxZ = 1.0 * ((val[i  ][j][k-1]+val[i  ][j][k])
+533c734
+<       nyZ = 1.0 * ((val[i][j+1][k-1]+val[i][j+1][k])
+---
+>       myZ = 1.0 * ((val[i][j+1][k-1]+val[i][j+1][k])
+535c736,737
+<       nzZ = copysign(1.0,+(val[i][j][k]-val[i][j][k-1]));
+---
+>       mzZ = copysign(1.0,+(val[i][j][k]-val[i][j][k-1]));
+>       normalize(mxZ,myZ,mzZ);
+537,539c739
+<       Comp mcomp; 
+<   select_norm_cc(nx[i][j][k],ny[i][j][k],nz[i][j][k],
+<                  nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ, mcomp);
+---
+>       selectMax(mxX,myX,mzX,mxY,myY,mzY,mxZ,myZ,mzZ,i,j,k);
+549,551c749,751
+<     real nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ;
+<     nxX = copysign(1.0,+(val[i+1][j][k]-val[i][j][k]));
+<     nyX = 1.0 * ((val[i+1][j+1][k]+val[i][j+1][k])
+---
+>     real mxX, myX, mzX, mxY, myY, mzY, mxZ, myZ, mzZ;
+>     mxX = copysign(1.0,+(val[i+1][j][k]-val[i][j][k]));
+>     myX = 1.0 * ((val[i+1][j+1][k]+val[i][j+1][k])
+553c753
+<     nzX = 1.0 * ((val[i+1][j][k+1]+val[i][j][k+1])
+---
+>     mzX = 1.0 * ((val[i+1][j][k+1]+val[i][j][k+1])
+554a755
+>     normalize(mxX,myX,mzX);
+556c757
+<     nxY = 1.0 * ((val[i+1][j][k]+val[i+1][j+1][k])
+---
+>     mxY = 1.0 * ((val[i+1][j][k]+val[i+1][j+1][k])
+558,559c759,760
+<     nyY = copysign(1.0,+(val[i][j+1][k]-val[i][j][k]));
+<     nzY = 1.0 * ((val[i][j][k+1]+val[i][j+1][k+1])
+---
+>     myY = copysign(1.0,+(val[i][j+1][k]-val[i][j][k]));
+>     mzY = 1.0 * ((val[i][j][k+1]+val[i][j+1][k+1])
+560a762
+>     normalize(mxY,myY,mzY);
+562c764
+<     nxZ = 1.0 * ((val[i+1][j][k]+val[i+1][j][k+1])
+---
+>     mxZ = 1.0 * ((val[i+1][j][k]+val[i+1][j][k+1])
+564c766
+<     nyZ = 1.0 * ((val[i][j+1][k]+val[i][j+1][k+1])
+---
+>     myZ = 1.0 * ((val[i][j+1][k]+val[i][j+1][k+1])
+566c768,769
+<     nzZ = copysign(1.0,+(val[i][j][k+1]-val[i][j][k]));
+---
+>     mzZ = copysign(1.0,+(val[i][j][k+1]-val[i][j][k]));
+>     normalize(mxZ,myZ,mzZ);
+568,570c771
+<     Comp mcomp; 
+<   select_norm_cc(nx[i][j][k],ny[i][j][k],nz[i][j][k],
+<                  nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ, mcomp);
+---
+>     selectMax(mxX,myX,mzX,mxY,myY,mzY,mxZ,myZ,mzZ,i,j,k);
+580,582c781,783
+<     real nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ;
+<     nxX = copysign(1.0,+(val[i+1][j][k]-val[i][j][k]));
+<     nyX = 1.0 * ((val[i+1][j+1][k]+val[i][j+1][k])
+---
+>     real mxX, myX, mzX, mxY, myY, mzY, mxZ, myZ, mzZ;
+>     mxX = copysign(1.0,+(val[i+1][j][k]-val[i][j][k]));
+>     myX = 1.0 * ((val[i+1][j+1][k]+val[i][j+1][k])
+584c785
+<     nzX = 1.0 * ((val[i+1][j][k  ]+val[i][j][k  ])
+---
+>     mzX = 1.0 * ((val[i+1][j][k  ]+val[i][j][k  ])
+585a787
+>     normalize(mxX,myX,mzX);
+587c789
+<     nxY = 1.0 * ((val[i+1][j][k]+val[i+1][j+1][k])
+---
+>     mxY = 1.0 * ((val[i+1][j][k]+val[i+1][j+1][k])
+589,590c791,792
+<     nyY = copysign(1.0,+(val[i][j+1][k]-val[i][j][k]));
+<     nzY = 1.0 * ((val[i][j][k  ]+val[i][j+1][k  ])
+---
+>     myY = copysign(1.0,+(val[i][j+1][k]-val[i][j][k]));
+>     mzY = 1.0 * ((val[i][j][k  ]+val[i][j+1][k  ])
+591a794
+>     normalize(mxY,myY,mzY);
+593c796
+<     nxZ = 1.0 * ((val[i+1][j][k-1]+val[i+1][j][k])
+---
+>     mxZ = 1.0 * ((val[i+1][j][k-1]+val[i+1][j][k])
+595c798
+<     nyZ = 1.0 * ((val[i][j+1][k-1]+val[i][j+1][k])
+---
+>     myZ = 1.0 * ((val[i][j+1][k-1]+val[i][j+1][k])
+597c800,801
+<     nzZ = copysign(1.0,+(val[i][j][k]-val[i][j][k-1]));
+---
+>     mzZ = copysign(1.0,+(val[i][j][k]-val[i][j][k-1]));
+>     normalize(mxZ,myZ,mzZ);
+599,601c803
+<     Comp mcomp; 
+<   select_norm_cc(nx[i][j][k],ny[i][j][k],nz[i][j][k],
+<                  nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ, mcomp);
+---
+>     selectMax(mxX,myX,mzX,mxY,myY,mzY,mxZ,myZ,mzZ,i,j,k);
+611,613c813,815
+<     real nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ;
+<     nxX = copysign(1.0,+(val[i+1][j][k]-val[i][j][k]));
+<     nyX = 1.0 * ((val[i+1][j  ][k]+val[i][j  ][k])
+---
+>     real mxX, myX, mzX, mxY, myY, mzY, mxZ, myZ, mzZ;
+>     mxX = copysign(1.0,+(val[i+1][j][k]-val[i][j][k]));
+>     myX = 1.0 * ((val[i+1][j  ][k]+val[i][j  ][k])
+615c817
+<     nzX = 1.0 * ((val[i+1][j][k+1]+val[i][j][k+1])
+---
+>     mzX = 1.0 * ((val[i+1][j][k+1]+val[i][j][k+1])
+616a819
+>     normalize(mxX,myX,mzX);
+618c821
+<     nxY = 1.0 * ((val[i+1][j-1][k]+val[i+1][j][k])
+---
+>     mxY = 1.0 * ((val[i+1][j-1][k]+val[i+1][j][k])
+620,621c823,824
+<     nyY = copysign(1.0,+(val[i][j][k]-val[i][j-1][k]));
+<     nzY = 1.0 * ((val[i][j-1][k+1]+val[i][j][k+1])
+---
+>     myY = copysign(1.0,+(val[i][j][k]-val[i][j-1][k]));
+>     mzY = 1.0 * ((val[i][j-1][k+1]+val[i][j][k+1])
+622a826
+>     normalize(mxY,myY,mzY);
+624c828
+<     nxZ = 1.0 * ((val[i+1][j][k]+val[i+1][j][k+1])
+---
+>     mxZ = 1.0 * ((val[i+1][j][k]+val[i+1][j][k+1])
+626c830
+<     nyZ = 1.0 * ((val[i][j  ][k]+val[i][j  ][k+1])
+---
+>     myZ = 1.0 * ((val[i][j  ][k]+val[i][j  ][k+1])
+628c832,833
+<     nzZ = copysign(1.0,+(val[i][j][k+1]-val[i][j][k]));
+---
+>     mzZ = copysign(1.0,+(val[i][j][k+1]-val[i][j][k]));
+>     normalize(mxZ,myZ,mzZ);
+630,632c835
+<     Comp mcomp; 
+<   select_norm_cc(nx[i][j][k],ny[i][j][k],nz[i][j][k],
+<                  nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ, mcomp);
+---
+>     selectMax(mxX,myX,mzX,mxY,myY,mzY,mxZ,myZ,mzZ,i,j,k);
+642,644c845,847
+<     real nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ;
+<     nxX = copysign(1.0,+(val[i+1][j][k]-val[i][j][k]));
+<     nyX = 1.0 * ((val[i+1][j  ][k]+val[i][j  ][k])
+---
+>     real mxX, myX, mzX, mxY, myY, mzY, mxZ, myZ, mzZ;
+>     mxX = copysign(1.0,+(val[i+1][j][k]-val[i][j][k]));
+>     myX = 1.0 * ((val[i+1][j  ][k]+val[i][j  ][k])
+646c849
+<     nzX = 1.0 * ((val[i+1][j][k  ]+val[i][j][k  ])
+---
+>     mzX = 1.0 * ((val[i+1][j][k  ]+val[i][j][k  ])
+647a851
+>     normalize(mxX,myX,mzX);
+649c853
+<     nxY = 1.0 * ((val[i+1][j-1][k]+val[i+1][j][k])
+---
+>     mxY = 1.0 * ((val[i+1][j-1][k]+val[i+1][j][k])
+651,652c855,856
+<     nyY = copysign(1.0,+(val[i][j][k]-val[i][j-1][k]));
+<     nzY = 1.0 * ((val[i][j-1][k  ]+val[i][j][k  ])
+---
+>     myY = copysign(1.0,+(val[i][j][k]-val[i][j-1][k]));
+>     mzY = 1.0 * ((val[i][j-1][k  ]+val[i][j][k  ])
+653a858
+>     normalize(mxY,myY,mzY);
+655c860
+<     nxZ = 1.0 * ((val[i+1][j][k-1]+val[i+1][j][k])
+---
+>     mxZ = 1.0 * ((val[i+1][j][k-1]+val[i+1][j][k])
+657c862
+<     nyZ = 1.0 * ((val[i][j  ][k-1]+val[i][j  ][k])
+---
+>     myZ = 1.0 * ((val[i][j  ][k-1]+val[i][j  ][k])
+659c864,865
+<     nzZ = copysign(1.0,+(val[i][j][k]-val[i][j][k-1]));
+---
+>     mzZ = copysign(1.0,+(val[i][j][k]-val[i][j][k-1]));
+>     normalize(mxZ,myZ,mzZ);
+661,663c867
+<     Comp mcomp; 
+<   select_norm_cc(nx[i][j][k],ny[i][j][k],nz[i][j][k],
+<                  nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ, mcomp);
+---
+>     selectMax(mxX,myX,mzX,mxY,myY,mzY,mxZ,myZ,mzZ,i,j,k);
+673,675c877,879
+<     real nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ;
+<     nxX = copysign(1.0,+(val[i][j][k]-val[i-1][j][k]));
+<     nyX = 1.0 * ((val[i][j+1][k]+val[i-1][j+1][k])
+---
+>     real mxX, myX, mzX, mxY, myY, mzY, mxZ, myZ, mzZ;
+>     mxX = copysign(1.0,+(val[i][j][k]-val[i-1][j][k]));
+>     myX = 1.0 * ((val[i][j+1][k]+val[i-1][j+1][k])
+677c881
+<     nzX = 1.0 * ((val[i][j][k+1]+val[i-1][j][k+1])
+---
+>     mzX = 1.0 * ((val[i][j][k+1]+val[i-1][j][k+1])
+678a883
+>     normalize(mxX,myX,mzX);
+680c885
+<     nxY = 1.0 * ((val[i  ][j][k]+val[i  ][j+1][k])
+---
+>     mxY = 1.0 * ((val[i  ][j][k]+val[i  ][j+1][k])
+682,683c887,888
+<     nyY = copysign(1.0,+(val[i][j+1][k]-val[i][j][k]));
+<     nzY = 1.0 * ((val[i][j][k+1]+val[i][j+1][k+1])
+---
+>     myY = copysign(1.0,+(val[i][j+1][k]-val[i][j][k]));
+>     mzY = 1.0 * ((val[i][j][k+1]+val[i][j+1][k+1])
+684a890
+>     normalize(mxY,myY,mzY);
+686c892
+<     nxZ = 1.0 * ((val[i  ][j][k]+val[i  ][j][k+1])
+---
+>     mxZ = 1.0 * ((val[i  ][j][k]+val[i  ][j][k+1])
+688c894
+<     nyZ = 1.0 * ((val[i][j+1][k]+val[i][j+1][k+1])
+---
+>     myZ = 1.0 * ((val[i][j+1][k]+val[i][j+1][k+1])
+690c896,897
+<     nzZ = copysign(1.0,+(val[i][j][k+1]-val[i][j][k]));
+---
+>     mzZ = copysign(1.0,+(val[i][j][k+1]-val[i][j][k]));
+>     normalize(mxZ,myZ,mzZ);
+692,694c899
+<     Comp mcomp; 
+<   select_norm_cc(nx[i][j][k],ny[i][j][k],nz[i][j][k],
+<                  nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ, mcomp);
+---
+>     selectMax(mxX,myX,mzX,mxY,myY,mzY,mxZ,myZ,mzZ,i,j,k);
+704,706c909,911
+<     real nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ;
+<     nxX = copysign(1.0,+(val[i][j][k]-val[i-1][j][k]));
+<     nyX = 1.0 * ((val[i][j+1][k]+val[i-1][j+1][k])
+---
+>     real mxX, myX, mzX, mxY, myY, mzY, mxZ, myZ, mzZ;
+>     mxX = copysign(1.0,+(val[i][j][k]-val[i-1][j][k]));
+>     myX = 1.0 * ((val[i][j+1][k]+val[i-1][j+1][k])
+708c913
+<     nzX = 1.0 * ((val[i][j][k  ]+val[i-1][j][k  ])
+---
+>     mzX = 1.0 * ((val[i][j][k  ]+val[i-1][j][k  ])
+709a915
+>     normalize(mxX,myX,mzX);
+711c917
+<     nxY = 1.0 * ((val[i  ][j][k]+val[i  ][j+1][k])
+---
+>     mxY = 1.0 * ((val[i  ][j][k]+val[i  ][j+1][k])
+713,714c919,920
+<     nyY = copysign(1.0,+(val[i][j+1][k]-val[i][j][k]));
+<     nzY = 1.0 * ((val[i][j][k  ]+val[i][j+1][k  ])
+---
+>     myY = copysign(1.0,+(val[i][j+1][k]-val[i][j][k]));
+>     mzY = 1.0 * ((val[i][j][k  ]+val[i][j+1][k  ])
+715a922
+>     normalize(mxY,myY,mzY);
+717c924
+<     nxZ = 1.0 * ((val[i  ][j][k-1]+val[i  ][j][k])
+---
+>     mxZ = 1.0 * ((val[i  ][j][k-1]+val[i  ][j][k])
+719c926
+<     nyZ = 1.0 * ((val[i][j+1][k-1]+val[i][j+1][k])
+---
+>     myZ = 1.0 * ((val[i][j+1][k-1]+val[i][j+1][k])
+721c928,929
+<     nzZ = copysign(1.0,+(val[i][j][k]-val[i][j][k-1]));
+---
+>     mzZ = copysign(1.0,+(val[i][j][k]-val[i][j][k-1]));
+>     normalize(mxZ,myZ,mzZ);
+723,725c931
+<     Comp mcomp; 
+<   select_norm_cc(nx[i][j][k],ny[i][j][k],nz[i][j][k],
+<                  nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ, mcomp);
+---
+>     selectMax(mxX,myX,mzX,mxY,myY,mzY,mxZ,myZ,mzZ,i,j,k);
+735,737c941,943
+<     real nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ;
+<     nxX = copysign(1.0,+(val[i][j][k]-val[i-1][j][k]));
+<     nyX = 1.0 * ((val[i][j  ][k]+val[i-1][j  ][k])
+---
+>     real mxX, myX, mzX, mxY, myY, mzY, mxZ, myZ, mzZ;
+>     mxX = copysign(1.0,+(val[i][j][k]-val[i-1][j][k]));
+>     myX = 1.0 * ((val[i][j  ][k]+val[i-1][j  ][k])
+739c945
+<     nzX = 1.0 * ((val[i][j][k+1]+val[i-1][j][k+1])
+---
+>     mzX = 1.0 * ((val[i][j][k+1]+val[i-1][j][k+1])
+740a947
+>     normalize(mxX,myX,mzX);
+742c949
+<     nxY = 1.0 * ((val[i  ][j-1][k]+val[i  ][j][k])
+---
+>     mxY = 1.0 * ((val[i  ][j-1][k]+val[i  ][j][k])
+744,745c951,952
+<     nyY = copysign(1.0,+(val[i][j][k]-val[i][j-1][k]));
+<     nzY = 1.0 * ((val[i][j-1][k+1]+val[i][j][k+1])
+---
+>     myY = copysign(1.0,+(val[i][j][k]-val[i][j-1][k]));
+>     mzY = 1.0 * ((val[i][j-1][k+1]+val[i][j][k+1])
+746a954
+>     normalize(mxY,myY,mzY);
+748c956
+<     nxZ = 1.0 * ((val[i  ][j][k]+val[i  ][j][k+1])
+---
+>     mxZ = 1.0 * ((val[i  ][j][k]+val[i  ][j][k+1])
+750c958
+<     nyZ = 1.0 * ((val[i][j  ][k]+val[i][j  ][k+1])
+---
+>     myZ = 1.0 * ((val[i][j  ][k]+val[i][j  ][k+1])
+752c960,961
+<     nzZ = copysign(1.0,+(val[i][j][k+1]-val[i][j][k]));
+---
+>     mzZ = copysign(1.0,+(val[i][j][k+1]-val[i][j][k]));
+>     normalize(mxZ,myZ,mzZ);
+754,756c963
+<     Comp mcomp; 
+<   select_norm_cc(nx[i][j][k],ny[i][j][k],nz[i][j][k],
+<                  nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ, mcomp);
+---
+>     selectMax(mxX,myX,mzX,mxY,myY,mzY,mxZ,myZ,mzZ,i,j,k);
+766,768c973,975
+<     real nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ;
+<     nxX = copysign(1.0,+(val[i][j][k]-val[i-1][j][k]));
+<     nyX = 1.0 * ((val[i][j  ][k]+val[i-1][j  ][k])
+---
+>     real mxX, myX, mzX, mxY, myY, mzY, mxZ, myZ, mzZ;
+>     mxX = copysign(1.0,+(val[i][j][k]-val[i-1][j][k]));
+>     myX = 1.0 * ((val[i][j  ][k]+val[i-1][j  ][k])
+770c977
+<     nzX = 1.0 * ((val[i][j][k  ]+val[i-1][j][k  ])
+---
+>     mzX = 1.0 * ((val[i][j][k  ]+val[i-1][j][k  ])
+771a979
+>     normalize(mxX,myX,mzX);
+773c981
+<     nxY = 1.0 * ((val[i  ][j-1][k]+val[i  ][j][k])
+---
+>     mxY = 1.0 * ((val[i  ][j-1][k]+val[i  ][j][k])
+775,776c983,984
+<     nyY = copysign(1.0,+(val[i][j][k]-val[i][j-1][k]));
+<     nzY = 1.0 * ((val[i][j-1][k  ]+val[i][j][k  ])
+---
+>     myY = copysign(1.0,+(val[i][j][k]-val[i][j-1][k]));
+>     mzY = 1.0 * ((val[i][j-1][k  ]+val[i][j][k  ])
+777a986
+>     normalize(mxY,myY,mzY);
+779c988
+<     nxZ = 1.0 * ((val[i  ][j][k-1]+val[i  ][j][k])
+---
+>     mxZ = 1.0 * ((val[i  ][j][k-1]+val[i  ][j][k])
+781c990
+<     nyZ = 1.0 * ((val[i][j  ][k-1]+val[i][j  ][k])
+---
+>     myZ = 1.0 * ((val[i][j  ][k-1]+val[i][j  ][k])
+783c992,993
+<     nzZ = copysign(1.0,+(val[i][j][k+1]-val[i][j][k-1]));
+---
+>     mzZ = copysign(1.0,+(val[i][j][k+1]-val[i][j][k-1]));
+>     normalize(mxZ,myZ,mzZ);
+785,787c995
+<     Comp mcomp; 
+<   select_norm_cc(nx[i][j][k],ny[i][j][k],nz[i][j][k],
+<                  nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ, mcomp);
+---
+>     selectMax(mxX,myX,mzX,mxY,myY,mzY,mxZ,myZ,mzZ,i,j,k);
+792a1001,1029
+> void VOF::selectMax(const real mxX, const real myX, const real mzX,
+>                const real mxY, const real myY, const real mzY,
+>                const real mxZ, const real myZ, const real mzZ,
+>                const int i,    const int j,    const int k    ) {
+> 
+>   if (fabs(mxX)<fabs(myY)) {
+>     if (fabs(myY)<fabs(mzZ)) {
+>       nx[i][j][k]=mxZ;
+>       ny[i][j][k]=myZ;
+>       nz[i][j][k]=mzZ;
+>     } else {
+>       nx[i][j][k]=mxY;
+>       ny[i][j][k]=myY;
+>       nz[i][j][k]=mzY;
+>     }
+>   } else {
+>     if (fabs(mxX)<fabs(mzZ)) {
+>       nx[i][j][k]=mxZ;
+>       ny[i][j][k]=myZ;
+>       nz[i][j][k]=mzZ;
+>     } else {
+>       nx[i][j][k]=mxX;
+>       ny[i][j][k]=myX;
+>       nz[i][j][k]=mzX;
+>     }
+>   }
+> }
+> 
+> /******************************************************************************/
+795,797c1032,1034
+<   real nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ;
+<   nxX = copysign(1.0,+(val[i+1][j][k]-val[i][j][k]));
+<   nyX = 0.5 * ((val[i+1][j+1][k]+val[i][j+1][k])
+---
+>   real mxX, myX, mzX, mxY, myY, mzY, mxZ, myZ, mzZ;
+>   mxX = copysign(1.0,+(val[i+1][j][k]-val[i][j][k]));
+>   myX = 0.5 * ((val[i+1][j+1][k]+val[i][j+1][k])
+799c1036
+<   nzX = 0.5 * ((val[i+1][j][k+1]+val[i][j][k+1])
+---
+>   mzX = 0.5 * ((val[i+1][j][k+1]+val[i][j][k+1])
+800a1038
+>   normalize(mxX,myX,mzX);
+802c1040
+<   nxY = 1.0 * ((val[i+1][j-1][k]+val[i+1][j][k]+val[i+1][j+1][k])
+---
+>   mxY = 1.0 * ((val[i+1][j-1][k]+val[i+1][j][k]+val[i+1][j+1][k])
+804,805c1042,1043
+<   nyY = copysign(1.0,+(val[i][j+1][k]-val[i][j-1][k]));
+<   nzY = 0.5 * ((val[i][j-1][k+1]+val[i][j][k+1]+val[i][j+1][k+1])
+---
+>   myY = copysign(1.0,+(val[i][j+1][k]-val[i][j-1][k]));
+>   mzY = 0.5 * ((val[i][j-1][k+1]+val[i][j][k+1]+val[i][j+1][k+1])
+806a1045
+>   normalize(mxY,myY,mzY);
+808c1047
+<   nxZ = 1.0 * ((val[i+1][j][k-1]+val[i+1][j][k]+val[i+1][j][k+1])
+---
+>   mxZ = 1.0 * ((val[i+1][j][k-1]+val[i+1][j][k]+val[i+1][j][k+1])
+810c1049
+<   nyZ = 0.5 * ((val[i][j+1][k-1]+val[i][j+1][k]+val[i][j+1][k+1])
+---
+>   myZ = 0.5 * ((val[i][j+1][k-1]+val[i][j+1][k]+val[i][j+1][k+1])
+812c1051,1052
+<   nzZ = copysign(1.0,+(val[i][j][k+1]-val[i][j][k-1]));
+---
+>   mzZ = copysign(1.0,+(val[i][j][k+1]-val[i][j][k-1]));
+>   normalize(mxZ,myZ,mzZ);
+814,816c1054
+<   Comp mcomp; 
+<   select_norm_cc(nx[i][j][k],ny[i][j][k],nz[i][j][k],
+<                  nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ, mcomp);
+---
+>   selectMax(mxX,myX,mzX,mxY,myY,mzY,mxZ,myZ,mzZ,i,j,k);
+822,824c1060,1062
+<   real nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ;
+<   nxX = copysign(1.0,+(val[i][j][k]-val[i-1][j][k]));
+<   nyX = 0.5 * ((val[i][j+1][k]+val[i-1][j+1][k])
+---
+>   real mxX, myX, mzX, mxY, myY, mzY, mxZ, myZ, mzZ;
+>   mxX = copysign(1.0,+(val[i][j][k]-val[i-1][j][k]));
+>   myX = 0.5 * ((val[i][j+1][k]+val[i-1][j+1][k])
+826c1064
+<   nzX = 0.5 * ((val[i][j][k+1]+val[i-1][j][k+1])
+---
+>   mzX = 0.5 * ((val[i][j][k+1]+val[i-1][j][k+1])
+827a1066
+>   normalize(mxX,myX,mzX);
+829c1068
+<   nxY = 1.0 * ((val[i  ][j-1][k]+val[i  ][j][k]+val[i  ][j+1][k])
+---
+>   mxY = 1.0 * ((val[i  ][j-1][k]+val[i  ][j][k]+val[i  ][j+1][k])
+831,832c1070,1071
+<   nyY = copysign(1.0,+(val[i][j+1][k]-val[i][j-1][k]));
+<   nzY = 0.5 * ((val[i][j-1][k+1]+val[i][j][k+1]+val[i][j+1][k+1])
+---
+>   myY = copysign(1.0,+(val[i][j+1][k]-val[i][j-1][k]));
+>   mzY = 0.5 * ((val[i][j-1][k+1]+val[i][j][k+1]+val[i][j+1][k+1])
+833a1073
+>   normalize(mxY,myY,mzY);
+835c1075
+<   nxZ = 1.0 * ((val[i  ][j][k-1]+val[i  ][j][k]+val[i  ][j][k+1])
+---
+>   mxZ = 1.0 * ((val[i  ][j][k-1]+val[i  ][j][k]+val[i  ][j][k+1])
+837c1077
+<   nyZ = 0.5 * ((val[i][j+1][k-1]+val[i][j+1][k]+val[i][j+1][k+1])
+---
+>   myZ = 0.5 * ((val[i][j+1][k-1]+val[i][j+1][k]+val[i][j+1][k+1])
+839c1079,1080
+<   nzZ = copysign(1.0,+(val[i][j][k+1]-val[i][j][k-1]));
+---
+>   mzZ = copysign(1.0,+(val[i][j][k+1]-val[i][j][k-1]));
+>   normalize(mxZ,myZ,mzZ);
+841,843c1082
+<   Comp mcomp; 
+<   select_norm_cc(nx[i][j][k],ny[i][j][k],nz[i][j][k],
+<                  nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ, mcomp);
+---
+>   selectMax(mxX,myX,mzX,mxY,myY,mzY,mxZ,myZ,mzZ,i,j,k);
+849,851c1088,1090
+<   real nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ;
+<   nxX = copysign(1.0,+(val[i+1][j][k]-val[i-1][j][k]));
+<   nyX = 1.0 * ((val[i+1][j+1][k]+val[i][j+1][k]+val[i-1][j+1][k])
+---
+>   real mxX, myX, mzX, mxY, myY, mzY, mxZ, myZ, mzZ;
+>   mxX = copysign(1.0,+(val[i+1][j][k]-val[i-1][j][k]));
+>   myX = 1.0 * ((val[i+1][j+1][k]+val[i][j+1][k]+val[i-1][j+1][k])
+853c1092
+<   nzX = 0.5 * ((val[i+1][j][k+1]+val[i][j][k+1]+val[i-1][j][k+1])
+---
+>   mzX = 0.5 * ((val[i+1][j][k+1]+val[i][j][k+1]+val[i-1][j][k+1])
+854a1094
+>   normalize(mxX,myX,mzX);
+856c1096
+<   nxY = 0.5 * ((val[i+1][j][k]+val[i+1][j+1][k])
+---
+>   mxY = 0.5 * ((val[i+1][j][k]+val[i+1][j+1][k])
+858,859c1098,1099
+<   nyY = copysign(1.0,+(val[i][j+1][k]-val[i][j][k]));
+<   nzY = 0.5 * ((val[i][j][k+1]+val[i][j+1][k+1])
+---
+>   myY = copysign(1.0,+(val[i][j+1][k]-val[i][j][k]));
+>   mzY = 0.5 * ((val[i][j][k+1]+val[i][j+1][k+1])
+860a1101
+>   normalize(mxY,myY,mzY);
+862c1103
+<   nxZ = 0.5 * ((val[i+1][j][k-1]+val[i+1][j][k]+val[i+1][j][k+1])
+---
+>   mxZ = 0.5 * ((val[i+1][j][k-1]+val[i+1][j][k]+val[i+1][j][k+1])
+864c1105
+<   nyZ = 1.0 * ((val[i][j+1][k-1]+val[i][j+1][k]+val[i][j+1][k+1])
+---
+>   myZ = 1.0 * ((val[i][j+1][k-1]+val[i][j+1][k]+val[i][j+1][k+1])
+866c1107,1108
+<   nzZ = copysign(1.0,+(val[i][j][k+1]-val[i][j][k-1]));
+---
+>   mzZ = copysign(1.0,+(val[i][j][k+1]-val[i][j][k-1]));
+>   normalize(mxZ,myZ,mzZ);
+868,870c1110
+<   Comp mcomp; 
+<   select_norm_cc(nx[i][j][k],ny[i][j][k],nz[i][j][k],
+<                  nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ, mcomp);
+---
+>   selectMax(mxX,myX,mzX,mxY,myY,mzY,mxZ,myZ,mzZ,i,j,k);
+876,878c1116,1118
+<   real nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ;
+<   nxX = copysign(1.0,+(val[i+1][j][k]-val[i-1][j][k]));
+<   nyX = 1.0 * ((val[i+1][j  ][k]+val[i][j  ][k]+val[i-1][j  ][k])
+---
+>   real mxX, myX, mzX, mxY, myY, mzY, mxZ, myZ, mzZ;
+>   mxX = copysign(1.0,+(val[i+1][j][k]-val[i-1][j][k]));
+>   myX = 1.0 * ((val[i+1][j  ][k]+val[i][j  ][k]+val[i-1][j  ][k])
+880c1120
+<   nzX = 0.5 * ((val[i+1][j][k+1]+val[i][j][k+1]+val[i-1][j][k+1])
+---
+>   mzX = 0.5 * ((val[i+1][j][k+1]+val[i][j][k+1]+val[i-1][j][k+1])
+881a1122
+>   normalize(mxX,myX,mzX);
+883c1124
+<   nxY = 0.5 * ((val[i+1][j-1][k]+val[i+1][j][k])
+---
+>   mxY = 0.5 * ((val[i+1][j-1][k]+val[i+1][j][k])
+885,886c1126,1127
+<   nyY = copysign(1.0,+(val[i][j][k]-val[i][j-1][k]));
+<   nzY = 0.5 * ((val[i][j-1][k+1]+val[i][j][k+1])
+---
+>   myY = copysign(1.0,+(val[i][j][k]-val[i][j-1][k]));
+>   mzY = 0.5 * ((val[i][j-1][k+1]+val[i][j][k+1])
+887a1129
+>   normalize(mxY,myY,mzY);
+889c1131
+<   nxZ = 0.5 * ((val[i+1][j][k-1]+val[i+1][j][k]+val[i+1][j][k+1])
+---
+>   mxZ = 0.5 * ((val[i+1][j][k-1]+val[i+1][j][k]+val[i+1][j][k+1])
+891c1133
+<   nyZ = 1.0 * ((val[i][j  ][k-1]+val[i][j  ][k]+val[i][j  ][k+1])
+---
+>   myZ = 1.0 * ((val[i][j  ][k-1]+val[i][j  ][k]+val[i][j  ][k+1])
+893c1135,1136
+<   nzZ = copysign(1.0,+(val[i][j][k+1]-val[i][j][k-1]));
+---
+>   mzZ = copysign(1.0,+(val[i][j][k+1]-val[i][j][k-1]));
+>   normalize(mxZ,myZ,mzZ);
+895,897c1138
+<   Comp mcomp; 
+<   select_norm_cc(nx[i][j][k],ny[i][j][k],nz[i][j][k],
+<                  nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ, mcomp);
+---
+>   selectMax(mxX,myX,mzX,mxY,myY,mzY,mxZ,myZ,mzZ,i,j,k);
+903,905c1144,1146
+<   real nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ;
+<   nxX = copysign(1.0,+(val[i+1][j][k]-val[i-1][j][k]));
+<   nyX = 0.5 * ((val[i+1][j+1][k]+val[i][j+1][k]+val[i-1][j+1][k])
+---
+>   real mxX, myX, mzX, mxY, myY, mzY, mxZ, myZ, mzZ;
+>   mxX = copysign(1.0,+(val[i+1][j][k]-val[i-1][j][k]));
+>   myX = 0.5 * ((val[i+1][j+1][k]+val[i][j+1][k]+val[i-1][j+1][k])
+907c1148
+<   nzX = 1.0 * ((val[i+1][j][k+1]+val[i][j][k+1]+val[i-1][j][k+1])
+---
+>   mzX = 1.0 * ((val[i+1][j][k+1]+val[i][j][k+1]+val[i-1][j][k+1])
+908a1150
+>   normalize(mxX,myX,mzX);
+910c1152
+<   nxY = 0.5 * ((val[i+1][j-1][k]+val[i+1][j][k]+val[i+1][j+1][k])
+---
+>   mxY = 0.5 * ((val[i+1][j-1][k]+val[i+1][j][k]+val[i+1][j+1][k])
+912,913c1154,1155
+<   nyY = copysign(1.0,+(val[i][j+1][k]-val[i][j-1][k]));
+<   nzY = 1.0 * ((val[i][j-1][k+1]+val[i][j][k+1]+val[i][j+1][k+1])
+---
+>   myY = copysign(1.0,+(val[i][j+1][k]-val[i][j-1][k]));
+>   mzY = 1.0 * ((val[i][j-1][k+1]+val[i][j][k+1]+val[i][j+1][k+1])
+914a1157
+>   normalize(mxY,myY,mzY);
+916c1159
+<   nxZ = 0.5 * ((val[i+1][j][k]+val[i+1][j][k+1])
+---
+>   mxZ = 0.5 * ((val[i+1][j][k]+val[i+1][j][k+1])
+918c1161
+<   nyZ = 0.5 * ((val[i][j+1][k]+val[i][j+1][k+1])
+---
+>   myZ = 0.5 * ((val[i][j+1][k]+val[i][j+1][k+1])
+920c1163,1164
+<   nzZ = copysign(1.0,+(val[i][j][k+1]-val[i][j][k]));
+---
+>   mzZ = copysign(1.0,+(val[i][j][k+1]-val[i][j][k]));
+>   normalize(mxZ,myZ,mzZ);
+922,924c1166
+<   Comp mcomp; 
+<   select_norm_cc(nx[i][j][k],ny[i][j][k],nz[i][j][k],
+<                  nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ, mcomp);
+---
+>   selectMax(mxX,myX,mzX,mxY,myY,mzY,mxZ,myZ,mzZ,i,j,k);
+931,933c1173,1175
+<   real nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ;
+<   nxX = copysign(1.0,+(val[i+1][j][k]-val[i-1][j][k]));
+<   nyX = 0.5 * ((val[i+1][j+1][k]+val[i][j+1][k]+val[i-1][j+1][k])
+---
+>   real mxX, myX, mzX, mxY, myY, mzY, mxZ, myZ, mzZ;
+>   mxX = copysign(1.0,+(val[i+1][j][k]-val[i-1][j][k]));
+>   myX = 0.5 * ((val[i+1][j+1][k]+val[i][j+1][k]+val[i-1][j+1][k])
+935c1177
+<   nzX = 1.0 * ((val[i+1][j][k  ]+val[i][j][k  ]+val[i-1][j][k  ])
+---
+>   mzX = 1.0 * ((val[i+1][j][k  ]+val[i][j][k  ]+val[i-1][j][k  ])
+936a1179
+>   normalize(mxX,myX,mzX);
+938c1181
+<   nxY = 0.5 * ((val[i+1][j-1][k]+val[i+1][j][k]+val[i+1][j+1][k])
+---
+>   mxY = 0.5 * ((val[i+1][j-1][k]+val[i+1][j][k]+val[i+1][j+1][k])
+940,941c1183,1184
+<   nyY = copysign(1.0,+(val[i][j+1][k]-val[i][j-1][k]));
+<   nzY = 1.0 * ((val[i][j-1][k  ]+val[i][j][k  ]+val[i][j+1][k  ])
+---
+>   myY = copysign(1.0,+(val[i][j+1][k]-val[i][j-1][k]));
+>   mzY = 1.0 * ((val[i][j-1][k  ]+val[i][j][k  ]+val[i][j+1][k  ])
+942a1186
+>   normalize(mxY,myY,mzY);
+944c1188
+<   nxZ = 0.5 * ((val[i+1][j][k-1]+val[i+1][j][k])
+---
+>   mxZ = 0.5 * ((val[i+1][j][k-1]+val[i+1][j][k])
+946c1190
+<   nyZ = 0.5 * ((val[i][j+1][k-1]+val[i][j+1][k])
+---
+>   myZ = 0.5 * ((val[i][j+1][k-1]+val[i][j+1][k])
+948c1192,1193
+<   nzZ = copysign(1.0,+(val[i][j][k]-val[i][j][k-1]));
+---
+>   mzZ = copysign(1.0,+(val[i][j][k]-val[i][j][k-1]));
+>   normalize(mxZ,myZ,mzZ);
+950,952c1195
+<   Comp mcomp; 
+<   select_norm_cc(nx[i][j][k],ny[i][j][k],nz[i][j][k],
+<                  nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ, mcomp);
+---
+>   selectMax(mxX,myX,mzX,mxY,myY,mzY,mxZ,myZ,mzZ,i,j,k);
+vof_insert_bc_norm.cpp
+21d20
+<       ||phi.bc().type(b) == BndType::pseudo()
+vof_normalize.cpp
+16,30d15
+< 
+< /******************************************************************************/
+< void VOF::normalize_l1(real & nx_l1, real & ny_l1, real & nz_l1,
+<                        const real nx, const real ny, const real nz) {
+< /***************************************************************************//**
+< *  \brief normalize (nx, ny, nz) according to l1 norm, with output to first 3
+< *******************************************************************************/
+< 
+<   real nmag = sqrt(nx*nx) + sqrt(ny*ny) + sqrt(nz*nz) + boil::pico;
+<   nx_l1 = nx/nmag;
+<   ny_l1 = ny/nmag;
+<   nz_l1 = nz/nmag;
+< 
+<   return;
+< }
+vof_norm_cc.cpp
+9c9
+< *         Results: nx, ny, nz
+---
+> *         Resluts: nx, ny, nz
+13,19c13,57
+<     real nxx, nyy, nzz;
+<     Comp mcomp;
+<     norm_cc(nxx, nyy, nzz, mcomp, i,j,k, sca);
+< 
+<     nx[i][j][k] = nxx;
+<     ny[i][j][k] = nyy;
+<     nz[i][j][k] = nzz;
+---
+>     real mxX, myX, mzX;
+>     mxX = copysign(1.0,+(sca[i+1][j][k]-sca[i-1][j][k]));
+>     myX = 0.5 * ( (sca[i+1][j+1][k]+sca[i][j+1][k]+sca[i-1][j+1][k])
+>                 - (sca[i+1][j-1][k]+sca[i][j-1][k]+sca[i-1][j-1][k])); 
+>     mzX = 0.5 * ( (sca[i+1][j][k+1]+sca[i][j][k+1]+sca[i-1][j][k+1])
+>                 - (sca[i+1][j][k-1]+sca[i][j][k-1]+sca[i-1][j][k-1])); 
+>     normalize(mxX,myX,mzX);
+> 
+>     real mxY, myY, mzY;
+>     mxY = 0.5 * ( (sca[i+1][j-1][k]+sca[i+1][j][k]+sca[i+1][j+1][k])
+>                 - (sca[i-1][j-1][k]+sca[i-1][j][k]+sca[i-1][j+1][k])); 
+>     myY = copysign(1.0,+(sca[i][j+1][k]-sca[i][j-1][k]));
+>     mzY = 0.5 * ( (sca[i][j-1][k+1]+sca[i][j][k+1]+sca[i][j+1][k+1])
+>                 - (sca[i][j-1][k-1]+sca[i][j][k-1]+sca[i][j+1][k-1]));
+>     normalize(mxY,myY,mzY);
+> 
+>     real mxZ, myZ, mzZ;
+>     mxZ = 0.5 * ( (sca[i+1][j][k-1]+sca[i+1][j][k]+sca[i+1][j][k+1])
+>                 - (sca[i-1][j][k-1]+sca[i-1][j][k]+sca[i-1][j][k+1])); 
+>     myZ = 0.5 * ( (sca[i][j+1][k-1]+sca[i][j+1][k]+sca[i][j+1][k+1])
+>                 - (sca[i][j-1][k-1]+sca[i][j-1][k]+sca[i][j-1][k+1])); 
+>     mzZ = copysign(1.0,+(sca[i][j][k+1]-sca[i][j][k-1]));
+>     normalize(mxZ,myZ,mzZ);
+> 
+>     if (fabs(mxX)<fabs(myY)) {
+>       if (fabs(myY)<fabs(mzZ)) {
+>         nx[i][j][k]=mxZ;
+>         ny[i][j][k]=myZ;
+>         nz[i][j][k]=mzZ;
+>       } else {
+>         nx[i][j][k]=mxY;
+>         ny[i][j][k]=myY;
+>         nz[i][j][k]=mzY;
+>       }
+>     } else {
+>       if (fabs(mxX)<fabs(mzZ)) {
+>         nx[i][j][k]=mxZ;
+>         ny[i][j][k]=myZ;
+>         nz[i][j][k]=mzZ;
+>       } else {
+>         nx[i][j][k]=mxX;
+>         ny[i][j][k]=myX;
+>         nz[i][j][k]=mzX;
+>       }
+>     }
+26,30d63
+< #if 1
+<   nx.bnd_update();
+<   ny.bnd_update();
+<   nz.bnd_update();
+< #endif
+45,77d77
+< 
+<   return;
+< }
+< 
+< void VOF::norm_cc(real & nx_val, real & ny_val, real & nz_val,
+<                   Comp & mcomp,
+<                   const int i, const int j, const int k,
+<                   const Scalar & sca) {
+< 
+<   real nxX, nyX, nzX;
+<   nxX = copysign(1.0,+(sca[i+1][j][k]-sca[i-1][j][k]));
+<   nyX = 0.5 * ( (sca[i+1][j+1][k]+sca[i][j+1][k]+sca[i-1][j+1][k])
+<               - (sca[i+1][j-1][k]+sca[i][j-1][k]+sca[i-1][j-1][k])); 
+<   nzX = 0.5 * ( (sca[i+1][j][k+1]+sca[i][j][k+1]+sca[i-1][j][k+1])
+<               - (sca[i+1][j][k-1]+sca[i][j][k-1]+sca[i-1][j][k-1])); 
+< 
+<   real nxY, nyY, nzY;
+<   nxY = 0.5 * ( (sca[i+1][j-1][k]+sca[i+1][j][k]+sca[i+1][j+1][k])
+<               - (sca[i-1][j-1][k]+sca[i-1][j][k]+sca[i-1][j+1][k])); 
+<   nyY = copysign(1.0,+(sca[i][j+1][k]-sca[i][j-1][k]));
+<   nzY = 0.5 * ( (sca[i][j-1][k+1]+sca[i][j][k+1]+sca[i][j+1][k+1])
+<               - (sca[i][j-1][k-1]+sca[i][j][k-1]+sca[i][j+1][k-1]));
+< 
+<   real nxZ, nyZ, nzZ;
+<   nxZ = 0.5 * ( (sca[i+1][j][k-1]+sca[i+1][j][k]+sca[i+1][j][k+1])
+<               - (sca[i-1][j][k-1]+sca[i-1][j][k]+sca[i-1][j][k+1])); 
+<   nyZ = 0.5 * ( (sca[i][j+1][k-1]+sca[i][j+1][k]+sca[i][j+1][k+1])
+<               - (sca[i][j-1][k-1]+sca[i][j-1][k]+sca[i][j-1][k+1])); 
+<   nzZ = copysign(1.0,+(sca[i][j][k+1]-sca[i][j][k-1]));
+< 
+<   select_norm_cc(nx_val, ny_val, nz_val,
+<                  nxX, nyX, nzX, nxY, nyY, nzY, nxZ, nyZ, nzZ,
+<                  mcomp);
+vof_norm_elvira.cpp
+vof_norm_mixed.cpp
+1a2
+> using namespace std;
+4c5
+< void VOF::norm_mixed(const Scalar & sca) {
+---
+> void VOF::norm_cc(const Scalar & sca) {
+7,8c8
+< *  Mixed method in E.Aulisa,JCP,225(2007),2301-2319
+< *         Results: nx, ny, nz
+---
+> *         Resluts: nx, ny, nz
+11,18c11,182
+<   for_ijk(i,j,k) {
+< 
+<     real nxx, nyy, nzz;
+<     norm_mixed(nxx, nyy, nzz, i,j,k, sca);
+< 
+<     nx[i][j][k] = nxx;
+<     ny[i][j][k] = nyy;
+<     nz[i][j][k] = nzz;
+---
+> for_ijk(i,j,k) {
+>     real mxX, myX, mzX, myXb, myXc, myXf, mzXb, mzXc, mzXf;
+>     mxX = copysign(1.0,+(sca[i+1][j-1][k-1]+sca[i+1][j-1][k]+sca[i+1][j-1][k+1]+
+>                          sca[i+1][j][k-1]  +sca[i+1][j][k]  +sca[i+1][j][k+1]+
+>                          sca[i+1][j+1][k-1]+sca[i+1][j+1][k]+sca[i+1][j+1][k+1]- 
+>                          sca[i-1][j-1][k-1]-sca[i-1][j-1][k]-sca[i-1][j-1][k+1]-
+>                          sca[i-1][j][k-1]  -sca[i-1][j][k]  -sca[i-1][j][k+1]-  
+>                          sca[i-1][j+1][k-1]-sca[i-1][j+1][k]-sca[i-1][j+1][k+1]));
+>     myXb = (sca[i+1][j][k]   +sca[i][j][k]  +sca[i-1][j][k])
+>           -(sca[i+1][j-1][k] +sca[i][j-1][k]+sca[i-1][j-1][k]); 
+>     myXc = 0.5 * ( (sca[i+1][j+1][k]+sca[i][j+1][k]+sca[i-1][j+1][k])
+>                  - (sca[i+1][j-1][k]+sca[i][j-1][k]+sca[i-1][j-1][k]));
+>     myXf = (sca[i+1][j+1][k]+sca[i][j+1][k]+sca[i-1][j+1][k]) 
+>           -(sca[i+1][j][k]  +sca[i][j][k]  +sca[i-1][j][k]);
+>     mzXb = (sca[i+1][j][k]  +sca[i][j][k]  +sca[i-1][j][k])
+>           -(sca[i+1][j][k-1]+sca[i][j][k-1]+sca[i-1][j][k-1]);
+>     mzXc = 0.5 * ( (sca[i+1][j][k+1]+sca[i][j][k+1]+sca[i-1][j][k+1])
+>                  - (sca[i+1][j][k-1]+sca[i][j][k-1]+sca[i-1][j][k-1])); 
+>     mzXf = (sca[i+1][j][k+1]+sca[i][j][k+1]+sca[i-1][j][k+1])
+>           -(sca[i+1][j][k]  +sca[i][j][k]  +sca[i-1][j][k]);
+> 
+>     if (fabs(myXb)<fabs(myXc)) {
+>       if (fabs(myXc)<fabs(myXf)){
+>         myX = myXf;
+>       } else{
+>         myX = myXc;
+>       }
+>     } else{
+>       if(fabs(myXb)<fabs(myXf)) {
+>         myX = myXf;
+>       } else{
+>         myX = myXb;
+>       }
+>     }
+> 
+>     if (fabs(mzXb)<fabs(mzXc)) {
+>       if (fabs(mzXc)<fabs(mzXf)){
+>         mzX = mzXf;
+>       } else{
+>         mzX = mzXc;
+>       }
+>     } else{
+>       if(fabs(mzXb)<fabs(mzXf)) {
+>         mzX = mzXf;
+>       } else{
+>         mzX = mzXb;
+>       }
+>     }
+> 
+>     normalize(mxX,myX,mzX);
+> 
+>     real mxY, myY, mzY, mxYb, mxYc, mxYf, mzYb, mzYc, mzYf;
+>     mxYb = (sca[i][j-1][k]  +sca[i][j][k]  +sca[i][j+1][k])
+>           -(sca[i-1][j-1][k]+sca[i-1][j][k]+sca[i-1][j+1][k]); 
+>     mxYc = 0.5 * ( (sca[i+1][j-1][k]+sca[i+1][j][k]+sca[i+1][j+1][k])
+>                  - (sca[i-1][j-1][k]+sca[i-1][j][k]+sca[i-1][j+1][k])); 
+>     mxYf = (sca[i+1][j-1][k]+sca[i+1][j][k]+sca[i+1][j+1][k])
+>           -(sca[i][j-1][k]  +sca[i][j][k]  +sca[i][j+1][k]);
+>     myY = copysign(1.0,+(sca[i-1][j+1][k-1]+sca[i-1][j+1][k]+sca[i-1][j+1][k+1]+
+>                          sca[i][j+1][k-1]  +sca[i][j+1][k]  +sca[i][j+1][k+1]+
+>                          sca[i+1][j+1][k-1]+sca[i+1][j+1][k]+sca[i+1][j+1][k+1]- 
+>                          sca[i-1][j-1][k-1]-sca[i-1][j-1][k]-sca[i-1][j-1][k+1]-
+>                          sca[i][j-1][k-1]  -sca[i][j-1][k]  -sca[i][j-1][k+1]-
+>                          sca[i+1][j-1][k-1]-sca[i+1][j-1][k]-sca[i+1][j-1][k+1]));
+>     mzYb = (sca[i][j-1][k]  +sca[i][j][k]  +sca[i][j+1][k])
+>           -(sca[i][j-1][k-1]+sca[i][j][k-1]+sca[i][j+1][k-1]);
+>     mzYc = 0.5 * ( (sca[i][j-1][k+1]+sca[i][j][k+1]+sca[i][j+1][k+1])
+>                 - (sca[i][j-1][k-1]+sca[i][j][k-1]+sca[i][j+1][k-1]));
+>     mzYf = (sca[i][j-1][k+1]+sca[i][j][k+1]+sca[i][j+1][k+1])
+>           -(sca[i][j-1][k]  +sca[i][j][k]  +sca[i][j+1][k]);
+> 
+>     if (fabs(mxYb)<fabs(mxYc)) {
+>       if (fabs(mxYc)<fabs(mxYf)){
+>         mxY = mxYf;
+>       } else{
+>         mxY = mxYc;
+>       }
+>     } else{
+>       if(fabs(mxYb)<fabs(mxYf)) {
+>         mxY = mxYf;
+>       } else{
+>         mxY = mxYb;
+>       }
+>     }
+> 
+>     if (fabs(mzYb)<fabs(mzYc)) {
+>       if (fabs(mzYc)<fabs(mzYf)){
+>         mzY = mzYf;
+>       } else{
+>         mzY = mzYc;
+>       }
+>     } else{
+>       if(fabs(mzYb)<fabs(mzYf)) {
+>         mzY = mzYf;
+>       } else{
+>         mzY = mzYb;
+>       }
+>     }
+> 
+>     normalize(mxY,myY,mzY);
+>     real mxZ, myZ, mzZ, mxZb, mxZc, mxZf, myZb, myZc, myZf;
+>     mxZb = (sca[i][j][k-1]  +sca[i][j][k]  +sca[i][j][k+1])
+>           -(sca[i-1][j][k-1]+sca[i-1][j][k]+sca[i-1][j][k+1]);
+>     mxZc = 0.5 * ((sca[i+1][j][k-1]+sca[i+1][j][k]+sca[i+1][j][k+1])
+>                 - (sca[i-1][j][k-1]+sca[i-1][j][k]+sca[i-1][j][k+1])); 
+>     mxZf = (sca[i+1][j][k-1]+sca[i+1][j][k]+sca[i+1][j][k+1])
+>           -(sca[i][j][k-1]  +sca[i][j][k]  +sca[i][j][k+1]);
+>     myZb = (sca[i][j][k-1]  +sca[i][j][k]  +sca[i][j][k+1])
+>           -(sca[i][j-1][k-1]+sca[i][j-1][k]+sca[i][j-1][k+1]);
+>     myZc = 0.5 * ((sca[i][j+1][k-1]+sca[i][j+1][k]+sca[i][j+1][k+1])
+>                 - (sca[i][j-1][k-1]+sca[i][j-1][k]+sca[i][j-1][k+1])); 
+>     myZf = (sca[i][j+1][k-1]+sca[i][j+1][k]+sca[i][j+1][k+1])
+>           -(sca[i][j][k-1]  +sca[i][j][k]  +sca[i][j][k+1]);
+>     mzZ = copysign(1.0,+(sca[i-1][j-1][k+1]+sca[i-1][j][k+1]+sca[i-1][j+1][k+1]+
+>                          sca[i][j-1][k+1]  +sca[i][j][k+1]  +sca[i][j+1][k+1]+
+>                          sca[i+1][j-1][k+1]+sca[i+1][j][k+1]+sca[i+1][j+1][k+1]-
+>                          sca[i-1][j-1][k-1]-sca[i-1][j][k-1]-sca[i-1][j+1][k-1]-
+>                          sca[i][j-1][k-1]  -sca[i][j][k-1]  -sca[i][j+1][k-1]-
+>                          sca[i+1][j-1][k-1]-sca[i+1][j][k-1]-sca[i+1][j+1][k-1]));
+>   
+>     if (fabs(mxZb)<fabs(mxZc)) {
+>       if (fabs(mxZc)<fabs(mxZf)){
+>         mxZ = mxZf;
+>       } else{
+>         mxZ = mxZc;
+>       }
+>     } else{
+>       if(fabs(mxZb)<fabs(mxZf)) {
+>         mxZ = mxZf;
+>       } else{
+>         mxZ = mxZb;
+>       }
+>     }
+> 
+>     if (fabs(myZb)<fabs(myZc)) {
+>       if (fabs(myZc)<fabs(myZf)){
+>         myZ = myZf;
+>       } else{
+>         myZ = myZc;
+>       }
+>     } else{
+>       if(fabs(myZb)<fabs(myZf)) {
+>         myZ = myZf;
+>       } else{
+>         myZ = myZb;
+>       }
+>     }
+> 
+> 
+>     normalize(mxZ,myZ,mzZ);
+> 
+>     if (fabs(mxX)<fabs(myY)) {
+>       if (fabs(myY)<fabs(mzZ)) {
+>         nx[i][j][k]=mxZ;
+>         ny[i][j][k]=myZ;
+>         nz[i][j][k]=mzZ;
+>       } else {
+>         nx[i][j][k]=mxY;
+>         ny[i][j][k]=myY;
+>         nz[i][j][k]=mzY;
+>       }
+>     } else {
+>       if (fabs(mxX)<fabs(mzZ)) {
+>         nx[i][j][k]=mxZ;
+>         ny[i][j][k]=myZ;
+>         nz[i][j][k]=mzZ;
+>       } else {
+>         nx[i][j][k]=mxX;
+>         ny[i][j][k]=myX;
+>         nz[i][j][k]=mzX;
+>       }
+>     }
+20a185,187
+>   /* normal vector at adjacent cells next to wall, symmetric and IB */
+>   //insert_bc_gradphic(sca); 
+>   
+22,62c189,200
+<   nx.bnd_update();
+<   ny.bnd_update();
+<   nz.bnd_update();
+<   /* boundaries treated using cc */
+<   insert_bc_norm_cc(sca);
+< 
+<   nx.exchange_all();
+<   ny.exchange_all();
+<   nz.exchange_all();
+< 
+<   //boil::plot->plot(sca,nx,ny,nz, "clr-nx-ny-nz", time->current_step());
+<   //exit(0);
+< 
+<   return;
+< }
+< 
+< void VOF::norm_mixed(real & nx_val, real & ny_val, real & nz_val,
+<                      const int i, const int j, const int k,
+<                      const Scalar & sca) {
+< 
+<   /* normal vector from the CC method; mcomp indicates candidate selected */
+<   Comp mcomp;
+<   real nxx_cc, nyy_cc, nzz_cc;
+<   norm_cc(nxx_cc, nyy_cc, nzz_cc, mcomp, i,j,k, sca);
+< 
+<   /* normal vector from the Young method */
+<   real nxx_young, nyy_young, nzz_young;
+<   norm_young(nxx_young, nyy_young, nzz_young, i,j,k, sca);
+< 
+<   /* selection according to Aulisa (9) */
+<   real nxx, nyy, nzz;
+<   select_norm_myc(nxx,nyy,nzz, 
+<                   nxx_cc,nyy_cc,nzz_cc,
+<                   nxx_young,nyy_young,nzz_young,
+<                   mcomp);
+< 
+<   nx_val = nxx;
+<   ny_val = nyy;
+<   nz_val = nzz;
+< 
+<   return;
+---
+>     insert_bc_norm_cc(sca);
+>   
+>   //      /* normalize */
+>   // for_avijk(sca,i,j,k) {
+>   //  normalize(nx[i][j][k],ny[i][j][k],nz[i][j][k]);
+>    //}
+>   
+>     nx.exchange_all();
+>     ny.exchange_all();
+>     nz.exchange_all();
+>   
+>     return;
+vof_norm_young.cpp
+11c11
+< *         Results: nx, ny, nz : normal vector in the VOF space
+---
+> *         Resluts: nx, ny, nz
+17,23c17,78
+<   for_ijk(i,j,k) {
+<     real nxx, nyy, nzz;
+<     norm_young(nxx, nyy, nzz, i,j,k, sca);
+< 
+<     nx[i][j][k] = nxx;
+<     ny[i][j][k] = nyy;
+<     nz[i][j][k] = nzz;
+---
+>   for_ijk(i,j,k){
+> 
+>     int jflag, sum_jflag=0;
+>     real nxave=0.0, nyave=0.0, nzave=0.0;
+> 
+>     for (int ii=0; ii<=1; ii++) {
+>     for (int jj=0; jj<=1; jj++) {
+>     for (int kk=0; kk<=1; kk++) {
+>       int iii=i+ii;
+>       int jjj=j+jj;
+>       int kkk=k+kk;
+>       real nxtmp,nytmp,nztmp; // normal at corner
+>       nxtmp = 0.25 * (sca[iii  ][jjj][kkk  ]+sca[iii  ][jjj-1][kkk  ]
+>                     + sca[iii  ][jjj][kkk-1]+sca[iii  ][jjj-1][kkk-1])
+>              -0.25 * (sca[iii-1][jjj][kkk  ]+sca[iii-1][jjj-1][kkk  ]
+>                     + sca[iii-1][jjj][kkk-1]+sca[iii-1][jjj-1][kkk-1]);
+>       nxtmp /= (sca.xc(iii)-sca.xc(iii-1));
+>       nytmp = 0.25 * (sca[iii][jjj  ][kkk  ]+sca[iii-1][jjj  ][kkk  ]
+>                     + sca[iii][jjj  ][kkk-1]+sca[iii-1][jjj  ][kkk-1])
+>              -0.25 * (sca[iii][jjj-1][kkk  ]+sca[iii-1][jjj-1][kkk  ]
+>                     + sca[iii][jjj-1][kkk-1]+sca[iii-1][jjj-1][kkk-1]);
+>       nytmp /= (sca.yc(jjj)-sca.yc(jjj-1));
+>       nztmp = 0.25 * (sca[iii][jjj  ][kkk  ]+sca[iii-1][jjj  ][kkk  ]
+>                     + sca[iii][jjj-1][kkk  ]+sca[iii-1][jjj-1][kkk  ])
+>              -0.25 * (sca[iii][jjj  ][kkk-1]+sca[iii-1][jjj  ][kkk-1]
+>                     + sca[iii][jjj-1][kkk-1]+sca[iii-1][jjj-1][kkk-1]);
+>       nztmp /= (sca.zc(kkk)-sca.zc(kkk-1));
+> 
+>       //normalize(nxtmp,nytmp,nztmp);  // comment out 2019.07.03
+> 
+>       /* check boundary condition */
+>       jflag=1;
+>       if (iii  ==si() && iminp==false) jflag=0;
+>       if (iii-1==ei() && imaxp==false) jflag=0;
+>       if (jjj  ==sj() && jminp==false) jflag=0;
+>       if (jjj-1==ej() && jmaxp==false) jflag=0;
+>       if (kkk  ==sk() && kminp==false) jflag=0;
+>       if (kkk-1==ek() && kmaxp==false) jflag=0;
+> 
+>       sum_jflag += jflag;
+> 
+>       nxave += real(jflag) * nxtmp;
+>       nyave += real(jflag) * nytmp;
+>       nzave += real(jflag) * nztmp;
+> 
+>     }}}
+> 
+>     /* average norm at coner */
+>     nxave /= sum_jflag;
+>     nyave /= sum_jflag;
+>     nzave /= sum_jflag;
+> 
+>     if (sum_jflag==0) {
+>       std::cout<<"sum_jflag=0: "<<i<<" "<<j<<" "<<k<<"\n";
+>     }
+> 
+>     normalize(nxave,nyave,nzave);
+> 
+>     nx[i][j][k]=nxave;
+>     ny[i][j][k]=nyave;
+>     nz[i][j][k]=nzave;
+> 
+25,28c80
+<     
+<   nx.bnd_update();
+<   ny.bnd_update();
+<   nz.bnd_update();
+---
+> 
+35,103d86
+< 
+<   return;
+< }
+< 
+< 
+< void VOF::norm_young(real & nx_val, real & ny_val, real & nz_val,
+<                      const int i, const int j, const int k,
+<                      const Scalar & sca) {
+< 
+<   int jflag, sum_jflag=0;
+<   real nxave=0.0, nyave=0.0, nzave=0.0;
+< 
+<   for (int ii=0; ii<=1; ii++) {
+<   for (int jj=0; jj<=1; jj++) {
+<   for (int kk=0; kk<=1; kk++) {
+<     int iii=i+ii;
+<     int jjj=j+jj;
+<     int kkk=k+kk;
+<     real nxtmp,nytmp,nztmp; // normal at corner
+<     nxtmp = 0.25 * (sca[iii  ][jjj][kkk  ]+sca[iii  ][jjj-1][kkk  ]
+<                   + sca[iii  ][jjj][kkk-1]+sca[iii  ][jjj-1][kkk-1])
+<            -0.25 * (sca[iii-1][jjj][kkk  ]+sca[iii-1][jjj-1][kkk  ]
+<                   + sca[iii-1][jjj][kkk-1]+sca[iii-1][jjj-1][kkk-1]);
+< 
+<     nytmp = 0.25 * (sca[iii][jjj  ][kkk  ]+sca[iii-1][jjj  ][kkk  ]
+<                   + sca[iii][jjj  ][kkk-1]+sca[iii-1][jjj  ][kkk-1])
+<            -0.25 * (sca[iii][jjj-1][kkk  ]+sca[iii-1][jjj-1][kkk  ]
+<                   + sca[iii][jjj-1][kkk-1]+sca[iii-1][jjj-1][kkk-1]);
+< 
+<     nztmp = 0.25 * (sca[iii][jjj  ][kkk  ]+sca[iii-1][jjj  ][kkk  ]
+<                   + sca[iii][jjj-1][kkk  ]+sca[iii-1][jjj-1][kkk  ])
+<            -0.25 * (sca[iii][jjj  ][kkk-1]+sca[iii-1][jjj  ][kkk-1]
+<                   + sca[iii][jjj-1][kkk-1]+sca[iii-1][jjj-1][kkk-1]);
+< 
+<     //normalize(nxtmp,nytmp,nztmp);  // comment out 2019.07.03
+< 
+<     /* check boundary condition */
+<     jflag=1;
+<     if (iii  ==si() && iminp==false) jflag=0;
+<     if (iii-1==ei() && imaxp==false) jflag=0;
+<     if (jjj  ==sj() && jminp==false) jflag=0;
+<     if (jjj-1==ej() && jmaxp==false) jflag=0;
+<     if (kkk  ==sk() && kminp==false) jflag=0;
+<     if (kkk-1==ek() && kmaxp==false) jflag=0;
+< 
+<     sum_jflag += jflag;
+< 
+<     nxave += real(jflag) * nxtmp;
+<     nyave += real(jflag) * nytmp;
+<     nzave += real(jflag) * nztmp;
+< 
+<   }}}
+< 
+<   /* average norm at corner */
+<   nxave /= sum_jflag;
+<   nyave /= sum_jflag;
+<   nzave /= sum_jflag;
+< 
+< #if 0
+<   if (sum_jflag==0) {
+<     boil::aout<<"sum_jflag=0: "<<i<<" "<<j<<" "<<k<<"\n";
+<   }
+< #endif
+< 
+<   normalize(nxave,nyave,nzave);
+< 
+<   nx_val=nxave;
+<   ny_val=nyave;
+<   nz_val=nzave;
+vof_select_norm.cpp
+vof_set_iflag.cpp
+vof_smooth.cpp
+vof_standardized_norm_vect.cpp
+vof_tension.cpp
+21c21,26
+<   curvature();
+---
+>   if(curv_method==0) {
+>     curv_HF();
+>   } else {
+>     curv_smooth();
+>   }
+>   //curvature();
+99a105,106
+> 
+>   //ancillary();
+vof_totalvol.cpp
+vof_true_norm_vect.cpp
+11,34c11,15
+<   for_aijk(i,j,k) {
+<     real mmx = nx[i][j][k];
+<     real mmy = ny[i][j][k];
+<     real mmz = nz[i][j][k];
+< 
+<     real dnx = nx.dxc(i);
+<     real dny = nx.dyc(j);
+<     real dnz = nx.dzc(k);
+<     real nnx, nny, nnz;
+<     if(dnx==0.0||dny==0.0||dnz==0.0) {
+<       nnx = mmx;
+<       nny = mmy;
+<       nnz = mmz;
+<     } else {
+<       nnx = mmx/nx.dxc(i);
+<       nny = mmy/nx.dyc(j);
+<       nnz = mmz/nx.dzc(k);
+<     }
+< 
+<     normalize(nnx,nny,nnz);
+<  
+<     mx[i][j][k] = nnx;
+<     my[i][j][k] = nny;
+<     mz[i][j][k] = nnz;
+---
+>   for_ijk(i,j,k) {
+>     mx[i][j][k] = (phi[i+1][j][k]-phi[i-1][j][k])/(dxw(i)+dxe(i));
+>     my[i][j][k] = (phi[i][j+1][k]-phi[i][j-1][k])/(dys(j)+dyn(j));
+>     mz[i][j][k] = (phi[i][j][k+1]-phi[i][j][k-1])/(dzb(k)+dzt(k));
+>   }
+35a17,19
+>   /* normalize */
+>   for_ijk(i,j,k) {
+>     normalize(mx[i][j][k],my[i][j][k],mz[i][j][k]);
+37a22
+> 
+40,43d24
+< 
+<   mx.bnd_update();
+<   my.bnd_update();
+<   mz.bnd_update();
+vof_update_at_walls.cpp
+4c4
+< void VOF::update_at_walls(Scalar & scp) {
+---
+> void VOF::update_at_walls() {
+26c26
+<   for( int b=0; b<scp.bc().count(); b++ ) {
+---
+>   for( int b=0; b<phi.bc().count(); b++ ) {
+28c28
+<     if( scp.bc().type_decomp(b) ) continue;
+---
+>     if( phi.bc().type_decomp(b) ) continue;
+30c30
+<     if( scp.bc().type(b) == BndType::wall() ) {
+---
+>     if( phi.bc().type(b) == BndType::wall() ) {
+32c32
+<       Dir d = scp.bc().direction(b);
+---
+>       Dir d = phi.bc().direction(b);
+58,59c58,59
+<         for_vijk( scp.bc().at(b), i,j,k ) { 
+<           scp[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp);
+---
+>         for_vijk( phi.bc().at(b), i,j,k ) { 
+>           phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
+70,71c70,71
+<   if(scp.bc().type_here(Dir::imin(), BndType::wall()) &&
+<      scp.bc().type_here(Dir::jmin(), BndType::wall())   ) {
+---
+>   if(phi.bc().type_here(Dir::imin(), BndType::wall()) &&
+>      phi.bc().type_here(Dir::jmin(), BndType::wall())   ) {
+81c81
+<       scp[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp);
+---
+>       phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
+86,87c86,87
+<   if(scp.bc().type_here(Dir::imin(), BndType::wall()) &&
+<      scp.bc().type_here(Dir::jmax(), BndType::wall())   ) {
+---
+>   if(phi.bc().type_here(Dir::imin(), BndType::wall()) &&
+>      phi.bc().type_here(Dir::jmax(), BndType::wall())   ) {
+97c97
+<       scp[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp);
+---
+>       phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
+102,103c102,103
+<   if(scp.bc().type_here(Dir::imax(), BndType::wall()) &&
+<      scp.bc().type_here(Dir::jmin(), BndType::wall())   ) {
+---
+>   if(phi.bc().type_here(Dir::imax(), BndType::wall()) &&
+>      phi.bc().type_here(Dir::jmin(), BndType::wall())   ) {
+113c113
+<       scp[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp);
+---
+>       phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
+118,119c118,119
+<   if(scp.bc().type_here(Dir::imax(), BndType::wall()) &&
+<      scp.bc().type_here(Dir::jmax(), BndType::wall())   ) {
+---
+>   if(phi.bc().type_here(Dir::imax(), BndType::wall()) &&
+>      phi.bc().type_here(Dir::jmax(), BndType::wall())   ) {
+129c129
+<       scp[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp);
+---
+>       phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
+134,135c134,135
+<   if(scp.bc().type_here(Dir::imin(), BndType::wall()) &&
+<      scp.bc().type_here(Dir::kmin(), BndType::wall())   ) {
+---
+>   if(phi.bc().type_here(Dir::imin(), BndType::wall()) &&
+>      phi.bc().type_here(Dir::kmin(), BndType::wall())   ) {
+145c145
+<       scp[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp);
+---
+>       phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
+150,151c150,151
+<   if(scp.bc().type_here(Dir::imin(), BndType::wall()) &&
+<      scp.bc().type_here(Dir::kmax(), BndType::wall())   ) {
+---
+>   if(phi.bc().type_here(Dir::imin(), BndType::wall()) &&
+>      phi.bc().type_here(Dir::kmax(), BndType::wall())   ) {
+161c161
+<       scp[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp);
+---
+>       phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
+166,167c166,167
+<   if(scp.bc().type_here(Dir::imax(), BndType::wall()) &&
+<      scp.bc().type_here(Dir::kmin(), BndType::wall())   ) {
+---
+>   if(phi.bc().type_here(Dir::imax(), BndType::wall()) &&
+>      phi.bc().type_here(Dir::kmin(), BndType::wall())   ) {
+177c177
+<       scp[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp);
+---
+>       phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
+182,183c182,183
+<   if(scp.bc().type_here(Dir::imax(), BndType::wall()) &&
+<      scp.bc().type_here(Dir::kmax(), BndType::wall())   ) {
+---
+>   if(phi.bc().type_here(Dir::imax(), BndType::wall()) &&
+>      phi.bc().type_here(Dir::kmax(), BndType::wall())   ) {
+193c193
+<       scp[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp);
+---
+>       phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
+198,199c198,199
+<   if(scp.bc().type_here(Dir::jmin(), BndType::wall()) &&
+<      scp.bc().type_here(Dir::kmin(), BndType::wall())   ) {
+---
+>   if(phi.bc().type_here(Dir::jmin(), BndType::wall()) &&
+>      phi.bc().type_here(Dir::kmin(), BndType::wall())   ) {
+209c209
+<       scp[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp);
+---
+>       phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
+214,215c214,215
+<   if(scp.bc().type_here(Dir::jmin(), BndType::wall()) &&
+<      scp.bc().type_here(Dir::kmax(), BndType::wall())   ) {
+---
+>   if(phi.bc().type_here(Dir::jmin(), BndType::wall()) &&
+>      phi.bc().type_here(Dir::kmax(), BndType::wall())   ) {
+225c225
+<       scp[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp);
+---
+>       phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
+230,231c230,231
+<   if(scp.bc().type_here(Dir::jmax(), BndType::wall()) &&
+<      scp.bc().type_here(Dir::kmin(), BndType::wall())   ) {
+---
+>   if(phi.bc().type_here(Dir::jmax(), BndType::wall()) &&
+>      phi.bc().type_here(Dir::kmin(), BndType::wall())   ) {
+241c241
+<       scp[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp);
+---
+>       phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
+246,247c246,247
+<   if(scp.bc().type_here(Dir::jmax(), BndType::wall()) &&
+<      scp.bc().type_here(Dir::kmax(), BndType::wall())   ) {
+---
+>   if(phi.bc().type_here(Dir::jmax(), BndType::wall()) &&
+>      phi.bc().type_here(Dir::kmax(), BndType::wall())   ) {
+257c257
+<       scp[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp);
+---
+>       phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
+266,268c266,268
+<   if(scp.bc().type_here(Dir::imin(), BndType::wall()) &&
+<      scp.bc().type_here(Dir::jmin(), BndType::wall()) &&
+<      scp.bc().type_here(Dir::kmin(), BndType::wall())   ) {
+---
+>   if(phi.bc().type_here(Dir::imin(), BndType::wall()) &&
+>      phi.bc().type_here(Dir::jmin(), BndType::wall()) &&
+>      phi.bc().type_here(Dir::kmin(), BndType::wall())   ) {
+280c280
+<     scp[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp);
+---
+>     phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
+285,287c285,287
+<   if(scp.bc().type_here(Dir::imin(), BndType::wall()) &&
+<      scp.bc().type_here(Dir::jmin(), BndType::wall()) &&
+<      scp.bc().type_here(Dir::kmax(), BndType::wall())   ) {
+---
+>   if(phi.bc().type_here(Dir::imin(), BndType::wall()) &&
+>      phi.bc().type_here(Dir::jmin(), BndType::wall()) &&
+>      phi.bc().type_here(Dir::kmax(), BndType::wall())   ) {
+299c299
+<     scp[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp);
+---
+>     phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
+303,305c303,305
+<   if(scp.bc().type_here(Dir::imin(), BndType::wall()) &&
+<      scp.bc().type_here(Dir::jmax(), BndType::wall()) &&
+<      scp.bc().type_here(Dir::kmin(), BndType::wall())   ) {
+---
+>   if(phi.bc().type_here(Dir::imin(), BndType::wall()) &&
+>      phi.bc().type_here(Dir::jmax(), BndType::wall()) &&
+>      phi.bc().type_here(Dir::kmin(), BndType::wall())   ) {
+317c317
+<     scp[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp);
+---
+>     phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
+322,324c322,324
+<   if(scp.bc().type_here(Dir::imin(), BndType::wall()) &&
+<      scp.bc().type_here(Dir::jmax(), BndType::wall()) &&
+<      scp.bc().type_here(Dir::kmax(), BndType::wall())   ) {
+---
+>   if(phi.bc().type_here(Dir::imin(), BndType::wall()) &&
+>      phi.bc().type_here(Dir::jmax(), BndType::wall()) &&
+>      phi.bc().type_here(Dir::kmax(), BndType::wall())   ) {
+336c336
+<     scp[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp);
+---
+>     phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
+341,343c341,343
+<   if(scp.bc().type_here(Dir::imax(), BndType::wall()) &&
+<      scp.bc().type_here(Dir::jmin(), BndType::wall()) &&
+<      scp.bc().type_here(Dir::kmin(), BndType::wall())   ) {
+---
+>   if(phi.bc().type_here(Dir::imax(), BndType::wall()) &&
+>      phi.bc().type_here(Dir::jmin(), BndType::wall()) &&
+>      phi.bc().type_here(Dir::kmin(), BndType::wall())   ) {
+355c355
+<     scp[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp);
+---
+>     phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
+359,361c359,361
+<   if(scp.bc().type_here(Dir::imax(), BndType::wall()) &&
+<      scp.bc().type_here(Dir::jmin(), BndType::wall()) &&
+<      scp.bc().type_here(Dir::kmax(), BndType::wall())   ) {
+---
+>   if(phi.bc().type_here(Dir::imax(), BndType::wall()) &&
+>      phi.bc().type_here(Dir::jmin(), BndType::wall()) &&
+>      phi.bc().type_here(Dir::kmax(), BndType::wall())   ) {
+373c373
+<     scp[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp);
+---
+>     phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
+377,379c377,379
+<   if(scp.bc().type_here(Dir::imax(), BndType::wall()) &&
+<      scp.bc().type_here(Dir::jmax(), BndType::wall()) &&
+<      scp.bc().type_here(Dir::kmin(), BndType::wall())   ) {
+---
+>   if(phi.bc().type_here(Dir::imax(), BndType::wall()) &&
+>      phi.bc().type_here(Dir::jmax(), BndType::wall()) &&
+>      phi.bc().type_here(Dir::kmin(), BndType::wall())   ) {
+391c391
+<     scp[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp);
+---
+>     phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
+395,397c395,397
+<   if(scp.bc().type_here(Dir::imax(), BndType::wall()) &&
+<      scp.bc().type_here(Dir::jmax(), BndType::wall()) &&
+<      scp.bc().type_here(Dir::kmax(), BndType::wall())   ) {
+---
+>   if(phi.bc().type_here(Dir::imax(), BndType::wall()) &&
+>      phi.bc().type_here(Dir::jmax(), BndType::wall()) &&
+>      phi.bc().type_here(Dir::kmax(), BndType::wall())   ) {
+409c409
+<     scp[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp);
+---
+>     phi[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
+426c426
+<       scp[i-1][j][k] = extrapolate_v(i-1,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp);
+---
+>       phi[i-1][j][k] = extrapolate_v(i-1,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
+435c435
+<       scp[i+1][j][k] = extrapolate_v(i+1,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp);
+---
+>       phi[i+1][j][k] = extrapolate_v(i+1,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
+444c444
+<       scp[i][j-1][k] = extrapolate_v(i,j-1,k,ofx,ofy,ofz,xpos,ypos,zpos,scp);
+---
+>       phi[i][j-1][k] = extrapolate_v(i,j-1,k,ofx,ofy,ofz,xpos,ypos,zpos);
+453c453
+<       scp[i][j+1][k] = extrapolate_v(i,j+1,k,ofx,ofy,ofz,xpos,ypos,zpos,scp);
+---
+>       phi[i][j+1][k] = extrapolate_v(i,j+1,k,ofx,ofy,ofz,xpos,ypos,zpos);
+462c462
+<       scp[i][j][k-1] = extrapolate_v(i,j,k-1,ofx,ofy,ofz,xpos,ypos,zpos,scp);
+---
+>       phi[i][j][k-1] = extrapolate_v(i,j,k-1,ofx,ofy,ofz,xpos,ypos,zpos);
+471c471
+<       scp[i][j][k+1] = extrapolate_v(i,j,k+1,ofx,ofy,ofz,xpos,ypos,zpos,scp);
+---
+>       phi[i][j][k+1] = extrapolate_v(i,j,k+1,ofx,ofy,ofz,xpos,ypos,zpos);
+475c475
+<   scp.exchange_all();
+---
+>   phi.exchange_all();
+488,489c488
+<                         const real xp, const real yp, const real zp,
+<                         const Scalar & scp) {
+---
+>                         const real xp, const real yp, const real zp) {
+495c494
+<   real scpscp = scp[ii][jj][kk];
+---
+>   real phiphi = phi[ii][jj][kk];
+498,499c497,498
+<   if(scpscp<tol_wall||scpscp-1.0>-tol_wall) {
+<     return real(scpscp>phisurf);
+---
+>   if(phiphi<tol_wall||phiphi-1.0>-tol_wall) {
+>     return real(phiphi>phisurf);
+507c506
+<     return real(scpscp>phisurf);
+---
+>     return real(phiphi>phisurf);
+530c529
+<     return real(scpscp>phisurf);
+---
+>     return real(phiphi>phisurf);
+562,563c561,562
+<   if(i==1&&j==0&&k==90) boil::oout<<ii<<" "<<jj<<" "<<kk<<" "<<alphaval<<" "<<vm1*(0.5-xpos) + vm2*(0.5-ypos) + vm3*(0.5-zpos)<<" "<<scpscp<<" "<<calc_v(alphaval,vm1,vm2,vm3)<<" | "<<vn1<<" "<<vn2<<" "<<vn3<<" "<<xpos<<" "<<ypos<<" "<<zpos<<" | "<<ofx<<" "<<ofy<<" "<<ofz<<boil::endl;
+<   //if(i==0&&j==1&&k==89) boil::oout<<ii<<" "<<jj<<" "<<kk<<" "<<alphaval<<" "<<vm1*(0.5-xpos) + vm2*(0.5-ypos) + vm3*(0.5-zpos)<<" "<<scpscp<<" "<<calc_v(alphaval,vm1,vm2,vm3)<<" | "<<vn1<<" "<<vn2<<" "<<vn3<<" "<<xpos<<" "<<ypos<<" "<<zpos<<" | "<<ofx<<" "<<ofy<<" "<<ofz<<boil::endl;
+---
+>   if(i==1&&j==0&&k==90) boil::oout<<ii<<" "<<jj<<" "<<kk<<" "<<alphaval<<" "<<vm1*(0.5-xpos) + vm2*(0.5-ypos) + vm3*(0.5-zpos)<<" "<<phiphi<<" "<<calc_v(alphaval,vm1,vm2,vm3)<<" | "<<vn1<<" "<<vn2<<" "<<vn3<<" "<<xpos<<" "<<ypos<<" "<<zpos<<" | "<<ofx<<" "<<ofy<<" "<<ofz<<boil::endl;
+>   //if(i==0&&j==1&&k==89) boil::oout<<ii<<" "<<jj<<" "<<kk<<" "<<alphaval<<" "<<vm1*(0.5-xpos) + vm2*(0.5-ypos) + vm3*(0.5-zpos)<<" "<<phiphi<<" "<<calc_v(alphaval,vm1,vm2,vm3)<<" | "<<vn1<<" "<<vn2<<" "<<vn3<<" "<<xpos<<" "<<ypos<<" "<<zpos<<" | "<<ofx<<" "<<ofy<<" "<<ofz<<boil::endl;
+vof_vf_limiter.cpp
+vof_wall_norm.cpp

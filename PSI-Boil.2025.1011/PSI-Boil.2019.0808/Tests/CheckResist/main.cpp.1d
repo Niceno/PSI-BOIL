@@ -1,0 +1,328 @@
+#include "Include/psi-boil.h"
+
+/* reading settings from the input file */
+template <class T>
+bool read_variable(std::ifstream & input, T & var) {
+  std::string line;
+  if(getline(input,line)) {
+    std::istringstream ssline(line);
+    ssline >> var;
+    OPR(var);
+    return 0;
+  } else {
+    return 1;
+  }
+}
+
+/******************************************************************************/
+int main(int argc, char * argv[]) {
+
+  boil::timer.start();
+
+  real tsat0 = 63.;
+
+  real res_wall = 0.;
+  real res_liq  = 0.;
+  real qflux  = 0.;
+  real t0 = 0.;
+  real t1 = 0.;
+  real LZheat = 0.;
+  real LZfilm = 0.;
+  int NZsol = 0.;
+  int inverted = 0.;
+  
+  std::vector<real*> readreal({&res_wall,
+                               &res_liq,
+                               &qflux,
+                               &t0,
+                               &t1,
+                               &LZheat,
+                               &LZfilm
+                               });
+
+  std::vector<int*> readint({&NZsol,&inverted});
+
+  /* only root reads */
+  int allread(0);
+  std::ifstream input;
+  if(boil::cart.iam()==0) {
+    input.open("input.file",std::ios::in);
+    if(!input.fail()) {
+      for(auto & rr : readreal)
+        allread += read_variable(input,*rr);
+      for(auto & ri : readint)
+        allread += read_variable(input,*ri);
+    } else {
+      boil::oout<<"Input file not found. Exiting."<<"\n";
+      exit(0);
+    }
+    input.close();
+  }
+
+  /*--------------------------------+
+  |  choose the output file format  |
+  +--------------------------------*/
+  boil::plot = new PlotTEC();
+
+  /*----------+
+  |  grid(s)  |
+  +----------*/
+  real DZ = 7e-7;
+  int NZ = 50;
+  real LZ = NZ*DZ;
+  Grid1D gz( Range<real>(-NZsol*DZ,(NZ-NZsol)*DZ), NZ, Periodic::no() );
+  Grid1D gy(DZ);
+
+  /*---------+
+  |  domain  |
+  +---------*/
+  Body floor("floor.stl");
+  Body * floor_ptr = NULL;
+  if(NZsol>0) {
+    floor_ptr = &floor;
+  }
+  Domain d(gy, gy, gz,floor_ptr);
+
+  /*------------------+
+  |  define unknowns  |
+  +------------------*/
+  Scalar c(d), g(d), kappa(d);        /* concentration */
+  Vector uvw(d);                      /* velocity */
+  Scalar tpr(d), q(d);                /* temperature */
+  Scalar f(d);                        /* pressure src */
+  Scalar mdot(d), mflx(d);            /* phase-change rate */
+  Scalar csub(d);                     /* heater color */
+
+  /*-----------------------------+
+  |  insert boundary conditions  |
+  +-----------------------------*/
+  for_m(m) {
+    uvw.bc(m).add( BndCnd( Dir::imin(), BndType::pseudo() ) );
+    uvw.bc(m).add( BndCnd( Dir::imax(), BndType::pseudo() ) );
+    uvw.bc(m).add( BndCnd( Dir::kmin(), BndType::wall() ) );
+    uvw.bc(m).add( BndCnd( Dir::kmax(), BndType::outlet() ) );
+    uvw.bc(m).add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
+    uvw.bc(m).add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
+  }
+
+  c.bc().add( BndCnd( Dir::imin(), BndType::pseudo() ) );
+  c.bc().add( BndCnd( Dir::imax(), BndType::pseudo() ) );
+  c.bc().add( BndCnd( Dir::kmin(), BndType::wall() ) );
+  c.bc().add( BndCnd( Dir::kmax(), BndType::outlet() ) );
+  c.bc().add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
+  c.bc().add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
+
+  f     = c.shape();
+  g     = c.shape();
+  kappa = c.shape();
+  csub  = c.shape();
+  q     = c.shape();
+  mdot  = c.shape();
+  mflx  = c.shape();
+
+  tpr.bc().add( BndCnd( Dir::imin(), BndType::pseudo() ) );
+  tpr.bc().add( BndCnd( Dir::imax(), BndType::pseudo() ) );
+  tpr.bc().add( BndCnd( Dir::kmin(), BndType::dirichlet(), t0+tsat0 ) );
+  tpr.bc().add( BndCnd( Dir::kmax(), BndType::dirichlet(), t1+tsat0 ) );
+  tpr.bc().add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
+  tpr.bc().add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
+
+  /*----------------------+
+  |  physical properties  |
+  +----------------------*/
+  /* ethanol from Carey ISBN 978-1-59169-035-1 */
+  const real tsat0_K = 78.37+273.15;
+  const real Mv = 46.07e-3;
+  const real muv = 10.4e-6;
+  const real rhov = 1.435;
+  const real cpv = 1.83e3*rhov;
+  const real lambdav = 19.9e-3;
+
+  const real mul = 428.7e-6;
+  const real rhol = 757.0;
+  const real cpl = 3.0e3*rhol;
+  const real lambdal = 153.6e-3;
+
+  const real sig = 1.77e-2;
+  const real latent = 963.0e3;
+
+  /* titanium */
+  const real rhoheat = 4506.;
+  const real cpheat = 544.3*rhoheat;
+  const real lambdaheat = 17.;
+
+  /* nickel */
+  const real rhosol = 8908.0;
+  real cpsol = 444.0;
+  const real lambdasol = 90.9;
+
+  Matter vapor(d), liquid(d);
+  vapor  .mu    (muv);
+  vapor  .rho   (rhov);
+  vapor  .cp    (cpv);  /* J/m3 */
+  vapor  .lambda(lambdav);
+  vapor  .mmass (Mv);
+  liquid.mu    (mul);
+  liquid.rho   (rhol);
+  liquid.cp    (cpl);   /* J/m3 */
+  liquid.lambda(lambdal);
+  liquid.mmass (Mv);
+
+  Matter mixed(liquid, vapor, & c);
+  mixed.sigma(sig);
+  mixed.latent(latent);
+
+  Matter substrate(d), heater(d);
+#if 0
+  substrate.rho    (rhosol);
+  substrate.cp     (cpsol);
+  substrate.lambda (lambdasol);
+  heater.rho    (rhoheat);
+  heater.cp     (cpheat);
+  heater.lambda (lambdaheat);
+#else
+  substrate.rho    (rhol);
+  substrate.cp     (cpl);
+  substrate.lambda (lambdal);
+  heater.rho    (rhol);
+  heater.cp     (cpl);
+  heater.lambda (lambdal);
+#endif
+
+  Matter solid(substrate,heater,&csub);
+
+  /*-------------------+
+  |  time-integration  |
+  +-------------------*/
+  real dxmin = DZ;
+  real dt = dxmin;
+  int ndt = 20000;
+  boil::oout<<"dxmin= "<<dxmin<<" "<<boil::cart.iam()<<" "<<dt<<"\n";
+  Times time(ndt, dt);
+
+  /*-----------------+
+  |  define solvers  |
+  +-----------------*/
+  Krylov * solver = new BiCGS(d, Prec::di());
+
+  /*-------------------+
+  |  define equations  |
+  +-------------------*/
+  /* color function */
+  VOF conc(c, g, kappa, uvw, time, solver);
+  conc.set_subgrid_method(SubgridMethod::SLICliquid());
+
+  /* supplementary classes for heat transfer */
+  TIF tsat(tsat0);
+
+  /* is there conjugate heat transfer? */
+  Matter * solid_ptr = NULL;
+  if(NZsol>0) {
+    solid_ptr = &solid;
+  }
+
+  /* function kernel of heat transfer */
+  CommonHeatTransfer cht(tpr,conc.topo,tsat,
+                         &mixed,solid_ptr);
+
+  if(res_wall>0.) {
+    cht.set_wall_resistance(res_wall);
+  } 
+  if(res_liq>0.) {
+    cht.set_int_resistance_liq(res_liq);
+  }
+  if(qflux>0.) {
+    cht.set_dirac_wall_source(qflux);
+  }
+
+  /* enthalpy equation */
+  EnthalpyFD enthFD(tpr, q, uvw,
+                    time, solver, &mixed, cht,
+                    solid_ptr);
+
+  enthFD.convection_set(TimeScheme::forward_euler());
+  enthFD.diffusion_set(TimeScheme::backward_euler());
+
+  /* phase change */
+  PhaseChange4 pc(mdot, mflx, q,
+                  g, f, uvw, cht,
+                  time, &mixed, solid_ptr);
+  pc.set_accuracy_order(AccuracyOrder::FourthUpwind());
+
+  /* eval tgamma */
+  real resfilm = (inverted ? (LZ-LZfilm*LZ) : LZfilm*LZ)/lambdal;
+  real ressol = NZsol*DZ/lambdal;
+  if(!inverted) {
+    resfilm += res_wall + ressol;
+  }
+  real tg = tsat0;
+  if(res_liq>0.)
+    tg = ((inverted ? t1+tsat0 : t0+tsat0)/resfilm + tsat0/res_liq+ qflux)
+         /(1./resfilm+1./res_liq);
+  boil::oout<<"tgamma= "<<resfilm<<" "<<res_liq<<" "<<tg-tsat0<<boil::endl;
+
+
+/**************** init */
+  /* solid */
+  csub = 0.0;
+  for_vijk(csub,i,j,k) {
+    if(csub.zc(k)<0.) {
+      if(csub.zn(k+1)<=-LZheat*LZ) {
+        csub[i][j][k] = 1.0;
+      } else if(csub.zn(k)<= -LZheat*LZ) {
+        csub[i][j][k] = (fabs(csub.zn(k))-LZheat*LZ)/csub.dzc(k);
+        //q[i][j][k] = (1.0-csub[i][j][k])*qflux/fabs(LZheat*LZ)*q.dV(i,j,k);
+      } else {
+        //q[i][j][k] = qflux/fabs(LZheat*LZ)*q.dV(i,j,k);
+      }
+    }
+  }
+
+  /* fluid */
+  c = 0.;
+  for_vijk(c,i,j,k) {
+    if(c.zn(k+1)<=LZfilm*LZ) {
+      c[i][j][k] = 1.0;
+    } else if(c.zn(k)<= LZfilm*LZ) {
+      c[i][j][k] = (LZfilm*LZ-c.zn(k))/c.dzc(k);
+    }
+  }
+  if(inverted) {
+    for_vijk(c,i,j,k) {
+      c[i][j][k] = 1.0 - c[i][j][k];
+    }
+  }
+  c.bnd_update();
+  c.exchange_all();
+  conc.init();
+  conc.front_minmax();
+
+  /* temperature */
+  tpr = t1+tsat0;
+
+/**************** run */
+  for(time.start(); time.end(); time.increase()) {
+    /* new time step */
+    cht.new_time_step();
+    conc.new_time_step();
+
+    pc.update();
+    enthFD.discretize();
+    enthFD.new_time_step();
+    enthFD.solve(ResTol(1e-16),"enthFD");
+  }
+
+  std::fstream output;
+  std::stringstream ssp;
+  ssp <<"tpr.txt";
+  output.open(ssp.str(), std::ios::out);
+  for_vk(tpr,k) {
+    output<<k<<" "<<tpr.zc(k)<<" "<<c[boil::BW][boil::BW][k]<<" "<<tpr[boil::BW][boil::BW][k]-tsat0<<boil::endl;
+  }
+  
+  boil::oout << "finished" << boil::endl;
+
+  boil::timer.stop();
+  boil::timer.report();
+
+}

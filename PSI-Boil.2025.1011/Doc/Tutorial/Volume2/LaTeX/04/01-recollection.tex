@@ -1,0 +1,175 @@
+\section{Recollection of some basic concepts}
+\label{sec:recollection}
+
+\subsection{General conservation equation}
+
+\noindent
+Integral equation for conservation of a general variable reads:
+%
+\be
+  \frac{\p}{\p t} \int_V ( \rho B_\phi \phi ) dV  
+  + 
+  \oint_S ( \rho B_\phi \uvw \phi ) dS
+  = 
+  \oint_S  (\Gamma_\phi \nabla \phi ) dS
+  +
+  \int_V f_\phi dV
+\ee
+%
+If, for the sake of shortness, we introduce the following definitions:
+%
+\bea
+  \mathbb{Q}_\phi & = & \int_V ( \rho B_\phi \phi ) dV         \\ 
+  \mathbb{H}_\phi & = & \oint_S ( \rho B_\phi \uvw \phi ) dS   \\ 
+  \mathbb{D}_\phi & = & \oint_S  (\Gamma_\phi \nabla \phi ) dS \\
+  \mathbb{F}_\phi & = & \int_V f_\phi dV
+\eea
+%
+where $\mathbb{Q}_\phi$ represents the {\em innertial} term, $\mathbb{H}_\phi$ 
+the {\em advection}, $\mathbb{D}_\phi$ the {\em diffusion} and 
+$\mathbb{F}_\phi$ the {\em forcing} (source) term, the conservation equation 
+for a general variable assumes the form:
+%
+\be
+  \frac{\p}{\p t} \mathbb{Q}_\phi + \mathbb{H}_\phi 
+  = 
+  \mathbb{D}_\phi + \mathbb{F}_\phi
+\ee
+
+\subsection{Integration in time}
+
+As the next step, this equation is discretized in time. In order to do that,
+it is worthwhile introducing convention on time steps:
+\begin{itemize}
+  \item {\em New time step}~($N$) is the one which is currently being resolved, 
+        i.e.\ the one whose value is unknown. 
+  \item {\em Old time step}~($N-1$) represents the time step before new, hence
+        it is the last known quantity, and
+  \item {\em Very old time step}~($N-2$) is the time step before old.
+\end{itemize}
+%
+In {\psiboil}, a linear variation between the new~($N$) and the old~($N-1$) time 
+step is assumed for the innertial term, expressed as:
+%
+\be
+  \frac{\p}{\p t} \mathbb{Q}_\phi 
+  = 
+  \frac{\mathbb{Q}^N_\phi - \mathbb{Q}^{N-1}_\phi}{\Delta t}
+\ee
+
+For advection, diffusion and forcing term different options exist. First order
+{\em backward Euler} (fully implicit) discretization for all terms is expressed 
+as:
+%
+\be
+  \frac{\mathbb{Q}^N_\phi - \mathbb{Q}^{N-1}_\phi}{\Delta t}
+  +
+  \mathbb{H}^N_\phi
+  =
+  \mathbb{D}^N_\phi
+  +
+  \mathbb{F}^N_\phi.
+\ee
+%
+This scheme is famous for its stability. 
+First order {\em forward Euler} (fully explicit) scheme for all terms reads:
+%
+\be
+  \frac{\mathbb{Q}^N_\phi - \mathbb{Q}^{N-1}_\phi}{\Delta t}
+  +
+  \mathbb{H}^{N-1}_\phi
+  =
+  \mathbb{D}^{N-1}_\phi
+  +
+  \mathbb{F}^{N-1}_\phi.
+\ee
+%
+and its most advantages feature is simplicity. Second order, semi-implicit
+{\em Crank-Nicolson} for all terms reads:
+%
+\be
+  \frac{\mathbb{Q}^N_\phi - \mathbb{Q}^{N-1}_\phi}{\Delta t}
+  +
+  \frac{1}{2}\mathbb{H}^{N}_\phi
+  +
+  \frac{1}{2}\mathbb{H}^{N-1}_\phi
+  =
+  \frac{1}{2}\mathbb{D}^{N}_\phi
+  +
+  \frac{1}{2}\mathbb{D}^{N-1}_\phi
+  +
+  \frac{1}{2}\mathbb{F}^{N}_\phi
+  +
+  \frac{1}{2}\mathbb{F}^{N-1}_\phi
+\ee
+%
+Very often, different schemes are used for different terms. If advection
+terms are treated with {\em Adams-Bashforth}, diffusive with Crank-Nicolson and
+forcing terms with forward Euler, the equations would read:
+%
+\be
+  \frac{\mathbb{Q}^N_\phi - \mathbb{Q}^{N-1}_\phi}{\Delta t}
+  +
+  \frac{3}{2}\mathbb{H}^{N-1}_\phi
+  -
+  \frac{1}{2}\mathbb{H}^{N-2}_\phi
+  =
+  \frac{1}{2}\mathbb{D}^{N}_\phi
+  +
+  \frac{1}{2}\mathbb{D}^{N-1}_\phi
+  +
+  \mathbb{F}^{N-1}_\phi
+\ee
+%
+This is a very often choice in {\psiboil} simulations, as Adams-Bashforth offers
+simplicity for non-linear advection terms, while Crank-Nicolson gives 
+stability to linear diffusive terms. 
+
+\subsection{Discretized system of equations}
+
+\noindent
+The final result of discretization procedure is a linear system of equations:
+%
+\be
+  [A] \cdot \{\phi^N\} = \{f\}
+\ee
+%
+where $[A]$ represents the system matrix, $\{\phi^N\}$
+is the unknown vector at new time step $N$ and $\{f\}$ the right-hand side. 
+System matrix contains contribution from inertial and implicit part of the 
+diffusion terms, while the right hand side contains everything else: advection 
+terms, source terms and explicitly treated diffusive terms. This is illustrated 
+in Table~\ref{tbl:system}.
+%
+\begin{table}[h!]
+  \begin{center}
+    \begin{tabular}{cc|c|c|}
+    \cline{3-3}
+    & & \multicolumn{1}{ c|}{Contains contribution from:} \\ 
+    \cline{1-3}
+    \multicolumn{1}{|c|}{\multirow{3}{*}{Term:}} &
+    \multicolumn{1}{ c|}{$[A]$}        & $\mathbb{Q}^N/\Delta t$, 
+                                         $\mathbb{D}^N$   \\ 
+    \cline{2-3}
+    \multicolumn{1}{|c|}{}                        &
+    \multicolumn{1}{ c|}{$\{\phi^N\}$} & -         \\ 
+    \cline{2-3}
+    \multicolumn{1}{|c|}{}                        &
+    \multicolumn{1}{ c|}{$\{f\}$}      & $\mathbb{Q}^{N-1}/\Delta t$,
+                                         $\mathbb{D}^{N-1}$,    
+                                         $\mathbb{H}^{N}$,    
+                                         $\mathbb{H}^{N-1}$,    
+                                         $\mathbb{H}^{N-2}$,    
+                                         $\mathbb{F}$   \\ 
+    \cline{1-3}
+    \end{tabular}
+    \caption{Dependence of linear system of equation on various terms
+             in the governing equation.}
+    \label{tbl:system}
+  \end{center}
+\end{table}
+%
+
+In Table~\ref{tbl:system} it is asssumed that system matrix does not change 
+in time and no assumption on time discretization of the external source 
+term~($\mathbb{F}$) is done.

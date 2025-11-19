@@ -1,0 +1,3 @@
+To scale results between old and new normalization, multiply with:
+
+   sqrt( Pr/Ra )

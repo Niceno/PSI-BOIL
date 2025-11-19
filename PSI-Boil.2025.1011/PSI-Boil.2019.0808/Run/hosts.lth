@@ -1,0 +1,12 @@
+#==============================================================================
+# this is a hostfile for Open MPI
+#
+# run MPI job as: nohup mpirun -np 8 -hostfile hosts.lth ./Boil > out &
+#------------------------------------------------------------------------------
+# do not forget to set:
+#  export PATH='/opt/mpi/openmpi-1.2.5/bin:'$PATH
+#  export LD_LIBRARY_PATH='/opt/mpi/openmpi-1.2.5/lib:'$LD_LIBRARY_PATH
+# in .bashrc
+#------------------------------------------------------------------------------
+lclth09 slots=4
+lclth10 slots=4

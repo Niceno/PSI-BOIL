@@ -1,0 +1,616 @@
+\section{Implementation in {\psiboil}}
+\label{sec:implementation}
+
+\subsection{Storing information on time-stepping scheme}
+
+In a computer program one needs a way to impose and control the time stepping 
+schemes. In {\psiboil}, it is achieved with the ravioli object {\tt TimeScheme} 
+defined in {\tt Src/Ravioli}. From {\em user} point of view, one adjusts the 
+desired time stepping scheme in the main function. 
+For example, program ({\tt 07-01-main.cpp}) from Volume~1 of the tutorial, 
+defines the enthalpy conservation equation and sets the time stepping scheme
+for diffusion as:
+%
+{\small \begin{verbatim}
+     29
+     30   Enthalpy enth(t, q, uvw, time, solver, &solid);   /* enthalpy conservation
+     31                                                        equation              */
+     32   enth.diffusion_set(TimeScheme::backward_euler()); /* time stepping scheme */
+     33
+\end{verbatim}}
+%
+A {\tt TimeScheme} object has three member functions: {\tt N()}, {\tt Nm1()} 
+and~{\tt Nm2()} which hold the coefficients multiplying time levels at $N$, 
+$N-1$ and~$N-2$ respectively.
+%
+Table~\ref{tbl:schemes} illustrates this point by summarizing values member
+functions return, depending on the time-stepping scheme.
+%
+\begin{table}[h!]
+  \begin{center}
+    \begin{tabular}{rr|c|c|c|c|l}
+      \cline{3-5}
+        &  & \multicolumn{3}{ c|}{Function:}       \\ 
+      \cline{3-5}
+        &  & {\tt N()} & {\tt Nm1()} & {\tt Nm2()} \\ 
+      \cline{1-5}
+      \multicolumn{1}{|c|}{\multirow{4}{*}{\tt TimeScheme::}} &
+      \multicolumn{1}{ c|}{\tt backward\_euler()}  &  1  &  0  &  0   \\ \cline{2-5}
+      \multicolumn{1}{|c|}{}                   &
+      \multicolumn{1}{ c|}{\tt forward\_euler()}   &  0  &  1  &  0   \\ \cline{2-5}
+      \multicolumn{1}{|c|}{}                   &
+      \multicolumn{1}{ c|}{\tt crank\_nicolson()}  & 1/2 & 1/2 &  0   \\ \cline{2-5}
+      \multicolumn{1}{|c|}{}                   &
+      \multicolumn{1}{ c|}{\tt adams\_bashforth()} &  0  & 3/2 &-1/2   \\ \cline{1-5}
+    \end{tabular}
+    \caption{Values of member functions {\tt N()}, {\tt Nm1()} and~{\tt Nm2()} for 
+             different time-stepping schemes.}
+    \label{tbl:schemes}
+  \end{center}
+\end{table}
+
+\subsection{Implementation of the time-stepping algorithms}
+
+\noindent
+From {\em development} point of view, {\tt TimeScheme}s are contained in object 
+{\tt Equation}, as shown with an excerpt from the file 
+{\tt equation.h}:
+%
+{\small \begin{verbatim}
+     42
+     43   protected:
+     44     TimeScheme diff_ts;
+     45     TimeScheme conv_ts;
+\end{verbatim}}
+%
+So, there are two objects of type {\tt TimeScheme} defined inside {\tt Equation}
+called {\tt conv\_ts} and {\tt diff\_ts} which define time-stepping schemes for
+advection and diffusion terms. Their default values are set in the constructor,
+as shown in lines 26--27 of the same file:
+%
+{\small \begin{verbatim}
+     18 class Equation {
+     19   public:
+     20     Equation(const Domain * d,
+     21              const Times  * t,
+     22              Matter * f,
+     23              Matter * s,
+     24              Krylov * sm) :
+     25       dom(d), time(t), flu(f), sol(s), solver(sm),
+     26       conv_ts(TimeScheme::adams_bashforth()),
+     27       diff_ts(TimeScheme::crank_nicolson()),
+     28       lim(ConvScheme::superbee()) {}
+\end{verbatim}}
+%
+As this constructor shows, the default scheme for advection is Adams-Bashforth
+and for diffusion is Crank-Nicolson.  
+
+Objects {\tt Centered} and {\tt Staggered} store parts of the linear system of
+equations in: {\tt Matrix A} which holds the system matrix~$[A]$, {\tt phi} 
+holding the variable~$\{\phi\}$ and {\tt Scalar fnew} holding the right hand
+side~$\{f\}$. In addition, {\tt Scalars} {\tt fold}, {\tt cnew}, {\tt cold}
+are used for storing intermediate parts of right-hand side.
+
+\subsubsection{Non-iterative time-advancement}
+
+Let's take the program {\tt 09-02-main.cpp} from the Volume~1 tutorial and
+focus only on the solution of enthalpy equation. A fraction of the 
+{\tt 09-02-main.cpp} is included below:
+%
+{\small \begin{verbatim}
+     77   Enthalpy enth( t,   g,   uvw, time, solver, &fluid);
+     ...
+     83   for(time.start(); time.end(); time.increase()) {
+     ...
+     93     enth.new_time_step();
+     94     enth.solve(ResRat(0.001));
+     ...
+\end{verbatim}}
+%
+Line 77 defines the equation for enthalpy, line~83 starts the time loop and
+lines~93 and~94 are all that is needed to advance enthalpy in time for
+non-iterative algorithms. 
+Since the time-stepping schemes was not changed for {\tt Enthalpy}, it uses the 
+default settings which is Adams-Bashforth for advection and Crank-Nicolson for 
+diffusion.
+%
+When a new time step begins (after line~83), data members from {\tt Centered} 
+contain the following:
+%
+  \begin{center}
+    \begin{tabular}{cc|c|cc}
+    \cline{3-3}
+    & & \multicolumn{1}{ c|}{Holds:} & \\ 
+    \cline{1-3}
+    \multicolumn{1}{|c|}{\multirow{3}{*}{Member:}} &
+    \multicolumn{1}{ l|}{\tt Matrix A}   & $[A]$ &      \\ 
+    \cline{2-3}
+    \multicolumn{1}{|l|}{} &
+    \multicolumn{1}{ l|}{\tt Scalar phi} & $\{\phi^{N-1}\}$ & \\ 
+    \cline{2-3}
+    \multicolumn{1}{|l|}{} &
+    \multicolumn{1}{ l|}{\tt Scalar cold} & $\mathbb{H}^{N-2} $ & \\
+    \cline{1-3}
+    \end{tabular}
+  \end{center}
+%
+The reason why {\tt cold} contains $\mathbb{H}^{N-2}$ will be clear by the 
+end of this section.
+
+With these values we enter {\tt Centered::new\_time\_step()} function, defined 
+in {\tt centered\_new\_time\_step.cpp}, outlined below:
+%
+{\small \begin{verbatim}
+     ...
+     13 void Centered::new_time_step() {
+     ...
+     23   /* no transport in solid */
+     24   if( !solid() )
+     25     for_ijk(i,j,k) {
+     26       const real c = fluid()->cp (i,j,k);
+     27       const real r = fluid()->rho(i,j,k);
+     28
+     29       fold[i][j][k] = r * c * dV(i,j,k) * phi[i][j][k] * time->dti()
+     30                     + conv_ts.Nm2() * cold[i][j][k];  
+     31     }
+     ...
+     53   /* a condition like: if(conv_ts != backward_euler()) would be good */
+     54   convection(&cold);
+     55   for_ijk(i,j,k)
+     56     fold[i][j][k] += conv_ts.Nm1() * cold[i][j][k]; /* conv_ts.Nm1() = 1.5 */
+     ...
+     63   /* a condition like: if(diff_ts != backward_euler()) would be good */
+     64   diffusion();
+     ...
+\end{verbatim}}
+%
+Lines 25--31 update the right-hand side with the part of the unsteady term from
+time step~$N-1$ and advection term from time step $N-2$. After line~31, data 
+members hold the following:
+%
+  \begin{center}
+    \begin{tabular}{cc|c|cc}
+    \cline{3-3}
+    & & \multicolumn{1}{ c|}{Holds:} & \\ 
+    \cline{1-3}
+    \multicolumn{1}{|c|}{\multirow{4}{*}{Member:}} &
+    \multicolumn{1}{ l|}{\tt Matrix A}   & $[A]$ &      \\ 
+    \cline{2-3}
+    \multicolumn{1}{|l|}{} &
+    \multicolumn{1}{ l|}{\tt Scalar phi} & $\{\phi^{N-1}\}$ & \\ 
+    \cline{2-3}
+    \multicolumn{1}{|l|}{} &
+    \multicolumn{1}{ l|}{\tt Scalar fold} & $\mathbb{Q}^{N-1}/\Delta t$,
+                                            $\mathbb{H}^{N-2} $ & $\gets$ change \\
+    \cline{2-3}
+    \multicolumn{1}{|l|}{} &
+    \multicolumn{1}{ l|}{\tt Scalar cold} & $\mathbb{H}^{N-2} $ & \\
+    \cline{1-3}
+    \end{tabular}
+  \end{center}
+%
+Line~54 calls member function {\tt convection} which computes the advection
+term with the last available velocity and stores it into member {\tt cnew}.
+In the present case, last available velocity is the one from the previous
+time step ($N-1$), so function {\tt convection} will 
+compute~$\mathbb{H}^{N-1}$. Therefore, after the line~54, data members have 
+contain the following:
+%
+  \begin{center}
+    \begin{tabular}{cc|c|cc}
+    \cline{3-3}
+    & & \multicolumn{1}{ c|}{Holds:} & \\ 
+    \cline{1-3}
+    \multicolumn{1}{|c|}{\multirow{4}{*}{Member:}} &
+    \multicolumn{1}{ l|}{\tt Matrix A}   & $[A]$ &      \\ 
+    \cline{2-3}
+    \multicolumn{1}{|l|}{} &
+    \multicolumn{1}{ l|}{\tt Scalar phi} & $\{\phi^{N-1}\}$ & \\ 
+    \cline{2-3}
+    \multicolumn{1}{|l|}{} &
+    \multicolumn{1}{ l|}{\tt Scalar fold} & $\mathbb{Q}^{N-1}/\Delta t$,
+                                            $\mathbb{H}^{N-2} $ & \\
+    \cline{2-3}
+    \multicolumn{1}{|l|}{} &
+    \multicolumn{1}{ l|}{\tt Scalar cold} & $\mathbb{H}^{N-1} $ & $\gets$ change \\
+    \cline{1-3}
+    \end{tabular}
+  \end{center}
+%
+Lines~55 and~56 update the right hand side with advection from previous time
+step. Thus, after line 56 data members hold the following:
+%
+  \begin{center}
+    \begin{tabular}{cc|c|cc}
+    \cline{3-3}
+    & & \multicolumn{1}{ c|}{Holds:} & \\ 
+    \cline{1-3}
+    \multicolumn{1}{|c|}{\multirow{4}{*}{Member:}} &
+    \multicolumn{1}{ l|}{\tt Matrix A}   & $[A]$ &      \\ 
+    \cline{2-3}
+    \multicolumn{1}{|l|}{} &
+    \multicolumn{1}{ l|}{\tt Scalar phi} & $\{\phi^{N-1}\}$ & \\ 
+    \cline{2-3}
+    \multicolumn{1}{|l|}{} &
+    \multicolumn{1}{ l|}{\tt Scalar fold} & $\mathbb{Q}^{N-1}/\Delta t$,
+                                            $\mathbb{H}^{N-2}$,
+                                            $\mathbb{H}^{N-1}$ & $\gets$ change \\
+    \cline{2-3}
+    \multicolumn{1}{|l|}{} &
+    \multicolumn{1}{ l|}{\tt Scalar cold} & $\mathbb{H}^{N-1} $ & \\
+    \cline{1-3}
+    \end{tabular}
+  \end{center}
+%
+Line~64 calls member function {\tt diffusion} which updates {\tt fold}
+with the explicitly treated part of the diffusion term. After line~64
+data members have the following meaning:
+%
+  \begin{center}
+    \begin{tabular}{cc|c|cc}
+    \cline{3-3}
+    & & \multicolumn{1}{ c|}{Holds:} & \\ 
+    \cline{1-3}
+    \multicolumn{1}{|c|}{\multirow{4}{*}{Member:}} &
+    \multicolumn{1}{ l|}{\tt Matrix A}   & $[A]$ &      \\ 
+    \cline{2-3}
+    \multicolumn{1}{|l|}{} &
+    \multicolumn{1}{ l|}{\tt Scalar phi} & $\{\phi^{N-1}\}$ & \\ 
+    \cline{2-3}
+    \multicolumn{1}{|l|}{} &
+    \multicolumn{1}{ l|}{\tt Scalar fold} & $\mathbb{Q}^{N-1}/\Delta t$,
+                                            $\mathbb{H}^{N-2}$,
+                                            $\mathbb{H}^{N-1}$,
+                                            $\mathbb{D}^{N-1}$ & $\gets$ change \\
+    \cline{2-3}
+    \multicolumn{1}{|l|}{} &
+    \multicolumn{1}{ l|}{\tt Scalar cold} & $\mathbb{H}^{N-1} $ & \\
+    \cline{1-3}
+    \end{tabular}
+  \end{center}
+%
+Data members hold the same meaning when exiting from the {\tt new\_time\_step}
+function. After the call to {\tt new\_time\_step} in the main function, a call
+to {\tt solve} is issued. Part of the {\tt Centered::solve()}, defined in
+{\tt centered\_solve.cpp}, is given below:
+%
+{\small \begin{verbatim}
+     ...
+      9 void Centered::solve(const real & fact, const char * name) {
+     ...
+     23   /* solve */
+     24   update_rhs();
+     25   solver->solve(A, phi, fnew, 20, name);
+     ...
+\end{verbatim}}
+%
+and shows that a call to {\tt Centered::update\_rhs()} is performed in line~24,
+just before staring the linear solver in line~25. As its name implies, this 
+function updates the right-hand side, as the portion of the code, located in
+{\tt centered\_update\_rhc.cpp} shows:
+%
+{\small \begin{verbatim}
+     12 real Centered::update_rhs() {
+     ...
+     19   for_ijk(i,j,k) {
+     20     fnew[i][j][k] = fold[i][j][k]
+     21                   + cnew[i][j][k] * conv_ts.N()
+     22                   + fbnd[i][j][k]
+     23                   + fext[i][j][k];
+     24   }
+     ...
+\end{verbatim}}
+%
+As lines~19--24 show, this function fills the right hand side with all the 
+terms needed. After the {\tt Centered::update\_rhs()}, which is also just
+before calling the liner solver at line~25 in {\tt Centered::solve()}, 
+data members hold the following:
+%
+  \begin{center}
+    \begin{tabular}{cc|c|cc}
+    \cline{3-3}
+    & & \multicolumn{1}{ c|}{Holds:} & \\ 
+    \cline{1-3}
+    \multicolumn{1}{|c|}{\multirow{4}{*}{Member:}} &
+    \multicolumn{1}{ l|}{\tt Matrix A}   & $[A]$ &      \\ 
+    \cline{2-3}
+    \multicolumn{1}{|l|}{} &
+    \multicolumn{1}{ l|}{\tt Scalar phi} & $\{\phi^{N-1}\}$ & \\ 
+    \cline{2-3}
+    \multicolumn{1}{|l|}{} &
+    \multicolumn{1}{ l|}{\tt Scalar fnew} & $\mathbb{Q}^{N-1}/\Delta t$,
+                                            $\mathbb{H}^{N-2}$,
+                                            $\mathbb{H}^{N-1}$,
+                                            $\mathbb{D}^{N-1}$,  
+                                            $\mathbb{F}$ & $\gets$ change \\
+    \cline{2-3}
+    \multicolumn{1}{|l|}{} &
+    \multicolumn{1}{ l|}{\tt Scalar fold} & $\mathbb{Q}^{N-1}/\Delta t$,
+                                            $\mathbb{H}^{N-2}$,
+                                            $\mathbb{H}^{N-1}$,
+                                            $\mathbb{D}^{N-1}$ & \\
+    \cline{2-3}
+    \multicolumn{1}{|l|}{} &
+    \multicolumn{1}{ l|}{\tt Scalar cold} & $\mathbb{H}^{N-1} $ & \\
+    \cline{1-3}
+    \end{tabular}
+  \end{center}
+%
+Note that, although line~21 in {\tt centered\_update\_rhc.cpp}
+adds contribution from {\tt cnew}, it is also multiplied by {\tt conv\_ts.N()},
+which is equal to zero for non-iterative time-stepping schemes. 
+
+At this stage, {\tt fnew} holds all the contributions it needs and a call to 
+linear solver can be performed, which yields new value of dependent variable.
+Hence, after the call to solver, data members contain the following:
+%
+  \begin{center}
+    \begin{tabular}{cc|c|cc}
+    \cline{3-3}
+    & & \multicolumn{1}{ c|}{Holds:} & \\ 
+    \cline{1-3}
+    \multicolumn{1}{|c|}{\multirow{5}{*}{Member:}} &
+    \multicolumn{1}{ l|}{\tt Matrix A}   & $[A]$ &      \\ 
+    \cline{2-3}
+    \multicolumn{1}{|l|}{} &
+    \multicolumn{1}{ l|}{\tt Scalar phi} & $\{\phi^N\}$ & $\gets$ change \\ 
+    \cline{2-3}
+    \multicolumn{1}{|l|}{} &
+    \multicolumn{1}{ l|}{\tt Scalar fnew} & $\mathbb{Q}^{N-1}/\Delta t$,
+                                            $\mathbb{H}^{N-2}$,
+                                            $\mathbb{H}^{N-1}$,
+                                            $\mathbb{D}^{N-1}$,  
+                                            $\mathbb{F}$ &  \\
+    \cline{2-3}
+    \multicolumn{1}{|l|}{} &
+    \multicolumn{1}{ l|}{\tt Scalar fold} & $\mathbb{Q}^{N-1}/\Delta t$,
+                                            $\mathbb{H}^{N-2}$,
+                                            $\mathbb{H}^{N-1}$,
+                                            $\mathbb{D}^{N-1}$ & \\
+    \cline{2-3}
+    \multicolumn{1}{|l|}{} &
+    \multicolumn{1}{ l|}{\tt Scalar cold} & $\mathbb{H}^{N-1} $ & \\
+    \cline{1-3}
+    \end{tabular}
+  \end{center}
+%
+The first three members outlined above ({\tt Matrix A}, {\tt Scalar phi} and
+{\tt Scalar fnew}) contain the same entries outlined in Table~\ref{tbl:system},
+meaning the linear system for the governing equation is discretized properly. 
+
+As soon as the computation of new time step starts, values in~{\tt phi} and 
+{\tt cold} get older by one time level and become~$\{\phi^{N-1}\}$ 
+and~$\mathbb{H}^{N-2}$ respectively. That explains the contents of the first
+table in this section. 
+
+\subsubsection{Iterative time-advancement}
+
+The algorithm outlined above works for non-iterative time-integration algorithms
+such as the projection method. For some simulations an iterative algorithm is 
+required for stronger coupling of momentum and pressure, of for implicit 
+treatment of non-linear or source terms. The most wide-spread iterative 
+time-stepping scheme is the SIMPLE algorithm. An example of a SIMPLE-like
+iterative scheme is given in the file {\tt Tests/simple/main-simple.cpp}.
+A portion of the file pertinent to time-integration is given below:
+%
+{\small \begin{verbatim}
+     ...
+     96   for(time.start(); time.end(); time.increase()) {
+     ...
+    106     /* momentum */
+    107     ns.cfl_max();
+    108     ns.new_time_step();
+    109
+    110     // NEW: SIMPLE ITERATIONS
+    111     for(int in=0; in<6; in++) {
+     ...                         
+    113       ns.convection();
+    114       ns.solve(ResRat(0.0001));
+    ...
+\end{verbatim}}
+%
+In this case, we are solving momentum equations, rather than enthalpy. But that
+doesn't matter, because objects {\tt Enthalpy} and {\tt Momentum} both descend
+from {\tt Equation} and concepts for time integration are the same.
+
+Iterative algorithms feature the so-called {\em outer} and {\em inner} loop. For
+the present example, outer loop begins at line~96, whereas the inner begins at
+line~111. Function {\tt Staggered::new\_time\_step()} is the analog of its 
+sister variant {\tt Centered::new\_time\_step()}, and the local data member have 
+the following meaning at the end of line~108:
+%
+  \begin{center}
+    \begin{tabular}{cc|c|c|}
+    \cline{3-3}
+    & & \multicolumn{1}{ c|}{Holds:} \\ 
+    \cline{1-3}
+    \multicolumn{1}{|c|}{\multirow{5}{*}{Member:}} &
+    \multicolumn{1}{ l|}{\tt Matrix A}   & $[A]$       \\ 
+    \cline{2-3}
+    \multicolumn{1}{|l|}{} &
+    \multicolumn{1}{ l|}{\tt Scalar phi} & $\{\phi^{N-1}\}$  \\ 
+    \cline{2-3}
+    \multicolumn{1}{|l|}{} &
+    \multicolumn{1}{ l|}{\tt Scalar fnew} & $\mathbb{Q}^{N-1}/\Delta t$,
+                                            $\mathbb{H}^{N-2}$,
+                                            $\mathbb{H}^{N-1}$,
+                                            $\mathbb{D}^{N-1}$,  
+                                            $\mathbb{F}$ \\
+    \cline{2-3}
+    \multicolumn{1}{|l|}{} &
+    \multicolumn{1}{ l|}{\tt Scalar fold} & $\mathbb{Q}^{N-1}/\Delta t$,
+                                            $\mathbb{H}^{N-2}$,
+                                            $\mathbb{H}^{N-1}$,
+                                            $\mathbb{D}^{N-1}$ \\
+    \cline{2-3}
+    \multicolumn{1}{|l|}{} &
+    \multicolumn{1}{ l|}{\tt Scalar cold} & $\mathbb{H}^{N-1} $ \\
+    \cline{1-3}
+    \end{tabular}
+  \end{center}
+%
+At this point, we enter the {\em inner} loop which contains a call to 
+{\tt Momentum::convection()} at line~113. This subroutine updates {\tt cnew} 
+with the advection term obtained from new velocities, i.e. velocities currently 
+being iterated at time step~$N$. Data members in {\tt Momentum} now contain 
+the following:
+%
+  \begin{center}
+    \begin{tabular}{cc|c|cc}
+    \cline{3-3}
+    & & \multicolumn{1}{ c|}{Holds:} & \\ 
+    \cline{1-3}
+    \multicolumn{1}{|c|}{\multirow{6}{*}{Member:}} &
+    \multicolumn{1}{ l|}{\tt Matrix A}   & $[A]$ &      \\ 
+    \cline{2-3}
+    \multicolumn{1}{|l|}{} &
+    \multicolumn{1}{ l|}{\tt Scalar phi} & $\{\phi\}^{N-1}$  & \\ 
+    \cline{2-3}
+    \multicolumn{1}{|l|}{} &
+    \multicolumn{1}{ l|}{\tt Scalar fnew} & $\mathbb{Q}^{N-1}/\Delta t$,
+                                            $\mathbb{H}^{N-2}$,
+                                            $\mathbb{H}^{N-1}$,
+                                            $\mathbb{D}^{N-1}$,  
+                                            $\mathbb{F}$ & \\
+    \cline{2-3}
+    \multicolumn{1}{|l|}{} &
+    \multicolumn{1}{ l|}{\tt Scalar fold} & $\mathbb{Q}^{N-1}/\Delta t$,
+                                            $\mathbb{H}^{N-2}$,
+                                            $\mathbb{H}^{N-1}$,
+                                            $\mathbb{D}^{N-1}$ & \\
+    \cline{2-3}
+    \multicolumn{1}{|l|}{} &
+    \multicolumn{1}{ l|}{\tt Scalar cnew} & $\mathbb{H}^{N}   $ & $\gets$ change \\
+    \cline{2-3}
+    \multicolumn{1}{|l|}{} &
+    \multicolumn{1}{ l|}{\tt Scalar cold} & $\mathbb{H}^{N-1} $ & \\
+    \cline{1-3}
+    \end{tabular}
+  \end{center}
+%
+In the call to solver at line~114, right hand side {\tt fnew} is updated with
+{\tt cnew}, so that the contents of inner variables before the call to linear
+solver is:
+%
+  \begin{center}
+    \begin{tabular}{cc|c|cc}
+    \cline{3-3}
+    & & \multicolumn{1}{ c|}{Stores:} & \\ 
+    \cline{1-3}
+    \multicolumn{1}{|c|}{\multirow{6}{*}{Member:}} &
+    \multicolumn{1}{ l|}{\tt Matrix A}   & $[A]$ &      \\ 
+    \cline{2-3}
+    \multicolumn{1}{|l|}{} &
+    \multicolumn{1}{ l|}{\tt Scalar phi} & $\{\phi^{N-1}\}$ & \\ 
+    \cline{2-3}
+    \multicolumn{1}{|l|}{} &
+    \multicolumn{1}{ l|}{\tt Scalar fnew} & $\mathbb{Q}^{N-1}/\Delta t$,
+                                            $\mathbb{H}^{N-2}$,
+                                            $\mathbb{H}^{N-1}$,
+                                            $\mathbb{H}^{N}$,
+                                            $\mathbb{D}^{N-1}$,  
+                                            $\mathbb{F}$ & $\gets$ changed \\
+    \cline{2-3}
+    \multicolumn{1}{|l|}{} &
+    \multicolumn{1}{ l|}{\tt Scalar fold} & $\mathbb{Q}^{N-1}/\Delta t$,
+                                            $\mathbb{H}^{N-2}$,
+                                            $\mathbb{H}^{N-1}$,
+                                            $\mathbb{D}^{N-1}$ & \\
+    \cline{2-3}
+    \multicolumn{1}{|l|}{} &
+    \multicolumn{1}{ l|}{\tt Scalar cnew} & $\mathbb{H}^{N}   $ & \\
+    \cline{2-3}
+    \multicolumn{1}{|l|}{} &
+    \multicolumn{1}{ l|}{\tt Scalar cold} & $\mathbb{H}^{N-1} $ & \\
+    \cline{1-3}
+    \end{tabular}
+  \end{center}
+%
+which is exactly what is needed. After the call to linear solver, {\tt phi}
+will hold the new value for velocities $\{\phi^N\}$, i.e.:
+%
+  \begin{center}
+    \begin{tabular}{cc|c|cc}
+    \cline{3-3}
+    & & \multicolumn{1}{ c|}{Stores:} & \\ 
+    \cline{1-3}
+    \multicolumn{1}{|c|}{\multirow{6}{*}{Member:}} &
+    \multicolumn{1}{ l|}{\tt Matrix A}   & $[A]$ &      \\ 
+    \cline{2-3}
+    \multicolumn{1}{|l|}{} &
+    \multicolumn{1}{ l|}{\tt Scalar phi} & $\{\phi^N\}$ & $\gets$ changed \\ 
+    \cline{2-3}
+    \multicolumn{1}{|l|}{} &
+    \multicolumn{1}{ l|}{\tt Scalar fnew} & $\mathbb{Q}^{N-1}/\Delta t$,
+                                            $\mathbb{H}^{N-2}$,
+                                            $\mathbb{H}^{N-1}$,
+                                            $\mathbb{H}^{N}$,
+                                            $\mathbb{D}^{N-1}$,  
+                                            $\mathbb{F}$ & \\
+    \cline{2-3}
+    \multicolumn{1}{|l|}{} &
+    \multicolumn{1}{ l|}{\tt Scalar fold} & $\mathbb{Q}^{N-1}/\Delta t$,
+                                            $\mathbb{H}^{N-2}$,
+                                            $\mathbb{H}^{N-1}$,
+                                            $\mathbb{D}^{N-1}$ & \\
+    \cline{2-3}
+    \multicolumn{1}{|l|}{} &
+    \multicolumn{1}{ l|}{\tt Scalar cnew} & $\mathbb{H}^{N}   $ & \\
+    \cline{2-3}
+    \multicolumn{1}{|l|}{} &
+    \multicolumn{1}{ l|}{\tt Scalar cold} & $\mathbb{H}^{N-1} $ & \\
+    \cline{1-3}
+    \end{tabular}
+  \end{center}
+%
+
+When the computation of new time step starts, values in~{\tt phi} and 
+{\tt cold} get older by one time level and become~$\{\phi^{N-1}\}$ 
+and~$\mathbb{H}^{N-2}$ respectively. 
+
+\subsubsection{A note on external source terms}
+
+The way external sources (or forces in case of momentum equation) are 
+discretized in time is defined implicitly in the main function. 
+If sources are estimated
+at the beginning of time step using the know values from old~($N-1$) time
+step, their discretization is based on forward Euler scheme. That is the 
+most straight-forward approach for non-iterative schemes. 
+
+In case iterative schemes are used, we can compute the value of the source
+term inside the inner loop and thus have it based on the new~($N$) value of 
+dependent variable making it a backward Euler scheme.
+
+For multi-level schemes (Adams-Bashforth or Crank-Nicolson) one would have to
+define two time level for sources in the main function and take care of their
+proper computation. At the time of writing this tutorial, there are no examples
+to demonstrate such an approach.
+
+%---------------------------------------------------------------------nutshell-%
+\vspace*{5mm} \fbox{ \begin{minipage}[c] {0.97\textwidth} %-----------nutshell-%
+    {\sf Section \ref{sec:implementation} in a nutshell} \\ %-----nutshell-%
+
+      - Implementation of time-stepping schemes in {\psiboil} is based on the
+      following concepts:
+      \begin{itemize}
+        \item available time-discretization schemes are stored in objects of 
+              type {\tt TimeScheme},
+        \item {\em inertial} term of the governing equations is assumed to 
+              vary linearly between the old ($N-1$) and the new ($N$) time step,
+        \item {\em diffusion} term can be discretized in time with the 
+              Crank-Nicolson, backward Euler and forward Euler schemes,
+        \item {\em advection} term can be discretized in time with the 
+              Adams-Bashforth, Crank-Nicolson, backward Euler and forward Euler 
+              schemes,
+        \item time-stepping scheme for {\em source} (or {\em force} term for 
+              momentum) is done in the {\psiboil}'s main function, 
+        \item objects of type {\tt Equation} and its descendants, keep various
+              parts of discretized governing equations in {\tt Scalar} fields:
+              {\tt fold}, {\tt fnew}, {\tt cold}, {\tt cnew},
+        \item these {\tt Scalar} fields are updated across several {\tt Equation}
+              descendant member functions, most notably {\tt new\_time\_step()},
+              {\tt convection}, {\tt diffusion}, {\tt update\_rhs()} and {\tt solve}.
+      \end{itemize}
+      
+  \end{minipage} } %--------------------------------------------------nutshell-%
+%---------------------------------------------------------------------nutshell-%

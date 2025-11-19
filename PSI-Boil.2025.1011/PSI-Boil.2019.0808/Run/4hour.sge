@@ -1,0 +1,42 @@
+#!/bin/bash
+ 
+#$ -cwd
+#$ -N _204
+#$ -pe orte 16
+#$ -l s_rt=000:59:00,h_rt=001:00:00
+
+# read the necessary modules
+source /usr/share/Modules/init/sh
+export -n -f module
+module load mpi/openmpi-1.5.4-gcc-4.6.1
+
+# limit the core size
+ulimit -c 0
+
+# set some parameters
+TIME_FILE=time.txt
+OUTPUT_FILE=out-204
+LAST_TIME_STEP=60000
+N_PROCESSORS=16
+WORK_DIRECTORY=/gpfs/home/niceno/Development/PSI-Boil-Copy-Systematic/Src/204-gravity-plus
+EXECUTABLE=./Boil_plus_cg_ic2
+SUBMIT=/gpfs/home/sge/bin/lx24-amd64/qsub
+
+# go to working directory
+cd $WORK_DIRECTORY
+ 
+# if time file exists, read it and launch the job if needed
+if [ -f $TIME_FILE ]; then
+  read TIME_STEP < $TIME_FILE
+  if [ "$TIME_STEP" -lt "$LAST_TIME_STEP" ]; then
+    mpirun -np $N_PROCESSORS $EXECUTABLE >> $OUTPUT_FILE
+    $SUBMIT $0
+  fi
+
+# if time file does not exist, launch the first job
+else
+  mpirun -np $N_PROCESSORS $EXECUTABLE > $OUTPUT_FILE
+  $SUBMIT $0
+fi
+
+exit

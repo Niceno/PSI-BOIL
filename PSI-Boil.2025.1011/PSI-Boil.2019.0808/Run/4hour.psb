@@ -1,0 +1,31 @@
+#!/bin/bash
+#PBS -l mppwidth=64
+#PBS -l walltime=03:59:00
+#PBS -V
+
+set -ex
+
+# set some parameters
+TEST=time.txt
+OUT=out
+END=220000
+NP=64
+
+# go to working directory
+cd  /scratch/rosa/bniceno/4HourJob
+
+# if TEST exists, read it and launch the job if needed
+if [ -f $TEST ]; then
+  read TIMESTEP < $TEST
+  if [ "$TIMESTEP" -lt "$END" ]; then
+    aprun -n $NP ./Boil >> $OUT
+    qsub $0
+  fi
+
+# if TEST file does not exist, launch the first job
+else
+  aprun -n $NP ./Boil > $OUT
+  qsub $0
+fi
+
+exit

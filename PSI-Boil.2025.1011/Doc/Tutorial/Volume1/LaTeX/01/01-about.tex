@@ -1,0 +1,55 @@
+\section{About {\psiboil}}
+\label{sec_about}
+
+{\psiboil} ({\sf P}arallel {\sf SI}mulator of {\sf Boil}ing phenomena) is a
+three-dimensional, numerical solver for single- and two-phase flows 
+with or without heat transfer. It has the capability to simulate conjugate 
+heat transfer problems as well. The discretization of governing equations is
+based on the~$2^{nd}$ order accurate Finite Volume~(FV) method,
+on staggered orthogonal grids. % REF
+%
+Two-phase flows are simulated with surface tracking algorithm,
+based on conservative Level Set~(LS) approach. % REF
+%
+Linear solvers are based on the Krylov's sub-space family of algorithms,
+which can be accelerated with an algebraic multigrid method. % REF
+
+{\psiboil} is written in {\tt C++} programming language and uses Message
+Passing Interface ({\tt MPI}) for parallelization. It compiles on most
+Linux-based computers\footnote{\tt www.linux.org}. 
+The compilation procedure relies on {\tt autotools},
+as well as on the {\tt make} utility. On most computational platforms, 
+compilation consists of running {\tt configure}, followed by {\tt make}. 
+%
+{\psiboil} has been compiled on Linux-based PCs, clusters, as
+well as main-frame computers such as Cray-XT3\footnote{Cray is
+a registered trademark of Cray Inc.\ ({\tt www.cray.com}).}.
+It is also possible to compile it on Windows~XP\footnote{Windows~XP
+is a registered trademark of Microsoft Inc.\ ({\tt www.microsoft.com}).}.
+Cygwin system\footnote{\tt www.cygwin.com} and without~{\tt MPI}
+support.
+
+The development of {\psiboil} has started in the summer of~2006,
+at Paul Scherrer Institute~(PSI), as an integral part of the project
+on Multi-Scale Modeling Analysis~(MSMA), which focuses on mechanistic
+modeling of boiling phenomena at multiple scales. Initially, it is
+available only to PSI personnel working on the MSMA project. But, should
+it prove useful, it might spread further among the academic
+community, presumably under a {\tt GNU} license\footnote{www.gnu.org}.
+%
+The main purpose of {\psiboil} is not to compete with commercial
+Computational Fluid Dynamics~(CFD) packages, but rather to serve
+as a tool for academic community.
+
+Since it's aim is not to compete with commercial CFD codes, {\psiboil} 
+is not an integral program capable to solve a general fluid
+flow problem. Rather, it is a suite of objects an algorithms 
+which are used as blocks for building programs for particular flow problems. 
+As you will see in this tutorial, for every problem being solved, 
+a new program\footnote{A new {\tt main()} function, embodied into a
+separate~{\tt main.cpp} file.} is written. These programs are supposed
+to be short and highly specialized for a particular task. 
+
+Following this rationale, {\psiboil} does not have any input files. 
+It's  main program is re-written for each problem being solved and 
+actually serves as an input file itself.  

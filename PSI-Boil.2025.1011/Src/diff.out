@@ -1,0 +1,220 @@
+11,20c11,20
+< const int  NX1 = 16*gLevel;
+< const int  NX2 =  2*gLevel;
+< const int  NY  = 8*gLevel;
+< const int  NZ  = 8*gLevel;
+< const int  NmZ =  2*gLevel;
+< const real LY  =  0.005;
+< const real LX1 =  0.01;
+< const real LX3 =  0.012;
+< const real LZ  =  0.00589;
+< const real LmZ = -0.001;
+---
+> const int  NX1 = 16*gLevel/8;
+> const int  NX2 =  2*gLevel/8;
+> const int  NY  = 8*gLevel/8;
+> const int  NZ  = 12*gLevel/16;  // 16 -> 24
+> const int  NmZ =  2*gLevel/8;  // 8  -> 
+> const real LY  =  0.005/8.0;
+> const real LX1 =  0.01/8.0;
+> const real LX3 =  0.012/8.0;
+> const real LZ  =  0.00036;
+> const real LmZ = -0.001/32.0;
+58a59
+>   boil::oout<<"Grid1D: gy\n";
+61,65c62,70
+<   //Grid1D gz2( Range<real>(0.0,LZ), NZ, Periodic::no());
+<   Grid1D gz2( Range<real>(0.0,0.5*LZ), Range<real>(dx/4.0,dx),NZ*3/4, Periodic::no());
+<   Grid1D gz3( Range<real>(0.5*LZ,LZ),  Range<real>(1.2*dx,4.0*dx), NZ/4, Periodic::no());
+<   Grid1D gztmp( gz1, gz2, Periodic::no());
+<   Grid1D gz( gztmp, gz3, Periodic::no(), BndGrid::wall(), BndGrid::symmetry());
+---
+>   boil::oout<<"Grid1D: gz1\n";
+>   Grid1D gz2( Range<real>(0.0,LZ), Range<real>(dx/4.0,dx*1.2),NZ, Periodic::no());
+>   //Grid1D gz2( Range<real>(0.0,0.5*LZ), Range<real>(dx/4.0,dx),NZ*3/4, Periodic::no());
+>   //boil::oout<<"Grid1D: gz2 NZ="<<NZ<<"\n";
+>   //Grid1D gz3( Range<real>(0.5*LZ,LZ),  Range<real>(1.2*dx,4.0*dx), NZ/4, Periodic::no());
+>   //boil::oout<<"Grid1D: gz3\n";
+>   //Grid1D gztmp( gz1, gz2, Periodic::no());
+>   //Grid1D gz( gztmp, gz3, Periodic::no(), BndGrid::wall(), BndGrid::symmetry());
+>   Grid1D gz( gz1, gz2, Periodic::no(), BndGrid::wall(), BndGrid::symmetry());
+87a93
+>   Scalar id_bubble(dom);  // for Floodfill
+126a133
+>   id_bubble = p.shape();
+215c222,224
+<   Krylov * solver2 = new BiCGS(dom, Prec::di());
+---
+>   //Krylov * solver2 = new BiCGS(dom, Prec::di());
+>   Krylov * solver2 = new CG(dom, Prec::di());  // Change on 2024.1128 because 
+> 					       // of floating point exception
+251a261,267
+>   /* track bubble ID */
+>   Floodfill flood(c, id_bubble, &uvw, time);
+>   flood.set_out_freq(10);
+>   boil::oout<<"main:Floodfill:output frequency= "<<flood.get_out_freq()<<"\n";
+>   flood.set_smallest_cvol(1);
+>   flood.set_range(Range<real>(0.0,LX1),Range<real>(-0.5*LY,0.5*LY),Range<real>(0.0,LZ));
+> 
+305a322,324
+> #if 0
+>     flood.load("flood", ts);
+> #endif
+320c339,340
+<     di.compute();
+---
+>     di.compute(1.0e-15);
+>     boil::plot->plot(wd,"wd",ts);
+338c358
+<     di.compute();
+---
+>     di.compute(1.0e-15);
+388c408,413
+<         nucl.add(Site(nsx, nsy, zsite, Tact, -0.002));
+---
+>         if(0.02*LX1<nsx && nsx<LX1 && -0.5*LY<nsy && nsy<0.5*LY) {
+>           nucl.add(Site(nsx, nsy, zsite, Tact, -0.002));
+>           if(ins%100==0)
+>             boil::oout<<"main:nucl.add= "<<ins<<" "<<nsx<<" "<<nsy<<" "<<Tact<<"\n";
+>           ins++;
+> 	}
+390,393c415,417
+<         if(ins%1000==0){
+<           boil::oout<<"main:nucl.add= "<<ins<<" "<<nsx<<" "<<nsy<<" "<<Tact<<"\n";
+<         }
+<         ins++;
+---
+>         //if(ins%1000==0){
+>         //  boil::oout<<"main:nucl.add= "<<ins<<" "<<nsx<<" "<<nsy<<" "<<Tact<<"\n";
+>         //}
+401,402c425,426
+<     boil::plot->plot(uvw,c,tpr,press,mdot,mu_t,yplus
+<                     ,"uvw-c-tpr-press-mdot-mut-yplus",0);
+---
+>     boil::plot->plot(uvw,c,tpr,press,mdot,mu_t,yplus,id_bubble,
+>                     "uvw-c-tpr-press-mdot-mut-yplus-id",0);
+488,489c512,513
+<     const real x0 = LX3 - 0.002;
+<     const real x1 = LX3 - 0.000;
+---
+>     const real x0 = LX1;
+>     const real x1 = LX3;
+548c572,574
+<     conc.totalvol();
+---
+>     conc.totalvol(Range<real>(0.0, LX1),
+>                   Range<real>(-LY/2.0, LY/2.0),
+>                   Range<real>(0.0, LZ));
+561c587
+<     const real x0b = LX3 - 0.001;
+---
+>     const real x0b = LX1 + 0.5*(LX3-LX1);
+592c618
+<       if(c.xc(i)>LX1){
+---
+>       if(c.xc(i)>LX1+(LX3-LX1)*0.5){
+608a635,640
+>     /*------------+
+>     |  floodfill  |
+>     +------------*/
+>     boil::oout<<"main:floodfill\n";
+>     flood.identify_regions();
+> 
+628,629c660
+<     /* average temperature */
+<     real sum_tc=0.0;
+---
+>     /* average temperature in ITO */
+636c667
+<           if(c.xc(i)<LX3-0.002) {
+---
+>           if(c.xc(i)<LX1) {
+645,656d675
+<     int ktc = c.akm(-1e-7, boil::pico);  // cell include z=-1e-6
+<     //int ktc = c.akm(LmZ+1e-6, boil::pico);  // cell include z=LmZ+1e-6
+<     if(ktc>=c.sk() && ktc<=c.ek()) {
+<       for_vij(c,i,j) {
+<         if(c.xc(i)<LX3-0.001) {
+<           sum_tc+=tpr[i][j][ktc];
+<           n_tc++;
+<         }
+<       }
+<     }
+<     boil::cart.sum_real(&sum_tc);
+<     boil::cart.sum_int(&n_tc);
+658,693d676
+< #if 1
+<     real tc[7];
+<     for(int ii=1; ii<=6; ii++) {
+<       real x0=0.0;
+<       real x_tc;
+<       x_tc = x0 + (LX3-0.001)/7.0*real(ii);
+<       if(time.current_step()==1){
+<         boil::oout<<"main:x_tc= "<<ii<<" "<<x_tc<<"\n";
+<       }
+< #if 0
+<       if (ii==1) { x_tc = x0 + 0.03; }
+<       else if (ii==2) { x_tc = x0 + 0.06; }
+<       else if (ii==3) { x_tc = x0 + 0.09; }
+<       else if (ii==4) { x_tc = x0 + 0.12; }
+<       else if (ii==5) { x_tc = x0 + 0.15; }
+<       else { x_tc = x0 + 0.317; }
+< #endif
+<       real sum_tc1=0.0;
+<       int n_tc1=0;
+<       int ktc = c.akm(-1e-7, boil::pico);  // cell include z=-1e-7
+<       //int ktc = c.akm(LmZ+1e-6, boil::pico);  // cell include z=LmZ+1e-6
+<       //std::cout<<"ktc= "<<ktc<<" "<<tpr.zc(ktc)<<" "<<tpr.zc(ktc+1)<<"\n";
+<       for_vi(tpr,i) {
+<         if(tpr.xc(i)>=x_tc && tpr.xc(i)<=x_tc+dx) {
+<           if(ktc>=c.sk() && ktc<=c.ek()) {
+<             for_vj(tpr,j) {
+<               sum_tc1+=tpr[i][j][ktc];
+<               n_tc1++;
+<             }
+<           }
+<         }
+<       }
+<       boil::cart.sum_real(&sum_tc1);
+<       boil::cart.sum_int(&n_tc1);
+<       tc[ii]=sum_tc1/real(n_tc1);
+<     }
+696,698c679
+<     boil::oout<<"twall= "<<time.current_time()<<" "<<sum_tcb/vol_tcb<<" "
+<               <<sum_tc/real(n_tc)<<" "<<tc[1]<<" "<<tc[2]<<" "
+<               <<tc[3]<<" "<<tc[4]<<" "<<tc[5]<<" "<<tc[6]<<"\n";
+---
+>     boil::oout<<"twall= "<<time.current_time()<<" "<<sum_tcb/vol_tcb<<"\n";
+701,720d681
+< #endif
+< 
+<     /* Sum(mdot) in wall adjascent cells = contact line evaporation */
+<     real sum_mdot_wall_pos = 0.0;
+<     real sum_mdot_wall_neg = 0.0;
+<     for_vk(mdot,k) {
+<       if( approx(mdot.zn(k),0.0,1e-10)) {
+<         for_vij(mdot,i,j) {
+<           if(mdot[i][j][k]>0.0) {
+<             sum_mdot_wall_pos += mdot[i][j][k];
+<           } else {
+<             sum_mdot_wall_neg += mdot[i][j][k];
+<           }
+<         }
+<       }
+<     }
+<     boil::cart.sum_real(&sum_mdot_wall_pos);
+<     boil::cart.sum_real(&sum_mdot_wall_neg);
+<     boil::oout<<"sum_mdot_wall= "<<time.current_time()<<" "
+<               <<sum_mdot_wall_pos<<" "<<sum_mdot_wall_neg<<"\n";
+726,727c687,688
+<       boil::plot->plot(uvw,c,tpr,press,mdot,mu_t,yplus,
+<                       "uvw-c-tpr-press-mdot-mut-yplus",iint);
+---
+>       boil::plot->plot(uvw,c,tpr,press,mdot,mu_t,yplus,id_bubble,
+>                       "uvw-c-tpr-press-mdot-mut-yplus-id",iint);
+740a702
+>       flood.save("flood",time.current_step());
+751a714
+>       flood.save("flood",time.current_step());
+758a722
+>       flood.rm("flood", ts);

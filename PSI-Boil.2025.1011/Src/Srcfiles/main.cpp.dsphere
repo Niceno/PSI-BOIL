@@ -1,0 +1,387 @@
+#include "Include/psi-boil.h"
+#include <fstream>
+#include "compare_areas.cpp"
+#define USE_VOF
+
+#define _GNU_SOURCE 1
+#include <fenv.h>
+#if 1
+static void __attribute__ ((constructor)) trapfpe(void)
+{
+  /* Enable some exceptions. At startup all exceptions are masked. */
+  feenableexcept(FE_INVALID|FE_DIVBYZERO|FE_OVERFLOW);
+}
+#endif
+
+const int level = 2;
+
+/* domain dimensions (given by problem) */
+//const real LX =   0.5;
+const real LX =   0.2;
+const real LY =   0.2;
+const real LZ =   0.2;
+
+/* computed parameters */
+const int NX = 50*level;
+const int NY = 50*level;
+const int NZ = 50*level;
+
+/******************************************************************************/
+main(int argc, char * argv[]) {
+
+  boil::timer.start();
+
+  /*--------------------------------+
+  |  choose the output file format  |
+  +--------------------------------*/
+  boil::plot = new PlotTEC();
+
+  /*----------+
+  |  grid(s)  |
+  +----------*/
+  Grid1D gx( Range<real>( -LX/2.,LX/2.), NX, Periodic::yes() );
+  Grid1D gy( Range<real>( -LY/2.,LY/2.), NY, Periodic::yes() );
+  Grid1D gz( Range<real>( -LZ/2.,LZ/2.), NZ, Periodic::yes() );
+
+  /*---------+
+  |  domain  |
+  +---------*/
+  Domain d(gx, gy, gz);
+
+  /*-------------------+
+  |  time-integration  |
+  +-------------------*/
+  const int  ndt = 400;
+  const int nint = 100;
+  const real dt  = 0.25 * LX / real(NX);
+  Times time(ndt, dt); 
+	
+  /*------------------+
+  |  define unknowns  |
+  +------------------*/
+  Vector uvw(d); // vel
+  Scalar c  (d), g  (d), kappa(d); // concentration
+  Scalar heaviside(d), heaviadens(d);
+  Scalar grad0adens(d), gradAadens(d), gradBadens(d);
+
+
+  /*-----------------------------+ 
+  |  insert boundary conditions  |
+  +-----------------------------*/
+  for_m(m) {
+    uvw.bc(m).add( BndCnd( Dir::imin(), BndType::periodic() ) );
+    uvw.bc(m).add( BndCnd( Dir::imax(), BndType::periodic() ) );
+    uvw.bc(m).add( BndCnd( Dir::kmin(), BndType::periodic() ) );
+    uvw.bc(m).add( BndCnd( Dir::kmax(), BndType::periodic() ) );
+    uvw.bc(m).add( BndCnd( Dir::jmin(), BndType::periodic() ) );
+    uvw.bc(m).add( BndCnd( Dir::jmax(), BndType::periodic() ) );
+  }
+
+  c.bc().add( BndCnd( Dir::imin(), BndType::periodic() ) );
+  c.bc().add( BndCnd( Dir::imax(), BndType::periodic() ) );
+  c.bc().add( BndCnd( Dir::kmin(), BndType::periodic() ) );
+  c.bc().add( BndCnd( Dir::kmax(), BndType::periodic() ) );
+  c.bc().add( BndCnd( Dir::jmin(), BndType::periodic() ) );
+  c.bc().add( BndCnd( Dir::jmax(), BndType::periodic() ) );
+ 
+  heaviside = c.shape();
+  heaviadens = c.shape();
+  grad0adens = c.shape();
+  gradAadens = c.shape();
+  gradBadens = c.shape();
+
+  /*--------------------+
+  |  initial condition  |
+  +--------------------*/
+  Comp m=Comp::u();
+  for_vmijk(uvw,m,i,j,k)
+    uvw[m][i][j][k]=1.0;
+
+  m=Comp::v();
+  for_vmijk(uvw,m,i,j,k)
+    uvw[m][i][j][k]=0.0;
+
+  m=Comp::w();
+  for_vmijk(uvw,m,i,j,k)
+    uvw[m][i][j][k]=0.0;
+  uvw.exchange();
+
+  for_vijk(c,i,j,k) 
+    c[i][j][k] = 0.0;
+
+#if 0
+  const real top = LZ/4.0;
+  const real fullval = 1.0;
+  const real faceval = 0.3;
+  const real edgeval = faceval*faceval;
+  const real nodeval = faceval*edgeval;
+
+  for_vijk(c,i,j,k) { 
+    /* none increased = inside */
+    if(c.xc(i)<top&&c.xc(i)>-top&& 
+       c.yc(j)<top&&c.yc(j)>-top&& 
+       c.zc(k)<top&&c.zc(k)>-top  ) 
+      c[i][j][k] = fullval;
+
+    /* one increased = faces */
+    else if(c.xc(i)<top         &&c.xc(i)>-top         && 
+            c.yc(j)<top         &&c.yc(j)>-top         && 
+            c.zc(k)<top+c.dzc(k)&&c.zc(k)>-top-c.dzc(k)  ) 
+       c[i][j][k] = faceval;
+
+    else if(c.xc(i)<top+c.dxc(i)&&c.xc(i)>-top-c.dxc(i)&& 
+            c.yc(j)<top         &&c.yc(j)>-top         && 
+            c.zc(k)<top         &&c.zc(k)>-top           ) 
+      c[i][j][k] = faceval;
+
+    else if(c.xc(i)<top         &&c.xc(i)>-top         && 
+            c.yc(j)<top+c.dyc(j)&&c.yc(j)>-top-c.dyc(j)&& 
+            c.zc(k)<top         &&c.zc(k)>-top           ) 
+      c[i][j][k] = faceval;
+
+    /* two increased = edges */
+    else if(c.xc(i)<top         &&c.xc(i)>-top         && 
+            c.yc(j)<top+c.dyc(j)&&c.yc(j)>-top-c.dyc(j)&& 
+            c.zc(k)<top+c.dzc(k)&&c.zc(k)>-top-c.dzc(k)  ) 
+      c[i][j][k] = edgeval;
+
+    else if(c.xc(i)<top+c.dxc(i)&&c.xc(i)>-top-c.dxc(i)&& 
+            c.yc(j)<top         &&c.yc(j)>-top         && 
+            c.zc(k)<top+c.dzc(k)&&c.zc(k)>-top-c.dzc(k)  ) 
+      c[i][j][k] = edgeval;
+
+    else if(c.xc(i)<top+c.dxc(i)&&c.xc(i)>-top-c.dxc(i)&& 
+            c.yc(j)<top+c.dyc(j)&&c.yc(j)>-top-c.dyc(j)&& 
+            c.zc(k)<top         &&c.zc(k)>-top           ) 
+      c[i][j][k] = edgeval;
+
+    /* all increased = corners */
+    else if(c.xc(i)<top+c.dxc(i)&&c.xc(i)>-top-c.dxc(i)&& 
+            c.yc(j)<top+c.dyc(j)&&c.yc(j)>-top-c.dyc(j)&& 
+            c.zc(k)<top+c.dzc(k)&&c.zc(k)>-top-c.dzc(k)  ) 
+      c[i][j][k] = nodeval;
+
+  }
+#else
+  const real valmult = 1.0+1e-2;
+  const real radiusOUT = valmult*LZ/4.0;
+  const real radiusINN = valmult*0.9*LZ/4.0;
+  const real xcent = 0.;
+  const real ycent = 0.;
+  const real zcent = 0.;
+  int Realsum(0);
+
+  for_vijk(c,i,j,k) {
+    real wsb_x = c.xc(i) - c.dxc(i)*0.5;
+    real wst_x = c.xc(i) - c.dxc(i)*0.5;
+    real wnb_x = c.xc(i) - c.dxc(i)*0.5;
+    real wnt_x = c.xc(i) - c.dxc(i)*0.5;
+    real esb_x = c.xc(i) + c.dxc(i)*0.5;
+    real est_x = c.xc(i) + c.dxc(i)*0.5;
+    real enb_x = c.xc(i) + c.dxc(i)*0.5;
+    real ent_x = c.xc(i) + c.dxc(i)*0.5;
+
+    real wsb_y = c.yc(j) - c.dyc(j)*0.5;
+    real wst_y = c.yc(j) - c.dyc(j)*0.5;
+    real wnb_y = c.yc(j) + c.dyc(j)*0.5;
+    real wnt_y = c.yc(j) + c.dyc(j)*0.5;
+    real esb_y = c.yc(j) - c.dyc(j)*0.5;
+    real est_y = c.yc(j) - c.dyc(j)*0.5;
+    real enb_y = c.yc(j) + c.dyc(j)*0.5;
+    real ent_y = c.yc(j) + c.dyc(j)*0.5;
+
+    real wsb_z = c.zc(k) - c.dzc(k)*0.5;
+    real wst_z = c.zc(k) + c.dzc(k)*0.5;
+    real wnb_z = c.zc(k) - c.dzc(k)*0.5;
+    real wnt_z = c.zc(k) + c.dzc(k)*0.5;
+    real esb_z = c.zc(k) - c.dzc(k)*0.5;
+    real est_z = c.zc(k) + c.dzc(k)*0.5;
+    real enb_z = c.zc(k) - c.dzc(k)*0.5;
+    real ent_z = c.zc(k) + c.dzc(k)*0.5;
+  
+    real wsb_dist = sqrt(pow(wsb_x-xcent,2.0)+pow(wsb_y-ycent,2.0)+pow(wsb_z-zcent,2.0));
+    real wst_dist = sqrt(pow(wst_x-xcent,2.0)+pow(wst_y-ycent,2.0)+pow(wst_z-zcent,2.0));
+    real wnb_dist = sqrt(pow(wnb_x-xcent,2.0)+pow(wnb_y-ycent,2.0)+pow(wnb_z-zcent,2.0));
+    real wnt_dist = sqrt(pow(wnt_x-xcent,2.0)+pow(wnt_y-ycent,2.0)+pow(wnt_z-zcent,2.0));
+    real esb_dist = sqrt(pow(esb_x-xcent,2.0)+pow(esb_y-ycent,2.0)+pow(esb_z-zcent,2.0));
+    real est_dist = sqrt(pow(est_x-xcent,2.0)+pow(est_y-ycent,2.0)+pow(est_z-zcent,2.0));
+    real enb_dist = sqrt(pow(enb_x-xcent,2.0)+pow(enb_y-ycent,2.0)+pow(enb_z-zcent,2.0));
+    real ent_dist = sqrt(pow(ent_x-xcent,2.0)+pow(ent_y-ycent,2.0)+pow(ent_z-zcent,2.0));
+ 
+    if(wsb_dist<radiusINN&&wst_dist<radiusINN&&wnb_dist<radiusINN&&wnt_dist<radiusINN&&
+       esb_dist<radiusINN&&est_dist<radiusINN&&enb_dist<radiusINN&&ent_dist<radiusINN) {
+       c[i][j][k] = 0.0;
+    } else if(wsb_dist<=radiusINN||wst_dist<=radiusINN||wnb_dist<=radiusINN||wnt_dist<=radiusINN||
+              esb_dist<=radiusINN||est_dist<=radiusINN||enb_dist<=radiusINN||ent_dist<=radiusINN) {
+       Realsum++;
+       int mm=20;
+       real x0=d.xn(i);
+       real y0=d.yn(j);
+       real z0=d.zn(k);
+       real ddx=d.dxc(i)/real(mm);
+       real ddy=d.dyc(j)/real(mm);
+       real ddz=d.dzc(k)/real(mm);
+       int itmp=0;
+       for (int ii=0; ii<mm; ii++){
+         for (int jj=0; jj<mm; jj++){
+           for (int kk=0; kk<mm; kk++){
+             real xxc=x0+0.5*ddx+real(ii)*ddx;
+             real yyc=y0+0.5*ddy+real(jj)*ddy;
+             real zzc=z0+0.5*ddz+real(kk)*ddz;
+             real dist=sqrt(pow(xxc-xcent,2.0)
+                           +pow(yyc-ycent,2.0)+pow(zzc-zcent,2.0));
+             if (dist<radiusINN){
+               itmp=itmp+1;
+             }
+           }
+         }
+       }
+       c[i][j][k]=1.0-real(itmp)/real(mm*mm*mm);
+    } else if(wsb_dist<radiusOUT&&wst_dist<radiusOUT&&wnb_dist<radiusOUT&&wnt_dist<radiusOUT&&
+              esb_dist<radiusOUT&&est_dist<radiusOUT&&enb_dist<radiusOUT&&ent_dist<radiusOUT) {
+       c[i][j][k] = 1.0;
+    } else if(wsb_dist<=radiusOUT||wst_dist<=radiusOUT||wnb_dist<=radiusOUT||wnt_dist<=radiusOUT||
+              esb_dist<=radiusOUT||est_dist<=radiusOUT||enb_dist<=radiusOUT||ent_dist<=radiusOUT) {
+       Realsum++;
+       int mm=20;
+       real x0=d.xn(i);
+       real y0=d.yn(j);
+       real z0=d.zn(k);
+       real ddx=d.dxc(i)/real(mm);
+       real ddy=d.dyc(j)/real(mm);
+       real ddz=d.dzc(k)/real(mm);
+       int itmp=0;
+       for (int ii=0; ii<mm; ii++){
+         for (int jj=0; jj<mm; jj++){
+           for (int kk=0; kk<mm; kk++){
+             real xxc=x0+0.5*ddx+real(ii)*ddx;
+             real yyc=y0+0.5*ddy+real(jj)*ddy;
+             real zzc=z0+0.5*ddz+real(kk)*ddz;
+             real dist=sqrt(pow(xxc-xcent,2.0)
+                           +pow(yyc-ycent,2.0)+pow(zzc-zcent,2.0));
+             if (dist<radiusOUT){
+               itmp=itmp+1;
+             }
+           }
+         }
+       }
+       c[i][j][k]=real(itmp)/real(mm*mm*mm);
+    }
+
+  }
+
+  /* verification */
+  real Realarea = 4.*acos(-1.0)*radiusINN*radiusINN;
+  Realarea += 4.*acos(-1.0)*radiusOUT*radiusOUT;
+  boil::oout<<"Real: "<<Realarea<<" "<<Realsum<<boil::endl;
+
+  #if 0
+  int testsum(0);
+  for_vijk(c,i,j,k) {
+    if(c[i][j][k]>boil::pico&&c[i][j][k]-1.<-boil::pico) testsum++;
+  }
+  boil::oout<<"Testsum: "<< testsum<<boil::endl;
+  #endif 
+
+  for_vijk(c,i,j,k) 
+    c[i][j][k] = 1.0-c[i][j][k];
+
+#endif
+  c.bnd_update();
+  c.exchange_all();
+  //c.save("conc",0);
+
+  Heaviside indicator(heaviside, &c);
+
+  /*----------------+
+  |  linear solver  |
+  +----------------*/
+  Krylov * solver = new CG(d, Prec::di());
+
+#ifdef USE_VOF
+  VOF conc  (c, g, kappa, uvw, time, solver);
+#else
+  CIPCSL2 conc  (c, g, kappa, uvw, time, solver);
+#endif
+  conc.totalvol();
+  conc.curvature();
+
+  indicator.calculate();
+
+  FineScalar marker(c,conc.fs,&(conc.nx),&(conc.ny),&(conc.nz),&(conc.nalpha)); 
+  marker.evaluate();
+ 
+  compare_areas(c, indicator, heaviadens, grad0adens, gradAadens, gradBadens);
+  marker.cal_adens();
+
+#if 0
+  for( int b=0; b<c.bc().count(); b++ ) {
+    boil::oout<<c.bc().direction(b)<<" "<<c.bc().type(b)<<boil::endl;
+  }
+
+  for(int cc=0; cc<d.ibody().nccells(); cc++) {
+     int i,j,k;
+     d.ibody().ijk(cc,&i,&j,&k); 
+     if(i==1&&j==1) boil::oout<<i<<" "<<j<<" "<<k<<" "<<c.xc(i)<<" "<<c.yc(j)<<" "<<c.zc(k)<<boil::endl;
+  }
+#endif
+#if 0
+  int ii = NX/2;
+  int jj = NY/2;
+  int kk = NZ/2;
+  for_avj(c,jj)
+    boil::oout<<ii<<" "<<jj<<" "<<kk<<" "<<c[ii][jj][kk]<<" "<<conc.fs[Comp::w()][ii][jj][kk]<<" "<<marker.value(ii,jj,kk,marker.w())<<" "<<marker.value(ii,jj,kk,marker.s())<<" "<<marker.value(ii,jj,kk,marker.b())<<" "<<marker.value(ii,jj,kk,marker.ws())<<" "<<marker.value(ii,jj,kk,marker.wb())<<" "<<marker.value(ii,jj,kk,marker.sb())<<boil::endl;
+#endif
+
+#if 0
+  for_vmk(uvw,Comp::w(),k) {
+    boil::oout<<k<<" "<<d.ibody().off(m,1,1,k)<<boil::endl;
+  }
+  
+  for_vijk(heaviside,i,j,k){
+    heaviside[i][j][k] -= c[i][j][k];
+    heaviside[i][j][k] /= c[i][j][k]+boil::pico;
+  }
+#endif
+
+  boil::plot->plot(uvw,c,marker.adens,heaviadens, "uvw-c-adens-heaviadens", 0);
+ 
+#if 0 
+  int ii = 65;
+  int jj = 50;
+  int kk = 72;
+
+  marker.output(ii,jj,kk);
+             //<<conc.fs[Comp::u()][ii][jj][kk]<<" "<<conc.fs[Comp::v()][ii][jj][kk]<<" "<<conc.fs[Comp::w()][ii][jj][kk]<<" | "
+             //<<conc.fs[Comp::u()][ii+1][jj][kk]<<" "<<conc.fs[Comp::v()][ii][jj+1][kk]<<" "<<conc.fs[Comp::w()][ii][jj][kk+1]<<" | "
+//             <<conc.nx[ii][jj][kk]<<" "<<conc.ny[ii][jj][kk]<<" "<<conc.nz[ii][jj][kk]<<" "<<conc.nalpha[ii][jj][kk]<<" | "
+//             <<conc.nx[ii][jj][kk-1]<<" "<<conc.ny[ii][jj][kk-1]<<" "<<conc.nz[ii][jj][kk-1]<<" "<<conc.nalpha[ii][jj][kk-1]
+#endif
+
+#if 0
+  for(time.start(); time.end(); time.increase()) {
+
+    conc.advance();
+    conc.totalvol();
+    conc.curvature();
+
+    marker.evaluate();
+    compare_areas(c, indicator, heaviadens, grad0adens, gradAadens, gradBadens);
+    marker.cal_adens();
+
+    if(time.current_step() % nint == 0) {
+      boil::plot->plot(uvw, c, "uvw-c",  time.current_step());
+    }
+
+  }
+#endif
+
+  boil::oout << "finished" << boil::endl;
+
+  boil::timer.stop();
+  boil::timer.report();
+
+}	
+/*-----------------------------------------------------------------------------+
+ '$Id: main-CIPCSL2-1d.cpp,v 1.3 2018/09/26 10:06:18 sato Exp $'/
++-----------------------------------------------------------------------------*/

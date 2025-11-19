@@ -1,0 +1,403 @@
+#include "Include/psi-boil.h"
+#include <fstream>
+#include <iostream>
+#include <fenv.h>
+//#define USE_CARTESIAN
+//#define USE_CONTINUOUS
+
+#define _GNU_SOURCE 1
+#if 1
+static void __attribute__ ((constructor)) trapfpe(void)
+{
+  /* Enable some exceptions. At startup all exceptions are masked. */
+  feenableexcept(FE_INVALID|FE_DIVBYZERO|FE_OVERFLOW);
+}
+#endif
+
+/******************************************************************************/
+int main(int argc, char * argv[]) {
+
+  boil::timer.start();
+
+  if(argc<4){
+    boil::oout<<"Three arguments (gridlevel, cfl, inversion) required!"<<"\n";
+    boil::oout<<"./Boil wmin gridlevel cfl-max inversion"<<"\n";
+    exit(0);
+  }
+  const real wmin = atof(argv[1]);
+  boil::oout<<"wmin= "<<wmin<<"\n";
+
+  const int level = atoi(argv[2]);
+  boil::oout<<"glevel= "<<level<<"\n";
+
+  const real cfl_max = atof(argv[3]);
+  boil::oout<<"cfl-max= "<<cfl_max<<"\n";
+
+  const bool inverted = atoi(argv[4]);
+  boil::oout<<"inversion= "<<inverted<<"\n";
+
+  /* computed parameters */
+  const real AR = 0.5;
+  const int NX = 100*level;
+  const int NZ = int(AR*NX);
+
+  /* domain dimensions (given by problem) */
+  const real LX = 1.0;
+  const real LZ = real(AR)*LX;
+  const real DX = LX/real(NX);
+
+  const int mSimple = 1;
+
+  const real A = 1.0;
+
+#ifdef USE_CARTESIAN
+  auto stream = [&](const real x, const real z) {
+    return -A*x*z/LX;
+  };
+#else
+  auto stream = [&](const real x, const real z) {
+    return -A*x*x*z/LX;
+  };
+#endif
+
+  /*--------------------------------+
+  |  choose the output file format  |
+  +--------------------------------*/
+  boil::plot = new PlotTEC();
+  //boil::plot = new PlotTEC(AsNodes::no(), Buffers::yes());
+
+  /*----------+
+  |  grid(s)  |
+  +----------*/
+  Grid1D gx( Range<real>(0.0,LX), NX, Periodic::no(),
+             BndGrid::symmetry(), BndGrid::wall() );
+  Grid1D gz( Range<real>(-LZ/2.,LZ/2.), NZ, Periodic::no() );
+
+  /*---------+
+  |  domain  |
+  +---------*/
+#ifdef USE_CARTESIAN
+  Grid1D gy(DX);
+  Domain d(gx,gy,gz,NULL,"name",Decompose::x());
+#else
+  Axisymmetric d(gx,gz,DX,NULL,"name",Decompose::x());
+#endif
+
+  /*------------------+
+  |  define unknowns  |
+  +------------------*/
+  Vector uvw(d), uvw_old(d); // vel
+  Vector xyz(d); // body force
+  Scalar c  (d), g  (d), kappa(d), cold(d), cold2(d); // concentration
+  Scalar press  (d), p(d), f  (d);
+
+  /*-----------------------------+ 
+  |  insert boundary conditions  |
+  +-----------------------------*/
+  for_m(m) {
+    uvw.bc(m).add( BndCnd( Dir::imin(), BndType::symmetry() ) );
+    uvw.bc(m).add( BndCnd( Dir::imax(), BndType::outlet() ) );
+    uvw.bc(m).add( BndCnd( Dir::kmin(), BndType::outlet() ) );
+    uvw.bc(m).add( BndCnd( Dir::kmax(), BndType::outlet() ) );
+    uvw.bc(m).add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
+    uvw.bc(m).add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
+    uvw_old(m)=uvw(m).shape();
+  }
+
+  c.bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
+  c.bc().add( BndCnd( Dir::imax(), BndType::outlet() ) );
+  c.bc().add( BndCnd( Dir::kmin(), BndType::outlet() ) );
+  c.bc().add( BndCnd( Dir::kmax(), BndType::outlet() ) );
+  c.bc().add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
+  c.bc().add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
+
+  g=c.shape();
+  press=c.shape();
+  p=c.shape();
+  kappa=c.shape();
+  cold=c.shape();
+  cold2=c.shape();
+
+  Matter air(d), water(d);
+#if 0
+  air  .mu    (1.0000e-3);
+  air  .rho   (1.0000e+0);
+  water.mu    (1.0000e-3);
+  water.rho   (1.0000e+0);
+
+  Matter mixed(water, air, &c);
+  mixed.sigma (0.01);
+#else
+  air  .mu    (1.0000e-5);
+  air  .rho   (1.2500e+0);
+  water.mu    (1.0000e-3);
+  water.rho   (1.0000e+3);
+
+  Matter mixed(water, air, &c);
+  mixed.sigma (0.07);
+#endif
+
+  /*-------------------+
+  |  time-integration  |
+  +-------------------*/
+#ifdef USE_CARTESIAN
+  const real vel_max = 0.5*A*AR;
+#else
+  const real vel_max = A*AR;
+#endif
+  const real dt  = cfl_max*DX/vel_max;
+  const int  ndt = 22*level*int(5.*AR*240./(100.*cfl_max));
+  const int nint = ndt/20;
+  Times time(ndt,dt);
+
+  /*--------------------+
+  |  initial condition  |
+  +--------------------*/
+  real a = boil::pi/LX;
+#ifdef USE_CONTINUOUS
+  Comp m=Comp::u();
+  for_avmijk(uvw,m,i,j,k) {
+    real xpos = uvw.xc(m,i);
+    real zpos = uvw.zc(m,k);
+    uvw[m][i][j][k]=(+A)*xpos/LX;
+  }
+  uvw.exchange();
+
+  m=Comp::w();
+  for_avmijk(uvw,m,i,j,k) {
+    real xpos = uvw.xc(m,i);
+    real zpos = uvw.zc(m,k);
+  #ifdef USE_CARTESIAN
+    uvw[m][i][j][k]=(-A)*zpos/LX;
+  #else
+    uvw[m][i][j][k]=2.*(-A)*zpos/LX;
+  #endif 
+  }
+  uvw.exchange();
+#else
+  Comp m=Comp::u();
+  for_avmijk(uvw,m,i,j,k) {
+    real xpos0 = uvw.xc(m,i);
+    if(fabs(xpos0)<boil::atto) {
+      uvw[m][i][j][k] = 0.0;
+      continue;
+    }
+    real xpos1 = uvw.xc(m,i);
+    real zpos1 = uvw.zc(m,k)-0.5*DX;
+    real xpos2 = uvw.xc(m,i);
+    real zpos2 = uvw.zc(m,k)+0.5*DX;
+  #ifdef USE_CARTESIAN
+    uvw[m][i][j][k] = -(stream(xpos2,zpos2)-stream(xpos1,zpos1))/DX;
+  #else
+    uvw[m][i][j][k] = -(stream(xpos2,zpos2)-stream(xpos1,zpos1))/DX/xpos0;
+  #endif
+  }
+  uvw.exchange();
+
+  m=Comp::w();
+  for_avmijk(uvw,m,i,j,k) {
+    real xpos0 = uvw.xc(m,i);
+    real xpos1 = uvw.xc(m,i)-0.5*DX;
+    real zpos1 = uvw.zc(m,k);
+    real xpos2 = uvw.xc(m,i)+0.5*DX;
+    real zpos2 = uvw.zc(m,k);
+  #ifdef USE_CARTESIAN
+    uvw[m][i][j][k] = (stream(xpos2,zpos2)-stream(xpos1,zpos1))/DX;
+  #else
+    uvw[m][i][j][k] = (stream(xpos2,zpos2)-stream(xpos1,zpos1))/DX/xpos0;
+  #endif
+  }
+  uvw.exchange();
+#endif
+
+  cold = 0.0;
+
+#if 1
+  boil::setup_circle_xz(cold,0.1,0.1*LX+DX,0.0);
+  cold.bnd_update();
+  cold.exchange_all();
+#else 
+  cold = 1.0;
+  cold.bnd_update();
+  cold.exchange_all();
+#endif
+
+  if(inverted)
+    for_avijk(cold,i,j,k) {
+      cold[i][j][k] = 1.0 - cold[i][j][k];
+    }
+
+  /*----------------+
+  |  linear solver  |
+  +----------------*/
+  Krylov * solver = new CG(d, Prec::ic2());
+  //Krylov * solver = new CG(d, Prec::di());
+  Momentum ns( uvw, xyz, time, solver, &mixed);
+  ns.convection_set(TimeScheme::backward_euler()); //ns.convection is mandatory
+  ns.diffusion_set(TimeScheme::backward_euler());
+  Pressure pr(p, f, uvw, time, solver, &mixed);
+
+  AC multigrid( &pr );
+  if(mSimple>1) {
+    multigrid.min_cycles(4);  // 4
+    multigrid.max_cycles(8); // 8
+  } else {
+    multigrid.min_cycles(6);  // 6
+  }
+  multigrid.stop_if_diverging(true);
+
+#if 0
+  p = 0.0;
+  if (multigrid.vcycle(ResRat(1e-6))) OMS(converged);
+  //pr.solve(ResRat(1e-6));
+  p.exchange();
+  ns.project(p);
+#endif
+
+#ifdef USE_CARTESIAN
+  VOF conc(c, g, kappa, uvw, time, solver);
+  conc.set_normal_vector_method_all(NormMethod::ElviraXZ());
+  for_avijk(c,i,j,k) {
+    c[i][j][k] = cold[i][j][k];
+    cold2[i][j][k] = cold[i][j][k];
+  }
+#else
+  VOFaxisym conc(c, g, kappa, uvw, time, solver);
+  //conc.set_reconstruction_parameters(1e-5,conc.get_reconstruction_maxiter());
+  conc.color_to_vf(cold,c);
+  conc.color_to_vf(cold,cold2);
+#endif
+  //conc.set_advection_method(AdvectionMethod::ReconstructedSplit());
+  conc.set_advection_method(AdvectionMethod::BoundedSplit());
+
+  conc.ancillary();
+  conc.totalvol();
+  conc.front_minmax();
+
+  c.bnd_update();
+  c.exchange_all();
+
+#if 0 /* divergence freedom of velocity verification */
+  real fnew_max(-1.);
+  int ii(0), jj(0), kk(0);
+  for_vijk(c,i,j,k) {
+    real a_w = c.dSx(Sign::neg(),i,j,k);
+    real a_e = c.dSx(Sign::pos(),i,j,k);
+    real a_s = c.dSy(Sign::neg(),i,j,k);
+    real a_n = c.dSy(Sign::pos(),i,j,k);
+    real a_b = c.dSz(Sign::neg(),i,j,k);
+    real a_t = c.dSz(Sign::pos(),i,j,k);
+    real fnew = uvw.outflow(i,j,k);
+    fnew = fabs(fnew/c.dV(i,j,k));
+    if(fnew>=fnew_max) {
+      ii = i;
+      jj = j;
+      kk = k;
+      fnew_max = fnew;
+      boil::oout<<i<<" "<<j<<" "<<k<<" | "<<a_w<<" "<<a_e<<" "<<a_s<<" "<<a_n<<" "<<a_b<<" "<<a_t
+                <<" | "<<uvw[Comp::u()][i]  [j]  [k]<<" "<<uvw[Comp::u()][i+1][j]  [k]<<" "
+                <<uvw[Comp::w()][i]  [j]  [k]<<" "<<uvw[Comp::w()][i]  [j]  [k+1]<<" | "
+                <<fnew<<" "
+                <<uvw[Comp::u()][i][j][k]*cold.dzc(i)*cold.xn(i)-uvw[Comp::u()][i+1][j][k]*cold.dzc(i)*cold.xn(i+1)
+                + (uvw[Comp::w()][i][j][k]-uvw[Comp::w()][i][j][k+1])*(cold.xn(i+1)*cold.xn(i+1)-cold.xn(i)*cold.xn(i))*0.5 
+                //<<" | "<<cold.dzc(i)*cold.xn(i)<<" "<<cold.dzc(i)*cold.xn(i+1)<<" "<<(cold.xn(i+1)*cold.xn(i+1)-cold.xn(i)*cold.xn(i))*0.5
+                <<boil::endl;
+    } 
+  }
+  boil::oout<<ii<<" "<<jj<<" "<<kk<<" "<<fnew_max<<boil::endl;
+  exit(0);
+#endif
+
+  boil::plot->plot(uvw,c, "uvw-c", 0);
+
+  ns.cfl_max();
+
+  /* load variables */
+  std::vector<Scalar*> load_scalars = { &c };
+  std::vector<std::string> load_scalar_names = { "c" };
+
+  real cmax_linf_linf(-1.0), cmax_l1(0.);
+  real cmin_linf_linf(+1.0), cmin_l1(0.);
+
+  int ts(0);
+  std::stringstream ssb;
+  ssb <<"time-"<<ndt<<".txt";
+  if(boil::load_backup(ssb.str(),ts,time,
+                       load_scalars, load_scalar_names)) {
+  } else {
+  for(time.start(); time.end(); time.increase()) {
+
+    if(time.current_step() == ndt/2+1) {
+    //if(time.current_step() == 1) {
+      for_m(m)
+        for_avmijk(uvw,m,i,j,k) {
+          uvw[m][i][j][k] = -uvw[m][i][j][k];
+        }
+    }
+   
+    //boil::oout<<"Main: "<<21+boil::BW-1<<" "<<31+boil::BW-1<<" "<<c[21+boil::BW-1][boil::BW][31+boil::BW-1]<<boil::endl;
+    conc.advance();
+    //boil::oout<<"Main: "<<c[21+boil::BW-1][boil::BW][31+boil::BW-1]<<boil::endl;
+    conc.totalvol();
+    conc.front_minmax();
+
+    if(time.current_step() % nint == 0) {
+      boil::plot->plot(uvw, c, "uvw-c",  time.current_step());
+      boil::save_backup(time.current_step(), 0, time,
+                        load_scalars, load_scalar_names);
+    }
+
+    //if(time.current_step()==1000*level)
+    //  exit(0);
+
+    /* evaluate overshoots */
+    real cmax_linf(-1.0), cmin_linf(+1.0);
+    for_vijk(c,i,j,k) {
+      real col = c[i][j][k];
+      if(col>1.0) {
+        if(col>cmax_linf) {
+          cmax_linf = col;
+        }
+      }
+      if(col<0.0) {
+        if(col<cmin_linf) {
+          cmin_linf = col;
+        }
+      }
+    }
+    boil::cart.max_real(&cmax_linf);
+    boil::cart.min_real(&cmin_linf);
+    cmax_l1 += fabs( std::max(0.0,cmax_linf-1.0) );
+    cmin_l1 += fabs( std::min(0.0,cmin_linf    ) );
+    cmax_linf_linf = std::max(cmax_linf_linf,cmax_linf);
+    cmin_linf_linf = std::min(cmin_linf_linf,cmin_linf);
+  }
+  } /* bck */
+
+  /* post-process */ 
+  cmax_l1 /= real(ndt);
+  cmin_l1 /= real(ndt);
+
+  boil::oout<<"Errors over time: ";
+  boil::oout<<level<<" "<<inverted<<" | "<<cmax_l1<<" "<<cmin_l1<<" | "
+            <<fabs(cmax_linf_linf-1.)<<" "<<fabs(cmin_linf_linf)<<boil::endl;
+
+  real toterr = boil::li_scalar_error(cold2,c);
+  real toterr2 = boil::l1_scalar_error(cold2,c);
+  real toterr2_vol = boil::l1_scalar_error_vol(cold2,c);
+
+  boil::oout<<"Linf/1 error: ";
+  boil::oout<<level<<" "<<inverted<<" "<<toterr<<" "<<toterr2<<" "<<toterr2_vol<<boil::endl;
+
+  std::ofstream output;
+  output.open( "results_diverging_bwd.txt", std::ios::out | std::ios::app );
+  if(!boil::cart.iam()) {
+    output<<level<<" "<<cfl_max<<" "<<inverted<<" | "<<cmax_l1<<" "<<cmin_l1<<" | "
+          <<fabs(cmax_linf_linf-1.)<<" "<<fabs(cmin_linf_linf)<<" | "<<toterr<<" "<<toterr2<<" "<<toterr2_vol<<boil::endl;
+  }
+
+  boil::oout << "finished" << boil::endl;
+
+  boil::timer.stop();
+  boil::timer.report();
+}	

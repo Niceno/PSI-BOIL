@@ -1,0 +1,3858 @@
+FILE: domain.cpp, LINE: 33, name = unnamed
+0:  dims[i] 0: 2 0: 1 0: 2 0: 
+0:  neighbours: 0:  2 0:  2 0:  -2 0:  -2 0:  1 0:  1 0: 
+0:  coords[i] 0: 0 0: 0 0: 0 0: 
+0: n_dir[k] = 50
+0: n_dir[k] = 50
+0: n_dir[k] = 10
+0: n_dir[k] = 50
+0: n_dir[k] = 50
+PROC: 0, FILE: domain.cpp, LINE: 70, cr_x = first = 1, last = 50
+PROC: 0, FILE: domain.cpp, LINE: 71, cr_y = first = 1, last = 10
+PROC: 0, FILE: domain.cpp, LINE: 72, cr_z = first = 1, last = 50
+0: ni =   52
+0: nj =   12
+0: nk =   52
+Level 1 created !
+Plotting: unnamed_level_p:000.gmv.0001
+Plotting: unnamed_level_p:000.gmv.0000
+FILE: levelset.cpp, LINE: 27, phi_old.dxc(1) = 0.02
+FILE: levelset_discretize.cpp, LINE: 12, dzc(1) = 0.02
+FILE: levelset_discretize.cpp, LINE: 14, lcnd = 0.0295752
+FILE: levelset_discretize.cpp, LINE: 15, lcnd = 0.0147876
+FILE: levelset_discretize.cpp, LINE: 18, ldt = 0.00676243
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 0.000150132, ratio = 0.00413927
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.235972
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 6.9811e-05, ratio = 0.00460953
+FILE: levelset_sharpen.cpp, LINE: 184, it = 1
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.102315
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 3.78177e-05, ratio = 0.00504191
+FILE: levelset_sharpen.cpp, LINE: 184, it = 2
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.0516034
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 2.19823e-05, ratio = 0.00518498
+FILE: levelset_sharpen.cpp, LINE: 184, it = 3
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.0291983
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.33026e-05, ratio = 0.00498599
+FILE: levelset_sharpen.cpp, LINE: 184, it = 4
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.0184438
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 8.31248e-06, ratio = 0.00455586
+FILE: levelset_sharpen.cpp, LINE: 184, it = 5
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.0128935
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 5.53192e-06, ratio = 0.00417485
+FILE: levelset_sharpen.cpp, LINE: 184, it = 6
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.0100585
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 4.02477e-06, ratio = 0.00400655
+FILE: levelset_sharpen.cpp, LINE: 184, it = 7
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00798254
+##################
+#                 
+# TIME:      0
+#                 
+# TIME STEP: 1
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.002
+#                 
+# TIME STEP: 2
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 4.33084e-06, ratio = 0.0055875
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00702395
+##################
+#                 
+# TIME:      0.004
+#                 
+# TIME STEP: 3
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.006
+#                 
+# TIME STEP: 4
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 4.07917e-06, ratio = 0.00610054
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.0059012
+##################
+#                 
+# TIME:      0.008
+#                 
+# TIME STEP: 5
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.01
+#                 
+# TIME STEP: 6
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 3.78154e-06, ratio = 0.00625542
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00505727
+##################
+#                 
+# TIME:      0.012
+#                 
+# TIME STEP: 7
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.014
+#                 
+# TIME STEP: 8
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 3.36593e-06, ratio = 0.00590883
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00510403
+##################
+#                 
+# TIME:      0.016
+#                 
+# TIME STEP: 9
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.018
+#                 
+# TIME STEP: 10
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 2.987e-06, ratio = 0.00536261
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00506115
+##################
+#                 
+# TIME:      0.02
+#                 
+# TIME STEP: 11
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.022
+#                 
+# TIME STEP: 12
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 2.69794e-06, ratio = 0.00494359
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00470217
+##################
+#                 
+# TIME:      0.024
+#                 
+# TIME STEP: 13
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.026
+#                 
+# TIME STEP: 14
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 2.52895e-06, ratio = 0.0048427
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00419507
+##################
+#                 
+# TIME:      0.028
+#                 
+# TIME STEP: 15
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.03
+#                 
+# TIME STEP: 16
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 2.39407e-06, ratio = 0.00485867
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00412813
+##################
+#                 
+# TIME:      0.032
+#                 
+# TIME STEP: 17
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.034
+#                 
+# TIME STEP: 18
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 2.28569e-06, ratio = 0.00490111
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.0044314
+##################
+#                 
+# TIME:      0.036
+#                 
+# TIME STEP: 19
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.038
+#                 
+# TIME STEP: 20
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 2.20484e-06, ratio = 0.00493924
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00459054
+##################
+#                 
+# TIME:      0.04
+#                 
+# TIME STEP: 21
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.042
+#                 
+# TIME STEP: 22
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 2.104e-06, ratio = 0.00482928
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00461856
+##################
+#                 
+# TIME:      0.044
+#                 
+# TIME STEP: 23
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.046
+#                 
+# TIME STEP: 24
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 2.0684e-06, ratio = 0.00468265
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00429873
+##################
+#                 
+# TIME:      0.048
+#                 
+# TIME STEP: 25
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.05
+#                 
+# TIME STEP: 26
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 2.02202e-06, ratio = 0.00443527
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00411792
+##################
+#                 
+# TIME:      0.052
+#                 
+# TIME STEP: 27
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.054
+#                 
+# TIME STEP: 28
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.97721e-06, ratio = 0.00422509
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00409447
+##################
+#                 
+# TIME:      0.056
+#                 
+# TIME STEP: 29
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.058
+#                 
+# TIME STEP: 30
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.94033e-06, ratio = 0.00403896
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00442069
+##################
+#                 
+# TIME:      0.06
+#                 
+# TIME STEP: 31
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.062
+#                 
+# TIME STEP: 32
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.88748e-06, ratio = 0.00386169
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00459424
+##################
+#                 
+# TIME:      0.064
+#                 
+# TIME STEP: 33
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.066
+#                 
+# TIME STEP: 34
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.85763e-06, ratio = 0.00384652
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.0045638
+##################
+#                 
+# TIME:      0.068
+#                 
+# TIME STEP: 35
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.07
+#                 
+# TIME STEP: 36
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.87073e-06, ratio = 0.00403201
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00423737
+##################
+#                 
+# TIME:      0.072
+#                 
+# TIME STEP: 37
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.074
+#                 
+# TIME STEP: 38
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.88442e-06, ratio = 0.00423761
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00423714
+##################
+#                 
+# TIME:      0.076
+#                 
+# TIME STEP: 39
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.078
+#                 
+# TIME STEP: 40
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.89753e-06, ratio = 0.00438486
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00431521
+##################
+#                 
+# TIME:      0.08
+#                 
+# TIME STEP: 41
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.082
+#                 
+# TIME STEP: 42
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.88234e-06, ratio = 0.00439495
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00439107
+##################
+#                 
+# TIME:      0.084
+#                 
+# TIME STEP: 43
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.086
+#                 
+# TIME STEP: 44
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.89699e-06, ratio = 0.00433896
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00442252
+##################
+#                 
+# TIME:      0.088
+#                 
+# TIME STEP: 45
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.09
+#                 
+# TIME STEP: 46
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.91656e-06, ratio = 0.00423395
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00452989
+##################
+#                 
+# TIME:      0.092
+#                 
+# TIME STEP: 47
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.094
+#                 
+# TIME STEP: 48
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.89564e-06, ratio = 0.00408091
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00434967
+##################
+#                 
+# TIME:      0.096
+#                 
+# TIME STEP: 49
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.098
+#                 
+# TIME STEP: 50
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.87556e-06, ratio = 0.00395485
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.0048034
+##################
+#                 
+# TIME:      0.1
+#                 
+# TIME STEP: 51
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.102
+#                 
+# TIME STEP: 52
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.83956e-06, ratio = 0.00382116
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00480265
+##################
+#                 
+# TIME:      0.104
+#                 
+# TIME STEP: 53
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.106
+#                 
+# TIME STEP: 54
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.84608e-06, ratio = 0.00387175
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00452735
+##################
+#                 
+# TIME:      0.108
+#                 
+# TIME STEP: 55
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.11
+#                 
+# TIME STEP: 56
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.83599e-06, ratio = 0.0039729
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00436394
+##################
+#                 
+# TIME:      0.112
+#                 
+# TIME STEP: 57
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.114
+#                 
+# TIME STEP: 58
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.83611e-06, ratio = 0.00411229
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00422509
+##################
+#                 
+# TIME:      0.116
+#                 
+# TIME STEP: 59
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.118
+#                 
+# TIME STEP: 60
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.83979e-06, ratio = 0.00422194
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00438515
+##################
+#                 
+# TIME:      0.12
+#                 
+# TIME STEP: 61
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.122
+#                 
+# TIME STEP: 62
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.85168e-06, ratio = 0.00427678
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00429952
+##################
+#                 
+# TIME:      0.124
+#                 
+# TIME STEP: 63
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.126
+#                 
+# TIME STEP: 64
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.86175e-06, ratio = 0.00423376
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00437283
+##################
+#                 
+# TIME:      0.128
+#                 
+# TIME STEP: 65
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.13
+#                 
+# TIME STEP: 66
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.88162e-06, ratio = 0.00417188
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00447252
+##################
+#                 
+# TIME:      0.132
+#                 
+# TIME STEP: 67
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.134
+#                 
+# TIME STEP: 68
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.88179e-06, ratio = 0.00405685
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00453191
+##################
+#                 
+# TIME:      0.136
+#                 
+# TIME STEP: 69
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.138
+#                 
+# TIME STEP: 70
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.87469e-06, ratio = 0.00395122
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00483435
+##################
+#                 
+# TIME:      0.14
+#                 
+# TIME STEP: 71
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.142
+#                 
+# TIME STEP: 72
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.86116e-06, ratio = 0.00389171
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00489902
+##################
+#                 
+# TIME:      0.144
+#                 
+# TIME STEP: 73
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.146
+#                 
+# TIME STEP: 74
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.84832e-06, ratio = 0.00391192
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00453625
+##################
+#                 
+# TIME:      0.148
+#                 
+# TIME STEP: 75
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.15
+#                 
+# TIME STEP: 76
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.85746e-06, ratio = 0.00402341
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00446204
+##################
+#                 
+# TIME:      0.152
+#                 
+# TIME STEP: 77
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.154
+#                 
+# TIME STEP: 78
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.86108e-06, ratio = 0.0041277
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00423294
+##################
+#                 
+# TIME:      0.156
+#                 
+# TIME STEP: 79
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.158
+#                 
+# TIME STEP: 80
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.84522e-06, ratio = 0.0041833
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00429208
+##################
+#                 
+# TIME:      0.16
+#                 
+# TIME STEP: 81
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.162
+#                 
+# TIME STEP: 82
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.83184e-06, ratio = 0.0041939
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00441095
+##################
+#                 
+# TIME:      0.164
+#                 
+# TIME STEP: 83
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.166
+#                 
+# TIME STEP: 84
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.84149e-06, ratio = 0.00419706
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00440254
+##################
+#                 
+# TIME:      0.168
+#                 
+# TIME STEP: 85
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.17
+#                 
+# TIME STEP: 86
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.83484e-06, ratio = 0.00410669
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00446725
+##################
+#                 
+# TIME:      0.172
+#                 
+# TIME STEP: 87
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.174
+#                 
+# TIME STEP: 88
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.84537e-06, ratio = 0.00399583
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00443214
+##################
+#                 
+# TIME:      0.176
+#                 
+# TIME STEP: 89
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.178
+#                 
+# TIME STEP: 90
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.86412e-06, ratio = 0.00391575
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00455631
+##################
+#                 
+# TIME:      0.18
+#                 
+# TIME STEP: 91
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.182
+#                 
+# TIME STEP: 92
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.88248e-06, ratio = 0.00392267
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.0047744
+##################
+#                 
+# TIME:      0.184
+#                 
+# TIME STEP: 93
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.186
+#                 
+# TIME STEP: 94
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.90956e-06, ratio = 0.00402686
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00446578
+##################
+#                 
+# TIME:      0.188
+#                 
+# TIME STEP: 95
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.19
+#                 
+# TIME STEP: 96
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.90455e-06, ratio = 0.00411014
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00442932
+##################
+#                 
+# TIME:      0.192
+#                 
+# TIME STEP: 97
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.194
+#                 
+# TIME STEP: 98
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.88295e-06, ratio = 0.00413066
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.0045018
+##################
+#                 
+# TIME:      0.196
+#                 
+# TIME STEP: 99
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.198
+#                 
+# TIME STEP: 100
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.84054e-06, ratio = 0.00414127
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00423668
+##################
+#                 
+# TIME:      0.2
+#                 
+# TIME STEP: 101
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.202
+#                 
+# TIME STEP: 102
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.8122e-06, ratio = 0.00414551
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00427478
+##################
+#                 
+# TIME:      0.204
+#                 
+# TIME STEP: 103
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.206
+#                 
+# TIME STEP: 104
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.81215e-06, ratio = 0.00415123
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00438086
+##################
+#                 
+# TIME:      0.208
+#                 
+# TIME STEP: 105
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.21
+#                 
+# TIME STEP: 106
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.80766e-06, ratio = 0.00407732
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00444046
+##################
+#                 
+# TIME:      0.212
+#                 
+# TIME STEP: 107
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.214
+#                 
+# TIME STEP: 108
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.85279e-06, ratio = 0.00402373
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00451774
+##################
+#                 
+# TIME:      0.216
+#                 
+# TIME STEP: 109
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.218
+#                 
+# TIME STEP: 110
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.89049e-06, ratio = 0.00397825
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00442547
+##################
+#                 
+# TIME:      0.22
+#                 
+# TIME STEP: 111
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.222
+#                 
+# TIME STEP: 112
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.92371e-06, ratio = 0.00397536
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00456133
+##################
+#                 
+# TIME:      0.224
+#                 
+# TIME STEP: 113
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.226
+#                 
+# TIME STEP: 114
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.9128e-06, ratio = 0.00398294
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00433409
+##################
+#                 
+# TIME:      0.228
+#                 
+# TIME STEP: 115
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.23
+#                 
+# TIME STEP: 116
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.89193e-06, ratio = 0.00403032
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00430432
+##################
+#                 
+# TIME:      0.232
+#                 
+# TIME STEP: 117
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.234
+#                 
+# TIME STEP: 118
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.8742e-06, ratio = 0.00412051
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00445436
+##################
+#                 
+# TIME:      0.236
+#                 
+# TIME STEP: 119
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.238
+#                 
+# TIME STEP: 120
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.84927e-06, ratio = 0.00417352
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00453764
+##################
+#                 
+# TIME:      0.24
+#                 
+# TIME STEP: 121
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.242
+#                 
+# TIME STEP: 122
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.80932e-06, ratio = 0.00414058
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00438175
+##################
+#                 
+# TIME:      0.244
+#                 
+# TIME STEP: 123
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.246
+#                 
+# TIME STEP: 124
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.79041e-06, ratio = 0.00409901
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00425981
+##################
+#                 
+# TIME:      0.248
+#                 
+# TIME STEP: 125
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.25
+#                 
+# TIME STEP: 126
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.80534e-06, ratio = 0.00407149
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00436666
+##################
+#                 
+# TIME:      0.252
+#                 
+# TIME STEP: 127
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.254
+#                 
+# TIME STEP: 128
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.86499e-06, ratio = 0.00408311
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00435121
+##################
+#                 
+# TIME:      0.256
+#                 
+# TIME STEP: 129
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.258
+#                 
+# TIME STEP: 130
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.90681e-06, ratio = 0.00406956
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00443789
+##################
+#                 
+# TIME:      0.26
+#                 
+# TIME STEP: 131
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.262
+#                 
+# TIME STEP: 132
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.91799e-06, ratio = 0.00402053
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00479617
+##################
+#                 
+# TIME:      0.264
+#                 
+# TIME STEP: 133
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.266
+#                 
+# TIME STEP: 134
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.89992e-06, ratio = 0.0039578
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00474027
+##################
+#                 
+# TIME:      0.268
+#                 
+# TIME STEP: 135
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.27
+#                 
+# TIME STEP: 136
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.88515e-06, ratio = 0.00398217
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.0043821
+##################
+#                 
+# TIME:      0.272
+#                 
+# TIME STEP: 137
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.274
+#                 
+# TIME STEP: 138
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.84531e-06, ratio = 0.00403039
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00420881
+##################
+#                 
+# TIME:      0.276
+#                 
+# TIME STEP: 139
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.278
+#                 
+# TIME STEP: 140
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.82463e-06, ratio = 0.00411117
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.0043689
+##################
+#                 
+# TIME:      0.28
+#                 
+# TIME STEP: 141
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.282
+#                 
+# TIME STEP: 142
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.83341e-06, ratio = 0.00418635
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00448556
+##################
+#                 
+# TIME:      0.284
+#                 
+# TIME STEP: 143
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.286
+#                 
+# TIME STEP: 144
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.85575e-06, ratio = 0.00423885
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00455609
+##################
+#                 
+# TIME:      0.288
+#                 
+# TIME STEP: 145
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.29
+#                 
+# TIME STEP: 146
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.90609e-06, ratio = 0.00429246
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00438026
+##################
+#                 
+# TIME:      0.292
+#                 
+# TIME STEP: 147
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.294
+#                 
+# TIME STEP: 148
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.90748e-06, ratio = 0.0042132
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00436277
+##################
+#                 
+# TIME:      0.296
+#                 
+# TIME STEP: 149
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.298
+#                 
+# TIME STEP: 150
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.89075e-06, ratio = 0.0041148
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00433283
+##################
+#                 
+# TIME:      0.3
+#                 
+# TIME STEP: 151
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.302
+#                 
+# TIME STEP: 152
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.86469e-06, ratio = 0.00400424
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.0044068
+##################
+#                 
+# TIME:      0.304
+#                 
+# TIME STEP: 153
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.306
+#                 
+# TIME STEP: 154
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.83857e-06, ratio = 0.00389667
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00465545
+##################
+#                 
+# TIME:      0.308
+#                 
+# TIME STEP: 155
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.31
+#                 
+# TIME STEP: 156
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.81387e-06, ratio = 0.00384879
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00447845
+##################
+#                 
+# TIME:      0.312
+#                 
+# TIME STEP: 157
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.314
+#                 
+# TIME STEP: 158
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.8255e-06, ratio = 0.00393726
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00454694
+##################
+#                 
+# TIME:      0.316
+#                 
+# TIME STEP: 159
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.318
+#                 
+# TIME STEP: 160
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.84659e-06, ratio = 0.00405367
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.0043107
+##################
+#                 
+# TIME:      0.32
+#                 
+# TIME STEP: 161
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.322
+#                 
+# TIME STEP: 162
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.878e-06, ratio = 0.00417919
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00407607
+##################
+#                 
+# TIME:      0.324
+#                 
+# TIME STEP: 163
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.326
+#                 
+# TIME STEP: 164
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.86252e-06, ratio = 0.00419684
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.004244
+##################
+#                 
+# TIME:      0.328
+#                 
+# TIME STEP: 165
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.33
+#                 
+# TIME STEP: 166
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.87014e-06, ratio = 0.00422812
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00435702
+##################
+#                 
+# TIME:      0.332
+#                 
+# TIME STEP: 167
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.334
+#                 
+# TIME STEP: 168
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.86591e-06, ratio = 0.00418953
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00442943
+##################
+#                 
+# TIME:      0.336
+#                 
+# TIME STEP: 169
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.338
+#                 
+# TIME STEP: 170
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.8729e-06, ratio = 0.00409854
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00446336
+##################
+#                 
+# TIME:      0.34
+#                 
+# TIME STEP: 171
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.342
+#                 
+# TIME STEP: 172
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.87631e-06, ratio = 0.00396714
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00442046
+##################
+#                 
+# TIME:      0.344
+#                 
+# TIME STEP: 173
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.346
+#                 
+# TIME STEP: 174
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.89168e-06, ratio = 0.0039164
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00436175
+##################
+#                 
+# TIME:      0.348
+#                 
+# TIME STEP: 175
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.35
+#                 
+# TIME STEP: 176
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.92032e-06, ratio = 0.00396156
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00432759
+##################
+#                 
+# TIME:      0.352
+#                 
+# TIME STEP: 177
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.354
+#                 
+# TIME STEP: 178
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.94473e-06, ratio = 0.00407621
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00428668
+##################
+#                 
+# TIME:      0.356
+#                 
+# TIME STEP: 179
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.358
+#                 
+# TIME STEP: 180
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.92433e-06, ratio = 0.0041246
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00441084
+##################
+#                 
+# TIME:      0.36
+#                 
+# TIME STEP: 181
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.362
+#                 
+# TIME STEP: 182
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.89381e-06, ratio = 0.00416578
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00448541
+##################
+#                 
+# TIME:      0.364
+#                 
+# TIME STEP: 183
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.366
+#                 
+# TIME STEP: 184
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.86551e-06, ratio = 0.00417542
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00446468
+##################
+#                 
+# TIME:      0.368
+#                 
+# TIME STEP: 185
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.37
+#                 
+# TIME STEP: 186
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.83256e-06, ratio = 0.00413377
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00426146
+##################
+#                 
+# TIME:      0.372
+#                 
+# TIME STEP: 187
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.374
+#                 
+# TIME STEP: 188
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.80449e-06, ratio = 0.00405079
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00423507
+##################
+#                 
+# TIME:      0.376
+#                 
+# TIME STEP: 189
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.378
+#                 
+# TIME STEP: 190
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.83066e-06, ratio = 0.00402846
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00427401
+##################
+#                 
+# TIME:      0.38
+#                 
+# TIME STEP: 191
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.382
+#                 
+# TIME STEP: 192
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.89968e-06, ratio = 0.00408106
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00420103
+##################
+#                 
+# TIME:      0.384
+#                 
+# TIME STEP: 193
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.386
+#                 
+# TIME STEP: 194
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.93728e-06, ratio = 0.00409137
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00428935
+##################
+#                 
+# TIME:      0.388
+#                 
+# TIME STEP: 195
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.39
+#                 
+# TIME STEP: 196
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.93347e-06, ratio = 0.00404812
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00461274
+##################
+#                 
+# TIME:      0.392
+#                 
+# TIME STEP: 197
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.394
+#                 
+# TIME STEP: 198
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.91782e-06, ratio = 0.00399897
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00459607
+##################
+#                 
+# TIME:      0.396
+#                 
+# TIME STEP: 199
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.398
+#                 
+# TIME STEP: 200
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.89199e-06, ratio = 0.00401081
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00432033
+##################
+#                 
+# TIME:      0.4
+#                 
+# TIME STEP: 201
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.402
+#                 
+# TIME STEP: 202
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.8426e-06, ratio = 0.00402426
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00408454
+##################
+#                 
+# TIME:      0.404
+#                 
+# TIME STEP: 203
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.406
+#                 
+# TIME STEP: 204
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.84308e-06, ratio = 0.00411588
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00413067
+##################
+#                 
+# TIME:      0.408
+#                 
+# TIME STEP: 205
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.41
+#                 
+# TIME STEP: 206
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.86613e-06, ratio = 0.00421338
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00424861
+##################
+#                 
+# TIME:      0.412
+#                 
+# TIME STEP: 207
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.414
+#                 
+# TIME STEP: 208
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.89816e-06, ratio = 0.00428602
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00433287
+##################
+#                 
+# TIME:      0.416
+#                 
+# TIME STEP: 209
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.418
+#                 
+# TIME STEP: 210
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.92065e-06, ratio = 0.00429893
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00438722
+##################
+#                 
+# TIME:      0.42
+#                 
+# TIME STEP: 211
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.422
+#                 
+# TIME STEP: 212
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.90579e-06, ratio = 0.00422913
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00430921
+##################
+#                 
+# TIME:      0.424
+#                 
+# TIME STEP: 213
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.426
+#                 
+# TIME STEP: 214
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.89005e-06, ratio = 0.00412559
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00432514
+##################
+#                 
+# TIME:      0.428
+#                 
+# TIME STEP: 215
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.43
+#                 
+# TIME STEP: 216
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.8869e-06, ratio = 0.00401971
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00427217
+##################
+#                 
+# TIME:      0.432
+#                 
+# TIME STEP: 217
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.434
+#                 
+# TIME STEP: 218
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.84686e-06, ratio = 0.00387014
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00424852
+##################
+#                 
+# TIME:      0.436
+#                 
+# TIME STEP: 219
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.438
+#                 
+# TIME STEP: 220
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.86657e-06, ratio = 0.0039065
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00430386
+##################
+#                 
+# TIME:      0.44
+#                 
+# TIME STEP: 221
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.442
+#                 
+# TIME STEP: 222
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.88157e-06, ratio = 0.0039878
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.0043035
+##################
+#                 
+# TIME:      0.444
+#                 
+# TIME STEP: 223
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.446
+#                 
+# TIME STEP: 224
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.92099e-06, ratio = 0.00411328
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00437519
+##################
+#                 
+# TIME:      0.448
+#                 
+# TIME STEP: 225
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.45
+#                 
+# TIME STEP: 226
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.90221e-06, ratio = 0.00412437
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00441871
+##################
+#                 
+# TIME:      0.452
+#                 
+# TIME STEP: 227
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.454
+#                 
+# TIME STEP: 228
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.8864e-06, ratio = 0.00414935
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00423336
+##################
+#                 
+# TIME:      0.456
+#                 
+# TIME STEP: 229
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.458
+#                 
+# TIME STEP: 230
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.85269e-06, ratio = 0.00409226
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00406986
+##################
+#                 
+# TIME:      0.46
+#                 
+# TIME STEP: 231
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.462
+#                 
+# TIME STEP: 232
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.81202e-06, ratio = 0.00399121
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.0041519
+##################
+#                 
+# TIME:      0.464
+#                 
+# TIME STEP: 233
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.466
+#                 
+# TIME STEP: 234
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.81641e-06, ratio = 0.00392976
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00410241
+##################
+#                 
+# TIME:      0.468
+#                 
+# TIME STEP: 235
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.47
+#                 
+# TIME STEP: 236
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.87766e-06, ratio = 0.00397585
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00416141
+##################
+#                 
+# TIME:      0.472
+#                 
+# TIME STEP: 237
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.474
+#                 
+# TIME STEP: 238
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.92954e-06, ratio = 0.00402378
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00422142
+##################
+#                 
+# TIME:      0.476
+#                 
+# TIME STEP: 239
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.478
+#                 
+# TIME STEP: 240
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.94525e-06, ratio = 0.00402935
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00437389
+##################
+#                 
+# TIME:      0.48
+#                 
+# TIME STEP: 241
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.482
+#                 
+# TIME STEP: 242
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.93522e-06, ratio = 0.00400694
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00444681
+##################
+#                 
+# TIME:      0.484
+#                 
+# TIME STEP: 243
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.486
+#                 
+# TIME STEP: 244
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.92284e-06, ratio = 0.00403722
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00426388
+##################
+#                 
+# TIME:      0.488
+#                 
+# TIME STEP: 245
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.49
+#                 
+# TIME STEP: 246
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.88119e-06, ratio = 0.00405612
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00399868
+##################
+#                 
+# TIME:      0.492
+#                 
+# TIME STEP: 247
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.494
+#                 
+# TIME STEP: 248
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.83984e-06, ratio = 0.00406441
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00404355
+##################
+#                 
+# TIME:      0.496
+#                 
+# TIME STEP: 249
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.498
+#                 
+# TIME STEP: 250
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.84966e-06, ratio = 0.00413124
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.0040923
+##################
+#                 
+# TIME:      0.5
+#                 
+# TIME STEP: 251
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.502
+#                 
+# TIME STEP: 252
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.88231e-06, ratio = 0.00421742
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00418248
+##################
+#                 
+# TIME:      0.504
+#                 
+# TIME STEP: 253
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.506
+#                 
+# TIME STEP: 254
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.92861e-06, ratio = 0.00429137
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.0042464
+##################
+#                 
+# TIME:      0.508
+#                 
+# TIME STEP: 255
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.51
+#                 
+# TIME STEP: 256
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.92163e-06, ratio = 0.00424446
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00429018
+##################
+#                 
+# TIME:      0.512
+#                 
+# TIME STEP: 257
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.514
+#                 
+# TIME STEP: 258
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.90379e-06, ratio = 0.00416726
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.0041678
+##################
+#                 
+# TIME:      0.516
+#                 
+# TIME STEP: 259
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.518
+#                 
+# TIME STEP: 260
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.88991e-06, ratio = 0.0040548
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00422422
+##################
+#                 
+# TIME:      0.52
+#                 
+# TIME STEP: 261
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.522
+#                 
+# TIME STEP: 262
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.85807e-06, ratio = 0.00389836
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00417539
+##################
+#                 
+# TIME:      0.524
+#                 
+# TIME STEP: 263
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.526
+#                 
+# TIME STEP: 264
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.86384e-06, ratio = 0.00386148
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00423889
+##################
+#                 
+# TIME:      0.528
+#                 
+# TIME STEP: 265
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.53
+#                 
+# TIME STEP: 266
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.90726e-06, ratio = 0.00395824
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00415084
+##################
+#                 
+# TIME:      0.532
+#                 
+# TIME STEP: 267
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.534
+#                 
+# TIME STEP: 268
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.93675e-06, ratio = 0.00405396
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00412712
+##################
+#                 
+# TIME:      0.536
+#                 
+# TIME STEP: 269
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.538
+#                 
+# TIME STEP: 270
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.93814e-06, ratio = 0.00410828
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00420122
+##################
+#                 
+# TIME:      0.54
+#                 
+# TIME STEP: 271
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.542
+#                 
+# TIME STEP: 272
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.92221e-06, ratio = 0.0041396
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00425056
+##################
+#                 
+# TIME:      0.544
+#                 
+# TIME STEP: 273
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.546
+#                 
+# TIME STEP: 274
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.86751e-06, ratio = 0.00405534
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00423866
+##################
+#                 
+# TIME:      0.548
+#                 
+# TIME STEP: 275
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.55
+#                 
+# TIME STEP: 276
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.83498e-06, ratio = 0.0039923
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.0041613
+##################
+#                 
+# TIME:      0.552
+#                 
+# TIME STEP: 277
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.554
+#                 
+# TIME STEP: 278
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.81273e-06, ratio = 0.00392641
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00402438
+##################
+#                 
+# TIME:      0.556
+#                 
+# TIME STEP: 279
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.558
+#                 
+# TIME STEP: 280
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.86851e-06, ratio = 0.00399878
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.0040771
+##################
+#                 
+# TIME:      0.56
+#                 
+# TIME STEP: 281
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.562
+#                 
+# TIME STEP: 282
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.92721e-06, ratio = 0.00407313
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00398492
+##################
+#                 
+# TIME:      0.564
+#                 
+# TIME STEP: 283
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.566
+#                 
+# TIME STEP: 284
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.93259e-06, ratio = 0.00406934
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00402236
+##################
+#                 
+# TIME:      0.568
+#                 
+# TIME STEP: 285
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.57
+#                 
+# TIME STEP: 286
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.92125e-06, ratio = 0.00403825
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00431647
+##################
+#                 
+# TIME:      0.572
+#                 
+# TIME STEP: 287
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.574
+#                 
+# TIME STEP: 288
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.91934e-06, ratio = 0.00402351
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00449805
+##################
+#                 
+# TIME:      0.576
+#                 
+# TIME STEP: 289
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.578
+#                 
+# TIME STEP: 290
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.87179e-06, ratio = 0.00396155
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00431664
+##################
+#                 
+# TIME:      0.58
+#                 
+# TIME STEP: 291
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.582
+#                 
+# TIME STEP: 292
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.84597e-06, ratio = 0.00395345
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00420402
+##################
+#                 
+# TIME:      0.584
+#                 
+# TIME STEP: 293
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.586
+#                 
+# TIME STEP: 294
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.87589e-06, ratio = 0.00404993
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00406909
+##################
+#                 
+# TIME:      0.588
+#                 
+# TIME STEP: 295
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.59
+#                 
+# TIME STEP: 296
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.91078e-06, ratio = 0.00414366
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00385051
+##################
+#                 
+# TIME:      0.592
+#                 
+# TIME STEP: 297
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.594
+#                 
+# TIME STEP: 298
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.945e-06, ratio = 0.00422291
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00388843
+##################
+#                 
+# TIME:      0.596
+#                 
+# TIME STEP: 299
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.598
+#                 
+# TIME STEP: 300
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.92898e-06, ratio = 0.00419482
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00392826
+##################
+#                 
+# TIME:      0.6
+#                 
+# TIME STEP: 301
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.602
+#                 
+# TIME STEP: 302
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.92007e-06, ratio = 0.00416236
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00400773
+##################
+#                 
+# TIME:      0.604
+#                 
+# TIME STEP: 303
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.606
+#                 
+# TIME STEP: 304
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.90702e-06, ratio = 0.00408357
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.0040715
+##################
+#                 
+# TIME:      0.608
+#                 
+# TIME STEP: 305
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.61
+#                 
+# TIME STEP: 306
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.88319e-06, ratio = 0.00393705
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00412162
+##################
+#                 
+# TIME:      0.612
+#                 
+# TIME STEP: 307
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.614
+#                 
+# TIME STEP: 308
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.91023e-06, ratio = 0.003908
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00416202
+##################
+#                 
+# TIME:      0.616
+#                 
+# TIME STEP: 309
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.618
+#                 
+# TIME STEP: 310
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.95676e-06, ratio = 0.00395454
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00407404
+##################
+#                 
+# TIME:      0.62
+#                 
+# TIME STEP: 311
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.622
+#                 
+# TIME STEP: 312
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.99718e-06, ratio = 0.00403457
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00413639
+##################
+#                 
+# TIME:      0.624
+#                 
+# TIME STEP: 313
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+##################
+#                 
+# TIME:      0.626
+#                 
+# TIME STEP: 314
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 10, conv_ts.N() = 0
+from_local, residual = 1.96355e-06, ratio = 0.00402647
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00404592
+Plotting: uvw_p:000.gmv.0314
+Plotting: phi_p:000.gmv.0314
+finished
++==========================================
+| Total execution time: 8.35 [s]
++------------------------------------------
+| Time spent in plotting           : 0.47 [s]    (5.62874%)
+| Time spent in levelset discretize: 0.0075 [s]    (0.0898204%)
+| Time spent in from_local smoother: 2.305 [s]    (27.6048%)
+| Time spent elsewhere: 5.5675 [s]    (66.6766%)
++------------------------------------------
+Plotting: test_p:000.gmv.0000
+unnamed
+1:  dims[i] 1: 2 1: 1 1: 2 1: 
+1:  neighbours: 1:  3 1:  3 1:  -2 1:  -2 1:  0 1:  0 1: 
+1:  coords[i] 1: 0 1: 0 1: 1 1: 
+1: n_dir[k] = 50
+1: n_dir[k] = 50
+1: n_dir[k] = 10
+1: n_dir[k] = 50
+1: n_dir[k] = 50
+PROC: 1, FILE: domain.cpp, LINE: 70, cr_x = first = 1, last = 50
+PROC: 1, FILE: domain.cpp, LINE: 71, cr_y = first = 1, last = 10
+PROC: 1, FILE: domain.cpp, LINE: 72, cr_z = first = 51, last = 100
+1: ni =   52
+1: nj =   12
+1: nk =   52
+Plotting: unnamed_level_p:001.gmv.0001
+Plotting: unnamed_level_p:001.gmv.0000
+Plotting: uvw_p:001.gmv.0314
+Plotting: phi_p:001.gmv.0314
+plotting           : 0.47 [s]    (5.62874%)
+levelset discretize: 0.0075 [s]    (0.0898204%)
+from_local smoother: 2.305 [s]    (27.6048%)
+Plotting: test_p:001.gmv.0000

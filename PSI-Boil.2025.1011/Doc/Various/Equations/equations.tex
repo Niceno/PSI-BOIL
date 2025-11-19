@@ -1,0 +1,576 @@
+\documentclass{report} 
+
+\input{../commands.tex}
+
+\begin{document}  
+
+%-------------------%
+% Mass conservation %
+%-------------------%
+\section{Mass conservation}
+
+In differential form:
+
+\be
+  \frac{\p \rho}{\p t} = - \nabla ( \rho \uvw )
+\ee
+
+In integral form:
+
+\be
+  \int_V \frac{\p \rho}{\p t} dV = - \int_S \rho \uvw dS
+\ee
+
+In the discrete form, they read:
+
+\be
+   \frac{\Delta V}{\Delta t} (\rho^N - \rho^{N-1}) 
+   = 
+   \Delta S (-\rho_w \uvw_w + \rho_e \uvw_e )
+\ee
+
+%-------------------------------%
+% General conservation equation %
+%-------------------------------%
+\section{General conservation equation}
+
+\be
+  \frac{\p \rho \phi}{\p t} 
+  = 
+  - \nabla ( \rho \uvw \phi) 
+  + \nabla (\Gamma \nabla \phi)
+\ee
+
+\be
+  \int_V \frac{\p \rho \phi}{\p t} dV 
+  = 
+  - \int_S (\rho \uvw \phi) dS 
+  + \int_S (\Gamma \nabla \phi)
+\ee
+
+\be
+  \frac{\Delta V}{\Delta t} (\rho^N - \rho^{N-1}) 
+  = 
+    \Delta S [-(\rho \uvw\phi)_w + (\rho \uvw \phi)_e ] 
+  + \Delta S [( \Gamma \nabla \phi)_w - (\Gamma \nabla \phi)_e]
+\ee
+
+\be
+  \frac{\Delta V}{\Delta t} (\rho^N - \rho^{N-1}) 
+  = 
+    \Delta S [-(\rho \uvw\phi)_w + (\rho \uvw \phi)_e ] 
+  + \Delta S [\Gamma_w \frac{\phi_c - \phi_w}{\Delta_w} - 
+              \Gamma_e \frac{\phi_e - \phi_c}{\Delta_e} ]
+\ee
+
+%------------------------%
+% Navier-Stokes equation %
+%------------------------%
+\section{Navier-Stokes equation}
+
+\be
+  \frac{\p \rho \uvw}{\p t} 
+  + \nabla (\rho \uvw \uvw)
+  =
+  - \nabla p
+  + \nabla \mu (\nabla \uvw + \nabla \uvw^T)
+  + \sigma \kappa {\bf n}
+  \; \; \; \; [ \frac{kg}{m^2 s^2} ]
+\ee
+
+where $\sigma$ is surface tension in $[N/m]$ or $[kg/s^2]$.
+Divided by $\rho$, they read:
+
+\be
+  \frac{\p \uvw}{\p t} 
+  + \nabla (\uvw \uvw)
+  =
+  - \frac{\nabla p}{\rho}
+  + \nabla \nu (\nabla \uvw + \nabla \uvw^T)
+  + \frac{\sigma}{\rho} \kappa {\bf n}
+  \; \; \; \; [ \frac{m}{s^2} ]
+\ee
+
+The term $\kappa {\bf n}$ is computed as:
+
+\be
+  \kappa {\bf n} 
+  = 
+  - \nabla \cdot \frac{\nabla \alpha}{|\nabla \alpha|} \nabla \alpha
+ \; \; \; \; [ \frac{1}{m^2} ]
+\ee
+
+Navier-Stokes equations in their integral form (one used by PSI-Boil):
+
+\bea
+  \int_V \frac{\p \rho \uvw}{\p t} dV + \int_S (\rho \uvw \uvw) dS 
+  =
+  & - & \int_V \nabla p \, dV                       \\ \nonumber
+  & + & \int_S \mu (\nabla \uvw + \nabla^T \uvw) dS \\
+  & + & \int_V \sigma \kappa {\bf n} \, dV
+  \; \; \; \; [ \frac{kg \, m}{s^2} = N ]
+\eea
+
+%-----------------------------------------------------------%
+% Correction of conservation equations, as derived by Yohei %
+%-----------------------------------------------------------%
+\section{Correction of conservation equations, \\ 
+         as derived by Yohei}
+
+General conservation equations in their integral form:
+
+\be
+    \underbrace{\frac{\p (\rho \phi)}{\p t}}_{\mathit{(U)nsteady}}
+  + \underbrace{ \nabla (\rho \phi \uvw) }_{\mathit{(A)dvection}}
+  =
+  r.h.s.
+\ee
+
+If derivatives of this form are taken:
+
+\be
+    \underbrace{\rho \frac{\p \phi}{\p t}}_{U1} +
+    \underbrace{\phi \frac{\p \rho}{\p t}}_{U2} 
+  + \underbrace{\phi \uvw \nabla \rho}_{A1}
+  + \underbrace{\rho \uvw \nabla \phi}_{A2}
+  + \underbrace{\rho \phi \nabla \uvw}_{A3}
+  =
+  r.h.s.
+\ee
+
+If re-arranged:
+
+\be
+    \underbrace{\rho \left[ \frac{\p \phi}{\p t} + \uvw \nabla \phi\right]}_{U1+A2}
+  + \underbrace{\phi \left[\frac{\p \rho}{\p t}          
+  +               \uvw \nabla \rho           
+  +             \rho \nabla \uvw \right]}_{U2+A1+A3}
+  =
+  r.h.s.
+\ee
+
+or:
+
+\be
+    \underbrace{\rho \left[ \frac{\p \phi}{\p t} + \uvw \nabla \phi\right]}_{U1+A2}
+  + \underbrace{\phi \left[\frac{\p \rho}{\p t} + \nabla(\rho \uvw)\right]}_{U2+A1+A3=0}
+  =
+  r.h.s.
+\ee
+
+The second term ($U2+A1+A3$) dissapears beacause of the mass conservation. What 
+remains to be solved, if we want to stay with conservative form of momentum 
+conservation equations, is:
+
+\be
+    \underbrace{\rho \left[ \frac{\p \phi}{\p t} + \uvw \nabla \phi\right]}_{\mathit{To \, be \, solved}}
+  =
+  r.h.s.
+\ee
+
+What is actually solved in PSI-Boil is:
+
+\be
+    \underbrace{\rho \left[ \frac{\p \phi}{\p t} + \nabla (\uvw \phi)\right]}_{\mathit{Solved}}
+  =
+  r.h.s.
+\ee
+
+If the solved version is developed:
+
+\be
+    \rho \left( \frac{\p \phi}{\p t} 
+  + \uvw \nabla \phi
+  + \underbrace{\phi \nabla \uvw}_{\mathit{Additional}}\right)
+  =
+  r.h.s.
+\ee
+
+we see that an additional term in the equations appears. Hence, in order to be 
+consistent with the conservative form of the momentum conservation equations,
+we should discretize momentum equations as follows:
+
+\be
+    \rho \left[ \frac{\p \phi}{\p t} + \nabla (\uvw \phi) - \underbrace{\phi \nabla{\uvw}}_{\mathit{Correction}} \right]
+  =
+  r.h.s.
+\ee
+
+%---------------------------%
+% Pressire-Poisson equation %
+%---------------------------%
+\section{Pressure-Poisson equation}
+
+\be
+  \frac{\nabla^2 p'}{\rho} = \frac{\nabla \uvw}{\Delta t}
+  \; \; \; \; [ \frac{1}{s^2} ]
+\ee
+
+In integral form:
+
+\be
+  \int_S \frac{\nabla p'}{\rho} \, dS = \frac{1}{\Delta t} \int_S \uvw \, dS
+  \; \; \; \; [ \frac{m^3}{s^2} ],    
+\ee
+
+or should it be:
+
+\be
+  \frac{1}{\rho} \int_S \nabla p' \, dS = \frac{1}{\Delta t} \int_S \uvw \, dS
+  \; \; \; \; [ \frac{m^3}{s^2} ] \, ?
+\ee
+
+%---------------------%
+% Velocity correction %
+%---------------------%
+\section{Velocity correction}
+
+\be
+  \uvw = \uvw + \frac{1}{\rho} \nabla p' \, \Delta t
+\ee
+
+or:
+
+\be
+  \uvw = \uvw + \nabla (\frac{p'}{\rho}) \, \Delta t
+\ee
+
+%------------------------%
+% Fractional step method %
+%------------------------%
+\section{Fractional step method}
+
+\subsection{In non-dimensional, tensorial form}
+
+It is quite clearly explained in Despotis \& Tsangaris. Governing equations for 
+viscous incompressible flow, written in non-dimensional form are re-written as:
+%
+\be
+  \frac{u_i^\s-u_i^n}{\Delta t} 
+  + 
+  \frac{\p}{\p x_j} \left( u_j^n u_i^\s \right)
+  =
+  \frac{1}{Re} \frac{\p^2 u_i^\s}{\p x_j \p x_j}
+\ee
+
+\be
+  \frac{u_i^{n+1} - u_i^\s}{\Delta t} 
+  + 
+  \frac{\p p^{n+1}}{\p x_i}
+  =
+  0
+  \label{eq:step_2}
+\ee
+%
+Note that these equations are written out for the fully implicit 
+time-discretization. Pressure in Eq.~\ref{eq:step_2} is the full pressure,
+not the pressure correction. 
+If we take the divergence of equation~\ref{eq:step_2}, we get:
+%
+\be
+  \frac{1}{\Delta t} 
+    \left( 
+      \underbrace{   \frac{\p u_i^{n+1}}{\p x_i} }_{=0} 
+                   - \frac{\p u_i^\s}   {\p x_i} 
+    \right) 
+  + 
+  \frac{\p^2 p^{n+1}}{\p x_j \p x_j}
+  =
+  0
+  \label{eq:step_3}
+\ee
+%
+Meaning that pressure-Poisson equation for the pressure is:
+%
+\be
+  \frac{\p^2 p^{n+1}}{\p x_j \p x_j}
+  =
+  \frac{1}{\Delta t}  \frac{\p u_i^\s}   {\p x_i} 
+  \label{eq:step_4}
+\ee
+%
+and new velocity field is (from~\ref{eq:step_2}):
+%
+\be
+  u_i^{n+1} 
+  =
+  u_i^\s 
+  - 
+  \Delta t \frac{\p p^{n+1}}{\p x_i}
+  \label{eq:step_5}
+\ee
+%
+
+\subsection{In dimensional, vector, non-conservative form}
+
+This section gives the same derivation, but for the vector form I used before.
+Surface tension terms are ommitted for simplicity. Advection terms are 
+treated with fully explicit and diffusion terms by fully implicit scheme.
+
+\be
+  \frac{\uvw^\s - \uvw^n}{\Delta t} 
+  + \nabla (\uvw^n \uvw^n)
+  =
+  \nu \nabla^2 \uvw^\s
+  \; \; \; \; [ \frac{m}{s^2} ]
+\ee
+
+\be
+  \frac{\uvw^{n+1} - \uvw^\s}{\Delta t} 
+  +
+  \frac{\nabla p}{\rho}
+  = 
+  0
+  \; \; \; \; [ \frac{m}{s^2} ]
+\ee
+
+Taking the divergence of the last equations, leads to:
+
+\be
+  \frac{1}{\Delta t} 
+  \left(   \underbrace{ \nabla \uvw^{n+1} }_{=0}
+                      - \nabla \uvw^\s \right)
+  +
+  \frac{\nabla^2 p}{\rho}
+  = 
+  0
+  \; \; \; \; [ \frac{1}{s^2} ]
+\ee
+
+or:
+
+\be
+  \frac{\nabla^2 p}{\rho} = \frac{\nabla \uvw^\s}{\Delta t}
+  \; \; \; \; [ \frac{1}{s^2} ]
+\ee
+
+Velocity is corrected from:
+
+\be
+  \uvw^{n+1} 
+  =
+  \uvw^\s
+  +
+  {\Delta t} \frac{\nabla p}{\rho}
+  \; \; \; \; [ \frac{m}{s} ]
+\ee
+
+\subsection{In dimensional, vector, conservative form}
+
+Finally, I will try to re-write the equations in conservative form.
+This is going to be tricky. Very tricky. Actually, we will encounter
+several major problems. 
+%
+\be
+  \frac{\rho^\s \uvw^\s - \rho^n \uvw^n}{\Delta t} 
+  + \nabla (\rho^n \uvw^n \uvw^n)
+  =
+  \nabla \left( \mu \nabla \uvw^\s \right)
+  \; \; \; \; [ \frac{kg}{m^2 s^2} ]
+\ee
+%
+{\bf First problem:} how much is $\rho^\s$? It could be obtained from
+forward Euler approximation of mass conservation equation: 
+$\rho^\s = \rho^n + \Delta t \nabla (\rho^n \uvw^n)$, but will it be
+accurate enough? Will it be stable enough?
+
+\be
+  \frac{\rho^{n+1} \uvw^{n+1} - \rho^\s \uvw^\s}{\Delta t} 
+  +
+  \nabla p
+  = 
+  0
+  \; \; \; \; [ \frac{kg}{m^2 s^2} ]
+\ee
+%
+{\bf Second problem:} how much is $\rho^{n+1}$? Can it be computed in the
+same way as $\rho^\s$? Is it the same? Can it be assumed to be the same?
+
+Taking the divergence of the last equations, leads to:
+
+\be
+  \frac{1}{\Delta t} 
+  \left(   \underbrace{ \nabla ( \rho^{n+1} \uvw^{n+1} ) }_{\neq 0}
+                      - \nabla ( \rho^\s    \uvw^\s    ) \right)
+  +
+  \nabla^2 p
+  = 
+  0
+  \; \; \; \; [ \frac{kg}{m^3 s^2} ]
+\ee
+%
+with some with more difficulties. The underbraced term is not equal
+to zero anymore, meaning the whole concept should be changed. Actually,
+the underbraced term is: $\nabla(\rho^{n+1} \uvw^{n+1}) = ( \frac{\p \rho}{\p t} ) ^{n+1}$.
+
+So, the pressure-Poisson equation should look like
+\be
+  \Delta t \nabla^2 p 
+  = 
+  \nabla (\rho^\s \uvw^\s)
+  -
+  ( \frac{\p \rho}{\p t} ) ^{n+1}
+  \; \; \; \; [ \frac{kg}{m^3 s} ]
+\ee
+%
+So how a final correction looks like, it is hard to guess at this point. 
+I should either find a good source of information on that topic, or
+abandon conservative discretization scheme. Afterall, there must be 
+a good reasong why so many papers are relying on non-conservative
+discretizations.
+
+\subsection{In dimensional, vector, conservative form, again}
+
+I was forgetting one importatn aspect in previous section. I was using
+only momentum conservation equation, but not the mass conservations.
+So, the system should read:
+
+\be
+  \frac{\p \rho}{\p t} = - \nabla ( \rho \uvw )
+  \; \; \; \; [ \frac{kg}{m^3 s} ]
+\ee
+
+\be
+  \frac{\p \rho \uvw}{\p t} 
+  + \nabla (\rho \uvw \uvw)
+  =
+  - \nabla p
+  + \nabla \mu (\nabla \uvw)
+  \; \; \; \; [ \frac{kg}{m^2 s^2} ]
+\ee
+
+If we turn this system into sem-discretized form (again using forward
+Euler for advection and backward Euler for diffusion), we get:
+
+\be
+  \frac{\rho^{n+1} - \rho^n}{\Delta t} = - \nabla ( \rho^n \uvw^n )
+  \; \; \; \; [ \frac{kg}{m^3 s} ]
+\ee
+
+\be
+  \frac{\rho^\s \uvw^\s - \rho^n \uvw^n }{\Delta t} 
+  + \nabla (\rho^n \uvw^n \uvw^n)
+  =
+  + \nabla \mu (\nabla \uvw^\s)
+  \; \; \; \; [ \frac{kg}{m^2 s^2} ]
+\ee
+%
+Here we still have a problem of defining the~$\rho^\s$. We may work
+around this by solving for $\rho^\s \uvw^\s$ rather than for $\uvw^\s$.
+%
+That should be followed by:
+%
+\be
+  \frac{\rho^{n+1} \uvw^{n+1} - \rho^\s \uvw^\s}{\Delta t} 
+  +
+  \nabla p
+  = 
+  0
+  \; \; \; \; [ \frac{kg}{m^2 s^2} ]
+\ee
+%
+% % However, if the assumption~$\rho^\s = \rho^{n+1}$ holds, this 
+% % reduces to:
+% % \be
+% %   \frac{\uvw^{n+1} - \uvw^\s}{\Delta t} 
+% %   +
+% %   \frac{\nabla p}{\rho^{n+1}}
+% %   = 
+% %   0
+% %   \; \; \; \; [ \frac{m}{s^2} ]
+% % \ee
+% %
+% % I am not sure if this is good. I mean, if it makes sense to continue down this road.
+%
+where $\rho^{n+1}$ is known. If we take the divergence, we get:
+%
+\be
+  \nabla( \rho^{n+1} \uvw^{n+1} ) - \nabla ( \rho^\s \uvw^\s )
+  +
+  \Delta t \nabla^2 p
+  = 
+  0
+  \; \; \; \; [ \frac{kg}{m^3 s} ]
+\ee
+%
+which is a pressure-Poisson equation, but the first term on the 
+left-hand side did not vanish. I mean, the unknown velocity $\uvw^{n+1}$
+did not vanish. 
+
+\subsection{Fractional step method by Zaleski}
+
+These considerations are not new. In the paper from Lafaurie, Nardone,
+Scardovelli and Zaleski, JCP~1994, they do the following:
+
+\begin{enumerate}
+  \item Enforce $\nabla \uvw^{n+1} = 0$ (their equation 18), 
+        presumably to get rif of the unknown density at new time step.
+  \item Set $\rho^\s = \rho^n$ during the whole projection step (their
+        equations 28 - 31).
+\end{enumerate}
+
+In the paper Popinet and Zaleski, IJNMF 1999, they do the following:
+
+\begin{enumerate}
+  \item Enforce $\nabla \uvw^{n+1} = 0$ (their equation 22), 
+        presumably to get rid of the density. 
+  \item Solve equations for $(\rho \uvw)^\s$ (their equation 18), 
+        presumably to get rid of the unknown density at the tentative
+        time step. 
+  \item Set $\rho^\s = \rho^{n+1}$ during the whole projection step (their
+        equations 28 - 31), although I am not sure how this helps the
+        matter.
+\end{enumerate}
+
+%------------%
+% Dimensions % 
+%------------%
+\section{Dimensions}
+
+\subsection{Dependent variables}
+
+\begin{center}
+  \begin{tabular*}{0.75\textwidth}{@{\extracolsep{\fill}}|ccc|} 
+    \hline
+         symbol   & description       & dimension                \\
+    \hline
+    \hline
+         $\uvw$   & velocity          & $\frac{m}{s}$            \\
+    \hline
+         $p$      & pressure          & $Pa = \frac{kg}{ms^2} $  \\
+    \hline
+%        $q$      & heat flux         & $\frac{W}{m^2} $         \\
+%   \hline
+%        $T$      & temperature       & $K$                      \\
+%   \hline
+  \end{tabular*}
+\end{center}
+
+\subsection{Physical properties}
+
+\begin{center}
+  \begin{tabular*}{0.75\textwidth}{@{\extracolsep{\fill}}|cccc|} 
+    \hline
+         symbol    & description          & definition               & dimension         \\
+    \hline
+    \hline
+%        c         & thermal capacity     &                          & $\frac{J}{kg K}$  \\
+%   \hline
+%        $\beta$   & volumetric expansion &                          & $\frac{1}{K}   $  \\
+%   \hline
+%        $\kappa$  & thermal diffusivity  & $\frac{\lambda}{\rho c}$ & $\frac{m^2}{s} $  \\
+%   \hline
+%        $\lambda$ & thermal conductivity &                          & $\frac{W}{mK}  $  \\
+%   \hline
+         $\mu$     & viscosity            &                          & $\frac{kg}{ms} $  \\
+    \hline
+         $\nu$     & kinematic viscosity  & $\frac{\mu}{\rho}$       & $\frac{m^2}{s} $  \\
+    \hline
+         $\rho$    & density              &                          & $\frac{kg}{m^3}$  \\
+    \hline
+         $\sigma$  & surface tension      &                          & $\frac{kg}{s^2}$  \\
+    \hline
+  \end{tabular*}
+\end{center}
+
+\end{document}

@@ -1,0 +1,28 @@
+This is test I performed for NRG.
+
+I have learned that, only when I perform 80,000 time steps, 60,000 for 
+statistics, I managed to get close to Kim's data.
+
+Few parameters:
+
+- Grid: 128 x 128 x 128 cells
+- Domain: L x H x W = 8 x 2 x 4
+- First cell size: 0.00222222 (0.4 in wall units)
+- Distance from the first computational point to the wall 0.00111111 
+  (0.2 in wall units)
+- First y+ = 0.2
+- Density: 1
+- Viscosity: 0.000333333
+- Pressure drop: 0.00036
+- Re_tau = 180.
+- Bulk velocity is very close to 1, and
+- Time step is 0.015.
+- This time step results in the CFL number varying around 0.3. 
+- Flow-through time is close to 8.
+- I have performed 80,000 time steps, but discarded first 20,000. 
+  Hence, the last 60,000 are used for statistics.
+- This number of time steps corresponds to a simulation time of 900, 
+  which is more than 100 flow-through times.
+- Computed Re_tau is 179.917
+- Computed u_tau is 0.0599724,
+

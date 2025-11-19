@@ -1,0 +1,2646 @@
+FILE: domain.cpp, LINE: 33, name = unnamed
+0:  dims[i] 0: 1 0: 1 0: 1 0: 
+0:  neighbours: 0:  -2 0:  -2 0:  0 0:  0 0:  -2 0:  -2 0: 
+0:  coords[i] 0: 0 0: 0 0: 0 0: 
+0: n_dir[k] = 64
+0: n_dir[k] = 4
+0: n_dir[k] = 64
+PROC: 0, FILE: domain.cpp, LINE: 70, cr_x = first = 1, last = 64
+PROC: 0, FILE: domain.cpp, LINE: 71, cr_y = first = 1, last = 4
+PROC: 0, FILE: domain.cpp, LINE: 72, cr_z = first = 1, last = 64
+0: ni =   66
+0: nj =   6
+0: nk =   66
+Domain level 4 created !
+Plotting: unnamed_level_p:000.gmv.000004
+Domain level 3 created !
+Plotting: unnamed_level_p:000.gmv.000003
+Domain level 2 created !
+Plotting: unnamed_level_p:000.gmv.000002
+Domain level 1 created !
+Plotting: unnamed_level_p:000.gmv.000001
+Plotting: unnamed_level_p:000.gmv.000000
+Plotting: c0_p:000.gmv.000000
+FILE: levelset.cpp, LINE: 28, phi_old.dxc(1) = 0.000117188
+FILE: levelset_discretize.cpp, LINE: 12, dzc(1) = 0.000117188
+FILE: levelset_discretize.cpp, LINE: 14, lcnd = 0.00028973
+FILE: levelset_discretize.cpp, LINE: 15, lcnd = 0.000144865
+FILE: levelset_discretize.cpp, LINE: 18, ldt = 2.36995e-05
+FILE: levelset_discretize.cpp, LINE: 12, dzc(1) = 0.000117188
+FILE: levelset_discretize.cpp, LINE: 14, lcnd = 0.00028973
+FILE: levelset_discretize.cpp, LINE: 15, lcnd = 0.000144865
+FILE: levelset_discretize.cpp, LINE: 18, ldt = 2.36995e-05
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+from_local, residual = 2.72281e-09, ratio = 0.00389458
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.233198
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+from_local, residual = 1.44707e-09, ratio = 0.00461504
+FILE: levelset_sharpen.cpp, LINE: 184, it = 1
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.105609
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+from_local, residual = 8.42005e-10, ratio = 0.00509694
+FILE: levelset_sharpen.cpp, LINE: 184, it = 2
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.0541754
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+from_local, residual = 5.12919e-10, ratio = 0.00511861
+FILE: levelset_sharpen.cpp, LINE: 184, it = 3
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.0339546
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+from_local, residual = 3.21712e-10, ratio = 0.00470824
+FILE: levelset_sharpen.cpp, LINE: 184, it = 4
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.026274
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+from_local, residual = 2.1345e-10, ratio = 0.00420212
+FILE: levelset_sharpen.cpp, LINE: 184, it = 5
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.0208757
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+from_local, residual = 1.52541e-10, ratio = 0.00380915
+FILE: levelset_sharpen.cpp, LINE: 184, it = 6
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.0167704
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+from_local, residual = 1.15226e-10, ratio = 0.00351112
+FILE: levelset_sharpen.cpp, LINE: 184, it = 7
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.0136559
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+from_local, residual = 9.36372e-11, ratio = 0.00338978
+FILE: levelset_sharpen.cpp, LINE: 184, it = 8
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.0112787
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+from_local, residual = 7.48565e-11, ratio = 0.00316044
+FILE: levelset_sharpen.cpp, LINE: 184, it = 9
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00944461
+Plotting: c1_p:000.gmv.000000
+FILE: centered_coarsen.cpp, LINE: 6, coarsenig
+Centered level 32 x 4 x 32 created !
+Centered level 16 x 4 x 16 created !
+Centered level 8 x 4 x 8 created !
+Centered level 4 x 4 x 4 created !
+Number of cycling levels: 5
+##################
+#                 
+# TIME:      0
+#                 
+# TIME STEP: 1
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+from_local, residual = 6.30179e-11, ratio = 0.00305791
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00800748
+cfl max = 0
+FILE: centered_coarsen.cpp, LINE: 6, coarsenig
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 0
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 1.32173e-09, ratio = 0.00301956
+w, residual = 1.32173e-09, ratio = 0.00301956
+@get_src; err sou = 4.00164e-08 -3.48557e-20
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 0.000108851
+Cycle 1; res = 1.8723e-05
+Cycle 2; res = 4.58337e-07
+Converged after 2 cycles!
+@get_src; err sou = 1.68496e-10 2.24218e-22
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 7.76893e-11, ratio = 0.00423775
+w, residual = 7.76894e-11, ratio = 0.00423775
+@get_src; err sou = 4.27006e-09 1.24832e-21
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 1.16152e-05
+Cycle 1; res = 3.65802e-07
+Cycle 2; res = 1.65832e-08
+Converged after 2 cycles!
+@get_src; err sou = 6.09639e-12 -7.8671e-24
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 8.09606e-12, ratio = 0.0033991
+w, residual = 8.09606e-12, ratio = 0.0033991
+@get_src; err sou = 6.94887e-10 -7.72251e-24
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 1.89021e-06
+Cycle 1; res = 7.66183e-09
+Converged after 1 cycles!
+@get_src; err sou = 2.81668e-12 -4.72044e-24
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 1.06162e-12, ratio = 0.00258965
+w, residual = 1.06163e-12, ratio = 0.00258967
+@get_src; err sou = 1.37062e-10 1.85017e-23
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 3.72831e-07
+Cycle 1; res = 3.73626e-09
+Cycle 2; res = 5.07331e-10
+Converged after 2 cycles!
+@get_src; err sou = 1.86507e-13 -4.42346e-25
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 1.58313e-13, ratio = 0.00198688
+w, residual = 1.58305e-13, ratio = 0.00198678
+@get_src; err sou = 3.16338e-11 2.33937e-24
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 8.6049e-08
+Cycle 1; res = 1.87272e-09
+Cycle 2; res = 2.12218e-10
+Converged after 2 cycles!
+@get_src; err sou = 7.80166e-14 -1.91832e-25
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 3.07136e-14, ratio = 0.00186422
+w, residual = 3.07037e-14, ratio = 0.00186362
+@get_src; err sou = 1.01106e-11 5.6384e-25
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 2.75025e-08
+Cycle 1; res = 3.80265e-10
+Cycle 2; res = 5.13771e-11
+Converged after 2 cycles!
+@get_src; err sou = 1.88875e-14 -8.05711e-26
+FILE: main.cpp, LINE: 200, v0+v1 = 2.63672e-08
+FILE: main.cpp, LINE: 201, p0-p1 = -3.17054
+##################
+#                 
+# TIME:      0.0004
+#                 
+# TIME STEP: 2
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+from_local, residual = 5.72853e-11, ratio = 0.00317179
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00651766
+cfl max = 0.0180785
+FILE: centered_coarsen.cpp, LINE: 6, coarsenig
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 0
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 3.83635e-10, ratio = 0.00332638
+w, residual = 3.83635e-10, ratio = 0.00332638
+@get_src; err sou = 7.03631e-09 -2.82703e-22
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 1.91813e-05
+Cycle 1; res = 3.57387e-07
+Cycle 2; res = 1.84625e-08
+Converged after 2 cycles!
+@get_src; err sou = 6.77262e-12 -3.39778e-24
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 2.61357e-11, ratio = 0.00538912
+w, residual = 2.61357e-11, ratio = 0.00538912
+@get_src; err sou = 9.62903e-10 6.11558e-22
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 2.62492e-06
+Cycle 1; res = 7.36881e-08
+Cycle 2; res = 5.2838e-09
+Converged after 2 cycles!
+@get_src; err sou = 1.93827e-12 -5.92113e-25
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 2.18809e-12, ratio = 0.00371854
+w, residual = 2.18826e-12, ratio = 0.00371883
+@get_src; err sou = 1.59576e-10 -1.09824e-22
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 4.35011e-07
+Cycle 1; res = 2.60034e-08
+Cycle 2; res = 4.36597e-09
+Cycle 3; res = 4.03468e-10
+Converged after 3 cycles!
+@get_src; err sou = 1.48005e-13 -1.0987e-24
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 3.73321e-13, ratio = 0.00382493
+w, residual = 3.73123e-13, ratio = 0.0038229
+@get_src; err sou = 3.0578e-11 -1.13234e-23
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 8.3357e-08
+Cycle 1; res = 2.83505e-09
+Cycle 2; res = 3.87501e-10
+Converged after 2 cycles!
+@get_src; err sou = 1.42148e-13 -1.73474e-25
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 1.54702e-13, ratio = 0.00837906
+w, residual = 1.54571e-13, ratio = 0.00837198
+@get_src; err sou = 8.87892e-12 5.00691e-24
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 2.42043e-08
+Cycle 1; res = 6.08366e-10
+Cycle 2; res = 9.43612e-11
+Converged after 2 cycles!
+@get_src; err sou = 3.46147e-14 -2.62381e-25
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 6.99384e-15, ratio = 0.00183326
+w, residual = 6.97964e-15, ratio = 0.00182955
+@get_src; err sou = 4.07895e-12 -1.49078e-24
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 1.11194e-08
+Cycle 1; res = 1.87125e-10
+Cycle 2; res = 3.07225e-11
+Converged after 2 cycles!
+@get_src; err sou = 1.127e-14 -2.88153e-25
+FILE: main.cpp, LINE: 200, v0+v1 = 2.63672e-08
+FILE: main.cpp, LINE: 201, p0-p1 = -3.18626
+##################
+#                 
+# TIME:      0.0008
+#                 
+# TIME STEP: 3
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+from_local, residual = 5.70841e-11, ratio = 0.00355195
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00621685
+cfl max = 0.0286363
+FILE: centered_coarsen.cpp, LINE: 6, coarsenig
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 0
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 4.56549e-10, ratio = 0.00491239
+w, residual = 4.56549e-10, ratio = 0.00491239
+@get_src; err sou = 1.22486e-08 -5.42569e-22
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 3.34803e-05
+Cycle 1; res = 2.23003e-06
+Cycle 2; res = 4.21888e-08
+Converged after 2 cycles!
+@get_src; err sou = 1.54345e-11 6.505e-23
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 2.35567e-11, ratio = 0.0035574
+w, residual = 2.35568e-11, ratio = 0.0035574
+@get_src; err sou = 1.66177e-09 8.46891e-23
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 4.5423e-06
+Cycle 1; res = 6.17182e-08
+Cycle 2; res = 9.60589e-09
+Converged after 2 cycles!
+@get_src; err sou = 3.51425e-12 5.75775e-24
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 6.07049e-12, ratio = 0.00632921
+w, residual = 6.07071e-12, ratio = 0.00632944
+@get_src; err sou = 2.93024e-10 8.9279e-23
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 8.00955e-07
+Cycle 1; res = 2.15551e-08
+Cycle 2; res = 3.3441e-09
+Converged after 2 cycles!
+@get_src; err sou = 1.22342e-12 5.01034e-25
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 4.76082e-13, ratio = 0.00282148
+w, residual = 4.761e-13, ratio = 0.00282159
+@get_src; err sou = 6.36955e-11 -1.39496e-22
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 1.74106e-07
+Cycle 1; res = 9.75655e-09
+Cycle 2; res = 1.57922e-09
+Converged after 2 cycles!
+@get_src; err sou = 5.77747e-13 -4.28131e-25
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 1.05776e-13, ratio = 0.00317938
+w, residual = 1.05655e-13, ratio = 0.00317574
+@get_src; err sou = 1.47675e-11 -1.60105e-24
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 4.03656e-08
+Cycle 1; res = 7.03926e-10
+Cycle 2; res = 9.56154e-11
+Converged after 2 cycles!
+@get_src; err sou = 3.49803e-14 -1.07411e-26
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 4.83301e-14, ratio = 0.0070108
+w, residual = 4.83323e-14, ratio = 0.00701111
+@get_src; err sou = 4.85188e-12 3.67465e-24
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 1.32622e-08
+Cycle 1; res = 1.56145e-10
+Cycle 2; res = 2.10343e-11
+Converged after 2 cycles!
+@get_src; err sou = 7.69526e-15 -2.65739e-25
+FILE: main.cpp, LINE: 200, v0+v1 = 2.63672e-08
+FILE: main.cpp, LINE: 201, p0-p1 = -3.10712
+##################
+#                 
+# TIME:      0.0012
+#                 
+# TIME STEP: 4
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+from_local, residual = 5.50822e-11, ratio = 0.0037961
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00624274
+cfl max = 0.0318441
+FILE: centered_coarsen.cpp, LINE: 6, coarsenig
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 0
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 4.41796e-10, ratio = 0.00449433
+w, residual = 4.41796e-10, ratio = 0.00449433
+@get_src; err sou = 7.19321e-09 -4.50398e-21
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 1.96863e-05
+Cycle 1; res = 3.61482e-07
+Cycle 2; res = 1.38595e-08
+Converged after 2 cycles!
+@get_src; err sou = 5.06416e-12 -2.86177e-23
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 2.05489e-11, ratio = 0.00453388
+w, residual = 2.05489e-11, ratio = 0.00453388
+@get_src; err sou = 9.50639e-10 -1.8219e-23
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 2.60169e-06
+Cycle 1; res = 4.6778e-08
+Cycle 2; res = 6.93954e-09
+Converged after 2 cycles!
+@get_src; err sou = 2.53565e-12 5.82419e-25
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 2.42772e-12, ratio = 0.00375397
+w, residual = 2.4278e-12, ratio = 0.0037541
+@get_src; err sou = 1.64901e-10 -6.24319e-23
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 4.51298e-07
+Cycle 1; res = 2.17944e-08
+Cycle 2; res = 3.9102e-09
+Converged after 2 cycles!
+@get_src; err sou = 1.42876e-12 1.4823e-24
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 4.16079e-13, ratio = 0.00352944
+w, residual = 4.16012e-13, ratio = 0.00352887
+@get_src; err sou = 3.2665e-11 -9.11232e-24
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 8.93971e-08
+Cycle 1; res = 9.19073e-09
+Cycle 2; res = 1.23786e-09
+Cycle 3; res = 1.18588e-10
+Converged after 3 cycles!
+@get_src; err sou = 4.33312e-14 -7.82271e-25
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 1.69826e-13, ratio = 0.00703716
+w, residual = 1.69749e-13, ratio = 0.00703394
+@get_src; err sou = 8.968e-12 1.5785e-24
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 2.45435e-08
+Cycle 1; res = 1.50203e-09
+Cycle 2; res = 2.03757e-10
+Converged after 2 cycles!
+@get_src; err sou = 7.44511e-14 -9.36094e-25
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 8.22842e-15, ratio = 0.00156493
+w, residual = 8.22502e-15, ratio = 0.00156429
+@get_src; err sou = 3.79238e-12 4.28938e-25
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 1.03789e-08
+Cycle 1; res = 2.97279e-10
+Cycle 2; res = 4.21957e-11
+Converged after 2 cycles!
+@get_src; err sou = 1.5418e-14 -9.92898e-25
+FILE: main.cpp, LINE: 200, v0+v1 = 2.63672e-08
+FILE: main.cpp, LINE: 201, p0-p1 = -3.12439
+##################
+#                 
+# TIME:      0.0016
+#                 
+# TIME STEP: 5
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+from_local, residual = 5.38668e-11, ratio = 0.0040593
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00600123
+cfl max = 0.0294878
+FILE: centered_coarsen.cpp, LINE: 6, coarsenig
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 0
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 4.27057e-10, ratio = 0.00355679
+w, residual = 4.27057e-10, ratio = 0.00355679
+@get_src; err sou = 1.07783e-08 -4.77031e-21
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 2.95448e-05
+Cycle 1; res = 2.61245e-06
+Cycle 2; res = 3.95147e-08
+Converged after 2 cycles!
+@get_src; err sou = 1.44155e-11 2.74585e-23
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 2.82341e-11, ratio = 0.00471467
+w, residual = 2.82342e-11, ratio = 0.00471469
+@get_src; err sou = 1.62458e-09 7.24756e-23
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 4.45317e-06
+Cycle 1; res = 1.22339e-07
+Cycle 2; res = 1.21874e-08
+Converged after 2 cycles!
+@get_src; err sou = 4.44614e-12 -4.04992e-24
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 5.36334e-12, ratio = 0.00520667
+w, residual = 5.36359e-12, ratio = 0.00520692
+@get_src; err sou = 3.20442e-10 1.70041e-24
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 8.78373e-07
+Cycle 1; res = 1.94806e-08
+Cycle 2; res = 3.29906e-09
+Converged after 2 cycles!
+@get_src; err sou = 1.20354e-12 -8.80899e-25
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 4.78282e-13, ratio = 0.00231422
+w, residual = 4.78319e-13, ratio = 0.0023144
+@get_src; err sou = 7.26164e-11 2.15325e-23
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 1.99051e-07
+Cycle 1; res = 7.04705e-09
+Cycle 2; res = 1.40703e-09
+Converged after 2 cycles!
+@get_src; err sou = 5.13304e-13 -3.6843e-25
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 1.08834e-13, ratio = 0.00244057
+w, residual = 1.08758e-13, ratio = 0.00243887
+@get_src; err sou = 1.73213e-11 2.82728e-26
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 4.74799e-08
+Cycle 1; res = 1.24421e-09
+Cycle 2; res = 1.56855e-10
+Converged after 2 cycles!
+@get_src; err sou = 5.7223e-14 2.62747e-25
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 5.36851e-14, ratio = 0.00538421
+w, residual = 5.37067e-14, ratio = 0.00538639
+@get_src; err sou = 5.36536e-12 -1.2338e-24
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 1.47071e-08
+Cycle 1; res = 2.41966e-10
+Cycle 2; res = 2.97668e-11
+Converged after 2 cycles!
+@get_src; err sou = 1.08593e-14 2.29199e-25
+FILE: main.cpp, LINE: 200, v0+v1 = 2.63672e-08
+FILE: main.cpp, LINE: 201, p0-p1 = -3.02124
+##################
+#                 
+# TIME:      0.002
+#                 
+# TIME STEP: 6
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+from_local, residual = 5.34246e-11, ratio = 0.00438717
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00530219
+cfl max = 0.028418
+FILE: centered_coarsen.cpp, LINE: 6, coarsenig
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 0
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 2.77666e-10, ratio = 0.00246722
+w, residual = 2.77666e-10, ratio = 0.00246722
+@get_src; err sou = 4.39983e-09 -1.18373e-21
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 1.20701e-05
+Cycle 1; res = 6.83225e-07
+Cycle 2; res = 2.84372e-08
+Converged after 2 cycles!
+@get_src; err sou = 1.0366e-11 -1.78361e-24
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 1.46824e-11, ratio = 0.00534582
+w, residual = 1.46824e-11, ratio = 0.00534582
+@get_src; err sou = 6.82855e-10 4.14463e-23
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 1.87328e-06
+Cycle 1; res = 3.9441e-08
+Cycle 2; res = 2.61981e-09
+Converged after 2 cycles!
+@get_src; err sou = 9.54983e-13 -3.19337e-25
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 1.43002e-12, ratio = 0.00394631
+w, residual = 1.43003e-12, ratio = 0.00394633
+@get_src; err sou = 1.26677e-10 -6.32547e-23
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 3.47515e-07
+Cycle 1; res = 3.24575e-09
+Converged after 1 cycles!
+@get_src; err sou = 1.18315e-12 -4.98626e-24
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 2.8882e-13, ratio = 0.00425071
+w, residual = 2.88835e-13, ratio = 0.00425093
+@get_src; err sou = 2.76111e-11 4.83424e-24
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 7.57456e-08
+Cycle 1; res = 4.80137e-09
+Cycle 2; res = 6.01943e-10
+Converged after 2 cycles!
+@get_src; err sou = 2.19422e-13 -6.15185e-25
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 1.33349e-13, ratio = 0.0093421
+w, residual = 1.33368e-13, ratio = 0.00934347
+@get_src; err sou = 6.71324e-12 -2.13258e-25
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 1.84165e-08
+Cycle 1; res = 7.43625e-10
+Cycle 2; res = 1.05241e-10
+Converged after 2 cycles!
+@get_src; err sou = 3.83627e-14 -1.24425e-25
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 5.64349e-15, ratio = 0.00176298
+w, residual = 5.64424e-15, ratio = 0.00176321
+@get_src; err sou = 1.96607e-12 2.45468e-25
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 5.39353e-09
+Cycle 1; res = 1.71336e-10
+Cycle 2; res = 2.94015e-11
+Converged after 2 cycles!
+@get_src; err sou = 1.07175e-14 -1.45971e-25
+FILE: main.cpp, LINE: 200, v0+v1 = 2.63672e-08
+FILE: main.cpp, LINE: 201, p0-p1 = -2.98719
+##################
+#                 
+# TIME:      0.0024
+#                 
+# TIME STEP: 7
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+from_local, residual = 5.29281e-11, ratio = 0.00472175
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00446391
+cfl max = 0.0209845
+FILE: centered_coarsen.cpp, LINE: 6, coarsenig
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 0
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 2.37175e-10, ratio = 0.00258008
+w, residual = 2.37175e-10, ratio = 0.00258008
+@get_src; err sou = 2.61137e-09 2.69939e-24
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 7.16764e-06
+Cycle 1; res = 1.24727e-07
+Cycle 2; res = 5.12795e-09
+Converged after 2 cycles!
+@get_src; err sou = 1.86825e-12 6.49224e-24
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 1.2604e-11, ratio = 0.00517733
+w, residual = 1.2604e-11, ratio = 0.00517733
+@get_src; err sou = 4.28153e-10 2.04659e-22
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 1.17519e-06
+Cycle 1; res = 9.62548e-09
+Converged after 1 cycles!
+@get_src; err sou = 3.50683e-12 7.10268e-24
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 1.28876e-12, ratio = 0.00415837
+w, residual = 1.28875e-12, ratio = 0.00415833
+@get_src; err sou = 6.58038e-11 -8.83181e-24
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 1.80617e-07
+Cycle 1; res = 3.51306e-09
+Cycle 2; res = 5.76059e-10
+Converged after 2 cycles!
+@get_src; err sou = 2.09874e-13 1.5433e-24
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 2.66291e-13, ratio = 0.00472886
+w, residual = 2.6628e-13, ratio = 0.00472866
+@get_src; err sou = 1.2661e-11 -5.00155e-24
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 3.47517e-08
+Cycle 1; res = 9.96936e-10
+Cycle 2; res = 9.77676e-11
+Converged after 2 cycles!
+@get_src; err sou = 3.56194e-14 1.66431e-25
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 1.13592e-13, ratio = 0.00972654
+w, residual = 1.13568e-13, ratio = 0.00972451
+@get_src; err sou = 2.88815e-12 1.83586e-24
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 7.92736e-09
+Cycle 1; res = 2.88835e-10
+Cycle 2; res = 3.35463e-11
+Converged after 2 cycles!
+@get_src; err sou = 1.22218e-14 2.49248e-25
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 4.6131e-15, ratio = 0.00176021
+w, residual = 4.61437e-15, ratio = 0.00176069
+@get_src; err sou = 8.56499e-13 -5.13832e-25
+FILE: main.cpp, LINE: 200, v0+v1 = 2.63672e-08
+FILE: main.cpp, LINE: 201, p0-p1 = -3.00749
+##################
+#                 
+# TIME:      0.0028
+#                 
+# TIME STEP: 8
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+from_local, residual = 5.17604e-11, ratio = 0.00498422
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00427595
+cfl max = 0.0203491
+FILE: centered_coarsen.cpp, LINE: 6, coarsenig
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 0
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 2.02216e-10, ratio = 0.00313882
+w, residual = 2.02216e-10, ratio = 0.00313882
+@get_src; err sou = 3.63171e-09 -2.96246e-22
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 9.98043e-06
+Cycle 1; res = 1.55641e-07
+Cycle 2; res = 2.5443e-08
+Converged after 2 cycles!
+@get_src; err sou = 9.25827e-12 -2.19397e-24
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 1.06046e-11, ratio = 0.0040656
+w, residual = 1.06046e-11, ratio = 0.0040656
+@get_src; err sou = 5.04869e-10 2.77784e-23
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 1.38745e-06
+Cycle 1; res = 1.6444e-08
+Cycle 2; res = 2.34489e-09
+Converged after 2 cycles!
+@get_src; err sou = 8.53265e-13 -1.56833e-24
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 1.30643e-12, ratio = 0.00382332
+w, residual = 1.30642e-12, ratio = 0.00382329
+@get_src; err sou = 7.80195e-11 -1.92507e-24
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 2.14408e-07
+Cycle 1; res = 3.77279e-09
+Cycle 2; res = 4.67063e-10
+Converged after 2 cycles!
+@get_src; err sou = 1.69956e-13 1.56106e-25
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 3.52494e-13, ratio = 0.00601936
+w, residual = 3.52469e-13, ratio = 0.00601893
+@get_src; err sou = 1.48943e-11 -1.5467e-23
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 4.09316e-08
+Cycle 1; res = 2.35031e-09
+Cycle 2; res = 2.20884e-10
+Converged after 2 cycles!
+@get_src; err sou = 8.03758e-14 3.95945e-26
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 3.01324e-14, ratio = 0.00260891
+w, residual = 3.01307e-14, ratio = 0.00260877
+@get_src; err sou = 3.56787e-12 -9.56488e-24
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 9.80498e-09
+Cycle 1; res = 5.38979e-10
+Cycle 2; res = 7.18974e-11
+Converged after 2 cycles!
+@get_src; err sou = 2.61623e-14 6.25724e-27
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 9.66036e-15, ratio = 0.00387726
+w, residual = 9.66227e-15, ratio = 0.00387802
+@get_src; err sou = 1.00081e-12 -2.71621e-25
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 2.75036e-09
+Cycle 1; res = 5.46679e-11
+Cycle 2; res = 1.30855e-11
+Converged after 2 cycles!
+@get_src; err sou = 4.76158e-15 -1.46157e-25
+Plotting: uvw,p_p:000.gmv.000008
+Plotting: xyz,c_p:000.gmv.000008
+Plotting: press_p:000.gmv.000008
+FILE: main.cpp, LINE: 200, v0+v1 = 2.63672e-08
+FILE: main.cpp, LINE: 201, p0-p1 = -3.0089
+##################
+#                 
+# TIME:      0.0032
+#                 
+# TIME STEP: 9
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+from_local, residual = 5.12706e-11, ratio = 0.00527574
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00408616
+cfl max = 0.0213479
+FILE: centered_coarsen.cpp, LINE: 6, coarsenig
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 0
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 1.93339e-10, ratio = 0.00392801
+w, residual = 1.93339e-10, ratio = 0.00392801
+@get_src; err sou = 4.24751e-09 8.33557e-22
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 1.16794e-05
+Cycle 1; res = 2.85253e-07
+Cycle 2; res = 1.07858e-08
+Converged after 2 cycles!
+@get_src; err sou = 3.92256e-12 -1.23512e-24
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 9.58498e-12, ratio = 0.00350166
+w, residual = 9.58498e-12, ratio = 0.00350166
+@get_src; err sou = 5.46017e-10 -1.28484e-23
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 1.50138e-06
+Cycle 1; res = 8.62693e-09
+Converged after 1 cycles!
+@get_src; err sou = 3.13742e-12 -1.01743e-23
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 1.35201e-12, ratio = 0.00354606
+w, residual = 1.35201e-12, ratio = 0.00354603
+@get_src; err sou = 8.76229e-11 4.67157e-23
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 2.40936e-07
+Cycle 1; res = 5.67856e-09
+Cycle 2; res = 7.85656e-10
+Converged after 2 cycles!
+@get_src; err sou = 2.85725e-13 3.07264e-25
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 4.28913e-13, ratio = 0.00647113
+w, residual = 4.28931e-13, ratio = 0.0064714
+@get_src; err sou = 1.70138e-11 -1.33036e-23
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 4.67828e-08
+Cycle 1; res = 1.99452e-09
+Cycle 2; res = 1.86223e-10
+Converged after 2 cycles!
+@get_src; err sou = 6.7725e-14 5.68939e-25
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 2.9747e-14, ratio = 0.00226622
+w, residual = 2.97479e-14, ratio = 0.00226629
+@get_src; err sou = 4.07826e-12 -1.85382e-25
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 1.1214e-08
+Cycle 1; res = 5.69025e-10
+Cycle 2; res = 7.97622e-11
+Converged after 2 cycles!
+@get_src; err sou = 2.90077e-14 4.8585e-25
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 1.20582e-14, ratio = 0.0042861
+w, residual = 1.20539e-14, ratio = 0.0042846
+@get_src; err sou = 1.08517e-12 2.75685e-25
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 2.98388e-09
+Cycle 1; res = 5.65532e-11
+Cycle 2; res = 1.38047e-11
+Converged after 2 cycles!
+@get_src; err sou = 5.02044e-15 5.94179e-25
+FILE: main.cpp, LINE: 200, v0+v1 = 2.63672e-08
+FILE: main.cpp, LINE: 201, p0-p1 = -3.02208
+##################
+#                 
+# TIME:      0.0036
+#                 
+# TIME STEP: 10
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+from_local, residual = 5.09996e-11, ratio = 0.0055487
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00392181
+cfl max = 0.0204009
+FILE: centered_coarsen.cpp, LINE: 6, coarsenig
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 0
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 2.32061e-10, ratio = 0.00408798
+w, residual = 2.32061e-10, ratio = 0.00408798
+@get_src; err sou = 3.99598e-09 1.63678e-21
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 1.10183e-05
+Cycle 1; res = 3.27564e-07
+Cycle 2; res = 7.79911e-09
+Converged after 2 cycles!
+@get_src; err sou = 2.82849e-12 -7.75078e-25
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 9.83419e-12, ratio = 0.00369418
+w, residual = 9.83418e-12, ratio = 0.00369418
+@get_src; err sou = 5.22221e-10 -3.00935e-23
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 1.43994e-06
+Cycle 1; res = 2.82749e-08
+Cycle 2; res = 3.34748e-09
+Converged after 2 cycles!
+@get_src; err sou = 1.21402e-12 -3.24329e-24
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 1.69275e-12, ratio = 0.00430309
+w, residual = 1.69276e-12, ratio = 0.00430312
+@get_src; err sou = 8.80268e-11 -2.27386e-23
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 2.4272e-07
+Cycle 1; res = 5.63436e-09
+Cycle 2; res = 7.91372e-10
+Converged after 2 cycles!
+@get_src; err sou = 2.87005e-13 -6.91938e-25
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 6.66501e-13, ratio = 0.00922419
+w, residual = 6.66485e-13, ratio = 0.00922397
+@get_src; err sou = 1.81114e-11 -1.51677e-23
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 4.99392e-08
+Cycle 1; res = 2.56011e-09
+Cycle 2; res = 3.73952e-10
+Converged after 2 cycles!
+@get_src; err sou = 1.35621e-13 -3.30489e-25
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 3.36451e-14, ratio = 0.00227355
+w, residual = 3.3646e-14, ratio = 0.00227361
+@get_src; err sou = 5.0319e-12 -7.31821e-24
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 1.38747e-08
+Cycle 1; res = 7.26835e-10
+Cycle 2; res = 1.31406e-10
+Converged after 2 cycles!
+@get_src; err sou = 4.76568e-14 -6.74041e-25
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 1.31962e-14, ratio = 0.00408665
+w, residual = 1.31915e-14, ratio = 0.00408519
+@get_src; err sou = 1.84252e-12 -7.30372e-25
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 5.08044e-09
+Cycle 1; res = 7.01896e-11
+Cycle 2; res = 1.64152e-11
+Converged after 2 cycles!
+@get_src; err sou = 5.95326e-15 -4.29795e-25
+FILE: main.cpp, LINE: 200, v0+v1 = 2.63672e-08
+FILE: main.cpp, LINE: 201, p0-p1 = -3.07285
+##################
+#                 
+# TIME:      0.004
+#                 
+# TIME STEP: 11
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+from_local, residual = 4.76202e-11, ratio = 0.00548498
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00389776
+cfl max = 0.0179428
+FILE: centered_coarsen.cpp, LINE: 6, coarsenig
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 0
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 2.19014e-10, ratio = 0.00328782
+w, residual = 2.19014e-10, ratio = 0.00328782
+@get_src; err sou = 2.84646e-09 -2.38888e-21
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 7.85667e-06
+Cycle 1; res = 2.51629e-08
+Converged after 1 cycles!
+@get_src; err sou = 9.1165e-12 1.03106e-22
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 7.62531e-12, ratio = 0.00423309
+w, residual = 7.62532e-12, ratio = 0.0042331
+@get_src; err sou = 3.60031e-10 -3.99375e-23
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 9.9374e-07
+Cycle 1; res = 5.28216e-08
+Cycle 2; res = 3.86809e-09
+Converged after 2 cycles!
+@get_src; err sou = 1.4014e-12 -6.02614e-25
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 1.67374e-12, ratio = 0.00715152
+w, residual = 1.67373e-12, ratio = 0.00715147
+@get_src; err sou = 5.97119e-11 -1.9967e-23
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 1.64814e-07
+Cycle 1; res = 1.55935e-08
+Cycle 2; res = 1.96499e-09
+Cycle 3; res = 1.20987e-10
+Converged after 3 cycles!
+@get_src; err sou = 4.38335e-14 3.22874e-25
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 1.19196e-13, ratio = 0.00293317
+w, residual = 1.19199e-13, ratio = 0.00293324
+@get_src; err sou = 1.3201e-11 1.30279e-23
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 3.64367e-08
+Cycle 1; res = 2.89684e-09
+Cycle 2; res = 4.1481e-10
+Cycle 3; res = 4.28857e-11
+Converged after 3 cycles!
+@get_src; err sou = 1.55374e-14 2.36385e-25
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 3.55787e-14, ratio = 0.00442011
+w, residual = 3.55586e-14, ratio = 0.00441761
+@get_src; err sou = 3.26194e-12 -1.55278e-24
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 9.00345e-09
+Cycle 1; res = 3.67513e-10
+Cycle 2; res = 4.58698e-11
+Converged after 2 cycles!
+@get_src; err sou = 1.66186e-14 2.27542e-25
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 1.4407e-14, ratio = 0.00851243
+w, residual = 1.44019e-14, ratio = 0.00850944
+@get_src; err sou = 1.33122e-12 6.11904e-26
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 3.67438e-09
+Cycle 1; res = 6.83031e-11
+Cycle 2; res = 1.56444e-11
+Converged after 2 cycles!
+@get_src; err sou = 5.66794e-15 1.47907e-25
+FILE: main.cpp, LINE: 200, v0+v1 = 2.63672e-08
+FILE: main.cpp, LINE: 201, p0-p1 = -3.06855
+##################
+#                 
+# TIME:      0.0044
+#                 
+# TIME STEP: 12
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+from_local, residual = 4.61396e-11, ratio = 0.00558863
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00401206
+cfl max = 0.0172775
+FILE: centered_coarsen.cpp, LINE: 6, coarsenig
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 0
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 1.92745e-10, ratio = 0.0027496
+w, residual = 1.92745e-10, ratio = 0.0027496
+@get_src; err sou = 1.77874e-09 1.49964e-22
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 4.91719e-06
+Cycle 1; res = 8.69243e-08
+Cycle 2; res = 1.20775e-08
+Converged after 2 cycles!
+@get_src; err sou = 4.36892e-12 -4.53172e-25
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 6.52198e-12, ratio = 0.00498388
+w, residual = 6.52199e-12, ratio = 0.00498388
+@get_src; err sou = 2.55251e-10 1.60663e-22
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 7.0562e-07
+Cycle 1; res = 3.21067e-08
+Cycle 2; res = 3.38132e-09
+Converged after 2 cycles!
+@get_src; err sou = 1.22316e-12 1.34094e-24
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 6.04398e-13, ratio = 0.003735
+w, residual = 6.04412e-13, ratio = 0.00373509
+@get_src; err sou = 4.47162e-11 -7.82671e-24
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 1.23614e-07
+Cycle 1; res = 1.70302e-08
+Cycle 2; res = 2.26329e-09
+Cycle 3; res = 1.83798e-10
+Converged after 3 cycles!
+@get_src; err sou = 6.6487e-14 4.02256e-26
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 1.15993e-13, ratio = 0.0042013
+w, residual = 1.15971e-13, ratio = 0.00420051
+@get_src; err sou = 8.63541e-12 5.12141e-25
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 2.38719e-08
+Cycle 1; res = 2.27271e-09
+Cycle 2; res = 3.37405e-10
+Cycle 3; res = 1.61561e-11
+Converged after 3 cycles!
+@get_src; err sou = 5.84431e-15 -3.33262e-26
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 5.113e-14, ratio = 0.00972812
+w, residual = 5.11069e-14, ratio = 0.00972374
+@get_src; err sou = 2.46642e-12 -1.69596e-24
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 6.81823e-09
+Cycle 1; res = 3.59669e-10
+Cycle 2; res = 5.72213e-11
+Converged after 2 cycles!
+@get_src; err sou = 2.06992e-14 -1.01239e-25
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 1.82239e-15, ratio = 0.00168854
+w, residual = 1.82285e-15, ratio = 0.00168898
+@get_src; err sou = 1.05898e-12 9.20784e-25
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 2.92746e-09
+Cycle 1; res = 6.78398e-11
+Cycle 2; res = 1.50343e-11
+Converged after 2 cycles!
+@get_src; err sou = 5.43849e-15 -5.63815e-26
+FILE: main.cpp, LINE: 200, v0+v1 = 2.63672e-08
+FILE: main.cpp, LINE: 201, p0-p1 = -3.06735
+##################
+#                 
+# TIME:      0.0048
+#                 
+# TIME STEP: 13
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+from_local, residual = 4.52277e-11, ratio = 0.00575312
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00401889
+cfl max = 0.0166579
+FILE: centered_coarsen.cpp, LINE: 6, coarsenig
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 0
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 1.60281e-10, ratio = 0.00250784
+w, residual = 1.60281e-10, ratio = 0.00250784
+@get_src; err sou = 1.15589e-09 -5.54062e-23
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 3.20293e-06
+Cycle 1; res = 9.19274e-08
+Cycle 2; res = 6.37633e-09
+Converged after 2 cycles!
+@get_src; err sou = 2.30113e-12 -4.23688e-24
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 6.62221e-12, ratio = 0.00666905
+w, residual = 6.62221e-12, ratio = 0.00666904
+@get_src; err sou = 1.83195e-10 -2.38223e-22
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 5.07625e-07
+Cycle 1; res = 1.57699e-08
+Cycle 2; res = 2.19761e-09
+Converged after 2 cycles!
+@get_src; err sou = 7.93088e-13 8.74033e-25
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 4.52155e-13, ratio = 0.00396701
+w, residual = 4.52162e-13, ratio = 0.00396707
+@get_src; err sou = 3.37127e-11 -1.0427e-23
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 9.34166e-08
+Cycle 1; res = 1.40711e-08
+Cycle 2; res = 1.89084e-09
+Cycle 3; res = 1.91409e-10
+Converged after 3 cycles!
+@get_src; err sou = 6.90768e-14 -1.08747e-24
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 1.23186e-13, ratio = 0.0067452
+w, residual = 1.23168e-13, ratio = 0.0067442
+@get_src; err sou = 7.12222e-12 -1.0982e-24
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 1.97354e-08
+Cycle 1; res = 1.86853e-09
+Cycle 2; res = 2.49959e-10
+Cycle 3; res = 1.6659e-11
+Converged after 3 cycles!
+@get_src; err sou = 6.01199e-15 -4.35024e-25
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 7.87818e-15, ratio = 0.00238695
+w, residual = 7.87471e-15, ratio = 0.0023859
+@get_src; err sou = 3.01166e-12 -1.0049e-24
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 8.34518e-09
+Cycle 1; res = 3.08455e-10
+Cycle 2; res = 4.78112e-11
+Converged after 2 cycles!
+@get_src; err sou = 1.72544e-14 -4.26982e-25
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 6.19012e-15, ratio = 0.00925587
+w, residual = 6.20295e-15, ratio = 0.009275
+@get_src; err sou = 1.50084e-12 -4.60442e-25
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 4.15877e-09
+Cycle 1; res = 5.31623e-11
+Cycle 2; res = 1.48833e-11
+Converged after 2 cycles!
+@get_src; err sou = 5.37118e-15 -4.62772e-25
+FILE: main.cpp, LINE: 200, v0+v1 = 2.63672e-08
+FILE: main.cpp, LINE: 201, p0-p1 = -3.07096
+##################
+#                 
+# TIME:      0.0052
+#                 
+# TIME STEP: 14
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+from_local, residual = 4.35139e-11, ratio = 0.00583174
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00393665
+cfl max = 0.0173631
+FILE: centered_coarsen.cpp, LINE: 6, coarsenig
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 0
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 1.38227e-10, ratio = 0.00270608
+w, residual = 1.38227e-10, ratio = 0.00270609
+@get_src; err sou = 1.43122e-09 -2.28712e-22
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 3.97291e-06
+Cycle 1; res = 1.80776e-07
+Cycle 2; res = 7.41576e-09
+Converged after 2 cycles!
+@get_src; err sou = 2.67149e-12 -3.69646e-24
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 7.93148e-12, ratio = 0.00726401
+w, residual = 7.93148e-12, ratio = 0.00726401
+@get_src; err sou = 2.01631e-10 3.49741e-22
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 5.59707e-07
+Cycle 1; res = 1.82075e-08
+Cycle 2; res = 2.72942e-09
+Converged after 2 cycles!
+@get_src; err sou = 9.83258e-13 4.16983e-24
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 5.88607e-13, ratio = 0.00414271
+w, residual = 5.88624e-13, ratio = 0.00414283
+@get_src; err sou = 3.73162e-11 8.21036e-24
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 1.03586e-07
+Cycle 1; res = 1.03991e-08
+Cycle 2; res = 1.51045e-09
+Cycle 3; res = 1.62119e-10
+Converged after 3 cycles!
+@get_src; err sou = 5.84024e-14 4.43037e-25
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 1.41089e-13, ratio = 0.00540274
+w, residual = 1.41058e-13, ratio = 0.00540156
+@get_src; err sou = 7.46711e-12 -2.00656e-24
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 2.07279e-08
+Cycle 1; res = 1.35077e-09
+Cycle 2; res = 1.34848e-10
+Converged after 2 cycles!
+@get_src; err sou = 4.85781e-14 4.45448e-25
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 1.11333e-14, ratio = 0.00199574
+w, residual = 1.1128e-14, ratio = 0.00199479
+@get_src; err sou = 2.59311e-12 -2.95551e-25
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 7.1982e-09
+Cycle 1; res = 2.72189e-10
+Cycle 2; res = 3.71203e-11
+Converged after 2 cycles!
+@get_src; err sou = 1.33724e-14 4.64345e-25
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 8.55764e-15, ratio = 0.00666036
+w, residual = 8.5737e-15, ratio = 0.00667285
+@get_src; err sou = 1.10556e-12 1.71404e-25
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 3.06892e-09
+Cycle 1; res = 4.29387e-11
+Cycle 2; res = 1.05251e-11
+Converged after 2 cycles!
+@get_src; err sou = 3.7916e-15 5.16624e-25
+FILE: main.cpp, LINE: 200, v0+v1 = 2.63672e-08
+FILE: main.cpp, LINE: 201, p0-p1 = -3.07727
+##################
+#                 
+# TIME:      0.0056
+#                 
+# TIME STEP: 15
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+from_local, residual = 4.07155e-11, ratio = 0.00571352
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00377858
+cfl max = 0.0179015
+FILE: centered_coarsen.cpp, LINE: 6, coarsenig
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 0
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 1.4663e-10, ratio = 0.00393682
+w, residual = 1.4663e-10, ratio = 0.00393682
+@get_src; err sou = 1.90565e-09 -2.42612e-22
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 5.29844e-06
+Cycle 1; res = 2.69801e-07
+Cycle 2; res = 1.04302e-08
+Converged after 2 cycles!
+@get_src; err sou = 3.75136e-12 3.84187e-24
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 8.98608e-12, ratio = 0.00648983
+w, residual = 8.98605e-12, ratio = 0.00648981
+@get_src; err sou = 2.64926e-10 7.39414e-23
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 7.36597e-07
+Cycle 1; res = 2.17219e-08
+Cycle 2; res = 3.50391e-09
+Converged after 2 cycles!
+@get_src; err sou = 1.26022e-12 3.58741e-24
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 9.64912e-13, ratio = 0.00441935
+w, residual = 9.64949e-13, ratio = 0.00441952
+@get_src; err sou = 5.09742e-11 -1.45256e-22
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 1.41728e-07
+Cycle 1; res = 9.98364e-09
+Cycle 2; res = 1.61805e-09
+Cycle 3; res = 1.9052e-10
+Converged after 3 cycles!
+@get_src; err sou = 6.85226e-14 2.42584e-25
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 1.8281e-13, ratio = 0.00413737
+w, residual = 1.82776e-13, ratio = 0.0041366
+@get_src; err sou = 1.07681e-11 3.02216e-25
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 2.99395e-08
+Cycle 1; res = 9.60583e-10
+Cycle 2; res = 1.1219e-10
+Converged after 2 cycles!
+@get_src; err sou = 4.03506e-14 -5.21942e-26
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 7.63449e-14, ratio = 0.00774558
+w, residual = 7.63056e-14, ratio = 0.0077416
+@get_src; err sou = 3.35235e-12 -1.07578e-24
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 9.32086e-09
+Cycle 1; res = 2.34296e-10
+Cycle 2; res = 3.34614e-11
+Converged after 2 cycles!
+@get_src; err sou = 1.20348e-14 6.60616e-26
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 3.12105e-15, ratio = 0.00134924
+w, residual = 3.12226e-15, ratio = 0.00134977
+@get_src; err sou = 1.52716e-12 1.00389e-24
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 4.24611e-09
+Cycle 1; res = 7.13887e-11
+Cycle 2; res = 1.42263e-11
+Converged after 2 cycles!
+@get_src; err sou = 5.11666e-15 -5.67585e-27
+FILE: main.cpp, LINE: 200, v0+v1 = 2.63672e-08
+FILE: main.cpp, LINE: 201, p0-p1 = -3.09707
+##################
+#                 
+# TIME:      0.006
+#                 
+# TIME STEP: 16
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+from_local, residual = 3.86187e-11, ratio = 0.00563032
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00357046
+cfl max = 0.0185848
+FILE: centered_coarsen.cpp, LINE: 6, coarsenig
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 0
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 1.19434e-10, ratio = 0.00396906
+w, residual = 1.19434e-10, ratio = 0.00396906
+@get_src; err sou = 1.85423e-09 2.22851e-23
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 5.15933e-06
+Cycle 1; res = 3.06544e-07
+Cycle 2; res = 1.21042e-08
+Converged after 2 cycles!
+@get_src; err sou = 4.35017e-12 -1.20523e-24
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 7.98018e-12, ratio = 0.0070184
+w, residual = 7.98016e-12, ratio = 0.00701839
+@get_src; err sou = 2.2531e-10 9.00157e-23
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 6.26917e-07
+Cycle 1; res = 1.87024e-08
+Cycle 2; res = 3.13306e-09
+Converged after 2 cycles!
+@get_src; err sou = 1.126e-12 -5.03377e-24
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 6.69995e-13, ratio = 0.00440563
+w, residual = 6.7001e-13, ratio = 0.00440573
+@get_src; err sou = 4.09048e-11 6.22865e-23
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 1.13816e-07
+Cycle 1; res = 9.3618e-09
+Cycle 2; res = 1.58084e-09
+Cycle 3; res = 1.76544e-10
+Converged after 3 cycles!
+@get_src; err sou = 6.34487e-14 5.52745e-25
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 1.5432e-13, ratio = 0.00563437
+w, residual = 1.54299e-13, ratio = 0.0056336
+@get_src; err sou = 8.00343e-12 1.42558e-24
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 2.22693e-08
+Cycle 1; res = 7.39032e-10
+Cycle 2; res = 1.03451e-10
+Converged after 2 cycles!
+@get_src; err sou = 3.71798e-14 1.32617e-25
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 1.24993e-14, ratio = 0.00218414
+w, residual = 1.24933e-14, ratio = 0.00218308
+@get_src; err sou = 2.6322e-12 -7.25626e-26
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 7.32401e-09
+Cycle 1; res = 1.76218e-10
+Cycle 2; res = 2.99032e-11
+Converged after 2 cycles!
+@get_src; err sou = 1.0747e-14 2.11986e-25
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 9.56102e-15, ratio = 0.00740961
+w, residual = 9.57772e-15, ratio = 0.00742252
+@get_src; err sou = 1.08301e-12 3.07466e-25
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 3.01343e-09
+Cycle 1; res = 2.45995e-11
+Converged after 1 cycles!
+@get_src; err sou = 8.84092e-15 2.30772e-25
+Plotting: uvw,p_p:000.gmv.000016
+Plotting: xyz,c_p:000.gmv.000016
+Plotting: press_p:000.gmv.000016
+FILE: main.cpp, LINE: 200, v0+v1 = 2.63672e-08
+FILE: main.cpp, LINE: 201, p0-p1 = -3.10752
+##################
+#                 
+# TIME:      0.0064
+#                 
+# TIME STEP: 17
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+from_local, residual = 3.76917e-11, ratio = 0.00566262
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00334546
+cfl max = 0.0191715
+FILE: centered_coarsen.cpp, LINE: 6, coarsenig
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 0
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 1.23469e-10, ratio = 0.0038662
+w, residual = 1.23469e-10, ratio = 0.0038662
+@get_src; err sou = 1.59896e-09 -4.33671e-22
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 4.45487e-06
+Cycle 1; res = 2.56376e-07
+Cycle 2; res = 1.55545e-08
+Converged after 2 cycles!
+@get_src; err sou = 5.58288e-12 2.11238e-24
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 8.2995e-12, ratio = 0.00845593
+w, residual = 8.29948e-12, ratio = 0.00845591
+@get_src; err sou = 1.94745e-10 -2.16766e-22
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 5.42582e-07
+Cycle 1; res = 1.923e-08
+Cycle 2; res = 3.28802e-09
+Converged after 2 cycles!
+@get_src; err sou = 1.18015e-12 -5.09708e-24
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 5.78745e-13, ratio = 0.0045999
+w, residual = 5.78757e-13, ratio = 0.00459999
+@get_src; err sou = 3.59648e-11 -5.88896e-23
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 1.00202e-07
+Cycle 1; res = 9.89112e-09
+Cycle 2; res = 1.76113e-09
+Cycle 3; res = 1.99373e-10
+Converged after 3 cycles!
+@get_src; err sou = 7.15597e-14 -6.56626e-25
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 1.54997e-13, ratio = 0.0070168
+w, residual = 1.54974e-13, ratio = 0.00701576
+@get_src; err sou = 6.9551e-12 -3.93012e-24
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 1.93777e-08
+Cycle 1; res = 8.69731e-10
+Cycle 2; res = 1.4637e-10
+Converged after 2 cycles!
+@get_src; err sou = 5.25355e-14 -3.67546e-26
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 1.03224e-14, ratio = 0.00228621
+w, residual = 1.03189e-14, ratio = 0.00228543
+@get_src; err sou = 2.39552e-12 1.20644e-24
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 6.67418e-09
+Cycle 1; res = 1.81912e-10
+Cycle 2; res = 3.39082e-11
+Converged after 2 cycles!
+@get_src; err sou = 1.21704e-14 6.75265e-26
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 8.73127e-15, ratio = 0.0086908
+w, residual = 8.74403e-15, ratio = 0.00870346
+@get_src; err sou = 1.01126e-12 1.00974e-28
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 2.81748e-09
+Cycle 1; res = 2.56548e-11
+Converged after 1 cycles!
+@get_src; err sou = 9.20809e-15 5.97404e-26
+FILE: main.cpp, LINE: 200, v0+v1 = 2.63672e-08
+FILE: main.cpp, LINE: 201, p0-p1 = -3.11689
+##################
+#                 
+# TIME:      0.0068
+#                 
+# TIME STEP: 18
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+from_local, residual = 3.62124e-11, ratio = 0.00560791
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00325047
+cfl max = 0.0194388
+FILE: centered_coarsen.cpp, LINE: 6, coarsenig
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 0
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 1.33729e-10, ratio = 0.00378804
+w, residual = 1.33729e-10, ratio = 0.00378804
+@get_src; err sou = 1.27595e-09 -5.30429e-22
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 3.55702e-06
+Cycle 1; res = 1.52505e-07
+Cycle 2; res = 4.23177e-09
+Converged after 2 cycles!
+@get_src; err sou = 1.51798e-12 -2.45408e-24
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 9.07129e-12, ratio = 0.00970344
+w, residual = 9.07126e-12, ratio = 0.00970341
+@get_src; err sou = 1.74997e-10 -2.38545e-22
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 4.8785e-07
+Cycle 1; res = 1.89758e-08
+Cycle 2; res = 3.31435e-09
+Converged after 2 cycles!
+@get_src; err sou = 1.1889e-12 9.75007e-25
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 6.3915e-13, ratio = 0.00459834
+w, residual = 6.3917e-13, ratio = 0.00459849
+@get_src; err sou = 3.54127e-11 5.35385e-23
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 9.8722e-08
+Cycle 1; res = 1.08873e-08
+Cycle 2; res = 2.02787e-09
+Cycle 3; res = 2.30239e-10
+Converged after 3 cycles!
+@get_src; err sou = 8.25892e-14 -5.03057e-25
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 1.77667e-13, ratio = 0.00641181
+w, residual = 1.77635e-13, ratio = 0.00641067
+@get_src; err sou = 7.08837e-12 -4.10201e-24
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 1.97606e-08
+Cycle 1; res = 1.0986e-09
+Cycle 2; res = 1.89059e-10
+Converged after 2 cycles!
+@get_src; err sou = 6.78175e-14 -5.68333e-25
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 1.17688e-14, ratio = 0.00193255
+w, residual = 1.17644e-14, ratio = 0.00193183
+@get_src; err sou = 2.35654e-12 1.59191e-24
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 6.56946e-09
+Cycle 1; res = 2.03523e-10
+Cycle 2; res = 3.83715e-11
+Converged after 2 cycles!
+@get_src; err sou = 1.37643e-14 -4.89996e-25
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 1.07464e-14, ratio = 0.00761097
+w, residual = 1.07659e-14, ratio = 0.00762475
+@get_src; err sou = 9.34989e-13 -2.19922e-25
+FILE: main.cpp, LINE: 200, v0+v1 = 2.63672e-08
+FILE: main.cpp, LINE: 201, p0-p1 = -3.12986
+##################
+#                 
+# TIME:      0.0072
+#                 
+# TIME STEP: 19
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+from_local, residual = 3.53763e-11, ratio = 0.00562627
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00316825
+cfl max = 0.0189248
+FILE: centered_coarsen.cpp, LINE: 6, coarsenig
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 0
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 1.06578e-10, ratio = 0.00299204
+w, residual = 1.06578e-10, ratio = 0.00299204
+@get_src; err sou = 7.63226e-10 -5.66501e-24
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 2.13023e-06
+Cycle 1; res = 4.17499e-08
+Cycle 2; res = 2.51231e-09
+Converged after 2 cycles!
+@get_src; err sou = 9.0012e-13 -1.36517e-25
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 2.82741e-12, ratio = 0.00483592
+w, residual = 2.82743e-12, ratio = 0.00483596
+@get_src; err sou = 1.17123e-10 -4.52274e-23
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 3.26901e-07
+Cycle 1; res = 2.27162e-08
+Cycle 2; res = 4.30069e-09
+Cycle 3; res = 4.78199e-10
+Converged after 3 cycles!
+@get_src; err sou = 1.71331e-13 1.14349e-24
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 4.60217e-13, ratio = 0.00669587
+w, residual = 4.60467e-13, ratio = 0.00669952
+@get_src; err sou = 1.7766e-11 9.47451e-24
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 4.95865e-08
+Cycle 1; res = 4.11664e-09
+Cycle 2; res = 5.40227e-10
+Cycle 3; res = 5.30706e-11
+Converged after 3 cycles!
+@get_src; err sou = 1.90143e-14 -1.62026e-25
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 3.44596e-14, ratio = 0.00300377
+w, residual = 3.44558e-14, ratio = 0.00300342
+@get_src; err sou = 4.89248e-12 7.629e-24
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 1.36554e-08
+Cycle 1; res = 7.08083e-10
+Cycle 2; res = 1.18576e-10
+Converged after 2 cycles!
+@get_src; err sou = 4.24837e-14 -1.96105e-25
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 1.76664e-14, ratio = 0.00810667
+w, residual = 1.76952e-14, ratio = 0.00811986
+@get_src; err sou = 1.90064e-12 2.50012e-25
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 5.30484e-09
+Cycle 1; res = 8.61509e-11
+Cycle 2; res = 1.40214e-11
+Converged after 2 cycles!
+@get_src; err sou = 5.02362e-15 -2.02535e-25
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 1.14145e-15, ratio = 0.00255146
+w, residual = 1.14035e-15, ratio = 0.00254901
+@get_src; err sou = 1.05677e-12 -4.12984e-26
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 2.94953e-09
+Cycle 1; res = 2.65913e-11
+Converged after 1 cycles!
+@get_src; err sou = 9.52723e-15 -5.24048e-26
+FILE: main.cpp, LINE: 200, v0+v1 = 2.63672e-08
+FILE: main.cpp, LINE: 201, p0-p1 = -3.13501
+##################
+#                 
+# TIME:      0.0076
+#                 
+# TIME STEP: 20
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+from_local, residual = 3.456e-11, ratio = 0.00566984
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00305968
+cfl max = 0.0180458
+FILE: centered_coarsen.cpp, LINE: 6, coarsenig
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 0
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 8.7875e-11, ratio = 0.002715
+w, residual = 8.7875e-11, ratio = 0.002715
+@get_src; err sou = 7.23349e-10 1.8488e-22
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 2.01998e-06
+Cycle 1; res = 9.55897e-08
+Cycle 2; res = 6.48728e-09
+Converged after 2 cycles!
+@get_src; err sou = 2.32307e-12 9.98271e-24
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 2.50531e-12, ratio = 0.00468817
+w, residual = 2.50535e-12, ratio = 0.00468824
+@get_src; err sou = 1.11354e-10 1.80598e-22
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 3.1096e-07
+Cycle 1; res = 2.60228e-08
+Cycle 2; res = 4.17822e-09
+Cycle 3; res = 4.87756e-10
+Converged after 3 cycles!
+@get_src; err sou = 1.74664e-13 1.14856e-24
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 4.11319e-13, ratio = 0.00622795
+w, residual = 4.11582e-13, ratio = 0.00623192
+@get_src; err sou = 1.70254e-11 3.05911e-24
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 4.75441e-08
+Cycle 1; res = 2.31643e-09
+Cycle 2; res = 1.99845e-10
+Converged after 2 cycles!
+@get_src; err sou = 7.15638e-14 3.26727e-25
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 3.01756e-14, ratio = 0.00271894
+w, residual = 3.01709e-14, ratio = 0.00271849
+@get_src; err sou = 4.24358e-12 -6.19234e-24
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 1.18504e-08
+Cycle 1; res = 6.50271e-10
+Cycle 2; res = 7.988e-11
+Converged after 2 cycles!
+@get_src; err sou = 2.86048e-14 2.39824e-25
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 1.65063e-14, ratio = 0.00785418
+w, residual = 1.65289e-14, ratio = 0.0078649
+@get_src; err sou = 1.42557e-12 5.1406e-25
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 3.98097e-09
+Cycle 1; res = 6.12096e-11
+Cycle 2; res = 1.59153e-11
+Converged after 2 cycles!
+@get_src; err sou = 5.6992e-15 2.90051e-25
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 9.03472e-16, ratio = 0.00211565
+w, residual = 9.01883e-16, ratio = 0.00211195
+@get_src; err sou = 7.45172e-13 6.43307e-25
+FILE: main.cpp, LINE: 200, v0+v1 = 2.63672e-08
+FILE: main.cpp, LINE: 201, p0-p1 = -3.1373
+##################
+#                 
+# TIME:      0.008
+#                 
+# TIME STEP: 21
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+from_local, residual = 3.413e-11, ratio = 0.00575419
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.0029321
+cfl max = 0.0188187
+FILE: centered_coarsen.cpp, LINE: 6, coarsenig
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 0
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 7.32581e-11, ratio = 0.00272808
+w, residual = 7.32581e-11, ratio = 0.00272808
+@get_src; err sou = 8.89489e-10 1.67029e-22
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 2.48476e-06
+Cycle 1; res = 4.50467e-08
+Cycle 2; res = 5.13618e-09
+Converged after 2 cycles!
+@get_src; err sou = 1.83864e-12 -1.41606e-24
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 2.47618e-12, ratio = 0.00439297
+w, residual = 2.47622e-12, ratio = 0.00439305
+@get_src; err sou = 1.19633e-10 -3.49722e-23
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 3.34192e-07
+Cycle 1; res = 2.49032e-08
+Cycle 2; res = 4.74581e-09
+Cycle 3; res = 4.89219e-10
+Converged after 3 cycles!
+@get_src; err sou = 1.7513e-13 -1.31966e-24
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 3.77217e-13, ratio = 0.00533973
+w, residual = 3.7743e-13, ratio = 0.00534275
+@get_src; err sou = 1.81343e-11 1.51259e-24
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 5.06576e-08
+Cycle 1; res = 1.82479e-09
+Cycle 2; res = 1.62401e-10
+Converged after 2 cycles!
+@get_src; err sou = 5.81359e-14 -1.14265e-25
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 3.44276e-14, ratio = 0.00295214
+w, residual = 3.44193e-14, ratio = 0.00295141
+@get_src; err sou = 4.27011e-12 2.92199e-24
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 1.19284e-08
+Cycle 1; res = 5.88966e-10
+Cycle 2; res = 7.45266e-11
+Converged after 2 cycles!
+@get_src; err sou = 2.66789e-14 -3.17864e-26
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 1.5818e-14, ratio = 0.00711265
+w, residual = 1.58475e-14, ratio = 0.00712591
+@get_src; err sou = 1.34532e-12 5.96202e-25
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 3.75812e-09
+Cycle 1; res = 4.76095e-11
+Cycle 2; res = 1.35216e-11
+Converged after 2 cycles!
+@get_src; err sou = 4.84044e-15 -1.69842e-26
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 8.13801e-16, ratio = 0.00176304
+w, residual = 8.12273e-16, ratio = 0.00175974
+@get_src; err sou = 6.7416e-13 3.30489e-25
+FILE: main.cpp, LINE: 200, v0+v1 = 2.63672e-08
+FILE: main.cpp, LINE: 201, p0-p1 = -3.13686
+##################
+#                 
+# TIME:      0.0084
+#                 
+# TIME STEP: 22
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+from_local, residual = 3.35394e-11, ratio = 0.00580723
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00279448
+cfl max = 0.0197195
+FILE: centered_coarsen.cpp, LINE: 6, coarsenig
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 0
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 1.05124e-10, ratio = 0.00427101
+w, residual = 1.05124e-10, ratio = 0.00427101
+@get_src; err sou = 1.41751e-09 1.18039e-22
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 3.96073e-06
+Cycle 1; res = 2.02631e-07
+Cycle 2; res = 7.94462e-09
+Converged after 2 cycles!
+@get_src; err sou = 2.84331e-12 2.23759e-25
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 7.78516e-12, ratio = 0.00735835
+w, residual = 7.78514e-12, ratio = 0.00735834
+@get_src; err sou = 1.93423e-10 -3.46883e-22
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 5.40451e-07
+Cycle 1; res = 2.43444e-08
+Cycle 2; res = 3.99777e-09
+Converged after 2 cycles!
+@get_src; err sou = 1.43077e-12 -3.39826e-24
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 6.99816e-13, ratio = 0.00391605
+w, residual = 6.99853e-13, ratio = 0.00391626
+@get_src; err sou = 3.87929e-11 7.30498e-23
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 1.08393e-07
+Cycle 1; res = 1.21216e-08
+Cycle 2; res = 1.96311e-09
+Cycle 3; res = 1.91458e-10
+Converged after 3 cycles!
+@get_src; err sou = 6.85211e-14 5.72928e-25
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 1.52419e-13, ratio = 0.00418464
+w, residual = 1.524e-13, ratio = 0.0041841
+@get_src; err sou = 7.94481e-12 -3.04336e-25
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 2.21989e-08
+Cycle 1; res = 1.4233e-09
+Cycle 2; res = 1.64525e-10
+Converged after 2 cycles!
+@get_src; err sou = 5.8882e-14 6.31846e-25
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 6.22601e-14, ratio = 0.00786295
+w, residual = 6.21917e-14, ratio = 0.00785432
+@get_src; err sou = 2.21142e-12 -8.95742e-25
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 6.17904e-09
+Cycle 1; res = 2.74304e-10
+Cycle 2; res = 3.55722e-11
+Converged after 2 cycles!
+@get_src; err sou = 1.2731e-14 6.30204e-25
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 2.45762e-15, ratio = 0.0013731
+w, residual = 2.4611e-15, ratio = 0.00137505
+@get_src; err sou = 8.83751e-13 2.77124e-25
+FILE: main.cpp, LINE: 200, v0+v1 = 2.63672e-08
+FILE: main.cpp, LINE: 201, p0-p1 = -3.14966
+##################
+#                 
+# TIME:      0.0088
+#                 
+# TIME STEP: 23
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+from_local, residual = 3.28882e-11, ratio = 0.00584607
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00265668
+cfl max = 0.0199552
+FILE: centered_coarsen.cpp, LINE: 6, coarsenig
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 0
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 8.32561e-11, ratio = 0.00423336
+w, residual = 8.32562e-11, ratio = 0.00423336
+@get_src; err sou = 9.81395e-10 4.18432e-23
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 2.74268e-06
+Cycle 1; res = 9.08565e-08
+Cycle 2; res = 9.4076e-09
+Converged after 2 cycles!
+@get_src; err sou = 3.36626e-12 8.748e-24
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 2.32903e-12, ratio = 0.00433767
+w, residual = 2.32908e-12, ratio = 0.00433778
+@get_src; err sou = 1.14454e-10 2.02109e-22
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 3.19861e-07
+Cycle 1; res = 2.59248e-08
+Cycle 2; res = 4.73258e-09
+Cycle 3; res = 3.78523e-10
+Converged after 3 cycles!
+@get_src; err sou = 1.35445e-13 -1.19916e-24
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 3.36984e-13, ratio = 0.00523269
+w, residual = 3.37201e-13, ratio = 0.00523606
+@get_src; err sou = 1.68196e-11 -2.11084e-23
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 4.70053e-08
+Cycle 1; res = 3.50345e-09
+Cycle 2; res = 4.20478e-10
+Converged after 2 cycles!
+@get_src; err sou = 1.50457e-13 2.93103e-25
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 3.14135e-14, ratio = 0.00305349
+w, residual = 3.14018e-14, ratio = 0.00305233
+@get_src; err sou = 3.85933e-12 -7.68552e-25
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 1.07856e-08
+Cycle 1; res = 7.32282e-10
+Cycle 2; res = 1.10434e-10
+Cycle 3; res = 1.70166e-11
+Converged after 3 cycles!
+@get_src; err sou = 6.08895e-15 1.30249e-25
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 1.36801e-14, ratio = 0.00701447
+w, residual = 1.37147e-14, ratio = 0.00703221
+@get_src; err sou = 1.17981e-12 5.85701e-25
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 3.29719e-09
+Cycle 1; res = 8.60782e-11
+Cycle 2; res = 1.70967e-11
+Converged after 2 cycles!
+@get_src; err sou = 6.11761e-15 1.22381e-25
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 6.8236e-16, ratio = 0.00169252
+w, residual = 6.82254e-16, ratio = 0.00169228
+@get_src; err sou = 5.74843e-13 3.51415e-25
+FILE: main.cpp, LINE: 200, v0+v1 = 2.63672e-08
+FILE: main.cpp, LINE: 201, p0-p1 = -3.17133
+##################
+#                 
+# TIME:      0.0092
+#                 
+# TIME STEP: 24
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+from_local, residual = 3.22495e-11, ratio = 0.00588076
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00253593
+cfl max = 0.0195744
+FILE: centered_coarsen.cpp, LINE: 6, coarsenig
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 0
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 7.86599e-11, ratio = 0.00416016
+w, residual = 7.866e-11, ratio = 0.00416016
+@get_src; err sou = 8.81528e-10 -2.88675e-23
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 2.46601e-06
+Cycle 1; res = 1.13016e-07
+Cycle 2; res = 1.06585e-08
+Converged after 2 cycles!
+@get_src; err sou = 3.8101e-12 4.76275e-24
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 2.06295e-12, ratio = 0.00435811
+w, residual = 2.06301e-12, ratio = 0.00435822
+@get_src; err sou = 9.95205e-11 3.01391e-22
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 2.78401e-07
+Cycle 1; res = 2.5248e-08
+Cycle 2; res = 4.41029e-09
+Cycle 3; res = 3.29802e-10
+Converged after 3 cycles!
+@get_src; err sou = 1.17895e-13 -3.44802e-25
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 2.98414e-13, ratio = 0.00555866
+w, residual = 2.98658e-13, ratio = 0.00556319
+@get_src; err sou = 1.43956e-11 2.093e-23
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 4.02707e-08
+Cycle 1; res = 3.89515e-09
+Cycle 2; res = 5.38883e-10
+Cycle 3; res = 3.15076e-11
+Converged after 3 cycles!
+@get_src; err sou = 1.12631e-14 2.54706e-25
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 2.5251e-14, ratio = 0.00307666
+w, residual = 2.52419e-14, ratio = 0.00307552
+@get_src; err sou = 3.67998e-12 2.59029e-24
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 1.02945e-08
+Cycle 1; res = 7.5637e-10
+Cycle 2; res = 1.12313e-10
+Cycle 3; res = 1.45642e-11
+Converged after 3 cycles!
+@get_src; err sou = 5.20627e-15 3.36164e-25
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 1.08885e-14, ratio = 0.00725097
+w, residual = 1.09282e-14, ratio = 0.00727741
+@get_src; err sou = 1.37658e-12 4.37374e-25
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 3.85088e-09
+Cycle 1; res = 9.69754e-11
+Cycle 2; res = 1.71986e-11
+Converged after 2 cycles!
+@get_src; err sou = 6.14801e-15 3.24833e-25
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 7.85336e-16, ratio = 0.00260212
+w, residual = 7.83708e-16, ratio = 0.00259679
+@get_src; err sou = 7.47297e-13 2.79228e-25
+Plotting: uvw,p_p:000.gmv.000024
+Plotting: xyz,c_p:000.gmv.000024
+Plotting: press_p:000.gmv.000024
+FILE: main.cpp, LINE: 200, v0+v1 = 2.63672e-08
+FILE: main.cpp, LINE: 201, p0-p1 = -3.16682
+##################
+#                 
+# TIME:      0.0096
+#                 
+# TIME STEP: 25
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+from_local, residual = 3.00858e-11, ratio = 0.00572142
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00249487
+cfl max = 0.0187342
+FILE: centered_coarsen.cpp, LINE: 6, coarsenig
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 0
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 8.0498e-11, ratio = 0.00405209
+w, residual = 8.0498e-11, ratio = 0.0040521
+@get_src; err sou = 7.70853e-10 -3.71059e-23
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 2.15723e-06
+Cycle 1; res = 1.25545e-07
+Cycle 2; res = 1.00168e-08
+Converged after 2 cycles!
+@get_src; err sou = 3.57935e-12 8.11025e-25
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 2.50964e-12, ratio = 0.00555452
+w, residual = 2.50971e-12, ratio = 0.00555467
+@get_src; err sou = 9.16334e-11 -2.52816e-22
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 2.56436e-07
+Cycle 1; res = 2.48703e-08
+Cycle 2; res = 3.99729e-09
+Cycle 3; res = 3.0828e-10
+Converged after 3 cycles!
+@get_src; err sou = 1.10159e-13 -1.58276e-24
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 3.54789e-13, ratio = 0.00594842
+w, residual = 3.55029e-13, ratio = 0.00595245
+@get_src; err sou = 1.3981e-11 3.91861e-24
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 3.91256e-08
+Cycle 1; res = 5.04094e-09
+Cycle 2; res = 6.05596e-10
+Cycle 3; res = 4.33951e-11
+Converged after 3 cycles!
+@get_src; err sou = 1.55066e-14 -1.56715e-25
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 3.33865e-14, ratio = 0.00304958
+w, residual = 3.33756e-14, ratio = 0.00304855
+@get_src; err sou = 3.37716e-12 3.56813e-24
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 9.45097e-09
+Cycle 1; res = 8.60628e-10
+Cycle 2; res = 1.09309e-10
+Cycle 3; res = 1.70647e-11
+Converged after 3 cycles!
+@get_src; err sou = 6.09782e-15 -1.27925e-25
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 1.3029e-14, ratio = 0.005604
+w, residual = 1.30805e-14, ratio = 0.00562613
+@get_src; err sou = 1.08427e-12 -7.49027e-25
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 3.03433e-09
+Cycle 1; res = 1.18339e-10
+Cycle 2; res = 1.49351e-11
+Converged after 2 cycles!
+@get_src; err sou = 5.33685e-15 -1.44511e-25
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 8.46499e-16, ratio = 0.0016039
+w, residual = 8.46476e-16, ratio = 0.00160386
+@get_src; err sou = 5.37009e-13 -1.6893e-25
+FILE: main.cpp, LINE: 200, v0+v1 = 2.63672e-08
+FILE: main.cpp, LINE: 201, p0-p1 = -3.16104
+##################
+#                 
+# TIME:      0.01
+#                 
+# TIME STEP: 26
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+from_local, residual = 2.9711e-11, ratio = 0.00579525
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00244901
+cfl max = 0.0176211
+FILE: centered_coarsen.cpp, LINE: 6, coarsenig
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 0
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 2.65566e-10, ratio = 0.00545535
+w, residual = 2.65566e-10, ratio = 0.00545535
+@get_src; err sou = 4.85053e-09 -1.20634e-21
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 1.35773e-05
+Cycle 1; res = 1.54378e-06
+Cycle 2; res = 2.86794e-08
+Converged after 2 cycles!
+@get_src; err sou = 1.02458e-11 1.15773e-23
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 1.38899e-11, ratio = 0.00450202
+w, residual = 1.389e-11, ratio = 0.00450202
+@get_src; err sou = 7.49206e-10 -4.55523e-23
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 2.09713e-06
+Cycle 1; res = 4.36548e-08
+Cycle 2; res = 7.78495e-09
+Converged after 2 cycles!
+@get_src; err sou = 2.78119e-12 3.43555e-24
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 1.93432e-12, ratio = 0.00366018
+w, residual = 1.93435e-12, ratio = 0.00366024
+@get_src; err sou = 1.40482e-10 3.54176e-23
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 3.93228e-07
+Cycle 1; res = 1.15722e-08
+Cycle 2; res = 1.68087e-09
+Converged after 2 cycles!
+@get_src; err sou = 6.00496e-13 5.98979e-25
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 7.09827e-13, ratio = 0.00680885
+w, residual = 7.09826e-13, ratio = 0.00680885
+@get_src; err sou = 2.94952e-11 6.7162e-24
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 8.25612e-08
+Cycle 1; res = 4.7765e-09
+Cycle 2; res = 6.45413e-10
+Converged after 2 cycles!
+@get_src; err sou = 2.30575e-13 4.19504e-25
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 4.19356e-14, ratio = 0.00189704
+w, residual = 4.19406e-14, ratio = 0.00189727
+@get_src; err sou = 6.94985e-12 7.82912e-24
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 1.94536e-08
+Cycle 1; res = 1.22666e-09
+Cycle 2; res = 1.89091e-10
+Converged after 2 cycles!
+@get_src; err sou = 6.7553e-14 1.62587e-25
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 1.2623e-14, ratio = 0.0025675
+w, residual = 1.26018e-14, ratio = 0.00256318
+@get_src; err sou = 1.79359e-12 -8.91703e-25
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 5.02051e-09
+Cycle 1; res = 9.24101e-11
+Cycle 2; res = 1.73103e-11
+Converged after 2 cycles!
+@get_src; err sou = 6.18415e-15 6.45351e-26
+FILE: main.cpp, LINE: 200, v0+v1 = 2.63672e-08
+FILE: main.cpp, LINE: 201, p0-p1 = -3.08171
+##################
+#                 
+# TIME:      0.0104
+#                 
+# TIME STEP: 27
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+from_local, residual = 2.88161e-11, ratio = 0.00595575
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00239232
+cfl max = 0.0182344
+FILE: centered_coarsen.cpp, LINE: 6, coarsenig
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 0
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 2.05077e-10, ratio = 0.00526399
+w, residual = 2.05077e-10, ratio = 0.00526399
+@get_src; err sou = 1.24202e-09 -8.45528e-22
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 3.48002e-06
+Cycle 1; res = 2.1837e-07
+Cycle 2; res = 1.09326e-08
+Converged after 2 cycles!
+@get_src; err sou = 3.90183e-12 6.46316e-24
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 5.41408e-12, ratio = 0.00539305
+w, residual = 5.41407e-12, ratio = 0.00539305
+@get_src; err sou = 1.83926e-10 -5.00565e-23
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 5.15345e-07
+Cycle 1; res = 1.00541e-08
+Cycle 2; res = 1.98458e-09
+Converged after 2 cycles!
+@get_src; err sou = 7.08294e-13 -2.57151e-24
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 1.57164e-12, ratio = 0.00970424
+w, residual = 1.57177e-12, ratio = 0.00970505
+@get_src; err sou = 3.3793e-11 5.35188e-24
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 9.4685e-08
+Cycle 1; res = 5.62203e-09
+Cycle 2; res = 6.43708e-10
+Converged after 2 cycles!
+@get_src; err sou = 2.29739e-13 2.08411e-25
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 7.99852e-14, ratio = 0.00248313
+w, residual = 7.99966e-14, ratio = 0.00248348
+@get_src; err sou = 7.8713e-12 -8.13048e-24
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 2.20547e-08
+Cycle 1; res = 1.51595e-09
+Cycle 2; res = 3.22452e-10
+Cycle 3; res = 2.64384e-11
+Converged after 3 cycles!
+@get_src; err sou = 9.43586e-15 -7.79347e-26
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 3.47703e-14, ratio = 0.00500363
+w, residual = 3.47302e-14, ratio = 0.00499786
+@get_src; err sou = 1.78963e-12 -7.71291e-25
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 5.01437e-09
+Cycle 1; res = 1.03205e-10
+Cycle 2; res = 1.48695e-11
+Converged after 2 cycles!
+@get_src; err sou = 5.30691e-15 -6.33613e-27
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 1.39245e-14, ratio = 0.00896946
+w, residual = 1.39048e-14, ratio = 0.00895679
+@get_src; err sou = 6.02564e-13 -1.68804e-25
+FILE: main.cpp, LINE: 200, v0+v1 = 2.63672e-08
+FILE: main.cpp, LINE: 201, p0-p1 = -3.09001
+##################
+#                 
+# TIME:      0.0108
+#                 
+# TIME STEP: 28
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+from_local, residual = 2.77091e-11, ratio = 0.00612528
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00232548
+cfl max = 0.0189583
+FILE: centered_coarsen.cpp, LINE: 6, coarsenig
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 0
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 1.82033e-10, ratio = 0.0051091
+w, residual = 1.82033e-10, ratio = 0.0051091
+@get_src; err sou = 1.16152e-09 2.51278e-22
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 3.25569e-06
+Cycle 1; res = 1.45156e-07
+Cycle 2; res = 1.08502e-08
+Converged after 2 cycles!
+@get_src; err sou = 3.87099e-12 -2.90043e-24
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 4.27704e-12, ratio = 0.0052255
+w, residual = 4.27703e-12, ratio = 0.00522549
+@get_src; err sou = 1.72099e-10 -4.15818e-23
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 4.82387e-07
+Cycle 1; res = 1.26802e-08
+Cycle 2; res = 2.19901e-09
+Converged after 2 cycles!
+@get_src; err sou = 7.84531e-13 1.61427e-24
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 4.15924e-13, ratio = 0.00357296
+w, residual = 4.15951e-13, ratio = 0.00357319
+@get_src; err sou = 3.08549e-11 2.07922e-23
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 8.64853e-08
+Cycle 1; res = 5.18641e-09
+Cycle 2; res = 8.20381e-10
+Converged after 2 cycles!
+@get_src; err sou = 2.92684e-13 1.2229e-24
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 8.09168e-14, ratio = 0.00386362
+w, residual = 8.09147e-14, ratio = 0.00386352
+@get_src; err sou = 5.98866e-12 -2.39814e-25
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 1.6786e-08
+Cycle 1; res = 5.98851e-10
+Cycle 2; res = 6.7426e-11
+Converged after 2 cycles!
+@get_src; err sou = 2.40553e-14 3.52801e-25
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 3.55424e-14, ratio = 0.00841499
+w, residual = 3.55166e-14, ratio = 0.0084089
+@get_src; err sou = 1.52777e-12 4.20223e-25
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 4.28229e-09
+Cycle 1; res = 1.083e-10
+Cycle 2; res = 1.62707e-11
+Converged after 2 cycles!
+@get_src; err sou = 5.80481e-15 4.57121e-25
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 1.61321e-15, ratio = 0.00175811
+w, residual = 1.61355e-15, ratio = 0.00175849
+@get_src; err sou = 5.54195e-13 6.20603e-25
+FILE: main.cpp, LINE: 200, v0+v1 = 2.63672e-08
+FILE: main.cpp, LINE: 201, p0-p1 = -3.08424
+##################
+#                 
+# TIME:      0.0112
+#                 
+# TIME STEP: 29
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+from_local, residual = 2.6994e-11, ratio = 0.00625373
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00224548
+cfl max = 0.0189078
+FILE: centered_coarsen.cpp, LINE: 6, coarsenig
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 0
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 1.72612e-10, ratio = 0.00505218
+w, residual = 1.72612e-10, ratio = 0.00505218
+@get_src; err sou = 1.16974e-09 -2.2697e-22
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 3.27948e-06
+Cycle 1; res = 1.68576e-07
+Cycle 2; res = 1.66318e-08
+Converged after 2 cycles!
+@get_src; err sou = 5.93233e-12 1.05344e-23
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 4.2386e-12, ratio = 0.0050547
+w, residual = 4.2386e-12, ratio = 0.0050547
+@get_src; err sou = 1.77516e-10 -3.64315e-24
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 4.97683e-07
+Cycle 1; res = 1.03872e-08
+Cycle 2; res = 1.66382e-09
+Converged after 2 cycles!
+@get_src; err sou = 5.93461e-13 -3.54258e-24
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 4.30087e-13, ratio = 0.00364207
+w, residual = 4.30113e-13, ratio = 0.00364229
+@get_src; err sou = 3.24575e-11 8.54827e-24
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 9.09974e-08
+Cycle 1; res = 5.66733e-09
+Cycle 2; res = 9.38306e-10
+Cycle 3; res = 1.01035e-10
+Converged after 3 cycles!
+@get_src; err sou = 3.60376e-14 2.0039e-25
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 8.70607e-14, ratio = 0.00406222
+w, residual = 8.70582e-14, ratio = 0.0040621
+@get_src; err sou = 6.36707e-12 1.59817e-24
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 1.78507e-08
+Cycle 1; res = 7.86212e-10
+Cycle 2; res = 1.02705e-10
+Converged after 2 cycles!
+@get_src; err sou = 3.66334e-14 1.6828e-25
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 3.84909e-14, ratio = 0.00883892
+w, residual = 3.84709e-14, ratio = 0.0088343
+@get_src; err sou = 1.63902e-12 -6.95611e-25
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 4.59515e-09
+Cycle 1; res = 1.26392e-10
+Cycle 2; res = 1.68606e-11
+Converged after 2 cycles!
+@get_src; err sou = 6.01395e-15 6.4618e-26
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 1.65272e-15, ratio = 0.0017296
+w, residual = 1.65321e-15, ratio = 0.00173011
+@get_src; err sou = 5.88498e-13 1.42727e-25
+FILE: main.cpp, LINE: 200, v0+v1 = 2.63672e-08
+FILE: main.cpp, LINE: 201, p0-p1 = -3.07932
+##################
+#                 
+# TIME:      0.0116
+#                 
+# TIME STEP: 30
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+from_local, residual = 2.64031e-11, ratio = 0.00633138
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00215356
+cfl max = 0.0180797
+FILE: centered_coarsen.cpp, LINE: 6, coarsenig
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 0
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 1.63629e-10, ratio = 0.00499278
+w, residual = 1.63629e-10, ratio = 0.00499278
+@get_src; err sou = 1.04996e-09 4.67244e-22
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 2.94412e-06
+Cycle 1; res = 9.47806e-08
+Cycle 2; res = 1.25751e-08
+Converged after 2 cycles!
+@get_src; err sou = 4.48466e-12 -6.75477e-24
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 4.19543e-12, ratio = 0.00539356
+w, residual = 4.19545e-12, ratio = 0.00539358
+@get_src; err sou = 1.60121e-10 1.30135e-22
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 4.48983e-07
+Cycle 1; res = 8.32041e-09
+Cycle 2; res = 1.21839e-09
+Converged after 2 cycles!
+@get_src; err sou = 4.34516e-13 4.08602e-24
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 3.74515e-13, ratio = 0.003569
+w, residual = 3.74535e-13, ratio = 0.00356919
+@get_src; err sou = 2.93489e-11 1.91586e-23
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 8.22951e-08
+Cycle 1; res = 6.38886e-09
+Cycle 2; res = 1.10559e-09
+Cycle 3; res = 9.09468e-11
+Converged after 3 cycles!
+@get_src; err sou = 3.24343e-14 2.86375e-25
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 8.95618e-14, ratio = 0.00482619
+w, residual = 8.95575e-14, ratio = 0.00482596
+@get_src; err sou = 5.65046e-12 1.03014e-24
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 1.58441e-08
+Cycle 1; res = 9.29652e-10
+Cycle 2; res = 1.37634e-10
+Converged after 2 cycles!
+@get_src; err sou = 4.90844e-14 1.25852e-25
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 7.63251e-15, ratio = 0.00209144
+w, residual = 7.63107e-15, ratio = 0.00209104
+@get_src; err sou = 1.58251e-12 8.46164e-26
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 4.43742e-09
+Cycle 1; res = 1.4535e-10
+Cycle 2; res = 2.39096e-11
+Converged after 2 cycles!
+@get_src; err sou = 8.52688e-15 2.89143e-25
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 6.46579e-15, ratio = 0.00831037
+w, residual = 6.46787e-15, ratio = 0.00831303
+@get_src; err sou = 5.07867e-13 2.22244e-25
+FILE: main.cpp, LINE: 200, v0+v1 = 2.63672e-08
+FILE: main.cpp, LINE: 201, p0-p1 = -3.10103
+##################
+#                 
+# TIME:      0.012
+#                 
+# TIME STEP: 31
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+from_local, residual = 2.60993e-11, ratio = 0.00637653
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00205388
+cfl max = 0.0166464
+FILE: centered_coarsen.cpp, LINE: 6, coarsenig
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 0
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 3.04671e-10, ratio = 0.00488248
+w, residual = 3.04671e-10, ratio = 0.00488248
+@get_src; err sou = 7.59627e-09 -3.32986e-21
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 2.13027e-05
+Cycle 1; res = 2.40476e-06
+Cycle 2; res = 4.68443e-08
+Converged after 2 cycles!
+@get_src; err sou = 1.6704e-11 1.86245e-23
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 1.94025e-11, ratio = 0.00419819
+w, residual = 1.94025e-11, ratio = 0.00419819
+@get_src; err sou = 1.16125e-09 2.01242e-22
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 3.25659e-06
+Cycle 1; res = 4.53501e-08
+Cycle 2; res = 6.80891e-09
+Converged after 2 cycles!
+@get_src; err sou = 2.42797e-12 -9.52389e-25
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 2.40841e-12, ratio = 0.00306695
+w, residual = 2.40841e-12, ratio = 0.00306696
+@get_src; err sou = 2.17863e-10 1.17271e-23
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 6.10967e-07
+Cycle 1; res = 9.96446e-09
+Cycle 2; res = 1.25279e-09
+Converged after 2 cycles!
+@get_src; err sou = 4.46726e-13 1.75025e-24
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 4.49283e-13, ratio = 0.0029134
+w, residual = 4.49295e-13, ratio = 0.00291348
+@get_src; err sou = 4.55534e-11 -7.98363e-24
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 1.27748e-07
+Cycle 1; res = 4.41885e-09
+Cycle 2; res = 5.49965e-10
+Converged after 2 cycles!
+@get_src; err sou = 1.9611e-13 2.44913e-25
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 1.79554e-13, ratio = 0.00550946
+w, residual = 1.79565e-13, ratio = 0.00550981
+@get_src; err sou = 1.03461e-11 -4.9134e-24
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 2.90143e-08
+Cycle 1; res = 7.1097e-10
+Cycle 2; res = 9.27703e-11
+Converged after 2 cycles!
+@get_src; err sou = 3.30806e-14 9.21516e-26
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 1.00518e-14, ratio = 0.00139276
+w, residual = 1.00526e-14, ratio = 0.00139286
+@get_src; err sou = 2.72611e-12 -3.69e-24
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 7.64501e-09
+Cycle 1; res = 1.46305e-10
+Cycle 2; res = 1.87326e-11
+Converged after 2 cycles!
+@get_src; err sou = 6.67979e-15 1.77973e-25
+FILE: main.cpp, LINE: 200, v0+v1 = 2.63672e-08
+FILE: main.cpp, LINE: 201, p0-p1 = -3.14253
+##################
+#                 
+# TIME:      0.0124
+#                 
+# TIME STEP: 32
+#                 
+##################
+FILE: centered_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: centered_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: centered_advance.cpp, LINE: 6, conv_ts.N() = 1
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+from_local, residual = 2.59033e-11, ratio = 0.00641207
+FILE: levelset_sharpen.cpp, LINE: 184, it = 0
+FILE: levelset_sharpen.cpp, LINE: 185, maxd = 0.00195835
+cfl max = 0.0153285
+FILE: centered_coarsen.cpp, LINE: 6, coarsenig
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 0
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = 0
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 0
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 2.62704e-10, ratio = 0.00571427
+w, residual = 2.62704e-10, ratio = 0.00571427
+@get_src; err sou = 7.53521e-09 -2.49161e-21
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 2.11336e-05
+Cycle 1; res = 2.348e-06
+Cycle 2; res = 4.57073e-08
+Converged after 2 cycles!
+@get_src; err sou = 1.6297e-11 -9.61274e-24
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 1.7876e-11, ratio = 0.00391693
+w, residual = 1.7876e-11, ratio = 0.00391693
+@get_src; err sou = 1.17507e-09 4.30707e-23
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 3.29565e-06
+Cycle 1; res = 3.22615e-08
+Converged after 1 cycles!
+@get_src; err sou = 1.15029e-11 1.11534e-23
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 2.28788e-12, ratio = 0.00287493
+w, residual = 2.28787e-12, ratio = 0.00287491
+@get_src; err sou = 2.23445e-10 -1.19502e-22
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 6.26684e-07
+Cycle 1; res = 1.4894e-08
+Cycle 2; res = 1.24889e-09
+Converged after 2 cycles!
+@get_src; err sou = 4.45293e-13 3.15443e-25
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 5.25997e-13, ratio = 0.00336003
+w, residual = 5.26045e-13, ratio = 0.00336033
+@get_src; err sou = 4.6797e-11 1.24725e-23
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 1.31249e-07
+Cycle 1; res = 4.18958e-09
+Cycle 2; res = 5.63065e-10
+Converged after 2 cycles!
+@get_src; err sou = 2.00762e-13 -2.7364e-26
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 2.38474e-13, ratio = 0.00724471
+w, residual = 2.38421e-13, ratio = 0.0072431
+@get_src; err sou = 1.06084e-11 8.0018e-24
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 2.97527e-08
+Cycle 1; res = 9.46517e-10
+Cycle 2; res = 1.41454e-10
+Converged after 2 cycles!
+@get_src; err sou = 5.04356e-14 -6.75328e-26
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 1
+u, residual = 1.06561e-14, ratio = 0.00147151
+w, residual = 1.06566e-14, ratio = 0.00147158
+@get_src; err sou = 2.79761e-12 -4.18861e-24
+FILE: centered_smooth.cpp, LINE: 30, conv_ts.N() = 0
+Initial  res = 7.8463e-09
+Cycle 1; res = 3.56622e-10
+Cycle 2; res = 5.70611e-11
+Converged after 2 cycles!
+@get_src; err sou = 2.03452e-14 -1.07367e-25
+Plotting: uvw,p_p:000.gmv.000032
+Plotting: xyz,c_p:000.gmv.000032
+Plotting: press_p:000.gmv.000032
+FILE: main.cpp, LINE: 200, v0+v1 = 2.63672e-08
+FILE: main.cpp, LINE: 201, p0-p1 = -3.10632
+finished
++==========================================
+| Total execution time: 35.82 [s]
++------------------------------------------
+| Time spent in plotting           : 3.01 [s]    (8.40313%)
+| Time spent in levelset discretize: 0.01 [s]    (0.0279174%)
+| Time spent in from_local smoother: 0.35 [s]    (0.977108%)
+| Time spent in momentum discretize: 1.38 [s]    (3.8526%)
+| Time spent in pressure discretize: 0.43 [s]    (1.20045%)
+| Time spent in system coarsening  : 0.1 [s]    (0.279174%)
+| Time spent in momentum smoother  : 3.01 [s]    (8.40313%)
+| Time spent in vcycle             : 18.02 [s]    (50.3071%)
+| Time spent elsewhere: 9.51 [s]    (26.5494%)
++------------------------------------------
+Plotting: test_p:000.gmv.000000

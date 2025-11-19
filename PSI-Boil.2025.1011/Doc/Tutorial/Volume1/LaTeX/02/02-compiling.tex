@@ -1,0 +1,291 @@
+\section{Compiling the sources}
+\label{sec_compiling}
+
+\subsection{Availability of required software}
+
+In order to compile {\psiboil} you should obtain the sources first, which
+is explained in~\ref{sec_obtaining}. If you don't have the sources yet, please
+get them before proceeding with this section in the tutorial. Furthermore,
+you need:
+%
+\begin{itemize}
+   \item a {\tt C++} compiler and
+   \item (hopefully) {\tt MPI} compiler and libraries.
+\end{itemize}
+%
+{\tt C++} compiler is available on most Linux distributions, as well as 
+{\tt MPI}. The most widely available on Linux is {\tt GNU C++} compiler. 
+You can check if it is available on your system by running:
+%
+\begin{verbatim}
+> g++
+\end{verbatim}
+%
+{\psiboil} is mostly compiled with {\tt g++}, so it is a safe option 
+to use it. 
+
+To check if you have {\tt MPI} on your system, run the command:
+%
+\begin{verbatim}
+> mpirun
+\end{verbatim}
+%
+That should give you a hint whether MPI is installed, but also which {\em flavor}
+it is. That is important to know. In case you had {\tt LAM/MPI} implementation,
+the {\tt mpirun} command will result in output like:
+%
+{\small \begin{verbatim}
+Synopsis:       mpirun [options] <app>
+                mpirun [options] <where> <program> [<prog args>]
+
+Description:    Start an MPI application in LAM/MPI.
+
+Notes:
+                [options]       Zero or more of the options listed below
+...
+\end{verbatim}}
+%
+Even if {\tt mpirun} command is available on your system, {\tt C++} compiler
+for {\tt MPI} might not be. Try to run {\tt mpiCC} or {\tt mpicxx} in the shell.
+%
+If none of those is available, they might be available as modules. To check 
+which modules are available on your system, us the command:
+%
+\begin{verbatim}
+> module avail
+\end{verbatim}
+%
+That should give an output like:
+%
+{\small \begin{verbatim}
+----------------------------- /opt/Modules/modulefiles -----------------------------
+acml/acml-3.1-pgi-64     intel-mkl/mkl-9.1_em64t  null
+clhep/clhep-1.9.2.2      lam/lam-7.1.3            pgi/pgi-7.0_32
+dot                      maple/10                 pgi/pgi-7.0_64
+eclipse/europa           mathematica/5.2          pgi/pgi-7.1_32
+fluent/Fluent-6.3.26     matlab/2007a_64          pgi/pgi-7.1_64
+idl/idl-6.4              matlab/2008a             pgi/pgi-7.2_32
+intel/intel-10.0_32      module-cvs               pgi/pgi-7.2_64
+intel/intel-10.0_64      module-info              pgi/pgi_32-6.2
+intel/intel-10.1_32      modules                  pgi/pgi_64-6.2
+intel-mkl/mkl-10.0_32    mpi/mpich2-1.0.4-mpd     root/root-5.16.00
+intel-mkl/mkl-10.0_64    mpi/mpich2-1.0.5         tecplot/tecplot-360
+\end{verbatim}}
+%
+In the above case, two {\tt MPI} implementations are available on the system as modules,
+namely the {\tt mpi/mpich2-1.0.4-mpd} and {\tt mpi/mpich2-1.0.5}. Load one of them,
+for example:
+%
+\begin{verbatim}
+> module load mpi/mpich2-1.0.4-mpd
+\end{verbatim}
+%
+and try to find a compiler for {\tt MPI} again. 
+
+If you do not have a {\tt C++} compiler, you can not continue. Ask your system 
+administrator to install it for you. If you do not have a compiler for {\tt MPI} 
+you might still compile a sequential version, although it is not recommended. 
+
+\subsection{Creating {\tt Makefile}s}
+\label{sub_sec_creating_makefiles}
+
+Let's assume that you have {\tt C++} and {\tt MPI} and imagine that you ran 
+{\tt cvs checkout PSI-Boil} command in directory {\tt ~/Development}.
+In such a case, {\psiboil} will reside in:
+%
+\begin{verbatim}
+~/Development/PSI-Boil
+\end{verbatim}
+%
+and let's call this directory the {\em root} directory, for the sake of shortness.
+(Just to make sure: inside the root directory, there are various 
+sub-directories, such as: {\tt Benchmarks}, {\tt Src}, {\tt Doc}, etc.\ and 
+files such as: {\tt AUTHORS}, {\tt NEWS}, {\tt README} \dots).
+
+The creation of {\tt Makefile}'s for {\psiboil} is under control of 
+{\tt autotools}. It is beyond the scope of this tutorial to describe {\tt autotools}, 
+but there is a script residing in root directory, called {\tt first}, which
+should be ran in order to create {\tt Makefile}s. It can be invoked with:
+%
+\begin{verbatim}
+> ./first LAM
+\end{verbatim}
+%
+to create {\tt Makefile}s for {\tt LAM/MPI} or:
+%
+\begin{verbatim}
+> ./first MPICH
+\end{verbatim}
+%
+if you use {\tt MPICH} libraries. If you, unfortunately, do not a {\tt C++}
+compiler for {\tt MPI}, create {\tt Makefile}s with:
+%
+\begin{verbatim}
+> ./first NOMPI
+\end{verbatim}
+%
+(The difference between these three invocations
+is merely a name of the {\tt MPI C++} compiler. In case of {\tt LAM/MPI} compiler
+is called {\tt mpiCC}, whereas in the case of {\tt MPICH}, it is called {\tt mpicxx}.
+If you have neither {\tt LAM/MPI} nor {\tt MPICH}, you can edit the scrip {\tt first}
+to add more library, or platform options. At this moment, there is no appreciable 
+difference between the two, you may chose whichever is more convenient for you.) 
+In case if you choose the {\tt NOMPI} option, {\tt C++} compiler is set to {\tt GNU}'s
+{\tt g++}. That should be installed on any Linux-based computer. 
+
+No matter which of the above options you choose, the creation of {\tt Makefile}'s 
+creates an output on the screen similar to:
+%
+{\small \begin{verbatim}
+...
+checking for mpicc option to accept ANSI C... none needed
+checking for style of include used by make... GNU
+checking dependency style of mpicc... gcc3
+checking whether we are using the GNU C++ compiler... yes
+checking whether mpiCC accepts -g... yes
+checking dependency style of mpiCC... gcc3
+checking for a BSD-compatible install... /usr/bin/install -c
+checking for ranlib... ranlib
+configure: creating ./config.status
+config.status: creating Makefile
+config.status: creating Src/Domain/Makefile
+config.status: creating Src/Global/Makefile
+config.status: creating Src/Scalar/Makefile
+config.status: creating Src/Vector/Makefile
+config.status: creating Src/Grid/Makefile
+config.status: creating Src/Parallel/Makefile
+config.status: creating Src/Parallel/Out/Makefile
+...
+\end{verbatim}}
+
+\subsection{Compilation}
+
+{\tt Makefile}'s for {\psiboil}, created in Sec.~\ref{sub_sec_creating_makefiles}, 
+assume that the {\em main} program is in the file called {\tt main.cpp}, which resides 
+in {\tt Src} sub-directory of the root directory. For convenience, we will call
+it the {\em source} directory and, following examples from previous sections, it will 
+be:
+%
+\begin{verbatim}
+~/Development/PSI-Boil/Src
+\end{verbatim}
+%
+The source directory is important because compilation is performed in it. Therefore,
+you should now go to source directory. 
+
+There is not {\tt main.cpp} (needed by {\tt Makefile}'s in source directory, so you 
+should either create it, copy it from another location, or even create a link in source 
+directory. The last option is recommended. So, assuming you are already in the source
+directory, run the command:
+%
+\begin{verbatim}
+> ln -i -s ../Doc/Tutorial/Volume1/Src/02-01-main.cpp main.cpp
+\end{verbatim} 
+%
+When you have the desired main program in the source directory, you just run:
+%
+\begin{verbatim}
+> make
+\end{verbatim} 
+%
+and wait few minutes. {\psiboil} grew to be a complex and long program and
+compilation requires patience. That is true only for the first build, as for
+the sub-sequent, only the sources which have been modified are re-compiled,
+thus greatly reducing the compilation time.
+
+During the compilation, the screen will be filled with messages such as:
+%
+{\small \begin{verbatim}
+Making all in Variable/Staggered/Momentum
+make[1]: Entering directory `/home/niceno/Development/PSI-Boil/Src/Variable/Staggered/Mom
+entum'
+if mpiCC -DHAVE_CONFIG_H -I. -I. -I../../../..     -g -O2 -MT momentum.o -MD -MP -MF ".de
+ps/momentum.Tpo" -c -o momentum.o momentum.cpp; \
+then mv -f ".deps/momentum.Tpo" ".deps/momentum.Po"; else rm -f ".deps/momentum.Tpo"; exi
+t 1; fi
+if mpiCC -DHAVE_CONFIG_H -I. -I. -I../../../..     -g -O2 -MT momentum_bulk_bct.o -MD -MP
+ -MF ".deps/momentum_bulk_bct.Tpo" -c -o momentum_bulk_bct.o momentum_bulk_bct.cpp; \
+then mv -f ".deps/momentum_bulk_bct.Tpo" ".deps/momentum_bulk_bct.Po"; else rm -f ".deps/
+momentum_bulk_bct.Tpo";exit 1; fi
+if mpiCC -DHAVE_CONFIG_H -I. -I. -I../../../..     -g -O2 -MT momentum_bulk_ijk.o -MD -MP
+ -MF ".deps/momentum_bulk_ijk.Tpo" -c -o momentum_bulk_ijk.o momentum_bulk_ijk.cpp; \
+then mv -f ".deps/momentum_bulk_ijk.Tpo" ".deps/momentum_bulk_ijk.Po"; else rm -f ".deps/
+momentum_bulk_ijk.Tpo";exit 1; fi
+if mpiCC -DHAVE_CONFIG_H -I. -I. -I../../../..     -g -O2 -MT momentum_cfl_max.o -MD -MP 
+-MF ".deps/momentum_cfl_max.Tpo" -c -o momentum_cfl_max.o momentum_cfl_max.cpp; \
+then mv -f ".deps/momentum_cfl_max.Tpo" ".deps/momentum_cfl_max.Po"; else rm -f ".deps/mo
+mentum_cfl_max.Tpo"; exit 1; fi
+...
+\end{verbatim}}
+%
+Once the compilation is done, the executable called {\tt Boil} will reside in the
+source directory. 
+
+\subsection{Running the code}
+
+You can run the executable from the source directory by:
+%
+\begin{verbatim}
+> ./Boil
+\end{verbatim} 
+%
+Try it. It will do nothing. You should even try the parallel version:
+%
+\begin{verbatim}
+> mpirun -np 2 ./Boil
+\end{verbatim} 
+%
+It also does nothing. It is no wonder, since the main program has very little action
+to it. It looks like:
+%
+{\small \begin{verbatim}
+      1 #include "Include/psi-boil.h"
+      2
+      3 /****************************************************************************/
+      4 main(int argc, char * argv[]) {
+      5
+      6   boil::timer.start();
+      7
+      8   boil::timer.stop();
+      9 }
+\end{verbatim}} 
+%
+The thing which immediately reveals this is different to ordinary {\tt C++} program 
+is in line~1. This line includes definitions of all {\psiboil} objects. One of the
+{\em global} {\psiboil}'s objects, {\tt timer}, is also used in this program\footnote
+{It should be clear that a {\em global} {\psiboil} object does not mean global 
+{\em class}, but an instance of object created when {\psiboil} starts, accessible 
+from any part of the code.}.
+It is stared in line~6 and stopped in line~8. The usage of {\tt timer} will be explained
+below, with more elaborate examples. The program also reveals the {\em namespace}
+defined with {\psiboil}, that is {\tt boil}. This namespace is used to enclose
+all {\psiboil}'s global objects. 
+
+% \clearpage
+
+%---------------------------------------------------------------------nutshell-%
+\vspace*{5mm} \fbox{ \begin{minipage}[c] {0.97\textwidth} %-----------nutshell-%
+    {\sf Section \ref{sec_compiling} in a nutshell} \\ %--------------nutshell-%
+
+    - The following software is required for compilation of {\psiboil}:
+    \begin{itemize}
+      \item a {\tt C++} compiler (Gnu's {\tt g++} will do the job),
+      \item {\tt autotools},
+      \item {\tt make} facility.
+    \end{itemize}
+    and is highle desirable if you have:
+    \begin{itemize}
+      \item {\tt MPI} libraries, as well.
+    \end{itemize}
+    On most Linux-based computers, all of the above software is available by default. \\
+
+    - To compile the {\psiboil}, you have to perform the following steps:
+    \begin{itemize}
+      \item execute {\tt first LAM/MPICH} script in root directory 
+            ({\tt .../PSI-Boil}),
+      \item create {\tt main.cpp} in source directory ({\tt .../PSI-Boil/Src}),
+            or link it to an already \\ existing program,
+      \item run {\tt make} in {\em source} directory. 
+    \end{itemize}
+  \end{minipage} } %--------------------------------------------------nutshell-%
+%---------------------------------------------------------------------nutshell-%

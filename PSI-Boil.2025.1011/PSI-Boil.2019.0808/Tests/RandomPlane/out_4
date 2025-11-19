@@ -1,0 +1,4071 @@
+FILE: domain.cpp, LINE: 33, name = unnamed
+0:  dims[i] 0: 1 0: 2 0: 2 0: 
+0:  neighbours: 0:  0 0:  0 0:  -2 0:  2 0:  1 0:  1 0: 
+0:  coords[i] 0: 0 0: 0 0: 0 0: 
+0: n_dir[k] = 2
+0: n_dir[k] = 16
+0: n_dir[k] = 16
+0: n_dir[k] = 32
+0: n_dir[k] = 32
+PROC: 0, FILE: domain.cpp, LINE: 70, cr_x = first = 1, last = 2
+PROC: 0, FILE: domain.cpp, LINE: 71, cr_y = first = 1, last = 16
+PROC: 0, FILE: domain.cpp, LINE: 72, cr_z = first = 1, last = 32
+0: ni =   4
+0: nj =   18
+0: nk =   34
+Level 3 created !
+Plotting: unnamed_level_p:000.gmv.0003
+Level 2 created !
+Plotting: unnamed_level_p:000.gmv.0002
+Level 1 created !
+Plotting: unnamed_level_p:000.gmv.0001
+Plotting: unnamed_level_p:000.gmv.0000
+FILE: domain.cpp, LINE: 33, name = unnamed
+0:  dims[i] 0: 2 0: 1 0: 2 0: 
+0:  neighbours: 0:  -2 0:  2 0:  -2 0:  -2 0:  1 0:  1 0: 
+0:  coords[i] 0: 0 0: 0 0: 0 0: 
+0: n_dir[k] = 128
+0: n_dir[k] = 128
+0: n_dir[k] = 32
+0: n_dir[k] = 32
+0: n_dir[k] = 32
+PROC: 0, FILE: domain.cpp, LINE: 70, cr_x = first = 1, last = 128
+PROC: 0, FILE: domain.cpp, LINE: 71, cr_y = first = 1, last = 32
+PROC: 0, FILE: domain.cpp, LINE: 72, cr_z = first = 1, last = 32
+0: ni =   130
+0: nj =   34
+0: nk =   34
+Level 5 created !
+Plotting: unnamed_level_p:000.gmv.0005
+Level 4 created !
+Plotting: unnamed_level_p:000.gmv.0004
+Level 3 created !
+Plotting: unnamed_level_p:000.gmv.0003
+Level 2 created !
+Plotting: unnamed_level_p:000.gmv.0002
+Level 1 created !
+Plotting: unnamed_level_p:000.gmv.0001
+Plotting: unnamed_level_p:000.gmv.0000
+FILE: randomflow.cpp, LINE: 17, skipping seed to get the same sequence every time
+Pressure level 64 x 16 x 16 created !
+Pressure level 32 x 8 x 8 created !
+Pressure level 16 x 4 x 4 created !
+Pressure level 8 x 4 x 4 created !
+Pressure level 4 x 4 x 4 created !
+Number of cycling levels: 6
+##################
+#                 
+# TIME:      0
+#                 
+# TIME STEP: 1
+#                 
+##################
+cfl max = 0.0893863
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = 2.85084e-06, ratio = 0.00132533
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 7.95358
+@get_src; err sou = 0.0112799 0.466707
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = 0.020838
+Cycle 1; res = 0.0265266
+Cycle 2; res = 0.0129319
+Cycle 3; res = 0.00352121
+Cycle 4; res = 0.00283697
+Cycle 5; res = 0.00164604
+Cycle 6; res = 0.00152589
+Cycle 7; res = 0.00142597
+Cycle 8; res = 0.000966173
+Cycle 9; res = 0.000911749
+Cycle 10; res = 0.0219438
+Cycle 11; res = 0.0170707
+Cycle 12; res = 0.971917
+Cycle 13; res = 0.748454
+Cycle 14; res = 0.531335
+Cycle 15; res = 0.250788
+Cycle 16; res = 0.321065
+Cycle 17; res = 5.63571
+Cycle 18; res = 3.16426
+Cycle 19; res = 38.3771
+Cycle 20; res = 18.636
+##################
+#                 
+# TIME:      0.03
+#                 
+# TIME STEP: 2
+#                 
+##################
+cfl max = 140.083
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = 645.894, ratio = 0.00119465
+v, residual = 228.02, ratio = 0.00313915
+w, residual = 67.5564, ratio = 0.00294469
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 7.97554
+@get_src; err sou = 1140.06 -692.084
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = 2106.11
+Cycle 1; res = 2948.85
+Cycle 2; res = 1651.12
+Cycle 3; res = 1754.05
+Cycle 4; res = 1776.93
+Cycle 5; res = 34327.5
+Cycle 6; res = 11810.9
+Cycle 7; res = 118936
+Cycle 8; res = 85836.4
+Cycle 9; res = 63103.4
+Cycle 10; res = 92250.4
+Cycle 11; res = 87939.6
+Cycle 12; res = 470353
+Cycle 13; res = 586293
+Cycle 14; res = 2.36452e+06
+Cycle 15; res = 3.97688e+06
+Cycle 16; res = 4.65058e+09
+Cycle 17; res = 1.62359e+09
+Cycle 18; res = 3.52431e+09
+Cycle 19; res = 4.82893e+10
+Cycle 20; res = 7.57085e+11
+##################
+#                 
+# TIME:      0.06
+#                 
+# TIME STEP: 3
+#                 
+##################
+cfl max = 5.73234e+12
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = 1.04237e+24, ratio = 0.00122517
+v, residual = 3.70683e+23, ratio = 0.0063928
+w, residual = 1.2853e+23, ratio = 0.00243865
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 7.98978
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = 2.24026e-24
+@get_src; err sou = 1.77842e+24 -1.52179e+25
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = 3.28538e+24
+Cycle 1; res = 3.07639e+24
+Cycle 2; res = 8.50281e+23
+Cycle 3; res = 4.10472e+23
+Cycle 4; res = 1.42128e+23
+Cycle 5; res = 1.14747e+23
+Cycle 6; res = 8.46005e+22
+Cycle 7; res = 6.36775e+22
+Cycle 8; res = 2.87297e+22
+Converged after 8 cycles!
+##################
+#                 
+# TIME:      0.09
+#                 
+# TIME STEP: 4
+#                 
+##################
+cfl max = 3.76173e+25
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = 4.2054e+48, ratio = 0.00430274
+v, residual = 5.68756e+47, ratio = 0.00603064
+w, residual = 2.68295e+47, ratio = 0.00232324
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 7.99898
+@get_src; err sou = 2.33751e+48 9.83153e+49
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = 4.31822e+48
+Cycle 1; res = 2.82843e+47
+Cycle 2; res = 1.8334e+47
+Cycle 3; res = 6.8936e+46
+Cycle 4; res = 2.31885e+46
+Converged after 4 cycles!
+##################
+#                 
+# TIME:      0.12
+#                 
+# TIME STEP: 5
+#                 
+##################
+cfl max = 1.95806e+51
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = 3.46377e+99, ratio = 0.00430677
+v, residual = 1.79961e+98, ratio = 0.00820751
+w, residual = 1.23447e+98, ratio = 0.00370994
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 8.00337
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = 3.19809e-96
+@get_src; err sou = 1.96919e+99 -6.07145e+99
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = 3.6378e+99
+Cycle 1; res = 2.5142e+98
+Cycle 2; res = 1.5834e+98
+Cycle 3; res = 4.51031e+97
+Cycle 4; res = 2.50879e+97
+Converged after 4 cycles!
+##################
+#                 
+# TIME:      0.15
+#                 
+# TIME STEP: 6
+#                 
+##################
+cfl max = 5.13952e+102
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 8.01086
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      0.18
+#                 
+# TIME STEP: 7
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 8.00736
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      0.21
+#                 
+# TIME STEP: 8
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 8.00049
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      0.24
+#                 
+# TIME STEP: 9
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 7.99194
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      0.27
+#                 
+# TIME STEP: 10
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 7.98214
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      0.3
+#                 
+# TIME STEP: 11
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 7.97402
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      0.33
+#                 
+# TIME STEP: 12
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 7.97099
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      0.36
+#                 
+# TIME STEP: 13
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 7.97865
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      0.39
+#                 
+# TIME STEP: 14
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 7.99122
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      0.42
+#                 
+# TIME STEP: 15
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 8.00539
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      0.45
+#                 
+# TIME STEP: 16
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 8.02112
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      0.48
+#                 
+# TIME STEP: 17
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 8.037
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      0.51
+#                 
+# TIME STEP: 18
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 8.04504
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      0.54
+#                 
+# TIME STEP: 19
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 8.03259
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      0.57
+#                 
+# TIME STEP: 20
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 8.00497
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      0.6
+#                 
+# TIME STEP: 21
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 7.97674
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      0.63
+#                 
+# TIME STEP: 22
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 7.96436
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      0.66
+#                 
+# TIME STEP: 23
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 7.96623
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      0.69
+#                 
+# TIME STEP: 24
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 7.9783
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      0.72
+#                 
+# TIME STEP: 25
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 7.99474
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      0.75
+#                 
+# TIME STEP: 26
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 8.0063
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      0.78
+#                 
+# TIME STEP: 27
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 8.00994
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      0.81
+#                 
+# TIME STEP: 28
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 8.00256
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      0.84
+#                 
+# TIME STEP: 29
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 7.98144
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      0.87
+#                 
+# TIME STEP: 30
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 7.95865
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      0.9
+#                 
+# TIME STEP: 31
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 7.94612
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      0.93
+#                 
+# TIME STEP: 32
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 7.94414
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      0.96
+#                 
+# TIME STEP: 33
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 7.94747
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      0.99
+#                 
+# TIME STEP: 34
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 7.9499
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      1.02
+#                 
+# TIME STEP: 35
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 7.95421
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      1.05
+#                 
+# TIME STEP: 36
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 7.94835
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      1.08
+#                 
+# TIME STEP: 37
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 7.93707
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      1.11
+#                 
+# TIME STEP: 38
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 7.91829
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      1.14
+#                 
+# TIME STEP: 39
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 7.90567
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      1.17
+#                 
+# TIME STEP: 40
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 7.91545
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      1.2
+#                 
+# TIME STEP: 41
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 7.94568
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      1.23
+#                 
+# TIME STEP: 42
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 7.98866
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      1.26
+#                 
+# TIME STEP: 43
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 8.03881
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      1.29
+#                 
+# TIME STEP: 44
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 8.07683
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      1.32
+#                 
+# TIME STEP: 45
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 8.08479
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      1.35
+#                 
+# TIME STEP: 46
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 8.08038
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      1.38
+#                 
+# TIME STEP: 47
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 8.06115
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      1.41
+#                 
+# TIME STEP: 48
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 8.02242
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      1.44
+#                 
+# TIME STEP: 49
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 7.98264
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      1.47
+#                 
+# TIME STEP: 50
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 7.95209
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      1.5
+#                 
+# TIME STEP: 51
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 7.93682
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      1.53
+#                 
+# TIME STEP: 52
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 7.94012
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      1.56
+#                 
+# TIME STEP: 53
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 7.94688
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      1.59
+#                 
+# TIME STEP: 54
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 7.95305
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      1.62
+#                 
+# TIME STEP: 55
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 7.96504
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      1.65
+#                 
+# TIME STEP: 56
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 7.98077
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      1.68
+#                 
+# TIME STEP: 57
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 7.99086
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      1.71
+#                 
+# TIME STEP: 58
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 7.99105
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      1.74
+#                 
+# TIME STEP: 59
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 7.98389
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      1.77
+#                 
+# TIME STEP: 60
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 7.96125
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      1.8
+#                 
+# TIME STEP: 61
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 7.9498
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      1.83
+#                 
+# TIME STEP: 62
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 7.92903
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      1.86
+#                 
+# TIME STEP: 63
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 7.90779
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      1.89
+#                 
+# TIME STEP: 64
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 7.876
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      1.92
+#                 
+# TIME STEP: 65
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 7.86763
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      1.95
+#                 
+# TIME STEP: 66
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 7.86514
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      1.98
+#                 
+# TIME STEP: 67
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 7.87079
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      2.01
+#                 
+# TIME STEP: 68
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 7.87612
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      2.04
+#                 
+# TIME STEP: 69
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 7.88305
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      2.07
+#                 
+# TIME STEP: 70
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 7.89091
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      2.1
+#                 
+# TIME STEP: 71
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 7.90022
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      2.13
+#                 
+# TIME STEP: 72
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 7.89942
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      2.16
+#                 
+# TIME STEP: 73
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 7.89934
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      2.19
+#                 
+# TIME STEP: 74
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 7.89605
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      2.22
+#                 
+# TIME STEP: 75
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 7.88732
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      2.25
+#                 
+# TIME STEP: 76
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 7.88286
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      2.28
+#                 
+# TIME STEP: 77
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 7.90893
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      2.31
+#                 
+# TIME STEP: 78
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 7.92229
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      2.34
+#                 
+# TIME STEP: 79
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 7.92671
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      2.37
+#                 
+# TIME STEP: 80
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 7.92638
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      2.4
+#                 
+# TIME STEP: 81
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 7.91786
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      2.43
+#                 
+# TIME STEP: 82
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 7.92364
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      2.46
+#                 
+# TIME STEP: 83
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 7.94594
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      2.49
+#                 
+# TIME STEP: 84
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 7.97702
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      2.52
+#                 
+# TIME STEP: 85
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 8.00719
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      2.55
+#                 
+# TIME STEP: 86
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 8.02851
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      2.58
+#                 
+# TIME STEP: 87
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 8.04322
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      2.61
+#                 
+# TIME STEP: 88
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 8.04291
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      2.64
+#                 
+# TIME STEP: 89
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 8.02287
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      2.67
+#                 
+# TIME STEP: 90
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 7.99636
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      2.7
+#                 
+# TIME STEP: 91
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 7.97312
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      2.73
+#                 
+# TIME STEP: 92
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 7.95783
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      2.76
+#                 
+# TIME STEP: 93
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 7.94885
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      2.79
+#                 
+# TIME STEP: 94
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 7.95292
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      2.82
+#                 
+# TIME STEP: 95
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 7.97354
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      2.85
+#                 
+# TIME STEP: 96
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 7.99544
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      2.88
+#                 
+# TIME STEP: 97
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 8.00327
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      2.91
+#                 
+# TIME STEP: 98
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 8.00697
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      2.94
+#                 
+# TIME STEP: 99
+#                 
+##################
+cfl max = 0
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = nan, ratio = nan
+v, residual = nan, ratio = nan
+w, residual = nan, ratio = nan
+FILE: momentum_scale_out.cpp, LINE: 15, u_blk_in = 7.9998
+FILE: momentum_scale_out.cpp, LINE: 71, ratio = nan
+@get_src; err sou = nan nan
+FILE: main.cpp, LINE: 122, about to start cycle
+Initial  res = nan
+Cycle 1; res = nan
+Cycle 2; res = nan
+Cycle 3; res = nan
+Cycle 4; res = nan
+Cycle 5; res = nan
+Cycle 6; res = nan
+Cycle 7; res = nan
+Cycle 8; res = nan
+Cycle 9; res = nan
+Cycle 10; res = nan
+Cycle 11; res = nan
+Cycle 12; res = nan
+Cycle 13; res = nan
+Cycle 14; res = nan
+Cycle 15; res = nan
+Cycle 16; res = nan
+Cycle 17; res = nan
+Cycle 18; res = nan
+Cycle 19; res = nan
+Cycle 20; res = nan
+##################
+#                 
+# TIME:      2.97
+#                 
+# TIME STEP: 100
+#             unnamed
+3:  dims[i] 3: 1 3: 2 3: 2 3: 
+3:  neighbours: 3:  3 3:  3 3:  1 3:  -2 3:  2 3:  2 3: 
+3:  coords[i] 3: 0 3: 1 3: 1 3: 
+3: n_dir[k] = 2
+3: n_dir[k] = 16
+3: n_dir[k] = 16
+3: n_dir[k] = 32
+3: n_dir[k] = 32
+PROC: 3, FILE: domain.cpp, LINE: 70, cr_x = first = 1, last = 2
+PROC: 3, FILE: domain.cpp, LINE: 71, cr_y = first = 17, last = 32
+PROC: 3, FILE: domain.cpp, LINE: 72, cr_z = first = 33, last = 64
+3: ni =   4
+3: nj =   18
+3: nk =   34
+Plotting: unnamed_level_p:003.gmv.0003
+Plotting: unnamed_level_p:003.gmv.0002
+Plotting: unnamed_level_p:003.gmv.0001
+Plotting: unnamed_level_p:003.gmv.0000
+unnamed
+3:  dims[i] 3: 2 3: 1 3: 2 3: 
+3:  neighbours: 3:  1 3:  -2 3:  -2 3:  -2 3:  2 3:  2 3: 
+3:  coords[i] 3: 1 3: 0 3: 1 3: 
+3: n_dir[k] = 128
+3: n_dir[k] = 128
+3: n_dir[k] = 32
+3: n_dir[k] = 32
+3: n_dir[k] = 32
+PROC: 3, FILE: domain.cpp, LINE: 70, cr_x = first = 129, last = 256
+PROC: 3, FILE: domain.cpp, LINE: 71, cr_y = first = 1, last = 32
+PROC: 3, FILE: domain.cpp, LINE: 72, cr_z = first = 33, last = 64
+3: ni =   130
+3: nj =   34
+3: nk =   34
+Plotting: unnamed_level_p:003.gmv.0005
+Plotting: unnamed_level_p:003.gmv.0004
+Plotting: unnamed_level_p:003.gmv.0003
+Plotting: unnamed_level_p:003.gmv.0002
+Plotting: unnamed_level_p:003.gmv.0001
+Plotting: unnamed_level_p:003.gmv.0000
+Plotting: uvw_p:003.gmv.0100
+Plotting: p_p:003.gmv.0100
+plotting           : 2.3 [s]    (0.105369%)
+momentum discretize: 0.1 [s]    (0.00458127%)
+pressure discretize: 0.0375 [s]    (0.00171797%)
+randomization      : 6.135 [s]    (0.281061%)
+momentum smoother  : 77.0975 [s]    (3.53204%)
+vcycle             : 2081.65 [s]    (95.3659%)
+Plotting: test_p:003.gmv.000unnamed
+1:  dims[i] 1: 1 1: 2 1: 2 1: 
+1:  neighbours: 1:  1 1:  1 1:  -2 1:  3 1:  0 1:  0 1: 
+1:  coords[i] 1: 0 1: 0 1: 1 1: 
+1: n_dir[k] = 2
+1: n_dir[k] = 16
+1: n_dir[k] = 16
+1: n_dir[k] = 32
+1: n_dir[k] = 32
+PROC: 1, FILE: domain.cpp, LINE: 70, cr_x = first = 1, last = 2
+PROC: 1, FILE: domain.cpp, LINE: 71, cr_y = first = 1, last = 16
+PROC: 1, FILE: domain.cpp, LINE: 72, cr_z = first = 33, last = 64
+1: ni =   4
+1: nj =   18
+1: nk =   34
+Plotting: unnamed_level_p:001.gmv.0003
+Plotting: unnamed_level_p:001.gmv.0002
+Plotting: unnamed_level_p:001.gmv.0001
+Plotting: unnamed_level_p:001.gmv.0000
+unnamed
+1:  dims[i] 1: 2 1: 1 1: 2 1: 
+1:  neighbours: 1:  -2 1:  3 1:  -2 1:  -2 1:  0 1:  0 1: 
+1:  coords[i] 1: 0 1: 0 1: 1 1: 
+1: n_dir[k] = 128
+1: n_dir[k] = 128
+1: n_dir[k] = 32
+1: n_dir[k] = 32
+1: n_dir[k] = 32
+PROC: 1, FILE: domain.cpp, LINE: 70, cr_x = first = 1, last = 128
+PROC: 1, FILE: domain.cpp, LINE: 71, cr_y = first = 1, last = 32
+PROC: 1, FILE: domain.cpp, LINE: 72, cr_z = first = 33, last = 64
+1: ni =   130
+1: nj =   34
+1: nk =   34
+Plotting: unnamed_level_p:001.gmv.0005
+Plotting: unnamed_level_p:001.gmv.0004
+Plotting: unnamed_level_p:001.gmv.0003
+Plotting: unnamed_level_p:001.gmv.0002
+Plotting: unnamed_level_p:001.gmv.0001
+Plotting: unnamed_level_p:001.gmv.0000
+Plotting: uvw_p:001.gmv.0100
+Plotting: p_p:001.gmv.0100
+plotting           : 2.3 [s]    (0.105369%)
+momentum discretize: 0.1 [s]    (0.00458127%)
+pressure discretize: 0.0375 [s]    (0.00171797%)
+randomization      : 6.135 [s]    (0.281061%)
+momentum smoother  : 77.0975 [s]    (3.53204%)
+vcycle             : 2081.65 [s]    (95.3659%)
+Plotting: test_p:001.gmv.0000

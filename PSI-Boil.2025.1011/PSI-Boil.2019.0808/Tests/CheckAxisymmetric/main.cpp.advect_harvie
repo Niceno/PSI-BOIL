@@ -1,0 +1,275 @@
+#include "Include/psi-boil.h"
+#include <fstream>
+#include <iostream>
+#include <fenv.h>
+//#define USE_CARTESIAN
+//#define USE_CONTINUOUS
+//#define SETUP_ONLY
+
+#define _GNU_SOURCE 1
+#if 1
+static void __attribute__ ((constructor)) trapfpe(void)
+{
+  /* Enable some exceptions. At startup all exceptions are masked. */
+  feenableexcept(FE_INVALID|FE_DIVBYZERO|FE_OVERFLOW);
+}
+#endif
+
+/******************************************************************************/
+int main(int argc, char * argv[]) {
+
+  boil::timer.start();
+
+  if(argc<4){
+    boil::oout<<"Four arguments (gridlevel, cfl, shape, inversion) required!"<<"\n";
+    boil::oout<<"./Boil gridlevel cfl-max shape inversion"<<"\n";
+    exit(0);
+  }
+
+  const int level = atoi(argv[1]);
+  boil::oout<<"glevel= "<<level<<"\n";
+
+  const real cfl_max = atof(argv[2]);
+  boil::oout<<"cfl-max= "<<cfl_max<<"\n";
+
+  const int shape = atoi(argv[3]);
+  boil::oout<<"shape= "<<shape<<"\n";
+  if(shape<0||shape>2) {
+    boil::print_line("Wrong shape. Exiting.");
+    exit(0);
+  }
+
+  const bool inverted = atoi(argv[4]);
+  boil::oout<<"inversion= "<<inverted<<"\n";
+
+  /* domain dimensions (given by problem) */
+  const real LX = 2.8;
+  const real LZ = 4.;
+
+  /* computed parameters */
+  const int NX = 70*level;
+  const int NZ = 100*level;
+
+  const real DX = LX/real(NX);
+
+  const real A = 1.0;
+  const real Rhi = 0.8;
+  const real Rlo = 0.6;
+
+  /*--------------------------------+
+  |  choose the output file format  |
+  +--------------------------------*/
+  boil::plot = new PlotTEC();
+  //boil::plot = new PlotTEC(AsNodes::no(), Buffers::yes());
+
+  /*----------+
+  |  grid(s)  |
+  +----------*/
+  Grid1D gx( Range<real>(0.0,LX), NX, Periodic::no(),
+             BndGrid::symmetry(), BndGrid::wall() );
+  Grid1D gz( Range<real>(0.0,LZ), NZ, Periodic::yes() );
+
+  /*---------+
+  |  domain  |
+  +---------*/
+#ifdef USE_CARTESIAN
+  Grid1D gy(DX);
+  Domain d(gx,gy,gz);
+#else
+  Axisymmetric d(gx,gz,DX,NULL);
+#endif
+
+  /*------------------+
+  |  define unknowns  |
+  +------------------*/
+  Vector uvw(d); // vel
+  Scalar c  (d), g  (d), kappa(d), cold(d), cold2(d); // concentration
+
+  /*-----------------------------+
+  |  insert boundary conditions  |
+  +-----------------------------*/
+  for_m(m) {
+    uvw.bc(m).add( BndCnd( Dir::imin(), BndType::symmetry() ) );
+    uvw.bc(m).add( BndCnd( Dir::imax(), BndType::neumann() ) );
+    uvw.bc(m).add( BndCnd( Dir::kmin(), BndType::periodic() ) );
+    uvw.bc(m).add( BndCnd( Dir::kmax(), BndType::periodic() ) );
+    uvw.bc(m).add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
+    uvw.bc(m).add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
+  }
+
+  c.bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
+  c.bc().add( BndCnd( Dir::imax(), BndType::neumann() ) );
+  c.bc().add( BndCnd( Dir::kmin(), BndType::periodic() ) );
+  c.bc().add( BndCnd( Dir::kmax(), BndType::periodic() ) );
+  c.bc().add( BndCnd( Dir::jmin(), BndType::pseudo() ) );
+  c.bc().add( BndCnd( Dir::jmax(), BndType::pseudo() ) );
+
+  g=c.shape();
+  kappa=c.shape();
+  cold=c.shape();
+  cold2=c.shape();
+
+  Matter air(d), water(d);
+  air  .mu    (1.0000e-5);
+  air  .rho   (1.2500e+0);
+  water.mu    (1.0000e-3);
+  water.rho   (1.0000e+3);
+
+  Matter mixed(water, air, &c);
+  mixed.sigma (0.07);
+
+  /*-------------------+
+  |  time-integration  |
+  +-------------------*/
+  const real vel_max = A;
+  const real dt = cfl_max*DX/vel_max;
+  const real ttot = LZ/A;
+  Times time(ttot,dt);
+  assert(!(time.total_steps()%4));
+  const int nint = time.total_steps()/4;
+  const int ndt = time.total_steps();
+
+  boil::oout<<"Times= "<<dt<<ttot<<" "<<time.total_steps()<<boil::endl;
+
+  /*----------------+
+  |  linear solver  |
+  +----------------*/
+  Krylov * solver = new CG(d, Prec::ic2());
+
+#ifdef USE_CARTESIAN
+  VOF conc(c, g, kappa, uvw, time, solver);
+  conc.set_normal_vector_method_all(NormMethod::ElviraXZ());
+#else
+  VOFaxisym conc(c, g, kappa, uvw, time, solver);
+#endif
+
+  Comp m=Comp::w();
+  for_avmijk(uvw,m,i,j,k) {
+    uvw[m][i][j][k] = A;
+  }
+
+  if(shape==0) {
+    boil::setup_circle_xz(cold,Rhi,LX/2.,LX/2.);
+    boil::setup_circle_xz(cold2,Rlo,LX/2.,LX/2.);
+  } else if(shape==1) {
+    boil::setup_square_xz(conc,cold2,LX/2.-Rhi,LZ/2.+Rhi,
+                                     0.,2.*Rhi);
+    cold = conc.color();
+    boil::setup_square_xz(conc,cold2,LX/2.-Rlo,LZ/2.+Rlo,
+                                     0.,2.*Rlo);
+    cold -= conc.color();
+  } else {
+    real x0 = LX/2.-0.2;
+    real z0 = LZ/2.+Rhi+0.2;
+    real sa = 2.*Rhi*3./5.;
+    real sb = 2.*Rhi*4./5.;
+    boil::setup_square_xz(conc,cold2,x0,z0,
+                                     sa,sb);
+    cold = conc.color();
+    boil::setup_square_xz(conc,cold2,x0+Rhi/10.,z0-7.*Rhi/10.,
+                                     sa/2.,sb/2.);
+    cold -= conc.color();
+  }
+
+  for_avijk(cold2,i,j,k) {
+    cold2[i][j][k] = - cold2[i][j][k];
+  }
+  cold += cold2;
+  cold.bnd_update();
+  cold.exchange_all();
+
+  if(inverted)
+    for_avijk(cold,i,j,k) {
+      cold[i][j][k] = 1.0 - cold[i][j][k];
+    }
+
+  conc.color_to_vf(cold,c);
+  conc.color_to_vf(cold,cold2);
+
+  conc.ancillary();
+  conc.totalvol();
+  conc.color_minmax();
+
+  c.bnd_update();
+  c.exchange_all();
+
+  boil::plot->plot(uvw,c, "uvw-c", 0);
+
+  /* load variables */
+  std::vector<Scalar*> load_scalars = { &c };
+  std::vector<std::string> load_scalar_names = { "c" };
+
+  real cmax_linf_linf(-1.0), cmax_l1(0.);
+  real cmin_linf_linf(+1.0), cmin_l1(0.);
+
+#ifndef SETUP_ONLY
+  int ts(0);
+  std::stringstream ssb;
+  ssb <<"time-"<<ndt<<".txt";
+  if(boil::load_backup(ssb.str(),ts,time,
+                       load_scalars, load_scalar_names)) {
+  } else {
+  for(time.start(); time.end(); time.increase()) {
+
+    conc.advance();
+    conc.totalvol();
+    conc.color_minmax();
+
+    if(time.current_step() % nint == 0) {
+      boil::plot->plot(uvw, c, "uvw-c",  time.current_step());
+      boil::save_backup(time.current_step(), 0, time,
+                        load_scalars, load_scalar_names);
+    }
+
+    /* evaluate overshoots */
+    real cmax_linf(-1.0), cmin_linf(+1.0);
+    for_vijk(c,i,j,k) {
+      real col = c[i][j][k];
+      if(col>1.0) {
+        if(col>cmax_linf) {
+          cmax_linf = col;
+        }
+      }
+      if(col<0.0) {
+        if(col<cmin_linf) {
+          cmin_linf = col;
+        }
+      }
+    }
+    boil::cart.max_real(&cmax_linf);
+    boil::cart.min_real(&cmin_linf);
+    cmax_l1 += fabs( std::max(0.0,cmax_linf-1.0) );
+    cmin_l1 += fabs( std::min(0.0,cmin_linf    ) );
+    cmax_linf_linf = std::max(cmax_linf_linf,cmax_linf);
+    cmin_linf_linf = std::min(cmin_linf_linf,cmin_linf);
+  }
+  } /* bck */
+
+  /* post-process */ 
+  cmax_l1 /= real(ndt);
+  cmin_l1 /= real(ndt);
+
+  boil::oout<<"Errors over time: ";
+  boil::oout<<level<<" "<<inverted<<" | "<<cmax_l1<<" "<<cmin_l1<<" | "
+            <<fabs(cmax_linf_linf-1.)<<" "<<fabs(cmin_linf_linf)<<boil::endl;
+
+  real toterr = boil::li_scalar_error(cold2,c);
+  real toterr2 = boil::l1_scalar_error(cold2,c);
+  real toterr2_vol = boil::l1_scalar_error_vol(cold2,c);
+
+  boil::oout<<"Linf/1 error: ";
+  boil::oout<<level<<" "<<inverted<<" "<<toterr<<" "<<toterr2<<" "<<toterr2_vol<<boil::endl;
+
+  std::ofstream output;
+  output.open( "results_harvie.txt", std::ios::out | std::ios::app );
+  if(!boil::cart.iam()) {
+    output<<level<<" "<<cfl_max<<" "<<inverted<<" | "<<cmax_l1<<" "<<cmin_l1<<" | "
+          <<fabs(cmax_linf_linf-1.)<<" "<<fabs(cmin_linf_linf)<<" | "<<toterr<<" "<<toterr2<<" "<<toterr2_vol<<boil::endl;
+  }
+#endif
+
+  boil::oout << "finished" << boil::endl;
+
+  boil::timer.stop();
+  boil::timer.report();
+}

@@ -1,0 +1,851 @@
+FILE: domain.cpp, LINE: 33, name = unnamed
+0:  dims[i] 0: 1 0: 1 0: 1 0: 
+0:  neighbours: 0:  0 0:  0 0:  0 0:  0 0:  0 0:  0 0: 
+0:  coords[i] 0: 0 0: 0 0: 0 0: 
+0: n_dir[k] = 128
+0: n_dir[k] = 128
+0: n_dir[k] = 128
+PROC: 0, FILE: domain.cpp, LINE: 70, cr_x = first = 1, last = 128
+PROC: 0, FILE: domain.cpp, LINE: 71, cr_y = first = 1, last = 128
+PROC: 0, FILE: domain.cpp, LINE: 72, cr_z = first = 1, last = 128
+0: ni =   130
+0: nj =   130
+0: nk =   130
+Level 5 created !
+Plotting: unnamed_level_p:000.gmv.0005
+Level 4 created !
+Plotting: unnamed_level_p:000.gmv.0004
+Level 3 created !
+Plotting: unnamed_level_p:000.gmv.0003
+Level 2 created !
+Plotting: unnamed_level_p:000.gmv.0002
+Level 1 created !
+Plotting: unnamed_level_p:000.gmv.0001
+Plotting: unnamed_level_p:000.gmv.0000
+Pressure level 64 x 64 x 64 created !
+Pressure level 32 x 32 x 32 created !
+Pressure level 16 x 16 x 16 created !
+Pressure level 8 x 8 x 8 created !
+Pressure level 4 x 4 x 4 created !
+Number of cycling levels: 6
+##################
+#                 
+# TIME:      0
+#                 
+# TIME STEP: 1
+#                 
+##################
+cfl max = 0.203596
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = 0.000406586, ratio = 0.000278805
+v, residual = 0.000406586, ratio = 0.000278805
+@get_src; err sou = 0.000470542 -8.2319e-13
+Initial  res = 0.00163522
+Cycle 1; res = 0.00029165
+Cycle 2; res = 3.69038e-05
+Cycle 3; res = 4.30397e-06
+Cycle 4; res = 6.31344e-07
+Cycle 5; res = 5.2311e-08
+Converged after 5 cycles!
+ K    = 18.3094
+ K o  = 0
+ EPS1 = -7.38134
+ eps2 = 0.00451708
+##################
+#                 
+# TIME:      0.01
+#                 
+# TIME STEP: 2
+#                 
+##################
+cfl max = 0.143769
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = 0.000115114, ratio = 0.000344592
+v, residual = 0.000115114, ratio = 0.000344592
+w, residual = 4.11897e-06, ratio = 0.000829976
+@get_src; err sou = 0.000113061 2.31977e-13
+Initial  res = 0.00039291
+Cycle 1; res = 7.5628e-05
+Cycle 2; res = 1.15439e-05
+Cycle 3; res = 1.2396e-06
+Cycle 4; res = 1.64288e-07
+Cycle 5; res = 1.95068e-08
+Converged after 5 cycles!
+ K    = 15.7963
+ K o  = 18.3094
+ EPS1 = 1.01318
+ eps2 = 0.00390908
+##################
+#                 
+# TIME:      0.02
+#                 
+# TIME STEP: 3
+#                 
+##################
+cfl max = 0.133695
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = 0.00010847, ratio = 0.000253325
+v, residual = 0.00010847, ratio = 0.000253325
+w, residual = 2.98601e-06, ratio = 0.00103142
+@get_src; err sou = 0.000137219 4.02227e-13
+Initial  res = 0.000476862
+Cycle 1; res = 9.01092e-05
+Cycle 2; res = 1.59409e-05
+Cycle 3; res = 1.97604e-06
+Cycle 4; res = 2.80345e-07
+Cycle 5; res = 3.58873e-08
+Converged after 5 cycles!
+ K    = 12.8938
+ K o  = 15.7963
+ EPS1 = 1.1701
+ eps2 = 0.00324096
+##################
+#                 
+# TIME:      0.03
+#                 
+# TIME STEP: 4
+#                 
+##################
+cfl max = 0.117758
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = 8.6564e-05, ratio = 0.000263515
+v, residual = 8.6564e-05, ratio = 0.000263515
+w, residual = 3.42548e-06, ratio = 0.00101613
+@get_src; err sou = 0.000106391 3.73038e-13
+Initial  res = 0.00036973
+Cycle 1; res = 7.05765e-05
+Cycle 2; res = 1.26425e-05
+Cycle 3; res = 1.42625e-06
+Cycle 4; res = 1.9706e-07
+Cycle 5; res = 2.48109e-08
+Converged after 5 cycles!
+ K    = 10.8541
+ K o  = 12.8938
+ EPS1 = 0.822297
+ eps2 = 0.00276686
+##################
+#                 
+# TIME:      0.04
+#                 
+# TIME STEP: 5
+#                 
+##################
+cfl max = 0.106243
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = 7.42058e-05, ratio = 0.000264878
+v, residual = 7.42058e-05, ratio = 0.000264878
+w, residual = 3.52345e-06, ratio = 0.00109371
+@get_src; err sou = 9.0894e-05 2.95645e-13
+Initial  res = 0.000315874
+Cycle 1; res = 5.9873e-05
+Cycle 2; res = 1.08592e-05
+Cycle 3; res = 1.1396e-06
+Cycle 4; res = 1.68401e-07
+Cycle 5; res = 1.90896e-08
+Converged after 5 cycles!
+ K    = 9.25338
+ K o  = 10.8541
+ EPS1 = 0.645327
+ eps2 = 0.00239459
+##################
+#                 
+# TIME:      0.05
+#                 
+# TIME STEP: 6
+#                 
+##################
+cfl max = 0.0965464
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = 6.44519e-05, ratio = 0.000270203
+v, residual = 6.44519e-05, ratio = 0.000270203
+w, residual = 3.59581e-06, ratio = 0.00114934
+@get_src; err sou = 7.77771e-05 3.28455e-13
+Initial  res = 0.00027029
+Cycle 1; res = 5.11664e-05
+Cycle 2; res = 9.28448e-06
+Cycle 3; res = 9.89243e-07
+Cycle 4; res = 1.40116e-07
+Cycle 5; res = 1.46815e-08
+Converged after 5 cycles!
+ K    = 7.98976
+ K o  = 9.25338
+ EPS1 = 0.509422
+ eps2 = 0.00209909
+##################
+#                 
+# TIME:      0.06
+#                 
+# TIME STEP: 7
+#                 
+##################
+cfl max = 0.088454
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = 5.66493e-05, ratio = 0.000275017
+v, residual = 5.66493e-05, ratio = 0.000275017
+w, residual = 3.62142e-06, ratio = 0.00120552
+@get_src; err sou = 6.74783e-05 3.50368e-13
+Initial  res = 0.0002345
+Cycle 1; res = 4.46645e-05
+Cycle 2; res = 7.44209e-06
+Cycle 3; res = 8.29361e-07
+Cycle 4; res = 1.18011e-07
+Cycle 5; res = 1.24875e-08
+Converged after 5 cycles!
+ K    = 6.97236
+ K o  = 7.98976
+ EPS1 = 0.410159
+ eps2 = 0.00185961
+##################
+#                 
+# TIME:      0.07
+#                 
+# TIME STEP: 8
+#                 
+##################
+cfl max = 0.0815816
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = 5.02783e-05, ratio = 0.000279841
+v, residual = 5.02783e-05, ratio = 0.000279841
+w, residual = 3.61673e-06, ratio = 0.00125849
+@get_src; err sou = 5.9142e-05 2.60059e-13
+Initial  res = 0.00020553
+Cycle 1; res = 3.90701e-05
+Cycle 2; res = 6.59594e-06
+Cycle 3; res = 7.07928e-07
+Cycle 4; res = 1.00675e-07
+Cycle 5; res = 9.80799e-09
+Converged after 5 cycles!
+ K    = 6.14087
+ K o  = 6.97236
+ EPS1 = 0.335211
+ eps2 = 0.00166236
+##################
+#                 
+# TIME:      0.08
+#                 
+# TIME STEP: 9
+#                 
+##################
+cfl max = 0.0756803
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = 4.4981e-05, ratio = 0.00028445
+v, residual = 4.4981e-05, ratio = 0.00028445
+w, residual = 3.59016e-06, ratio = 0.00130895
+@get_src; err sou = 5.23058e-05 2.59975e-13
+Initial  res = 0.000181773
+Cycle 1; res = 3.46916e-05
+Cycle 2; res = 5.56294e-06
+Cycle 3; res = 5.69517e-07
+Cycle 4; res = 8.65564e-08
+Cycle 5; res = 8.07129e-09
+Converged after 5 cycles!
+ K    = 5.45221
+ K o  = 6.14087
+ EPS1 = 0.277628
+ eps2 = 0.00149758
+##################
+#                 
+# TIME:      0.09
+#                 
+# TIME STEP: 10
+#                 
+##################
+cfl max = 0.0705612
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = 4.05137e-05, ratio = 0.000288794
+v, residual = 4.05137e-05, ratio = 0.000288794
+w, residual = 3.54809e-06, ratio = 0.00135699
+@get_src; err sou = 4.66243e-05 2.33602e-13
+Initial  res = 0.000162028
+Cycle 1; res = 3.08673e-05
+Cycle 2; res = 4.81726e-06
+Cycle 3; res = 4.74747e-07
+Cycle 4; res = 7.41555e-08
+Cycle 5; res = 6.54437e-09
+Converged after 5 cycles!
+ K    = 4.87516
+ K o  = 5.45221
+ EPS1 = 0.232633
+ eps2 = 0.00135822
+##################
+#                 
+# TIME:      0.1
+#                 
+# TIME STEP: 11
+#                 
+##################
+cfl max = 0.066088
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = 3.67056e-05, ratio = 0.000292874
+v, residual = 3.67056e-05, ratio = 0.000292874
+w, residual = 3.49503e-06, ratio = 0.00140274
+@get_src; err sou = 4.18483e-05 1.96977e-13
+Initial  res = 0.000145431
+Cycle 1; res = 2.77607e-05
+Cycle 2; res = 4.10875e-06
+Cycle 3; res = 3.88987e-07
+Cycle 4; res = 6.24225e-08
+Cycle 5; res = 5.3544e-09
+Converged after 5 cycles!
+ K    = 4.38662
+ K o  = 4.87516
+ EPS1 = 0.196952
+ eps2 = 0.00123908
+##################
+#                 
+# TIME:      0.11
+#                 
+# TIME STEP: 12
+#                 
+##################
+cfl max = 0.06214
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = 3.34298e-05, ratio = 0.000296708
+v, residual = 3.34298e-05, ratio = 0.000296708
+w, residual = 3.43429e-06, ratio = 0.00144631
+@get_src; err sou = 3.77923e-05 2.49727e-13
+Initial  res = 0.000131335
+Cycle 1; res = 2.51909e-05
+Cycle 2; res = 3.68994e-06
+Cycle 3; res = 3.42602e-07
+Cycle 4; res = 5.54027e-08
+Cycle 5; res = 4.32769e-09
+Converged after 5 cycles!
+ K    = 3.9692
+ K o  = 4.38662
+ EPS1 = 0.168282
+ eps2 = 0.00113626
+##################
+#                 
+# TIME:      0.12
+#                 
+# TIME STEP: 13
+#                 
+##################
+cfl max = 0.0586311
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = 3.05911e-05, ratio = 0.000300334
+v, residual = 3.05911e-05, ratio = 0.000300334
+w, residual = 3.36829e-06, ratio = 0.0014878
+@get_src; err sou = 3.43159e-05 2.26217e-13
+Initial  res = 0.000119255
+Cycle 1; res = 2.2588e-05
+Cycle 2; res = 3.22823e-06
+Cycle 3; res = 2.93653e-07
+Cycle 4; res = 4.98534e-08
+Cycle 5; res = 3.51811e-09
+Converged after 5 cycles!
+ K    = 3.60959
+ K o  = 3.9692
+ EPS1 = 0.144974
+ eps2 = 0.00104675
+##################
+#                 
+# TIME:      0.13
+#                 
+# TIME STEP: 14
+#                 
+##################
+cfl max = 0.0554924
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = 2.81161e-05, ratio = 0.000303798
+v, residual = 2.81161e-05, ratio = 0.000303798
+w, residual = 3.29882e-06, ratio = 0.00152731
+@get_src; err sou = 3.1312e-05 2.13295e-13
+Initial  res = 0.000108815
+Cycle 1; res = 2.04899e-05
+Cycle 2; res = 2.83917e-06
+Cycle 3; res = 2.4184e-07
+Cycle 4; res = 4.33796e-08
+Cycle 5; res = 3.22324e-09
+Converged after 5 cycles!
+ K    = 3.29749
+ K o  = 3.60959
+ EPS1 = 0.125823
+ eps2 = 0.000968248
+##################
+#                 
+# TIME:      0.14
+#                 
+# TIME STEP: 15
+#                 
+##################
+cfl max = 0.0526689
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = 2.59469e-05, ratio = 0.00030715
+v, residual = 2.59469e-05, ratio = 0.00030715
+w, residual = 3.2272e-06, ratio = 0.00156492
+@get_src; err sou = 2.86969e-05 1.67161e-13
+Initial  res = 9.97274e-05
+Cycle 1; res = 1.86315e-05
+Cycle 2; res = 2.55416e-06
+Cycle 3; res = 2.03853e-07
+Cycle 4; res = 3.71522e-08
+Cycle 5; res = 3.0955e-09
+Converged after 5 cycles!
+ K    = 3.02479
+ K o  = 3.29749
+ EPS1 = 0.109938
+ eps2 = 0.000898928
+##################
+#                 
+# TIME:      0.15
+#                 
+# TIME STEP: 16
+#                 
+##################
+cfl max = 0.0501182
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = 2.40374e-05, ratio = 0.000310444
+v, residual = 2.40374e-05, ratio = 0.000310444
+w, residual = 3.15442e-06, ratio = 0.0016007
+@get_src; err sou = 2.64052e-05 1.85012e-13
+Initial  res = 9.17632e-05
+Cycle 1; res = 1.69553e-05
+Cycle 2; res = 2.32186e-06
+Cycle 3; res = 1.76918e-07
+Cycle 4; res = 3.19714e-08
+Cycle 5; res = 3.15939e-09
+Converged after 5 cycles!
+ K    = 2.78506
+ K o  = 3.02479
+ EPS1 = 0.096645
+ eps2 = 0.000837337
+##################
+#                 
+# TIME:      0.16
+#                 
+# TIME STEP: 17
+#                 
+##################
+cfl max = 0.0478033
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = 2.23502e-05, ratio = 0.000313731
+v, residual = 2.23502e-05, ratio = 0.000313731
+w, residual = 3.08121e-06, ratio = 0.00163471
+@get_src; err sou = 2.43846e-05 1.32551e-13
+Initial  res = 8.47413e-05
+Cycle 1; res = 1.55167e-05
+Cycle 2; res = 2.10249e-06
+Cycle 3; res = 1.57804e-07
+Cycle 4; res = 2.77401e-08
+Cycle 5; res = 3.14543e-09
+Converged after 5 cycles!
+ K    = 2.57314
+ K o  = 2.78506
+ EPS1 = 0.0854341
+ eps2 = 0.000782309
+##################
+#                 
+# TIME:      0.17
+#                 
+# TIME STEP: 18
+#                 
+##################
+cfl max = 0.0456908
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = 2.0854e-05, ratio = 0.000317055
+v, residual = 2.0854e-05, ratio = 0.000317055
+w, residual = 3.00812e-06, ratio = 0.00166703
+@get_src; err sou = 2.25932e-05 9.38683e-14
+Initial  res = 7.85158e-05
+Cycle 1; res = 1.42305e-05
+Cycle 2; res = 1.88712e-06
+Cycle 3; res = 1.36526e-07
+Cycle 4; res = 2.47657e-08
+Cycle 5; res = 2.86583e-09
+Converged after 5 cycles!
+ K    = 2.38484
+ K o  = 2.57314
+ EPS1 = 0.0759102
+ eps2 = 0.000732894
+##################
+#                 
+# TIME:      0.18
+#                 
+# TIME STEP: 19
+#                 
+##################
+cfl max = 0.0437554
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = 1.95232e-05, ratio = 0.000320461
+v, residual = 1.95232e-05, ratio = 0.000320461
+w, residual = 2.93559e-06, ratio = 0.00169772
+@get_src; err sou = 2.0997e-05 1.37969e-13
+Initial  res = 7.29687e-05
+Cycle 1; res = 1.3093e-05
+Cycle 2; res = 1.72139e-06
+Cycle 3; res = 1.19228e-07
+Cycle 4; res = 2.17268e-08
+Cycle 5; res = 2.64488e-09
+Converged after 5 cycles!
+ K    = 2.21675
+ K o  = 2.38484
+ EPS1 = 0.0677653
+ eps2 = 0.000688314
+##################
+#                 
+# TIME:      0.19
+#                 
+# TIME STEP: 20
+#                 
+##################
+cfl max = 0.0419758
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = 1.83357e-05, ratio = 0.00032398
+v, residual = 1.83357e-05, ratio = 0.00032398
+w, residual = 2.86389e-06, ratio = 0.00172682
+@get_src; err sou = 1.9568e-05 9.93721e-14
+Initial  res = 6.80026e-05
+Cycle 1; res = 1.21196e-05
+Cycle 2; res = 1.56732e-06
+Cycle 3; res = 1.03475e-07
+Cycle 4; res = 1.94748e-08
+Cycle 5; res = 2.29924e-09
+Converged after 5 cycles!
+ K    = 2.06604
+ K o  = 2.21675
+ EPS1 = 0.0607571
+ eps2 = 0.000647924
+##################
+#                 
+# TIME:      0.2
+#                 
+# TIME STEP: 21
+#                 
+##################
+cfl max = 0.0403341
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = 1.7273e-05, ratio = 0.00032764
+v, residual = 1.7273e-05, ratio = 0.00032764
+w, residual = 2.79327e-06, ratio = 0.00175439
+@get_src; err sou = 1.82832e-05 7.89103e-14
+Initial  res = 6.35376e-05
+Cycle 1; res = 1.1214e-05
+Cycle 2; res = 1.43134e-06
+Cycle 3; res = 9.33926e-08
+Cycle 4; res = 1.70822e-08
+Cycle 5; res = 2.06023e-09
+Converged after 5 cycles!
+ K    = 1.93038
+ K o  = 2.06604
+ EPS1 = 0.0546925
+ eps2 = 0.000611188
+##################
+#                 
+# TIME:      0.21
+#                 
+# TIME STEP: 22
+#                 
+##################
+cfl max = 0.038815
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = 1.6319e-05, ratio = 0.000331459
+v, residual = 1.6319e-05, ratio = 0.000331459
+w, residual = 2.72391e-06, ratio = 0.00178051
+@get_src; err sou = 1.71234e-05 9.00921e-14
+Initial  res = 5.9507e-05
+Cycle 1; res = 1.04304e-05
+Cycle 2; res = 1.33241e-06
+Cycle 3; res = 8.62801e-08
+Cycle 4; res = 1.54177e-08
+Cycle 5; res = 1.85094e-09
+Converged after 5 cycles!
+ K    = 1.8078
+ K o  = 1.93038
+ EPS1 = 0.0494169
+ eps2 = 0.000577655
+##################
+#                 
+# TIME:      0.22
+#                 
+# TIME STEP: 23
+#                 
+##################
+cfl max = 0.0374053
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = 1.54602e-05, ratio = 0.000335454
+v, residual = 1.54602e-05, ratio = 0.000335454
+w, residual = 2.65589e-06, ratio = 0.00180517
+@get_src; err sou = 1.60725e-05 6.47145e-14
+Initial  res = 5.58551e-05
+Cycle 1; res = 9.73126e-06
+Cycle 2; res = 1.2324e-06
+Cycle 3; res = 7.78665e-08
+Cycle 4; res = 1.35767e-08
+Cycle 5; res = 1.63699e-09
+Converged after 5 cycles!
+ K    = 1.69666
+ K o  = 1.8078
+ EPS1 = 0.0448052
+ eps2 = 0.000546943
+##################
+#                 
+# TIME:      0.23
+#                 
+# TIME STEP: 24
+#                 
+##################
+cfl max = 0.0360936
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = 1.46849e-05, ratio = 0.000339635
+v, residual = 1.46849e-05, ratio = 0.000339635
+w, residual = 2.58933e-06, ratio = 0.00182847
+@get_src; err sou = 1.51172e-05 8.10268e-14
+Initial  res = 5.25351e-05
+Cycle 1; res = 9.10577e-06
+Cycle 2; res = 1.14835e-06
+Cycle 3; res = 7.21678e-08
+Cycle 4; res = 1.27229e-08
+Cycle 5; res = 1.43111e-09
+Converged after 5 cycles!
+ K    = 1.59557
+ K o  = 1.69666
+ EPS1 = 0.0407554
+ eps2 = 0.000518728
+##################
+#                 
+# TIME:      0.24
+#                 
+# TIME STEP: 25
+#                 
+##################
+cfl max = 0.0348718
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = 1.39829e-05, ratio = 0.000344006
+v, residual = 1.39829e-05, ratio = 0.000344006
+w, residual = 2.52426e-06, ratio = 0.00185042
+@get_src; err sou = 1.42459e-05 6.62824e-14
+Initial  res = 4.95072e-05
+Cycle 1; res = 8.52118e-06
+Cycle 2; res = 1.07488e-06
+Cycle 3; res = 6.6234e-08
+Cycle 4; res = 1.18786e-08
+Cycle 5; res = 1.3156e-09
+Converged after 5 cycles!
+ K    = 1.50333
+ K o  = 1.59557
+ EPS1 = 0.0371839
+ eps2 = 0.000492733
+##################
+#                 
+# TIME:      0.25
+#                 
+# TIME STEP: 26
+#                 
+##################
+cfl max = 0.03373
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = 1.33452e-05, ratio = 0.000348565
+v, residual = 1.33452e-05, ratio = 0.000348565
+w, residual = 2.46073e-06, ratio = 0.00187109
+@get_src; err sou = 1.34489e-05 5.74058e-14
+Initial  res = 4.67374e-05
+Cycle 1; res = 7.99672e-06
+Cycle 2; res = 1.0079e-06
+Cycle 3; res = 6.07404e-08
+Cycle 4; res = 1.11407e-08
+Cycle 5; res = 1.22482e-09
+Converged after 5 cycles!
+ K    = 1.41894
+ K o  = 1.50333
+ EPS1 = 0.0340217
+ eps2 = 0.000468719
+##################
+#                 
+# TIME:      0.26
+#                 
+# TIME STEP: 27
+#                 
+##################
+cfl max = 0.0326601
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = 1.27641e-05, ratio = 0.000353308
+v, residual = 1.27641e-05, ratio = 0.000353308
+w, residual = 2.39876e-06, ratio = 0.0018905
+@get_src; err sou = 1.27178e-05 5.6123e-14
+Initial  res = 4.41968e-05
+Cycle 1; res = 7.507e-06
+Cycle 2; res = 9.4284e-07
+Cycle 3; res = 5.6365e-08
+Cycle 4; res = 1.07063e-08
+Cycle 5; res = 1.13488e-09
+Converged after 5 cycles!
+ K    = 1.34152
+ K o  = 1.41894
+ EPS1 = 0.0312113
+ eps2 = 0.00044648
+##################
+#                 
+# TIME:      0.27
+#                 
+# TIME STEP: 28
+#                 
+##################
+cfl max = 0.0316555
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = 1.2233e-05, ratio = 0.000358226
+v, residual = 1.2233e-05, ratio = 0.000358226
+w, residual = 2.33834e-06, ratio = 0.00190871
+@get_src; err sou = 1.20454e-05 4.49343e-14
+Initial  res = 4.18603e-05
+Cycle 1; res = 7.0703e-06
+Cycle 2; res = 8.93728e-07
+Cycle 3; res = 5.28123e-08
+Cycle 4; res = 1.01666e-08
+Cycle 5; res = 1.09586e-09
+Converged after 5 cycles!
+ K    = 1.27032
+ K o  = 1.34152
+ EPS1 = 0.0287049
+ eps2 = 0.000425837
+##################
+#                 
+# TIME:      0.28
+#                 
+# TIME STEP: 29
+#                 
+##################
+cfl max = 0.0307104
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = 1.1746e-05, ratio = 0.000363308
+v, residual = 1.1746e-05, ratio = 0.000363308
+w, residual = 2.27949e-06, ratio = 0.00192577
+@get_src; err sou = 1.14256e-05 4.711e-14
+Initial  res = 3.97061e-05
+Cycle 1; res = 6.6581e-06
+Cycle 2; res = 8.43413e-07
+Cycle 3; res = 5.00234e-08
+Cycle 4; res = 9.9855e-09
+Cycle 5; res = 1.07555e-09
+Converged after 5 cycles!
+ K    = 1.20468
+ K o  = 1.27032
+ EPS1 = 0.0264621
+ eps2 = 0.000406634
+##################
+#                 
+# TIME:      0.29
+#                 
+# TIME STEP: 30
+#                 
+##################
+cfl max = 0.0298197
+FILE: momentum_new_time_step.cpp, LINE: 11, conv_ts.Nm1() = 1.5
+FILE: momentum_new_time_step.cpp, LINE: 12, conv_ts.Nm2() = -0.5
+FILE: momentum_diffusion.cpp, LINE: 17, tsc = 1
+FILE: momentum_smooth.cpp, LINE: 8, conv_ts.N() = 0
+u, residual = 1.12978e-05, ratio = 0.000368539
+v, residual = 1.12978e-05, ratio = 0.000368539
+w, residual = 2.22221e-06, ratio = 0.00194172
+@get_src; err sou = 1.08528e-05 4.36605e-14
+Initial  res = 3.77157e-05
+Cycle 1; res = 6.28922e-06
+Cycle 2; res = 8.01909e-07
+Cycle 3; res = 4.72598e-08
+Cycle 4; res = 9.53928e-09
+Cycle 5; res = 1.06008e-09
+Converged after 5 cycles!
+ K    = 1.14403
+ K o  = 1.20468
+ EPS1 = 0.024449
+ eps2 = 0.000388733
+finished
++==========================================
+| Total execution time: 1377.37 [s]
++------------------------------------------
+| Time spent in plotting           : 10.33 [s]    (0.74998%)
+| Time spent in pressure discretize: 0.59 [s]    (0.0428353%)
+| Time spent in momentum discretize: 1.41 [s]    (0.102369%)
+| Time spent in momentum smoother  : 42.4 [s]    (3.07833%)
+| Time spent in vcycle             : 1248.08 [s]    (90.6133%)
+| Time spent elsewhere: 74.56 [s]    (5.41322%)
++------------------------------------------
+Plotting: test_p:000.gmv.0000

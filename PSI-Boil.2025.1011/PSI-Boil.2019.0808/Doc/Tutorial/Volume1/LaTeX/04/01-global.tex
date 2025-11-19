@@ -1,0 +1,113 @@
+\section{Global timing}
+\label{sec_global}
+
+The examples considered so far executed almost instantly and it does not
+make sense to measure their performance. Here is a program example
+which has a cognizable CPU-time of execution ({\tt 04-01-main.cpp})\footnote{From
+this point on, the example program names will be given without their location,
+because it is assumed they all reside in directory: {\tt PSI-Boil/Doc/Tutorial/Volume1/Src}.
+Furthermore, the procedures for linking them into source directory and compiling
+them will not be repeated.}:
+%
+{\small \begin{verbatim}
+      1 #include "Include/psi-boil.h"
+      2
+      3 const int N = 256;
+      4
+      5 /****************************************************************************/
+      6 main(int argc, char * argv[]) {
+      7
+      8   boil::timer.start();
+      9
+     10   real a;
+     11
+     12   boil::oout << "Running ..." << boil::endl;
+     13
+     14   for(int i=0; i<N; i++)
+     15     for(int j=0; j<N; j++)
+     16       for(int k=0; k<N; k++) {
+     17         a = acos(-1.0);
+     18       }
+     29
+     20   boil::timer.stop();
+     21   boil::timer.report();
+     22 }
+\end{verbatim}}
+%
+The central part of this program is nested loop in lines~14--16 which computes
+$acos(-1.0)$. Clearly, this program will calculate $acos$ (a relatively 
+time-consuming operation) for $256^3$ times. The commands {\tt boil::timer.start();}
+and {\tt boil::timer.stop();} (lines 8 and 20 respectively) start and stop the 
+global timer. In addition to these, we also use {\tt boil::timer.report();}, which
+will report (print on the terminal) the time needed to execute this program. 
+Compile and run this program, to get an output such as this\footnote{The actual 
+time in seconds will differ on your computer, of course}: 
+%
+{\small \begin{verbatim}
+Running ...
++==========================================
+| Total execution time: 5.14 [s]
++------------------------------------------
+\end{verbatim}}
+%
+As you can see {\psiboil} reports on the total CPU-time needed for program 
+execution. You only had to use commands:
+%
+\begin{itemize}
+  \item {\tt boil::timer.start();} - as the first,
+  \item {\tt boil::timer.stop();} - as penultimate, and
+  \item {\tt boil::timer.report();} - as the last statement in the program.
+\end{itemize}
+%
+If you call {\tt boil::timer.stop();} before {\tt boil::timer.start();}, or
+{\tt boil::timer.report();} before any of the other two, error messages will
+be printed on the terminal.
+
+Although the main topic of this section is timing of {\psiboil} programs,
+two more issues deserve attention at this point:
+%
+\begin{itemize}
+  \item Line 10: {\tt real a;} - declaration of floating point number which
+        is not one of the standard {\tt C++} data types (neither {\tt float}
+        nor {\tt double}). It is essentially a macro, defined in:
+        {\tt Global/global\_precision.h} as one of the standard floating
+        point types. The reason for introducing it, is to make precision of
+        {\psiboil} independent of compiler options, which may be tedious
+        to remember for different compilers or platforms. The usage of {\tt MPI}
+        libraries (which have their own definitions of single and double precision
+        numbers) makes things even less transparent. With macro for {\tt real},
+        things are quite straightforward: if you want the entire {\psiboil} 
+        to run in single precision, define {\tt real} as {\tt float},
+        if you want it in double precision, just define {\tt real} as {\tt double}.
+        Use of standard declarations is {\em strongly discouraged}, since it would
+        lead to inconsistencies between different parts of the program.
+  \item Line 3 defines an integer constant which sets the limits for loops in 
+        lines~14--16. That is a good programming practice. If you kept number~256
+        in the loops itself, every time you want to change the problem size, you would
+        have to change all three lines, not to mention that in a bigger program
+        you might forget what all these numbers mean. Such {\em ghost} numbers
+        greatly reduce the modifiability of the code and should be avoided by any
+        means.
+\end{itemize}
+
+%---------------------------------------------------------------------nutshell-%
+\vspace*{5mm} \fbox{ \begin{minipage}[c] {0.97\textwidth} %-----------nutshell-%
+    {\sf Section \ref{sec_global} in a nutshell} \\ %-----------------nutshell-%
+    
+    - To measure the total CPU-time used by {\psiboil}
+    use commands: 
+    \begin{itemize}
+      \item {\tt boil::timer.start();} - as the first,
+      \item {\tt boil::timer.stop();}  - as the penultimate, and
+      \item {\tt boil::timer.report();} - as the last statement in the 
+                                          program.
+    \end{itemize}
+
+    - Floating point numbers are defined by macro {\tt real}, which is defined
+    to be on of the standard {\tt C++} data types {\tt float} or 
+    {\tt double}. \\ 
+
+    - Use of {\em ghost} numbers should be avoided. 
+
+  \end{minipage} } %--------------------------------------------------nutshell-%
+%---------------------------------------------------------------------nutshell-%

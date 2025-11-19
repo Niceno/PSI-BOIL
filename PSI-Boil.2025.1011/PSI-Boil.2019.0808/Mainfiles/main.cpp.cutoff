@@ -1,0 +1,143 @@
+#include "Include/psi-boil.h"
+#include <fstream>
+#define USE_VOF
+//#define PERIODIC
+//#define AVEJ
+
+/* computed parameters */
+const int gLevel = 4;
+const int NX = 4;
+const int NY = 16;
+const int NZ = 4;
+
+/* domain dimensions (given by problem) */
+//const real LX =   1.0;
+const real LX =   4.0e-3;
+const real LZ =   LX;
+const real LY =   LX/real(NX)*real(NY);
+
+const int Niter = 1;
+
+/******************************************************************************/
+main(int argc, char * argv[]) {
+
+  boil::timer.start();
+
+  /*--------------------------------+
+  |  choose the output file format  |
+  +--------------------------------*/
+  //boil::plot = new PlotTEC();
+  boil::plot = new PlotTEC(AsNodes::no(), Buffers::yes());
+
+  /*----------+
+  |  grid(s)  |
+  +----------*/
+#ifdef PERIODIC
+  Grid1D gx( Range<real>(-0.5*LX,0.5*LX), NX, Periodic::yes() );
+  Grid1D gz( Range<real>(-0.5*LZ,0.5*LZ), NZ, Periodic::yes() );
+#else
+  Grid1D gx( Range<real>(-0.5*LX,0.5*LX), NX, Periodic::no(),  Cutoff::symmetry(), Cutoff::symmetry());
+  Grid1D gz( Range<real>(-0.5*LZ,0.5*LZ), NZ, Periodic::no(), Cutoff::extrapolate() );
+#endif
+  Grid1D gy( Range<real>(-0.5*LY,0.5*LY), NY, Periodic::yes(), Cutoff::undefined() );
+
+  /*---------+
+  |  domain  |
+  +---------*/
+  Domain d(gx, gy, gz);
+
+  Scalar c  (d), g  (d), kappa(d), cold(d); // concentration
+#if 0
+  for_avi(c,i)
+    boil::oout<<i<<" "<<c.xc(i)<<" "<<c.yc(i)<<" "<<c.zc(i)<<boil::endl;
+#endif
+
+  /*------------------+
+  |  define unknowns  |
+  +------------------*/
+  Vector uvw(d), uvw_old(d); // vel
+  Vector xyz(d); // body force
+  Scalar press  (d), p(d), f  (d);
+
+  Scalar cmmm(d), cmmp(d), cmpm(d), cmpp(d);
+  Scalar cpmm(d), cpmp(d), cppm(d), cppp(d);
+  Scalar kappaold(d);
+
+  /*-----------------------------+ 
+  |  insert boundary conditions  |
+  +-----------------------------*/
+  for_m(m) {
+#ifdef PERIODIC
+    uvw.bc(m).add( BndCnd( Dir::imin(), BndType::periodic() ) );
+    uvw.bc(m).add( BndCnd( Dir::imax(), BndType::periodic() ) );
+    uvw.bc(m).add( BndCnd( Dir::kmin(), BndType::periodic() ) );
+    uvw.bc(m).add( BndCnd( Dir::kmax(), BndType::periodic() ) );
+#else
+    uvw.bc(m).add( BndCnd( Dir::imin(), BndType::wall() ) );
+    uvw.bc(m).add( BndCnd( Dir::imax(), BndType::wall() ) );
+    uvw.bc(m).add( BndCnd( Dir::kmin(), BndType::wall() ) );
+    uvw.bc(m).add( BndCnd( Dir::kmax(), BndType::wall() ) );
+#endif
+    uvw.bc(m).add( BndCnd( Dir::jmin(), BndType::periodic() ) );
+    uvw.bc(m).add( BndCnd( Dir::jmax(), BndType::periodic() ) );
+    uvw_old(m)=uvw(m).shape();
+  }
+
+#ifdef PERIODIC
+  c.bc().add( BndCnd( Dir::imin(), BndType::periodic() ) );
+  c.bc().add( BndCnd( Dir::imax(), BndType::periodic() ) );
+  c.bc().add( BndCnd( Dir::kmin(), BndType::periodic() ) );
+  c.bc().add( BndCnd( Dir::kmax(), BndType::periodic() ) );
+#else
+  c.bc().add( BndCnd( Dir::imin(), BndType::symmetry()) );
+  c.bc().add( BndCnd( Dir::imax(), BndType::symmetry()) );
+  c.bc().add( BndCnd( Dir::kmin(), BndType::neumann() ) );
+  c.bc().add( BndCnd( Dir::kmax(), BndType::neumann() ) );
+#endif
+  c.bc().add( BndCnd( Dir::jmin(), BndType::periodic() ) );
+  c.bc().add( BndCnd( Dir::jmax(), BndType::periodic() ) );
+
+  press=c.shape();
+  p=c.shape();
+  kappa=c.shape();
+  cold=c.shape();
+
+  cmmm = c.shape();
+  cmmp = c.shape();
+  cmpm = c.shape();
+  cmpp = c.shape();
+  cpmm = c.shape();
+  cpmp = c.shape();
+  cppm = c.shape();
+  cppp = c.shape();
+  kappaold=c.shape();
+
+  for_vijk(c,i,j,k) {
+    c[i][j][k] = c.yc(j)>0.;
+  }
+  c.bnd_update();
+  c.exchange_all();
+#if 0
+  for( int b=0; b<c.bc().count(); b++ ) {
+    Dir d = c.bc().direction(b);
+    if( d == Dir::imin() || d == Dir::imax())
+      for_vjk(c.bc().at(b),j,k)
+        boil::oout<<b<<" "<<c.bc().at(b).si()<<" "<<c.bc().at(b).ei()<<" "<<j<<" "<<k<<" "<<c[c.bc().at(b).si()][j][k]<<boil::endl;
+  }
+#endif
+  //for_avi(c,i)
+  //  boil::oout<<i<<" "<<c.xc(i)<<" "<<c[i][4][4]<<boil::endl;
+  //for_avk(c,k)
+  //  boil::oout<<k<<" "<<c[0][0][k]<<" "<<c[1][1][k]<<" "<<c[3][3][k]<<boil::endl;
+  for_avj(c,j)
+    boil::aout<<j<<" "<<c.yc(j)<<" "<<c[4][j][4]<<boil::endl;
+
+  Krylov * solver = new CG(d, Prec::ic2());
+  Times time(10, 1.);
+  VOF conc  (c, g, kappa, uvw, time, solver);
+  conc.set_curv_method(0);  // height function
+  conc.curvature();
+  kappa.bnd_update();
+  boil::plot->plot(c,kappa,"c-kappa",0);
+
+}

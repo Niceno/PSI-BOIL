@@ -1,0 +1,286 @@
+\section{Naming conventions}
+\label{sec:naming_conventions}
+
+%%%%%%%%%%%%%%%%%
+%               %
+%  Class names  %
+%               %
+%%%%%%%%%%%%%%%%%
+\subsection{Class names}
+
+In {\psiboil}, classes are named with first letter capitalized, such as:
+\begin{itemize}
+  \item {\tt Scalar}, 
+  \item {\tt Vector}, 
+  \item {\tt Domain}, etc. 
+\end{itemize}
+
+If the description of a class requires two words, they are written together,
+with each word having the first letter capitalized. Examples include:
+\begin{itemize}
+  \item {\tt LevelSet} and 
+  \item {\tt RandomFlow}. 
+\end{itemize}
+
+In cases where a class with best described with an acronym, the name of the
+class is capitalized, such as:
+\begin{itemize}
+  \item {\tt CIPCSL2} for Constrained Interpolated Profile method of Conservative 
+        Semi-Lagrangian of the 2$^{nd}$ order.
+  \item {\tt AC} which stands for Additive Correction.
+\end{itemize}
+
+Combinations of words and acronyms are also allowed:
+\begin{itemize}
+  \item {\tt Grid1D} for Grid in 1 Dimension, or             
+  \item {\tt ColorCIP} for Color Cubical Interpolated Polynomial.
+\end{itemize}
+
+This naming convention makes the {\psiboil}'s classes (which may be regarded as
+new data types), distinguishable from {\tt C++}'s built-in data types.
+%
+The naming convention explain here holds for {\em class} names. 
+The {\em objects} derived from these classes are named as other variables, 
+generally in low-case only.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                               %
+%  Function and variable names  %
+%                               %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Function and variable names}
+
+All variables, no matter if they are of {\tt C++}'s built-in data type, or of
+{\psiboil} class, are written in lower case. If a name is made of more than
+one word, it is separated with an underscore. 
+
+Some examples of variable declarations are:
+{\small \begin{verbatim}
+  int i;                     /* built-in data type */  
+  real x_i;                  /* built-in data type */  
+  Body body("cylinder.stl"); /* a PSI-Boil object */ 
+  Domain d(gx,gy,gz);        /* a PSI-Boil object */ 
+\end{verbatim}}
+
+In some instances, this rule can be violated. For example, if a complex 
+algorithm is implemented, which follows a publication where small and capital
+letters are used simultaneously, keeping the same notation in the code makes
+the algorithms easier to follow. Example are the interpolation and restriction
+part of the AC algorithm, whose implementation is in the functions 
+{\tt additive\_interpolation.cpp} and {\tt additive\_restriction}, which 
+begin with:
+%
+{\small \begin{verbatim}
+     12 void AC::interpolation(const Centered & H, Centered & h) const {
+\end{verbatim}}
+%
+and:
+%
+{\small \begin{verbatim}
+     12 void AC::restriction(const Centered & h, Centered & H) const {
+\end{verbatim}}
+%
+respectively. Here, the coarse and the fine variable are denoted with
+an {\tt H} and {\tt h} respectively, the notation introduced in the
+original paper. 
+
+Such exceptions should be kept at the minimum and {\em only} applied locally,
+i.e.\ inside function definitions, for local variables. A global variable, or
+a variable belonging to a class, must be written in small case.
+
+%%%%%%%%%%%%%%%%%%%%
+%                  %
+%  Constant names  %
+%                  %
+%%%%%%%%%%%%%%%%%%%%
+\subsection{Constant names}
+
+There are two simple ways two define constants in {\tt C++}:
+
+\begin{itemize}
+  \item Using {\tt C/C++} directive {\tt \#define} -- This directive is inherited
+        from the {\tt C} language. It is insecure since it is based on a plain
+        text replacement and thus no type checking is performed by compiler. 
+        This method is {\bf obsolete} and should be {\bf avoided}.
+  \item Using {\tt C++}'s declaration {\tt const} -- This is a modern way to define
+        a constant in {\tt C++} program. It is much safer than the {\tt \#define}
+        directive, since the {\tt const} declaration is merely a modifier for
+        a data type which follows. This method is strongly promoted in {\psiboil}
+        throughout the code.
+\end{itemize}
+
+Each of these types of constants follows different naming conventions. Constant 
+defined by {\tt \#define} directive (obsolete) are defined with all upper-case
+letters. This is done for two reasons. One is historical. This directive is
+inherited from {\tt C}, where constants were written with all capital letters.
+The other reason to keep them in upper case is for easier identification. Since
+{\psiboil} is aimed to be a well-designed program following state-of-the art
+advances in software development, such constants should be eradicated. Actually,
+at the time of writing this manual, only one such constant is present in the
+code\footnote{Here we mean usage of {\tt \#define} for constants. It is still
+heavily for defining certain macro's, as well as for compiler directives.}. 
+It is in file {\tt communicator.h}:
+%
+{\small \begin{verbatim}
+      4 #define MAX_BUFF_SIZE 1048576
+\end{verbatim}}
+%
+Constants defined using the {\tt C++}'s {\tt const} declaration, are named with
+the same convention as variables. Hence, they are written in lower-case. There 
+are two reasons for that. First is to make them different from old-style constant
+declaration. The other lies in the fact that {\tt const} directive is heavily
+used inside {\psiboil} in all parts of the code: from constants local to certain
+sections of code to parameters. For example, in the same {\tt communicator.h} 
+file introduced above, we have:
+%
+{\small \begin{verbatim}
+     58     void send(real * buff_send, const int size,
+     59               const par_datatype & par_t,
+     60               const int dir_send,
+     61               const Tag tag) const;
+\end{verbatim}}
+%
+all but the first parameter are constants. Typing them all in upper-case would
+make the code far less readable.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                               %
+%  Reference and pointer names  %
+%                               %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Reference and pointer names}
+
+Names for references and pointers follow the same rule as variables.
+However, for readability, one space must be placed between the
+reference or pointer sign ({\tt \&} or {\tt *}), and the variable name.
+Line~86 from file {\tt body.h} illustrates this rule:
+%
+{\small \begin{verbatim}
+    86     void ijk(Comp & m, int cc, int * i, int * j, int * k) const;
+\end{verbatim}}
+%
+A {\bf wrong} way would be to attach reference and pointer signs to variable
+names: 
+%
+{\small \begin{verbatim}
+    86     void ijk(Comp &m, int cc, int *i, int *j, int *k) const;
+\end{verbatim}}
+%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                                   %
+%  Directory and source file names  %
+%                                   %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\clearpage
+\subsection{Directory and source file names}
+
+\subsubsection{Directory names}
+
+Directory names follow the same convention as classes themselves: they are
+written with first letter capitalized. This convention follows the principle
+that each class (except for very small, {\em ravioli} type classes is in a
+separate directory. 
+
+As an example, here is a part of {\psiboil}'s directory structure:
+%
+{\small \begin{verbatim}
+|-- Equation
+|   |-- Centered
+|   |   |-- ColorCIP
+|   |   |-- Concentration
+|   |   |-- Distance
+|   |   |-- Enthalpy
+|   |   |-- LevelSet
+|   |   `-- Pressure
+|   `-- Staggered
+|       `-- Momentum
+\end{verbatim}}
+%
+In the {\tt Equation} directory, the class {\tt Equation} is defined, with it's
+children: {\tt Centered} and {\tt Staggered} in it's sub-directories with same 
+names. {\tt Centered} has six children, each defined in it's sub-directory,    
+named the same as the class it contains.
+
+\subsubsection{Source file names}
+
+To define a class, one needs a header file ({\tt .h}) and one or more
+source files ({\tt .cpp}). The files which define a certain class, 
+reside in it's directory. The file names are written in low-case letters only,
+the file name beginning with class name, followed by the function name. 
+
+To illustrate this point with an example, bellow is the list of source files to
+define object {\tt LevelSet} 
+(residing in directory {\tt Src/Equation/Centered/LevelSet}):
+%
+{\small \begin{verbatim}
+CVS
+levelset.cpp
+levelset_discretize.cpp
+levelset.h
+levelset_sharpen.cpp
+levelset_tension.cpp
+Makefile.am
+\end{verbatim}}
+%
+In this example, the header file {\tt levelset.h} contains the declaration of 
+the object {\tt LevelSet}, whereas {\tt levelset.cpp} contains constructor and 
+destructor functions. Small member function (like setter and getter) are defined 
+in the header file. Bigger functions, such as {\tt LevelSet::discretize}, 
+{\tt LevelSet::discretize} and {\tt LevelSet::tension} are defined in separate
+source files. 
+
+The files defining a class are placed in a directory with class' name, so 
+inserting the class name at the beginning of each file's name may seem like an
+overkill. But, it proves to be very useful when one prints source files. Since
+there may be more than one class with a member function with a same name, one
+might mix up their paper copies. If a class name precedes the file name, it
+will not happen. 
+
+%---------------------------------------------------------------------nutshell-%
+\vspace*{5mm} \fbox{ \begin{minipage}[c] {0.97\textwidth} %-----------nutshell-%
+    {\sf Section \ref{sec:naming_conventions} in a nutshell} \\ %-----nutshell-%
+
+      - Class names in {\psiboil}:
+      \begin{itemize}
+        \item have first letter capitalized ({\tt Scalar}),
+        \item if created from more than one word, each word has first letter 
+              capitalized ({\tt LevelSet}),
+        \item if based on an acronym, all letters are capitalized ({\tt AC}),
+        \item can be defined as combinations of the above ({\tt ColorCIP}).
+      \end{itemize}
+      
+      - Function and variable names in {\psiboil}:
+      \begin{itemize}
+        \item are written with all letters in lower-case,
+        \item if created from more than one word, words are separated by 
+              an underscore character.
+      \end{itemize}
+      
+      - Reference and pointer signs must not be attached to variable names. \\
+      
+      - Constant names in {\psiboil}:
+      \begin{itemize}
+        \item are named with all letters in upper-case if defined with
+              the obsolete {\tt C/C++} directive {\tt \#define}.
+        \item follow the same convention as variables, if defined with
+              the {\tt C++}'s {\tt const} declaration.
+      \end{itemize}
+      
+      - Directory names in {\psiboil}:
+      \begin{itemize}
+        \item follow the same rules as class names.     
+        \item Directory hierarchy, closely follows class hierarchy.      
+              Inherited classes are placed in parent's sub-directories.
+      \end{itemize}
+      
+      - File names in {\psiboil}:
+      \begin{itemize}
+        \item are written in lower-case letters only,   
+        \item if formed from more than one word, they are separated by
+              underscores,
+        \item if belonging to a class (most likely) the first word in the
+              file name must be the class name in lower-case.
+      \end{itemize}
+  \end{minipage} } %--------------------------------------------------nutshell-%
+%---------------------------------------------------------------------nutshell-%

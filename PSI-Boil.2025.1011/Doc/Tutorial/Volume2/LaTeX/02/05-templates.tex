@@ -1,0 +1,167 @@
+\section{Template header and source files}
+\label{sec:templates}
+
+This chapter is wrapped up by providing template header and source files.
+The files provided here are a part of {\psiboil} sources and reside in
+directory {\tt Src/Template}. The sources define the class {\tt Template}. 
+
+Class {\tt Template} serves primarily a demonstration purpose; it illustrates
+the points outlined in this chapter. It could be useful as a starting point to
+adding new classes into {\psiboil}. It's only real functions is to store two
+real data members, which can be accessed with setter and getter functions, and
+it can also return the sum of their squares.
+
+The entire class is declared in file {\tt template.h}, included bellow:
+%
+{\small \begin{verbatim}
+      1 /***************************************************************************//**
+      2 *  \brief A template header file for PSI-Boil
+      3 *
+      4 *  This file was created as a part of the PSI-Boil Tutorial, Volume 2:
+      5 *  Development Manual. It's purpose is to outline components a PSI-Boil
+      6 *  header file should have. It can be used as a starting point when defining
+      7 *  new classes.
+      8 *
+      9 *  \warning
+     10 *  Although it is compiled with the package, it has no functional purposes.
+     11 *******************************************************************************/
+     12
+     13 /* directives for the compiler */
+     14 #ifndef TEMPLATE_H
+     15 #define TEMPLATE_H
+     16
+     17 #include <iostream>                     /* first stadard C++ headers  ...     */
+     18 #include "../Global/global_precision.h" /* ... followed by PSI-Boil's headers */
+     19
+     20 ////////////////
+     21 //            //
+     22 //  Template  //
+     23 //            //
+     24 ////////////////
+     25 class Template {
+     26   public:
+     27     //! Default construtor.
+     28     Template() {at=0; bt=0;}  /* if short, it can stay in the header */
+     29
+     30     //! A more elaborate constructor.
+     31     Template(const real & x,
+     32              const real & y); /* if long, defined in a .cpp source file */
+     33
+     34     ~Template();
+     35
+     36     //! Getter and setter functions should be in the header
+     37     real a() const {return at;}    /* getter should be declared as const */
+     38     real b() const {return bt;}    /* getter should be declared as const */
+     39     void a(const real & x) {at=x;} /* const promoted for parameters */
+     40     void b(const real & y) {bt=y;} /* const promoted for parameters */
+     41
+     42     //! Returns the sum of squares.
+     43     real sum_squares() const;
+     44
+     45   private:
+     46     real at, bt;
+     47 };
+     48
+     49 #endif /* directive for the compiler */
+     50
+     51 /*-----------------------------------------------------------------------------+
+     52  '$Id: 05-templates.tex,v 1.1 2009/11/12 15:29:43 niceno Exp $'/
+     53 +-----------------------------------------------------------------------------*/
+\end{verbatim}}
+% 
+In addition to declaring the entire object, the header file also defines default 
+constructor ({\tt Template}), setter and getter functions (variants of {\tt a} and 
+{\tt b}). The non-default constructor, supposed to be complex, for the sake of the
+argument, and is therefore defined in a separate file {\tt template.cpp}.
+%
+{\small \begin{verbatim}
+      1 #include "template.h" /* class header must be included */
+      2
+      3 /***************************************************************************//**
+      4 *  This is a non-trivial constructor. Note that this comment is written in
+      5 *  Doxygen style and therefore in a grammatically correct English language.
+      6 *******************************************************************************/
+      7 Template :: Template(const real & x, const real & y) {
+      8
+      9   /*----------------------------------------------+
+     10   |  copy values of paremeters into data members  |
+     11   +----------------------------------------------*/
+     12   at = x;
+     13   bt = y;
+     14 }
+     15
+     16 /******************************************************************************/
+     17 Template :: ~Template() {
+     18 /*--------------------------------------------------------------------------+
+     19 |  destructor is also placed here.                                          |
+     20 |  this is a psi-boil-style comment, written with lower-case letters only.  |
+     21 +--------------------------------------------------------------------------*/
+     22
+     23 }
+     24
+     25 /*-----------------------------------------------------------------------------+
+     26  '$Id: 05-templates.tex,v 1.1 2009/11/12 15:29:43 niceno Exp $'/
+     27 +-----------------------------------------------------------------------------*/
+\end{verbatim}}
+% 
+The file {\tt template.cpp}, i.e.\ any source file having the name of it's class
+in lower-case and extension, holds the definition of non-trivial constructors and
+destructors. 
+% 
+Other member functions, which are too long to be defined in the header file, are
+placed in separate files, whose name is formed by the class name, followed by 
+the function name. For this example, the only such function is 
+{\tt Template::sum\_squares() const;} stored in the file 
+{\tt template\_sum\_squares.cpp} outlined bellow:
+%
+{\small \begin{verbatim}
+      1 #include "template.h" /* class header must be included */
+      2
+      3 /***************************************************************************//**
+      4 *  This function mimics a definition of a non-trivial member function.
+      5 *******************************************************************************/
+      6 real Template :: sum_squares() const {
+      7
+      8   /*-----------------------------------+
+      9   |  compute the result and return it  |
+     10   +-----------------------------------*/
+     11   return at*at + bt*bt;
+     12 }
+     13
+     14 /*-----------------------------------------------------------------------------+
+     15  '$Id: 05-templates.tex,v 1.1 2009/11/12 15:29:43 niceno Exp $'/
+     16 +-----------------------------------------------------------------------------*/
+\end{verbatim}}
+% 
+
+Two important needs to be pointed out:
+\begin{itemize} 
+  \item No line in any of the source codes should be wider than 80 characters. 
+        If it did, it would create broken lines in source files hard-copies,
+        and render them difficult to read.
+  \item Each files ends with the so called {\em footer}. Footer is sought as a
+        three-line comment for {\tt C++}, but contains a quoted line beginning 
+        with {\tt \$Id:}. This line is under full control of {\tt CVS}, which
+        changes it to insert the revision number, date and time of that 
+        revision. This information is very useful when debugging the code.
+\end{itemize} 
+
+%---------------------------------------------------------------------nutshell-%
+\vspace*{5mm} \fbox{ \begin{minipage}[c] {0.97\textwidth} %-----------nutshell-%
+    {\sf Section \ref{sec:templates} in a nutshell} \\ %--------------nutshell-%
+
+      - Class names in {\psiboil}:
+      \begin{itemize}
+        \item Each class is declared in a separate header file.         
+        \item Header file can also contain definition of trivial constructors
+              and any other member functions short enough to fit in one line.
+        \item Setter and getter functions should be placed in the header.
+        \item Constructors longer than one line of code, must be placed in
+              a separate file.
+        \item No line in any of the sources should be wider than 80 characters.
+        \item Each file in the package must end with a footer.          
+        \item Template files provided in this section are a good starting
+              point when defining new classes.
+      \end{itemize}
+  \end{minipage} } %--------------------------------------------------nutshell-%
+%---------------------------------------------------------------------nutshell-%

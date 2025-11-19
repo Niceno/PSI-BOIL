@@ -1,0 +1,19 @@
+#include "ZoneWriterFactory.h"
+#include "ThirdPartyHeadersBegin.h"
+#include <stdexcept>
+#include <boost/make_shared.hpp>
+#include <boost/ref.hpp>
+#include "ThirdPartyHeadersEnd.h"
+#include "AltTecUtil.h"
+#include "ClassicFEZoneWriter.h"
+#include "ClassicOrderedZoneWriter.h"
+#include "FEZoneInfo.h"
+#include "IJKZoneInfo.h"
+#include "ItemSetIterator.h"
+#include "SZLFEPartitionedZoneWriter.h"
+#include "SZLFEZoneWriter.h"
+#include "SZLOrderedPartitionedZoneWriter.h"
+#include "SZLOrderedZoneWriter.h"
+#include "ZoneInfoCache.h"
+#include "zoneUtil.h"
+namespace tecplot { namespace ___3931 { ___4709::___4709( ZoneInfoCache& zoneInfoCache, ___37& ___36) : ___2678(zoneInfoCache) , ___2335(___36) {} boost::shared_ptr<___4707> ___4709::___4706( ItemSetIterator&              varIter, ___4634                   zone, ___4634                   ___341, std::vector<___372> const& ___4562, ___372                     ___4497) { REQUIRE(0 <= zone && ___2335.___4636(zone + 1)); REQUIRE(0 <= ___341 && ___341 <= zone); REQUIRE(varIter.___2810() == static_cast<___4350>(___4562.size())); REQUIRE(VALID_BOOLEAN(___4497)); boost::shared_ptr<___4707> ___3356; switch(___2335.___4618(zone+1)) { case ___4702: { if (___4644(___2335, zone)) { if (zoneIsPartitioned(___2335, zone)) { ___3356 = boost::make_shared<SZLOrderedPartitionedZoneWriter>( boost::ref(varIter), zone, ___341, boost::ref(___4562), ___4497, boost::ref(___2335), boost::ref(___2678)); } else { boost::shared_ptr<___1879 const> ijkZoneInfo = ___2678.getIJKZoneInfo(zone); ___3356 = boost::make_shared<SZLOrderedZoneWriter>( boost::ref(varIter), zone, ___341, boost::ref(___4562), ___4497, boost::ref(___2335), ijkZoneInfo); } } else { ___3356 = boost::make_shared<ClassicOrderedZoneWriter>( boost::ref(varIter), zone, ___341, boost::ref(___4562), ___4497, boost::ref(___2335)); } } break; case ___4700: case ___4698: case ___4694: { ___3356 = boost::make_shared<ClassicFEZoneWriter>( boost::ref(varIter), zone, ___341, boost::ref(___4562), ___4497, boost::ref(___2335)); } break; case ___4699: case ___4693: { if (zoneIsPartitioned(___2335, zone)) { ___3356 = boost::make_shared<SZLFEPartitionedZoneWriter>( boost::ref(varIter), zone, ___341, boost::ref(___4562), ___4497, boost::ref(___2335), boost::ref(___2678)); } else { boost::shared_ptr<___1348 const> ___1347 = ___2678.getFEZoneInfo(zone); ___3356 = boost::make_shared<SZLFEZoneWriter>( boost::ref(varIter), zone, ___341, boost::ref(___4562), ___4497, boost::ref(___2335), ___1347); } } break; case ___4696: case ___4697: case ___4695: default: std::ostringstream ___2890; ___2890 << "Type of zone " << zone + 1 << " not currently supported"; throw std::runtime_error(___2890.str()); } return ___3356; } }}

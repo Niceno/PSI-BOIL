@@ -1,0 +1,216 @@
+\section{Standard terminal output}
+\label{sec_standard}
+
+In this section, we will develop a {\em classical} {\tt C/C++} application,
+dating back to Karnaghan \& Ritchie famous book on {\tt C} programming 
+language, {\em Hello World}. It is an application which does noting but
+prints the message:
+%
+{\small \begin{verbatim}
+Hello World!
+\end{verbatim}}
+%
+on the terminal and yet it serves to illustrate some important features
+of the language. In this tutorial, however, we will not use the standard
+{\tt C++} language, but we will do it inside the {\psiboil} and we
+will use it to illustrate {\psiboil}'s terminal output. We will 
+use the program introduced in section~\ref{sec_compiling} as a starting
+point. For this example, we introduce one more line which prints the desired 
+message:
+%
+{\small \begin{verbatim}
+      1 #include "Include/psi-boil.h"
+      2
+      3 /****************************************************************************/
+      4 main(int argc, char * argv[]) {
+      5
+      6   boil::timer.start();
+      7
+      8   boil::aout << "Hello World!" << boil::endl;
+      9
+     10   boil::timer.stop();
+     11 }
+\end{verbatim}}
+%
+For your convenience, this program is already written, and to compile it,
+you have to link it from the {\em source} directory ({\tt ...PSI-Boil/Src})
+with the command:
+%
+\begin{verbatim}
+> ln -i -s ../Doc/Tutorial/Volume1/Src/03-01-main.cpp main.cpp
+\end{verbatim}
+%
+Once you make a link, remove the object file ({\tt main.o}) from the source
+directory and re-make, {\em i.e.}:
+%
+\begin{verbatim}
+> rm -f main.o
+> make
+\end{verbatim}
+%
+This will create the executable {\tt Boil} in the source directory. If you 
+execute it, by issuing command:
+%
+\begin{verbatim}
+> ./Boil
+\end{verbatim}
+%
+from the source directory, you will get the following output:
+%
+{\small \begin{verbatim}
+Hello World!
+\end{verbatim}}
+%
+on the terminal. As you have probably guessed, the program line which creates 
+this message is line number~8. In standard {\tt C++}, one would write:
+%
+{\small \begin{verbatim}
+      8   std::cout << "Hello World!" << std::endl;
+\end{verbatim}}
+%
+which is, of course, still possible in {\psiboil}, but is not recommended.
+{\psiboil} has its own {\em global} objects for terminal output, suited
+for parallel execution and execution on high-performance computing platforms. 
+These objects are:
+%
+\begin{itemize}
+  \item {\tt boil::aout} - acronym for {\tt a}ll {\tt out}, meaning that all 
+                           processors print;
+  \item {\tt boil::oout} - acronym for {\tt o}ne {\tt out}, meaning that only 
+                           one processor prints;
+  \item {\tt boil::endl} - {\psiboil}'s internal {\em end of line}. (This 
+                           object was introduced to overcome very slow execution
+                           of output on some high-performance computational platforms.
+                           Namely, the {\tt C++} standard {\tt std::endl} was slowing
+                           down the output on Cray-XT3 computer by two orders of 
+                           magnitude.) 
+  \item {\tt boil::pid} - processor i.d. for printing. (Not an integer value holding
+                          the processor number). 
+\end{itemize}
+%
+
+Now try to execute the application on four processors. Use the command:
+%
+\begin{verbatim}
+> mpirun -np 4 ./Boil
+\end{verbatim}
+%
+As you could expect, you get the following output:
+%
+{\small \begin{verbatim}
+Hello World!
+Hello World!
+Hello World!
+Hello World!
+\end{verbatim}}
+%
+Each processor wrote its own message on the screen. You may wish to find out 
+which processor wrote each of the messages. To find that out, you may use
+the {\tt boil::pid}. Replace line~8 by:
+%
+{\small \begin{verbatim}
+      8   boil::aout << boil::pid << "Hello World!" << boil::endl;
+\end{verbatim}}
+%
+This program is already written and can be retrieved by:
+%
+\begin{verbatim}
+> ln -i -s ../Doc/Tutorial/Volume1/Src/03-02-main.cpp main.cpp
+\end{verbatim}
+%
+After linking, remove the {\tt main.o} and recompile the program with {\tt make}.
+Re-run the program on four processors. You might get the output like this:
+%
+{\small \begin{verbatim}
+0: Hello World!
+1: Hello World!
+3: Hello World!
+2: Hello World!
+\end{verbatim}}
+%
+This time, you get processor i.d.\ in front of each message. You may wonder,
+at this point, what was the reason to introduce all these new objects just to
+write messages on the screen, processors i.d.'s and end of lines 
+({\tt boil::endl}). Well, the reason is {\em encapsulation} {\bf check}. 
+{\psiboil} hides the details of implementation from the end-user (or developer). 
+If {\tt MPI} standard is replaced with something else in the future, only the
+{\psiboil} objects for terminal output will have to be changed (re-coded)
+while for the rest of the code, which was using {\psiboil}'s global 
+objects, nothing has to be changed.
+
+Or, imagine a new hardware platform is developed in a number of years, for 
+which the end of line ({\tt endl}) has to be defined in a different way for
+efficiency. It will only have to be changed in one place, {\em i.e.} in the
+definition of {\tt boil::endl}, while the rest of the code which uses that
+global object to end the line can remain unchanged.
+
+Let's assume now you want to print a different message. For example, if you
+want to be sure you have reached the main body of the program, you would
+want to write something like:
+%
+{\small \begin{verbatim}
+      8   boil::aout << "Inside the PSI-Boil!" << boil::endl;
+\end{verbatim}}
+%
+This program is in ({\tt ../Doc/Tutorial/Volume1/Src/03-03-main.cpp}). Re-link
+it, recompile and run on one processor to get the message:
+%
+{\small \begin{verbatim}
+Inside the PSI-Boil!
+\end{verbatim}}
+%
+If you run it on eight processors, with:
+%
+\begin{verbatim}
+> mpirun -np 8 ./Boil
+\end{verbatim}
+%
+you will get:
+%
+{\small \begin{verbatim}
+Inside the PSI-Boil!
+Inside the PSI-Boil!
+Inside the PSI-Boil!
+Inside the PSI-Boil!
+Inside the PSI-Boil!
+Inside the PSI-Boil!
+Inside the PSI-Boil!
+Inside the PSI-Boil!
+\end{verbatim}}
+%
+Clearly, this is an overkill. Some output should be written by one processor
+only. To that end, the object {\tt boil::oout} should be used. If the line~8
+is replaced with:
+%
+{\small \begin{verbatim}
+      8   boil::oout << "Inside the PSI-Boil!" << boil::endl;
+\end{verbatim}}
+%
+(it is in {\tt ../Doc/Tutorial/Volume1/Src/03-04-main.cpp}). Link to this
+source, recompile and run. No matter how many processors you use, you will
+always get one line of output:
+%
+{\small \begin{verbatim}
+Inside the PSI-Boil!
+\end{verbatim}}
+%
+
+%---------------------------------------------------------------------nutshell-%
+\vspace*{5mm} \fbox{ \begin{minipage}[c] {0.97\textwidth} %-----------nutshell-%
+    {\sf Section \ref{sec_standard} in a nutshell} \\ %---------------nutshell-%
+
+    - {\psiboil}'s terminal output should be performed using the objects:
+    %
+    \begin{itemize}
+      \item {\tt boil::aout} - if all processors print,
+      \item {\tt boil::oout} - if one processor prints,
+      \item {\tt boil::endl} - to end the line,
+      \item {\tt boil::pid}  - for printing processor's i.d.
+    \end{itemize}
+    
+    - The usage of standard {\tt C++} output facilities, such as {\tt std::cout},
+    {\tt std::endl}, as well as {\tt MPI}'s standard commands for getting 
+    processor i.d.\ is {\em discouraged}. 
+  \end{minipage} } %--------------------------------------------------nutshell-%
+%---------------------------------------------------------------------nutshell-%
+

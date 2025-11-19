@@ -1,0 +1,30 @@
+solid stl file generated from AC3D
+ facet normal  1.000000 0.000000 0.000000
+  outer loop
+   vertex 0.0 -1.0 -1.0
+   vertex 0.0  2.0  3.0
+   vertex 0.0 -1.0  3.0
+  endloop
+ endfacet
+ facet normal  1.000000 0.000000 0.000000
+  outer loop
+   vertex 0.0 -1.0 -1.0
+   vertex 0.0  2.0 -1.0
+   vertex 0.0  2.0  3.0
+  endloop
+ endfacet
+ facet normal  1.000000 0.000000 0.000000
+  outer loop
+   vertex 2.286 -1.0  0.0
+   vertex 2.286 -1.0  3.0
+   vertex 2.286  2.0  3.0
+  endloop
+ endfacet
+ facet normal  1.000000 0.000000 0.000000
+  outer loop
+   vertex 2.286 -1.0  0.0
+   vertex 2.286  2.0  3.0
+   vertex 2.286  2.0  0.0
+  endloop
+ endfacet
+endsolid

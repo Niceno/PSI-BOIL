@@ -1,0 +1,61 @@
+\section{Ravioli classes}
+\label{sec_ravioli}
+
+Small objects, such as that of {\tt Range} type, are in {\psiboil} referred to 
+as {\em ravioli} objects. They are very small and have limited functionality 
+(small number of member functions), but primarily serve for improved code readability, 
+safer argument passing and to reduce chances for making coding errors. 
+
+Take class {\tt Periodic}, for example. If it was not defined, one would have
+to send some other data types, such as integers, for example. Then, an
+integer would be sent to {\tt Grid1D}'s constructor, having value 0 if non-periodic,
+and 1 if periodic. Or, maybe, -1 if periodic and 0 if non-periodic. Such
+parameters are difficult to understand, and would always have to read 
+{\tt Grid1D}'s documentation to recall which number means what (Did we agree
+0 was periodic, or non-periodic?). Furthermore, type checking is not ensured
+with some simple types, integers and Boolean in particular. If one sends
+Boolean variable as a parameter where integer should have been sent, compiler
+would not notice it, resulting in hard-to-find bugs. With ravioli parameter,
+compiler recognizes, during compilation time, any inconsistencies in parameter
+types.  
+
+Most frequently used ravioli classes are all declared in 
+directory:~{\tt PSI-Boil/Src/Ravioli}. Those used only inside one other 
+class\footnote{For example: type of preconditioner is defined as a ravioli class and is
+used only inside the preconditioner class. It would not make sense to place a ravioli
+class with such a limited application into~{\tt PSI-Boil/Src/Ravioli} directory.}.
+
+More details about each of the ravioli classes can be obtained either from
+it's Doxygen documentation (check the directory:~{\tt PSI-Boil/Doc/Dox}), or
+from it's header file. If you find the additional information insufficient,
+or even missing, feel free to contact the author. The same goes for all other
+classes, of course.
+
+%---------------------------------------------------------------------nutshell-%
+\vspace*{5mm} \fbox{ \begin{minipage}[c] {0.97\textwidth} %-----------nutshell-%
+    {\sf Sections \ref{sec_one-dimensional} and \ref{sec_ravioli} 
+         in a nutshell} \\  %-----------------------------------------nutshell-%
+    
+      - {\psiboil} supports three-dimensional Cartesian grids, represent with 
+      class {\tt Domain}. \\
+
+      - {\tt Domain} is built from three one-dimensional grids 
+      ({\tt Grid1D}), defining resolution in $x$, $y$ and $z$ directions. \\
+
+      - To create a 1D grid, use the constructor: 
+      \begin{itemize}
+        \item {\tt Grid1D(Range<real>(xi\_s, xi\_e), N, Periodic);} 
+      \end{itemize}
+      for uniform grids, or: 
+      \begin{itemize}
+        \item {\tt Grid1D(Range<real>(xi\_s, xi\_e), Range<real>(D\_s, D\_e), N, Periodic);} 
+      \end{itemize}
+      for non-uniform grids. \\
+
+      - {\psiboil} uses quite a lot of small objects, called ravioli, for
+      improved code readability, safer argument passing and reduced 
+      chance of coding errors. Most of them are declared in sub-directory
+      {\tt Ravioli}.
+   
+  \end{minipage} } %--------------------------------------------------nutshell-%
+%---------------------------------------------------------------------nutshell-%

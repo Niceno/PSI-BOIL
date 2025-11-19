@@ -1,0 +1,32 @@
+#!/bin/bash
+
+dir_src=$PWD/../../../Src
+dir_test=$PWD
+
+echo $dir_src
+ls $dir_test/*.cpp
+
+#------------------------------#
+# browse through all the tests #
+#------------------------------#
+for icase in $( ls $dir_test/*.cpp ); do
+
+  echo "########################################"
+  echo $icase
+  echo "########################################"
+
+  # go to source directory
+  cd $dir_src
+
+  ln -s $dir_test/*.h .
+
+  # compile in source directory
+  rm -f main.o
+  rm -f Boil
+  ln -s -f $icase main.cpp
+  make
+
+done
+
+echo 'done !'
+

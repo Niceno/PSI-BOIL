@@ -1,0 +1,54 @@
+#!/bin/bash
+
+# find the number of processors
+declare -i numprocs=0
+# find the number of files
+declare -i numfiles=0
+for filename in *.dat; do
+    IFS="_" arr=($filename) # split file name according to _
+    procnum=${arr[1]} # e.g. p001
+    if [[ $procnum != "pall" ]]; then
+      numfiles=$((numfiles + 1))
+      procnum=${procnum//p}    # p001 -> 001
+      procnum=$(expr $procnum + 0)  # 001 -> 1
+      if (( procnum > numprocs )); then
+        numprocs=$procnum
+      fi
+    fi
+done
+numprocs=$((numprocs + 1)) # numbering starts with zero
+
+#if [ $# -eq 0 ];  then
+#    echo "Number of processors must be specified!"
+#    exit 1
+#fi
+#numprocs=$1
+
+# perform gather
+for filename in *.dat; do
+    IFS="_" arr=($filename) # split file name according to _
+    keyword=${arr[0]}       # e.g. uvw-tpr-press
+    procnum=${arr[1]}       # e.g. p000
+    procnum2=$(expr ${procnum#?} + 0)   # p000 -> 000 -> 0
+    step=${arr[2]//.dat}    # e.g. 000023.dat -> 000023
+    step=$(expr $step + 0)  # 000023 -> 23
+    IFS="-" arr=($keyword)  # uvw-tpr-press -> uvw tpr press
+    declare -i varnum=${#arr[@]}    # uvw+tpr+press = 3     
+    varnum=$((varnum + 2))          # u+v+w+tpr+press = 5
+    IFS="|"
+    add="_p"
+    keyword="$keyword$add"  # uvw-tpr-press -> uvw-tpr-press_p
+    if [[ $procnum != "pall" ]] && [[ $procnum2 -eq 0 ]]; then
+      # run gather with the given arguments for each file in folder
+      printf '%s\n' "$numprocs" "6" "$step" "$step" "1" "$keyword" | gather-zip.exe
+   fi
+done
+
+# change extension to .plt so that visit recognises the tecplot format
+for filename in *.dat; do
+    IFS="_" arr=($filename) # split file name according to _
+    procnum=${arr[1]}       # e.g. p000
+    if [[ $procnum == "pall" ]]; then
+      mv "$filename" "${filename%.dat}.plt"
+    fi
+done

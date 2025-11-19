@@ -1,0 +1,340 @@
+vof.cpp
+94a95
+>   use_HF_wall=false;
+vof_curv_HF.cpp
+24a25,31
+>   stmp2=phi;
+> 
+>   if (use_HF_wall) {
+>     //std::cout<<"curv_HF:phi= "<<phi[27+2][1+2][4+2]<<"\n";
+>     update_at_walls(phi,&cangle);
+>     //std::cout<<"curv_HF:phi= "<<phi[27+2][1+2][4+2]<<"\n";
+>   }
+531c538,551
+<   bdcurv();
+---
+>   std::cout<<"curv_HF:point 100\n";
+>   phi=stmp2;
+> 
+>   if (use_HF_wall) {
+>     //phi[27+2][1+2][4+2]=0.8;
+>     //update_at_walls(phi);
+>     std::cout<<"curv_HF:after:phi= "<<phi[27+2][1+2][4+2]<<"\n";
+>   }
+>   std::cout<<"curv_HF:point 110\n";
+> 
+>   if (!use_HF_wall) {
+>     bdcurv();
+>   }
+>   std::cout<<"curv_HF:point 120\n";
+vof_update_at_walls.cpp
+4c4
+< void VOF::update_at_walls(Scalar & scp) {
+---
+> void VOF::update_at_walls(Scalar & scp, const real * cang) {
+6,15c6,22
+< *  \brief Prepares volume fraction for marching cube at boundaries.
+< *         scalar_exchange(_all) should take account of periodic condition.
+< *         IMPORTANT: does not work when immersed boundaries do not correspond
+< *                    to cell boundaries!!!
+< *         MOREOVER:  since the normal vector is not properly corrected at
+< *                    boundaries consisting partially of walls and partially
+< *                    of immersed bodies, this special case was not considered.
+< *                    if such a thing was to be implemented, cases like
+< *                    ib-wall edge, wall-ib edge, wall-ib-wall corner,
+< *                    wall-ib-ib corner etc would have to be included!!!
+---
+> *  \brief In case that cang = NULL
+> *           Prepares volume fraction for marching cube at boundaries.
+> *           scalar_exchange(_all) should take account of periodic condition.
+> *           IMPORTANT: does not work when immersed boundaries do not correspond
+> *                      to cell boundaries!!!
+> *           MOREOVER:  since the normal vector is not properly corrected at
+> *                      boundaries consisting partially of walls and partially
+> *                      of immersed bodies, this special case was not considered.
+> *                      if such a thing was to be implemented, cases like
+> *                      ib-wall edge, wall-ib edge, wall-ib-wall corner,
+> *                      wall-ib-ib corner etc would have to be included!!!
+> *         ----------------------------------------------------------------------
+> *         In case that cang != NULL
+> *           Prepares volume fraction for curvature calculation in wall adjacent
+> *           cells based on equilibrium contact angle.
+> *           IMPORTANT: currently 0 or 180 deg is can be applied to the angle.
+> 
+22a30,35
+>   //if(cang == nullptr){
+>   //  std::cout<<"update_at_walls: nullptr\n";
+>   //} else {
+>   //  std::cout<<"update_at_walls: non-nullptr\n";
+>   //}
+> 
+59c72
+<           scp[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp);
+---
+>           scp[i][j][k]=extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp,cang);
+81c94
+<       scp[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp);
+---
+>       scp[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp,cang);
+97c110
+<       scp[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp);
+---
+>       scp[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp,cang);
+113c126
+<       scp[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp);
+---
+>       scp[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp,cang);
+129c142
+<       scp[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp);
+---
+>       scp[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp,cang);
+145c158
+<       scp[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp);
+---
+>       scp[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp,cang);
+161c174
+<       scp[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp);
+---
+>       scp[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp,cang);
+177c190
+<       scp[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp);
+---
+>       scp[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp,cang);
+193c206
+<       scp[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp);
+---
+>       scp[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp,cang);
+209c222
+<       scp[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp);
+---
+>       scp[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp,cang);
+225c238
+<       scp[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp);
+---
+>       scp[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp,cang);
+241c254
+<       scp[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp);
+---
+>       scp[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp,cang);
+257c270
+<       scp[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp);
+---
+>       scp[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp,cang);
+280c293
+<     scp[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp);
+---
+>     scp[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp,cang);
+299c312
+<     scp[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp);
+---
+>     scp[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp,cang);
+317c330
+<     scp[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp);
+---
+>     scp[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp,cang);
+336c349
+<     scp[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp);
+---
+>     scp[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp,cang);
+355c368
+<     scp[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp);
+---
+>     scp[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp,cang);
+373c386
+<     scp[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp);
+---
+>     scp[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp,cang);
+391c404
+<     scp[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp);
+---
+>     scp[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp,cang);
+409c422
+<     scp[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp);
+---
+>     scp[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp,cang);
+426c439
+<       scp[i-1][j][k] = extrapolate_v(i-1,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp);
+---
+>       scp[i-1][j][k]=extrapolate_v(i-1,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp,cang);
+435c448
+<       scp[i+1][j][k] = extrapolate_v(i+1,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp);
+---
+>       scp[i+1][j][k]=extrapolate_v(i+1,j,k,ofx,ofy,ofz,xpos,ypos,zpos,scp,cang);
+444c457
+<       scp[i][j-1][k] = extrapolate_v(i,j-1,k,ofx,ofy,ofz,xpos,ypos,zpos,scp);
+---
+>       scp[i][j-1][k]=extrapolate_v(i,j-1,k,ofx,ofy,ofz,xpos,ypos,zpos,scp,cang);
+453c466
+<       scp[i][j+1][k] = extrapolate_v(i,j+1,k,ofx,ofy,ofz,xpos,ypos,zpos,scp);
+---
+>       scp[i][j+1][k]=extrapolate_v(i,j+1,k,ofx,ofy,ofz,xpos,ypos,zpos,scp,cang);
+462c475
+<       scp[i][j][k-1] = extrapolate_v(i,j,k-1,ofx,ofy,ofz,xpos,ypos,zpos,scp);
+---
+>       scp[i][j][k-1]=extrapolate_v(i,j,k-1,ofx,ofy,ofz,xpos,ypos,zpos,scp,cang);
+471c484
+<       scp[i][j][k+1] = extrapolate_v(i,j,k+1,ofx,ofy,ofz,xpos,ypos,zpos,scp);
+---
+>       scp[i][j][k+1]=extrapolate_v(i,j,k+1,ofx,ofy,ofz,xpos,ypos,zpos,scp,cang);
+489c502
+<                         const Scalar & scp) {
+---
+>                         const Scalar & scp, const real * cang) {
+491,493c504,507
+<   int ii = i+ofx;
+<   int jj = j+ofy;
+<   int kk = k+ofz;
+---
+>   if(cang == nullptr){
+>     int ii = i+ofx;
+>     int jj = j+ofy;
+>     int kk = k+ofz;
+495c509
+<   real scpscp = scp[ii][jj][kk];
+---
+>     real scpscp = scp[ii][jj][kk];
+497,500c511,514
+<   /* erroneous interfaces */
+<   if(scpscp<tol_wall||scpscp-1.0>-tol_wall) {
+<     return real(scpscp>phisurf);
+<   } 
+---
+>     /* erroneous interfaces */
+>     if(scpscp<tol_wall||scpscp-1.0>-tol_wall) {
+>       return real(scpscp>phisurf);
+>     } 
+502,503c516,517
+<   /* unnormalized alpha value */
+<   real alphaval = nalpha[ii][jj][kk];
+---
+>     /* unnormalized alpha value */
+>     real alphaval = nalpha[ii][jj][kk];
+505,519c519,533
+<   /* degenerate case I */
+<   if(!boil::realistic(alphaval)) {
+<     return real(scpscp>phisurf);
+<   } 
+< 
+<   /* calculate vn1, vn2, vn3: normal vector at cell center */
+<   /* n points to the liquid */
+<   real vn1 = -nx[ii][jj][kk];
+<   real vn2 = -ny[ii][jj][kk];
+<   real vn3 = -nz[ii][jj][kk];
+< 
+<   /* surface normal is not affected by translation */
+<   nx[i][j][k] = -vn1;
+<   ny[i][j][k] = -vn2;
+<   nz[i][j][k] = -vn3;
+---
+>     /* degenerate case I */
+>     if(!boil::realistic(alphaval)) {
+>       return real(scpscp>phisurf);
+>     } 
+> 
+>     /* calculate vn1, vn2, vn3: normal vector at cell center */
+>     /* n points to the liquid */
+>     real vn1 = -nx[ii][jj][kk];
+>     real vn2 = -ny[ii][jj][kk];
+>     real vn3 = -nz[ii][jj][kk];
+> 
+>     /* surface normal is not affected by translation */
+>     nx[i][j][k] = -vn1;
+>     ny[i][j][k] = -vn2;
+>     nz[i][j][k] = -vn3;
+521,531c535,545
+<   /* normalized normal */
+<   real vm1 = fabs(vn1);
+<   real vm2 = fabs(vn2);
+<   real vm3 = fabs(vn3);
+< 
+<   real denom = vm1+vm2+vm3;
+< 
+<   /* degenerate case II */
+<   if(denom<boil::pico) {
+<     return real(scpscp>phisurf);
+<   }
+---
+>     /* normalized normal */
+>     real vm1 = fabs(vn1);
+>     real vm2 = fabs(vn2);
+>     real vm3 = fabs(vn3);
+> 
+>     real denom = vm1+vm2+vm3;
+> 
+>     /* degenerate case II */
+>     if(denom<boil::pico) {
+>       return real(scpscp>phisurf);
+>     }
+533,559c547,573
+<   real xpos = xp;
+<   real ypos = yp;
+<   real zpos = zp;
+< 
+<   /* mirror boundary cell to the normalized space */
+<   if(vn1<0) {
+<     xpos = 1.0-xpos;
+<   }
+<   if(vn2<0) {
+<     ypos = 1.0-ypos;
+<   }
+<   if(vn3<0) {
+<     zpos = 1.0-zpos;
+<   }
+< 
+<   /* now, we need to translate the coordinate system */
+<   /* so that x'(center of bnd cell) = (0.5,0.5,0.5)  */
+<   /* x' = x - x(center of bnd cell) + (0.5,0.5,0.5)  */
+<   /* this affects alpha value: */
+<   /* m dot x' = alpha + m dot [(0.5,0.5,0.5) - x(cbc)] = alpha' */
+<   alphaval += vm1*(0.5-xpos) + vm2*(0.5-ypos) + vm3*(0.5-zpos);
+< 
+<   /* normalized alpha value */
+<   alphaval /= denom; 
+<   vm1 /= denom;
+<   vm2 /= denom;
+<   vm3 /= denom;
+---
+>     real xpos = xp;
+>     real ypos = yp;
+>     real zpos = zp;
+> 
+>     /* mirror boundary cell to the normalized space */
+>     if(vn1<0) {
+>       xpos = 1.0-xpos;
+>     }
+>     if(vn2<0) {
+>       ypos = 1.0-ypos;
+>     }
+>     if(vn3<0) {
+>       zpos = 1.0-zpos;
+>     }
+> 
+>     /* now, we need to translate the coordinate system */
+>     /* so that x'(center of bnd cell) = (0.5,0.5,0.5)  */
+>     /* x' = x - x(center of bnd cell) + (0.5,0.5,0.5)  */
+>     /* this affects alpha value: */
+>     /* m dot x' = alpha + m dot [(0.5,0.5,0.5) - x(cbc)] = alpha' */
+>     alphaval += vm1*(0.5-xpos) + vm2*(0.5-ypos) + vm3*(0.5-zpos);
+> 
+>     /* normalized alpha value */
+>     alphaval /= denom; 
+>     vm1 /= denom;
+>     vm2 /= denom;
+>     vm3 /= denom;
+566,567c580,592
+<   /* volume fraction */
+<   return calc_v(alphaval,vm1,vm2,vm3);
+---
+>     /* volume fraction */
+>     return calc_v(alphaval,vm1,vm2,vm3);
+> 
+>   } else {
+> 
+>     //std::cout<<"extrapolate_v:A "<<cang<<"\n";
+>     if (*cang<0.5*boil::pi) {
+>       //std::cout<<"extrapolate_v:B "<<*cang<<"\n";
+>       return 1.0;  // hydrophilic
+>     } else {
+>       return 0.0;  // phdrophobic
+>     }
+>   }

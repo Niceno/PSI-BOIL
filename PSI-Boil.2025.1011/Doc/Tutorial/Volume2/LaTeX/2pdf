@@ -1,0 +1,11 @@
+#!/bin/bash
+
+if [ $# -lt 1 ]; then
+  echo "Wrong syntax!"
+  echo "Usage: " $0 "[file_name] -> file to be processed without extension"
+else
+  latex $1.tex
+  dvips -o $1.ps $1.dvi
+  ps2pdf $1.ps
+fi
+
