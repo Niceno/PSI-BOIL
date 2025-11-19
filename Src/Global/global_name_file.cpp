@@ -14,7 +14,11 @@ const std::string name_file(const char * gname, const char * ext,
   if( cpu > -1 ) {
     numb << "_p";
     numb.fill('0');
-    numb.width(3);
+    if( cpu < 1000) {
+      numb.width(3);
+    } else {
+      numb.width(4);
+    }
     numb << cpu;
   }
 

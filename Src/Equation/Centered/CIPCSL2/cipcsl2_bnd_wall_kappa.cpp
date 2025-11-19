@@ -10,8 +10,6 @@ void CIPCSL2::bnd_wall_kappa() {
 *  However, the curvature in wall adjacent cells is overwritten by bdcurev.
 *******************************************************************************/
 
-  int i,j,k;
-
   for( int b=0; b<phi.bc().count(); b++ ) {
     if(phi.bc().type_decomp(b)) continue;
     if( phi.bc().type(b) == BndType::wall() ) {

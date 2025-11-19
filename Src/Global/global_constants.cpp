@@ -21,15 +21,10 @@ namespace boil {
   real yocto(1.0e-24);
 
   real unreal = yotta;
-  int unint(INT_MAX);
 
   real pi(acos(-1.0));
 
   /* gravitational constant for earth.  
      should be changed if martians start to use psi-boil */
   real g(9.81);
-
-  /* universal gas constant */
-  real R(8.3144621); /* [J/molK] */
-
 }

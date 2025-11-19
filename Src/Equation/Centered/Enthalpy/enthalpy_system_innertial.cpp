@@ -33,4 +33,7 @@ void Enthalpy::create_system_innertial(const Property * f_prop,
   }
 
   A.c.exchange();
+#if 0
+  std::cout<<"system_innertial: "<<A.c[35][33][6]<<" "<<s_prop->value(35,33,6)<<"\n";
+#endif
 }

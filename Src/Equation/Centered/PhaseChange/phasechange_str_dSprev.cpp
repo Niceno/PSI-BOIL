@@ -9,12 +9,12 @@ void PhaseChange::str_dSprev() {
   std::cout<<"str_dSprev: "<<boil::cart.iam()<<"\n";
 #endif
 
-  int kk;
+  //int kk;
   for(int cc=0; cc<dom->ibody().nccells(); cc++){
     int i,j,k;
     dom->ibody().ijk(cc,&i,&j,&k);
     nucl->dSprev[i][j] = nucl->area_vapor(i,j,k,Dir::kmin());
-    kk=k;
+    //kk=k;
   }
   nucl->store_dSprev=true;
 

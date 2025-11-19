@@ -138,7 +138,7 @@ void BndCnd::add(BndCnd bc) {
   }
   if( fail ) {
     boil::oout << "Fatal: trying to define periodic b.c. " 
-               << "to a non-periodic domain. Exiting!" << boil::endl;
+               << "to a non-periodic domain. Exiting!" << std::endl;
     exit(0);
   }
 
@@ -152,8 +152,8 @@ void BndCnd::add(BndCnd bc) {
     if( bc.dir == Dir::kmax() && dom->period(2) ) fail = true;
   }
   if( fail ) {
-    boil::oout << "Fatal: trying to define real non-periodic b.c. " 
-               << "to a periodic domain. Exiting!" << boil::endl;
+    boil::oout << "Fatal: trying to define non-periodic b.c. " 
+               << "to a periodic domain. Exiting!" << std::endl;
     exit(0);
   }
 
@@ -169,7 +169,7 @@ void BndCnd::add(BndCnd bc) {
   }
   if( fail ) {
     boil::oout << "Fatal: trying to define a dummy b.c. "
-               << "in a real direction. Exiting!" << boil::endl;
+               << "in a real direction. Exiting!\n";
     exit(0);
   }
 
@@ -184,7 +184,7 @@ void BndCnd::add(BndCnd bc) {
   }
   if( fail ) {
     boil::oout << "Fatal: trying to define a real b.c. "
-               << "in a pseudo-direction. Exiting!" << boil::endl;
+               << "in a pseudo-direction. Exiting!\n";
     exit(0);
   }
 #endif
@@ -200,7 +200,7 @@ void BndCnd::add(BndCnd bc) {
   }
   if( fail ) {
     boil::oout << "Fatal: trying to define symmetry b.c. "
-               << "to a non-symmetric domain. Exiting!" << boil::endl;
+               << "to a non-symmetric domain. Exiting!\n";
     exit(0);
   }
 
@@ -215,7 +215,7 @@ void BndCnd::add(BndCnd bc) {
   }
   if( fail ) {
     boil::oout << "Fatal: trying to define non-symmetric b.c. "
-               << "to a symmetric domain. Exiting!" << boil::endl;
+               << "to a symmetric domain. Exiting!\n";
     exit(0);
   }
 
@@ -654,7 +654,6 @@ std::ostream & operator << (std::ostream &ost, const BndType & bt) {
     case( 7): ost << "symmetry ";   break;
     case( 8): ost << "insert ";     break;
     case( 9): ost << "convective "; break;
-    case(10): ost << "pseudo ";     break;
   }
     
   return ost;

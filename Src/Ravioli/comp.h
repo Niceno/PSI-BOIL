@@ -21,6 +21,9 @@ class Comp {
     static const Comp u()           {return i();}
     static const Comp v()           {return j();}
     static const Comp w()           {return k();}
+    static const Comp x()           {return i();}
+    static const Comp y()           {return j();}
+    static const Comp z()           {return k();}
     static const Comp inf()         {return Comp( 0);}
     static const Comp coefficient() {return Comp( 1);}
 

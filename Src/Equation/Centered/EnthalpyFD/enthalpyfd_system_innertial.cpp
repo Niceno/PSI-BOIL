@@ -15,11 +15,11 @@ void EnthalpyFD::create_system_innertial() {
   if( !solid() ) {
 
     for_ijk(i,j,k){
-      real r,c;
-      if(cht.above_interface(i,j,k,Old::no)) {
-        c = cht.cpl(i,j,k);
+      real c;
+      if((*clr)[i][j][k]>=clrsurf){
+        c = cpl;
       } else {
-        c = cht.cpv(i,j,k);
+        c = cpv;
       }
       A.c[i][j][k] = dV(i,j,k) * dti * c;
     }
@@ -29,9 +29,9 @@ void EnthalpyFD::create_system_innertial() {
 
     for_ijk(i,j,k) {
       const real fV = dom->ibody().fV(i,j,k); /* fraction in fluid */
-      real c=cht.cpl(i,j,k);
-      if(!cht.above_interface(i,j,k,Old::no)) {
-        c = cht.cpv(i,j,k);
+      real c=cpl;
+      if((*clr)[i][j][k]<clrsurf){
+        c = cpv;
       }
 
       A.c[i][j][k] = dV(i,j,k) * dti * 
@@ -41,4 +41,3 @@ void EnthalpyFD::create_system_innertial() {
 
   A.c.exchange();
 }
-

@@ -55,7 +55,7 @@ real PhaseChangeVOF::gradtx8(const int dir, const int i, const int j, const int 
     }
   }
 
-  return second_order_difference(tm0,tm1,tm2,dxm1,dxm2);
+  return grad_2nd(tm0,tm1,tm2,dxm1,dxm2);
 }
 
 /******************************************************************************/
@@ -112,7 +112,7 @@ real PhaseChangeVOF::gradty8(const int dir, const int i, const int j, const int 
     }
   }
 
-  return second_order_difference(tm0,tm1,tm2,dym1,dym2);
+  return grad_2nd(tm0,tm1,tm2,dym1,dym2);
 }
 
 /******************************************************************************/
@@ -169,5 +169,5 @@ real PhaseChangeVOF::gradtz8(const int dir, const int i, const int j, const int 
     }
   }
 
-  return second_order_difference(tm0,tm1,tm2,dzm1,dzm2);
+  return grad_2nd(tm0,tm1,tm2,dzm1,dzm2);
 }

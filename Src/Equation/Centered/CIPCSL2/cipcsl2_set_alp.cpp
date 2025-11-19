@@ -335,22 +335,22 @@ if (!localSharpen) {
     for_ijk(i,j,k) {
       if(stmp[i][j][k]==0.0){
         isgn=copysign(1.0,dist[i][j][k]);
-        flux=-isgn*nx[i][j][k]*dSx(Sign::neg(),i,j,k);
+        flux=-isgn*nx[i][j][k]*dSx(i,j,k);
         atmp[i][j][k] =-(0.5*(alp[i][j][k]+alp[i-1][j][k])*flux
                         +0.5*(alp[i][j][k]-alp[i-1][j][k])*fabs(flux));
-        flux= isgn*nx[i][j][k]*dSx(Sign::pos(),i,j,k);
+        flux= isgn*nx[i][j][k]*dSx(i,j,k);
         atmp[i][j][k]-=0.5*(alp[i][j][k]+alp[i+1][j][k])*flux
                       +0.5*(alp[i][j][k]-alp[i+1][j][k])*fabs(flux);
-        flux=-isgn*ny[i][j][k]*dSy(Sign::neg(),i,j,k);
+        flux=-isgn*ny[i][j][k]*dSy(i,j,k);
         atmp[i][j][k]-=0.5*(alp[i][j][k]+alp[i][j-1][k])*flux
                       +0.5*(alp[i][j][k]-alp[i][j-1][k])*fabs(flux);
-        flux= isgn*ny[i][j][k]*dSy(Sign::pos(),i,j,k);
+        flux= isgn*ny[i][j][k]*dSy(i,j,k);
         atmp[i][j][k]-=0.5*(alp[i][j][k]+alp[i][j+1][k])*flux
                       +0.5*(alp[i][j][k]-alp[i][j+1][k])*fabs(flux);
-        flux=-isgn*nz[i][j][k]*dSz(Sign::neg(),i,j,k);
+        flux= -isgn*nz[i][j][k]*dSz(i,j,k);
         atmp[i][j][k]-=0.5*(alp[i][j][k]+alp[i][j][k-1])*flux
                       +0.5*(alp[i][j][k]-alp[i][j][k-1])*fabs(flux);
-        flux= isgn*nz[i][j][k]*dSz(Sign::pos(),i,j,k);
+        flux= isgn*nz[i][j][k]*dSz(i,j,k);
         atmp[i][j][k]-=0.5*(alp[i][j][k]+alp[i][j][k+1])*flux
                       +0.5*(alp[i][j][k]-alp[i][j][k+1])*fabs(flux);
       }
@@ -374,27 +374,27 @@ if (!localSharpen) {
           diag =dV(i,j,k)/dtau;
           drhs = 0.0;
 
-          flux=-isgn*nx[i][j][k]*dSx(Sign::neg(),i,j,k);
+          flux= -isgn*nx[i][j][k]*dSx(i,j,k);
           diag+=0.5*(flux+fabs(flux));
           drhs =-0.5*(flux-fabs(flux))*fn[i-1][j][k];
 
-          flux= isgn*nx[i][j][k]*dSx(Sign::pos(),i,j,k);
+          flux= isgn*nx[i][j][k]*dSx(i,j,k);
           diag+=0.5*(flux+fabs(flux));
           drhs-=0.5*(flux-fabs(flux))*fn[i+1][j][k];
 
-          flux=-isgn*ny[i][j][k]*dSy(Sign::neg(),i,j,k);
+          flux=-isgn*ny[i][j][k]*dSy(i,j,k);
           diag+=0.5*(flux+fabs(flux));
           drhs-=0.5*(flux-fabs(flux))*fn[i][j-1][k];
 
-          flux= isgn*ny[i][j][k]*dSy(Sign::pos(),i,j,k);
+          flux= isgn*ny[i][j][k]*dSy(i,j,k);
           diag+=0.5*(flux+fabs(flux));
           drhs-=0.5*(flux-fabs(flux))*fn[i][j+1][k];
 
-          flux=-isgn*nz[i][j][k]*dSz(Sign::neg(),i,j,k);
+          flux=-isgn*nz[i][j][k]*dSz(i,j,k);
           diag+=0.5*(flux+fabs(flux));
           drhs-=0.5*(flux-fabs(flux))*fn[i][j][k-1];
 
-          flux= isgn*nz[i][j][k]*dSz(Sign::pos(),i,j,k);
+          flux= isgn*nz[i][j][k]*dSz(i,j,k);
           diag+=0.5*(flux+fabs(flux));
           drhs-=0.5*(flux-fabs(flux))*fn[i][j][k+1];
 

@@ -108,7 +108,7 @@
       call compress
 #endif
 #ifndef SZPLT
-      !call delfile
+      call delfile
 #endif
       call dealloc
    ENDDO

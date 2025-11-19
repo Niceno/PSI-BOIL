@@ -8,7 +8,7 @@ Concentration::Concentration(const Scalar & PHI,
                              const Scalar & F,
                              const Vector & U, 
                              Times & T, 
-                             Linear * S,
+                             Krylov * S,
                              Matter * f) :
 /*---------------------+ 
 |  initialize parent   |

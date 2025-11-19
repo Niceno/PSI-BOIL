@@ -9,7 +9,6 @@ void CIPCSL2::ib_ext_scalar(Scalar & sca) {
 *  \brief Set immersed boundary value of color function
 *******************************************************************************/
   if(dom->ibody().ncall()==0) return;
-  if(!extrapolate_ib) return;
 
 #if 0
   /* set iflag for immersed boundary */
@@ -88,6 +87,7 @@ void CIPCSL2::ib_ext_scalar(Scalar & sca) {
     exit(0);
 #endif
 #else
+
   // extrapolate clr  //crude 2014.01.16, Ver1.1.10.23R2
   for(int cc=0; cc<dom->ibody().nccells(); cc++){
     int i,j,k;

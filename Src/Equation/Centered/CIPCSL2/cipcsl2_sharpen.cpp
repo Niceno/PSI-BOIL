@@ -15,12 +15,11 @@ bool CIPCSL2::sharpen(Scalar & sca, const real epss, const int itmax, const bool
 *******************************************************************************/
   real dsca_max=0.0;  // l_infinity for iterative cal.
 
+#ifdef DEBUG
   bool ibm=false;
   if(dom->ibody().nccells() > 0) {
     ibm=true;
   }
-
-#ifdef DEBUG
   boil::oout<<"sharpen:ibm= "<<ibm<<"\n";
 #endif
 
@@ -117,12 +116,12 @@ bool CIPCSL2::sharpen(Scalar & sca, const real epss, const int itmax, const bool
           // compression
           tm = sca[i-1][j][k] * (1.0-sca[i-1][j][k]) * nx[i-1][j][k];
           tc = sca[i]  [j][k] * (1.0-sca[i]  [j][k]) * nx[i]  [j][k];
-          fluxc = 0.5 * (tm+tc) * dSx(Sign::neg(),i,j,k);
+          fluxc = 0.5 * (tm+tc) * dSx(i,j,k);
           coefc = beta(alp[i-1][j][k],alp[i][j][k],local)     // beta
                 * 0.5*(sca.dxc(i-1)+sca.dxc(i))         // dx
                 / (0.5*(atmp[i-1][j][k]+atmp[i][j][k]));// dxmax
           // diffusion
-          fluxd = (sca[i][j][k]-sca[i-1][j][k])*dSx(Sign::neg(),i,j,k)/sca.dxw(i);
+          fluxd = (sca[i][j][k]-sca[i-1][j][k])*dSx(i,j,k)/sca.dxw(i);
           coefd = beta(alp[i-1][j][k],alp[i][j][k],local)  // beta
                 * epss * 0.5 * (sca.dxc(i-1)+sca.dxc(i));    // epss
           ldt  = 0.5*(fn [i-1][j][k]+fn [i][j][k]);
@@ -159,12 +158,12 @@ bool CIPCSL2::sharpen(Scalar & sca, const real epss, const int itmax, const bool
           // compression
           tm = sca[i][j-1][k] * (1.0-sca[i][j-1][k]) * ny[i][j-1][k];
           tc = sca[i][j]  [k] * (1.0-sca[i][j]  [k]) * ny[i][j]  [k];
-          fluxc = 0.5 * (tm+tc) * dSy(Sign::neg(),i,j,k);
+          fluxc = 0.5 * (tm+tc) * dSy(i,j,k);
           coefc = beta(alp[i][j-1][k],alp[i][j][k],local)     // beta
                 * 0.5*(sca.dyc(j-1)+sca.dyc(j))         // dy
                 / (0.5*(atmp[i][j-1][k]+atmp[i][j][k]));// dxmax
           // diffusion
-          fluxd = (sca[i][j][k]-sca[i][j-1][k])*dSy(Sign::neg(),i,j,k)/sca.dys(j);
+          fluxd = (sca[i][j][k]-sca[i][j-1][k])*dSy(i,j,k)/sca.dys(j);
           coefd = beta(alp[i][j-1][k],alp[i][j][k],local)  // beta
                 * epss * 0.5 * (sca.dyc(j-1)+sca.dyc(j));    // epss
           ldt  = 0.5*(fn [i][j-1][k]+fn [i][j][k]);
@@ -197,12 +196,12 @@ bool CIPCSL2::sharpen(Scalar & sca, const real epss, const int itmax, const bool
           // compression
           tm = sca[i][j][k-1] * (1.0-sca[i][j][k-1]) * nz[i][j][k-1];
           tc = sca[i][j][k]   * (1.0-sca[i][j][k]  ) * nz[i][j][k];
-          fluxc = 0.5 * (tm+tc) * dSz(Sign::neg(),i,j,k);
+          fluxc = 0.5 * (tm+tc) * dSz(i,j,k);
           coefc = beta(alp[i][j][k-1],alp[i][j][k],local)     // beta
                 * 0.5*(sca.dzc(k-1)+sca.dzc(k))         // dz
                 / (0.5*(atmp[i][j][k-1]+atmp[i][j][k]));// dxmax
           // diffusion
-          fluxd = (sca[i][j][k]-sca[i][j][k-1])*dSz(Sign::neg(),i,j,k)/sca.dzb(k);
+          fluxd = (sca[i][j][k]-sca[i][j][k-1])*dSz(i,j,k)/sca.dzb(k);
           coefd = beta(alp[i][j][k-1],alp[i][j][k],local)  // beta
                 * epss * 0.5 * (sca.dzc(k-1)+sca.dzc(k));    // epss
           ldt  = 0.5*(fn [i][j][k-1]+fn [i][j][k]);
@@ -226,16 +225,16 @@ bool CIPCSL2::sharpen(Scalar & sca, const real epss, const int itmax, const bool
     /* advance */
     dsca_max=0.0;  // L_infinity
     //real dsca_sum=0.0;  // L_infinity
-    int imx,jmx,kmx;
+    //int imx,jmx,kmx;
     for_ijk(i,j,k){
       real dsca = 1.0/dV(i,j,k) * stmp[i][j][k];
       sca[i][j][k] += dsca;
       //dsca_sum += dsca;
       if(fabs(dsca)>dsca_max){
         dsca_max=fabs(dsca);
-        imx=i;
-        jmx=j;
-        kmx=k;
+        //imx=i;
+        //jmx=j;
+        //kmx=k;
       }
     }
     boil::cart.max_real(&dsca_max);

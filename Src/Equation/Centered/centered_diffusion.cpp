@@ -27,7 +27,7 @@
 *  stipulated in main program. Obviously, these concerns are important for 
 *  non-implicit time stepping schemes only.
 *******************************************************************************/
-void Centered::diffusion(const Scalar * diff_eddy) {
+void Centered::diffusion() {
 
   phi.exchange();
 

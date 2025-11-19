@@ -1,13 +1,12 @@
 #ifndef ENTHALPYFD_H
 #define ENTHALPYFD_H
 
-#include <cmath>
 #include "../../../Parallel/mpi_macros.h"
+#include <cmath>
 #include "../centered.h"
 #include "../../../Parallel/communicator.h"
+#include "../../../Solver/Gauss/gauss.h"
 #include "../../../Timer/timer.h"
-#include "../../../Global/global_realistic.h"
-#include "../../CommonHeatTransfer/commonheattransfer.h"
 
 /***************************************************************************//**
 *  \brief Discretizes and solves enthalpy conservaion equation.
@@ -38,186 +37,101 @@ class EnthalpyFD : public Centered {
     //! Global constructor.
     /*!
         \param phi - temperature (\f$T\f$),
-        \param f   - external source array (\f$\dot{q}\f$),
+        \param f   - extarnal source array (\f$\dot{q}\f$),
         \param u   - convection velocity (\f${\bf u}\f$),
         \param t   - simulation (physical) time (\f${t}\f$),
-        \param sm  - Linear solver. It acts as a solver, or as a
-                     smoother for AC multigrid.
+        \param sm  - Krylov subspace solver. It acts as a solver, or as a
+                     smoother for AC multirid.
         \param flu - Holds all fluid properties (\f$\rho, C_p, \lambda\f$),
-        \param topo - properties of the free surface (from ITM).
-        \param tifmodel - interfacial temperature model.
         \param sol - holds all solid properties (\f$\rho, C_p, \lambda\f$).
     */
-
-    /* Most general constructor */
     EnthalpyFD(const Scalar & phi, 
                const Scalar & f,
-               const Vector & umixed,
-               const Vector & uliq,
-               const Vector & ugas,
+               const Scalar & clr,
+               const Vector & u,
                Times & t,
-               Linear * sm,
+               Krylov * sm,
                Matter * flu,
-               const CommonHeatTransfer & cht,
+               const real tsat,
                Matter * sol = NULL);
-
-    /* Delegating constructor */
-    EnthalpyFD(const Scalar & phi,
-               const Scalar & f,
-               const Vector & umixed,
-               Times & t,
-               Linear * sm,
-               Matter * flu,
-               const CommonHeatTransfer & cht,
-               Matter * sol = NULL) :
-    EnthalpyFD(phi,f,umixed,umixed,umixed,t,sm,flu,
-               cht,sol) {};
+    ~EnthalpyFD();
 
     void new_time_step(const Scalar * diff_eddy = NULL);
-    void inertial(Scalar & sca, const bool interface_crossed, const Old old); 
-    void inertial(const bool interface_crossed, const Old old); 
-    void convective_time_step(Scalar & sca);
-    void convective_time_step();
-    virtual void convection();
-    virtual void diffusion(const Scalar * diff_eddy = NULL) {
-      evaluate_diffusion(Old::yes,diff_eddy);
-      return;
+    void solve(const ResRat & fact, const char * name = NULL);
+    void solve_sor(const int & it, const real & r, const char * name = NULL);
+	  
+    //! Direct solver introduced just for checking it.
+    void direct() {
+      for_ijk(i,j,k)
+        fnew[i][j][k] = fold[i][j][k]
+                      + cnew[i][j][k] * conv_ts.N()
+                      + fbnd[i][j][k]
+                      + fext[i][j][k];
+
+      boil::timer.start("enthalpy solver");
+      Gauss gs;
+      gs.solve(A, phi, fnew);
+      boil::timer.stop("enthalpy solver");
     }
-    virtual void solve(const ResTol & toler, const ResRat & fact,
-                       const char * name = NULL);
-    virtual void solve(const ResTol & toler, const char * name = NULL) {
-      solve(toler,ResRat(-1.),name);
-    } 
-    virtual void solve(const ResRat & fact, const char * name = NULL) {
-      solve(ResTol(boil::atto),fact,name);
-    }
+
+    real hflux_wall(const Scalar & s, const Dir d
+                  , const Scalar * diff_eddy = NULL);
+    void hflux_wall_ib(const Scalar * diff_eddy = NULL);
+    void hflux_wall_ib(Range<real> xr, Range<real> yr,
+                       const Scalar * diff_eddy = NULL);
 
     //! Interface call to parent's discretization.
     void discretize(const Scalar * diff_eddy = NULL) {
-      boil::timer.start("enthalpyfd discretize");
+      boil::timer.start("enthalpy discretize");
       create_system(diff_eddy);
       if(diff_eddy != NULL)laminar=false;
-      boil::timer.stop("enthalpyfd discretize");
+      boil::timer.stop("enthalpy discretize");
     }
 
-#include "enthalpyfd_inline.h"
+    real get_turbP(){return turbP;}
+    void set_turbP(real a){
+      turbP=a;
+      boil::oout<<"EnthalpyFD:turbP= "<<turbP<<"\n";
+    }
 
-    /* unit tests */
-    bool test_extrapolation(const int count);
-    bool test_extrapolation(std::vector<real> & stencil,
-                            const std::vector<real> & coefficients,
-                            const std::vector<int> & cutpoints);
-
+    void convection();
   protected:
-    typedef real (EnthalpyFD::*coef_gen)(const real,const real,const real);
-
-    void evaluate_diffusion(const Old old, const Scalar * diff_eddy = NULL);
-    
     void create_system(const Scalar * diff_eddy = NULL);
     void create_system_innertial();
-    void create_system_diffusive(const Scalar * diff_eddy = NULL) {
-      evaluate_diffusion(Old::no,diff_eddy);
-      return;
-    }
+    void create_system_diffusive(const Scalar * diff_eddy = NULL);
     void create_system_bnd();
     real update_rhs();
     void convection(Scalar * sca);
+    void diffusion_fd(const Scalar * diff_eddy = NULL);
+    real dVFD(const int i, const int j, const int k){
+      real vol = 0.5 * (phi.dxw(i)+phi.dxe(i))
+               * 0.5 * (phi.dys(j)+phi.dyn(j))
+               * 0.5 * (phi.dzb(k)+phi.dzt(k));
+      return vol;
+    };
+    void setflag();
+    void diff_matrix(real & am, real & ac, real & ap
+                , real & tm, real & tc, real & tp
+                , real & aflagm, real & aflagp
+                , const real vol, const real area
+                , const bool onm, const bool onc, const bool onp
+                , const bool ofm, const bool ofc, const bool ofp
+                , const real lsm, const real lsc, const real lsp
+                , const real lfm, const real lfc, const real lfp
+                , const real clm, const real clc, const real clp
+                , real dxm, real dxp
+                , real fdm, real fdp, real fdms, real fdps
+                , real pm, real pc, real pp
+                , const real edm, const real edc, const real edp
+                , const int i, const int j, const int k, const Comp m);
 
-    void cell_diffusion_fluid(const Comp m,
-                          const int i, const int j, const int k,
-                          const int ox, const int oy, const int oz,
-                          const real x0,
-                          const coef_gen coef_m, const coef_gen coef_p,
-                          const ResistEval re, const Old old,
-                          const real tscn, const real tscm,
-                          std::vector<StencilPoint> & stencil,
-                          real & Aw, real & Ac, real & Ae, real & F,
-                          const Scalar * diff_eddy);
-
-    void cell_diffusion_solid(const Comp m,
-                          const int i, const int j, const int k,
-                          const int ox, const int oy, const int oz,
-                          const real x0,
-                          const coef_gen coef_m, const coef_gen coef_p,
-                          const real dSm, const real dSp,
-                          const ResistEval re, const Old old,
-                          const real tscn, const real tscm,
-                          real & Aw, real & Ac, real & Ae, real & F,
-                          const Scalar * diff_eddy);
-
-    void kernel_fluid1(const std::array<ConnectType,3> & ctype,
-                       const real cxm, const real cxp,
-                       std::vector<StencilPoint> & stencil,
-                       const real resinvm, const real resinvp,
-                       real & Am, real & Ac, real & Ap, real & F);
-
-    void kernel_fluid2(const std::array<ConnectType,3> & ctype,
-                       const real cxm, const real cxp,
-                       std::vector<StencilPoint> & stencil,
-                       const real resinvm, const real resinvp,
-                       const real reswallm, const real reswallp,
-                       const std::array<real,3> resistvals,
-                       const real dwsrcm, const real dwsrcp,
-                       real & Am, real & Ac, real & Ap, real & F);
-
-    void kernel_solid(const std::array<ConnectType,3> & ctype,
-                      const real cxm, const real cxp,
-                      const real pm, const real pp,
-                      const std::array<real,3> resistvals,
-                      const real dwsrcm, const real dwsrcp,
-                      real & Am, real & Ac, real & Ap, real & F);
-
-    /* needed in diffusion kernels */
-    inline real resistance_multiplier(const real res0,
-                                      const real res1) const {
-      return res0 / (res0 + res1);
-    }
-
-    virtual real coef_x_m(const real dxm, const real dxp, const real x0);
-    virtual real coef_x_p(const real dxm, const real dxp, const real x0);
-    virtual real coef_y_m(const real dxm, const real dxp, const real x0);
-    virtual real coef_y_p(const real dxm, const real dxp, const real x0);
-    virtual real coef_z_m(const real dxm, const real dxp, const real x0);
-    virtual real coef_z_p(const real dxm, const real dxp, const real x0);
-
-    real face_value(const Sign matter_sig, const Comp m, const real vel,
-                    const int i, const int j, const int k,
-                    const int ofx, const int ofy, const int ofz,
-                    const Old old);
-    real extrapolate_value(const Sign & dir,
-                           const std::vector<StencilPoint> & stencil,
-                           const StencilPoint & ctm,
-                           const StencilPoint & ctp,
-                           const real xpos);
-    void extrapolate_values(std::vector<StencilPoint> & stencil,
-                            const StencilPoint & ctm, const StencilPoint & ctp);
-    void point_extrapolation(std::vector<StencilPoint> & stencil,
-                             const int i0, const int i1,
-                             const std::vector<StencilPoint> & extcil);
-
-    /* This points to solid if solid() = true and fluid() otherwise.
-       So you can always dereference it without segfaults */
-    const Matter * safe_solid; 
-
-    const Vector * uliq, * ugas;
-    Vector flux_liq, flux_gas;
-    
-    const CommonHeatTransfer & cht;
-    /* gradt in convection difference order */
-    AccuracyOrder ao_conv;
-
-    const BndFlag bflag_struct;
-    Scalar ftif;
-    ScalarInt iflag,iflagold;
+    const Scalar * clr;
+    real tsat,rhol,rhov,cpl,cpv,lambdal,lambdav,clrsurf,epsl;
+    bool store_clrold;
+    Scalar clrold;
+    ScalarInt iflag;
+    real turbP; //turbulent Prandtl number
     bool laminar;
 
-    /* reference ctypes */
-    std::array<ConnectType,3> c_fff, c_sss,
-                              c_iff, c_ffi, c_ifi,
-                              c_sff, c_ffs, c_sfs,
-                              c_fss, c_ssf, c_fsf,
-                              c_iss, c_ssi, c_isi,
-                              c_fsi, c_isf,
-                              c_sfi, c_ifs;
-};	
+};
 #endif

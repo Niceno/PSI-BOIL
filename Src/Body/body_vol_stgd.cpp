@@ -28,6 +28,12 @@ void Body::vol_stgd(const Domain & dom, const Body & nfx, const Body & nfy,
   /* preparation for body-fill */
   stack_pointer = 0;
   stack_size    = 4 * dom.ni() * dom.nj() * dom.nk();
+
+  if (stack_size>4*500*500*500) {
+    boil::aout<<"body_vol_stgd:lack of memory. Use more cores!\n";
+    exit(0);
+  }
+
   alloc2d( & stack, stack_size, 3 );
 
   for_m(m){

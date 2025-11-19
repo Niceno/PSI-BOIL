@@ -5,11 +5,9 @@ using namespace std;
 /******************************************************************************/
 void PhaseChangeVOF::update(const Scalar * diff_eddy) {
 
-  boil::timer.start("phasechangevof update");
-
-  /*------------+
-  |  reset phi  |
-  +------------*/
+  /*-------------------------------------+
+  |  calculate normal vector + set flag  |
+  +-------------------------------------*/
   initialize();
 
   /*----------------------+
@@ -21,9 +19,5 @@ void PhaseChangeVOF::update(const Scalar * diff_eddy) {
   |  calculate mass source  |
   +------------------------*/
   finalize();
-
-  boil::timer.stop("phasechangevof update");
-
-  return;
 }
 

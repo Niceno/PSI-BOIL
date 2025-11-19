@@ -1,32 +1,23 @@
 #include "heaviside.h"
 
 /******************************************************************************/
-void Heaviside::calculate(const bool evalflag) {
+void Heaviside::calculate() {
 /***************************************************************************//**
 *  \brief Calculate the Heaviside function from the color function.
 *******************************************************************************/
 
-  if(evalflag)
-    evaluate_nodes();
-
-  calculate_flag(false);
-
   if(phi)
-    calculate_vf(false);
+    calculate_heaviside();
   if(adens)
-    calculate_adens(false);
+    calculate_adens();
 
   return;
 }
 
-void Heaviside::calculate_vf(const bool evalflag) {
+void Heaviside::calculate_heaviside() {
 
-  if(evalflag)
-    evaluate_nodes();
-
-  for_vijk((*phi),i,j,k) { 
-    (*phi)[i][j][k] = vf(i,j,k);
-  }
+  for_vijk((*phi),i,j,k) 
+    (*phi)[i][j][k] = mc.volume(i,j,k);
   
   (*phi).bnd_update();
   (*phi).exchange_all();
@@ -34,30 +25,12 @@ void Heaviside::calculate_vf(const bool evalflag) {
   return;
 }
 
-void Heaviside::calculate_adens(const bool evalflag) {
+void Heaviside::calculate_adens() {
 
-  if(evalflag)
-    evaluate_nodes();
-
-  for_vijk((*adens),i,j,k) {
-    (*adens)[i][j][k] = ad(i,j,k);
-  }
+  for_vijk((*adens),i,j,k)
+    (*adens)[i][j][k] = mc.area(i,j,k)/adens->dV(i,j,k);
   (*adens).bnd_update();
   (*adens).exchange();
  
-  return;
-}
-
-void Heaviside::calculate_flag(const bool evalflag) {
-
-  if(evalflag)
-    evaluate_nodes();
-
-  for_vijk(flag,i,j,k) {
-    flag[i][j][k] = status(i,j,k);
-  }
-  flag.bnd_update();
-  flag.exchange();
-
   return;
 }

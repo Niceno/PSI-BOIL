@@ -16,7 +16,7 @@ void PhaseChangeVOF::finalize() {
 #endif
 
   /* calculate source terms */
-  sources_vfs();
+  sources_clrs();
   sources_fext();
   sources_sum();
   boil::oout<<"phasechangevof_update: time= "<<time->current_time()
@@ -26,7 +26,7 @@ void PhaseChangeVOF::finalize() {
   smdot_neg_macro=smdot_neg;
 
 #ifdef DEBUG
-  boil::plot->plot(clr, tprs, vfs, "clr-tprs-vfs",  time->current_step());
+  boil::plot->plot(clr, tprs, clrs, "clr-tprs-clrs",  time->current_step());
   std::cout<<"pc.update:end "<<boil::cart.iam()<<"\n";
   exit(0);
 #endif

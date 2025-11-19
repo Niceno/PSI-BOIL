@@ -2,6 +2,7 @@
 
 /***************************************************************************//**
 *  cut neck of the bubble when the bottom-area < area_neck
+*  This is an old function.
 *******************************************************************************/
 void Nucleation::cutneck (const real area_neck) {
 
@@ -9,10 +10,11 @@ void Nucleation::cutneck (const real area_neck) {
   for(int ns=0; ns<size(); ns++){
     bool bneck=false;
     real a_vapor=0.0;
-    if( time->current_time() > (sites[ns].time_seed() + seed_period) ) {
+    real range = 4.0*rseed;
+    if( time->current_time() > (sites[ns].time_plant_clr() + seed_period) ) {
       a_vapor
-	= area_vapor_sum( Range<real>(sites[ns].x()-rcut, sites[ns].x()+rcut)
-                        , Range<real>(sites[ns].y()-rcut, sites[ns].y()+rcut)
+	= area_vapor_sum( Range<real>(sites[ns].x()-range, sites[ns].x()+range)
+                        , Range<real>(sites[ns].y()-range, sites[ns].y()+range)
                         , Range<real>(zbtm, zbtm+dxmin));
 
       /*--------------------------------------------------------+
@@ -20,7 +22,7 @@ void Nucleation::cutneck (const real area_neck) {
       |  and (2) replant process is not running                 |
       +------------------------------------------------------- */
       if( a_vapor < area_neck &&
-          !sites[ns].seed() ) {
+          !sites[ns].plant_clr_current() ) {
         bneck=true;
 
         /* store the beginning time of cutneck */
@@ -46,22 +48,23 @@ void Nucleation::cutneck (const real area_neck) {
   /* cut neck */
   for(int ns=0; ns<size(); ns++){
     if( sites[ns].neck() ){
-      real xfirst = sites[ns].x() - rcut;
-      real xlast  = sites[ns].x() + rcut;
-      real yfirst = sites[ns].y() - rcut;
-      real ylast  = sites[ns].y() + rcut;
+      real range = 4.0*rseed;
+      real xfirst = sites[ns].x() - range;
+      real xlast  = sites[ns].x() + range;
+      real yfirst = sites[ns].y() - range;
+      real ylast  = sites[ns].y() + range;
       real zfirst = zbtm;
       real zlast  = zbtm+dxmin;
-      for (int i=vf->si(); i<=vf->ei(); i++) {
-        if (vf->xc(i)<xfirst) continue;
-        if (vf->xc(i)>xlast ) continue;
-        for (int j=vf->sj(); j<=vf->ej(); j++) {
-          if (vf->yc(j)<yfirst) continue;
-          if (vf->yc(j)>ylast ) continue;
-	  for (int k=vf->sk(); k<=vf->ek(); k++) {
-            if (vf->zc(k)<zfirst) continue;
-            if (vf->zc(k)>zlast ) continue;
-            (*vf)[i][j][k]= (matter_sig>0) ? 1.0 : 0.0;
+      for (int i=(*clr).si(); i<=(*clr).ei(); i++) {
+        if ((*clr).xc(i)<xfirst) continue;
+        if ((*clr).xc(i)>xlast ) continue;
+        for (int j=(*clr).sj(); j<=(*clr).ej(); j++) {
+          if ((*clr).yc(j)<yfirst) continue;
+          if ((*clr).yc(j)>ylast ) continue;
+	  for (int k=(*clr).sk(); k<=(*clr).ek(); k++) {
+            if ((*clr).zc(k)<zfirst) continue;
+            if ((*clr).zc(k)>zlast ) continue;
+            (*clr)[i][j][k]=1.0;
 	    //std::cout<<i<<" "<<j<<" "<<k<<"\n";
           }
         }
@@ -72,22 +75,23 @@ void Nucleation::cutneck (const real area_neck) {
   /* dummy sites */
   for(int nsd=0; nsd<dsize(); nsd++){
     if( dsites[nsd].neck() ){
-      real xfirst = dsites[nsd].x() - rcut;
-      real xlast  = dsites[nsd].x() + rcut;
-      real yfirst = dsites[nsd].y() - rcut;
-      real ylast  = dsites[nsd].y() + rcut;
+      real range = 4.0*rseed;
+      real xfirst = dsites[nsd].x() - range;
+      real xlast  = dsites[nsd].x() + range;
+      real yfirst = dsites[nsd].y() - range;
+      real ylast  = dsites[nsd].y() + range;
       real zfirst = zbtm;
       real zlast  = zbtm+dxmin;
-      for (int i=vf->si(); i<=vf->ei(); i++) {
-        if (vf->xc(i)<xfirst) continue;
-        if (vf->xc(i)>xlast ) continue;
-        for (int j=vf->sj(); j<=vf->ej(); j++) {
-          if (vf->yc(j)<yfirst) continue;
-          if (vf->yc(j)>ylast ) continue;
-          for (int k=vf->sk(); k<=vf->ek(); k++) {
-            if (vf->zc(k)<zfirst) continue;
-            if (vf->zc(k)>zlast ) continue;
-            (*vf)[i][j][k]= (matter_sig>0) ? 1.0 : 0.0;
+      for (int i=(*clr).si(); i<=(*clr).ei(); i++) {
+        if ((*clr).xc(i)<xfirst) continue;
+        if ((*clr).xc(i)>xlast ) continue;
+        for (int j=(*clr).sj(); j<=(*clr).ej(); j++) {
+          if ((*clr).yc(j)<yfirst) continue;
+          if ((*clr).yc(j)>ylast ) continue;
+          for (int k=(*clr).sk(); k<=(*clr).ek(); k++) {
+            if ((*clr).zc(k)<zfirst) continue;
+            if ((*clr).zc(k)>zlast ) continue;
+            (*clr)[i][j][k]=1.0;
           }
         }
       }

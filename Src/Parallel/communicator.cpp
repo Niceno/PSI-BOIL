@@ -169,7 +169,7 @@ void Communicator::irecv(real * buff_recv,
                          const Tag tag,
                          par_request * req) const {
   
-  static par_status status;
+  //static par_status status;
 
   assert(dir_recv != iam());
 
@@ -183,7 +183,7 @@ void Communicator::irecv(bool * buff_recv,
                          const Tag tag,
                          par_request * req) const {
   
-  static par_status status;
+  //static par_status status;
 
   assert(dir_recv != iam());
 
@@ -197,7 +197,7 @@ void Communicator::irecv(int * buff_recv,
                          const Tag tag,
                          par_request * req) const {
 
-  static par_status status;
+  //static par_status status;
 
   assert(dir_recv != iam());
 

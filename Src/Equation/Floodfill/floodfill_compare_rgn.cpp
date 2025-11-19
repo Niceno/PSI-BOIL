@@ -5,8 +5,8 @@
 *******************************************************************************/
 void Floodfill::compare_rgn(const int & rgnin, const int & rgnout) {
   if (rgnin * rgnout > 0) {  
-    int i=0;
-    for (i; i<rgnid_match_arrayi.size(); i++) {
+    int i;
+    for (i=0; i<rgnid_match_arrayi.size(); i++) {
       if ((rgnid_match_arrayi[i] == rgnin) && 
           (rgnid_match_arrayj[i] == rgnout))  {
         break; 
@@ -17,4 +17,5 @@ void Floodfill::compare_rgn(const int & rgnin, const int & rgnout) {
       rgnid_match_arrayj.push_back(rgnout); 
     }
   }
+  return;
 }

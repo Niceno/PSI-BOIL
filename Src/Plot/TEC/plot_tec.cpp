@@ -527,6 +527,7 @@ void PlotTEC::plot(const Vector & vec,
 
   boil::timer.stop("plotting");
 }
+
 /******************************************************************************/
 void PlotTEC::plot(const Scalar & sca, 
                    const Scalar & scb, 
@@ -877,7 +878,7 @@ void PlotTEC::plot_tec_domain(const Domain & dom) {
 
 /******************************************************************************/
 void PlotTEC::plot_tec_body(const Body & bod, std::vector<int> & vars) {
-
+#if 0
   if( bod.tpolys() < 1) 
     return;
 
@@ -889,6 +890,8 @@ void PlotTEC::plot_tec_body(const Body & bod, std::vector<int> & vars) {
     out << "# BODY " << -1 << boil::endl;
     return;
   }
+
+  if(!b_plot_body) return;
 
   /*-------------------------------------------+
   |  count the number of additional triangles  |
@@ -950,6 +953,7 @@ void PlotTEC::plot_tec_body(const Body & bod, std::vector<int> & vars) {
       if(nn>5)  out << n+1 << " " << n+5 << " " << n+6 << boil::endl;
       n+=nn;
   }
+#endif
 }
 
 /******************************************************************************/

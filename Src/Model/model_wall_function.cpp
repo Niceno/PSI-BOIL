@@ -34,6 +34,9 @@ void Model::wall_function( const Vector & uvw, const Matter & fluid,
   const real nu = fluid.mu(i,j,k) / fluid.rho(i,j,k);
 
   /* try linear */
+  if(ut*d/nu<0){
+    std::cout<<"wall_function:ut*d/nu<0: "<<ut<<" "<<d<<" "<<nu<<"\n";
+  }
   real y_plus = sqrt( ut * d / nu );
 
   /* low re */

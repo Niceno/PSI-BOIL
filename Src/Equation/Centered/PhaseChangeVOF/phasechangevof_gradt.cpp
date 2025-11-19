@@ -12,7 +12,7 @@ void PhaseChangeVOF::gradt(const Scalar * diff_eddy) {
   /* achieved by switching to upwind/downwind differencing */
   /* it is also possible to use purely upw/dwnw through the upwind_flag */
   /* this is however not recommended <- lower precision */
-  calculate_node_temperature(diff_eddy);
+  calculate_node_temperature();
 
   /* calculate grad(tpr) in fluid */
   cal_gradt_fluid(diff_eddy);
@@ -61,14 +61,13 @@ void PhaseChangeVOF::gradt(const Scalar * diff_eddy) {
   extrapolate(tnv, 1);
   extrapolate(tnl,-1);
 #else
-  /* extrapolate grad(tpr), values in brackets indicate
-     iflag values for extrapolated cells */
-  topo->extrapolate(txv,Sign::pos(),{1,2});
-  topo->extrapolate(tyv,Sign::pos(),{1,2});
-  topo->extrapolate(tzv,Sign::pos(),{1,2});
-  topo->extrapolate(txl,Sign::neg(),{-1,-2});
-  topo->extrapolate(tyl,Sign::neg(),{-1,-2});
-  topo->extrapolate(tzl,Sign::neg(),{-1,-2});
+  /* extrapolate grad(tpr) */
+  extrapolate(txv, 1);
+  extrapolate(tyv, 1);
+  extrapolate(tzv, 1);
+  extrapolate(txl,-1);
+  extrapolate(tyl,-1);
+  extrapolate(tzl,-1);
   /* calculate the normal component */
   for_aijk(i,j,k) {
     tnv[i][j][k] = txv[i][j][k]*nx[i][j][k]
@@ -86,10 +85,11 @@ void PhaseChangeVOF::gradt(const Scalar * diff_eddy) {
 #endif
 
 #endif
-  
-  /* for increased stability in the near-wall region */
-  if(near_wall_modelling)
-    near_wall_model(diff_eddy);
+
+#if 0
+  /* subgrid treatment - obsolete! */
+  subgrid();
+#endif
 
 #if 0
   boil::plot->plot(clr,tnl,tnv,"clr-tnl-tnv",time->current_step());

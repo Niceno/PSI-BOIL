@@ -23,14 +23,12 @@ LookUpTable :: LookUpTable(const char * filename) {
 
   /* read the rest of the lines */
   while ( getline(in, line) ) {
-    if(line.length()>1){
-      std::vector < real > data;    /* row of data                             */
-      real value;                   /* datum                                   */
-      std::istringstream iss(line); /* manipulate string as if it was stream   */
-      while (iss >> value)          /* read all entries in the current row ... */
-        data.push_back(value);      /* ... and push them into "data"           */
-      table.push_back(data);        /* add the entire row into table           */
-    }
+    std::vector < real > data;    /* row of data                             */
+    real value;                   /* datum                                   */
+    std::istringstream iss(line); /* manipulate string as if it was stream   */
+    while (iss >> value)          /* read all entries in the current row ... */ 
+      data.push_back(value);      /* ... and push them into "data"           */
+    table.push_back(data);        /* add the entire row into table           */
   }
 
   // boil::oout << "table size: " << table.size() << boil::endl;

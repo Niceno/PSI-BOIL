@@ -161,6 +161,13 @@ void Model::tau_wall(Momentum * mom, const Scalar & dist,
         tau_x[i][j][k] = dist.dSz(i,j,k) * tau_w * tx;
         tau_y[i][j][k] = dist.dSz(i,j,k) * tau_w * ty;
         tau_z[i][j][k] = dist.dSz(i,j,k) * tau_w * tz;
+
+        //if (i==tau_x.si()+5&&j==tau_x.sj()+5) {
+        //  boil::oout<<"tau_wall:k= "<<k<<" "<<tau_x[i][j][k]<<" "<<tau_y[i][j][k]<<" "
+        //            <<tau_z[i][j][k]<<" y+ "<<y_plus<<"\n";
+        //  exit(0);
+        //}
+
       } 
   }
 

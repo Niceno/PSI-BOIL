@@ -9,6 +9,14 @@ real cal_area(real vec1[], real vec2[]) {
   real oy = vec1[2]*vec2[0] - vec1[0]*vec2[2];
   real oz = vec1[0]*vec2[1] - vec1[1]*vec2[0];
   return 0.5*sqrt(ox*ox+oy*oy+oz*oz);
+#if 0
+  real area2 = ox*ox+oy*oy+oz*oz;
+  if (area2 == 0.0) {
+    return 0.0;
+  } else {
+    return 0.5*sqrt(area2+1.0e-300);
+  }
+#endif
 }
 
 /******************************************************************************/

@@ -8,14 +8,13 @@ bool PhaseChangeVOF::Interface(const int dir, const Comp m,
   int of(1);
   if(dir<0) of = 0;
 
-  if(m==Comp::i())
+  if(m == Comp::i())
     return boil::realistic(fs[m][i+of][j][k]);
-  else if(m==Comp::j())
+  else if(m == Comp::j()) 
     return boil::realistic(fs[m][i][j+of][k]); 
   else
     return boil::realistic(fs[m][i][j][k+of]); 
 
-  return false;
 }
 
 bool PhaseChangeVOF::Interface(const int i, const int j, const int k) {

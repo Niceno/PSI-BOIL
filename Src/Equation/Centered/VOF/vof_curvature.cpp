@@ -1,4 +1,5 @@
 #include "vof.h"
+using namespace std;
 
 /******************************************************************************/
 void VOF::curvature() {
@@ -7,13 +8,10 @@ void VOF::curvature() {
 *     output: kappa
 *******************************************************************************/
 
-  if       (bulk_curv_method==CurvMethod::HF()) {
+  if(curv_method==0) {
     curv_HF();
-  } else if(bulk_curv_method==CurvMethod::none()) {
   } else {
-    boil::oout<<"VOF::curvature: Curvature calculation method not set properly!"
-              <<" Exiting."<<boil::endl;
-    exit(0);
+    curv_smooth();
   }
 
   return;

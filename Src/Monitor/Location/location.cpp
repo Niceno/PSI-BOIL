@@ -12,7 +12,7 @@
 *******************************************************************************/
 Location::Location(const char * n, 
                    const Domain & d, const int I, const int J, const int K) 
- : name(n), dom(&d), m_i(I), m_j(J), m_k(K) {
+ : name(n), dom(&d), m_i(I+boil::BW-1), m_j(J+boil::BW-1), m_k(K+boil::BW-1) {
 
   assert(true ==1);
   assert(false==0);
@@ -30,7 +30,7 @@ Location::Location(const char * n,
 
   /* monitoring point found, print it */
   if( found_here ) {
-    dom->locals(&m_i, &m_j, &m_k);
+    dom->locals(&m_i, &m_j, &m_k); // send global, return local
     if(name)
     boil::aout << "Location " << name <<
                   " at x = " << dom->xc(m_i) <<
@@ -102,3 +102,130 @@ void Location::print(const Vector & u, const Comp & m) {
                   z/count << " " << value/count << boil::endl;
   }
 }
+
+/******************************************************************************/
+real Location::value(const Scalar & phi) {
+
+  real val=0;
+  real count=0;
+
+  if( found_here ) {
+    val = phi[m_i][m_j][m_k];
+    count = 1.0;
+  }
+
+  boil::cart.sum_real(&val);
+  boil::cart.sum_real(&count);
+
+  assert(count > 0.0);
+
+  return val/count;
+}
+
+/******************************************************************************/
+real Location::value(const Vector & u, const Comp & m) {
+
+  real val=0;
+  real count=0;
+
+  if( found_here ) {
+    val = u[m][m_i][m_j][m_k];
+    count = 1;
+  }
+
+  boil::cart.sum_real(&val);
+  boil::cart.sum_real(&count);
+
+  assert(count > 0.0);
+
+  return val/count;
+}
+
+/******************************************************************************/
+real Location::get_scalar(const Scalar & phi) {
+
+  real value=0;
+  real count=0;
+
+  if( found_here ) {
+    value = phi[m_i][m_j][m_k];
+    count = 1;
+  }
+
+  boil::cart.sum_real(&value);
+  boil::cart.sum_real(&count);
+
+  assert(count > 0.0);
+
+  return value/count;
+}
+
+/******************************************************************************/
+real Location::get_vector(const Vector & u, const Comp & m) {
+
+  real value=0;
+  real count=0;
+
+  if( found_here ) {
+    value = u[m][m_i][m_j][m_k];
+    count = 1;
+  }
+
+  boil::cart.sum_real(&value);
+  boil::cart.sum_real(&count);
+
+  assert(count > 0.0);
+
+  return value/count;
+}
+
+/******************************************************************************/
+real Location::get_grid(const Scalar & phi, const Comp & m) {
+
+  real count=0;
+  real xyz=0;
+
+  if( found_here ) {
+    count = 1;
+    if (m==Comp::x()) {
+      xyz=phi.xc(m_i);
+    } else if (m==Comp::y()) {
+      xyz=phi.yc(m_j);
+    } else {
+      xyz=phi.zc(m_k);
+    }
+  }
+
+  boil::cart.sum_real(&count);
+  boil::cart.sum_real(&xyz);
+
+  assert(count > 0.0);
+
+  return xyz/count;
+}
+
+/******************************************************************************/
+real Location::get_grid(const Vector & u, const Comp & m, const Comp & n) {
+
+  real count=0;
+  real xyz=0;
+
+  if( found_here ) {
+    count = 1;
+    if (n==Comp::x()) {
+      xyz=u.xc(m,m_i);
+    } else if (n==Comp::y()) {
+      xyz=u.yc(m,m_j);
+    } else {
+      xyz=u.zc(m,m_k);
+    }
+  }
+
+  boil::cart.sum_real(&count);
+  boil::cart.sum_real(&xyz);
+
+  assert(count > 0.0);
+
+  return xyz/count;
+}
+

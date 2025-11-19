@@ -20,7 +20,6 @@ void CIPCSL2::front_minmax(Range<real> xr,
   xminft=boil::exa; xmaxft=-boil::exa;
   yminft=boil::exa; ymaxft=-boil::exa;
   zminft=boil::exa; zmaxft=-boil::exa;
-  bool frontExist=false;
 
   real phi1, phi2, xyz1, xyz2, xfront, yfront, zfront;
   for (int i=phi.si()-1; i<=phi.ei()  ; i++) {
@@ -39,7 +38,6 @@ void CIPCSL2::front_minmax(Range<real> xr,
         if ( dom->ibody().off(i,j,k) || dom->ibody().off(i+1,j,k)) continue;
 #endif
         if ( (phi1-0.5)*(phi2-0.5) <=0.0) {
-           frontExist=true;
            xyz1=phi.xc(i);
            xyz2=phi.xc(i+1);
            xfront=frontPosition(xyz1,xyz2,phi1,phi2);
@@ -71,7 +69,6 @@ void CIPCSL2::front_minmax(Range<real> xr,
         if ( dom->ibody().off(i,j,k) || dom->ibody().off(i,j+1,k)) continue;
 #endif
         if ( (phi1-0.5)*(phi2-0.5) <=0.0) {
-           frontExist=true;
            xyz1=phi.yc(j);
            xyz2=phi.yc(j+1);
            xfront=phi.xc(i);
@@ -103,7 +100,6 @@ void CIPCSL2::front_minmax(Range<real> xr,
         if ( dom->ibody().off(i,j,k) || dom->ibody().off(i,j,k+1)) continue;
 #endif
         if ( (phi1-0.5)*(phi2-0.5) <=0.0) {
-           frontExist=true;
            xyz1=phi.zc(k);
            xyz2=phi.zc(k+1);
            xfront=phi.xc(i);

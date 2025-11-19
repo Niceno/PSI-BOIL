@@ -35,17 +35,6 @@ void CIPCSL2::set_iflag() {
   insert_bc_flag(iflag, false);
   iflag.exchange();
 
-  /* EXTENDED BUFFERS HINT:
-   all lines with: 
-     for(int i=0; i<ni()-1; i++) or ...
-     for(int j=0; i<nj()-1; i++) or ...
-     for(int k=0; i<nk()-1; i++)
-   could probably be replaced with:
-     for(int i=si()-1; i<ei()+1; i++) and ...
-     for(int j=sj()-1; i<ej()+1; i++) and ...
-     for(int k=sk()-1; i<ek()+1; i++)
-  */
-
   /* next to free-surface (NFCell) */
   /* i-direction */
   for(int i=si()-1; i<ei()+1; i++){

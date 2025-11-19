@@ -1,7 +1,5 @@
 #include "centered.h"
 
-#define NEW_CONSERVATIVE_FORM false
-
 /***************************************************************************//**
 *  \brief Interface for calling convection for new time step \f$\{C\}^{N}\f$.
 *******************************************************************************/
@@ -68,8 +66,8 @@ void Centered::convection(Scalar * conv, const Property * prop) {
     umf = (*u)[Comp::u()][i]  [j][k];  // u @ imin
     upf = (*u)[Comp::u()][i+1][j][k];  // u @ imax
     
-    real a_w = dSx(Sign::neg(),i,j,k);
-    real a_e = dSx(Sign::pos(),i,j,k);
+    real a_w = dSx(i,j,k);
+    real a_e = dSx(i,j,k);
     if(dom->ibody().cut(i,j,k)) {
       a_w *= dom->ibody().fSw(i,j,k);
       a_e *= dom->ibody().fSe(i,j,k);
@@ -96,8 +94,8 @@ void Centered::convection(Scalar * conv, const Property * prop) {
     vmf = (*u)[Comp::v()][i][j]  [k];  // v @ jmin
     vpf = (*u)[Comp::v()][i][j+1][k];  // v @ jmax
 
-    real a_s = dSy(Sign::neg(),i,j,k);
-    real a_n = dSy(Sign::pos(),i,j,k);
+    real a_s = dSy(i,j,k);
+    real a_n = dSy(i,j,k);
     if(dom->ibody().cut(i,j,k)) {
       a_s *= dom->ibody().fSs(i,j,k);
       a_n *= dom->ibody().fSn(i,j,k);
@@ -123,8 +121,8 @@ void Centered::convection(Scalar * conv, const Property * prop) {
     wmf = (*u)[Comp::w()][i][j][k];    // w @ kmin
     wpf = (*u)[Comp::w()][i][j][k+1];  // w @ kmax
 
-    real a_b = dSz(Sign::neg(),i,j,k);
-    real a_t = dSz(Sign::pos(),i,j,k);
+    real a_b = dSz(i,j,k);
+    real a_t = dSz(i,j,k);
     if(dom->ibody().cut(i,j,k)) {
       a_b *= dom->ibody().fSb(i,j,k);
       a_t *= dom->ibody().fSt(i,j,k);

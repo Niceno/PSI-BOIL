@@ -1,6 +1,6 @@
 #include "floodfill.h"
 #include "../../Plot/plot.h"
-#define VERBOSE
+//#define VERBOSE
 
 /***************************************************************************//**
 *  outputs region properties to a file    
@@ -32,23 +32,23 @@ void Floodfill::out_region_info() {
     real cu = 0.0;
     real cv = 0.0;
     real cw = 0.0;
-    if(odt!=0){
-      real cu = (r.x()-r.xold()) / odt;
-      real cv = (r.y()-r.yold()) / odt;
-      real cw = (r.z()-r.zold()) / odt;
+    if (odt != 0.0) {
+      cu = (r.x()-r.xold()) / odt;
+      cv = (r.y()-r.yold()) / odt;
+      cw = (r.z()-r.zold()) / odt;
     }
     r.comuvw(cu,cv,cw);
     if (!(r.hiding()) ) { //do not output hidden regions
 #ifdef VERBOSE
       outrgn<<"Info1:t "<<time->current_time()<<" ID "<<r.id()
-            <<" cvol "<<r.cellvol()
+            <<" cvol "<<r.cellvol()<<" vol "<<r.volume()
             <<" xyz "<<r.x()<<" "<<r.y()<<" "<<r.z()
             <<" uvw "<<r.u()<<" "<<r.v()<<" "<<r.w()
             <<" comuvw "<<r.comu()<<" "<<r.comv()<<" "<<r.comw()
             <<std::endl;
 #else
       outrgn<<"Info1:t "<<time->current_time()<<" ID "<<r.id()
-            <<" cvol "<<r.cellvol()
+            <<" cvol "<<r.cellvol()<<" vol "<<r.volume()
             <<" xyz "<<r.x()<<" "<<r.y()<<" "<<r.z()
             <<std::endl;
 #endif

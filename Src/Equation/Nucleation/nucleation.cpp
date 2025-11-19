@@ -1,54 +1,61 @@
 #include "nucleation.h"
-#include "header.h"
 
 /***************************************************************************//**
 *  nucleation site model
 *******************************************************************************/
-Nucleation::Nucleation ( CommonHeatTransfer * CHT, Heaviside * HEAVI,
-                         const Times * t, const real rs, 
-                         Scalar * QSRC, const Sign SIG) :
-  cht(CHT),
-  heavi(HEAVI),
-  matter_sig(SIG)
+Nucleation::Nucleation ( Scalar * c, Scalar *tp, Scalar *qs,
+                     const Times * t, Scalar & DM,
+                     Matter *f, const real rs, const real dm, const real l,
+                     const real ca, const real tst, Matter *s ) :
+  dmicro(&DM),
+  flu(f),
+  sol(s)
 {
-  vf = cht->topo->vf;
-  clr= cht->topo->clr;
-  qsrc=QSRC;
+  clr=c;
+  tpr=tp;
+  qsrc=qs;
   time=t;
   rseed=rs;
+  dmicro_min = dm;
+  latent = l;
+  cang = ca;
+  tsat = tst;
 
-  if(matter_sig==Sign::pos()) {
-    rhol = cht->fluid()->rho(1);
-    rhov = cht->fluid()->rho(0);
-    lambdal = cht->fluid()->lambda(1);
-    lambdav = cht->fluid()->lambda(0);
-    cpl = cht->fluid()->cp(1);
-    cpv = cht->fluid()->cp(0);
-    mmass = cht->fluid()->mmass(0);
-  } else {
-    rhol = cht->fluid()->rho(0);
-    rhov = cht->fluid()->rho(1);
-    lambdal = cht->fluid()->lambda(0);
-    lambdav = cht->fluid()->lambda(1);
-    cpl = cht->fluid()->cp(0);
-    cpv = cht->fluid()->cp(1);
-    mmass = cht->fluid()->mmass(1);
-  }
-  latent = cht->fluid()->latent()->value();
-
-#ifndef USE_VOF_NUCL
-  rcut = 4.*rseed;
-#endif
-  seed_period = 0.01;
-  period_prevent_replant = 0.0;
-  dxmin = vf->domain()->dxyz_min();
-  eps = 1.5*dxmin;
+  /* default value */
+  dmicro = boil::exa;
+  seed_period = 0.001;
+  dxmin       = c->domain()->dxyz_min();
+  zbtm        = 0.0;
+  store_dSprev = false;
+  slope = 4.46e-3;  // Utaka's coefficient for water
+  boil::oout<<"Nucleation:slope= "<<slope<<"\n";
+  b_slope = 0.0;
+  exp_slope = 1.0;
+  rmax = 1.0e+300;
   bzoning = false;
-  zbtm = 0.0;
+  boptdat = false;
+  eps_clr = 1.0e-4;
+  clrsurf = 0.5;
+  range_zoning = 1.0;
+  set_heat_sink(true);
+  set_pre_heat_sink(false);
   threshold_c = 0.5;
+  threshold_clr_site = 0.9;
+  rseed_plus = 0.0;
+  set_micro_exists(true);
 
-  limit_zoning = true;
-  zoning_limit_multiplier = 0.2;
+  /* material properties */
+  rhov =    fluid()->rho(0);
+  lambdav = fluid()->lambda(0);
+  cpv =     fluid()->cp(0);
+
+  /* allocate */
+  const int n = boil::maxi(clr->ni(),clr->nj(),clr->nk());
+  dSprev = new real*[n];
+  for (int i=0; i<n; i++) {
+    dSprev[i] = new real[n];
+  }
+
 }
 
 /******************************************************************************/

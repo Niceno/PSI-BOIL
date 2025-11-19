@@ -8,8 +8,6 @@ void CIPCSL2::insert_bc_norm() {
 
   Formula form;
 
-  int i,j,k;
-
   for( int b=0; b<phi.bc().count(); b++ ) {
 
     if(phi.bc().type_decomp(b)) continue;

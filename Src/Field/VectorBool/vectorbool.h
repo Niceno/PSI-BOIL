@@ -8,7 +8,6 @@
 #include <cmath>
 
 #include "../../Ravioli/comp.h"
-#include "../../Ravioli/sign.h"
 #include "../../Parallel/communicator.h"
 #include "../../Domain/domain.h"
 #include "../../Boundary/bndcnd.h"
@@ -111,39 +110,6 @@ class VectorBool {
     real  yc(const Comp & m, const int j) const {return (this->*pnt_yc[~m])(j);}
     real  zc(const Comp & m, const int k) const {return (this->*pnt_zc[~m])(k);}
 
-    /* staggered cell-face areas */
-#if 0
-    real dSx(const Comp & m, const int i, const int j, const int k) const
-     {return dyc(m,j) * dzc(m,k);}
-    real dSy(const Comp & m, const int i, const int j, const int k) const
-     {return dxc(m,i) * dzc(m,k);}
-    real dSz(const Comp & m, const int i, const int j, const int k) const
-     {return dxc(m,i) * dyc(m,j);}
-#else
-    real dSx(const Comp & m, const int i, const int j, const int k) const
-     {return (this->*pnt_dSx[~m])(i,j,k);}
-    real dSy(const Comp & m, const int i, const int j, const int k) const
-     {return (this->*pnt_dSy[~m])(i,j,k);}
-    real dSz(const Comp & m, const int i, const int j, const int k) const
-     {return (this->*pnt_dSz[~m])(i,j,k);}
-#endif
-
-    real dSx(const Comp & m, const Sign sig, const int i, const int j, const int k) const
-      {return (this->*pnt_dSx_dir[~m])(sig,i,j,k);}
-    real dSy(const Comp & m, const Sign sig, const int i, const int j, const int k) const
-      {return (this->*pnt_dSy_dir[~m])(sig,i,j,k);}
-    real dSz(const Comp & m, const Sign sig, const int i, const int j, const int k) const
-      {return (this->*pnt_dSz_dir[~m])(sig,i,j,k);}
-
-    /* staggered cell volume */
-#if 0
-    real dV(const Comp & m, const int i, const int j, const int k) const
-     {return dxc(m,i) * dyc(m,j) * dzc(m,k);}
-#else
-    real dV(const Comp & m, const int i, const int j, const int k) const
-     {return (this->*pnt_dV[~m])(i,j,k);}
-#endif
-
     int i(const Comp & m, const real x) const;
     int j(const Comp & m, const real y) const;
     int k(const Comp & m, const real z) const;
@@ -159,6 +125,18 @@ class VectorBool {
     int aip(const Comp & m, const real x, const real t) const;
     int ajp(const Comp & m, const real y, const real t) const;
     int akp(const Comp & m, const real z, const real t) const;
+
+    /* staggered cell-face areas */
+    real dSx(const Comp & m, const int i, const int j, const int k) const
+     {return dyc(m,j) * dzc(m,k);}
+    real dSy(const Comp & m, const int i, const int j, const int k) const
+     {return dxc(m,i) * dzc(m,k);}
+    real dSz(const Comp & m, const int i, const int j, const int k) const
+     {return dxc(m,i) * dyc(m,j);}
+
+    /* staggered cell volume */
+    real dV(const Comp & m, const int i, const int j, const int k) const
+     {return dxc(m,i) * dyc(m,j) * dzc(m,k);}
 
     void exchange    (const Comp comp = Comp::undefined(),
                       const int  dir  = -1);
@@ -214,16 +192,6 @@ class VectorBool {
     real (VectorBool::*pnt_dzb[3])(const int k) const;
     real (VectorBool::*pnt_dzt[3])(const int k) const;
 
-    real (VectorBool::*pnt_dSx[3])(const int i, const int j, const int k) const;
-    real (VectorBool::*pnt_dSy[3])(const int i, const int j, const int k) const;
-    real (VectorBool::*pnt_dSz[3])(const int i, const int j, const int k) const;
-
-    real (VectorBool::*pnt_dSx_dir[3])(const Sign sig, const int i, const int j, const int k) const;
-    real (VectorBool::*pnt_dSy_dir[3])(const Sign sig, const int i, const int j, const int k) const;
-    real (VectorBool::*pnt_dSz_dir[3])(const Sign sig, const int i, const int j, const int k) const;
-
-    real (VectorBool::*pnt_dV[3])(const int i, const int j, const int k) const;
-
     /* these will be pointed to by above pointers */
     real  xc_nrm      (const int i) const {return dom-> xc(i);}
     real  xc_staggered(const int i) const {return dom-> xn(i);}
@@ -260,43 +228,6 @@ class VectorBool {
     real dzb_staggered(const int k) const {return dom->dzc(k-1);}
     real dzt_nrm      (const int k) const {return dom->dzt(k);}
     real dzt_staggered(const int k) const {return dom->dzc(k);}
-
-    real dSx_xstaggered(const int i, const int j, const int k) const {return dom->dSx_xstag(i,j,k);}
-    real dSx_ystaggered(const int i, const int j, const int k) const {return dom->dSx_ystag(i,j,k);}
-    real dSx_zstaggered(const int i, const int j, const int k) const {return dom->dSx_zstag(i,j,k);}
-
-    real dSy_xstaggered(const int i, const int j, const int k) const {return dom->dSy_xstag(i,j,k);}
-    real dSy_ystaggered(const int i, const int j, const int k) const {return dom->dSy_ystag(i,j,k);}
-    real dSy_zstaggered(const int i, const int j, const int k) const {return dom->dSy_zstag(i,j,k);}
-
-    real dSz_xstaggered(const int i, const int j, const int k) const {return dom->dSz_xstag(i,j,k);}
-    real dSz_ystaggered(const int i, const int j, const int k) const {return dom->dSz_ystag(i,j,k);}
-    real dSz_zstaggered(const int i, const int j, const int k) const {return dom->dSz_zstag(i,j,k);}
-
-    real dSx_dir_xstaggered(const Sign sig, const int i, const int j, const int k) const
-     {return dom->dSx_xstag(sig,i,j,k);}
-    real dSx_dir_ystaggered(const Sign sig, const int i, const int j, const int k) const
-     {return dom->dSx_ystag(sig,i,j,k);}
-    real dSx_dir_zstaggered(const Sign sig, const int i, const int j, const int k) const
-     {return dom->dSx_zstag(sig,i,j,k);}
-
-    real dSy_dir_xstaggered(const Sign sig, const int i, const int j, const int k) const
-     {return dom->dSy_xstag(sig,i,j,k);}
-    real dSy_dir_ystaggered(const Sign sig, const int i, const int j, const int k) const
-     {return dom->dSy_ystag(sig,i,j,k);}
-    real dSy_dir_zstaggered(const Sign sig, const int i, const int j, const int k) const
-     {return dom->dSy_zstag(sig,i,j,k);}
-
-    real dSz_dir_xstaggered(const Sign sig, const int i, const int j, const int k) const
-     {return dom->dSz_xstag(sig,i,j,k);}
-    real dSz_dir_ystaggered(const Sign sig, const int i, const int j, const int k) const
-     {return dom->dSz_ystag(sig,i,j,k);}
-    real dSz_dir_zstaggered(const Sign sig, const int i, const int j, const int k) const
-     {return dom->dSz_zstag(sig,i,j,k);}
-
-    real dV_xstaggered(const int i, const int j, const int k) const {return dom->dV_xstag(i,j,k);}
-    real dV_ystaggered(const int i, const int j, const int k) const {return dom->dV_ystag(i,j,k);}
-    real dV_zstaggered(const int i, const int j, const int k) const {return dom->dV_zstag(i,j,k);}
 
     /* take care that all of the data bellow is passed in copy constructor */
     ScalarBoolP  vec;

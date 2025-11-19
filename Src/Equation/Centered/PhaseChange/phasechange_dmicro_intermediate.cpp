@@ -39,7 +39,6 @@ void PhaseChange::dmicro_intermediate(){
     }
 
     int iof=0, jof=0, kof=0;
-    int ndir = 6;  // ibody()
     if(d == Dir::imin()) iof--; if(d == Dir::imax()) iof++;
     if(d == Dir::jmin()) jof--; if(d == Dir::jmax()) jof++;
     if(d == Dir::kmin()) kof--; if(d == Dir::kmax()) kof++;
@@ -48,9 +47,6 @@ void PhaseChange::dmicro_intermediate(){
     |  Note:  (i    , j    , k    ) is in fluid domain  |
     |         (i+iof, j+jof, k+kof) is in solid domain  |
     +--------------------------------------------------*/
-    int ii=i+iof;
-    int jj=j+jof;
-    int kk=k+kof;
 
     /* include vapor */
     real a_vapor=nucl->area_vapor(i,j,k,d);

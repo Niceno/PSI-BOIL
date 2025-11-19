@@ -17,7 +17,7 @@ void Floodfill::identify_regions() {
   /* if region is small may not be tracked properly ( could not
      be detected and then be redetected if smeared color function drops below
      0.5 cutoff */
-  const int size_smallrgn = 3;
+  //const int size_smallrgn = 3;  // 2024.12.06
 
   pt_idavail = v_idavail.data() - nrgn_inc;
 
@@ -155,8 +155,13 @@ void Floodfill::identify_regions() {
   }
   
   for_vijk(rgnid,i,j,k) {  
-    int rid = int(rgnid[i][j][k]);
-    pt_lookup_volcells[rid]++;
+     // Range
+    if(xr.contains(c.xc(i)) &&
+       yr.contains(c.yc(j)) &&
+       zr.contains(c.zc(k))) {
+      int rid = int(rgnid[i][j][k]);
+      pt_lookup_volcells[rid]++;
+    }
   }
   boil::cart.sum_int_n(&lookup_volcells[0], size_lookups);
 
@@ -538,6 +543,7 @@ void Floodfill::identify_regions() {
     updatergn.cellvol(pt_smlookup_cvol[i]);
     updatergn.xyz(pt_flookup_x[i], pt_flookup_y[i], pt_flookup_z[i]); //set new pos
     updatergn.uvw(pt_flookup_u[i], pt_flookup_v[i], pt_flookup_w[i]); //set new vel
+    updatergn.volume(pt_flookup_vol[i]);
   }
   
   /* erase region that is not hiding and not used */

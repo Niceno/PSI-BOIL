@@ -411,6 +411,7 @@ void CIPCSL2::update_at_walls(Scalar & sca) {
     sca[i][j][k] = extrapolate_v(i,j,k,ofx,ofy,ofz,xpos,ypos,zpos);
   }
 #endif
+
   /*--------------+
   | immersed body |
   +--------------*/
@@ -426,6 +427,7 @@ void CIPCSL2::update_at_walls(Scalar & sca) {
       real rat = -sca.dxe(i)/sca.dxc(i);
       sca[i-1][j][k] = extrapolate_c(sca,i-1,j,k,ofx,ofy,ofz,rat);
     }
+
     /* east */
     if (dom->ibody().off(i+1,j,k)) {
       int ofx(0), ofy(0), ofz(0);
@@ -433,6 +435,7 @@ void CIPCSL2::update_at_walls(Scalar & sca) {
       real rat = -sca.dxw(i)/sca.dxc(i);
       sca[i+1][j][k] = extrapolate_c(sca,i+1,j,k,ofx,ofy,ofz,rat);
     }
+
     /* south */
     if (dom->ibody().off(i,j-1,k)) {
       int ofx(0), ofy(0), ofz(0);
@@ -440,6 +443,7 @@ void CIPCSL2::update_at_walls(Scalar & sca) {
       real rat = -sca.dyn(j)/sca.dyc(j);
       sca[i][j-1][k] = extrapolate_c(sca,i,j-1,k,ofx,ofy,ofz,rat);
     }
+
     /* north */
     if (dom->ibody().off(i,j+1,k)) {
       int ofx(0), ofy(0), ofz(0);
@@ -447,6 +451,7 @@ void CIPCSL2::update_at_walls(Scalar & sca) {
       real rat = -sca.dys(j)/sca.dyc(j);
       sca[i][j+1][k] = extrapolate_c(sca,i,j+1,k,ofx,ofy,ofz,rat);
     }
+
     /* bottom */
     if (dom->ibody().off(i,j,k-1)) {
       int ofx(0), ofy(0), ofz(0);
@@ -458,7 +463,7 @@ void CIPCSL2::update_at_walls(Scalar & sca) {
     /* top */
     if (dom->ibody().off(i,j,k+1)) {
       int ofx(0), ofy(0), ofz(0);
-      ofz = -1;
+      ofy = -1;
       real rat = -sca.dzb(k)/sca.dzc(k);
       sca[i][j][k+1] = extrapolate_c(sca,i,j,k+1,ofx,ofy,ofz,rat);
     }

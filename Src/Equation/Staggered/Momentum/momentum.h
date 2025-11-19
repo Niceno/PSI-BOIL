@@ -64,7 +64,7 @@ class Momentum : public Staggered {
     Momentum(const Vector & U, 
              const Vector & F, 
              Times & t, 
-             Linear * sm,
+             Krylov * sm,
              Matter * M);
     ~Momentum();
 
@@ -74,63 +74,38 @@ class Momentum : public Staggered {
       create_system(mu_eddy);
       boil::timer.stop("momentum discretize");
     }
+    void insert_bc();
 
     real cfl_max() const;
-    void solve(const ResTol & toler, const ResRat & fact);
-    void solve(const ResTol & toler) { solve(toler,ResRat(-1.)); };
-    void solve(const ResRat & fact) { solve(ResTol(boil::atto),fact); };
-    void solve_wo_outlet(const ResTol & toler, const ResRat & fact);
-    void solve_wo_outlet(const ResTol & toler) { solve_wo_outlet(toler,ResRat(-1.)); };
-    void solve_wo_outlet(const ResRat & fact) { solve_wo_outlet(ResTol(boil::atto),fact); };
+    void solve(const ResRat & fact);
     real bulk(const Comp & m, const real & coord) const;
 
     void get_eps(Scalar * src);
     void get_q(Scalar * src);
     void project(const Scalar & frc);
-    void project(const Scalar & frc, Vector & veloc);
     void project_ghost(const Scalar & frc, const Scalar & c, const Scalar & k);
-    void project_w_outlet(const Scalar & frc);
-    void project_w_outlet(const Scalar & frc, Vector & veloc);
-    void new_time_step(const Scalar * prs = NULL);
-    void new_time_step(const Vector & v, const Scalar * prs = NULL);
+    void new_time_step();
+    void new_time_step(Vector & v);
     void grad(Scalar & p);
-    void convection(const Scalar * prs = NULL) {convection(&cnew,prs);}
+    void convection() {convection(&cnew);}
     real vol_phase_change(Scalar * psrc);
     
     void save(const char *, const int = -1);
     void load(const char *, const int = -1);
 
     void outlet();
-    void pressure_outlet(const Scalar & frc);
-    void pressure_outlet(const Scalar & frc, Vector & veloc);
-
-    void vanishing_derivative_outlet(Vector & veloc);
-
-    // trust velocities defined in solid (immersed boundary)
-    void set_trust_vel_wall(const bool b){
-           ib_trust_vel_wall=b; boil::oout<<"Momentum:trust_vel_wall= "<<b<<"\n";
-        };
-    bool get_trust_vel_wall(){return ib_trust_vel_wall;};
-
-    void set_volf_ib(real x) {volf_ib=x;};
-
-    void set_min_iteration(const int i){
-      min_iter = MinIter(i);
-      boil::oout<<"Momentum:min_iteration= "<<min_iter<<"\n";
-    }
-    int get_min_iteration() {return min_iter;}
 
     Matrix * A[3];
 
   private:
     
     void create_system(const Scalar * mu_eddy);
-
     void extrapolate_outlet_velocity(const real ubo, const real ratio);
-    void convective_outlet(Vector & veloc, const real ubo);
     void scale_outlet_velocity(const real ubo, const real ratio);
+    real volf_bct(const BndType & bc_type, 
+                  real * Ax=NULL, real * Ay=NULL, real * Az=NULL) const;
 
-    void convection(Vector * conv, const Scalar * prs = NULL);
+    void convection(Vector * conv);
     void diffusion();
 
     void advection_rho_c();
@@ -140,10 +115,8 @@ class Momentum : public Staggered {
     real bulk_j(const real & yp) const;
     real bulk_k(const real & zp) const;
 
-    real v_phase_change,volf_ib;
+    real v_phase_change;
     bool ifull, jfull, kfull;
-    bool ib_trust_vel_wall;
-    MinIter min_iter;
 
 };
 

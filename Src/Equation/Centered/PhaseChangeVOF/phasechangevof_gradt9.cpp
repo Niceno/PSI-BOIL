@@ -6,9 +6,9 @@ real PhaseChangeVOF::gradtx9(const int dir, const int i, const int j, const int 
 /***************************************************************************//**
 *  \brief calculate grad(tpr) in x-direction
 *         dir= 1: grad(tpr) second order central
-*         dir=-1: grad(tpr)  second order central
+*         dir=-1: grad(tpr)  second order cenral
 *******************************************************************************/
-  int m1, m2;
+  int m1;
   real dxm1, dxm2;
   real tm0, tm1, tm2;
   if (dir < 0) {
@@ -24,7 +24,7 @@ real PhaseChangeVOF::gradtx9(const int dir, const int i, const int j, const int 
     tm2  = tpr[i+m1][j][k];   
 
     /* cell-centred gradient */
-    return second_order_difference(tm1,tm0,tm2,-dxm1,dxm2-dxm1);
+    return grad_2nd(tm1,tm0,tm2,-dxm1,dxm2-dxm1);
   } else {
     m1 = -1;
     dxm1 = -distance_x(i,j,k,dir,tm0);
@@ -38,11 +38,11 @@ real PhaseChangeVOF::gradtx9(const int dir, const int i, const int j, const int 
     tm2  = tpr[i+m1][j][k];   
 
     /* cell-centred gradient */
-    return second_order_difference(tm1,tm2,tm0,dxm2-dxm1,-dxm1);
+    return grad_2nd(tm1,tm2,tm0,dxm2-dxm1,-dxm1);
   }
 
   /* upwind/downwind at interface */
-  //return second_order_difference(tm0,tm1,tm2,dxm1,dxm2);
+  //return grad_2nd(tm0,tm1,tm2,dxm1,dxm2);
 }
 
 /******************************************************************************/
@@ -52,7 +52,7 @@ real PhaseChangeVOF::gradty9(const int dir, const int i, const int j, const int 
 *         dir= 1: grad(tpr) second order central
 *         dir=-1: grad(tpr)  second order central
 *******************************************************************************/
-  int m1, m2;
+  int m1;
   real dym1, dym2;
   real tm0, tm1, tm2;
   if (dir < 0) {
@@ -69,7 +69,7 @@ real PhaseChangeVOF::gradty9(const int dir, const int i, const int j, const int 
     tm2  = tpr[i][j+m1][k];
 
     /* cell-centred gradient */
-    return second_order_difference(tm1,tm0,tm2,-dym1,dym2-dym1);
+    return grad_2nd(tm1,tm0,tm2,-dym1,dym2-dym1);
   } else {
     m1 = -1;
     dym1 = -distance_y(i,j,k,dir,tm0);
@@ -83,11 +83,11 @@ real PhaseChangeVOF::gradty9(const int dir, const int i, const int j, const int 
     tm2  = tpr[i][j+m1][k];
 
     /* cell-centred gradient */
-    return second_order_difference(tm1,tm2,tm0,dym2-dym1,-dym1);
+    return grad_2nd(tm1,tm2,tm0,dym2-dym1,-dym1);
   }
 
   /* upwind/downwind at interface */
-  //return second_order_difference(tm0,tm1,tm2,dym1,dym2);
+  //return grad_2nd(tm0,tm1,tm2,dym1,dym2);
 }
 
 /******************************************************************************/
@@ -97,7 +97,7 @@ real PhaseChangeVOF::gradtz9(const int dir, const int i, const int j, const int 
 *         dir= 1: grad(tpr) second order central
 *         dir=-1: grad(tpr)  second order central
 *******************************************************************************/
-  int m1, m2;
+  int m1;
   real dzm1, dzm2;
   real tm0, tm1, tm2;
   if (dir < 0) {
@@ -113,7 +113,7 @@ real PhaseChangeVOF::gradtz9(const int dir, const int i, const int j, const int 
     tm2  = tpr[i][j][k+m1];
 
     /* cell-centred gradient */
-    return second_order_difference(tm1,tm0,tm2,-dzm1,dzm2-dzm1);
+    return grad_2nd(tm1,tm0,tm2,-dzm1,dzm2-dzm1);
   } else {
     m1 = -1;
     dzm1 = -distance_z(i,j,k,dir,tm0);
@@ -127,9 +127,9 @@ real PhaseChangeVOF::gradtz9(const int dir, const int i, const int j, const int 
     tm2  = tpr[i][j][k+m1];
 
     /* cell-centred gradient */
-    return second_order_difference(tm1,tm2,tm0,dzm2-dzm1,-dzm1);
+    return grad_2nd(tm1,tm2,tm0,dzm2-dzm1,-dzm1);
   }
 
   /* upwind/downwind at interface */
-  //return second_order_difference(tm0,tm1,tm2,dzm1,dzm2);
+  //return grad_2nd(tm0,tm1,tm2,dzm1,dzm2);
 }

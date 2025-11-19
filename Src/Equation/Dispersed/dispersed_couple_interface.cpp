@@ -10,7 +10,6 @@ void Dispersed::couple_interface() {
 
   for_p(p) {
     real vol_dis = 0.0;
-    real vol_con = 0.0;
     real r = 0.5 * particles[p].d();
     real delta_x = particles[p].box_dx();
     real delta_y = particles[p].box_dy();

@@ -7,7 +7,7 @@ void AC::coarsen_system(const Centered & h, Centered & H) const {
 +------------------------*/
 
   boil::timer.start("coarsening");
-
+	
   /*---------------------------------+ 
   |  initialize central coefficient  |
   +---------------------------------*/
@@ -35,17 +35,6 @@ void AC::coarsen_system(const Centered & h, Centered & H) const {
     for(int j=1; j<=CJ; j++) jh[CJ-j] = jh[CJ]-j;
     for(int k=1; k<=CK; k++) kh[CK-k] = kh[CK]-k;
 
-    /* active cell flagging */
-    int central_flag = 0;
-
-    /* if cell is inactive, central flag must be 1
-       to avoid singularity */
-    if(!H.aflag[iH][jH][kH]) {
-      central_flag = 1;
-    }
-
-    /* w,e,s,n,b,t elements are zero for inactive cells */
-
     /*--------------+
     |  c = central  |
     +--------------*/
@@ -53,12 +42,7 @@ void AC::coarsen_system(const Centered & h, Centered & H) const {
     for(int i=1; i<=CI; i++) 
       for(int j=1; j<=CJ; j++) 
         for(int k=1; k<=CK; k++) {
-          H.A.c[iH][jH][kH] += h.A.c[ih[i]][jh[j]][kh[k]] 
-#if 0 /* discard inactive cells from blending (sorry for the syntax) */ 
-                             * std::max(central_flag,
-                                        h.aflag[ih[i]][jh[j]][kh[k]])
-#endif
-                             ;
+          H.A.c[iH][jH][kH] += h.A.c[ih[i]][jh[j]][kh[k]];
         }
 
     /*------+

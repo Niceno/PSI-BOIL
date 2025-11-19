@@ -6,7 +6,6 @@ void Momentum::project_ghost(const Scalar & frc,
                              const Scalar & kappa ) {
  
   Comp m;
-  real rho;
 
   real sigma = fluid()->sigma()->value();
   real cint = 0.5;
@@ -146,7 +145,6 @@ void Momentum::project_ghost(const Scalar & frc,
         }
       }
   }
-
-  u.bnd_update_nooutlet();
+  insert_bc();
   u.exchange_all();
 }

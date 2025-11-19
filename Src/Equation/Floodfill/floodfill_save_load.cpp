@@ -123,3 +123,15 @@ void Floodfill::load(const char * nm, const int it) {
     
   in.close();
 }
+
+/******************************************************************************/
+void Floodfill::rm(const char * nm, const int it) {
+
+  /* file name */
+  std::string name = name_file(nm, ".bck", it, boil::cart.iam());
+
+  /* remove a file */
+  remove(name.c_str());
+
+}
+

@@ -8,7 +8,7 @@
 *
 *  The only thing useful from the parent is handling of boundary conditions.
 *******************************************************************************/
-void Pressure::discretize(const Scalar * diff_eddy) {
+void Pressure::discretize() {
 
   boil::timer.start("pressure discretize");
 
@@ -26,8 +26,8 @@ void Pressure::discretize(const Scalar * diff_eddy) {
     /* linear */
     rhom = fluid()->rho(m,i,  j,k);
     rhop = fluid()->rho(m,i+1,j,k);
-    a_w = dSx(Sign::neg(),i,j,k);
-    a_e = dSx(Sign::pos(),i,j,k);
+    a_w = dSx(i,j,k);
+    a_e = dSx(i,j,k);
     A.w[i][j][k] = a_w / dxw(i) / rhom;
     A.e[i][j][k] = a_e / dxe(i) / rhop;
   }
@@ -38,8 +38,8 @@ void Pressure::discretize(const Scalar * diff_eddy) {
     /* linear */
     rhom = fluid()->rho(m,i,j,  k);
     rhop = fluid()->rho(m,i,j+1,k);
-    a_s = dSy(Sign::neg(),i,j,k);
-    a_n = dSy(Sign::pos(),i,j,k);
+    a_s = dSy(i,j,k);
+    a_n = dSy(i,j,k);
     A.s[i][j][k] = a_s / dys(j) / rhom;
     A.n[i][j][k] = a_n / dyn(j) / rhop;
   }
@@ -50,8 +50,8 @@ void Pressure::discretize(const Scalar * diff_eddy) {
     /* linear */
     rhom = fluid()->rho(m,i,j,k);
     rhop = fluid()->rho(m,i,j,k+1);
-    a_b = dSz(Sign::neg(),i,j,k);
-    a_t = dSz(Sign::pos(),i,j,k);
+    a_b = dSz(i,j,k);
+    a_t = dSz(i,j,k);
     A.b[i][j][k] = a_b / dzb(k) / rhom;
     A.t[i][j][k] = a_t / dzt(k) / rhop;
   }
@@ -135,7 +135,8 @@ void Pressure::discretize(const Scalar * diff_eddy) {
         /* since solid and fluid cells are blended during coarsening,
            it is necessary for the central coefficient to maintain
            magnitude negligible wrt fluid ones (comment 2/2) */
-        A.c[i][j][k]  *= boil::pico;
+        //A.c[i][j][k]  *= boil::pico;  // Lubomir
+        //A.ci[i][j][k] = 1.0 / A.c[i][j][k];  // Yohei
         //A.c[i][j][k]  = boil::pico;
         //A.ci[i][j][k] = 1.0;
         //A.c[i][j][k]  = 1.0;

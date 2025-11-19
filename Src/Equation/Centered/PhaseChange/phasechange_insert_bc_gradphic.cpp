@@ -6,15 +6,11 @@ void PhaseChange::insert_bc_gradphic(const Scalar & val) {
 *  \brief boundary condition for the adjacent cell next to boundary
 *******************************************************************************/
 
-  int i,j,k;
-
   for( int b=0; b<val.bc().count(); b++ ) {
 
     if(val.bc().type_decomp(b)) continue;
 
     if( val.bc().type(b) == BndType::wall() ) {
-
-      int iof=0, jof=0, kof=0;
 
       Dir d      = val.bc().direction(b);
 
@@ -22,7 +18,6 @@ void PhaseChange::insert_bc_gradphic(const Scalar & val) {
       |  direction  |
       +------------*/
       if(d != Dir::undefined()) {
-        real ni,nj,nk,magn;
         if(d == Dir::imin()){
           for_vijk( val.bc().at(b), i,j,k ){
             int ii=i+1;
@@ -64,15 +59,12 @@ void PhaseChange::insert_bc_gradphic(const Scalar & val) {
 
     if( val.bc().type(b) == BndType::symmetry() ) {
 
-      int iof=0, jof=0, kof=0;
-
       Dir d      = val.bc().direction(b);
 
       /*------------+
       |  direction  |
       +------------*/
       if(d != Dir::undefined()) {
-        real ni,nj,nk,magn;
         if(d == Dir::imin()){
           for_vijk( val.bc().at(b), i,j,k ){
             int ii=i+1; 

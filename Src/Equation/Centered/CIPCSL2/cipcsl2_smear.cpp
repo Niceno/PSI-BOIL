@@ -11,7 +11,6 @@ void CIPCSL2::smear(Scalar & sca) {
 *            input & output: sca
 *            temporary: stmp
 *******************************************************************************/
-  real dsca_max=0.0;  // l_infinity for iterative cal.
   const real epss = dxmin*dxmin;
   const real dtau=0.125;
 
@@ -70,7 +69,7 @@ void CIPCSL2::smear(Scalar & sca) {
           if (dom->ibody().off(Comp::u(),i,j,k)) continue;
           real fluxd, ldt;
           // diffusion
-          fluxd = epss * (sca[i][j][k]-sca[i-1][j][k])*dSx(Sign::neg(),i,j,k)/sca.dxw(i);
+          fluxd = epss * (sca[i][j][k]-sca[i-1][j][k])*dSx(i,j,k)/sca.dxw(i);
           ldt  = dtau;
 
           if(i==si()   && imin) ldt=0.0;
@@ -93,7 +92,7 @@ void CIPCSL2::smear(Scalar & sca) {
           if (dom->ibody().off(Comp::v(),i,j,k)) continue;
           real fluxd, ldt;
           // diffusion
-          fluxd = epss * (sca[i][j][k]-sca[i][j-1][k])*dSy(Sign::neg(),i,j,k)/sca.dys(j);
+          fluxd = epss * (sca[i][j][k]-sca[i][j-1][k])*dSy(i,j,k)/sca.dys(j);
           ldt  = dtau;
 
           if(j==sj()   && jmin) ldt=0.0;
@@ -116,7 +115,7 @@ void CIPCSL2::smear(Scalar & sca) {
           if (dom->ibody().off(Comp::w(),i,j,k)) continue;
           real fluxd, ldt;
           // diffusion
-          fluxd = epss * (sca[i][j][k]-sca[i][j][k-1])*dSz(Sign::neg(),i,j,k)/sca.dzb(k);
+          fluxd = epss * (sca[i][j][k]-sca[i][j][k-1])*dSz(i,j,k)/sca.dzb(k);
           ldt  = dtau;
 
           if(k==sk()   && kmin) ldt=0.0;

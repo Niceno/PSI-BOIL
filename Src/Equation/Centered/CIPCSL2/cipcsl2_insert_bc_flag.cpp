@@ -7,8 +7,6 @@ void CIPCSL2::insert_bc_flag(ScalarInt & val, const bool adj) {
 *  if adj == true, flag in wall adjacent cells = -1001
 *******************************************************************************/
 
-  int i,j,k;
-
   int iproc=boil::cart.iam();
 
   for( int b=0; b<val.bc().count(); b++ ) {

@@ -6,81 +6,46 @@
 *******************************************************************************/
 EnthalpyFD::EnthalpyFD(const Scalar & PHI, 
                        const Scalar & F,
+                       const Scalar & C,
                        const Vector & U,
-                       const Vector & Uliq,
-                       const Vector & Ugas,
                        Times & T,
-                       Linear * S,
+                       Krylov * S,
                        Matter * f,
-                       const CommonHeatTransfer & CHT,
+                       const real Tsat,
                        Matter * s) :
 /*---------------------+ 
 |  initialize parent   |
 +---------------------*/
   Centered( PHI.domain(), PHI, F, & U, T, f, s, S ),
-  ftif   (  *PHI.domain()),
-  cht(CHT),
-  iflag(CHT.topo->iflag),
-  iflagold(&(CHT.topo->iflagold)),
-  uliq(&Uliq),
-  ugas(&Ugas),
-  flux_liq( *U.domain() ),
-  flux_gas( *U.domain() ),
-  bflag_struct(PHI),
-
-  c_fff({ ConnectType::fluid,     ConnectType::fluid, ConnectType::fluid     }),
-  c_sss({ ConnectType::solid,     ConnectType::solid, ConnectType::solid     }),
-
-  c_iff({ ConnectType::interface, ConnectType::fluid, ConnectType::fluid     }),
-  c_ffi({ ConnectType::fluid,     ConnectType::fluid, ConnectType::interface }),
-  c_ifi({ ConnectType::interface, ConnectType::fluid, ConnectType::interface }),
-
-  c_sff({ ConnectType::solid,     ConnectType::fluid, ConnectType::fluid     }),
-  c_ffs({ ConnectType::fluid,     ConnectType::fluid, ConnectType::solid     }),
-  c_sfs({ ConnectType::solid,     ConnectType::fluid, ConnectType::solid     }),
-
-  c_sfi({ ConnectType::solid,     ConnectType::fluid, ConnectType::interface }),
-  c_ifs({ ConnectType::interface, ConnectType::fluid, ConnectType::solid     }),
-
-  c_ssf({ ConnectType::solid,     ConnectType::solid, ConnectType::fluid     }),
-  c_fss({ ConnectType::fluid,     ConnectType::solid, ConnectType::solid     }),
-  c_fsf({ ConnectType::fluid,     ConnectType::solid, ConnectType::fluid     }),
-
-  c_ssi({ ConnectType::solid,     ConnectType::solid, ConnectType::interface }),
-  c_iss({ ConnectType::interface, ConnectType::solid, ConnectType::solid     }),
-  c_isi({ ConnectType::interface, ConnectType::solid, ConnectType::interface }),
-
-  c_fsi({ ConnectType::fluid,     ConnectType::solid, ConnectType::interface }),
-  c_isf({ ConnectType::interface, ConnectType::solid, ConnectType::fluid     })
-
+  clrold(  *C  .domain()),
+  iflag (  *C  .domain())
 {
+  tsat = Tsat,
+  rhol = fluid()->rho(1),
+  rhov = fluid()->rho(0),
+  cpl  = fluid()->cp(1),
+  cpv  = fluid()->cp(0),
+  lambdal = fluid()->lambda(1),
+  lambdav = fluid()->lambda(0),
+  clr = &C;
+  clrsurf = 0.5;
+  clrold = (*clr).shape();
+  iflag  = (*clr).shape();
+  store_clrold = false;
   assert(PHI.domain() == F.domain());
   assert(PHI.domain() == U.domain());
+  epsl=1.0e-2;
+  turbP=0.9;
   laminar=true;
-  ao_conv = AccuracyOrder::First();
 
-  for_m(m) {
-    flux_liq(m) = (*uliq)(m).shape();
-    flux_gas(m) = (*ugas)(m).shape();
-  }
-
-  /* see header for explanation */
-  if(solid()) {
-    safe_solid = solid();
-    if(cht.solid()==NULL) {
-      boil::oout<<"enthalpyFD:Error!!! Solid is defined for EnthalpyFD ";
-      boil::oout<<"but it is not defined for CommonHeat Transfer.\n";
-      exit(0);
-    }
-  } else {
-    safe_solid = fluid();
-  }
-
-  ftif = phi.shape();
   phi.bnd_update();
 
   convection_set(TimeScheme::forward_euler());
   diffusion_set(TimeScheme::backward_euler());
 
   discretize();
+}	
+
+/******************************************************************************/
+EnthalpyFD::~EnthalpyFD() {
 }

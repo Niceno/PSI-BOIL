@@ -12,41 +12,6 @@ void VOF::cal_fs3(const Scalar & scp) {
   /* tolerance is necessary because the linear-planes are not closed */
   /* with this version, it shouldnt be necessary anymore */
   real tolf = 0.0e-2;
-
-  /* fs is a result of calculations involving nx,ny,nz,nalpha,color
-   * and cell dimensions. Thus, by taking care of properly exchanging
-   * these variables, we can safely venture to calculate fs in buffer
-   * cells without dealing with the exchange() method, which would 
-   * not function properly for fs. So don't worry and let's loop over
-   * (almost) all cells, including buffers except for the furthest one */
-  int ibeg(si()), iend(ei()+1);
-  int jbeg(sj()), jend(ej()+1);
-  int kbeg(sk()), kend(ek()+1);
-
-  if(bflag_struct.ifull) {
-    if(bflag_struct.iminp) {
-      ibeg -= boil::BW-1;
-    }
-    if(bflag_struct.imaxp) {
-      iend += boil::BW-1;
-    }
-  }
-  if(bflag_struct.jfull) {
-    if(bflag_struct.jminp) {
-      jbeg -= boil::BW-1;
-    }
-    if(bflag_struct.jmaxp) {
-      jend += boil::BW-1;
-    }
-  }
-  if(bflag_struct.kfull) {
-    if(bflag_struct.kminp) {
-      kbeg -= boil::BW-1;
-    }
-    if(bflag_struct.kmaxp) {
-      kend += boil::BW-1;
-    }
-  }
         
   /* initialize */
   for_m(m)
@@ -54,20 +19,22 @@ void VOF::cal_fs3(const Scalar & scp) {
       fs[m][i][j][k] = boil::unreal;
 
   Comp m;
-
+  
   /******************************************
   *             x-direction                 *
   ******************************************/
 
   m = Comp::i();
-  for(int i=ibeg; i<=iend; i++)
-  for(int j=sj(); j<=ej(); j++)
-  for(int k=sk(); k<=ek(); k++) {
+  //for_vmijk(u,m,i,j,k) {  /* don't use vmijk. wall will be skipped! */
+  for(int i=si(); i<=ei()+1; i++)
+  for(int j=sj(); j<=ej()  ; j++)
+  for(int k=sk(); k<=ek()  ; k++) {
 
-    /* degenerate cases */
-    if(dom->ibody().off(i-1,j,k)&&dom->ibody().off(i,j,k))
+    /* immersed body */
+    if(dom->ibody().off(i-1,j,k)||dom->ibody().off(i,j,k))
       continue;
-
+  
+    /* degenerate cases */
     real clrw = scp[i-1][j][k];
     real clre = scp[i  ][j][k];
 
@@ -122,14 +89,16 @@ void VOF::cal_fs3(const Scalar & scp) {
   ******************************************/
 
   m = Comp::j();
-  for(int i=si(); i<=ei(); i++)
-  for(int j=jbeg; j<=jend; j++)
-  for(int k=sk(); k<=ek(); k++) {
+  //for_vmijk(u,m,i,j,k) {  /* don't use vmijk. wall will be skipped! */
+  for(int i=si(); i<=ei()  ; i++)
+  for(int j=sj(); j<=ej()+1; j++)
+  for(int k=sk(); k<=ek()  ; k++) {
 
-    /* degenerate cases */
-    if(dom->ibody().off(i,j-1,k)&&dom->ibody().off(i,j,k))
+    /* immersed body */
+    if(dom->ibody().off(i,j-1,k)||dom->ibody().off(i,j,k))
       continue;
-
+               
+    /* degenerate cases */
     real clrs = scp[i][j-1][k];
     real clrn = scp[i][j  ][k];
 
@@ -152,7 +121,7 @@ void VOF::cal_fs3(const Scalar & scp) {
        b. inside the correct cell (real interface)
     ----------------------------------------------- */
     bool flags = (0.5     <= fsys && fsys <= 1.0+tolf);
-    bool flagn = (0.0-tolf <= fsyn && fsyn <= 0.5);
+    bool flagn = (0.0-tolf <= fsyn && fsyn <= 0.5+tolf);
    
     if     ( flags && !flagn) { /* south is real and north is not */
       fs[m][i][j][k] = scp.yn(j-1) + scp.dyc(j-1) * fsys;
@@ -183,14 +152,16 @@ void VOF::cal_fs3(const Scalar & scp) {
   ******************************************/
 
   m = Comp::k();
-  for(int i=si(); i<=ei(); i++)
-  for(int j=sj(); j<=ej(); j++)
-  for(int k=kbeg; k<=kend; k++) {
+  //for_vmijk(u,m,i,j,k) {  /* don't use vmijk. wall will be skipped! */
+  for(int i=si(); i<=ei()  ; i++)
+  for(int j=sj(); j<=ej()  ; j++)
+  for(int k=sk(); k<=ek()+1; k++) {
 
-    /* degenerate cases */
-    if(dom->ibody().off(i,j,k-1)&&dom->ibody().off(i,j,k))
+    /* immersed body */
+    if(dom->ibody().off(i,j,k-1)||dom->ibody().off(i,j,k))
       continue;
-
+               
+    /* degenerate cases */
     real clrb = scp[i][j][k-1];
     real clrt = scp[i][j][k  ];
 
@@ -217,11 +188,11 @@ void VOF::cal_fs3(const Scalar & scp) {
    
     //if(i==46&&j==50&&k==76) boil::oout<<"VOF::cal_FS3 "<<fszb<<" "<<fszt<<boil::endl;
   
-    if     ( flagb && !flagt) { /* bottom is real and top is not */
+    if     ( flagb && !flagt) { /* south is real and north is not */
       fs[m][i][j][k] = scp.zn(k-1) + scp.dzc(k-1) * fszb;
       continue;
     }
-    else if(!flagb &&  flagt) { /* top is real and bottom is not */
+    else if(!flagb &&  flagt) { /* north is real and south is not */
       fs[m][i][j][k] = scp.zn(k) + scp.dzc(k) * fszt;
       continue;
     }
@@ -242,21 +213,10 @@ void VOF::cal_fs3(const Scalar & scp) {
   } 
 
   /* correct at boundaries */
-  if       (subgrid_method == SubgridMethod::PLIC()) {
-    topo->fs_bnd_geometric(scp,fs,tol_wall);
-  } else if(subgrid_method == SubgridMethod::None()) {
-    topo->fs_bnd_nosubgrid(scp,fs,tol_wall);
-  } else if(subgrid_method == SubgridMethod::SLICliquid()) {
-    topo->fs_bnd_1D(scp,fs,tol_wall,Sign::pos());
-  } else if(subgrid_method == SubgridMethod::SLICgas()) {
-    topo->fs_bnd_1D(scp,fs,tol_wall,Sign::neg());
-  } else {
-    boil::oout<<"VOF::fs3: Subgrid method not set properly!"
-              <<" Exiting."<<boil::endl;
-    exit(0);
-  }
-  /* symmetry */
-  fs_bnd_symmetry(scp,fs,tol_wall);
+  if(use_subgrid)
+    fs_bnd(scp);
+  else
+    fs_bnd_nosubgrid(scp);
   //fs.exchange_all();
 
   //boil::plot->plot(fs,scp, "fs-clr", 0);
@@ -322,6 +282,6 @@ real VOF::fs_val(const Comp m, const int i, const int j, const int k) {
   }
 #endif
 
-  return boil::unreal;
+  //return boil::unreal;
 }
 

@@ -33,7 +33,7 @@ void Scalar::bnd_insert ( const Dir d, real **  cp ) {
       val[i][j][sk()-1] = cp[i][j];
 
   if( (d == Dir::kmax()) && (dom->coord(Comp::k()) == dom->dim(Comp::k())-1) )
-    for_aij(i, j)
+    for_aij(i, j) 
       val[i][j][ek()+1] = cp[i][j];
 
   /* free the memory used during this process */

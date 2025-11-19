@@ -16,8 +16,8 @@ Floodfill::Floodfill(Scalar & colorf,
                      uvw(p_uvw),
                      time ( & t),
                      rgnid_old(*(srid.domain())),
-                     m_dV(srid.domain()->dV_min()),
-                     m_dxc(srid.domain()->dxyz_min()) {
+                     m_dV(srid.dV(srid.si()+1,srid.sj()+1,srid.sk()+1)),
+                     m_dxc(srid.dxc(srid.si()+1)) {
 
   new_seed_stack.reserve (BIG_BUFFER_SIZE);  /* sizes may be too small/big? */
   same_fill_stack.reserve(BIG_BUFFER_SIZE);
@@ -35,6 +35,7 @@ Floodfill::Floodfill(Scalar & colorf,
   flookup_v.reserve(BIG_BUFFER_SIZE);
   flookup_w.reserve(BIG_BUFFER_SIZE);
   flookup_cvol.reserve(BIG_BUFFER_SIZE);
+  flookup_vol.reserve(BIG_BUFFER_SIZE);
   smlookup_oldid.reserve(BIG_BUFFER_SIZE);
   smlookupvchk.reserve(BIG_BUFFER_SIZE);
   oldid_num_newrgns.reserve(BIG_BUFFER_SIZE);
@@ -53,6 +54,7 @@ Floodfill::Floodfill(Scalar & colorf,
   pt_flookup_u   = 0;
   pt_flookup_v   = 0;
   pt_flookup_w   = 0;
+  pt_flookup_vol = 0;
 
   rgnid_old = srid.shape();
   
@@ -61,6 +63,10 @@ Floodfill::Floodfill(Scalar & colorf,
   pltinc = 0; //for debug plotting
 
   out_rgn_info_freq=50;
+  size_smallrgn = 3;
+  xr.first(-boil::yotta); xr.last(boil::yotta);
+  yr.first(-boil::yotta); yr.last(boil::yotta);
+  zr.first(-boil::yotta); zr.last(boil::yotta);
 
   if (!boil::cart.iam()){
     outrgn.open("tracked_regions.txt",std::ios::app);
@@ -102,7 +108,7 @@ Region & Floodfill::getregion(int rid) {
 }
 
 /******************************************************************************/
-int Floodfill::mng_hidden_rgns() {
+void Floodfill::mng_hidden_rgns() {
   /*------------------------------------------------------------------+
   |  rgn erased after hidden for more than 100(why?) time steps       |
   +------------------------------------------------------------------*/
@@ -121,7 +127,6 @@ int Floodfill::mng_hidden_rgns() {
       }
     }
   }
-  return 0;
 }
 
 /******************************************************************************/
@@ -138,8 +143,8 @@ int Floodfill::hidden_rgnid(real ix, real iy, real iz) {
                 <<m_vectrgns[i].get_tsteps_hidden()<<" dist traveled in hiding "
                 <<dist<<" < 1.5dx "<<1.5*m_dxc<<std::endl;
         }
-        m_vectrgns[i].hiding(false);
-        return m_vectrgns[i].id();
+      m_vectrgns[i].hiding(false);
+      return m_vectrgns[i].id();
       }
     }
   }

@@ -26,8 +26,18 @@ class Location : public Monitor {
     void print(const Scalar & u);
     void print(const Vector & u, const Comp & m);
 
+    real value(const Scalar & u);
+    real value(const Vector & u, const Comp & m);
+
+    real get_scalar(const Scalar & u);
+    real get_vector(const Vector & u, const Comp & m);
+
+    real get_grid(const Scalar & u, const Comp & m);
+    real get_grid(const Vector & u, const Comp & m, const Comp & n);
+
   private:
-    Location() : dom(NULL), m_i(-1), m_j(-1), m_k(-1) {};
+    //Location() : dom(NULL), m_i(-1), m_j(-1), m_k(-1) {};
+    Location() : dom(NULL), m_i(+10), m_j(-1), m_k(-1) {}; //boil::BW
    
     const char   * name;
     const Domain * dom;

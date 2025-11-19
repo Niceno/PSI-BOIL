@@ -2,23 +2,26 @@
 using namespace std;
 
 /******************************************************************************/
-void VOF::norm_young(const Scalar & sca) {
+void VOF::norm_young(const Scalar & sca, const bool gridSize) {
 /***************************************************************************//**
 *  \brief Calculate normal vector at interface
 *  Young's method in E.Aulisa,JCP,225(2007),2301-2319, Section 2.2.2.1
 *  Young's method is used by J.Lopez et al., An improved height function...
 *  Comput. Methods Appl. Mech. Engrg. 198 (2009) 2555-2564
 *         Results: nx, ny, nz : normal vector in the VOF space
+*
+*         gridSize=true:  grid size is taken into acount
+*         gridSize=false: assuming uniform grid (required for advance)
 *******************************************************************************/
   nx=0.0;
   ny=0.0;
   nz=0.0;
-  
-  real dummy; /* dummy from alpha calculations */
+
+  //std::cout<<"norm_young: "<<gridSize<<"\n";
 
   for_ijk(i,j,k) {
     real nxx, nyy, nzz;
-    norm_young_kernel(nxx, nyy, nzz, dummy, i,j,k, sca);
+    norm_young(nxx, nyy, nzz, i,j,k, sca, gridSize);
 
     nx[i][j][k] = nxx;
     ny[i][j][k] = nyy;
@@ -38,11 +41,16 @@ void VOF::norm_young(const Scalar & sca) {
   return;
 }
 
+/******************************************************************************/
+void VOF::norm_young(real & nx_val, real & ny_val, real & nz_val,
+                     const int i, const int j, const int k,
+                     const Scalar & sca, const bool gridSize) {
 
-void VOF::norm_young_kernel(real & nx_val, real & ny_val, real & nz_val,
-                            real & dummy, /* unused */
-                            const int i, const int j, const int k,
-                            const Scalar & sca) {
+#if 0
+  if(i==si()&&j==sj()&&k==sk()) {
+    std::cout<<"norm_young:component "<<gridSize<<"\n";
+  }
+#endif
 
   int jflag, sum_jflag=0;
   real nxave=0.0, nyave=0.0, nzave=0.0;
@@ -69,16 +77,22 @@ void VOF::norm_young_kernel(real & nx_val, real & ny_val, real & nz_val,
            -0.25 * (sca[iii][jjj  ][kkk-1]+sca[iii-1][jjj  ][kkk-1]
                   + sca[iii][jjj-1][kkk-1]+sca[iii-1][jjj-1][kkk-1]);
 
+    if (gridSize) {
+      nxtmp /= dxw(i);
+      nytmp /= dys(j);
+      nztmp /= dzb(k);
+    }
+
     //normalize(nxtmp,nytmp,nztmp);  // comment out 2019.07.03
 
     /* check boundary condition */
     jflag=1;
-    if (iii  ==si() && bflag_struct.iminc==true) jflag=0;
-    if (iii-1==ei() && bflag_struct.imaxc==true) jflag=0;
-    if (jjj  ==sj() && bflag_struct.jminc==true) jflag=0;
-    if (jjj-1==ej() && bflag_struct.jmaxc==true) jflag=0;
-    if (kkk  ==sk() && bflag_struct.kminc==true) jflag=0;
-    if (kkk-1==ek() && bflag_struct.kmaxc==true) jflag=0;
+    if (iii  ==si() && iminc==true) jflag=0;
+    if (iii-1==ei() && imaxc==true) jflag=0;
+    if (jjj  ==sj() && jminc==true) jflag=0;
+    if (jjj-1==ej() && jmaxc==true) jflag=0;
+    if (kkk  ==sk() && kminc==true) jflag=0;
+    if (kkk-1==ek() && kmaxc==true) jflag=0;
 
     sum_jflag += jflag;
 
@@ -89,9 +103,9 @@ void VOF::norm_young_kernel(real & nx_val, real & ny_val, real & nz_val,
   }}}
 
   /* average norm at corner */
-  nxave /= real(sum_jflag);
-  nyave /= real(sum_jflag);
-  nzave /= real(sum_jflag);
+  nxave /= sum_jflag;
+  nyave /= sum_jflag;
+  nzave /= sum_jflag;
 
 #if 0
   if (sum_jflag==0) {

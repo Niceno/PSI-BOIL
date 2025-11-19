@@ -15,7 +15,7 @@ void PhaseChangeVOF::modify_vel(Vector & uvw,
   for_vmijk(uvw, m,i,j,k) {
     real cf_old=cold[m][i][j][k];
     real cf_new=cnew[m][i][j][k];
-    if ((cf_old-clrsurf)*(cf_new-clrsurf)<0.0) {
+    if ((cf_old-0.5)*(cf_new-0.5)<0.0) {
       if (dom->ibody().on(m,i,j,k)) {
         //std::cout<<"vel:cell1 "<<boil::cart.iam()<<" "<<i<<" "<<j<<" "<<k<<"\n";
 #if 0
@@ -80,7 +80,7 @@ void PhaseChangeVOF::modify_vel(Vector & uvw,
   for_vmijk(uvw, m,i,j,k) {
     real cf_old=cold[m][i][j][k];
     real cf_new=cnew[m][i][j][k];
-    if ((cf_old-clrsurf)*(cf_new-clrsurf)<0.0) {
+    if ((cf_old-0.5)*(cf_new-0.5)<0.0) {
       if (dom->ibody().on(m,i,j,k)) {
         real nyf = 0.5*(ny[i][j-1][k]+ny[i][j][k]);
         real rhof_new, rhof_old;
@@ -113,7 +113,7 @@ void PhaseChangeVOF::modify_vel(Vector & uvw,
   for_vmijk(uvw, m,i,j,k) {
     real cf_old=cold[m][i][j][k];
     real cf_new=cnew[m][i][j][k];
-    if ((cf_old-clrsurf)*(cf_new-clrsurf)<0.0) {
+    if ((cf_old-0.5)*(cf_new-0.5)<0.0) {
       if (dom->ibody().on(m,i,j,k)) {
         //std::cout<<"vel:cell "<<boil::cart.iam()<<" "<<i<<" "<<j<<" "<<k<<"\n";
         //std::cout<<"vel:cf   "<<boil::cart.iam()<<" "<<cf_new<<" "<<cf_old<<"\n";
@@ -164,7 +164,7 @@ void PhaseChangeVOF::modify_vel(Vector & uvw,
   for_vmijk(uvw, m,i,j,k) {
     real cf_old=0.5*(cold[i-1][j][k]+cold[i][j][k]);
     real cf_new=0.5*(cnew[i-1][j][k]+cnew[i][j][k]);
-    if ((cf_old-clrsurf)*(cf_new-clrsurf)<0.0) {
+    if ((cf_old-0.5)*(cf_new-0.5)<0.0) {
       if (dom->ibody().on(m,i,j,k)) {
         //std::cout<<"vel:cell1 "<<boil::cart.iam()<<" "<<i<<" "<<j<<" "<<k<<"\n";
 #if 0
@@ -229,7 +229,7 @@ void PhaseChangeVOF::modify_vel(Vector & uvw,
   for_vmijk(uvw, m,i,j,k) {
     real cf_old=0.5*(cold[i][j-1][k]+cold[i][j][k]);
     real cf_new=0.5*(cnew[i][j-1][k]+cnew[i][j][k]);
-    if ((cf_old-clrsurf)*(cf_new-clrsurf)<0.0) {
+    if ((cf_old-0.5)*(cf_new-0.5)<0.0) {
       if (dom->ibody().on(m,i,j,k)) {
         real nyf = 0.5*(ny[i][j-1][k]+ny[i][j][k]);
         real rhof_new, rhof_old;
@@ -262,7 +262,7 @@ void PhaseChangeVOF::modify_vel(Vector & uvw,
   for_vmijk(uvw, m,i,j,k) {
     real cf_old=0.5*(cold[i][j][k-1]+cold[i][j][k]);
     real cf_new=0.5*(cnew[i][j][k-1]+cnew[i][j][k]);
-    if ((cf_old-clrsurf)*(cf_new-clrsurf)<0.0) {
+    if ((cf_old-0.5)*(cf_new-0.5)<0.0) {
       if (dom->ibody().on(m,i,j,k)) {
         //std::cout<<"vel:cell "<<boil::cart.iam()<<" "<<i<<" "<<j<<" "<<k<<"\n";
         //std::cout<<"vel:cf   "<<boil::cart.iam()<<" "<<cf_new<<" "<<cf_old<<"\n";

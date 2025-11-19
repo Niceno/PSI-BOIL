@@ -11,32 +11,27 @@ real Momentum::cfl_max() const {
   int km  =  0;
 
   Comp m = Comp::u();
-  if(ifull) {
-    for_mijk(m,i,j,k) {
-      cfl = fabs(u[m][i][j][k]) * time->dt() / u.dxc(m,i);
-      if( cfl > cflm ) {cflm = cfl; dir = m; im=i; jm=j; km=k;} 
-    }
+  for_mijk(m,i,j,k) {
+    cfl = fabs(u[m][i][j][k]) * time->dt() / u.dxc(m,i);
+    if( cfl > cflm ) {cflm = cfl; dir = m; im=i; jm=j; km=k;} 
   }
   
   m = Comp::v();
-  if(jfull) {
-    for_mijk(m,i,j,k) {
-      cfl = fabs(u[m][i][j][k]) * time->dt() / u.dyc(m,j);
-      if( cfl > cflm ) {cflm = cfl; dir = m; im=i; jm=j; km=k;}
-    }
+  for_mijk(m,i,j,k) {
+    cfl = fabs(u[m][i][j][k]) * time->dt() / u.dyc(m,j);
+    if( cfl > cflm ) {cflm = cfl; dir = m; im=i; jm=j; km=k;}
   }
 
   m = Comp::w();
-  if(kfull) {
-    for_mijk(m,i,j,k) {
-      cfl = fabs(u[m][i][j][k]) * time->dt() / u.dzc(m,k);
-      if( cfl > cflm ) {cflm = cfl; dir = m; im=i; jm=j; km=k;}
-    }
+  for_mijk(m,i,j,k) {
+    cfl = fabs(u[m][i][j][k]) * time->dt() / u.dzc(m,k);
+    if( cfl > cflm ) {cflm = cfl; dir = m; im=i; jm=j; km=k;}
   }
 
   real cflm_l = cflm;
   boil::cart.max_real(&cflm);
 
+#if 0
   if(cflm == 0.0){
     boil::oout << "cfl max = " << cflm <<  boil::endl;
   } else if( approx(cflm,cflm_l) ){
@@ -47,7 +42,7 @@ real Momentum::cfl_max() const {
                << u.xc(dir,im) << " " << u.yc(dir,jm) << " " << u.zc(dir,km) 
                << boil::endl;
   }
-  boil::cart.barrier();
+#endif
 
   return cflm;
 }

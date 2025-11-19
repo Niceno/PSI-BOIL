@@ -6,6 +6,7 @@
 #include "../../Field/Vector/vector.h"
 #include "../../Plot/plot.h"
 #include "../../SimulationTime/simulation_time.h"
+#include "../../Ravioli/range.h"
 #include "region.h"
 
 
@@ -28,12 +29,28 @@ class Floodfill {
 
     void save(const char * nm, const int it);
     void load(const char * nm, const int it);
+    void rm  (const char * nm, const int it);
 
     void set_out_freq(const int i){
       out_rgn_info_freq=i;
       boil::oout<<"Floodfill:out_freq= "<<i<<"\n";
     }
     int  get_out_freq(){return out_rgn_info_freq;}
+
+    /* smallest number of cells for a bubble/droplet */
+    void set_smallest_cvol(int i){
+      boil::oout<<"Floodfill:set_smallest_size= "<<i
+                <<" changed from "<<size_smallrgn<<"\n";
+      size_smallrgn = i;
+    }
+
+    /* Range */
+    void set_range(Range<real>rx, Range<real>ry, Range<real>rz) {
+      xr = rx; yr = ry; zr = rz;
+      boil::oout<<"Floodfill:set_range:x= "<<xr.first()<<" "<<xr.last()
+                <<" y= "<<yr.first()<<" "<<yr.last()
+                <<" z= "<<zr.first()<<" "<<zr.last()<<"\n";
+    }
 
   private:
     std::vector<Index_ijk> new_seed_stack, same_fill_stack, track_index_stack;
@@ -43,7 +60,8 @@ class Floodfill {
                      lookup_volcells, smlookup_cvol, flookup_cvol;
     std::vector< std::vector<int> > track_rid_matrix;
     std::vector<real> flookup_x, flookup_y, flookup_z,
-                      flookup_u, flookup_v, flookup_w;
+                      flookup_u, flookup_v, flookup_w,
+                      flookup_vol;
 
     std::vector<int> v_idavail;
     int * pt_idavail; 
@@ -97,11 +115,12 @@ class Floodfill {
     real * pt_flookup_u;
     real * pt_flookup_v;
     real * pt_flookup_w;
+    real * pt_flookup_vol;
 
     Region & getregion(int rid);  //was posregion or negregion
     
     /* rgn erased after hidden for more than 30 time steps (why 30, good guess) */
-    int mng_hidden_rgns();  
+    void mng_hidden_rgns();  
     
     int hidden_rgnid(real ix, real iy, real iz); //was hid_prgn_xyz, hid_nrgn_xyz
 
@@ -111,6 +130,10 @@ class Floodfill {
     int get_new_neg_id();
 
     int out_rgn_info_freq;
+
+    int size_smallrgn;
+
+    Range<real> xr, yr, zr;
     
     std::ofstream outrgn;
 

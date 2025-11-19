@@ -28,6 +28,8 @@ class Monitor {
         \param m - specifies the Vector component.
     */
     virtual void print(const Vector & u, const Comp & m) = 0;
+    //virtual real get_scalar(const Scalar & s) = 0;
+    //virtual real get_vector(const Vector & u, const Comp & m) = 0;
 };
 
 #endif

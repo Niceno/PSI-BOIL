@@ -5,7 +5,7 @@
 
 /******************************************************************************/
 void ScalarInt::exchange_all(const int dir) const {
-
+	
   if( bc().count() == 0 ) {
     OMS(Warning: exchanging a variable without boundary conditions);
   }
@@ -54,7 +54,7 @@ void ScalarInt::exchange_all(const int dir) const {
           val[s_x - 1 - b][j][k] = val[e_x - o_x - b][j][k] + v_min;
         }
       }
-    }
+    } 
     /* decomposed */
     else {
 #ifdef SENDRECV
@@ -135,7 +135,7 @@ void ScalarInt::exchange_all(const int dir) const {
       }
     }
   }
-
+  
   /*----------------+
   |  J - direction  |
   +----------------*/
@@ -154,7 +154,7 @@ void ScalarInt::exchange_all(const int dir) const {
           val[i][s_y - 1 - b][k] = val[i][e_y - o_y - b][k] + v_min;
         }
       }
-    }
+    } 
     /* decomposed */
     else {
 #ifdef SENDRECV
@@ -198,7 +198,7 @@ void ScalarInt::exchange_all(const int dir) const {
         sbuff_e[l] = val[i][e_y - o_y - b][k];   // buffer j end
         sbuff_s[l] = val[i][s_y + o_y + b][k];   // buffer j start
       }
-
+  
       if( dom->neighbour(Dir::jmax()) != par_proc_null ) {
         boil::cart.isend( &sbuff_e[0], ni()*nk(), par_int, 
                            dom->neighbour(Dir::jmax()), Tag(2), & req_s1 );
@@ -235,7 +235,7 @@ void ScalarInt::exchange_all(const int dir) const {
       }
     }
   }
-
+  
   /*----------------+
   |  K - direction  |
   +----------------*/
@@ -254,7 +254,7 @@ void ScalarInt::exchange_all(const int dir) const {
           val[i][j][s_z - 1 - b] = val[i][j][e_z - o_z - b] + v_min;
         }
       }
-    }
+    } 
     /* decomposed */
     else {
 #ifdef SENDRECV

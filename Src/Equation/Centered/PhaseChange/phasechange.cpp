@@ -95,6 +95,7 @@ PhaseChange::PhaseChange(const Scalar & MDOT,
   alloc1d ( & area_sum, 7);
   alloc1d ( & area_l, 7);
   alloc1d ( & area_v, 7);
+  alloc1d ( & area_micro, 7);
 
 }	
 

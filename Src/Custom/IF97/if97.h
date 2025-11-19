@@ -3916,14 +3916,14 @@ namespace IF97
                                return R2.output(outkey, T, p);  // On saturation curve and need the Vapor phase
                            else
                                return R1.output(outkey, T, p);  // otherwise, use Liquid Region 1
-                           break;
+                           //break;
             case REGION_2: if (State == LIQUID)
                                return R1.output(outkey, T, p);  // On saturation curve and need the Liquid phase
                            else
                                return R2.output(outkey, T, p);  // otherwise, use Vapor Region 2
-                           break;
+                           //break;
             case REGION_3: return R3.output(outkey, T, p, State);
-                           break;
+                           //break;
             case REGION_4: if (State == VAPOR) {
                                return R2.output(outkey, T, p);
                            } else if (State == LIQUID) {
@@ -3931,7 +3931,7 @@ namespace IF97
                            } else {
                                throw std::out_of_range("Cannot use Region 4 with T and p as inputs");
                            }
-                           break;
+                           //break;
             case REGION_5: return R5.output(outkey, T, p);
         }
         throw std::out_of_range("Unable to match region");
@@ -4000,11 +4000,11 @@ namespace IF97
         IF97REGIONS region = RegionDetermination_pX(p, X, inkey);
 
         switch(region){
-        case REGION_1: return 1; break;
-        case REGION_2: return 2; break;
-        case REGION_3: return 3; break;
-        case REGION_4: return 4; break;
-        default: return 0; break;
+        case REGION_1: return 1; //break;
+        case REGION_2: return 2; //break;
+        case REGION_3: return 3; //break;
+        case REGION_4: return 4; //break;
+        default: return 0; //break;
         }
     }
 
@@ -4038,7 +4038,7 @@ namespace IF97
                            return B1H.T_pX(p,X);
                        else
                            return B1S.T_pX(p,X);
-                       break;
+                       //break;
         case REGION_2: if (inkey == IF97_HMASS){
                            if (p <= 4.0*p_fact)
                                return B2aH.T_pX(p,X);
@@ -4053,7 +4053,7 @@ namespace IF97
                                return B2bS.T_pX(p,X);
                            else 
                                return B2cS.T_pX(p,X);
-                       }; break;
+                       }; //break;
         case REGION_3: if (inkey == IF97_HMASS){
                            if (X <= Backwards::H3ab_p(p))
                                return B3aH.T_pX(p,X);
@@ -4064,8 +4064,8 @@ namespace IF97
                                return B3aS.T_pX(p,X);
                            else
                                return B3bS.T_pX(p,X);
-                       }; break;
-        case REGION_4: return Tsat97(p); break;
+                       }; //break;
+        case REGION_4: return Tsat97(p); //break;
         default: throw std::out_of_range("Unable to match region");
         }
     }  // Region Output backward
@@ -4122,20 +4122,20 @@ namespace IF97
                     Xliq = RegionOutput( inkey, Tsat97(p), p, LIQUID);
                     Xvap = RegionOutput( inkey, Tsat97(p), p, VAPOR);
                     return std::min(1.0,std::max(0.0,(X-Xliq)/(Xvap-Xliq)));
-                    break;
+                    //break;
                 case IF97_DMASS:
                     Xliq = 1.0/RegionOutput( IF97_DMASS, Tsat97(p), p, LIQUID);
                     Xvap = 1.0/RegionOutput( IF97_DMASS, Tsat97(p), p, VAPOR);
                     X = 1.0/X;
                     return std::min(1.0,std::max(0.0,(X-Xliq)/(Xvap-Xliq)));
-                    break;
+                    //break;
                 default:
                     throw std::invalid_argument("Quality cannot be determined for these inputs.");
             };
         }
         // If all else fails, which it shouldn't...
-        throw std::invalid_argument("Quality cannot be determined for these inputs.");
-        return -1;  // Should never occur, but eliminates warnings.
+        //throw std::invalid_argument("Quality cannot be determined for these inputs.");
+        //return -1;  // Should never occur, but eliminates warnings.
     };
 
     inline double X_pQ(IF97parameters inkey, double p, double Q){
@@ -4151,18 +4151,18 @@ namespace IF97
                 Xliq = RegionOutput( inkey, Tsat97(p), p, LIQUID);
                 Xvap = RegionOutput( inkey, Tsat97(p), p, VAPOR);
                 return Q*Xvap + (1-Q)*Xliq;
-                break;
+                //break;
             case IF97_DMASS:
                 Xliq = 1.0/RegionOutput( IF97_DMASS, Tsat97(p), p, LIQUID);
                 Xvap = 1.0/RegionOutput( IF97_DMASS, Tsat97(p), p, VAPOR);
                 return 1.0/(Q*Xvap + (1-Q)*Xliq);
-                break;
+                //break;
             default: 
                 throw std::invalid_argument("Mixture property undefined");
-                return -1;  // Should never occur but eliminates warnings.
-                break;
+                //return -1;  // Should never occur but eliminates warnings.
+                //break;
         };
-        return -1;  // Should never occur but eliminates warnings.
+        //return -1;  // Should never occur but eliminates warnings.
     };
 
 

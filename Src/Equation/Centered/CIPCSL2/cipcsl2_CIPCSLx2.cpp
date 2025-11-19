@@ -16,21 +16,21 @@ void CIPCSL2::CIPCSLx2(const Scalar & f, const Vector & sx) {
   for(int k=u->sk(m);   k<=u->ek(m)+1; k++) {
     vel[i][j][k]=((*u)[m][i][j][k]+(*u)[m][i][j][k-1])/2.0;
   }}}
-  /* EXTENDED BUFFERS HINT:
-     Lines 14-16 could probably be replaced with this:
-  for(int i=u->si(m)-1; i<=u->ei(m)+1; i++) {
-  for(int j=u->sj(m)-1; j<=u->ej(m)+1; j++) {
-  for(int k=u->sk(m);   k<=u->ek(m)+1; k++) {
-  */
+
+#if 0
+  if(dom->ibody().nccells() > 0) {
+    for(int i=0; i<=u->ni(m)-2; i++) {
+    for(int j=0; j<=u->nj(m)-1; j++) {
+    for(int k=1; k<=u->nk(m)-1; k++) {
+      cout<<i<<" "<<j<<" "<<k<<" "<<u->ni(m)-1<<"\n";
+      if(dom->ibody().off(mc, i, j, k)) vel[i][j][k]=0.0;
+    }}}
+  }
+#endif
 
   /* Reset delrho */
   for_aijk(i,j,k)
     delrho[i][j][k]=0.0;
-  /* EXTENDED BUFFERS HINT:
-     Lines 27-29 could probably be replaced with this:
-  for_aijk(i,j,k)
-    delrho[i][j][k]=0.0;
-  */
 
   /* CIPCSL 1D */
   const real dt= time->dt();

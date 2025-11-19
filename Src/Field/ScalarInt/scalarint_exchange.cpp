@@ -135,7 +135,7 @@ void ScalarInt::exchange(const int dir) const {
       }
     }
   }
-
+  
   /*----------------+
   |  J - direction  |
   +----------------*/

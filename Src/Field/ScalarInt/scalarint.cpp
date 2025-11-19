@@ -7,13 +7,13 @@ ScalarInt::ScalarInt(const Domain & d) : alias(false) {
 +--------------------------------------*/
 
   dom = & d;
-
+	
   allocate(d.ni(), d.nj(), d.nk());
 
   bndcnd = new BndCnd( *dom );
 
   nam = "";
-}
+}	
 
 /******************************************************************************/
 ScalarInt::ScalarInt(const Domain & d, const char * nm) : alias(false) {
@@ -22,13 +22,13 @@ ScalarInt::ScalarInt(const Domain & d, const char * nm) : alias(false) {
 +--------------------------------------*/
 
   dom = & d;
-
+	
   allocate(d.ni(), d.nj(), d.nk());
 
   bndcnd = new BndCnd( *dom );
 
   nam = nm;
-}
+}	
 
 /******************************************************************************/
 ScalarInt::ScalarInt(const Domain & d, BndCnd & b) : alias(false) {
@@ -43,7 +43,7 @@ ScalarInt::ScalarInt(const Domain & d, BndCnd & b) : alias(false) {
   bndcnd = & b; 
 
   nam = "";
-}
+}	
 
 /******************************************************************************/
 ScalarInt::ScalarInt(const ScalarInt & s) : alias(false) {
@@ -52,13 +52,13 @@ ScalarInt::ScalarInt(const ScalarInt & s) : alias(false) {
 +---------------------------------------------------------------------*/
 
   dom = s.domain();
-
+	
   allocate(s.ni(), s.nj(), s.nk());
 
   bndcnd = new BndCnd( *dom ); 
 
   nam = "";
-}
+}	
 
 /******************************************************************************/
 ScalarInt::ScalarInt(const ScalarInt * s) : alias(true), nam(s->nam) {
@@ -83,7 +83,7 @@ ScalarInt::ScalarInt(const ScalarInt * s) : alias(true), nam(s->nam) {
 
   dom    = s->domain();
   bndcnd = s->bndcnd;
-}
+}	
 
 /******************************************************************************/
 void ScalarInt::allocate(int ni, int nj, int nk) {
@@ -112,7 +112,7 @@ void ScalarInt::deallocate() {
 
   /* deallocate memory */
   dealloc3d( &val );
-}
+}	
 
 /******************************************************************************/
 ScalarInt::~ScalarInt() {

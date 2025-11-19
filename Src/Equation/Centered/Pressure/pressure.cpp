@@ -5,7 +5,7 @@ Pressure::Pressure(const Scalar & PHI,
                    const Scalar & F, 
                    const Vector & U,
                    Times & T, 
-                   Linear * sm,
+                   Krylov * sm,
                    Matter * f) :
   /* call parent's constructor. NULL is for solid */
   Centered( PHI.domain(), PHI, F, & U, T, f, NULL, sm ) 
@@ -14,9 +14,7 @@ Pressure::Pressure(const Scalar & PHI,
   assert(PHI.domain() == sm->domain());
 
   diffusion_set(TimeScheme::backward_euler());
-  ib_trust_vel_wall=false;
 
-  phi.bnd_update();
   discretize();
 }	
 

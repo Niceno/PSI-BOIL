@@ -14,12 +14,6 @@ void CIPCSL2::plot_f(const char * nam) {
                  <<ek()-sk()+2<<"\n";
   fout<<"DATAPACKING=BLOCK, VARLOCATION=([4]=NODAL)"<<"\n";
   fout << boil::endl;
-  /* EXTENDED BUFFERS HINT:
-     Line 12 should probably be replaced with this:
-  fout<<"ZONE I="<<dom->ei()-dom->si()+1 <<", 
-              J="<<dom->ej()-dom->sj()+1 <<", 
-              K="<<dom->ek()-dom->sk()+1<<"\n";
-  */
 
   for_m(m) {
     if(m==Comp::u()) fout << "# X-COORDINATES" << boil::endl;
@@ -47,12 +41,6 @@ void CIPCSL2::plot_f(const char * nam) {
         count++;
         if(count % 8 == 0) fout << boil::endl;
       }
-    /* EXTENDED BUFFERS HINT:
-       Lines 47-49 should probably be replaced with this:
-    for(int k=sk(); k<=dom->ek()+1; k++)
-      for(int j=sj(); j<=dom->ej()+1; j++)
-        for(int i=si(); i<=dom->ei()+1; i++) {
-    */
 }
 
 /******************************************************************************/
@@ -69,12 +57,6 @@ void CIPCSL2::plot_sigx(const char * nam) {
       <<", K="<<ek()-sk()+2<<"\n";
   fout<<"DATAPACKING=BLOCK, VARLOCATION=([4]=NODAL)"<<"\n";
   fout << boil::endl;
-  /* EXTENDED BUFFERS HINT:
-     Line 71 should probably be replaced with this:
-  fout<<"ZONE I="<<dom->ei()-dom->si()   <<", 
-              J="<<dom->ej()-dom->sj()+1 <<", 
-              K="<<dom->ek()-dom->sk()+1<<"\n";
-  */
 
   for_m(m) {
     if(m==Comp::u()) fout << "# X-COORDINATES" << boil::endl;
@@ -93,12 +75,6 @@ void CIPCSL2::plot_sigx(const char * nam) {
      /* start each coordinate in the new line (if needed) */
      if(count % 8 != 0) fout << boil::endl;
    }
-    /* EXTENDED BUFFERS HINT:
-       Lines 86-88 should probably be replaced with this:
-    for(int k=sk(); k<=dom->ek()+1; k++)
-      for(int j=sj(); j<=dom->ej()+1; j++)
-        for(int i=si(); i<=dom->ei(); i++) {
-    */
 
   int count=0;
   for(int k=sk(); k<=ek()+1; k++)
@@ -109,12 +85,6 @@ void CIPCSL2::plot_sigx(const char * nam) {
         count++;
         if(count % 8 == 0) fout << boil::endl;
       }
-    /* EXTENDED BUFFERS HINT:
-       Lines 106-108 should probably be replaced with this:
-    for(int k=sk(); k<=dom->ek()+1; k++)
-      for(int j=sj(); j<=dom->ej()+1; j++)
-        for(int i=si(); i<=dom->ei(); i++) {
-    */
 }
 
 
@@ -132,12 +102,6 @@ void CIPCSL2::plot_sigy(const char * nam) {
                  <<ek()-sk()+2<<"\n";
   fout<<"DATAPACKING=BLOCK, VARLOCATION=([4]=NODAL)"<<"\n";
   fout << boil::endl;
-  /* EXTENDED BUFFERS HINT:
-     Line 132 should probably be replaced with this:
-  fout<<"ZONE I="<<dom->ei()-dom->si()+1 <<", 
-              J="<<dom->ej()-dom->sj()   <<", 
-              K="<<dom->ek()-dom->sk()+1<<"\n";
-  */
 
   for_m(m) {
     if(m==Comp::u()) fout << "# X-COORDINATES" << boil::endl;
@@ -156,12 +120,6 @@ void CIPCSL2::plot_sigy(const char * nam) {
      /* start each coordinate in the new line (if needed) */
      if(count % 8 != 0) fout << boil::endl;
    }
-    /* EXTENDED BUFFERS HINT:
-       Lines 150-152 should probably be replaced with this:
-    for(int k=sk(); k<=dom->ek()+1; k++)
-      for(int j=sj(); j<=dom->ej()  ; j++)
-        for(int i=si(); i<=dom->ei()+1; i++) {
-    */
 
   int count=0;
   for(int k=sk(); k<=ek()+1; k++)
@@ -172,12 +130,6 @@ void CIPCSL2::plot_sigy(const char * nam) {
         count++;
         if(count % 8 == 0) fout << boil::endl;
       }
-    /* EXTENDED BUFFERS HINT:
-       Lines 167-169 should probably be replaced with this:
-    for(int k=sk(); k<=dom->ek()+1; k++)
-      for(int j=sj(); j<=dom->ej()  ; j++)
-        for(int i=si(); i<=dom->ei()+1; i++) {
-    */
 }
 
 /******************************************************************************/
@@ -194,12 +146,6 @@ void CIPCSL2::plot_sigz(const char * nam) {
                  <<ek()-sk()+1<<"\n";
   fout<<"DATAPACKING=BLOCK, VARLOCATION=([4]=NODAL)"<<"\n";
   fout << boil::endl;
-  /* EXTENDED BUFFERS HINT:
-     Line 192 should probably be replaced with this:
-  fout<<"ZONE I="<<dom->ei()-dom->si()+1 <<", 
-              J="<<dom->ej()-dom->sj()+1 <<", 
-              K="<<dom->ek()-dom->sk()  <<"\n";
-  */
 
   for_m(m) {
     if(m==Comp::u()) fout << "# X-COORDINATES" << boil::endl;
@@ -218,12 +164,6 @@ void CIPCSL2::plot_sigz(const char * nam) {
      /* start each coordinate in the new line (if needed) */
      if(count % 8 != 0) fout << boil::endl;
    }
-    /* EXTENDED BUFFERS HINT:
-       Lines 207-209 should probably be replaced with this:
-    for(int k=sk(); k<=dom->ek();   k++)
-      for(int j=sj(); j<=dom->ej()+1; j++)
-        for(int i=si(); i<=dom->ei()+1; i++) {
-    */
 
   int count=0;
   for(int k=sk(); k<=ek();   k++)
@@ -234,12 +174,6 @@ void CIPCSL2::plot_sigz(const char * nam) {
         count++;
         if(count % 8 == 0) fout << boil::endl;
       }
-    /* EXTENDED BUFFERS HINT:
-       Lines 227-229 should probably be replaced with this:
-    for(int k=sk(); k<=dom->ek();   k++)
-      for(int j=sj(); j<=dom->ej()+1; j++)
-        for(int i=si(); i<=dom->ei()+1; i++) {
-    */
 }
 
 /******************************************************************************/
@@ -255,15 +189,6 @@ void CIPCSL2::plot_sxyz(const char * nam, const Comp & mc) {
   } else if(mc==Comp::k()){
     ir=0;   jr=0; kr=1;
   }
-  /* EXTENDED BUFFERS HINT:
-     Lines 249-255 should probably be replaced with this:
-  if(mc==Comp::i()){
-    ir=2*boil::BW-1; jr=2*boil::BW;   kr=2*boil::BW;
-  } else if(mc==Comp::j()){
-    ir=2*boil::BW;   jr=2*boil::BW-1; kr=2*boil::BW;
-  } else if(mc==Comp::k()){
-    ir=2*boil::BW;   jr=2*boil::BW;   kr=2*boil::BW-1;
-  */
 
   std::ofstream fout;
   std::string name = name_file(nam, ".dat", 3, boil::cart.iam());
@@ -295,10 +220,6 @@ void CIPCSL2::plot_sxyz(const char * nam, const Comp & mc) {
      /* start each coordinate in the new line (if needed) */
      if(count % 8 != 0) fout << boil::endl;
    }
-    /* EXTENDED BUFFERS HINT:
-       Lines 281-283 should probably be replaced with this:
-    for_mijk(mc,i,j,k)
-    */
 
   int count=0;
   for(int k=sk(); k<=ek()+kr; k++)

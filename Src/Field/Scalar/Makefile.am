@@ -6,7 +6,6 @@ libScalar_a_SOURCES = scalar.h                     \
                       scalar_bnd_insert.cpp        \
                       scalar_bnd_update.cpp        \
                       scalar_browsing.h            \
-                      scalar_change_grid.cpp       \
                       scalar.cpp                   \
                       scalar_average.cpp           \
                       scalar_exchange.cpp          \

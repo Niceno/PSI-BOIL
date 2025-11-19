@@ -46,7 +46,15 @@ class Times {
                      else
                        return false;
                     } 
-    void increase() {c_dt++; time+=d_t;}
+    void increase() {
+                       c_dt++;
+                       real tnew = 0.0;
+                       if(boil::cart.iam()==0){
+                         tnew=time+d_t;
+                       }
+                       boil::cart.sum_real(&tnew);
+                       time = tnew;
+                     }
     void set_dt(const real d) {d_t = d; d_ti=1.0/d_t;}
     void increase_nhist() {nhist++;}
     void decrease_nhist() {nhist--;}

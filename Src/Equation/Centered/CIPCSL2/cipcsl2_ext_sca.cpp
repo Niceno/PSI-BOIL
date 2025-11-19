@@ -52,8 +52,6 @@ void CIPCSL2::ext_sca(Scalar & sca) {
   //                "clr-dist-iflag-stmp", time->current_step());
   //exit(0);
 
-  const real dtau = dxmin;
-  real flux,isgn;
   int mmax=4;
 
   for(int mstep=1; mstep<=mmax; mstep++){

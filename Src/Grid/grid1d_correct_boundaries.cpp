@@ -23,18 +23,18 @@ void Grid1D::correct_boundaries() {
     if(periodicN() == true) {
       x_node[nc_in + boil::BW + b + 1] += dx1b;
     } else {
-      if     (bndgridN() == BndGrid::extrapolate())
+      if     (cutoffN() == BndGrid::extrapolate())
         x_node[nc_in + boil::BW + b + 1] += real(b+1)*dxN;
-      else if(bndgridN() == BndGrid::symmetry())
+      else if(cutoffN() == BndGrid::symmetry())
         x_node[nc_in + boil::BW + b + 1] += dxNb;
     }
 
     if(periodic1() == true) {
       x_node[boil::BW - b - 1] -= dxNb;
     } else {
-      if     (bndgrid1() == BndGrid::extrapolate())
+      if     (cutoff1() == BndGrid::extrapolate())
         x_node[boil::BW - b - 1] -= real(b+1)*dx1;
-      else if(bndgrid1() == BndGrid::symmetry())
+      else if(cutoff1() == BndGrid::symmetry())
         x_node[boil::BW - b - 1] -= dx1b;
     }
   }
@@ -66,9 +66,9 @@ void Grid1D::correct_boundaries() {
     /* node[0] \equiv node[boil::BW+nc_in - boil::BW] = node[nc_in] */
     dx_node[0] = x_cell[nc_in] - x_cell[nc_in-1];
   } else {
-    if     (bndgrid1() == BndGrid::extrapolate())
+    if     (cutoff1() == BndGrid::extrapolate())
       dx_node[0] = dx_node[1];
-    else if(bndgrid1() == BndGrid::symmetry())
+    else if(cutoff1() == BndGrid::symmetry())
       dx_node[0] = x_cell[2*boil::BW] - x_cell[2*boil::BW-1];
   }
   if(periodicN()==true) {
@@ -76,9 +76,9 @@ void Grid1D::correct_boundaries() {
        dx_node[nc_in+2*boil::BW] = x_cell[boil::BW+1] - x_cell[boil::BW]; */
     dx_node[nc_in+2*boil::BW] = x_cell[2*boil::BW] - x_cell[2*boil::BW-1];
   } else {
-    if     (bndgridN() == BndGrid::extrapolate())
+    if     (cutoffN() == BndGrid::extrapolate())
       dx_node[nc_in+2*boil::BW] = dx_node[nc_in+2*boil::BW-1];
-    else if(bndgridN() == BndGrid::symmetry())
+    else if(cutoffN() == BndGrid::symmetry())
       dx_node[nc_in+2*boil::BW] = x_cell[nc_in] - x_cell[nc_in-1];
   }
 

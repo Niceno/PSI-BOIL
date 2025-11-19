@@ -550,10 +550,10 @@ void VOF::nwall(const Scalar & sca
   real ntany= dphidy - pin*nwly;
   real ntanz= dphidz - pin*nwlz;
   normalize(ntanx,ntany,ntanz);
-  /* n_wall = nwl * cos(cangle0) + ntan * sin(cangle0) */
-  real nnx = nwlx*cos(cangle0) + ntanx*sin(cangle0);
-  real nny = nwly*cos(cangle0) + ntany*sin(cangle0);
-  real nnz = nwlz*cos(cangle0) + ntanz*sin(cangle0);
+  /* n_wall = nwl * cos(cangle) + ntan * sin(cangle) */
+  real nnx = nwlx*cos(cangle) + ntanx*sin(cangle);
+  real nny = nwly*cos(cangle) + ntany*sin(cangle);
+  real nnz = nwlz*cos(cangle) + ntanz*sin(cangle);
   normalize(nnx,nny,nnz);
   nout[0] = nnx;
   nout[1] = nny;

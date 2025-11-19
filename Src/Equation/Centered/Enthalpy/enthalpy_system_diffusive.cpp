@@ -25,46 +25,43 @@ void Enthalpy::create_system_diffusive(const Property * f_prop,
     /* coefficients in i direction (w and e) */
     for_ijk(i,j,k) {
       Comp m = Comp::u();
-      const real a_w = dSx(Sign::neg(),i,j,k);
-      const real a_e = dSx(Sign::pos(),i,j,k);
+      const real a_x = dSx(i,j,k);
       real lm = f_prop->value(m,i  ,j,k);
       real lp = f_prop->value(m,i+1,j,k);
       if (diff_eddy) {
-        lm += 0.5 * (turb_diff(diff_eddy,i,j,k) + turb_diff(diff_eddy,i-1,j,k));
-        lp += 0.5 * (turb_diff(diff_eddy,i,j,k) + turb_diff(diff_eddy,i+1,j,k));
+        lm += 0.5 * (turb_diff(diff_eddy,i,j,k) + (*diff_eddy)[i-1][j][k]);
+        lp += 0.5 * (turb_diff(diff_eddy,i,j,k) + (*diff_eddy)[i+1][j][k]);
       }
-      A.w[i][j][k] = tsc * lm * a_w / dxw(i);
-      A.e[i][j][k] = tsc * lp * a_e / dxe(i);
+      A.w[i][j][k] = tsc * lm * a_x / dxw(i);
+      A.e[i][j][k] = tsc * lp * a_x / dxe(i);
     }
 
     /* coefficients in j direction (s and n) */
     for_ijk(i,j,k) {
       Comp m = Comp::v();
-      const real a_s = dSy(Sign::neg(),i,j,k);
-      const real a_n = dSy(Sign::pos(),i,j,k);
+      const real a_y = dSy(i,j,k);
       real lm = f_prop->value(m,i,j  ,k);
       real lp = f_prop->value(m,i,j+1,k);
       if (diff_eddy) {
-        lm += 0.5 * (turb_diff(diff_eddy,i,j,k) + turb_diff(diff_eddy,i,j-1,k));
-        lp += 0.5 * (turb_diff(diff_eddy,i,j,k) + turb_diff(diff_eddy,i,j+1,k));
+        lm += 0.5 * (turb_diff(diff_eddy,i,j,k) + (*diff_eddy)[i][j-1][k]);
+        lp += 0.5 * (turb_diff(diff_eddy,i,j,k) + (*diff_eddy)[i][j+1][k]);
       }
-      A.s[i][j][k] = tsc * lm * a_s / dys(j);
-      A.n[i][j][k] = tsc * lp * a_n / dyn(j);
+      A.s[i][j][k] = tsc * lm * a_y / dys(j);
+      A.n[i][j][k] = tsc * lp * a_y / dyn(j);
     }
   
     /* coefficients in k direction (b and t) */
     for_ijk(i,j,k) {
       Comp m = Comp::w();
-      const real a_b = dSz(Sign::neg(),i,j,k);
-      const real a_t = dSz(Sign::pos(),i,j,k);
+      const real a_z = dSz(i,j,k);
       real lm = f_prop->value(m,i,j,k  );
       real lp = f_prop->value(m,i,j,k+1);
       if (diff_eddy) {
-        lm += 0.5 * (turb_diff(diff_eddy,i,j,k) + turb_diff(diff_eddy,i,j,k-1));
-        lp += 0.5 * (turb_diff(diff_eddy,i,j,k) + turb_diff(diff_eddy,i,j,k+1));
+        lm += 0.5 * (turb_diff(diff_eddy,i,j,k) + (*diff_eddy)[i][j][k-1]);
+        lp += 0.5 * (turb_diff(diff_eddy,i,j,k) + (*diff_eddy)[i][j][k+1]);
       }
-      A.b[i][j][k] = tsc * lm * a_b / dzb(k);
-      A.t[i][j][k] = tsc * lp * a_t / dzt(k);
+      A.b[i][j][k] = tsc * lm * a_z / dzb(k);
+      A.t[i][j][k] = tsc * lp * a_z / dzt(k);
     }
 
     /*-------------------------------+
@@ -74,7 +71,7 @@ void Enthalpy::create_system_diffusive(const Property * f_prop,
       for(int cc=0; cc<dom->ibody().nccells(); cc++) {
         int i,j,k;
         dom->ibody().ijk(cc,&i,&j,&k); // OPR(i); OPR(j); OPR(k);
-
+  
         /* w */
         if( dom->ibody().on(i-1,j,k) ) {
           const real fSw  = dom->ibody().fSw(cc);
@@ -137,10 +134,9 @@ void Enthalpy::create_system_diffusive(const Property * f_prop,
     /* coefficients in i direction (w and e) */
     for_ijk(i,j,k) {
       Comp m = Comp::u();
-      real a_full_w = dSx(Sign::neg(),i,j,k);
-      real a_full_e = dSx(Sign::pos(),i,j,k);
-      real a_w = dSx(Sign::neg(),i,j,k);
-      real a_e = dSx(Sign::pos(),i,j,k);
+      real a_x = dSx(i,j,k);
+      real a_w = dSx(i,j,k);
+      real a_e = dSx(i,j,k);
       if(dom->ibody().cut(i,j,k)) {
         a_w *= dom->ibody().fSw(i,j,k);
         a_e *= dom->ibody().fSe(i,j,k);
@@ -148,16 +144,16 @@ void Enthalpy::create_system_diffusive(const Property * f_prop,
       real lmf = f_prop->value(m,i  ,j,k);
       real lpf = f_prop->value(m,i+1,j,k);
       if (diff_eddy) {
-        lmf += 0.5 * (turb_diff(diff_eddy,i,j,k) + turb_diff(diff_eddy,i-1,j,k));
-        lpf += 0.5 * (turb_diff(diff_eddy,i,j,k) + turb_diff(diff_eddy,i+1,j,k));
+        lmf += 0.5 * (turb_diff(diff_eddy,i,j,k) + (*diff_eddy)[i-1][j][k]);
+        lpf += 0.5 * (turb_diff(diff_eddy,i,j,k) + (*diff_eddy)[i+1][j][k]);
       }
-      const real lms = s_prop->value(m,i  ,j,k);
-      const real lps = s_prop->value(m,i+1,j,k);
+      const real lms = solid()->lambda(m,i  ,j,k);
+      const real lps = solid()->lambda(m,i+1,j,k);
       /* w */
       if( dom->ibody().on (i-1,j,k) && dom->ibody().on (i,j,k) )  
-        A.w[i][j][k] = tsc * ( lmf*a_w + lms*(a_full_w-a_w) ) / dxw(i);
+        A.w[i][j][k] = tsc * ( lmf*a_w + lms*(a_x-a_w) ) / dxw(i);
       else if( dom->ibody().off(i-1,j,k) && dom->ibody().off(i,j,k) )  
-        A.w[i][j][k] = tsc * ( lms*a_w + lmf*(a_full_w-a_w) ) / dxw(i);
+        A.w[i][j][k] = tsc * ( lms*a_w + lmf*(a_x-a_w) ) / dxw(i);
       else {
         real lamc, lamn, dc, dn, xw_surf;
         if( dom->ibody().fdxw(i,j,k) < 1.0 )
@@ -167,22 +163,22 @@ void Enthalpy::create_system_diffusive(const Property * f_prop,
         if( dom->ibody().on(i,j,k) ) {
           lamc = f_prop->value(i,j,k);
           if (diff_eddy) lamc += turb_diff(diff_eddy,i,j,k);
-          lamn = s_prop->value(i,j,k);
+          lamn = solid()->lambda(i,j,k);
         } else {
-          lamc = s_prop->value(i,j,k);
+          lamc = solid()->lambda(i,j,k);
           lamn = f_prop->value(i,j,k);
           if (diff_eddy) lamn += turb_diff(diff_eddy,i,j,k);
         }
         dc = phi.xc(i) - xw_surf;
         dn = xw_surf - phi.xc(i-1);
-        A.w[i][j][k] = tsc * a_full_w * lamc*lamn / (lamc*dn + lamn*dc);
+        A.w[i][j][k] = tsc * a_x * lamc*lamn / (lamc*dn + lamn*dc);
       }
       
       /* e */
       if( dom->ibody().on (i+1,j,k) && dom->ibody().on (i,j,k) )  
-        A.e[i][j][k] = tsc * ( lpf*a_e + lps*(a_full_e-a_e) ) / dxe(i);
+        A.e[i][j][k] = tsc * ( lpf*a_e + lps*(a_x-a_e) ) / dxe(i);
       else if( dom->ibody().off(i+1,j,k) && dom->ibody().off(i,j,k) )  
-        A.e[i][j][k] = tsc * ( lps*a_e + lpf*(a_full_e-a_e) ) / dxe(i);
+        A.e[i][j][k] = tsc * ( lps*a_e + lpf*(a_x-a_e) ) / dxe(i);
       else {
         real lamc, lamn, dc, dn, xe_surf;
         if( dom->ibody().fdxe(i,j,k) < 1.0 )
@@ -192,25 +188,24 @@ void Enthalpy::create_system_diffusive(const Property * f_prop,
         if( dom->ibody().on(i,j,k) ) {
           lamc = f_prop->value(i,j,k);
           if (diff_eddy) lamc += turb_diff(diff_eddy,i,j,k);
-          lamn = s_prop->value(i,j,k);
+          lamn = solid()->lambda(i,j,k);
         } else {
-          lamc = s_prop->value(i,j,k);
+          lamc = solid()->lambda(i,j,k);
           lamn = f_prop->value(i,j,k);
           if (diff_eddy) lamn += turb_diff(diff_eddy,i,j,k);
         }
         dc = xe_surf - phi.xc(i);
         dn = phi.xc(i+1) - xe_surf;
-        A.e[i][j][k] = tsc * a_full_e * lamc*lamn / (lamc*dn + lamn*dc);
+        A.e[i][j][k] = tsc * a_x * lamc*lamn / (lamc*dn + lamn*dc);
       }
     }
 
     /* coefficients in j direction (s and n) */
     for_ijk(i,j,k) {
       Comp m = Comp::v();
-      real a_full_s = dSy(Sign::neg(),i,j,k);
-      real a_full_n = dSy(Sign::pos(),i,j,k);
-      real a_s = dSy(Sign::neg(),i,j,k);
-      real a_n = dSy(Sign::pos(),i,j,k);
+      real a_y = dSy(i,j,k);
+      real a_s = dSy(i,j,k);
+      real a_n = dSy(i,j,k);
       if(dom->ibody().cut(i,j,k)) {
         a_s *= dom->ibody().fSs(i,j,k);
         a_n *= dom->ibody().fSn(i,j,k);
@@ -218,16 +213,16 @@ void Enthalpy::create_system_diffusive(const Property * f_prop,
       real lmf = f_prop->value(m,i,j  ,k);
       real lpf = f_prop->value(m,i,j+1,k);
       if (diff_eddy) {
-        lmf += 0.5 * (turb_diff(diff_eddy,i,j,k) + turb_diff(diff_eddy,i,j-1,k));
-        lpf += 0.5 * (turb_diff(diff_eddy,i,j,k) + turb_diff(diff_eddy,i,j+1,k));
+        lmf += 0.5 * (turb_diff(diff_eddy,i,j,k) + (*diff_eddy)[i][j-1][k]);
+        lpf += 0.5 * (turb_diff(diff_eddy,i,j,k) + (*diff_eddy)[i][j+1][k]);
       }
-      const real lms = s_prop->value(m,i,j  ,k);
-      const real lps = s_prop->value(m,i,j+1,k);
+      const real lms = solid()->lambda(m,i,j  ,k);
+      const real lps = solid()->lambda(m,i,j+1,k);
       /* s */
       if( dom->ibody().on (i,j-1,k) && dom->ibody().on (i,j,k) )  
-        A.s[i][j][k] = tsc * ( lmf*a_s + lms*(a_full_s-a_s) ) / dys(j);
+        A.s[i][j][k] = tsc * ( lmf*a_s + lms*(a_y-a_s) ) / dys(j);
       else if( dom->ibody().off(i,j-1,k) && dom->ibody().off(i,j,k) ) 
-        A.s[i][j][k] = tsc * ( lms*a_s + lmf*(a_full_s-a_s) ) / dys(j);
+        A.s[i][j][k] = tsc * ( lms*a_s + lmf*(a_y-a_s) ) / dys(j);
       else {
         real lamc, lamn, dc, dn, ys_surf;
         if( dom->ibody().fdys(i,j,k) < 1.0 )
@@ -237,22 +232,22 @@ void Enthalpy::create_system_diffusive(const Property * f_prop,
         if( dom->ibody().on(i,j,k) ) {
           lamc = f_prop->value(i,j,k);
           if (diff_eddy) lamc += turb_diff(diff_eddy,i,j,k);
-          lamn = s_prop->value(i,j,k);
+          lamn = solid()->lambda(i,j,k);
         } else {
-          lamc = s_prop->value(i,j,k);
+          lamc = solid()->lambda(i,j,k);
           lamn = f_prop->value(i,j,k);
           if (diff_eddy) lamn += turb_diff(diff_eddy,i,j,k);
         }
         dc = phi.yc(j) - ys_surf;
         dn = ys_surf - phi.yc(j-1);
-        A.s[i][j][k] = tsc * a_full_s * lamc*lamn / (lamc*dn + lamn*dc);
+        A.s[i][j][k] = tsc * a_y * lamc*lamn / (lamc*dn + lamn*dc);
       }
       
       /* n */
       if( dom->ibody().on (i,j+1,k) && dom->ibody().on (i,j,k) )  
-        A.n[i][j][k] = tsc * ( lpf*a_n + lps*(a_full_n-a_n) ) / dyn(j);
+        A.n[i][j][k] = tsc * ( lpf*a_n + lps*(a_y-a_n) ) / dyn(j);
       else if( dom->ibody().off(i,j+1,k) && dom->ibody().off(i,j,k) )  
-        A.n[i][j][k] = tsc * ( lps*a_n + lpf*(a_full_n-a_n) ) / dyn(j);
+        A.n[i][j][k] = tsc * ( lps*a_n + lpf*(a_y-a_n) ) / dyn(j);
       else {
         real lamc, lamn, dc, dn, yn_surf;
         if( dom->ibody().fdyn(i,j,k) < 1.0 )
@@ -262,25 +257,24 @@ void Enthalpy::create_system_diffusive(const Property * f_prop,
         if( dom->ibody().on(i,j,k) ) {
           lamc = f_prop->value(i,j,k);
           if (diff_eddy) lamc += turb_diff(diff_eddy,i,j,k);
-          lamn = s_prop->value(i,j,k);
+          lamn = solid()->lambda(i,j,k);
         } else {
-          lamc = s_prop->value(i,j,k);
+          lamc = solid()->lambda(i,j,k);
           lamn = f_prop->value(i,j,k);
           if (diff_eddy) lamn += turb_diff(diff_eddy,i,j,k);
         }
         dc = yn_surf - phi.yc(j);
         dn = phi.yc(j+1) - yn_surf;
-        A.n[i][j][k] = tsc * a_full_n * lamc*lamn / (lamc*dn + lamn*dc);
+        A.n[i][j][k] = tsc * a_y * lamc*lamn / (lamc*dn + lamn*dc);
       }
     }
   
     /* coefficients in k direction (b and t) */
     for_ijk(i,j,k) {
       Comp m = Comp::w();
-      real a_full_b = dSz(Sign::neg(),i,j,k);
-      real a_full_t = dSz(Sign::pos(),i,j,k);
-      real a_b = dSz(Sign::neg(),i,j,k);
-      real a_t = dSz(Sign::pos(),i,j,k);
+      real a_z = dSz(i,j,k);
+      real a_b = dSz(i,j,k);
+      real a_t = dSz(i,j,k);
       if(dom->ibody().cut(i,j,k)) {
         a_b *= dom->ibody().fSb(i,j,k);
         a_t *= dom->ibody().fSt(i,j,k);
@@ -288,16 +282,16 @@ void Enthalpy::create_system_diffusive(const Property * f_prop,
       real lmf = f_prop->value(m,i,j,k  );
       real lpf = f_prop->value(m,i,j,k+1);
       if (diff_eddy) {
-        lmf += 0.5 * (turb_diff(diff_eddy,i,j,k) + turb_diff(diff_eddy,i,j,k-1));
-        lpf += 0.5 * (turb_diff(diff_eddy,i,j,k) + turb_diff(diff_eddy,i,j,k+1));
+        lmf += 0.5 * (turb_diff(diff_eddy,i,j,k) + (*diff_eddy)[i][j][k-1]);
+        lpf += 0.5 * (turb_diff(diff_eddy,i,j,k) + (*diff_eddy)[i][j][k+1]);
       }
-      const real lms = s_prop->value(m,i,j,k  );
-      const real lps = s_prop->value(m,i,j,k+1);
+      const real lms = solid()->lambda(m,i,j,k  );
+      const real lps = solid()->lambda(m,i,j,k+1);
       /* b */
       if( dom->ibody().on(i,j,k-1) && dom->ibody().on(i,j,k) ) 
-        A.b[i][j][k] = tsc * ( lmf*a_b + lms*(a_full_b-a_b) ) / dzb(k);
+        A.b[i][j][k] = tsc * ( lmf*a_b + lms*(a_z-a_b) ) / dzb(k);
       else if( dom->ibody().off(i,j,k-1) && dom->ibody().off(i,j,k) ) 
-        A.b[i][j][k] = tsc * ( lms*a_b + lmf*(a_full_b-a_b) ) / dzb(k);
+        A.b[i][j][k] = tsc * ( lms*a_b + lmf*(a_z-a_b) ) / dzb(k);
       else {
         real lamc, lamn, dc, dn, zb_surf;
         if( dom->ibody().fdzb(i,j,k) < 1.0 )
@@ -307,21 +301,21 @@ void Enthalpy::create_system_diffusive(const Property * f_prop,
         if( dom->ibody().on(i,j,k) ) {
           lamc = f_prop->value(i,j,k);
           if (diff_eddy) lamc += turb_diff(diff_eddy,i,j,k);
-          lamn = s_prop->value(i,j,k);
+          lamn = solid()->lambda(i,j,k);
         } else {
-          lamc = s_prop->value(i,j,k);
+          lamc = solid()->lambda(i,j,k);
           lamn = f_prop->value(i,j,k);
           if (diff_eddy) lamn += turb_diff(diff_eddy,i,j,k);
         }
         dc = phi.zc(k) - zb_surf;
         dn = zb_surf - phi.zc(k-1);
-        A.b[i][j][k] = tsc * a_full_b * lamc*lamn / (lamc*dn + lamn*dc);
+        A.b[i][j][k] = tsc * a_z * lamc*lamn / (lamc*dn + lamn*dc);
       }
       /* t */
       if( dom->ibody().on (i,j,k+1) && dom->ibody().on (i,j,k) ) 
-        A.t[i][j][k] = tsc * ( lpf*a_t + lps*(a_full_t-a_t) ) / dzt(k);
+        A.t[i][j][k] = tsc * ( lpf*a_t + lps*(a_z-a_t) ) / dzt(k);
       else if( dom->ibody().off(i,j,k+1) && dom->ibody().off(i,j,k) ) 
-        A.t[i][j][k] = tsc * ( lps*a_t + lpf*(a_full_t-a_t) ) / dzt(k);
+        A.t[i][j][k] = tsc * ( lps*a_t + lpf*(a_z-a_t) ) / dzt(k);
       else {
         real lamc, lamn, dc, dn, zt_surf;
         if( dom->ibody().fdzt(i,j,k) < 1.0 )
@@ -331,15 +325,15 @@ void Enthalpy::create_system_diffusive(const Property * f_prop,
         if( dom->ibody().on(i,j,k) ) {
           lamc = f_prop->value(i,j,k);
           if (diff_eddy) lamc += turb_diff(diff_eddy,i,j,k);
-          lamn = s_prop->value(i,j,k);
+          lamn = solid()->lambda(i,j,k);
         } else {
-          lamc = s_prop->value(i,j,k);
+          lamc = solid()->lambda(i,j,k);
           lamn = f_prop->value(i,j,k);
           if (diff_eddy) lamn += turb_diff(diff_eddy,i,j,k);
         }
         dc = zt_surf - phi.zc(k);
         dn = phi.zc(k+1) - zt_surf;
-        A.t[i][j][k] = tsc * a_full_t * lamc*lamn / (lamc*dn + lamn*dc);
+        A.t[i][j][k] = tsc * a_z * lamc*lamn / (lamc*dn + lamn*dc);
       }
     }
 

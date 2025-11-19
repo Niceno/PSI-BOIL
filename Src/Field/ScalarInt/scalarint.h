@@ -13,7 +13,6 @@
 #include "../../Global/global_minmax.h"
 #include "../../Global/global_name_file.h"
 #include "../../LookUpTable/lookuptable.h"  
-#include "../../Ravioli/sign.h"
 
 #include "../Scalar/scalar_acc.h"
 #include "../Scalar/scalar_aliases.h"
@@ -113,13 +112,6 @@ class ScalarInt {
     real dSz(const int i, const int j, const int k) const 
      {return dom->dSz(i,j,k);}
 
-    real dSx(const Sign sig, const int i, const int j, const int k) const 
-     {return dom->dSx(sig,i,j,k);}
-    real dSy(const Sign sig, const int i, const int j, const int k) const 
-     {return dom->dSy(sig,i,j,k);}
-    real dSz(const Sign sig, const int i, const int j, const int k) const 
-     {return dom->dSz(sig,i,j,k);}
-
     /* cell volume */
     real dV(const int i, const int j, const int k) const 
      {return dom->dV(i,j,k);}
@@ -166,21 +158,9 @@ class ScalarInt {
     const Domain * domain() const {return dom;}
     
     void bnd_update();
-    void bnd_update_nowall();
-    void bnd_update_symmetry();
 
     void bnd_extract( const Dir d, int *** cp ) const;
     void bnd_insert ( const Dir d, int **  cp );
-
-    /* the same as below but bndcnds are copied */
-    ScalarInt & copy_shape(const Shape & a) {
-      n_x=a.n_i;n_y=a.n_j;n_z=a.n_k;  o_x=a.o_i;o_y=a.o_j;o_z=a.o_k;
-      s_x=a.s_i;s_y=a.s_j;s_z=a.s_k;  e_x=a.e_i;e_y=a.e_j;e_z=a.e_k;
-      dom=a.dm;
-      bc().replicate(*(a.bc));
-
-      return *this;
-    }
 
     /* operators */
     ScalarInt & operator = (const Shape & a)

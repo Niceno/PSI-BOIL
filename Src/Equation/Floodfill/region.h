@@ -15,7 +15,8 @@ class Region {
     Region(const int rid,
            const int cvol=0,
            const real x=0., const real y=0., const real z=0.,
-           const real u=0., const real v=0., const real w=0.);
+           const real u=0., const real v=0., const real w=0.,
+           const real vol=0.0);
 
     /* get members */
     real x()      const {return m_pos[0];}
@@ -36,6 +37,8 @@ class Region {
 
     int cellvol() const {return m_cellvol;}
     int id() const {return m_id;}
+    real volume() const {return m_volume;}
+
     bool hiding() const {return m_hiding;}
     int get_tsteps_hidden() const {return m_tsteps_hiding;}
 
@@ -70,6 +73,7 @@ class Region {
       m_comvel[0]=iu; m_comvel[1]=iv; m_comvel[2]=iw; }
 
     void cellvol(int icellvol) {m_cellvol = icellvol;}
+    void volume(real v) {m_volume = v;}
     void id(int iid) {m_id=iid;}
     void set_nts_hidden(int itshid) {m_tsteps_hiding = itshid;}
     void hiding(bool ihiding) {
@@ -82,6 +86,7 @@ class Region {
     real m_opos[DIM];   //for position xyz at n-1
     real m_vel[DIM];
     real m_comvel[DIM];
+    real m_volume; 
     int m_cellvol;
     bool m_hiding;
     int m_id;

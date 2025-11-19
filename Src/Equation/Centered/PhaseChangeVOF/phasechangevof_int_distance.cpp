@@ -15,14 +15,12 @@ real PhaseChangeVOF::distance(const int i, const int j, const int k,
   } else {
     return distance_z(i,j,k,dir,tint);
   }
-
-  return 0.0;
 }
 
 
 /* x-direction */
 real PhaseChangeVOF::distance_x(const int i, const int j, const int k,
-                                const int dir, real & tint) {
+                               const int dir, real & tint) {
   int of(1);
   if(dir<0) of = -1;
 
@@ -77,7 +75,7 @@ bool PhaseChangeVOF::distance1D_x(const int i, const int j, const int k,
 
 /* y-direction */
 real PhaseChangeVOF::distance_y(const int i, const int j, const int k,
-                                const int dir, real & tint) {
+                               const int dir, real & tint) {
   int of(1);
   if(dir<0) of = -1;
 

@@ -13,8 +13,6 @@ void CIPCSL2::insert_bc_gradphi(const Scalar & val) {
 
     if(  val.bc().type(b) == BndType::symmetry() ) {
 
-      int iof=0, jof=0, kof=0;
-
       Dir d      = val.bc().direction(b);
 
       if(d != Dir::undefined()) {

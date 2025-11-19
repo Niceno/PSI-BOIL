@@ -4,7 +4,7 @@
 Momentum::Momentum(const Vector & U, 
                    const Vector & F,
                    Times & T,   
-                   Linear * sm,
+                   Krylov * sm,
                    Matter * M) :
   Staggered(U.domain(), U, F, T, M, NULL, sm) { /* NULL is for solid */
 
@@ -31,14 +31,12 @@ Momentum::Momentum(const Vector & U,
     }
 
   boil::oout<<"Momentum-full: "<<ifull<<" "<<jfull<<" "<<kfull<<boil::endl;
-  ib_trust_vel_wall = false;
 
-  u.bnd_update_nooutlet();
+  insert_bc();
 
   discretize();
 
   v_phase_change=0.0;
-  min_iter = MinIter(1);
 }
 
 /******************************************************************************/

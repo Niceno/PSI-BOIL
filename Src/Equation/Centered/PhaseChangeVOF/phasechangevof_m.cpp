@@ -7,6 +7,8 @@ void PhaseChangeVOF::m(const Scalar * diff_eddy) {
 *         M = (qflux_liquid + qflux_vapor) / latent
 *******************************************************************************/
 
+  boil::timer.start("phasechangevof m");
+
   for_ijk(i,j,k){
     if(Interface(i,j,k)){
       real lv = lambdav;
@@ -17,13 +19,9 @@ void PhaseChangeVOF::m(const Scalar * diff_eddy) {
       }
       real qv = -lv*tnv[i][j][k];
       real ql =  ll*tnl[i][j][k];
-      M[i][j][k] = (qv + ql) / fluid()->latent(i,j,k);
+      M[i][j][k] = (qv + ql) / latent;
 
-#if 0
-      if(i==3&&j==3&&k==3) {
-      boil::aout<<"PCV_m: "<<i<<" "<<j<<" "<<k<<" | "<<phi.xc(i)<<" | "<<clr[i][j][k]<<" "<<adens[i][j][k]<<" "<<fs[Comp::k()][i][j][k]<<" "<<fs[Comp::k()][i+1][j][k]<<" | "<<tpr[i][j][k]<<" "<<tpr[i][j][k-1]<<" "<<tpr[i][j][k+1]<<" | "<<tpr[i-1][j][k]<<" "<<tpr[i+1][j][k]<<" | "<<qv<<" "<<ql<<" "<<qv+ql<<" | "<<tzv[i][j][k]<<" "<<nx[i][j][k]<<" "<<nz[i][j][k]<<boil::endl;
-      }
-#endif
+      //boil::oout<<"PCV_m: "<<i<<" "<<j<<" "<<k<<" | "<<phi.zc(k)<<" | "<<clr[i][j][k]<<" "<<adens[i][j][k]<<" "<<fs[Comp::w()][i][j][k]<<" | "<<tnv[i][j][k]<<" "<<tnl[i][j][k]<<" | "<<M[i][j][k]<<boil::endl;
     } else {
       M[i][j][k] = 0.0;
     }
@@ -31,6 +29,8 @@ void PhaseChangeVOF::m(const Scalar * diff_eddy) {
 
   M.bnd_update();
   M.exchange_all();
+
+  boil::timer.stop("phasechangevof m");
 
   return;
 }

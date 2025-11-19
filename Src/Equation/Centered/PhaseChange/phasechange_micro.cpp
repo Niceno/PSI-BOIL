@@ -4,7 +4,13 @@
 using namespace std;
 
 /******************************************************************************/
-void PhaseChange::micro(Vector * vec, const Scalar * diff_eddy) {
+void PhaseChange::micro(Vector * vec, const Scalar * diff_eddy,
+                        Scalar * hflux, Scalar * warea) {
+/***************************************************************************//**
+*  /brief micro-layer treatment
+*    warea = 0~1: ratio of liquid-area
+*          =-1~0: -(ratio of micro-layer), warea+=1 returns ratio of liquid-area
+*******************************************************************************/
 
 #ifdef DEBUG
   std::cout<<"pc.micro: "<<boil::cart.iam()<<"\n";
@@ -22,6 +28,7 @@ void PhaseChange::micro(Vector * vec, const Scalar * diff_eddy) {
     area_sum[i]=0.0;
     area_l[i]=0.0;
     area_v[i]=0.0;
+    area_micro[i]=0.0;
     hflux_micro[i]=0.0;
     hflux_total[i]=0.0;
     hflux_vapor[i]=0.0;
@@ -84,8 +91,16 @@ void PhaseChange::micro(Vector * vec, const Scalar * diff_eddy) {
                     + fabs(jof)*clr.dSy(ii,jj,kk)
                     + fabs(kof)*clr.dSz(ii,jj,kk);
           area_sum[ndir] += area;
-          area_l[ndir] += area *clr[ii][jj][kk];
-          area_v[ndir] += area *(1.0-clr[ii][jj][kk]);
+	  if (nucl->dmicro[ii][jj][kk] >boil::mega) {  // no micro-layer
+            area_l[ndir] += area *clr[ii][jj][kk];
+            area_v[ndir] += area *(1.0-clr[ii][jj][kk]);
+          } else if (nucl->dmicro[ii][jj][kk] <= nucl->dmicro_min+boil::pico) { // dry spot
+            area_l[ndir] += area *clr[ii][jj][kk];  // vicinity of dry spot
+            area_v[ndir] += area *(1.0-clr[ii][jj][kk]);
+          } else {
+            area_l[ndir] += area *clr[ii][jj][kk];  // vicinity of microlayer
+            area_micro[ndir] += area *(1.0-clr[ii][jj][kk]);
+          }
 
           if (clr[ii][jj][kk] < 0.5) {
  
@@ -105,10 +120,16 @@ void PhaseChange::micro(Vector * vec, const Scalar * diff_eddy) {
                         + fabs(tpr.yc(j)-tpr.yc(j+jof))
                         + fabs(tpr.zc(k)-tpr.zc(k+kof));
               hflux_total[ndir] += lc*(tpr[i][j][k]-tpr[i+iof][j+jof][k+kof])
-                                /alen*area;
+                                /alen*area; // [W]
               hflux_vapor[ndir] += lc*(tpr[i][j][k]-tpr[i+iof][j+jof][k+kof])
-                                /alen*area;
-
+                                /alen*area; // [W]
+              if (hflux) {
+                (*hflux)[ii][jj][kk] = lc*(tpr[i][j][k]-tpr[i+iof][j+jof][k+kof])
+                                    /alen;  // [W/m2]
+	      }
+              if (warea) {
+                (*warea)[ii][jj][kk]= clr[i][j][k];
+	      }
               //phi[ii][jj][kk] = 0.0;  // 2019.0809
 
 	    } else {
@@ -134,8 +155,14 @@ void PhaseChange::micro(Vector * vec, const Scalar * diff_eddy) {
 
               /* heat flux */
               real Mdot = phi[ii][jj][kk] * vol / area;
-              hflux_total[ndir] += Mdot * latent;
-              hflux_micro[ndir] += Mdot * latent;
+              hflux_total[ndir] += Mdot * latent * area; //[W] updated 2021.11.12
+              hflux_micro[ndir] += Mdot * latent * area; //[W] updated 2021.11.12
+              if (hflux) {
+                (*hflux)[ii][jj][kk] = Mdot * latent; //[W/m2]
+	      }
+              if (warea) {
+                (*warea)[ii][jj][kk] = -(1.0-clr[i][j][k]); // -(area-ratio of micro-layer)
+	      }
 
             }
 
@@ -149,6 +176,13 @@ void PhaseChange::micro(Vector * vec, const Scalar * diff_eddy) {
                       + fabs(tpr.zc(k)-tpr.zc(k+kof));
             hflux_total[ndir] += lc*(tpr[i][j][k]-tpr[i+iof][j+jof][k+kof])
                               /alen*area;
+            if (hflux) {
+              (*hflux)[ii][jj][kk] = lc*(tpr[i][j][k]-tpr[i+iof][j+jof][k+kof])
+                                  /alen; //[W/m2]
+	    }
+            if (warea) {
+              (*warea)[ii][jj][kk] = clr[i][j][k]; // -(area-ratio of micro-layer)
+	    }
 
           }
 
@@ -242,6 +276,11 @@ void PhaseChange::micro(Vector * vec, const Scalar * diff_eddy) {
               + fabs(jof)*clr.dSy(i,j,k)
               + fabs(kof)*clr.dSz(i,j,k);
     real a_vapor = nucl->area_vapor(i,j,k,d);
+#if 0
+    if (a_vapor>0.0) {
+      boil::oout<<"micro:a_vapor= "<<a_vapor<<" ijk "<<i<<" "<<j<<" "<<k<<"\n";
+    }
+#endif
     real clrc = min(1.0,max(0.0,clr[i][j][k]));
     bool inclNoInterface = incl_no_interface(i,j,k);
     if (incl_no_interface(i,j,k)) {
@@ -251,9 +290,20 @@ void PhaseChange::micro(Vector * vec, const Scalar * diff_eddy) {
         clrc=0.0;
       }
     }
+
     area_sum[ndir] += area;
-    area_l[ndir] += area - a_vapor;
-    area_v[ndir] += a_vapor;
+    if (nucl->dmicro[i][j][k] >boil::mega) {  // no micro-layer
+       area_l[ndir] += area - a_vapor;
+       area_v[ndir] += a_vapor;
+     } else if (nucl->dmicro[i][j][k] <= nucl->dmicro_min+boil::pico) { // dry spot
+       //std::cout<<"vapor:dmicro= "<<nucl->dmicro[i][j][k]<<" "<<a_vapor<<"\n";
+       area_l[ndir] += area - a_vapor;  // vicinity of dry spot
+       area_v[ndir] += a_vapor;
+     } else {
+       //std::cout<<"micro:dmicro= "<<nucl->dmicro[i][j][k]<<" "<<a_vapor<<"\n";
+       area_l[ndir] += area - a_vapor;  // vicinity of microlayer
+       area_micro[ndir] += a_vapor;
+     }
 
     int ii=i+iof;
     int jj=j+jof;
@@ -266,10 +316,9 @@ void PhaseChange::micro(Vector * vec, const Scalar * diff_eddy) {
     real df = 0.5 * tpr.dzc(k);   // half cell size in fluid
     real lambdas = solid()->lambda(ii,jj,kk);  // lambda solid
 
-    /* cell includes vapor: includes micro-layer */
     if (a_vapor == 0.0) {
 
-      /* liquid cell */
+      /* 100% liquid cell */
       nucl->dmicro[i][j][k]=boil::exa;
 
       /* heat flux for liquid cell */
@@ -279,10 +328,17 @@ void PhaseChange::micro(Vector * vec, const Scalar * diff_eddy) {
                 + dw * laml    * tpr[i ][j ][k ] )
                 / ( df * lambdas + dw * laml);
       hflux_total[ndir] += lambdas*(tpr[ii][jj][kk]-tw)/dw*area;
+      if (hflux) {
+          (*hflux)[ii][jj][kk] = lambdas*(tpr[ii][jj][kk]-tw)/dw; //[W/m2]
+      }
+      if (warea) {
+          (*warea)[ii][jj][kk] = (area-a_vapor)/area; // ratio of liquid on face
+          //std::cout<<k<<" "<<(*warea)[i][j][k]<<"\n";
+      }
 
     } else if ( approx (a_vapor, area, area*boil::micro)) {
 
-      /* vapor cell */
+      /* 100% vapor cell */
 
       if ( nucl->dmicro[i][j][k] <= nucl->dmicro_min+boil::pico // depleted
         || nucl->dmicro[i][j][k] >  boil::mega){                // full vapor
@@ -298,10 +354,16 @@ void PhaseChange::micro(Vector * vec, const Scalar * diff_eddy) {
         /* heat flux for vapor cell */
         hflux_total[ndir] += lambdas*(tpr[ii][jj][kk]-tw)/dw*area;
         hflux_vapor[ndir] += lambdas*(tpr[ii][jj][kk]-tw)/dw*area;
+        if (hflux) {
+          (*hflux)[ii][jj][kk] = lambdas*(tpr[ii][jj][kk]-tw)/dw; //[W/m2]
+        }
+        if (warea) {
+            (*warea)[ii][jj][kk] = (area-a_vapor)/area; // ratio of liquid on face
+        }
 
       } else {
 
-        /* micro layer exists */
+        /* 100% micro-layer */
         real dmicro_new;
         real dt = time->dt();
 
@@ -336,6 +398,12 @@ void PhaseChange::micro(Vector * vec, const Scalar * diff_eddy) {
         // it doesn't take into account max(dmicro_new, nucl->dmicro_min)
         hflux_total[ndir] += qtmp*a_vapor;
         hflux_micro[ndir] += qtmp*a_vapor;
+        if (hflux) {
+          (*hflux)[ii][jj][kk] = qtmp*a_vapor/area; //[W/m2]
+        }
+        if (warea) {
+            (*warea)[ii][jj][kk] = -1.0; // ratio of liquid on face
+        }
         // it does take into account max(dmicro_new, nucl->dmicro_min)
         //hflux_total[ndir] += phi[i][j][k] * vol * latent;
         //hflux_micro[ndir] += phi[i][j][k] * vol * latent;
@@ -367,9 +435,18 @@ void PhaseChange::micro(Vector * vec, const Scalar * diff_eddy) {
         hflux_total[ndir] += lambdas*(tpr[ii][jj][kk]-twv)/dw*a_vapor
                            + lambdas*(tpr[ii][jj][kk]-twl)/dw*(area-a_vapor);
         hflux_vapor[ndir] += lambdas*(tpr[ii][jj][kk]-twv)/dw*a_vapor;
+        if (hflux) {
+          (*hflux)[ii][jj][kk] = (lambdas*(tpr[ii][jj][kk]-twv)/dw*a_vapor
+                             + lambdas*(tpr[ii][jj][kk]-twl)/dw*(area-a_vapor))
+                             / area; //[W/m2]
+        }
+        if (warea) {
+            (*warea)[ii][jj][kk] = (area-a_vapor)/area; // ratio of liquid on face
+        }
 
       } else {
 
+        /* liquid and micro-layer face */
         /* micro layer exists */
         real dmicro_new;
         real dt = time->dt();
@@ -407,6 +484,15 @@ void PhaseChange::micro(Vector * vec, const Scalar * diff_eddy) {
         hflux_total[ndir] += qtmp*a_vapor
                              + lambdas*(tpr[ii][jj][kk]-twl)/dw*(area-a_vapor);
         hflux_micro[ndir] += qtmp*a_vapor;
+        if (hflux) {
+          (*hflux)[ii][jj][kk] = (qtmp*(a_vapor)
+                             + lambdas*(tpr[ii][jj][kk]-twl)/dw*(area-a_vapor))
+                             / area; //[W/m2]
+        }
+	// BUG twl is not computed here! 2023.01.19 bug is not fixed yet.
+        if (warea) {
+            (*warea)[ii][jj][kk] = -(a_vapor)/area; // -(ratio of micro-layer)
+        }
         // it does take into account max(dmicro_new, nucl->dmicro_min)
         //hflux_total[ndir] += phi[i][j][k] * vol * latent
         //                   + lambdas*(tpr[ii][jj][kk]-twl)/dw*(area-a_vapor);
@@ -460,10 +546,13 @@ void PhaseChange::micro(Vector * vec, const Scalar * diff_eddy) {
   txl.exchange();
   tyl.exchange();
   tzl.exchange();
+  if (hflux) (*hflux).exchange();
+  if (warea) (*warea).exchange();
 
   boil::cart.sum_real_n(area_sum,7);
   boil::cart.sum_real_n(area_l,7);
   boil::cart.sum_real_n(area_v,7);
+  boil::cart.sum_real_n(area_micro,7);
   boil::cart.sum_real_n(hflux_total,7);
   boil::cart.sum_real_n(hflux_micro,7);
   boil::cart.sum_real_n(hflux_vapor,7);
@@ -550,6 +639,9 @@ void PhaseChange::micro(Vector * vec, const Scalar * diff_eddy) {
             <<" smdot_pos_incl.micro= "<<smdot_pos
             <<" smdot_neg_macro= "<<smdot_neg_macro-smdot_neg_macro_overwrite
             <<"\n";
+#if 0
+  boil::oout<<"micro:areav= "<<area_v[6]<<" "<<area_micro[6]<<"\n";
+#endif
 
 #ifdef DEBUG
   boil::plot->plot(clr, nucl->dmicro, phi, clrs, 

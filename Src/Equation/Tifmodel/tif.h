@@ -2,11 +2,8 @@
 #define TIF_H
 
 #include "../../Field/Scalar/scalar.h"
-#include "../../Field/ScalarInt/scalarint.h"
-#include "../Topology/topology.h"
 #include "../../Matter/matter.h"
 #include "../../Global/global_realistic.h"
-#include "../../Plot/plot.h"
 
 ///////////////////////////////////
 //                               //
@@ -16,32 +13,31 @@
 class TIF {
   public:
     TIF(const real tref); 
-    TIF(const real tref, Topology * topo); 
+    TIF(const real tref, 
+        const real latent,
+        const real mresis,
+        Matter * flu,
+        const Scalar & adens,
+        const Scalar & mflx,
+        const Scalar * pres = NULL);
     ~TIF() {}
 
-    void init() {
-      if(variable_tif) { 
-        model(); 
-        tif.bnd_update();
-        tif.exchange_all();
-        extend_tint();
-      }
-    }
-
     void update_tifold() {
-      tifold = tif;
+      for_vijk(tifold,i,j,k) 
+        tifold[i][j][k] = tif[i][j][k];
       store_tif = true;
+      tifold.exchange();
     }
     void tint_field(const bool newstep = true);
 
-    inline real get_ur() const { return factor; }
-    inline void set_ur(const real factnew) {
+    real get_ur() { return factor; }
+    void set_ur(const real factnew) {
       factor = factnew;
       boil::oout<<"TIFmodel: Underrelaxation factor = "<<factnew<<boil::endl;
     }
 
-    inline real tref() const { return tr; }
-    inline void set_tref(const real tnew) {
+    real tref() { return tr; }
+    void set_tref(const real tnew) {
       tr = tnew;
       boil::oout<<"TIFmodel: Tref = "<<tnew<<boil::endl;
     }
@@ -56,28 +52,35 @@ class TIF {
     real Tint_old(const int i, const int j, const int k) const; 
 
     void set_weak_limiting(const real tmin, const real tmax);
-
-    static real calculate_heat_transfer_resistance(
-                                          const real tr, const real rhov,
-                                          const real mmass, const real latent,
-                                          const real accommodation);
+    void set_strong_limiting(const Scalar * tpr,
+                             const Scalar * clr,
+                             const real clrsurf);
 
   protected:
     real factor; /* under-relaxation factor */
     real tmin, tmax;
-    bool weaklim;
+    bool weaklim, stronglim;
+    real clrsurf;
 
     bool store_tif,variable_tif;
-    real tr;
+    real tr, latent, mresis, rhol;
 
-    Topology * topo;
-    ScalarInt iflag, tempflag, tempflag2;
-    Scalar stmp;
+    const Matter * fluid() const {return flu;}
+    Matter * flu;
 
-    virtual void model() {};
-    void extend_tint();
+    const Scalar mflx;
+    const Scalar adens;
+    const Scalar * dpres;
+    const Scalar * clr;
+    const Scalar * tpr;
 
-    inline real underrelaxation(const real tintnew, const real tifold);
+    void Pressure_effect();
+    void Mass_src_effect();
+    void Extend_tint    ();
+
+    bool Vicinity(const int i, const int j, const int k);
+    bool Interface(const int i, const int j, const int k);
+    inline real Underrelaxation(const real tintnew, const real tifold);
 };
 
 #endif
