@@ -1,2 +1,0 @@
-#!/bin/bash
-ftp -inv < ftp_commands
