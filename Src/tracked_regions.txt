@@ -1,2 +1,0 @@
-Info3:t 0 ID 1 cvol 65536 xyz 0.005 -4.23516e-22 0.00194361 is a large new ID
-Info3:t 0 ID 1 cvol 65536 xyz 0.005 -4.23516e-22 0.00194361 is a large new ID
