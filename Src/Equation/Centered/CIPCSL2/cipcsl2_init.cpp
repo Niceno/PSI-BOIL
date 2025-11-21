@@ -8,9 +8,8 @@ void CIPCSL2::init() {
 /***************************************************************************//**
 *  \brief  Initialize variables used for CIPCSL2
 *******************************************************************************/
-
   for_aijk(i,j,k){
-    phi[i][j][k]=maxr(1.0,maxr(0.0,phi[i][j][k]));
+    phi[i][j][k]=minr(1.0,maxr(0.0,phi[i][j][k]));
   }
  
   bdcond(phi);
