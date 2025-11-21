@@ -50,3 +50,4 @@ static void __attribute__ ((constructor)) trapfpe(void)
 #include "../Custom/custom.h"
 #include "../Custom/IF97/if97.h"
 #include "../Custom/PIDcontrol/pidcontrol.h"
+#include "../Custom/SEMInlet/seminlet.h"

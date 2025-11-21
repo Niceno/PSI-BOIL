@@ -76,4 +76,5 @@ AC_OUTPUT(Makefile                                     \
           Src/Template/Makefile                        \
           Src/Custom/Makefile                          \
           Src/Custom/IF97/Makefile                     \
-          Src/Custom/PIDcontrol/Makefile)
+          Src/Custom/PIDcontrol/Makefile               \
+          Src/Custom/SEMInlet/Makefile)

@@ -63,7 +63,8 @@ SUBDIRS = Equation/Staggered/Momentum      \
           Template                         \
           Custom                           \
           Custom/IF97                      \
-          Custom/PIDcontrol
+          Custom/PIDcontrol                \
+          Custom/SEMInlet
 
 LDADD = Equation/Staggered/Momentum/libMomentum.a            \
         Equation/Staggered/libStaggered.a                    \
@@ -127,6 +128,7 @@ LDADD = Equation/Staggered/Momentum/libMomentum.a            \
         Domain/libDomain.a                                   \
         Custom/libCustom.a                                   \
         Custom/IF97/libIF97.a                                \
-        Custom/PIDcontrol/libPIDcontrol.a
+        Custom/PIDcontrol/libPIDcontrol.a                    \
+        Custom/SEMInlet/libSEMInlet.a
 ### Domain/libDomain.a is define twice because of compile error in the case that
 ### vector_bnd_extract_global is used.
