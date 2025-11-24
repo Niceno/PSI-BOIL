@@ -46,6 +46,10 @@ class Times {
                      else
                        return false;
                     } 
+    void end(real t) {
+      t_time = t;
+      boil::oout<<"simulationtime.h: set total tile ="<<t_time<<"\n";
+    }
     void increase() {
                        c_dt++;
                        real tnew = 0.0;
