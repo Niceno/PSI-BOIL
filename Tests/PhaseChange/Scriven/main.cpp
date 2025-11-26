@@ -2,7 +2,7 @@
 #define USE_VOF
 
 /* computed parameters */
-const int gLevel = 4;  //grid level=2,4,8
+const int gLevel = 2;  //grid level=2,4,8
 const int NX = 24*gLevel;
 
 /* domain dimensions (given by problem) */
@@ -89,6 +89,7 @@ int main(int argc, char ** argv) {
   f     = p.shape();
   mdot  = p.shape();
   q     = p.shape();
+  kappa = p.shape();
 
   c.bc().add( BndCnd( Dir::imin(), BndType::symmetry() ) );
   c.bc().add( BndCnd( Dir::imax(), BndType::outlet() ) );
@@ -144,7 +145,7 @@ int main(int argc, char ** argv) {
   /*-----------------+
   |  define solvers  |
   +-----------------*/
-#ifdef VOF
+#ifdef USE_VOF
   VOF conc  (c,  g, kappa, uvw, time, solver);
 #else
   CIPCSL2 conc  (c,  g, kappa, uvw, time, solver);
@@ -251,7 +252,7 @@ int main(int argc, char ** argv) {
 
     fin.close();
 
-    boil::oout << "Read " << r.size() << " rows.\n";
+    std::cout << "Read " << r.size() << " rows.\n";
     if (!r.empty()) {
         boil::oout << "First row: r=" << r.front() << ", T=" << T.front() << "\n";
         boil::oout << "Last row : r=" << r.back()  << ", T=" << T.back()  << "\n";
@@ -441,7 +442,7 @@ int main(int argc, char ** argv) {
       boil::timer.report();
       uvw  .rm("uvw", ts);
       press.rm("press", ts);
-      conc .rm("conc", ts);
+      //conc .rm("conc", ts);
       tpr  .rm("tpr", ts);
       exit(0); 
     }
