@@ -15,6 +15,6 @@ libEnthalpyFD_a_SOURCES = enthalpyfd.h                    \
                           enthalpyfd_setflag.cpp          \
                           enthalpyfd_solve.cpp            \
                           enthalpyfd_solve_sor.cpp        \
-                          enthalpyfd_update_rhs.cpp
+                          enthalpyfd_update_rhs.cpp       
 
 INCLUDE = -I@top_srcdir@/

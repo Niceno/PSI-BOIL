@@ -18,8 +18,9 @@ class EnthalpyFDhighPr : public EnthalpyFD {
                      Linear * sm,
                      Matter * flu,
                      const real tsat,
+		     const real latent,
                      Matter * sol = NULL) :
-    EnthalpyFD(phi,f,clr,u,t,sm,flu,tsat,sol) {}
+    EnthalpyFD(phi,f,clr,u,t,sm,flu,tsat,latent,sol) {}
     ~EnthalpyFDhighPr() {};
     void new_time_step(const Scalar * diff_eddy = NULL);
     void convection();

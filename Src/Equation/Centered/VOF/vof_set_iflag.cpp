@@ -14,15 +14,15 @@ void VOF::set_iflag() {
 *
 *   solid region: iflag = -1001
 *******************************************************************************/
-  const int ifmax =  nlayer+4;
-  const int ifmin = -nlayer-4;
+  const int ifmax =  nlayer+4;  //ifmax=10
+  const int ifmin = -nlayer-4;  //ifmin=-10
 
   /*-----------+
   |  set flag  |
   +-----------*/
   for_aijk(i,j,k) {
     if(phi[i][j][k]<phisurf){
-      iflag[i][j][k]=ifmin;
+      iflag[i][j][k]=ifmin;  
     } else {
       iflag[i][j][k]=ifmax;
     }
@@ -58,13 +58,19 @@ void VOF::set_iflag() {
   for(int k=0; k<nk()-1; k++){
     for_ij(i,j){
       if((phi[i][j][k]-phisurf)*(phi[i][j][k+1]-phisurf)<=0.0){
-        if(iflag[i][j][k  ]>-1000) iflag[i][j][k  ]=0;
-        if(iflag[i][j][k+1]>-1000) iflag[i][j][k+1]=0;
+	if(iflag[i][j][k  ]<-1000 || iflag[i][j][k+1]<-1000) {
+          iflag[i][j][k] = iflag[i][j][k];
+          iflag[i][j][k+1] = iflag[i][j][k+1];
+        }else {
+          if(iflag[i][j][k  ]>-1000) iflag[i][j][k  ]=0;
+          if(iflag[i][j][k+1]>-1000) iflag[i][j][k+1]=0;
+        }
       }
     }
   }
   insert_bc_flag(iflag, false);
   iflag.exchange();
+
 
   for(int layer=1; layer<=nlayer; layer++){
     /* i-direction */
@@ -73,7 +79,7 @@ void VOF::set_iflag() {
         if(int(abs(iflag[i  ][j][k]))==ifmax &&
            int(abs(iflag[i+1][j][k]))==(layer-1)){
            if(iflag[i  ][j][k]>-1000)
-             iflag[i  ][j][k]=layer*int(copysign(1.0,iflag[i  ][j][k]));
+             iflag[i  ][j][k]=layer*int(copysign(1.0,iflag[i  ][j][k]));  //copysign(x,y)::abs(x)*y/|y|
         } else if(int(abs(iflag[i+1][j][k]))==ifmax &&
                   int(abs(iflag[i  ][j][k]))==(layer-1)){
            if(iflag[i+1][j][k]>-1000)
@@ -81,6 +87,7 @@ void VOF::set_iflag() {
         }
       }
     }
+
     /* j-direction */
     for(int j=0; j<nj()-1; j++){
       for_ik(i,k){
@@ -95,6 +102,7 @@ void VOF::set_iflag() {
         }
       }
     }
+
     /* k-direction */
     for(int k=0; k<nk()-1; k++){
       for_ij(i,j){
@@ -112,6 +120,7 @@ void VOF::set_iflag() {
     insert_bc_flag(iflag, false);
     iflag.exchange();
   }
+
 
 #if 0
   boil::plot->plot(phi, iflag, "phi-iflag", time->current_step());

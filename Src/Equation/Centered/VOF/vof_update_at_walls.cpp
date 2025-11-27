@@ -482,8 +482,8 @@ void VOF::update_at_walls(Scalar & scp, const real * cang) {
     if (dom->ibody().off(i,j,k+1)) {
       int ofx(0), ofy(0), ofz(0);
       real xpos(0.5), ypos(0.5), zpos(0.5);
-      ofy = -1;
-      ypos = 1.5;
+      ofz = -1;
+      zpos = 1.5;
       scp[i][j][k+1]=extrapolate_v(i,j,k+1,ofx,ofy,ofz,xpos,ypos,zpos,scp,cang);
     }
   }
@@ -510,11 +510,26 @@ real VOF::extrapolate_v(const int i, const int j, const int k,
     int kk = k+ofz;
    
     real scpscp = scp[ii][jj][kk];
+    real scpscp_t = scp[ii][jj][kk+1];
+    real scpscp_s = scp[ii][jj-1][kk];
+    real scpscp_n = scp[ii][jj+1][kk+1];
+    real scpscp_w = scp[ii-1][jj][kk+1];
+    real scpscp_e = scp[ii+1][jj][kk+1];
+
 
     /* erroneous interfaces */
     if(scpscp<tol_wall||scpscp-1.0>-tol_wall) {
       return real(scpscp>phisurf);
-    } 
+    }
+
+    /* delete subgrid vapor, if bottom is immersed boudary */
+    if (use_delete_wall_vapor) {
+      if (dom->ibody().off(i,j,k-1)) {
+        if(scpscp>phisurf && (scpscp_t-phisurf)*(scpscp-phisurf)>0.0 && (scpscp_s-phisurf)*(scpscp_n-phisurf)>0.0 && (scpscp_w-phisurf)*(scpscp_e-phisurf)>0.0) {
+          return real(scpscp>phisurf);
+        }
+      } 
+    }
 
     /* unnormalized alpha value */
     real alphaval = nalpha[ii][jj][kk];
