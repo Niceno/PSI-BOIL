@@ -60,23 +60,6 @@ void PhaseChange::setflag() {
       }
     }
   }
-  /* k-direction touch immersed boundary */
-  for(int cc=0; cc<dom->ibody().nccells(); cc++){
-    int i,j,k;
-    dom->ibody().ijk(cc,&i,&j,&k);
-    if((clr[i-1][j][k]-phisurf)*(clr[i+1][j][k]-phisurf)>0.0){
-      if((clr[i][j-1][k]-phisurf)*(clr[i][j+1][k]-phisurf)>0.0){
-        if((clr[i][j][k]-phisurf)*(clr[i][j][k-1]-phisurf)<=0.0){
-          if(clr[i][j][k]<phisurf){
-            iflag[i][j][k]=-3;
-          } else {
-            iflag[i][j][k]=3;
-	  }
-	}
-      }
-    }
-  }
-
 
 #ifdef IB
   for_ijk(i,j,k) {

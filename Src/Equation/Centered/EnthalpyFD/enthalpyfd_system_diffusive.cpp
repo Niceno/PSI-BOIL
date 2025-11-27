@@ -9,6 +9,7 @@ void EnthalpyFD::create_system_diffusive(const Scalar * diff_eddy) {
   /* initialize: get time stepping coefficient */
   real tscn = diff_ts.N();
   assert( tscn > 0.0 );
+
   /*------------------------------------+
   |  no conduction through solid parts  |
   +------------------------------------*/
@@ -323,11 +324,7 @@ void EnthalpyFD::create_system_diffusive(const Scalar * diff_eddy) {
         if (onc) edc = (*diff_eddy)[i][j][k  ];
         if (onp) edp = (*diff_eddy)[i][j][k+1];
       }
-#if 0
-      if (i==17 && j==20 && k==10){
-        boil::oout<<"diff_matrix:i= "<<i<<" j= "<<j<<" k= "<<k<<" phim= "<<pm<<" phic= "<<pc<<" phip= "<<pp<<" clrm= "<<clm<<" clrc= "<<clc<<" clrp= "<<clp<<" dxm= "<<dxm<<" dxp= "<<dxp<<" fdm= "<<fdm<<" fdp= "<<fdp<<"\n";
-      }
-#endif
+  
       diff_matrix(am, ac, ap
                 , tm, tc, tp
                 , aflagm, aflagp
@@ -371,4 +368,5 @@ void EnthalpyFD::create_system_diffusive(const Scalar * diff_eddy) {
   A.n.exchange();
   A.b.exchange();
   A.t.exchange();
+
 }

@@ -124,13 +124,6 @@ class VOF : public Centered {
     }
     bool get_use_flag_tension() {return use_flag_tension;};
 
-    /* setter for use_delete_wall_vapor */
-    void set_use_delete_wall_vapor(const bool b) {
-      use_delete_wall_vapor=b;
-      boil::oout<<"set_delete_wall_vapor= "<<b<<"\n";
-    }
-    bool get_use_delete_wall_vapor() {return use_delete_wall_vapor;};
-    
     /* min and max of color function in fluid domain */
     real minval() {return minclr;}
     real maxval() {return maxclr;}
@@ -187,8 +180,8 @@ class VOF : public Centered {
     void norm_mixed(real & nx_val, real & ny_val, real & nz_val,
                     const int i, const int j, const int k,
                     const Scalar & sca);
-    void bdnorm(Scalar & scp);
 
+    void bdnorm(Scalar & scp);
     void extend_norm(const Scalar & g);
 
     void normalize(real & r1, real & r2, real & r3);
@@ -282,7 +275,7 @@ class VOF : public Centered {
     bool iminc, imaxc, jminc, jmaxc, kminc, kmaxc; // true = cut-stencil
     bool ifull, jfull, kfull; // true = not a dummy direction
     bool limit_color, use_subgrid, use_HF_wall;
-    bool use_flag_tension, use_delete_wall_vapor;
+    bool use_flag_tension;
     real minclr, maxclr;
 
     Heaviside heavi;

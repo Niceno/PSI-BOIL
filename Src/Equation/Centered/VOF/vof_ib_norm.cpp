@@ -13,6 +13,7 @@ void VOF::ib_norm(const Scalar & sca) {
   for(int cc=0; cc<dom->ibody().nccells(); cc++){
     int i,j,k;
     dom->ibody().ijk(cc,&i,&j,&k);
+
     if(dom->ibody().fPmmm(i,j,k)==0) ib_norm_cal(cc, i  ,j  ,k  );
     if(dom->ibody().fPpmm(i,j,k)==0) ib_norm_cal(cc, i+1,j  ,k  );
     if(dom->ibody().fPmpm(i,j,k)==0) ib_norm_cal(cc, i  ,j+1,k  );

@@ -22,7 +22,7 @@ class PhaseChange : public Centered {
                 const Vector & u, 
                 Times & t,
                 Matter * flu,
-                real r1, real r2, real r3,
+                real r1, real r2,
                 Matter * sol = NULL,
                 Nucleation * nucl = NULL);
 
@@ -132,11 +132,11 @@ class PhaseChange : public Centered {
     Scalar txv,tyv,tzv;
     Scalar txl,tyl,tzl;
     real dxmin,phisurf,pi,phimin,phimax;
-    real latent, tsat, Ri, rhol, rhov, lambdal, lambdav, cpl, cpv;
+    real latent, tsat, rhol, rhov, lambdal, lambdav, cpl, cpv;
     real rhoave, rhodlt;
     real epsl,epsnorm;
     real Mmicro,Fmicro;
-    real smdot_pos, smdot_neg, smdot_micro_VOF, smdot_pos_macro, smdot_neg_macro;
+    real smdot_pos, smdot_neg, smdot_pos_macro, smdot_neg_macro;
     real turbP;
     real * hflux_total, * hflux_micro, * hflux_vapor;
     real * area_sum, * area_l, * area_v, * area_micro;

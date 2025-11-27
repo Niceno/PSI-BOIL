@@ -114,7 +114,6 @@ void PhaseChange::cal_gradt(const Scalar * diff_eddy) {
   +--------------------------*/
   for(int cc=0; cc<dom->ibody().nccells(); cc++){
     int i,j,k;
-    int ii,jj,kk;
     dom->ibody().ijk(cc,&i,&j,&k);
     real t_c  = tpr[i][j][k];
 
@@ -150,15 +149,6 @@ void PhaseChange::cal_gradt(const Scalar * diff_eddy) {
         real ww = (phisurf-clr[i][j][k])/(clr[i+1][j][k]-clr[i][j][k]);
         dx_e *= ww;
 	dtdx = grad3(ww, dx_w, dx_e, t_w, t_c, t_e, epsl);
-        ii += 1;
-      }
-      // interface in west
-      if((clr[i][j][k]-phisurf)*(clr[i-1][j][k]-phisurf)<=0.0){
-        t_w = tsat;
-        real ww = (phisurf-clr[i][j][k])/(clr[i-1][j][k]-clr[i][j][k]);
-        dx_w *= ww;
-        dtdx = grad3(ww, dx_w, dx_e, t_w, t_c, t_e, epsl);	
-        ii += 1;
       }
 
       // update grad
@@ -194,15 +184,6 @@ void PhaseChange::cal_gradt(const Scalar * diff_eddy) {
         real ww = (phisurf-clr[i][j][k])/(clr[i-1][j][k]-clr[i][j][k]);
         dx_w *= ww;
 	dtdx = grad3(ww, dx_w, dx_e, t_w, t_c, t_e, epsl);
-	ii += 1;
-      }
-      // interface in east
-      if((clr[i+1][j][k]-phisurf)*(clr[i][j][k]-phisurf)<=0.0){
-        t_e = tsat;
-        real ww = (phisurf-clr[i][j][k])/(clr[i+1][j][k]-clr[i][j][k]);
-        dx_e *= ww;
-	dtdx = grad3(ww, dx_w, dx_e, t_w, t_c, t_e, epsl);
-        ii += 1;
       }
 
       // update grad
@@ -245,15 +226,6 @@ void PhaseChange::cal_gradt(const Scalar * diff_eddy) {
         real ww = (phisurf-clr[i][j][k])/(clr[i][j+1][k]-clr[i][j][k]);
         dy_n *= ww;
 	dtdy = grad3(ww, dy_s, dy_n, t_s, t_c, t_n, epsl);
-        jj += 1;
-      }
-      // interface in south
-      if((clr[i][j][k]-phisurf)*(clr[i][j-1][k]-phisurf)<=0.0){
-        t_s = tsat;
-        real ww = (phisurf-clr[i][j][k])/(clr[i][j-1][k]-clr[i][j][k]);
-        dy_s *= ww;
-	dtdy = grad3(ww, dy_s, dy_n, t_s, t_c, t_n, epsl);
-        jj += 1;
       }
 
       // update grad
@@ -289,15 +261,6 @@ void PhaseChange::cal_gradt(const Scalar * diff_eddy) {
         real ww = (phisurf-clr[i][j][k])/(clr[i][j-1][k]-clr[i][j][k]);
         dy_s *= ww;
 	dtdy = grad3(ww, dy_s, dy_n, t_s, t_c, t_n, epsl);
-        jj += 1;
-      }
-      // interface in north
-      if((clr[i][j+1][k]-phisurf)*(clr[i][j][k]-phisurf)<=0.0){
-        t_n = tsat;
-        real ww = (phisurf-clr[i][j][k])/(clr[i][j+1][k]-clr[i][j][k]);
-        dy_n *= ww;
-	dtdy = grad3(ww, dy_s, dy_n, t_s, t_c, t_n, epsl);
-        jj += 1;
       }
 
       // update grad
@@ -344,15 +307,14 @@ void PhaseChange::cal_gradt(const Scalar * diff_eddy) {
 	real ww = (phisurf-clr[i][j][k])/(clr[i][j][k+1]-clr[i][j][k]);
        	dz_t *= ww;
 	dtdz = grad3(ww, dz_b, dz_t, t_b, t_c, t_t, epsl);
-	kk += 1;
-      }
-      // interface in bottom
-      if((clr[i][j][k]-phisurf)*(clr[i][j][k-1]-phisurf)<=0.0){
-        t_b = tsat;
-	real ww = (phisurf-clr[i][j][k])/(clr[i][j][k-1]-clr[i][j][k]);
-       	dz_b *= ww;
-	dtdz = grad3(ww, dz_b, dz_t, t_b, t_c, t_t, epsl);
-	kk += 1;
+        if (ww>epsl) {
+          real a = dz_b;
+          real b = dz_t;
+          dtdz = b*b*(t_c - t_b) +a*a*(t_t - t_c);
+          dtdz /= (a*b*(a+b));
+        } else {
+          dtdz = (t_t - t_b)/(dz_b + dz_t);
+        }
       }
 
       // update grad
@@ -388,15 +350,6 @@ void PhaseChange::cal_gradt(const Scalar * diff_eddy) {
         real ww = (phisurf-clr[i][j][k])/(clr[i][j][k-1]-clr[i][j][k]);
         dz_b *= ww;
 	dtdz = grad3(ww, dz_b, dz_t, t_b, t_c, t_t, epsl);
-        kk += 1;
-      }
-      // interface in top
-      if((clr[i][j][k+1]-phisurf)*(clr[i][j][k]-phisurf)<=0.0){
-        t_t = tsat;
-        real ww = (phisurf-clr[i][j][k])/(clr[i][j][k+1]-clr[i][j][k]);
-        dz_t *= ww;
-	dtdz = grad3(ww, dz_b, dz_t, t_b, t_c, t_t, epsl);
-        kk += 1;
       }
 
       // update grad
@@ -406,9 +359,6 @@ void PhaseChange::cal_gradt(const Scalar * diff_eddy) {
         tzv[i][j][k]=dtdz;
       }
     }
-    if(ii==2)txv[i][j][k]=txl[i][j][k]=0.0;
-    if(jj==2)tyv[i][j][k]=tyl[i][j][k]=0.0;
-    if(kk==2)tzv[i][j][k]=tzl[i][j][k]=0.0;
   }
 
   if(dom->ibody().nccells() > 0) {

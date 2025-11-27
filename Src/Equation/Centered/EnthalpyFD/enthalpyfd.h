@@ -53,7 +53,6 @@ class EnthalpyFD : public Centered {
                Linear * sm,
                Matter * flu,
                const real tsat,
-	       const real Ri,
                Matter * sol = NULL);
     ~EnthalpyFD();
 
@@ -135,7 +134,7 @@ class EnthalpyFD : public Centered {
                 , const int i, const int j, const int k, const Comp m);
 
     const Scalar * clr;
-    real tsat,Ri,rhol,rhov,cpl,cpv,lambdal,lambdav,clrsurf,epsl,heater_power,half_heater,pi;
+    real tsat,rhol,rhov,cpl,cpv,lambdal,lambdav,clrsurf,epsl;
     bool store_clrold;
     Scalar clrold;
     ScalarInt iflag;
