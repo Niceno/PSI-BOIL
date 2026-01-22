@@ -4,7 +4,7 @@ using namespace std;
 /******************************************************************************/
 void VOF::curv_smooth() {
 /***************************************************************************//**
-*  \brief Calculate curvature using height function.
+*  \brief Calculate curvature: kappa = - div(n_vector)
 *     output: kappa
 *******************************************************************************/
 
