@@ -13,9 +13,9 @@ const real dia = radius *2.0;
 
 const real LX = 6.0*dia;
 const real LY = LX;
-const real LZ= 24*dia;
+const real LZ= 12.0*dia;  //originally 24.0*dia
 
-const int glevel = 6;
+const int glevel = 4; // coarse grid!
 const int NX = 16*glevel;
 const real dxmin = LX/real(NX); //to change
 const int NY = NX;
@@ -172,7 +172,7 @@ if(argc==1){
   const int nint=10000;
   Times time(200000, dt); // ndt, dt
   const real cfl_limit=0.25;
-  const real tint=5.0e-2;
+  const real tint=1.0e-3;
 
   /*-----------------+
   |  define equation  |
@@ -367,9 +367,9 @@ if(argc==1){
       for_avmijk(xyz,m,i,j,k)
         xyz[m][i][j][k] = 0.0;
 
-    /* lorenz force */
+    /* lorentz force */
     if (B0 != 0.0) {
-      pt.force_lorenz(&xyz);
+      pt.force_lorentz(&xyz);
     }
 
     /* gravity */
@@ -479,7 +479,7 @@ if(argc==1){
       c    .save("c",  time.current_step());
     }
 
-    if( boil::timer.current_min() > (wmin-30)
+    if( boil::timer.current_min() > wmin
       || time.current_step()==time.total_steps()) {
       if( boil::cart.iam()==0) {
         std::fstream output;
