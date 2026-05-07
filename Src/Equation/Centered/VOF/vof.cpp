@@ -35,9 +35,15 @@ VOF::VOF(const Scalar & PHI,
 |  this constructor is called only at the finest level  |
 +------------------------------------------------------*/
 { 
+  // following scalars use same boundary conditions as phi
+  stmp      = phi.shape();
+  stmp2     = phi.shape();
+  iflag     = phi.shape();
+  iflagx    = phi.shape();
 #if 0
   // If next lines are used, then boundary conditions are shared between nx, and phi
-  // when boundary condition fo nx is changed, then bc for phi, ny, nz, ... are modified automatically!
+  // when boundary condition for nx is changed, then bc for phi, ny, nz, ... are
+  // modified automatically!
   kappa     = phi.shape();
   nx        = phi.shape();
   ny        = phi.shape();
@@ -46,13 +52,10 @@ VOF::VOF(const Scalar & PHI,
   my        = phi.shape();
   mz        = phi.shape();
   nalpha    = phi.shape();
-  stmp      = phi.shape();
-  stmp2     = phi.shape();
-  iflag     = phi.shape();
-  iflagx    = phi.shape();
   adens     = phi.shape();
 #else
   for( int b=0; b<phi.bc().count(); b++ ) {
+    // boundary conditions for the following scalars will be changed later
     nx.bc().add(phi.bc().at(b));
     ny.bc().add(phi.bc().at(b));
     nz.bc().add(phi.bc().at(b));
@@ -60,10 +63,6 @@ VOF::VOF(const Scalar & PHI,
     my.bc().add(phi.bc().at(b));
     mz.bc().add(phi.bc().at(b));
     nalpha.bc().add(phi.bc().at(b));
-    stmp.bc().add(phi.bc().at(b));
-    stmp2.bc().add(phi.bc().at(b));
-    iflag.bc().add(phi.bc().at(b));
-    iflagx.bc().add(phi.bc().at(b));
     adens.bc().add(phi.bc().at(b));
   }
 #endif
@@ -114,6 +113,7 @@ VOF::VOF(const Scalar & PHI,
   use_subgrid=false;
   use_HF_wall=false;
   use_flag_tension=false;
+  limit_kappa=false;
   total_vol0=0.0;
   total_vol1=0.0;
 
