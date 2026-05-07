@@ -124,6 +124,13 @@ class VOF : public Centered {
     }
     bool get_use_flag_tension() {return use_flag_tension;};
 
+    /* setter for limit_kappa */
+    void set_limit_kappa(const bool b){
+      limit_kappa=b;
+      boil::oout<<"set_limit_kappa= "<<b<<"\n";
+    }
+    bool get_limit_kappa() {return limit_kappa;};
+
     /* min and max of color function in fluid domain */
     real minval() {return minclr;}
     real maxval() {return maxclr;}
@@ -275,7 +282,7 @@ class VOF : public Centered {
     bool iminc, imaxc, jminc, jmaxc, kminc, kmaxc; // true = cut-stencil
     bool ifull, jfull, kfull; // true = not a dummy direction
     bool limit_color, use_subgrid, use_HF_wall;
-    bool use_flag_tension;
+    bool use_flag_tension, limit_kappa;
     real minclr, maxclr;
 
     Heaviside heavi;
