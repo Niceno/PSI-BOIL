@@ -30,6 +30,11 @@ void VOF::tension(Vector * vec, const Matter matt) {
     set_iflag();
   }
 
+#if 0
+  // calculate smoothed VOF function
+  smooth(phi, stmp2, 16);
+#endif
+
   Comp m;
   if(rho_diff==0.0){
     m = Comp::u();
