@@ -12,83 +12,57 @@ void VOF::smooth(const Scalar & sca, Scalar & scb, const int itnum) {
 *            temporary: dflag
 *******************************************************************************/
 
+  // set initial value
   for_aijk(i,j,k)
     scb[i][j][k]=sca[i][j][k];
 
-  if (itnum>=1) {
-#if 0
-    /*----------+
-    |   Yabe    |
-    +----------*/
-    /* coefficients for smooth */
-    const real c1 = 1.0/(6.0+12.0/sqrt(2.0)+8/sqrt(3.0));
-    const real c2 = c1/sqrt(2.0);
-    const real c3 = c1/sqrt(3.0);
-
-    /* iterate */
-    for(int it=0; it<itnum; it++) {
-      for_ijk(i,j,k) {
-        stmp[i][j][k] =0.5*scb[i][j][k] + 0.5/(1.0+6.0*c1+12.0*c2+8.0*c3)
-                         *(scb[i][j][k]
-                      +c1*(scb[i-1][j][k]+scb[i+1][j][k]
-                          +scb[i][j-1][k]+scb[i][j+1][k]
-                          +scb[i][j][k-1]+scb[i][j][k+1])
-                      +c2*(scb[i-1][j-1][k]+scb[i-1][j+1][k] 
-                          +scb[i+1][j-1][k]+scb[i+1][j+1][k]
-                          +scb[i-1][j][k-1]+scb[i-1][j][k+1]
-                          +scb[i+1][j][k-1]+scb[i+1][j][k+1]
-                          +scb[i][j-1][k-1]+scb[i][j-1][k+1]
-                          +scb[i][j+1][k-1]+scb[i][j+1][k+1])
-                      +c3*(scb[i-1][j-1][k-1]+scb[i-1][j-1][k+1]
-                          +scb[i-1][j+1][k-1]+scb[i-1][j+1][k+1]
-                          +scb[i+1][j-1][k-1]+scb[i+1][j-1][k+1]
-                          +scb[i+1][j+1][k-1]+scb[i+1][j+1][k+1]));
+  /*-----------------------------+
+  |  diffusion, explicit Jakobi  |
+  +-----------------------------*/
+  /* iterate */
+  for(int it=0; it<itnum; it++) {
+    real diff=0.0;
+    for_ijk(i,j,k) {
+      real lambda = 1.0*std::max(phi.dxc(i),std::max(phi.dyc(j),phi.dzc(k)));
+      real dtau=1.0;
+      real dxm = phi.dxw(i);
+      real dxp = phi.dxe(i);
+      real dym = phi.dys(j);
+      real dyp = phi.dyn(j);
+      real dzm = phi.dzb(k);
+      real dzp = phi.dzt(k);
+      real diag = 1.0 + dtau * lambda *
+                ( 2.0/(dxm+dxp)*(1.0/dxp+1.0/dxm)
+                + 2.0/(dym+dyp)*(1.0/dyp+1.0/dym)
+                + 2.0/(dzm+dzp)*(1.0/dzp+1.0/dzm));
+      real rhs = scb[i][j][k] + dtau * lambda *
+                ( 2.0/(dxm+dxp)*(scb[i+1][j][k]/dxp+scb[i-1][j][k]/dxm)
+                + 2.0/(dym+dyp)*(scb[i][j+1][k]/dyp+scb[i][j-1][k]/dym)
+                + 2.0/(dzm+dzp)*(scb[i][j][k+1]/dzp+scb[i][j][k-1]/dzm));
+      stmp[i][j][k] = rhs/diag;
+      diff += pow(scb[i][j][k]-stmp[i][j][k],2);
+      if(pow(scb[i][j][k]-stmp[i][j][k],2)>1) {
+        std::cout<<"large diff:"<<i<<" "<<j<<" "<<k<<" "<<scb[i][j][k]<<" "<<stmp[i][j][k]<<"\n";
+        exit(0);
       }
-      //insert_bc(dflag);
-      //dflag.exchange_all();
-
-      for_ijk(i,j,k)
-        scb[i][j][k]=stmp[i][j][k];
-
-      scb.bnd_update(); // boundary condition for scb
-      scb.exchange();
     }
-#endif
-#if 1
-    /*-----------------------------+
-    |  diffusion, explicit Jakobi  |
-    +-----------------------------*/
-    real dtau=0.125;
-    /* iterate */
-    for(int it=0; it<itnum; it++) {
-      for_ijk(i,j,k) {
-        stmp[i][j][k] = scb[i-1][j][k] -2.0*scb[i][j][k] +scb[i+1][j][k]
-                      + scb[i][j-1][k] -2.0*scb[i][j][k] +scb[i][j+1][k]
-                      + scb[i][j][k-1] -2.0*scb[i][j][k] +scb[i][j][k+1];
-      }
-      //insert_bc(nmag);
-      //nmag.exchange_all();
+    boil::oout<<"vof_smooth: "<<it<<" "<<sqrt(diff)<<"\n";
+    stmp.bnd_update();   // BUG IN bnd_update: the range is 5<i,j,k<...! vof.cpp
+    stmp.exchange_all();
 
-      // update
-      //for_aijk(i,j,k){
-      for_ijk(i,j,k){
-        //real coef=minr(1.0,pow(abs(2.0*sca[i][j][k]-1.0),1.0));
-        //scb[i][j][k]=scb[i][j][k]+dtau*coef*nmag[i][j][k];
-        scb[i][j][k]=scb[i][j][k]+dtau*stmp[i][j][k];
-      }
-      //insert_bc_diffeq(scb); // boundary condition for scb
-      scb.bnd_update(); // boundary condition for scb
-      scb.exchange();
+    // update
+    for_aijk(i,j,k){
+      scb[i][j][k]=stmp[i][j][k];
     }
-
-#endif
   }
 
   /*----------+
   |  cut-off  |
   +----------*/
+#if 1
   for_aijk(i,j,k)
     scb[i][j][k]=maxr(0.0,(minr(1.0,scb[i][j][k])));
+#endif
 
 #if 0
   boil::plot->plot(sca,scb, "sca-scb", time->current_step());
