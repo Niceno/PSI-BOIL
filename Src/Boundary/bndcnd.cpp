@@ -239,12 +239,19 @@ void BndCnd::add(BndCnd bc) {
   if(bc.dir == Dir::kmax() && dom->coord(Comp::k()) != dom->dim(Comp::k())-1) 
     fail = true;
 
+  // initialize range
+  bc.ir.first( 0); bc.jr.first( 0); bc.kr.first( 0);
+  bc.ir.last (-1); bc.jr.last (-1); bc.kr.last (-1);
+
   if( fail ) {
-    bc.ir.first( 0); bc.jr.first( 0); bc.kr.first( 0);
-    bc.ir.last (-1); bc.jr.last (-1); bc.kr.last (-1);
+    //bc.ir.first( 0); bc.jr.first( 0); bc.kr.first( 0);
+    //bc.ir.last (-1); bc.jr.last (-1); bc.kr.last (-1);
     section.push_back(bc);
     return;
   }
+#if 0
+  boil::oout<<"Bnd after1:dir= "<<bc.dir<<" ir "<<bc.ir.first()<<"-"<<bc.ir.last()<<" jr "<<bc.jr.first()<<"-"<<bc.jr.last()<<" kr "<<bc.kr.first()<<"-"<<bc.kr.last()<<"\n";
+#endif
 
 #if 0
   /*---------------------------------------------------+
@@ -369,6 +376,9 @@ void BndCnd::add(BndCnd bc) {
   if(bc.dir == Dir::kmax()) {bc.kr.first(dom->nk()-boil::BW);
                              bc.kr.last (dom->nk()-boil::BW);}
 
+#if 0
+  boil::oout<<"Bnd after2:dir= "<<bc.dir<<" ir "<<bc.ir.first()<<"-"<<bc.ir.last()<<" jr "<<bc.jr.first()<<"-"<<bc.jr.last()<<" kr "<<bc.kr.first()<<"-"<<bc.kr.last()<<"\n";
+#endif
   /*--------------------------------------+
   |  3. set the range for the directions  |
   |         not explicitly defined        |
@@ -393,6 +403,9 @@ void BndCnd::add(BndCnd bc) {
     bc.kr.first(czg.first()); // as sz()
     bc.kr.last (czg.last() ); // as ez()
   }
+#if 0
+  boil::oout<<"Bnd after3:dir= "<<bc.dir<<" ir "<<bc.ir.first()<<"-"<<bc.ir.last()<<" jr "<<bc.jr.first()<<"-"<<bc.jr.last()<<" kr "<<bc.kr.first()<<"-"<<bc.kr.last()<<"\n";
+#endif
 
   /* now the non-aligned indices correspond exactly to the
      c*g, provided that they were not user-specified 
@@ -423,6 +436,9 @@ void BndCnd::add(BndCnd bc) {
     }
   } /* j || k || b */
 
+#if 0
+  boil::oout<<"Bnd after4:dir= "<<bc.dir<<" ir "<<bc.ir.first()<<"-"<<bc.ir.last()<<" jr "<<bc.jr.first()<<"-"<<bc.jr.last()<<" kr "<<bc.kr.first()<<"-"<<bc.kr.last()<<"\n";
+#endif
   if( i || k || b ) {
 
     /* if both outside the range - skip this b.c. */
@@ -438,6 +454,9 @@ void BndCnd::add(BndCnd bc) {
       else                          bc.jr.last(dom->nj()-boil::BW-1);
     }
   } /* i || k || b */
+#if 0
+  boil::oout<<"Bnd after5:dir= "<<bc.dir<<" ir "<<bc.ir.first()<<"-"<<bc.ir.last()<<" jr "<<bc.jr.first()<<"-"<<bc.jr.last()<<" kr "<<bc.kr.first()<<"-"<<bc.kr.last()<<"\n";
+#endif
 
   if( i || j || b ) {
 
@@ -456,7 +475,10 @@ void BndCnd::add(BndCnd bc) {
   } /* i || j || b */
 #endif
 
-  //boil::oout<<"Bnd after 4 "<<bc.dir<<" "<<bc.ir.first()<<" "<<bc.ir.last()<<" | "<<bc.kr.first()<<" "<<bc.kr.last()<<" || "<<cxg.first()<<" "<<cxg.last()<<" | "<<czg.first()<<" "<<czg.last()<<boil::endl;
+#if 1
+  boil::oout<<"Bnd after6:dir= "<<bc.dir<<" ir "<<bc.ir.first()<<"-"<<bc.ir.last()<<" jr "<<bc.jr.first()<<"-"<<bc.jr.last()<<" kr "<<bc.kr.first()<<"-"<<bc.kr.last()<<"\n";
+  //" || "<<cxg.first()<<" "<<cxg.last()<<" | "<<czg.first()<<" "<<czg.last()<<boil::endl;
+#endif
 
   section.push_back(bc);
 
