@@ -547,6 +547,15 @@ void VOF::curv_HF() {
       }
     }
   }
+  if(limit_kappa){
+    for_ijk(i,j,k){
+      real dxmin=std::min({kappa.dxc(i),kappa.dyc(j),kappa.dzc(k)});
+      real kappa_min =-2.0/dxmin;
+      real kappa_max = 2.0/dxmin;
+      kappa[i][j][k] = std::max(kappa[i][j][k],kappa_min);
+      kappa[i][j][k] = std::min(kappa[i][j][k],kappa_max);
+    }
+  }
   kappa.exchange();
   iflag.exchange();
 
