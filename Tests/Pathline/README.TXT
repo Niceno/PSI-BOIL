@@ -10,7 +10,7 @@
          tecmcr.exe is in ./Src/Utilities/TecplotMacro/tecmcr.f90
    > tec360 3D.lay &
      tec360 GUI: Scripting (top bar) > Play Macro/Script: select png.mcr
-4B. post-process: visualization usinv visit
+4B. post-process: visualization using visit
    > visit
      Open: uvw*.plt, particles_*.dat, pathlines.dat
      (Warning! When you open particles_*dat files, specify the file type as Tecplot)
