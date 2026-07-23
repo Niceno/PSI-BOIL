@@ -3,14 +3,6 @@
 +----------------------*/
 #include "Include/psi-boil.h"
 
-#define _GNU_SOURCE 1
-#include <fenv.h>
-static void __attribute__ ((constructor)) trapfpe(void)
-{
-  /* Enable some exceptions. At startup all exceptions are masked. */
-  feenableexcept(FE_INVALID|FE_DIVBYZERO|FE_OVERFLOW);
-}
-
 void update_step(const Scalar & c, Scalar & step, Scalar & sflag);
 
 const int Level=1;  // =1,2,4
