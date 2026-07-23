@@ -1,7 +1,6 @@
 #include "Include/psi-boil.h"
 #include <fstream>
 #include <iostream>
-#include <fenv.h>
 
 #define VARIABLE
 

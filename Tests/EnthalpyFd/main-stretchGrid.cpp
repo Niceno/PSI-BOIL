@@ -4,14 +4,6 @@
 #include <cstring>
 using namespace std;
 
-#define _GNU_SOURCE 1
-#include <fenv.h>
-static void __attribute__ ((constructor)) trapfpe(void)
-{
-  /* Enable some exceptions. At startup all exceptions are masked. */
-  feenableexcept(FE_INVALID|FE_DIVBYZERO|FE_OVERFLOW);
-}
-
 /* domain dimensions */
 //const real LX = 0.005;
 const real LX = 0.04;

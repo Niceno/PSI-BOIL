@@ -1,16 +1,7 @@
 #include "Include/psi-boil.h"
 #include <fstream>
 #include <iostream>
-#include <fenv.h>
 #include <iterator>
-#define _GNU_SOURCE 1
-#if 1
-static void __attribute__ ((constructor)) trapfpe(void)
-{
-  /* Enable some exceptions. At startup all exceptions are masked. */
-  feenableexcept(FE_INVALID|FE_DIVBYZERO|FE_OVERFLOW);
-}
-#endif
 
 #include "header.cpp"
 #include "aux.cpp"

@@ -2,15 +2,6 @@
 #include <fstream>
 #define USE_VOF
 
-#define _GNU_SOURCE 1
-#include <fenv.h>
-static void __attribute__ ((constructor)) trapfpe(void)
-{
-  /* Enable some exceptions. At startup all exceptions are masked. */
-  feenableexcept(FE_INVALID|FE_DIVBYZERO|FE_OVERFLOW);
-}
-
-
 /* domain dimensions (given by problem) */
 //const real LX =   0.5;
 const real LX =   0.2;

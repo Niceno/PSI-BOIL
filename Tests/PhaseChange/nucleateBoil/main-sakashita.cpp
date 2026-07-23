@@ -4,14 +4,6 @@
 #include <cstring>
 #include "update_step.cpp"
 
-#define _GNU_SOURCE 1
-#include <fenv.h>
-static void __attribute__ ((constructor)) trapfpe(void)
-{
-  /* Enable some exceptions. At startup all exceptions are masked. */
-  feenableexcept(FE_INVALID|FE_DIVBYZERO|FE_OVERFLOW);
-}
-
 /* domain dimensions */
 const int gLevel = 2;  //grid level=2,3,4
 const real LX2 =  0.15 *0.001;

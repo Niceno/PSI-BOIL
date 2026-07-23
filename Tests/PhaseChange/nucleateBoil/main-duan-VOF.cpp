@@ -5,14 +5,6 @@
 #include "update_step.cpp"
 #define USE_VOF
 
-#define _GNU_SOURCE 1
-#include <fenv.h>
-static void __attribute__ ((constructor)) trapfpe(void)
-{
-  /* Enable some exceptions. At startup all exceptions are masked. */
-  feenableexcept(FE_INVALID|FE_DIVBYZERO|FE_OVERFLOW);
-}
-
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 * Sato, Niceno, JCP 300 (2015) 20-52
 * Duan's case: Case 1 in Table 3
