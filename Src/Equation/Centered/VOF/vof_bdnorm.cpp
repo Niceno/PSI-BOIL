@@ -6,6 +6,8 @@ void VOF::bdnorm(Scalar & scp) {
 *  \brief iteration routine to obtain
           normal vector for cells adjacent to a wall or an immersed boundary
 *         obtained using extrapolated volume fractions
+*  YOHEI: update_at_walls, which is called in this function, will modify
+*         scp in wall
 *******************************************************************************/
 
   int niter = 2;
