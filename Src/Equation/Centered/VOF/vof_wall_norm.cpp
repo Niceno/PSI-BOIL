@@ -15,6 +15,111 @@ void VOF::wall_norm(const Scalar & sca) {
   real nwlx, nwly, nwlz;
   real nout[3];
 
+#if 1
+  // new implementation on 2026.07.27
+  // multiple BC for e.g. k-min is allowed
+  for ( int b=0; b<sca.bc().count(); b++ ) {
+
+    //boil::oout<<"b= "<<b<<"\n";
+
+    // focus on wall
+    if( sca.bc().type(b) == BndType::wall() ) {
+
+      /* i-min plane */
+      if(sca.bc().direction(b)==Dir::imin()) {
+        for_vijk( sca.bc().at(b), i,j,k ){
+          int ii=si();
+          //std::cout<<"i-min:i,j,k="<<i<<" "<<j<<" "<<k<<"\n";
+          /* unit normal vector directed into the wall */
+          nwlx =-1.0;
+          nwly = 0.0;
+          nwlz = 0.0;
+          nwall(sca,nwlx,nwly,nwlz,ii,j,k,nout);
+          nx[ii][j][k]=nout[0];
+          ny[ii][j][k]=nout[1];
+          nz[ii][j][k]=nout[2];
+        }
+      }
+
+      /* i-max plane */
+      if(sca.bc().direction(b)==Dir::imax()) {
+        for_vijk( sca.bc().at(b), i,j,k ){
+          int ii=ei()+1;
+          /* unit normal vector directed into the wall */
+          nwlx = 1.0;
+          nwly = 0.0;
+          nwlz = 0.0;
+          nwall(sca,nwlx,nwly,nwlz,ii,j,k,nout);
+          nx[ii][j][k]=nout[0];
+          ny[ii][j][k]=nout[1];
+          nz[ii][j][k]=nout[2];
+        }
+      }
+
+      /* j-min plane */
+      if(sca.bc().direction(b)==Dir::jmin()) {
+        for_vijk( sca.bc().at(b), i,j,k ){
+          int jj=sj();
+          /* unit normal vector directed into the wall */
+          nwlx = 0.0;
+          nwly =-1.0;
+          nwlz = 0.0;
+          nwall(sca,nwlx,nwly,nwlz,i,jj,k,nout);
+          nx[i][jj][k]=nout[0];
+          ny[i][jj][k]=nout[1];
+          nz[i][jj][k]=nout[2];
+        }
+      }
+
+      /* j-max plane */
+      if(sca.bc().direction(b)==Dir::jmax()) {
+        for_vijk( sca.bc().at(b), i,j,k ){
+          int jj=ej()+1;
+          /* unit normal vector directed into the wall */
+          nwlx = 0.0;
+          nwly = 1.0;
+          nwlz = 0.0;
+          nwall(sca,nwlx,nwly,nwlz,i,jj,k,nout);
+          nx[i][jj][k]=nout[0];
+          ny[i][jj][k]=nout[1];
+          nz[i][jj][k]=nout[2];
+        }
+      }
+
+      /* k-min plane */
+      if(sca.bc().direction(b)==Dir::kmin()) {
+        for_vijk( sca.bc().at(b), i,j,k ){
+          int kk=sk();
+          /* unit normal vector directed into the wall */
+          nwlx = 0.0;
+          nwly = 0.0;
+          nwlz =-1.0;
+          nwall(sca,nwlx,nwly,nwlz,i,j,kk,nout);
+          nx[i][j][kk]=nout[0];
+          ny[i][j][kk]=nout[1];
+          nz[i][j][kk]=nout[2];
+        }
+      }
+
+      /* k-max plane */
+      if(sca.bc().direction(b)==Dir::kmax()) {
+        for_vijk( sca.bc().at(b), i,j,k ){
+          int kk=ek()+1;
+          /* unit normal vector directed into the wall */
+          nwlx = 0.0;
+          nwly = 0.0;
+          nwlz = 1.0;
+          nwall(sca,nwlx,nwly,nwlz,i,j,kk,nout);
+          nx[i][j][kk]=nout[0];
+          ny[i][j][kk]=nout[1];
+          nz[i][j][kk]=nout[2];
+        }
+      }
+    }
+  }
+#endif
+#if 0
+  // implementation before 2026.07.26
   /* i-min plane */
   if(sca.bc().type_here(Dir::imin(), BndType::wall())) {
     int i=si();
@@ -116,6 +221,7 @@ void VOF::wall_norm(const Scalar & sca) {
       }
     }
   }
+#endif
 
   /* line i-min & j-min */
   if(sca.bc().type_here(Dir::imin(), BndType::wall()) &&
