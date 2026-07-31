@@ -475,7 +475,7 @@ void BndCnd::add(BndCnd bc) {
   } /* i || j || b */
 #endif
 
-#if 1
+#if 0
   boil::oout<<"Bnd after6:dir= "<<bc.dir<<" ir "<<bc.ir.first()<<"-"<<bc.ir.last()<<" jr "<<bc.jr.first()<<"-"<<bc.jr.last()<<" kr "<<bc.kr.first()<<"-"<<bc.kr.last()<<"\n";
   //" || "<<cxg.first()<<" "<<cxg.last()<<" | "<<czg.first()<<" "<<czg.last()<<boil::endl;
 #endif
