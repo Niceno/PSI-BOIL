@@ -1,6 +1,6 @@
 #include "matter.h"
 
-#define MIX_VISC 0    // 0 = linear; 1 = harmonic; 2 = prosperetti
+#define MIX_VISC 1    // 0 = linear; 1 = harmonic; 2 = prosperetti
 #define MIX_LAMBDA 1  // 0 = linear; 1 = harmonic
 
 /*============================================================================*/
@@ -97,8 +97,6 @@ Matter::Matter(const Matter & a,
   assert(b.dens_o_visc != NULL);
   dens_o_visc = new PropertyMix(a.dens_o_visc,b.dens_o_visc,ca,cda,cdb);
   visc = new PropertyDiv(dens,dens_o_visc);
-<<<<<<< HEAD
-=======
 #endif
 #if MIX_LAMBDA == 0
   cond = new PropertyMix(a.cond, b.cond, ca, cda, cdb);
