@@ -205,12 +205,13 @@ int main(int argc, char * argv[]) {
     if(i==1+boil::BW&&(c.xc(boil::BW)<2.*c.dxc(boil::BW))) {
       tpr[i][j][k] = Tsat;
     } else if(i==boil::BW&&(c.xc(boil::BW)<2.*c.dxc(boil::BW))) {
-      tpr[i][j][k] = c.xc(i)/(1.01*c.dxc(i)); /* approximately one cell and linear profile */
+      tpr[i][j][k] = Twall - (Twall-Tsat)*c.xc(i)/(1.01*c.dxc(i)); /* approximately one cell and linear profile */
     } else {
-      tpr[i][j][k] = c[i][j][k]*Tsat
-                   + (1.0-c[i][j][k])*Twall;
+      tpr[i][j][k] = c[i][j][k]*Tsat + (1.0-c[i][j][k])*Twall;
     }
   }
+  tpr.bnd_update();
+  tpr.exchange();
 
   for_avijk(c,i,j,k){
     step[i][j][k]=c[i][j][k];
@@ -246,7 +247,7 @@ int main(int argc, char * argv[]) {
   EnthalpyFD enthFD(tpr, q, uvw, uvw_1, uvw_2, time, solver, &mixed, cht);
   enthFD.convection_set(TimeScheme::forward_euler());
   enthFD.diffusion_set(TimeScheme::backward_euler());
-  enthFD.set_no_solid_acceleration(false);
+  //enthFD.set_no_solid_acceleration(false);
   enthFD.set_flux_accuracy_order(AccuracyOrder::First());
   PhaseChange4 pc(mdot, mflx, q, g , f , uvw, cht,
                   time, &mixed);
@@ -308,8 +309,6 @@ int main(int argc, char * argv[]) {
     press += p;
     press.exchange();
 
-    //exit(0);
-
     /*---------------------------+
     |  solve transport equation  |
     +---------------------------*/
@@ -329,7 +328,7 @@ int main(int argc, char * argv[]) {
     }
 
 #ifndef USE_VOF
-    pc.modify_vel(uvw,c,cold);
+    //pc.modify_vel(uvw,c,cold);
 #endif
 
 #if 0
